@@ -194,6 +194,12 @@ main () {
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
+            local branch=$(git rev-parse --abbrev-ref HEAD)
+            if [[ "$branch" == "HEAD" ]]; then
+                # if the branch is HEAD, then we are not on a branch, checkout master
+                git checkout master
+            fi
+
             old_ver=$(git rev-parse --short HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
@@ -221,6 +227,14 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
+                # Check for missing vendor dir
+                if [ ! -f vendor/autoload.php ]; then
+                    git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
+                    git reset HEAD vendor/  # don't add vendor directory to the index
+                fi
+
+                status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
+
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then
                     check_php_ver # check php version and switch branches

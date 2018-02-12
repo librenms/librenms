@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -36,6 +37,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Unifi extends OS implements
+    ProcessorDiscovery,
     WirelessClientsDiscovery,
     WirelessCcqDiscovery,
     WirelessCcqPolling,
@@ -44,6 +46,8 @@ class Unifi extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    use OS\Traits\FrogfootResources;
+
     private $ccqDivisor = 10;
 
     /**

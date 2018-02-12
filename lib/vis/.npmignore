@@ -1,9 +1,0 @@
-misc
-node_modules
-test
-tools
-.idea
-bower.json
-Jakefile.js
-.npmignore
-.gitignore

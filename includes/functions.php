@@ -756,7 +756,7 @@ function createHost(
 
     $device = array(
         'hostname' => $host,
-        'sysName' => $host,
+        'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
         'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
         'community' => $community,
@@ -1987,9 +1987,9 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $db_stats, $rrd_stats;
+    global $snmp_stats, $rrd_stats;
 
-    if (!isset($snmp_stats, $db_stats, $rrd_stats)) {
+    if (!isset($snmp_stats, $rrd_stats)) {
         $snmp_stats = array(
             'ops' => array(
                 'snmpget' => 0,
@@ -2001,27 +2001,6 @@ function initStats()
                 'snmpgetnext' => 0.0,
                 'snmpwalk' => 0.0,
             )
-        );
-
-        $db_stats = array(
-            'ops' => array(
-                'insert' => 0,
-                'update' => 0,
-                'delete' => 0,
-                'fetchcell' => 0,
-                'fetchcolumn' => 0,
-                'fetchrow' => 0,
-                'fetchrows' => 0,
-            ),
-            'time' => array(
-                'insert' => 0.0,
-                'update' => 0.0,
-                'delete' => 0.0,
-                'fetchcell' => 0.0,
-                'fetchcolumn' => 0.0,
-                'fetchrow' => 0.0,
-                'fetchrows' => 0.0,
-            ),
         );
 
         $rrd_stats = array(
@@ -2134,35 +2113,6 @@ function recordRrdStatistic($stat, $start_time)
     $runtime = microtime(true) - $start_time;
     $rrd_stats['ops'][$stat]++;
     $rrd_stats['time'][$stat] += $runtime;
-
-    return $runtime;
-}
-
-/**
- * Update statistics for db operations
- *
- * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
- */
-function recordDbStatistic($stat, $start_time)
-{
-    global $db_stats;
-    initStats();
-
-    $runtime = microtime(true) - $start_time;
-    $db_stats['ops'][$stat]++;
-    $db_stats['time'][$stat] += $runtime;
-
-    //double accounting corrections
-    if ($stat == 'fetchcolumn') {
-        $db_stats['ops']['fetchrows']--;
-        $db_stats['time']['fetchrows'] -= $runtime;
-    }
-    if ($stat == 'fetchcell') {
-        $db_stats['ops']['fetchrow']--;
-        $db_stats['time']['fetchrow'] -= $runtime;
-    }
 
     return $runtime;
 }

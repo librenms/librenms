@@ -1,0 +1,2026 @@
+-- ******************************************************************************
+-- HILLSTONE-STATISTICS-MIB 
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks STATISTICS MIB Object Identifier Assignments
+-- ******************************************************************************
+--
+
+HILLSTONE-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneStatistics
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;	
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+-- System Statistics data
+
+hillstoneSystemStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 1 }
+
+onlineUserNum OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSystemStatistics 1 }
+
+
+-- IPSec Statistics data 
+hillstoneIPSecStatistic OBJECT IDENTIFIER ::= { hillstoneStatistics 2 }
+
+hillstoneIPSecGlobalActiveTunnels OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of currently active  IPSec Phase-2 Tunnels."
+	::= { hillstoneIPSecStatistic 1 }
+
+hillstoneIPSecGlobalActiveSas OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of currently active or expiring IPSec Phase-2 SA."
+	::= { hillstoneIPSecStatistic 2 }
+
+hillstoneIPSecStatisticTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneIPSecStatisticEntry   
+	MAX-ACCESS not-accessible      
+	STATUS current      
+	DESCRIPTION         
+		"The table of the ipsec tunnel flow statistics"
+        ::= { hillstoneIPSecStatistic 3 }
+
+HillstoneIPSecStatisticEntry OBJECT-TYPE
+	SYNTAX HillstoneIPSecStatisticEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The entry is used in ip address informatioin of this dns server"
+	INDEX { hillstoneIPsecTunnelID }
+	::= { hillstoneIPSecStatisticTable 1 } 
+
+
+HillstoneIPSecStatisticEntry ::=
+      SEQUENCE{
+          hillstoneIPsecTunnelID
+	      Counter,
+	  hillstoneIPSecInOctets
+	      Counter64,
+	  hillstoneIPSecInDecompOctets
+	      Counter64,
+	  hillstoneIPSecInPkts
+	      Counter64,
+	  hillstoneIPSecInDrops
+	      Counter64,
+	  hillstoneIPSecInReplayDrops
+	      Counter32,
+	  hillstoneIPSecInAuthFails
+	      Counter32,
+	  hillstoneIPSecInDecryptFails
+	      Counter32,
+	  hillstoneIPSecOutOctets
+	      Counter64,
+	  hillstoneIPSecOutUncompOctets
+	      Counter64,
+	  hillstoneIPSecOutPkts
+	      Counter64,
+	  hillstoneIPSecOutDrops
+	      Counter64,
+	  hillstoneIPSecOutEncryptFails
+	      Counter32,
+	  hillstoneIPSecNoMemoryDropPkts
+	      Counter32,
+	  hillstoneIPSecNoFindSaDropPkts
+	      Counter32,
+	  hillstoneIPSecQueueFullDropPkts
+	      Counter32,
+	  hillstoneIPSecInvalidLenDropPkts
+	      Counter32,
+	  hillstoneIPSecTooLongDropPkts
+	      Counter32,
+	  hillstoneIPSecInvalidSaDropPkts
+	      Counter32
+      }
+
+hillstoneIPsecTunnelID OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IPSec tunnel ID"
+	::= { HillstoneIPSecStatisticEntry 1 }
+
+hillstoneIPSecInOctets OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of octets received by all current and previous
+		 IPSec Phase-2 Tunnels. This value is accumulated BEFORE determining 
+		 whether or not the packet should be decompressed."
+	::= { HillstoneIPSecStatisticEntry 2 }
+
+hillstoneIPSecInDecompOctets OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of decompressed octets received by all current
+		 and previous IPSec Phase-2 Tunnels. This value is accumulated 
+		 AFTER the packet is decompressed."
+	::= { HillstoneIPSecStatisticEntry 3 }
+
+hillstoneIPSecInPkts OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets received by all current and 
+		 previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 4 }
+
+hillstoneIPSecInDrops OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped during receiving
+		 process by all current and previous IPSec Phase-2 
+		 Tunnels. "
+	::= { HillstoneIPSecStatisticEntry 5 }
+
+hillstoneIPSecInReplayDrops OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped during receiving
+		 process due to Anti-Replay process by all 
+		 current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 6 } 
+
+hillstoneIPSecInAuthFails OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of inbound authentication's which ended
+		 in failure by all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 7 }
+						
+hillstoneIPSecInDecryptFails OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of inbound decryption's which ended in
+		 failure by all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 8 }
+
+hillstoneIPSecOutOctets OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of octets sent by all current and previous 
+		 IPSec Phase-2 Tunnels. This value is accumulated AFTER 
+		 determining whether or not the packet should be compressed."
+	::= { HillstoneIPSecStatisticEntry 9 }
+
+hillstoneIPSecOutUncompOctets OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of uncompressed octets sent by all current
+		 and previous IPSec Phase-2 Tunnels. This value is accumulated 
+		 BEFORE the packet is compressed."
+	::= { HillstoneIPSecStatisticEntry 10 }
+
+hillstoneIPSecOutPkts OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets sent by all current and previous
+		 IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 11 }
+
+hillstoneIPSecOutDrops OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped during sending process
+		 by all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 12 }
+
+hillstoneIPSecOutEncryptFails OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of outbound encryption's which ended in failure
+		 by all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 13 }
+
+hillstoneIPSecNoMemoryDropPkts OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped due to no enough memory
+		 by all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 14 }
+
+hillstoneIPSecNoFindSaDropPkts OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped due to not find SA by 
+		 all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 15 }
+
+hillstoneIPSecQueueFullDropPkts OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped due to queue full by 
+		 all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 16 }
+	
+hillstoneIPSecInvalidLenDropPkts OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped due to invalid packet
+		length by all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 17 }
+
+hillstoneIPSecTooLongDropPkts OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped due to too long packet by 
+		 all current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 18 }
+
+hillstoneIPSecInvalidSaDropPkts OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The total number of packets dropped due to invalid SA by all
+		 current and previous IPSec Phase-2 Tunnels."
+	::= { HillstoneIPSecStatisticEntry 19 }
+
+
+	
+-- IPS Statistics data     
+hillstoneIpsEventStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 3 }
+
+hillstoneEventHttpAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The http attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 1 }
+	
+hillstoneEventFtpAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The ftp attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 2 }           
+
+hillstoneEventSmtpAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The Smtp attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 3 }
+	
+hillstoneEventDnsAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The dns attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 4 }
+	
+hillstoneEventNetbiosAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The Netbios attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 5 }   
+	
+hillstoneEventPop3Atk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The pop3 attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 6 }
+	
+hillstoneEventSipAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The sip attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 7 }
+
+hillstoneEventH323Atk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The h323 attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 8 }
+	
+hillstoneEventImapAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The imap attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 9 }
+	
+hillstoneEventP2PAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The P2P attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 10 }      
+	
+hillstoneEventImAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The IM attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 11 }
+	 
+hillstoneEventSQLAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The SQL inspection attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 12 }  
+	
+hillstoneEventIPSOthersAtk  OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The others attack occurs during the last statistcs period."
+	::= { hillstoneIpsEventStatistics 13 }  
+
+
+
+hillstoneIpsFlowStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 4 }
+
+hillstonePktsHttpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The http attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 1 }
+    
+hillstonePktsFtpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The ftp attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 2 }           
+
+hillstonePktsSmtpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Smtp attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 3 }
+    
+hillstonePktsDnsAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The dns attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 4 }
+    
+hillstonePktsNetbiosAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Netbios attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 5 }   
+    
+hillstonePktsPop3Atk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The pop3 attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 6 }
+    
+hillstonePktsSipAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The sip attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 7 }
+
+hillstonePktsH323Atk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The h323 attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 8 }
+    
+hillstonePktsImapAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The imap attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 9 }
+    
+hillstonePktsP2PAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The P2P attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 10 }      
+    
+hillstonePktsImAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The IM attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 11 }
+	 
+hillstonePktsSQLAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The SQL inspection attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 12 }    
+    
+hillstonePktsIPSOthersAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Others attack packets occurs during the last statistcs period."
+    ::= { hillstoneIpsFlowStatistics 13 } 
+
+
+
+hillstoneAtkEventStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 5 }
+	
+
+hillstoneEventIpSpoof  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The total number of ip spoof attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 1 }
+    
+hillstoneEventLandAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of land attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 2 }           
+
+hillstoneEventSmurfAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of smurf attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 3 }
+    
+hillstoneEventFraggleAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of fraggle attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 4 }
+    
+hillstoneEventWinnuke  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Winnuke attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 5 }   
+    
+hillstoneEventDnsFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of DNS flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 6 }
+    
+hillstoneEventTcpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of TCP flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 7 }
+
+hillstoneEventSynFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of syn flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 8 }
+    
+hillstoneEventUdpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of udp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 9 }
+    
+hillstoneEventIcmpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 10 }      
+    
+hillstoneEventRedirect  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp Redirect attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 11 }
+	 
+hillstoneEventUnreacheableAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp Unreacheable attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 12 }    
+    
+ hillstoneEventIpSweep  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp Ip sweep attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 13 }     
+				    
+ hillstoneEventPortScan  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Port scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 14 }  
+			  
+ hillstoneEventIpOptAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ip Options attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 15 }
+	       
+ hillstoneEventIpOptSrcRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ip option source route attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 16 }
+		       
+ hillstoneEventIpOptRoutRecord  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ip options route record attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 17 }
+		 
+ hillstoneEventTraceRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of trace route attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 18 }
+	      
+ hillstoneEventTimeStampAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Time stamp attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 19 }
+    
+ hillstoneEventPingOfDeathAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ping of death attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 20 }
+    
+  hillstoneEventTearDropAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Tear drop attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 21 }
+    
+  hillstoneEventTcpFlagAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Tcp flag attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 22 }
+    
+  hillstoneEventIpFragAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of IP Fragment attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 23 }
+    
+  hillstoneEventLargeIcmpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Large ICMP attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 24 }
+    
+  hillstoneEventSweepAndScanAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Both ip-sweep and port-scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 25 }
+    
+  hillstoneEventHalfConnAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Too much Half Con of SYN Flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 26 }
+    
+  hillstoneEventFtpBounceAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ftp Bounce attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 27 }
+
+hillstoneEventSynProxyAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynProxy attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 28 }
+
+hillstoneEventSynCookieAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynCookie attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 29 }
+
+hillstoneEventTCPAnomalyAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of TCPAnomaly attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 30 }
+
+hillstoneEventIPDirectedAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of IPDirected attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 31 }
+
+
+ hillstoneEventAtkOthersAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Others attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatistics 32 }
+
+hillstoneAtkFlowStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 6 }
+
+
+hillstonePktsIpSpoof  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of ip spoof attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 1 }
+    
+hillstonePktsLandAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of land attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 2 }           
+
+hillstonePktsSmurfAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of smurf attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 3 }
+    
+hillstonePktsFraggleAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of fraggle attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 4 }
+    
+hillstonePktsWinnuke  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Winnuke attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 5 }   
+    
+hillstonePktsDnsFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of DNS flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 6 }
+    
+hillstonePktsTcpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of TCP flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 7 }
+
+hillstonePktsSynFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of syn flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 8 }
+    
+hillstonePktsUdpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of udp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 9 }
+    
+hillstonePktsIcmpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 10 }      
+    
+hillstonePktsRedirect  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp Redirect attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 11 }
+	 
+hillstonePktsUnreacheableAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp Unreacheable attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 12 }    
+    
+ hillstonePktsIpSweep  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp Ip sweep attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 13 }     
+				    
+ hillstonePktsPortScan  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Port scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 14 }  
+			  
+ hillstonePktsIpOptAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ip Options attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 15 }
+	       
+ hillstonePktsIpOptSrcRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ip option source route attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 16 }
+		       
+ hillstonePktsIpOptRoutRecord  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ip options route record attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 17 }
+		 
+ hillstonePktsTraceRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of trace route attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 18 }
+	      
+ hillstonePktsTimeStampAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Time stamp attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 19 }
+    
+ hillstonePktsPingOfDeathAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ping of death attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 20 }
+    
+  hillstonePktsTearDropAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Tear drop attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 21 }
+    
+  hillstonePktsTcpFlagAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Tcp flag attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 22 }
+    
+  hillstonePktsIpFragAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of IP Fragment attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 23 }
+    
+  hillstonePktsLargeIcmpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Large ICMP attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 24 }
+    
+  hillstonePktsSweepAndScanAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Both ip-sweep and port-scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 25 }
+    
+  hillstonePktsHalfConnAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Too much Half Con of SYN Flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 26 }
+    
+  hillstonePktsFtpBounceAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ftp Bounce attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 27 }     
+    
+  hillstonePktsAtkOthersAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of others attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 28 }    
+
+hillstonePktsSynProxyAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynProxy attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 29 }
+
+hillstonePktsSynCookieAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynCookie attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 30 }
+
+hillstonePktsTCPAnomalyAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of TCPAnomaly attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 31 }
+
+hillstonPktsIPDirectedAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of IPDirected attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatistics 32 }
+
+
+
+hillstoneAVEventStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 7 }
+    
+hillstoneEventAVHttpClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The http protcol's virus which cleared by AV module during the last statistcs period."
+    ::= { hillstoneAVEventStatistics 1 }
+    
+hillstoneEventAVFtpClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The ftp protcol's virus which cleared by AV module during the last statistcs period."
+    ::= { hillstoneAVEventStatistics 2 } 
+					   
+hillstoneEventAVSmtpClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The smtp protcol's virus which cleared by AV module during the last statistcs period."
+    ::= { hillstoneAVEventStatistics 3 }     
+					   
+hillstoneEventAVPopClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The pop3 protcol's virus which cleared by AV module during the last statistcs period."
+    ::= { hillstoneAVEventStatistics 4 }   
+
+hillstoneEventAVImapClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The IMAP which cleared by AV module during the last statistcs period."
+    ::= { hillstoneAVEventStatistics 5 } 
+
+-- hillstoneEventAVTrojanClear  OBJECT-TYPE
+--    SYNTAX Counter64
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--    "The Trojan horse virus which cleared by AV module during the last statistcs period."
+--    ::= { hillstoneAVEventStatistics 5 }   
+
+-- hillstoneEventAVHackerClear  OBJECT-TYPE
+--    SYNTAX Counter64
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--    "The hacker which cleared by AV module during the last statistcs period."
+--    ::= { hillstoneAVEventStatistics 6 }   
+
+-- hillstoneEventAVWormClear  OBJECT-TYPE
+--    SYNTAX Counter64
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--    "The Worm which cleared by AV module during the last statistcs period."
+--    ::= { hillstoneAVEventStatistics 7 }   
+
+
+--content filter statistica
+hillstoneContentFltStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 8 }
+
+hillstoneUrlFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The url filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 1 }
+
+hillstoneActiveXFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The activeX filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 2 }
+
+hillstoneAppletFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The applet filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 2 }
+
+hillstoneQQFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The QQ filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 3 }
+
+hillstoneMSNFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The MSN filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 4 }
+
+hillstoneOtherIMFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The IM(except QQ and MSN) filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 5 }
+
+hillstoneP2PFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The P2P filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 6 }
+
+hillstoneWebPostFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The web post filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 7 }
+
+hillstoneNetGameFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Net Game filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 8 }
+
+hillstoneStockFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Stock filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 9 }
+
+hillstoneStreamingMediaFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Streaming Media filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 10 }
+
+hillstoneOtherFlt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The other filter which block by content filter module during the last statistcs period.."
+    ::= { hillstoneContentFltStatistics 11 }
+
+
+
+hillstoneMailFltStatistics OBJECT IDENTIFIER ::= { hillstoneStatistics 9 }
+
+hillstoneMFSmtpClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The smtp rubbish mail which block by Spam module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 1 }
+    
+hillstoneMFPopClear  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The pop3 rubbish mail which block by Spam module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 2 }          
+
+hillstoneMFByTitle  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The title based Spam which block by this module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 3 }             
+
+hillstoneMFBySender  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The title based Spam which block by this module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 4 }     
+    
+hillstoneMFByReceiver  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The receiver based Spam which block by this module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 5 }  
+    
+hillstoneMFByCopyTo  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The copyto based Spam which block by this module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 6 } 
+    
+hillstoneMFByContext  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The Context based Spam which block by this module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 7 }  
+    
+hillstoneMFByKeyWord  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The KeyWord based Spam which block by this module during the last statistcs period.."
+    ::= { hillstoneMailFltStatistics 8 }    
+
+hillstoneAtkEventStatisticsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF hillstoneAtkEventStatisticsEntry   
+	MAX-ACCESS not-accessible      
+	STATUS current      
+	DESCRIPTION         
+		"The table of the ad statistics"
+        ::= { hillstoneStatistics 10 }
+
+hillstoneAtkEventStatisticsEntry OBJECT-TYPE
+	SYNTAX hillstoneAtkEventStatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The entry is used in ad event"
+	INDEX { hillstoneAtkEventZoneIdx }
+	::= { hillstoneAtkEventStatisticsTable 1 } 
+
+hillstoneAtkEventStatisticsEntry ::=
+      SEQUENCE{
+	  hillstoneAtkEventZoneIdx
+		Counter,
+	  hillstoneAtkEventZoneName
+		OCTET STRING,
+      hillstoneAtkEventIpSpoof
+		Counter64,
+	  hillstoneAtkEventLandAtk
+		Counter64,
+	  hillstoneAtkEventSmurfAtk
+		Counter64,
+	  hillstoneAtkEventFraggleAtk
+		Counter64,
+      hillstoneAtkEventWinnuke
+		Counter64,
+	  hillstoneAtkEventDnsFlood
+		Counter64,
+	  hillstoneAtkEventTcpFlood
+		Counter64,
+	  hillstoneAtkEventSynSourceFlood
+		Counter64,
+	  hillstoneAtkEventSynDestFlood
+		Counter64,
+	  hillstoneAtkEventUdpFlood
+		Counter64,
+	  hillstoneAtkEventIcmpFlood
+		Counter64,
+ 	  hillstoneAtkEventRedirect
+		Counter64,
+	  hillstoneAtkEventUnreacheableAtk
+		Counter64,
+	  hillstoneAtkEventIpSweep
+		Counter64,
+	  hillstoneAtkEventPortScan
+		Counter64,
+	  hillstoneAtkEventIpOptAtk
+		Counter64,		       
+ 	  hillstoneAtkEventIpOptSrcRoutAtk
+		Counter64,		       
+ 	  hillstoneAtkEventIpOptRoutRecord
+		Counter64,		 
+ 	  hillstoneAtkEventTraceRoutAtk
+		Counter64,	      
+      hillstoneAtkEventTimeStampAtk  
+		Counter64,  
+ 	  hillstoneAtkEventPingOfDeathAtk 
+		Counter64,
+      hillstoneAtkEventTearDropAtk 
+		Counter64,   
+  	  hillstoneAtkEventTcpFlagAtk
+ 	       Counter64,  
+  	  hillstoneAtkEventIpFragAtk
+		Counter64,
+      hillstoneAtkEventLargeIcmpAtk  
+		Counter64,	  
+	  hillstoneAtkEventSweepAndScanAtk  
+		Counter64,  
+      hillstoneAtkEventHalfConnAtk
+		Counter64,    
+      hillstoneAtkEventFtpBounceAtk
+		Counter64,
+      hillstoneAtkEventSynProxyAtk
+		Counter64,
+	  hillstoneAtkEventSynCookieAtk
+		Counter64,
+	  hillstoneAtkEventTCPAnomalyAtk
+		Counter64, 
+	  hillstoneAtkEventIPDirectedAtk
+		Counter64,
+	  hillstoneAtkEventAtkOthersAtk 
+		Counter64
+ 	 }
+	
+hillstoneAtkEventZoneIdx OBJECT-TYPE
+	SYNTAX Counter 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "
+	    An internal number to distinguish security zone.
+	    Different zone has different number.
+	    "
+::= { hillstoneAtkEventStatisticsEntry 1 }
+
+hillstoneAtkEventZoneName OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (1..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "
+	    The name of security zone.
+	    Different zone has different name."
+::= { hillstoneAtkEventStatisticsEntry 2 }
+
+hillstoneAtkEventIpSpoof  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The total number of ip spoof attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 3 }
+    
+hillstoneAtkEventLandAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of land attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 4 }           
+
+hillstoneAtkEventSmurfAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of smurf attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 5 }
+    
+hillstoneAtkEventFraggleAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of fraggle attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 6 }
+    
+hillstoneAtkEventWinnuke  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Winnuke attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 7 }   
+    
+hillstoneAtkEventDnsFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of DNS flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 8 }
+    
+hillstoneAtkEventTcpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of TCP flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 9 }
+
+hillstoneAtkEventSynSourceFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of syn flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 10 }
+
+hillstoneAtkEventSynDestFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of syn flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 11 }
+
+    
+hillstoneAtkEventUdpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of udp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 12 }
+    
+hillstoneAtkEventIcmpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 13 }      
+    
+hillstoneAtkEventRedirect  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp Redirect attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 14 }
+	 
+hillstoneAtkEventUnreacheableAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp Unreacheable attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 15 }    
+    
+ hillstoneAtkEventIpSweep  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of icmp Ip sweep attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 16 }     
+				    
+ hillstoneAtkEventPortScan  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Port scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 17 }  
+			  
+ hillstoneAtkEventIpOptAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ip Options attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 18 }
+	       
+ hillstoneAtkEventIpOptSrcRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ip option source route attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 19 }
+		       
+ hillstoneAtkEventIpOptRoutRecord  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ip options route record attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 20 }
+		 
+ hillstoneAtkEventTraceRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of trace route attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 21 }
+	      
+ hillstoneAtkEventTimeStampAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Time stamp attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 22 }
+    
+ hillstoneAtkEventPingOfDeathAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ping of death attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 23 }
+    
+  hillstoneAtkEventTearDropAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Tear drop attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 24 }
+    
+  hillstoneAtkEventTcpFlagAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Tcp flag attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 25 }
+    
+  hillstoneAtkEventIpFragAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of IP Fragment attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 26 }
+    
+  hillstoneAtkEventLargeIcmpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Large ICMP attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 27 }
+    
+  hillstoneAtkEventSweepAndScanAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Both ip-sweep and port-scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 28 }
+    
+  hillstoneAtkEventHalfConnAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Too much Half Con of SYN Flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 29 }
+    
+  hillstoneAtkEventFtpBounceAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Ftp Bounce attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 30 }
+
+hillstoneAtkEventSynProxyAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynProxy attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 31 }
+
+hillstoneAtkEventSynCookieAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynCookie attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 32 }
+
+hillstoneAtkEventTCPAnomalyAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of TCPAnomaly attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 33 }
+
+hillstoneAtkEventIPDirectedAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of IPDirected attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 34 }
+
+ hillstoneAtkEventAtkOthersAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of Others attack occurs during last statistcs period."
+    ::= { hillstoneAtkEventStatisticsEntry 35 }
+
+hillstoneAtkFlowStatisticsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF hillstoneAtkFlowStatisticsEntry   
+	MAX-ACCESS not-accessible      
+	STATUS current      
+	DESCRIPTION         
+		"The table of the ad  flow statistics"
+        ::= { hillstoneStatistics 11 }
+
+hillstoneAtkFlowStatisticsEntry OBJECT-TYPE
+	SYNTAX hillstoneAtkFlowStatisticsEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The entry is used in ad flow"
+	INDEX { hillstoneFlowPktsZoneIdx }
+	::= { hillstoneAtkFlowStatisticsTable 1 } 
+
+hillstoneAtkFlowStatisticsEntry ::=
+      SEQUENCE{
+	  hillstoneFlowPktsZoneIdx
+		Counter,
+	  hillstoneFlowPktsZoneName
+		OCTET STRING,
+      hillstoneFlowPktsIpSpoof  
+		Counter64,
+	  hillstoneFlowPktsLandAtk  
+		Counter64,
+	  hillstoneFlowPktsSmurfAtk  
+		Counter64,
+	  hillstoneFlowPktsFraggleAtk  
+		Counter64,
+      hillstoneFlowPktsWinnuke  
+		Counter64,
+	  hillstoneFlowPktsDnsFlood  
+		Counter64,
+	  hillstoneFlowPktsTcpFlood  
+		Counter64,
+	  hillstoneFlowPktsSynSourceFlood  
+		Counter64,
+	  hillstoneFlowPktsSynDestFlood  
+		Counter64,
+	  hillstoneFlowPktsUdpFlood  
+		Counter64,
+	  hillstoneFlowPktsIcmpFlood  
+		Counter64,
+ 	  hillstoneFlowPktsRedirect  
+		Counter64,
+	  hillstoneFlowPktsUnreacheableAtk  
+		Counter64,
+	  hillstoneFlowPktsIpSweep  
+		Counter64,
+	  hillstoneFlowPktsPortScan  
+		Counter64,
+	  hillstoneFlowPktsIpOptAtk 
+		Counter64,		       
+ 	  hillstoneFlowPktsIpOptSrcRoutAtk  
+		Counter64,		       
+ 	  hillstoneFlowPktsIpOptRoutRecord 
+		Counter64,		 
+ 	  hillstoneFlowPktsTraceRoutAtk
+		Counter64,	      
+      hillstoneFlowPktsTimeStampAtk 
+		Counter64,  
+ 	  hillstoneFlowPktsPingOfDeathAtk 
+		Counter64,
+      hillstoneFlowPktsTearDropAtk  
+		Counter64,   
+  	  hillstoneFlowPktsTcpFlagAtk 
+ 	    Counter64,  
+  	  hillstoneFlowPktsIpFragAtk  
+		Counter64,
+      hillstoneFlowPktsLargeIcmpAtk  
+		Counter64,	  
+	  hillstoneFlowPktsSweepAndScanAtk 
+		Counter64,  
+      hillstoneFlowPktsHalfConnAtk 
+		Counter64,    
+      hillstoneFlowPktsFtpBounceAtk 
+		Counter64,
+      hillstoneFlowPktsSynProxyAtk   
+		Counter64,
+	  hillstoneFlowPktsSynCookieAtk   
+		Counter64,
+	  hillstoneFlowPktsTCPAnomalyAtk   
+		Counter64, 
+	  hillstonFlowPktsIPDirectedAtk   
+		Counter64,
+	  hillstoneFlowPktsAtkOthersAtk  
+		Counter64
+ 	 }
+	
+hillstoneFlowPktsZoneIdx OBJECT-TYPE
+	SYNTAX Counter 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "
+	    An internal number to distinguish security zone.
+	    Different zone has different number.
+	    "
+::= { hillstoneAtkFlowStatisticsEntry 1 }
+
+hillstoneFlowPktsZoneName OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (1..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "
+	    The name of security zone.
+	    Different zone has different name."
+::= { hillstoneAtkFlowStatisticsEntry 2 }
+
+
+hillstoneFlowPktsIpSpoof  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of ip spoof attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 3 }
+    
+hillstoneFlowPktsLandAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of land attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 4 }           
+
+hillstoneFlowPktsSmurfAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of smurf attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 5 }
+    
+hillstoneFlowPktsFraggleAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of fraggle attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 6 }
+    
+hillstoneFlowPktsWinnuke  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Winnuke attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 7 }   
+    
+hillstoneFlowPktsDnsFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of DNS flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 8 }
+    
+hillstoneFlowPktsTcpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of TCP flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 9 }
+
+hillstoneFlowPktsSynSourceFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of syn flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 10 }
+
+hillstoneFlowPktsSynDestFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of syn flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 11 }
+
+    
+hillstoneFlowPktsUdpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of udp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 12 }
+    
+hillstoneFlowPktsIcmpFlood  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 13 }      
+    
+hillstoneFlowPktsRedirect  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp Redirect attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 14 }
+	 
+hillstoneFlowPktsUnreacheableAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp Unreacheable attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 15 }    
+    
+ hillstoneFlowPktsIpSweep  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of icmp Ip sweep attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 16 }     
+				    
+ hillstoneFlowPktsPortScan  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Port scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 17 }  
+			  
+ hillstoneFlowPktsIpOptAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ip Options attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 18 }
+	       
+ hillstoneFlowPktsIpOptSrcRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ip option source route attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 19 }
+		       
+ hillstoneFlowPktsIpOptRoutRecord  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ip options route record attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 20 }
+		 
+ hillstoneFlowPktsTraceRoutAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of trace route attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 21 }
+	      
+ hillstoneFlowPktsTimeStampAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Time stamp attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 22 }
+    
+ hillstoneFlowPktsPingOfDeathAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ping of death attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 23 }
+    
+  hillstoneFlowPktsTearDropAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Tear drop attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 24 }
+    
+  hillstoneFlowPktsTcpFlagAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Tcp flag attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 25 }
+    
+  hillstoneFlowPktsIpFragAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of IP Fragment attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 26 }
+    
+  hillstoneFlowPktsLargeIcmpAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Large ICMP attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 27 }
+    
+  hillstoneFlowPktsSweepAndScanAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Both ip-sweep and port-scan attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 28 }
+    
+  hillstoneFlowPktsHalfConnAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Too much Half Con of SYN Flood attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 29 }
+    
+  hillstoneFlowPktsFtpBounceAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of Ftp Bounce attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 30 }     
+    
+  hillstoneFlowPktsAtkOthersAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total packets of others attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 31 }    
+
+hillstoneFlowPktsSynProxyAtk  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynProxy attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 32 }
+
+hillstoneFlowPktsSynCookieAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of SynCookie attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 33 }
+
+hillstoneFlowPktsTCPAnomalyAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of TCPAnomaly attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 34 }
+
+hillstonFlowPktsIPDirectedAtk   OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The total number of IPDirected attack occurs during last statistcs period."
+    ::= { hillstoneAtkFlowStatisticsEntry 35 }
+
+END
+

@@ -624,3 +624,54 @@ function dbGenPlaceholders($count)
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
 }
+
+/**
+ * Update statistics for db operations
+ *
+ * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordDbStatistic($stat, $start_time)
+{
+    global $db_stats;
+
+    if (!isset($db_stats)) {
+        $db_stats = array(
+            'ops' => array(
+                'insert' => 0,
+                'update' => 0,
+                'delete' => 0,
+                'fetchcell' => 0,
+                'fetchcolumn' => 0,
+                'fetchrow' => 0,
+                'fetchrows' => 0,
+            ),
+            'time' => array(
+                'insert' => 0.0,
+                'update' => 0.0,
+                'delete' => 0.0,
+                'fetchcell' => 0.0,
+                'fetchcolumn' => 0.0,
+                'fetchrow' => 0.0,
+                'fetchrows' => 0.0,
+            ),
+        );
+    }
+
+    $runtime = microtime(true) - $start_time;
+    $db_stats['ops'][$stat]++;
+    $db_stats['time'][$stat] += $runtime;
+
+    //double accounting corrections
+    if ($stat == 'fetchcolumn') {
+        $db_stats['ops']['fetchrows']--;
+        $db_stats['time']['fetchrows'] -= $runtime;
+    }
+    if ($stat == 'fetchcell') {
+        $db_stats['ops']['fetchrow']--;
+        $db_stats['time']['fetchrow'] -= $runtime;
+    }
+
+    return $runtime;
+}

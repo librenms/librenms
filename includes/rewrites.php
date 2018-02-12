@@ -414,6 +414,8 @@ function rewrite_extreme_hardware($hardware)
         '.1.3.6.1.4.1.1916.2.141' => 'Summit x480-48x',
         '.1.3.6.1.4.1.1916.2.167' => 'Summit x670-48x',
         '.1.3.6.1.4.1.1916.2.168' => 'Summit x670v-48x',
+        '.1.3.6.1.4.1.1916.2.118' => 'Summit X650-24x(SSns)',
+        '.1.3.6.1.4.1.1916.2.139' => 'Summit X480-24x(10G4X)',
     );
 
     // $hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
@@ -956,6 +958,7 @@ function rewrite_junos_hardware($hardware)
         'jnxProductNameMX80'           => 'MX80',
         'jnxProductName'               => '',
         'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
+        'jnxProductQFX511048S4Q'       => 'QFX5110-48S4Q',
     );
 
 
@@ -1310,6 +1313,9 @@ function rewrite_brocade_fc_switches($descr)
             break;
         case "148":
             $hardware = "Brocade 7840 Switch";
+            break;
+        case "170":
+            $hardware = "Brocade 6610 Switch";
             break;
         default:
             $hardware = "Unknown Brocade FC Switch";

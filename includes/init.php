@@ -28,8 +28,11 @@
  */
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Config;
 
 global $config;
+
+error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
 $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
@@ -39,13 +42,9 @@ require_once $install_dir . '/includes/common.php';
 
 # composer autoload
 if (!is_file($install_dir . '/vendor/autoload.php')) {
-    c_echo("%RError: Missing dependencies%n, run: %Bcomposer install --no-dev%n\n\n");
+    c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
 }
 require $install_dir . '/vendor/autoload.php';
-
-if (version_compare(PHP_VERSION, '5.4', '>=')) {
-    require_once $install_dir . '/lib/influxdb-php/vendor/autoload.php';
-}
 
 if (!function_exists('module_selected')) {
     function module_selected($module, $modules)
@@ -69,7 +68,6 @@ if (module_selected('mocksnmp', $init_modules)) {
     require_once $install_dir . '/includes/snmp.inc.php';
 }
 require_once $install_dir . '/includes/services.inc.php';
-require_once $install_dir . '/includes/mergecnf.inc.php';
 require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
 
@@ -92,19 +90,11 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
-// variable definitions
-require $install_dir . '/includes/cisco-entities.php';
-require $install_dir . '/includes/vmware_guestid.inc.php';
-require $install_dir . '/includes/defaults.inc.php';
-require $install_dir . '/includes/definitions.inc.php';
-
 // Display config.php errors instead of http 500
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
-include $install_dir . '/config.php';
-if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
-    ini_set('memory_limit', $config['php_memory_limit'].'M');
-}
+Config::load($install_dir);
+// set display_errors back
 ini_set('display_errors', $display_bak);
 
 if (!module_selected('nodb', $init_modules)) {
@@ -124,6 +114,8 @@ if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
         dbConnect();
+
+        Config::loadFromDatabase();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
             echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
@@ -132,15 +124,10 @@ if (!module_selected('nodb', $init_modules)) {
         }
         exit(2);
     }
+}
 
-    // pull in the database config settings
-    mergedb();
-
-    // load graph types from the database
-    require $install_dir . '/includes/load_db_graph_types.inc.php';
-
-    // Process $config to tidy up
-    require $install_dir . '/includes/process_config.inc.php';
+if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
+    ini_set('memory_limit', $config['php_memory_limit'].'M');
 }
 
 try {
