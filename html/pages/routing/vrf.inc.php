@@ -114,9 +114,9 @@ if ($_SESSION['userlevel'] >= '5') {
         $i = '1';
         foreach (dbFetchRows('SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`') as $vrf) {
             if (($i % 2)) {
-                $bg_colour = $list_colour_a;
+                $bg_colour = $config['list_colour']['even'];
             } else {
-                $bg_colour = $list_colour_b;
+                $bg_colour = $config['list_colour']['odd'];
             }
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
@@ -128,15 +128,15 @@ if ($_SESSION['userlevel'] >= '5') {
             foreach ($vrf_devices[$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 if (($i % 2)) {
                     if (($x % 2)) {
-                        $dev_colour = $list_colour_a_a;
+                        $dev_colour = $config['list_colour']['even_alt'];
                     } else {
-                        $dev_colour = $list_colour_a_b;
+                        $dev_colour = $config['list_colour']['even_alt2'];
                     }
                 } else {
                     if (($x % 2)) {
-                        $dev_colour = $list_colour_b_b;
+                        $dev_colour = $config['list_colour']['odd_alt2'];
                     } else {
-                        $dev_colour = $list_colour_b_a;
+                        $dev_colour = $config['list_colour']['odd_alt'];
                     }
                 }
 
@@ -165,7 +165,7 @@ if ($_SESSION['userlevel'] >= '5') {
                             $port['bg']         = '#'.$bg;
                             $port['graph_type'] = 'port_'.$_GET['optc'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
-                            text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
+                            text-align: center; float: left; background-color: ".$config['list_colour']['odd_alt2'].";'>
                                 <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>';
                             print_port_thumbnail($port);
                             echo "<div style='font-size: 9px;'>".substr(short_port_descr($port['ifAlias']), 0, 22).'</div>
@@ -189,7 +189,7 @@ if ($_SESSION['userlevel'] >= '5') {
 
         echo '</table></div>';
     } else {
-        echo "<div style='background: $list_colour_a; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
+        echo "<div style='background: {$config['list_colour']['even']}; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?', array($_GET['optb']));
         echo "<tr valign=top bgcolor='$bg_colour'>";
         echo "<td width=200 class=list-large><a href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$_GET['optc']."/'>".$vrf['vrf_name'].'</a></td>';
@@ -213,15 +213,15 @@ if ($_SESSION['userlevel'] >= '5') {
             foreach (dbFetchRows('SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?', array($device['vrf_id'], $device['device_id'])) as $interface) {
                 if (($x % 2)) {
                     if (($i % 2) === 0) {
-                        $int_colour = $list_colour_a_b;
+                        $int_colour = $config['list_colour']['even_alt2'];
                     } else {
-                        $int_colour = $list_colour_a_a;
+                        $int_colour = $config['list_colour']['even_alt'];
                     }
                 } else {
                     if (($i % 2) === 0) {
-                        $int_colour = $list_colour_b_a;
+                        $int_colour = $config['list_colour']['odd_alt'];
                     } else {
-                        $int_colour = $list_colour_b_b;
+                        $int_colour = $config['list_colour']['odd_alt2'];
                     }
                 }
 
