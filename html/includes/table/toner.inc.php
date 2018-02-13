@@ -62,8 +62,8 @@ foreach (dbFetchRows($sql, $param) as $toner) {
         $graph_array_zoom['width']  = '400';
         $link       = 'graphs/id='.$graph_array['id'].'/type='.$graph_array['type'].'/from='.$graph_array['from'].'/to='.$graph_array['to'].'/';
         $mini_graph = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
-        $bar_link   = print_percentage_bar(400, 20, $perc, "$perc%", 'ffffff', $background['left'], $free, 'ffffff', $background['right']);
         $background = get_percentage_colours(100 - $perc);
+        $bar_link   = print_percentage_bar(400, 20, $perc, "$perc%", 'ffffff', $background['left'], $free, 'ffffff', $background['right']);
 
         $response[] = array(
             'hostname' => generate_device_link($toner),
