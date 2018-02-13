@@ -1,5 +1,12 @@
-mib: AT-ENVMONv2-MIB
+mib: AT-ENVMONv2-MIB:AT-SYSINFO-MIB
 modules:
+    processors:
+          data:
+              -
+                  oid: cpuUtilisationStackEntry
+                  value: cpuUtilisationStackAvgLastMinute
+                  num_oid: '.1.3.6.1.4.1.207.8.4.4.3.3.8.1.4.{{ $index }}'
+                  descr: 'Processor {{ $index }}'
     sensors:
         fanspeed:
             options:
@@ -82,12 +89,3 @@ modules:
                         - { descr: failed, graph: 0, value: 1, generic: 2 }
                         - { descr: good, graph: 0, value: 2, generic: 0 }
                         - { descr: notPowered, graph: 0, value: 3, generic: 3 }
-mib: AT-SYSINFO-MIB
-modules:
-    processors:
-          data:
-              -
-                  oid: cpuUtilisationStackEntry
-                  value: cpuUtilisationStackAvgLastMinute
-                  num_oid: '.1.3.6.1.4.1.207.8.4.4.3.3.8.1.4.{{ $index }}'
-                  descr: 'Processor {{ $index }}'
