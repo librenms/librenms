@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Jira API Transport
+ * Gitlab API Transport
  * @author  Aldemir Akpinar <aldemir.akpinar@gmail.com>
  * @copyright 2017 Aldemir Akpinar, LibreNMS
  * @license GPL
