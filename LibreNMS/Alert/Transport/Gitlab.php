@@ -36,13 +36,13 @@ class Gitlab implements Transport
 
         $device = device_by_id_cache($obj['device_id']); // for event logging
 
-	$project_host= $opts['host'];
-	$project_id  = $opts['project_id'];
-	$project_key = $opts['key'];
+        $project_host= $opts['host'];
+        $project_id  = $opts['project_id'];
+        $project_key = $opts['key'];
         $details     = "Librenms alert for: " . $obj['hostname'];
-	$description = "[DEV]".$obj['msg'];
-	$title 	     = urlencode($details);
-	$desc        = urlencode($description);
+        $description = "[DEV]".$obj['msg'];
+        $title       = urlencode($details);
+        $desc        = urlencode($description);
         $url         = $opts['host'] . "/api/v4/projects/$project_id/issues?title=$title&description=$desc";
         $curl        = curl_init();
 
