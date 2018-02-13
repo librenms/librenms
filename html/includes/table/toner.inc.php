@@ -19,6 +19,10 @@ $graph_type = 'toner_usage';
 
 $sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id';
 
+if (isset($searchPhrase) && !empty($searchPhrase)) {
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `toner_descr` LIKE '%$searchPhrase%')";
+}
+
 $count_sql = "SELECT COUNT(`toner_id`) FROM `toner`";
 $param[] = $_SESSION['user_id'];
 
