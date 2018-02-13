@@ -40,7 +40,7 @@ class Gitlab implements Transport
         $project_id  = $opts['project_id'];
         $project_key = $opts['key'];
         $details     = "Librenms alert for: " . $obj['hostname'];
-        $description = "[DEV]".$obj['msg'];
+        $description = $obj['msg'];
         $title       = urlencode($details);
         $desc        = urlencode($description);
         $url         = $opts['host'] . "/api/v4/projects/$project_id/issues?title=$title&description=$desc";
