@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2015 Aldemir Akpinar <aldemir.akpinar@gmail.com>
+/* Copyright (C) 2018 Drew Hynes <drew.hynes@gmail.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,8 +15,8 @@
 
 /**
  * Gitlab API Transport
- * @author  Aldemir Akpinar <aldemir.akpinar@gmail.com>
- * @copyright 2017 Aldemir Akpinar, LibreNMS
+ * @author Drew Hynes <drew.hynes@gmail.com>
+ * @copyright 2018 Drew Hynes, LibreNMS
  * @license GPL
  * @package LibreNMS
  * @subpackage Alerts
