@@ -37,7 +37,7 @@ $pagetitle[] = "Health :: Toner";
                 <th data-column-id="toner_descr">Toner</th>
                 <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
                 <th data-column-id="toner_used" data-searchable="false">Used</th>
-                <th data-column-id="toner_perc" data-searchable="false">Usage</th>
+                <th data-column-id="toner_current" data-searchable="false">Usage</th>
             </tr>
             </thead>
         </table>

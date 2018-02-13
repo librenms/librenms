@@ -17,7 +17,7 @@
 
 $graph_type = 'toner_usage';
 
-$sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.toner_descr';
+$sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id';
 
 $count_sql = "SELECT COUNT(`toner_id`) FROM `toner`";
 $param[] = $_SESSION['user_id'];
@@ -26,6 +26,12 @@ $count     = dbFetchCell($count_sql, $param);
 if (empty($count)) {
     $count = 0;
 }
+
+if (!isset($sort) || empty($sort)) {
+    $sort = '`D`.`hostname`, `S`.`toner_descr`';
+}
+
+$sql .= " ORDER BY $sort";
 
 if (isset($current)) {
     $limit_low  = (($current * $rowCount) - ($rowCount));
@@ -60,7 +66,7 @@ foreach (dbFetchRows($sql, $param) as $toner) {
             'toner_descr' => $toner['toner_descr'],
             'graph' => $mini_graph,
             'toner_used' => $bar_link,
-            'toner_perc' => $perc.'%',
+            'toner_current' => $perc.'%',
         );
 
         if ($vars['view'] == 'graphs') {
