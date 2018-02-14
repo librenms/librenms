@@ -876,12 +876,12 @@ $config['ipmi']['type'][] = 'imb';
 $config['ipmi']['type'][] = 'open';
 
 // Options needed for dynamic config - do NOT edit
-$config['email_backend'] = array(
+$config['email_backend_options'] = array(
     'mail',
     'sendmail',
     'smtp',
 );
-$config['email_smtp_secure'] = array(
+$config['email_smtp_secure_options'] = array(
     '',
     'tls',
     'ssl',
