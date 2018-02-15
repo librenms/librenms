@@ -34,8 +34,8 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
-        "phpunit/phpunit": "4.*",
-        "jakub-onderka/php-parallel-lint": "^0.9.2",
+        "phpunit/phpunit": "5.*",
+        "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
         "fojuth/readmegen": "1.*",
         "amenadiel/jpgraph": "^3.6"
