@@ -197,9 +197,9 @@ if ($format == "graph") {
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_integer($row / 2)) {
-            $row_colour = $list_colour_a;
+            $row_colour = $config['list_colour']['even'];
         } else {
-            $row_colour = $list_colour_b;
+            $row_colour = $config['list_colour']['odd'];
         }
 
         if (device_permitted($device['device_id'])) {

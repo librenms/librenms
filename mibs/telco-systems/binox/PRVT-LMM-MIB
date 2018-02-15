@@ -1,0 +1,426 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-LMM-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-LMM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+prvtLmmMIB MODULE-IDENTITY
+    LAST-UPDATED "201110110000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Initial version. This MIB will configure laser monitoring"
+    REVISION    "201110110000Z"
+    DESCRIPTION 
+        "Initial release"
+    ::= { switch 172 }
+
+
+prvtLmmNotifications OBJECT IDENTIFIER
+    ::= { prvtLmmMIB 0 }
+
+prvtLmmObjects OBJECT IDENTIFIER
+    ::= { prvtLmmMIB 1 }
+
+prvtLmmShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/disable laser monitoring"
+    ::= { prvtLmmObjects 1 }
+
+prvtLmmDebug OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable laser monitoring"
+    ::= { prvtLmmObjects 2 }
+
+prvtLmmPeriod OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the monitoring interval (sec)."
+    ::= { prvtLmmObjects 3 }
+
+prvtLmmTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable sending SNMP traps when thresholds are crossed"
+    ::= { prvtLmmObjects 4 }
+
+prvtLmmLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable alert notification logging when thresholds are crossed"
+    ::= { prvtLmmObjects 5 }
+
+prvtLmmLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable LED-alert notifications when thresholds are crossed"
+    ::= { prvtLmmObjects 6 }
+
+prvtLmmTemperatureHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-128..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for global temperature (-128 up to 128).
+         prvtLmmTemperatureHighThreshold must be higher than prvtLmmTemperatureLowThreshold"
+    ::= { prvtLmmObjects 7 }
+
+prvtLmmTemperatureLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-128..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for global temperature (-128 up to 128).
+         prvtLmmTemperatureHighThreshold must be higher than prvtLmmTemperatureLowThreshold"
+    ::= { prvtLmmObjects 8 }
+
+prvtLmmRxPowerLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for global RX-power (-40 up to 8)
+         prvtLmmRxPowerHighThreshold must be higher than prvtLmmRxPowerLowThreshold"
+    ::= { prvtLmmObjects 9 }
+
+prvtLmmRxPowerHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the high threshold value for global RX-power (-40 up to 8)
+         prvtLmmRxPowerHighThreshold must be higher than prvtLmmRxPowerLowThreshold"
+    ::= { prvtLmmObjects 10 }
+
+prvtLmmTxPowerLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for global RX-power (-40 up to 8)
+         prvtLmmTxPowerHighThreshold must be higher than prvtLmmTxPowerLowThreshold"
+    ::= { prvtLmmObjects 11 }
+
+prvtLmmTxPowerHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the high threshold value for global RX-power (-40 up to 8)
+         prvtLmmTxPowerHighThreshold must be higher than prvtLmmTxPowerLowThreshold"
+    ::= { prvtLmmObjects 12 }
+
+prvtLmmInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLmmInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Lmm configuration per ethernet port"
+    ::= { prvtLmmObjects 13 }
+
+prvtLmmInterfaceEntry OBJECT-TYPE
+    SYNTAX      PrvtLmmInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Stack table entry"
+    INDEX       { ifIndex }
+    ::= { prvtLmmInterfaceTable 1 }
+
+PrvtLmmInterfaceEntry ::= SEQUENCE {
+    prvtLmmInterfaceShutdown                TruthValue,
+    prvtLmmInterfaceTempLowThreshold        Integer32,
+    prvtLmmInterfaceTempHighThreshold       Integer32,
+    prvtLmmInterfaceTempValue               Integer32,
+    prvtLmmInterfaceTempThresholdLo         Integer32,
+    prvtLmmInterfaceTempThresholdHi         Integer32,
+    prvtLmmInterfaceTempTestState           TruthValue,
+    prvtLmmInterfaceRxPowerLowThreshold     Integer32,
+    prvtLmmInterfaceRxPowerHighThreshold    Integer32,
+    prvtLmmInterfaceRxPowerValue            Integer32,
+    prvtLmmInterfaceRxPowerThresholdRxLo    Integer32,
+    prvtLmmInterfaceRxPowerThresholdRxHi    Integer32,
+    prvtLmmInterfaceRxPowerTestState        TruthValue,
+    prvtLmmInterfaceTxPowerLowThreshold     Integer32,
+    prvtLmmInterfaceTxPowerHighThreshold    Integer32,
+    prvtLmmInterfaceTxPowerValue            Integer32,
+    prvtLmmInterfaceTxPowerThresholdTxLo    Integer32,
+    prvtLmmInterfaceTxPowerThresholdTxHi    Integer32,
+    prvtLmmInterfaceTxPowerTestState        TruthValue,
+    prvtLmmInterfaceOperStatus              TruthValue
+}
+
+prvtLmmInterfaceShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable laser monitoring on port"
+    ::= { prvtLmmInterfaceEntry 1 }
+
+prvtLmmInterfaceTempLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-128..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for port temperature"
+    ::= { prvtLmmInterfaceEntry 2 }
+
+prvtLmmInterfaceTempHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-128..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the high threshold value for port temperature.
+         Value of prvtLmmInterfaceTempHighThreshold must be greater than 
+         prvtLmmInterfaceTempLowThreshold"
+    ::= { prvtLmmInterfaceEntry 3 }
+
+prvtLmmInterfaceTempValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Display laser Temperature current value"
+    ::= { prvtLmmInterfaceEntry 4 }
+
+prvtLmmInterfaceTempThresholdLo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The thresholds read from hardware or set by user"
+    ::= { prvtLmmInterfaceEntry 5 }
+
+prvtLmmInterfaceTempThresholdHi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The thresholds read from hardware or set by user"
+    ::= { prvtLmmInterfaceEntry 6 }
+
+prvtLmmInterfaceTempTestState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state test"
+    ::= { prvtLmmInterfaceEntry 7 }
+
+prvtLmmInterfaceRxPowerLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for port RX-power."
+    ::= { prvtLmmInterfaceEntry 8 }
+
+prvtLmmInterfaceRxPowerHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the high threshold value for port RX-power.
+         Value of prvtLmmInterfaceRxPowerHighThreshold must be greater than
+         prvtLmmInterfaceRxPowerLowThreshold"
+    ::= { prvtLmmInterfaceEntry 9 }
+
+prvtLmmInterfaceRxPowerValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Display laser Rx Power current value"
+    ::= { prvtLmmInterfaceEntry 10 }
+
+prvtLmmInterfaceRxPowerThresholdRxLo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The thresholds read from hardware or set by user"
+    ::= { prvtLmmInterfaceEntry 11 }
+
+prvtLmmInterfaceRxPowerThresholdRxHi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The thresholds read from hardware or set by user"
+    ::= { prvtLmmInterfaceEntry 12 }
+
+prvtLmmInterfaceRxPowerTestState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state test"
+    ::= { prvtLmmInterfaceEntry 13 }
+
+prvtLmmInterfaceTxPowerLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the low threshold value for port TX-power"
+    ::= { prvtLmmInterfaceEntry 14 }
+
+prvtLmmInterfaceTxPowerHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the high threshold value for port TX-power
+         Value of prvtLmmInterfaceTxPowerHighThreshold must be greater than
+         prvtLmmInterfaceTxPowerLowThreshold"
+    ::= { prvtLmmInterfaceEntry 15 }
+
+prvtLmmInterfaceTxPowerValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Display laser Tx Power current value"
+    ::= { prvtLmmInterfaceEntry 16 }
+
+prvtLmmInterfaceTxPowerThresholdTxLo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The thresholds read from hardware or set by user"
+    ::= { prvtLmmInterfaceEntry 17 }
+
+prvtLmmInterfaceTxPowerThresholdTxHi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The thresholds read from hardware or set by user"
+    ::= { prvtLmmInterfaceEntry 18 }
+
+prvtLmmInterfaceTxPowerTestState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state test"
+    ::= { prvtLmmInterfaceEntry 19 }
+
+prvtLmmInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Operational status"
+    ::= { prvtLmmInterfaceEntry 20 }
+
+prvtLmmTemperatureThresholdCrossed NOTIFICATION-TYPE
+    OBJECTS     { prvtLmmInterfaceTempValue, 
+                  prvtLmmInterfaceTempThresholdHi, 
+                  prvtLmmInterfaceTempThresholdLo }
+    STATUS      current
+    DESCRIPTION 
+        "The prvtLmmTemperatureThresholdCrossed shall be generated 
+         when prvtLmmInterfaceTempValue rises above prvtLmmInterfaceTempThresholdHi
+         or falls below prvtLmmInterfaceTempThresholdLo. Also the 
+         notification shall be generated when prvtLmmInterfaceTempValue
+         returns to the normal range between prvtLmmInterfaceTempThresholdHi 
+         and prvtLmmInterfaceTempThresholdLo."
+    ::= { prvtLmmNotifications 1 }
+
+prvtLmmTxPowerThresholdCrossed NOTIFICATION-TYPE
+    OBJECTS     { prvtLmmInterfaceTxPowerValue, 
+                  prvtLmmInterfaceTxPowerThresholdTxHi, 
+                  prvtLmmInterfaceTxPowerThresholdTxLo }
+    STATUS      current
+    DESCRIPTION 
+        "The prvtLmmTxPowerThresholdCrossed shall be generated 
+         when prvtLmmInterfaceTxPowerValue rises above prvtLmmInterfaceTxPowerThresholdTxHi
+         or falls below prvtLmmInterfaceTxPowerThresholdTxLo. Also the 
+         notification shall be generated when prvtLmmInterfaceTxPowerValue
+         returns to the normal range between prvtLmmInterfaceTxPowerThresholdTxHi 
+         and prvtLmmInterfaceTxPowerThresholdTxLo."
+    ::= { prvtLmmNotifications 2 }
+
+prvtLmmRxPowerThresholdCrossed NOTIFICATION-TYPE
+    OBJECTS     { prvtLmmInterfaceRxPowerValue, 
+                  prvtLmmInterfaceRxPowerThresholdRxHi, 
+                  prvtLmmInterfaceRxPowerThresholdRxLo }
+    STATUS      current
+    DESCRIPTION 
+        "The prvtLmmRxPowerThresholdCrossed shall be generated 
+         when prvtLmmInterfaceRxPowerValue rises above prvtLmmInterfaceRxPowerThresholdRxHi
+         or falls below prvtLmmInterfaceRxPowerThresholdRxLo. Also the 
+         notification shall be generated when prvtLmmInterfaceRxPowerValue
+         returns to the normal range between prvtLmmInterfaceRxPowerThresholdRxHi 
+         and prvtLmmInterfaceRxPowerThresholdRxLo."
+    ::= { prvtLmmNotifications 3 }
+
+END -- end of module PRVT-LMM-MIB.

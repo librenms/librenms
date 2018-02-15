@@ -27,12 +27,12 @@ namespace LibreNMS\Authentication;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 use LibreNMS\Exceptions\AuthenticationException;
-use Phpass\PasswordHash;
 
 abstract class AuthorizerBase implements Authorizer
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 0;
     protected static $CAN_UPDATE_USER = 0;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
     protected static $AUTH_IS_EXTERNAL = 0;
 
     /**
@@ -137,8 +137,7 @@ abstract class AuthorizerBase implements Authorizer
         } else {
             $token = strgen();
             $auth = strgen();
-            $hasher = new PasswordHash(8, false);
-            $token_id = $_SESSION['username'] . '|' . $hasher->HashPassword($_SESSION['username'] . $token);
+            $token_id = $_SESSION['username'] . '|' . password_hash($_SESSION['username'] . $token, PASSWORD_DEFAULT);
 
             $db_entry['session_username'] = $_SESSION['username'];
             $db_entry['session_token'] = $token;
@@ -168,8 +167,7 @@ abstract class AuthorizerBase implements Authorizer
             array($uname, $sess_id)
         );
 
-        $hasher = new PasswordHash(8, false);
-        if ($hasher->CheckPassword($uname . $session['session_token'], $hash)) {
+        if (password_verify($uname . $session['session_token'], $hash)) {
             $_SESSION['username'] = $uname;
             return true;
         }
@@ -208,7 +206,7 @@ abstract class AuthorizerBase implements Authorizer
 
     public function canUpdatePasswords($username = '')
     {
-        return 0;
+        return static::$CAN_UPDATE_PASSWORDS;
     }
 
     public function changePassword($username, $newpassword)

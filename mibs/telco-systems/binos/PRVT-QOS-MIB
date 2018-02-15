@@ -1,0 +1,4006 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-QOS-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+
+PRVT-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Gauge32,
+        Integer32, Unsigned32, IpAddress,
+        TimeTicks, Counter64, Counter32             FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+
+        TEXTUAL-CONVENTION, DisplayString,
+        RowStatus, MacAddress, TimeStamp,
+        TruthValue, RowPointer, StorageType         FROM SNMPv2-TC
+
+        InterfaceIndex, InterfaceIndexOrZero        FROM IF-MIB
+        prvt-products								FROM PRVT-SWITCH-MIB;
+
+       
+      
+
+prvtQosMIB   MODULE-IDENTITY
+        LAST-UPDATED    "201003230000Z"
+        ORGANIZATION    "BATM Advanced Communication"
+        CONTACT-INFO
+            " BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+        DESCRIPTION
+            "This  document is the SNMP MIB module to manage the QoS parameters."
+
+--                                           
+--  Revision History
+--
+	REVISION        "201003230000Z"
+        DESCRIPTION     "Added support for QOS over VLAN."	
+        REVISION        "200904240000Z"
+        DESCRIPTION     "Changed hqosVirtualSchedulerParent to type TNamedItemOrEmpty.
+                         Added some TCs.  Miscellaneous additional clean up."
+        REVISION        "200810010000Z"
+     	DESCRIPTION     "Miscellaneous clean up."
+        REVISION        "200711170000Z"   
+        DESCRIPTION     "Initial version."
+
+        
+         ::= { serviceAccessSwitch 1 }
+         
+          serviceAccessSwitch  OBJECT IDENTIFIER ::= { prvt-products 7 }
+--
+-- Textual conventions
+--  
+  TNamedItem ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The name of an item.
+
+        Note, use only NVT ASCII displayable characters
+        here, no control characters, no UTF-8, etc."
+    SYNTAX OCTET STRING (SIZE (1..6))
+
+TNamedItemOrEmpty ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The name of an item, or an empty string.  When used in a reference
+        (TNamedItemOrEmpty) the item name entry must exist in the table.
+
+        Note, use only NVT ASCII displayable characters
+        here, no control characters, no UTF-8, etc."
+    SYNTAX OCTET STRING (SIZE (0 | 1..6))
+ 
+TQEncapVal ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+       "A valid Vlan ID in the range 1-4093, or 65535."
+    SYNTAX  Unsigned32
+
+TLspExpValue ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+	"MPLS Experimental bits. -1 means not set."
+    REFERENCE ""
+    SYNTAX      INTEGER (-1 | 0..7)
+
+Dot1PPriority ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+	"IEEE 802.1p priority.  zero is lowest, seven is highest.
+	-1 means not set"
+    REFERENCE ""
+    SYNTAX      INTEGER (-1 | 0..7)
+
+ TFCName ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The name of a Forwarding Class entry."
+    SYNTAX OCTET STRING (SIZE (1..6))
+
+TFCNameOrEmpty ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The name of a Forwarding Class entry."
+    SYNTAX INTEGER { be(1), l2(2), af(3), l1(4), h2(5), ef(6), h1(7), nc(8) }
+
+TDSCPValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The value of a Differential Services Code Point."
+    SYNTAX INTEGER (0..63)
+
+TItemDescription ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Description for an item.  Note, use only NVT ASCII displayable characters
+        here, no control characters, no UTF-8, etc."
+    SYNTAX OCTET STRING (SIZE(0..30))
+
+   
+TQueueId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of a queue. zero means not set.
+         legal values when used for an index are [1..32]."
+    SYNTAX INTEGER (0 | 1..32)
+
+TIngressQueueId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of a queue. zero means not set. legal
+         values when used for an index are [1..32]."
+    SYNTAX INTEGER (0 | 1..32)
+
+TEgressQueueId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of an egress queue. zero means not set.
+         legal values when used for an index are [1..32]."
+    SYNTAX INTEGER (0 | 1..32)
+
+TSapIngressPolicyId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of a SAP ingress policy."
+    SYNTAX Unsigned32 (1..64)
+
+TSapIngressPolicyIdOrNone ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of a SAP ingress policy.
+         A value of 0 indicates no policy."
+    SYNTAX Unsigned32 (0..64)
+
+TSapEgressPolicyId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of a SAP egress policy."
+    SYNTAX Unsigned32 (1..64)
+
+TSapEgressPolicyIdOrNone::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification number of a SAP egress policy.
+         A value of 0 indicates no policy."
+    SYNTAX Unsigned32 (0..64)
+
+TNetworkPolicyId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification string of a network policy."
+    SYNTAX OCTET STRING (SIZE(1..6))
+    
+TNetworkPolicyIdOrNone ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The identification string of a network policy."
+    SYNTAX          OCTET STRING (SIZE(0..6))
+    
+TItemMatch  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "When set to off, the item is not matched.
+         When set to false, packets without the item match the filter.
+         When set to true, packets with the item match the filter.
+        "
+    SYNTAX INTEGER { off(1), false(2), true(3) }
+
+TPriority ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The priority to apply to a packet"
+    SYNTAX INTEGER { low(1), high(2) }
+
+TPriorityOrDefault ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The priority to apply to a packet.
+         When set to default(3), the priority from the default-action is used."
+    SYNTAX INTEGER { low(1), high(2), default(3) }
+
+TProfile ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The profile marking of a packet at the ingress."
+    SYNTAX INTEGER { in(1), out(2) }
+
+
+TCIRRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The rate to be used in kbps."
+    SYNTAX      INTEGER (0..100000000)
+
+TPIRRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The rate to be used in kbps."
+    SYNTAX      INTEGER (1..100000000)
+
+TRateValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The percentage of maximum rate allowed."
+    SYNTAX      INTEGER 
+
+TLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The level of the specified entity while feeding into the parent."
+    SYNTAX      INTEGER (1..8)
+
+TWeight ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The weight of the specified entity while feeding into the parent."
+    SYNTAX      INTEGER (0..100)
+
+TTreshold ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The treshold to be used in %.Valid values are 25,50,75,100%."
+    SYNTAX      INTEGER (25..100)
+    
+TConformanceLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The conformance level green or yellow."
+    SYNTAX  INTEGER { green(1), yellow(2) }
+
+
+TShaperId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Shaper Profile."
+    SYNTAX  INTEGER
+
+TTailDropId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The ID of a TailDrop Profile."
+    SYNTAX  INTEGER
+    
+TSredId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The ID of a SRED Profile."
+    SYNTAX  INTEGER
+     
+TSSchedulingProfile ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Scheduling Profile."
+    SYNTAX  INTEGER 
+    
+TSlopePolicy ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Wred Profile."
+ SYNTAX INTEGER (1..64)
+ 
+
+--
+-- mib objects
+-- 
+
+tFCObjects              	OBJECT IDENTIFIER ::= { prvtQosMIB 1 }
+hqosSapIngressObjects		OBJECT IDENTIFIER ::= { prvtQosMIB 2 }
+hqosSapEgressObjects		OBJECT IDENTIFIER ::= { prvtQosMIB 3 }
+hqosNetworkObjects			OBJECT IDENTIFIER ::= { prvtQosMIB 4 }
+hqosNetworkQueueObjects    	OBJECT IDENTIFIER ::= { prvtQosMIB 5 }
+hqosSchedulerObjects       	OBJECT IDENTIFIER ::= { prvtQosMIB 6 }
+tWredObjects           		OBJECT IDENTIFIER ::= { prvtQosMIB 7 }
+tCongestionAvoidanceProfileObjects	OBJECT IDENTIFIER ::= { prvtQosMIB 8 }
+tShaperObjects          	OBJECT IDENTIFIER ::= { prvtQosMIB 9 }         
+tWfqObjects		        	OBJECT IDENTIFIER ::= { prvtQosMIB 10 }
+qosSchedulingProfileObjects	OBJECT IDENTIFIER ::= { prvtQosMIB 11 }
+qosServicePolicyObjects				OBJECT IDENTIFIER ::= { prvtQosMIB 12 }
+qosNetworkPolicyObjects				OBJECT IDENTIFIER ::= { prvtQosMIB 13 }
+qosGlobalObjects					OBJECT IDENTIFIER ::= { prvtQosMIB 14 }
+qosServiceObjects					OBJECT IDENTIFIER ::= { prvtQosMIB 15 }
+qosInterfaceObjects					OBJECT IDENTIFIER ::= { prvtQosMIB 16 }
+qosStatisticsObjects				OBJECT IDENTIFIER ::= { prvtQosMIB 17 }
+qosVlanPolicyObjects			OBJECT IDENTIFIER ::= { prvtQosMIB 18 }
+qosVlanObjects				OBJECT IDENTIFIER ::= { prvtQosMIB 19 }
+
+--
+-- Forwarding Class name table
+--
+
+tFCNameTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TFCNameEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A list of all Forwarding Class Names.  Forwarding Class Name entries
+        must exist here and be active before they can be referenced
+        elsewhere (e.g. qos queue)."
+    ::= { tFCObjects 1 }
+
+tFCNameEntry OBJECT-TYPE
+    SYNTAX       TFCNameEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular Forwarding Class Name, particularly
+         the Forwarding Class value.
+
+         Some default entries are created by the agent.
+         Default entries have tFCNameStorageType permanent,
+         and can not be deleted.
+
+         Entries cannot be created by user but maybe supported in future.
+
+         An attempt to create a row in this table would return no creation."
+    INDEX { tFCValue }
+    ::= { tFCNameTable 1 }
+
+TFCNameEntry ::= SEQUENCE
+    {
+    	tFCValue              INTEGER,
+        tFCRowStatus          RowStatus,
+        tFCStorageType        StorageType,
+        tFCName               TFCName,
+        tFCNameLastChanged    TimeStamp
+    }
+
+tFCValue  OBJECT-TYPE
+    SYNTAX       INTEGER (1..8)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "Forwarding class number as used in the tables below."
+    REFERENCE ""
+    ::= { tFCNameEntry 1 }
+
+tFCRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "Row Status of the entry."
+    ::= { tFCNameEntry 2 }
+
+tFCStorageType  OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "The storage type of this row in the table."
+    DEFVAL { nonVolatile }
+    ::= { tFCNameEntry 3 }
+
+tFCName  OBJECT-TYPE
+    SYNTAX       TFCName
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "FC name."
+    REFERENCE ""
+    ::= { tFCNameEntry 4 }
+
+tFCNameLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Timestamp of last change to this row in tFCNameTable."
+    ::= { tFCNameEntry 5 }
+ 
+ --
+-- sap-ingress policy table
+--
+
+hqosSapIngressTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapIngressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "This table specifies HQoS service ingress  policy configuration."
+    ::= { hqosSapIngressObjects 1 }
+
+hqosSapIngressEntry OBJECT-TYPE
+    SYNTAX       HqosSapIngressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular HQoS Sap Ingress Policy.
+
+         sap-ingress policy (1) is the default entry.
+
+         Default Entry is created by the agent, other entries are
+         created by user.
+
+         Default Entry cannot be modified/deleted. The other
+         entries are deleted by user.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile.
+        "
+    INDEX { hqosSapIngressIndex }
+    ::= { hqosSapIngressTable 1 }
+
+HqosSapIngressEntry ::= SEQUENCE
+    {
+        hqosSapIngressIndex                 TSapIngressPolicyId,
+        hqosSapIngressRowStatus             RowStatus,
+        hqosSapIngressDescription           TItemDescription,
+        hqosSapIngressDefaultDscpFC         INTEGER,
+        hqosSapIngressDefaultVptFC			INTEGER,
+        hqosSapIngressLastChanged           TimeStamp
+    }
+
+hqosSapIngressIndex  OBJECT-TYPE
+    SYNTAX       TSapIngressPolicyId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The identifier of a HQoS service ingress policy.
+        The policy ID is the index to this table."
+    ::= { hqosSapIngressEntry 1 }
+
+hqosSapIngressRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for the policy. The deletion of this row has
+         an action of removing the dependent rows in the following
+         tables :
+           - hqosSapIngressQueueTable
+           - hqosSapIngressDSCPTable
+           - hqosSapIngressDot1pTable
+        "
+    ::= { hqosSapIngressEntry 2 }
+
+
+hqosSapIngressDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "User-provided description of the policy."
+    DEFVAL { ''H }
+    ::= { hqosSapIngressEntry 3 }
+
+hqosSapIngressDefaultDscpFC  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "All traffic that does not match the specified dot1p, DSCP,
+         is classified as the default action forwarding class.
+
+         The default forwarding class is best-effort."
+    DEFVAL { 4 }
+    ::= { hqosSapIngressEntry 4 }
+
+hqosSapIngressDefaultVptFC  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The priority to assign to traffic ingressing as the default
+         action queue."
+    DEFVAL { 0 }
+    ::= { hqosSapIngressEntry 5 }
+
+
+hqosSapIngressLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in tSapIngressTable."
+    ::= { hqosSapIngressEntry 6 }
+
+--
+-- sap-ingress policy queue table
+--
+
+hqosSapIngressQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapIngressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all HQoS service ingress policies' queues."
+    ::= { hqosSapIngressObjects 2 }
+
+hqosSapIngressQueueEntry OBJECT-TYPE
+    SYNTAX       HqosSapIngressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular queue for a service ingress policy.
+
+         Some default queues are created by the system, they cannot be removed.
+
+         Other entries are created by user."
+    INDEX { hqosSapIngressIndex, hqosSapIngressQueue, hqosSapIngressQueueParent }
+    ::= { hqosSapIngressQueueTable 1 }
+
+HqosSapIngressQueueEntry ::= SEQUENCE
+    {
+        hqosSapIngressQueue                 TIngressQueueId,
+        hqosSapIngressQueueParent           TNamedItemOrEmpty,
+        hqosSapIngressQueueRowStatus        RowStatus,
+        hqosSapIngressQueueLevel            TLevel,
+        hqosSapIngressQueueServWfq          INTEGER,
+        hqosSapIngressQueueType             INTEGER,
+        hqosSapIngressQueueHiPriority       TruthValue,
+		hqosSapIngressQueueWred	            TSlopePolicy,
+        hqosSapIngressQueueLastChanged      TimeStamp
+    }
+
+hqosSapIngressQueue  OBJECT-TYPE
+    SYNTAX       TIngressQueueId (1..32)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The queue ID is used as the secondary index to the table entry."
+    ::= { hqosSapIngressQueueEntry 1 }
+
+hqosSapIngressQueueParent  OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The scheduler to which this queue would be feeding to."
+    ::= { hqosSapIngressQueueEntry 2 }
+
+hqosSapIngressQueueRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { hqosSapIngressQueueEntry 3 }
+    
+hqosSapIngressQueueLevel  OBJECT-TYPE
+    SYNTAX       TLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This specifies the level of priority while feeding to the parent."
+    DEFVAL { 1 }
+    ::= { hqosSapIngressQueueEntry 4 }
+
+hqosSapIngressQueueServWfq  OBJECT-TYPE
+    SYNTAX       INTEGER (1..61)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The WFQ profile that needs to be used by the scheduler to which this queue
+         would be feeding to."
+    DEFVAL { 1 }
+    ::= { hqosSapIngressQueueEntry 5 }
+
+
+hqosSapIngressQueueType  OBJECT-TYPE
+    SYNTAX       INTEGER {     
+    				unknown(0),
+                    unicast(1),
+                    multicast(2),
+                    broadcast(3)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the traffic type of the queue."
+       ::= { hqosSapIngressQueueEntry 6 }
+
+
+hqosSapIngressQueueHiPriority  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Is this a high-priority queue."
+    DEFVAL { false }
+    ::= { hqosSapIngressQueueEntry 7 }
+
+hqosSapIngressQueueWred  OBJECT-TYPE
+    SYNTAX       TSlopePolicy (1..32)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "WRED profile applied to this queue."
+       ::= { hqosSapIngressQueueEntry 8 }
+    
+hqosSapIngressQueueLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapIngressQueueTable."
+    ::= { hqosSapIngressQueueEntry 9 }
+
+--
+-- service ingress policy DSCP mappings table
+--
+ 
+hqosSapIngressDSCPTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapIngressDSCPEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A list of all DSCP entries for service ingress policies."
+    ::= { hqosSapIngressObjects 3 }
+
+hqosSapIngressDSCPEntry OBJECT-TYPE
+    SYNTAX       HqosSapIngressDSCPEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular DSCP entry for a service ingress policy.
+
+        Entries are created by user.
+        Entries are deleted by user.
+
+        There is no StorageType object, entries have a presumed
+        StorageType of nonVolatile.
+
+        In the event that one policy has multiple entries, and
+        the hqosSapIngressDSCP values are the same, only one queue
+        will be created (the queue for the lexicographically
+        first hqosSapIngressDSCP).
+        "
+    INDEX { hqosSapIngressIndex, hqosSapIngressDSCP }
+    ::= { hqosSapIngressDSCPTable 1 }
+
+HqosSapIngressDSCPEntry ::= SEQUENCE
+    {
+        hqosSapIngressDSCP            TDSCPValue,
+        hqosSapIngressDSCPRowStatus   RowStatus,
+        hqosSapIngressDSCPFC          TFCNameOrEmpty,
+        hqosSapIngressDSCPConformance TConformanceLevel,
+        hqosSapIngressDSCPLastChanged TimeStamp
+    }
+
+hqosSapIngressDSCP  OBJECT-TYPE
+    SYNTAX       TDSCPValue
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Differentiated Services Code Point (DSCP) value
+		as to match in the packet. This value is also used 
+		index so that for any DSCP value there
+        is only one possible disposition queue and priority."
+    ::= { hqosSapIngressDSCPEntry 1 }
+
+hqosSapIngressDSCPRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object allows creation/deletion of rows in this table."
+    ::= { hqosSapIngressDSCPEntry 2 }
+
+hqosSapIngressDSCPFC  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The forwarding class into which the matching traffic should
+         be classified."
+    ::= { hqosSapIngressDSCPEntry 3 }
+
+
+hqosSapIngressDSCPConformance  OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Previous conformance level: green or yellow."
+    ::= { hqosSapIngressDSCPEntry 4 } 
+ 
+ hqosSapIngressDSCPLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapIngressDSCPTable."
+    ::= { hqosSapIngressDSCPEntry 5 }
+--
+-- service ingress policy dot1p mapping table
+--
+
+hqosSapIngressDot1pTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapIngressDot1pEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A list of all dot1p entries for service ingress policies."
+    ::= { hqosSapIngressObjects 4 }
+
+hqosSapIngressDot1pEntry OBJECT-TYPE
+    SYNTAX       HqosSapIngressDot1pEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular dot1p match for a service ingress policy.
+         Entries are created by user.
+         Entries are deleted by user.
+        "
+    INDEX { hqosSapIngressIndex, hqosSapIngressDot1pValue }
+    ::= { hqosSapIngressDot1pTable 1 }
+
+HqosSapIngressDot1pEntry ::= SEQUENCE
+    {
+        hqosSapIngressDot1pValue       Dot1PPriority,
+        hqosSapIngressDot1pRowStatus   RowStatus,
+        hqosSapIngressDot1pFC          TFCNameOrEmpty,
+        hqosSapIngressDot1pConformance TConformanceLevel,
+        hqosSapIngressDot1pLastChanged TimeStamp
+    }
+
+hqosSapIngressDot1pValue  OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Dot1p value to match in the packet. This value is
+        also used as an index so that for any dot1p value there
+        is only one possible disposition queue and priority.
+        "
+    ::= { hqosSapIngressDot1pEntry 1 }
+
+hqosSapIngressDot1pRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this service ingress policy's dot1p entry."
+    ::= { hqosSapIngressDot1pEntry 2 }
+
+hqosSapIngressDot1pFC  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current                   
+    DESCRIPTION
+        "The forwarding class into which the matching traffic
+         should be classified."
+    ::= { hqosSapIngressDot1pEntry 3 }
+
+hqosSapIngressDot1pConformance  OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Previous conformance level: green or yellow"
+    ::= { hqosSapIngressDot1pEntry 4 }
+
+hqosSapIngressDot1pLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapIngressDot1pTable."
+    ::= { hqosSapIngressDot1pEntry 5 }
+
+--
+-- service ingress policy fc table
+--
+
+hqosSapIngressFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapIngressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "This table maintains the mapping of a particular 
+         forwarding class traffic into the specified queue."
+    ::= { hqosSapIngressObjects 5 }
+
+hqosSapIngressFCEntry OBJECT-TYPE
+    SYNTAX       HqosSapIngressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service ingress policy's
+         forwarding class mappings to queues.
+
+         Entries are created and deleted by user."
+    INDEX { hqosSapIngressIndex, hqosSapIngressFCNumber, hqosSapIngressFCQueueType }
+    ::= { hqosSapIngressFCTable 1 }
+
+HqosSapIngressFCEntry ::= SEQUENCE
+    {
+        hqosSapIngressFCNumber         		TFCNameOrEmpty,
+        hqosSapIngressFCQueueType			INTEGER,
+        hqosSapIngressFCRowStatus      		RowStatus,
+        hqosSapIngressFCQueue          		TIngressQueueId, 
+        hqosSapIngressFCQueueParent			TNamedItemOrEmpty,
+        hqosSapIngressFCLastChanged    		TimeStamp
+    }
+
+hqosSapIngressFCNumber  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Forwarding class number."
+    ::= { hqosSapIngressFCEntry 1 }  
+    
+hqosSapIngressFCQueueType  OBJECT-TYPE
+    SYNTAX       INTEGER {
+                 unknown(0),
+                 unicast(1),
+                 multicast(2),
+                 broadcast(3)
+    }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The type of the queue to be assigned to the FC."
+    ::= { hqosSapIngressFCEntry 2 }
+
+hqosSapIngressFCRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this queue."
+    ::= { hqosSapIngressFCEntry 3 }
+
+hqosSapIngressFCQueue OBJECT-TYPE
+    SYNTAX       TIngressQueueId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The specific queue to be used for packets in this forwarding class."
+    ::= { hqosSapIngressFCEntry 4 }    
+    
+hqosSapIngressFCQueueParent OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The parent of the specific queue for this FC"
+    ::= { hqosSapIngressFCEntry 5 }
+
+hqosSapIngressFCLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapIngressFCTable."
+    ::= { hqosSapIngressFCEntry 6 }
+
+
+--
+-- service egress policy table
+--
+
+hqosSapEgressTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapEgressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all service egress policies."
+    ::= { hqosSapEgressObjects 1 }
+
+hqosSapEgressEntry OBJECT-TYPE
+    SYNTAX       HqosSapEgressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service egress policy.
+         Entries are created by user.
+         Entries are deleted by user.
+         The default service egress policy (1) cannot be changed or
+         destroyed.
+        "
+    INDEX { hqosSapEgressIndex }
+    ::= { hqosSapEgressTable 1 }
+
+HqosSapEgressEntry ::= SEQUENCE
+    {
+        hqosSapEgressIndex              TSapEgressPolicyId,
+        hqosSapEgressRowStatus          RowStatus,
+        hqosSapEgressDescription        TItemDescription,
+        hqosSapEgressLastChanged        TimeStamp
+    }
+
+hqosSapEgressIndex  OBJECT-TYPE
+    SYNTAX       TSapEgressPolicyId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The service egress policy ID is used as index for the table."
+    ::= { hqosSapEgressEntry 1 }
+
+hqosSapEgressRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of this policy's entry."
+    ::= { hqosSapEgressEntry 2 }
+
+hqosSapEgressDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "User-supplied description of this service egress policy."
+    DEFVAL { ''H }
+    ::= { hqosSapEgressEntry 5 }
+
+hqosSapEgressLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapEgressTable."
+    ::= { hqosSapEgressEntry 6 }
+
+
+--
+-- service egress policy queue table
+--
+
+hqosSapEgressQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapEgressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about service egress policies' queues."
+    ::= { hqosSapEgressObjects 2 }
+
+hqosSapEgressQueueEntry OBJECT-TYPE
+    SYNTAX       HqosSapEgressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service egress queue.
+        Entries are created by user.
+        Entries are deleted by user."
+    INDEX { hqosSapEgressIndex, hqosSapEgressQueueIndex, hqosSapEgressQueueParent }
+    ::= { hqosSapEgressQueueTable 1 }
+
+HqosSapEgressQueueEntry ::= SEQUENCE
+    {
+        hqosSapEgressQueueIndex             TEgressQueueId,
+        hqosSapEgressQueueParent            TNamedItemOrEmpty,
+        hqosSapEgressQueueRowStatus         RowStatus,
+        hqosSapEgressQueueLevel             TLevel,
+        hqosSapEgressQueueServWfq           INTEGER, 
+        hqosSapEgressQueueType				INTEGER,	
+        hqosSapEgressQueueHiPriority        TruthValue,
+		hqosSapEgressQueueWred				TSlopePolicy,
+        hqosSapEgressQueueLastChanged			TimeStamp
+    }
+
+hqosSapEgressQueueIndex  OBJECT-TYPE
+    SYNTAX       TEgressQueueId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The number of a queue.Zero is not allowed."
+    ::= { hqosSapEgressQueueEntry 1 }
+
+hqosSapEgressQueueParent  OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The scheduler to which this queue would be feeding to."
+    ::= { hqosSapEgressQueueEntry 2 }
+    
+  hqosSapEgressQueueRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+		"Row Status of the entry."
+    ::= { hqosSapEgressQueueEntry 3 }
+
+hqosSapEgressQueueLevel  OBJECT-TYPE
+    SYNTAX       TLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This specifies the level of priority while feeding to the parent."
+    DEFVAL { 1 }
+    ::= { hqosSapEgressQueueEntry 4 }
+
+hqosSapEgressQueueServWfq  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The WFQ profile that needs to be used by the scheduler to which this queue
+         would be feeding to."
+    DEFVAL { 1 }
+    ::= { hqosSapEgressQueueEntry 5 }
+
+ hqosSapEgressQueueType  OBJECT-TYPE
+    SYNTAX       INTEGER {     
+    				unknown(0),
+                    unicast(1),
+                    multicast(2),
+                    broadcast(3)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the traffic type of the queue."
+       ::= { hqosSapEgressQueueEntry 6 }
+
+hqosSapEgressQueueHiPriority  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Is this a high-priority queue?"
+    DEFVAL { false }
+    ::= { hqosSapEgressQueueEntry 7 }
+
+hqosSapEgressQueueWred  OBJECT-TYPE
+    SYNTAX       TSlopePolicy
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "ID of WRED profile applied to this queue."
+    ::= { hqosSapEgressQueueEntry 8 }
+    
+hqosSapEgressQueueLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapEgressQueueTable."
+    ::= { hqosSapEgressQueueEntry 9 }
+    
+--
+-- service egress policy fc table
+--
+
+hqosSapEgressFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSapEgressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+    	"Information about a particular service egress policy's
+         forwarding class mappings to queues.
+
+         Entries are created and deleted by user."
+    ::= { hqosSapEgressObjects 3 }
+
+hqosSapEgressFCEntry OBJECT-TYPE
+    SYNTAX       HqosSapEgressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service egress policy's
+        forwarding class mappings to queues and dot1p values.
+        Entries are created by user.
+        Entries are deleted by user."
+    INDEX { hqosSapEgressIndex, hqosSapEgressFCNumber, hqosSapEgressFCEntryType }
+    ::= { hqosSapEgressFCTable 1 }
+
+HqosSapEgressFCEntry ::= SEQUENCE
+    {
+        hqosSapEgressFCNumber				TFCNameOrEmpty,
+        hqosSapEgressFCEntryType			INTEGER,
+        hqosSapEgressFCRowStatus			RowStatus,
+        hqosSapEgressFCQueue				TEgressQueueId,  
+        hqosSapEgressFCQueueParent			TNamedItemOrEmpty,
+        hqosSapEgressFCDot1PValue			Dot1PPriority,  
+        hqosSapEgressFCDSCPValue			TDSCPValue,
+        hqosSapEgressFCLastChanged			TimeStamp
+    }
+
+hqosSapEgressFCNumber  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Forwarding class number."
+    ::= { hqosSapEgressFCEntry 1 }
+
+hqosSapEgressFCEntryType  OBJECT-TYPE
+    SYNTAX		INTEGER {
+     			unknown(0),
+                unicast(1),
+                multicast(2),
+                broadcast(3),
+                dscp(4),
+                dot1p(5)
+    }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The type of the configuration entry for this FC."
+    ::= { hqosSapEgressFCEntry 2 }
+
+hqosSapEgressFCRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this queue."
+    ::= { hqosSapEgressFCEntry 3 }
+
+hqosSapEgressFCQueue OBJECT-TYPE
+    SYNTAX       TEgressQueueId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The queue to use for packets with this forwarding class.
+		A valid queue-id must be specified before setting the row status
+		to active."
+    ::= { hqosSapEgressFCEntry 4 }             
+ 
+    
+hqosSapEgressFCQueueParent OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The name of the parent scheduler for the specific queue."
+    ::= { hqosSapEgressFCEntry 5 }
+
+hqosSapEgressFCDot1PValue OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The 802.1p value to use for packet remarking.Currently not supported."
+    DEFVAL { -1 }
+    ::= { hqosSapEgressFCEntry 6 }
+    
+hqosSapEgressFCDSCPValue OBJECT-TYPE
+    SYNTAX       TDSCPValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The DSCP value to use for packets remarking. Currently not supported."
+    ::= { hqosSapEgressFCEntry 7 }
+
+
+hqosSapEgressFCLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSapEgressFCTable."
+    ::= { hqosSapEgressFCEntry 8 }
+  
+--
+-- network policy table
+--
+
+hqosNetworkPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosNetworkPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "HQOS network policy table. Keeps comman information of the network policy "
+    ::= { hqosNetworkObjects 1 }
+
+hqosNetworkPolicyEntry OBJECT-TYPE
+    SYNTAX       HqosNetworkPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular Network Policy.
+
+         Network policy DefPol(1) is the default entry.
+
+         Default Entry is created by the agent, other entries are
+         created by user.
+
+         Default Entry cannot be modified/deleted. The other
+         entries are deleted by user.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile.
+
+         The default Egress FC entries are created as an action
+         of setting the rowstatus.
+        "
+    INDEX { hqosNetworkPolicyIndex }
+    ::= { hqosNetworkPolicyTable 1 }
+
+HqosNetworkPolicyEntry ::= SEQUENCE
+    {
+        hqosNetworkPolicyIndex						TNetworkPolicyId,
+        hqosNetworkPolicyRowStatus					RowStatus,
+        hqosNetworkPolicyDescription				TItemDescription,
+        hqosNetworkPolicyIngressDefaultActionFC		TFCNameOrEmpty,
+        hqosNetworkPolicyIngressConformance			TConformanceLevel,
+        hqosNetworkPolicyEgressRemark				TruthValue,
+        hqosNetworkPolicyLastChanged					TimeStamp
+    }
+
+hqosNetworkPolicyIndex  OBJECT-TYPE
+    SYNTAX       TNetworkPolicyId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "Network policy index"
+    REFERENCE ""
+    ::= { hqosNetworkPolicyEntry 1 }
+
+hqosNetworkPolicyRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "Row status of the network policy
+    			 HQoS network policy is created with createAndWait(5)."
+    ::= { hqosNetworkPolicyEntry 2 }
+
+hqosNetworkPolicyDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "User-defined description of the network policy"
+    DEFVAL { ''H }
+    ::= { hqosNetworkPolicyEntry 3 }
+
+hqosNetworkPolicyIngressDefaultActionFC   OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current 
+    DESCRIPTION "Network policy default action FC.
+                 Currently not used. Reserved for future use."
+    ::= { hqosNetworkPolicyEntry 4 }
+
+hqosNetworkPolicyIngressConformance   OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "Defines network conformance level green or yellow.
+                 Currently not used. Reserved for future use."
+       ::= { hqosNetworkPolicyEntry 5 }
+
+hqosNetworkPolicyEgressRemark  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "Verifies if remarking is set on network egress.
+    			 Remarking is enabled by default"
+    DEFVAL { false }
+    ::= { hqosNetworkPolicyEntry 6 }
+
+hqosNetworkPolicyLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosNetworkPolicyTable."
+    ::= { hqosNetworkPolicyEntry 7 }
+  
+--
+-- network ingress policy lspexp table
+--
+
+hqosNetworkIngressLSPEXPTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosNetworkIngressLSPEXPEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about network ingress policies' mappings."
+    ::= { hqosNetworkObjects 2 }
+
+hqosNetworkIngressLSPEXPEntry OBJECT-TYPE
+    SYNTAX       HqosNetworkIngressLSPEXPEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about LSP EXP mapping for a network policy.
+
+         Some default entries are created by the agent for the
+         default network policy DefPol(1). These cannot be deleted or
+         modified. Other entries are created/deleted by user.
+        "
+    INDEX { hqosNetworkPolicyIndex, hqosNetworkIngressLSPEXP }
+    ::= { hqosNetworkIngressLSPEXPTable 1 }
+
+HqosNetworkIngressLSPEXPEntry ::= SEQUENCE
+    {
+        hqosNetworkIngressLSPEXP            TLspExpValue,
+        hqosNetworkIngressLSPEXPRowStatus   RowStatus,
+        hqosNetworkIngressLSPEXPFC			TFCNameOrEmpty,
+        hqosNetworkIngressLSPEXPConformance TConformanceLevel,
+        hqosNetworkIngressLSPEXPLastChanged TimeStamp
+    }
+
+hqosNetworkIngressLSPEXP  OBJECT-TYPE
+    SYNTAX       TLspExpValue (0..7)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "LSP EXP bit value."
+    ::= { hqosNetworkIngressLSPEXPEntry 1 }
+
+hqosNetworkIngressLSPEXPRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "Row status of network ingress mapping"
+    ::= { hqosNetworkIngressLSPEXPEntry 2 }
+
+hqosNetworkIngressLSPEXPFC  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Mapping of LSP EXP to forwarding class."
+    ::= { hqosNetworkIngressLSPEXPEntry 3 }
+
+hqosNetworkIngressLSPEXPConformance  OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Indentifies conformance level green or yellow for a frame with a LSP EXP bit value."
+    ::= { hqosNetworkIngressLSPEXPEntry 4 }
+
+hqosNetworkIngressLSPEXPLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosNetworkIngressLSPEXPTable.
+        Currently not supported"
+    ::= { hqosNetworkIngressLSPEXPEntry 5 }
+ 
+--
+-- network egress fc table
+--
+
+hqosNetworkEgressFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosNetworkEgressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all network policies' egress FC traffic disposition."
+    ::= { hqosNetworkObjects 3 }
+
+hqosNetworkEgressFCEntry OBJECT-TYPE
+    SYNTAX       HqosNetworkEgressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular network policy's egress
+         per-forwarding-class traffic disposition.
+
+         Entries are created/deleted as an action of creating/deleting
+         a row in the hqosNetworkPolicyTable.
+        "
+    INDEX { hqosNetworkPolicyIndex, hqosNetworkEgressFCNumber, hqosNetworkEgressFCConformance}
+    ::= { hqosNetworkEgressFCTable 1 }
+
+HqosNetworkEgressFCEntry ::= SEQUENCE
+    {
+        hqosNetworkEgressFCNumber				TFCNameOrEmpty,
+        hqosNetworkEgressFCRowStatus			RowStatus,
+        hqosNetworkEgressFCLspExpValue			TLspExpValue,
+        hqosNetworkEgressFCDot1Priority			Dot1PPriority,
+        hqosNetworkEgressFCLastChanged			TimeStamp,
+        hqosNetworkEgressFCConformance			TConformanceLevel
+    }
+
+hqosNetworkEgressFCNumber OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The number of the forwarding class (FC)."
+    ::= { hqosNetworkEgressFCEntry 1 }   
+    
+hqosNetworkEgressFCRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status of this row. Only the value of createAndWait(5) is available for
+         row creation"
+    ::= { hqosNetworkEgressFCEntry 2 }
+
+hqosNetworkEgressFCLspExpValue  OBJECT-TYPE
+    SYNTAX       TLspExpValue (0..7)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Network egress remarking value for LSP EXP bits."
+    ::= { hqosNetworkEgressFCEntry 3 }
+
+hqosNetworkEgressFCDot1Priority  OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+		"Network egress remarking value for Dot1p. 
+        Currently not supported. Reserved for future use."
+    ::= { hqosNetworkEgressFCEntry 4 }
+
+
+hqosNetworkEgressFCLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosNetworkEgressFCTable."
+    ::= { hqosNetworkEgressFCEntry 5 }
+
+hqosNetworkEgressFCConformance OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Conformance level: green or yellow."
+    ::= { hqosNetworkEgressFCEntry 6 }   
+    
+--
+-- network-queue policy table
+--
+
+hqosNetworkQueuePolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosNetworkQueuePolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about network queue policy."
+    ::= { hqosNetworkQueueObjects 1 }
+
+hqosNetworkQueuePolicyEntry OBJECT-TYPE
+    SYNTAX       HqosNetworkQueuePolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about network egress queue configuration"
+    INDEX { hqosNetworkQueuePolicy }
+    ::= { hqosNetworkQueuePolicyTable 1 }
+
+HqosNetworkQueuePolicyEntry ::= SEQUENCE
+    {
+        hqosNetworkQueuePolicy                TNamedItem,
+        hqosNetworkQueuePolicyRowStatus       RowStatus,
+        hqosNetworkQueuePolicyDescription     TItemDescription,
+        hqosNetworkQueuePolicyLastChanged     TimeStamp
+    }
+
+hqosNetworkQueuePolicy  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Name of network egress queue policy.
+        
+        This is the index in the table. Should be no more than 6 characters long."
+    ::= { hqosNetworkQueuePolicyEntry 1 }
+
+hqosNetworkQueuePolicyRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status. Used for creation of a row in the table."
+    ::= { hqosNetworkQueuePolicyEntry 2 }
+
+hqosNetworkQueuePolicyDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "User-defined description of the network policy. "
+    DEFVAL { ''H }
+    ::= { hqosNetworkQueuePolicyEntry 3 }
+
+hqosNetworkQueuePolicyLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The time when an object in the row was last changed.
+        Currently not supported."
+    ::= { hqosNetworkQueuePolicyEntry 8 }
+
+--
+-- network egress policy queue table
+--
+
+hqosNetworkQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosNetworkQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about network queues."
+    ::= { hqosNetworkQueueObjects 2 }
+
+hqosNetworkQueueEntry OBJECT-TYPE
+    SYNTAX       HqosNetworkQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Network queue configuration"
+    INDEX { hqosNetworkQueuePolicy, hqosNetworkQueue }
+    ::= { hqosNetworkQueueTable 1 }
+
+HqosNetworkQueueEntry ::= SEQUENCE
+    {
+        hqosNetworkQueue                 TQueueId,
+        hqosNetworkQueueRowStatus        RowStatus,
+        hqosNetworkQueueParent           TNamedItemOrEmpty,
+        hqosNetworkQueueLevel            TLevel,
+        hqosNetworkQueueWfqProfile       INTEGER,
+        hqosNetworkQueueType             INTEGER,
+        hqosNetworkQueueHiPriority       TruthValue,
+		hqosNetworkQueueWred           	 TSlopePolicy,
+		hqosNetworkQueueShaper           TShaperId,
+        hqosNetworkQueueLastChanged      TimeStamp
+    }
+
+hqosNetworkQueue  OBJECT-TYPE
+    SYNTAX       TQueueId (1..24)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Network queue identifier.
+        The queue ID is used as an index of the table entry."
+    ::= { hqosNetworkQueueEntry 1 }
+
+hqosNetworkQueueRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { hqosNetworkQueueEntry 2 }
+
+
+hqosNetworkQueueParent  OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Network queue parent is not configurable. Reserved for future use."
+    DEFVAL { ''H }
+    ::= { hqosNetworkQueueEntry 3 }
+
+hqosNetworkQueueLevel  OBJECT-TYPE
+    SYNTAX       TLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This specifies the level of priority while feeding to the parent.
+        Priority levels are high(1) or low(2)"
+    DEFVAL { 1 }
+    ::= { hqosNetworkQueueEntry 4 }
+
+hqosNetworkQueueWfqProfile  OBJECT-TYPE
+    SYNTAX       INTEGER (1..16)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The WFQ profile for this network queue"
+    ::= { hqosNetworkQueueEntry 5 }
+
+hqosNetworkQueueType  OBJECT-TYPE
+    SYNTAX       INTEGER {     
+    				unknown(0),
+                    unicast(1),
+                    multicast(2),
+                    broadcast(3)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the type of the network queue.
+        The possible values are:
+		-	unknown(0) 
+		-	unicast(1)
+		-	multicast(2)
+		-	broadcast(3)"
+      ::= { hqosNetworkQueueEntry 6 }
+
+
+hqosNetworkQueueHiPriority  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       obsolete
+    DESCRIPTION
+        "The object specifies is this a high-priority queue.
+        This object is obsolete, use object hqosNetworkQueueLevel instead"
+    ::= { hqosNetworkQueueEntry 7 }
+
+
+hqosNetworkQueueWred  OBJECT-TYPE
+    SYNTAX       TSlopePolicy (57..64)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "ID of WRED profile applied to this queue."
+      ::= { hqosNetworkQueueEntry 8 }
+
+hqosNetworkQueueShaper  OBJECT-TYPE
+    SYNTAX       TShaperId (17..64)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "ID of shaping profile applied to this queue. There is no default value"
+    ::= { hqosNetworkQueueEntry 9 }
+
+hqosNetworkQueueLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosNetworkQueueTable.
+        Not supported. Reserved for future use."
+    ::= { hqosNetworkQueueEntry 10 }
+
+--
+-- network queue policy fc table
+--
+
+hqosNetworkQueueFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosNetworkQueueFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information which network egress queue traffic with a FC assigned on ingress feeds to."
+    ::= { hqosNetworkQueueObjects 3 }
+
+hqosNetworkQueueFCEntry OBJECT-TYPE
+    SYNTAX       HqosNetworkQueueFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Forwarding class to network queue configuratiom"
+    INDEX { hqosNetworkQueuePolicy, hqosNetworkQueueFCNumber, hqosNetworkQueueFCType }
+    ::= { hqosNetworkQueueFCTable 1 }
+
+HqosNetworkQueueFCEntry ::= SEQUENCE
+    {
+        hqosNetworkQueueFCNumber        TFCNameOrEmpty, 
+        hqosNetworkQueueFCType	     	INTEGER,
+        hqosNetworkQueueFCRowStatus     RowStatus,	
+        hqosNetworkQueueFC              TQueueId,
+        hqosNetworkQueueFCLastChanged   TimeStamp
+    }
+
+hqosNetworkQueueFCNumber  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The number of the forwarding class as referenced in the tFCNameTable."
+    ::= { hqosNetworkQueueFCEntry 1 }     
+    
+hqosNetworkQueueFCType OBJECT-TYPE   
+	SYNTAX       INTEGER {
+                 unknown(0),
+                 unicast(1),
+                 multicast(2),
+                 broadcast(3)
+   							 }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The type of the queue to be assigned to the forwarding class.
+        The possible values of this object are:
+		- unknown(0) 
+		- unicast(1) 
+		- multicast(2) 
+		- broadcast(3) 
+		This object is part of the index."
+    ::= { hqosNetworkQueueFCEntry 2 }
+    
+
+hqosNetworkQueueFCRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this queue.
+        The object serves to create entries in the table."
+    ::= { hqosNetworkQueueFCEntry 3 }
+
+hqosNetworkQueueFC OBJECT-TYPE
+    SYNTAX       TQueueId (1..24)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The queue id to be mapped."
+    ::= { hqosNetworkQueueFCEntry 4 }
+
+hqosNetworkQueueFCLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The time when an object in the row was last changed."
+    ::= { hqosNetworkQueueFCEntry 5 }
+
+--
+--  Service Scheduler policy table
+--
+
+hqosSchedulerPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosSchedulerPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a service scheduler policy. "
+    ::= { hqosSchedulerObjects 1 }
+
+hqosSchedulerPolicyEntry OBJECT-TYPE
+    SYNTAX       HqosSchedulerPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service scheduler policy."
+    INDEX { 
+    			hqosSchedulerPolicyName, 
+    			hqosSchedulerPolicyType
+           }
+    ::= { hqosSchedulerPolicyTable 1 }
+
+HqosSchedulerPolicyEntry ::= SEQUENCE
+    {
+        hqosSchedulerPolicyName			TNamedItem,
+        hqosSchedulerPolicyRowStatus	RowStatus, 
+        hqosSchedulerPolicyType			INTEGER, 
+        hqosSchedulerPolicyDescription	TItemDescription,
+        hqosSchedulerPolicyLastChanged	TimeStamp
+    }
+
+hqosSchedulerPolicyName  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This is the index of the table. Should be no more that 6 characters long."
+    ::= { hqosSchedulerPolicyEntry 1 }
+
+hqosSchedulerPolicyRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry.
+        The entry in the table that serves to create rows."
+    ::= { hqosSchedulerPolicyEntry 2 }
+
+hqosSchedulerPolicyType  OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                
+                unknown(0),
+                ingress(1),
+                egress (2),
+                network (3)
+                
+                }
+    			
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Type of the scheduler - ingress or egress.
+        The object can accept one of the three values:
+		-	unknown(0)
+		-	ingress(1)
+		-	egress (2)
+		The value unknown is the default one, but causes the row to be in notReady(3) state.
+		network (3) is not supported"
+    ::= { hqosSchedulerPolicyEntry 3 }
+
+hqosSchedulerPolicyDescription  OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User-description for the scheduler policy"
+    DEFVAL      { ''H }
+    ::= { hqosSchedulerPolicyEntry 4 }
+
+hqosSchedulerPolicyLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosSchedulerPolicyTable.  Reserved for future use."
+    ::= { hqosSchedulerPolicyEntry 5 }
+
+--
+-- Scheduler configuration table
+--
+
+hqosVirtualSchedulerTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HqosVirtualSchedulerEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+		"Information about schedulers belonging to scheduler policies"
+    ::= { hqosSchedulerObjects 2 }
+
+hqosVirtualSchedulerEntry OBJECT-TYPE
+    SYNTAX       HqosVirtualSchedulerEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular Scheduler belonging to a Scheduler 
+        Policy."
+    INDEX { hqosSchedulerPolicyName, hqosSchedulerPolicyType, 
+            hqosVirtualSchedulerName,  hqosVirtualSchedulerLevel}
+    ::= { hqosVirtualSchedulerTable 1 }
+
+HqosVirtualSchedulerEntry ::= SEQUENCE
+    {
+        hqosVirtualSchedulerName			TNamedItem,
+        hqosVirtualSchedulerRowStatus		RowStatus,
+        hqosVirtualSchedulerDescription		TItemDescription,
+        hqosVirtualSchedulerParent			TNamedItemOrEmpty,
+        hqosVirtualSchedulerLevel			TLevel,
+        hqosVirtualSchedulerPriority		INTEGER,
+        hqosVirtualSchedulerWfqProfile		INTEGER,
+        hqosVirtualSchedulerShaper			TShaperId,
+        hqosVirtualSchedulerLastChanged		TimeStamp
+    }
+
+hqosVirtualSchedulerName  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Name of the scheduler."
+    ::= { hqosVirtualSchedulerEntry 1 }
+
+hqosVirtualSchedulerRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry.
+        Part of the index together with the policy name and the tier. Should be up to 6 characters long."
+    ::= { hqosVirtualSchedulerEntry 2 }
+
+hqosVirtualSchedulerDescription  OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User-defined description for the scheduler policy.
+        Note this is currently not supported (returns empty string, writes not accepted).
+        Reserved for future use."
+    DEFVAL { ''H }
+    ::= { hqosVirtualSchedulerEntry 3 }
+
+hqosVirtualSchedulerParent  OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The scheduler to which this scheduler would be feeding to."
+     ::= { hqosVirtualSchedulerEntry 4 }
+
+hqosVirtualSchedulerLevel  OBJECT-TYPE
+    SYNTAX  TLevel
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This specifies the level of priority while feeding to the parent."
+    ::= { hqosVirtualSchedulerEntry 5 }
+
+hqosVirtualSchedulerPriority  OBJECT-TYPE
+    SYNTAX       INTEGER 
+    					{
+    					low(1),
+    					high(2)
+    					}
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Priority of the scheduler."
+    ::= { hqosVirtualSchedulerEntry 6 }
+
+hqosVirtualSchedulerWfqProfile  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The WFQ profile number for this scheduler."
+    ::= { hqosVirtualSchedulerEntry 7 }
+
+hqosVirtualSchedulerShaper  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "ID of shaping profile applied to scheduler. There is no default value"
+    ::= { hqosVirtualSchedulerEntry 8 }
+
+hqosVirtualSchedulerLastChanged  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in hqosVirtualSchedulerTable."
+    ::= { hqosVirtualSchedulerEntry 9 }
+
+
+--
+-- WRED profile table
+--
+
+tWredProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TWredProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "WRED Profile Table. Each entry in this table defines the WRED 
+        slopes for the high and the low priority traffic."
+    ::= { tWredObjects 1 }
+
+tWredProfileEntry OBJECT-TYPE
+    SYNTAX       TWredProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "WRED Profile Entry."
+    INDEX { tWredProfile }
+    ::= { tWredProfileTable 1 }
+
+TWredProfileEntry ::= SEQUENCE
+    {
+        tWredProfile            TSlopePolicy,
+        tWredRowStatus         	RowStatus,
+        tWredDescription       	TItemDescription,
+        tWredGreenStartAverage	Unsigned32,
+        tWredGreenMaxAverage	Unsigned32,
+        tWredGreenProbability	Unsigned32,
+        tWredYellowStartAverage	Unsigned32,
+        tWredYellowMaxAverage	Unsigned32,
+        tWredYellowProbability  Unsigned32,
+        tWredRedStartAverage    Unsigned32,
+        tWredRedMaxAverage      Unsigned32,
+        tWredRedProbability  	Unsigned32,
+        tWredLastChanged       	TimeStamp
+    }
+
+tWredProfile  OBJECT-TYPE
+    SYNTAX      TSlopePolicy
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tWredProfile maintains the id of the WRED Profile."
+    ::= { tWredProfileEntry 1 }
+
+tWredRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tWredProfileEntry 2 }
+
+tWredDescription  OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User-provided description of the profile."
+    DEFVAL { ''H }
+    ::= { tWredProfileEntry 3 }
+
+tWredGreenStartAverage  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop start threshold for the green traffic in kilobytes."
+    ::= { tWredProfileEntry 4 } 
+    
+tWredGreenMaxAverage  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Absolute drop threshold for the green traffic in kilobytes."
+    ::= { tWredProfileEntry 5 }
+
+tWredGreenProbability  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop probability slope for the green traffic."
+    ::= { tWredProfileEntry 6 }
+
+tWredYellowStartAverage  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop start threshold for the Yellow traffic in kilobytes."
+    ::= { tWredProfileEntry 7 } 
+    
+tWredYellowMaxAverage  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Absolute drop threshold for the Yellow traffic in kilobytes."
+    ::= { tWredProfileEntry 8 }
+
+tWredYellowProbability  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop probability slope for the Yellow traffic."
+    ::= { tWredProfileEntry 9 }  
+    
+tWredRedStartAverage  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop start threshold for the Red traffic in kilobytes."
+    ::= { tWredProfileEntry 10 } 
+    
+tWredRedMaxAverage  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Absolute drop threshold for the Red traffic in kilobytes."
+    ::= { tWredProfileEntry 11 }
+
+tWredRedProbability  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop probability slope for the Red traffic."
+    ::= { tWredProfileEntry 12 }
+
+
+tWredLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Timestamp of when this entry was last changed."
+    ::= { tWredProfileEntry 13 }
+
+--
+-- TailDrop profile table
+--
+
+qosTailDropProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QoSTailDropProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "Tail-drop profile Table. 
+		Each entry in this table defines set of tail-drop parameters that may be enforced 
+		on a queue or a policy."
+    ::= { tCongestionAvoidanceProfileObjects 1 }
+
+qosTailDropProfileEntry OBJECT-TYPE
+    SYNTAX       QoSTailDropProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Tail-drop Profile Entry."
+    INDEX { qosTailDropProfile}
+    ::= { qosTailDropProfileTable 1 }
+
+QoSTailDropProfileEntry ::= SEQUENCE
+    {
+        qosTailDropProfile				TTailDropId,
+        qosTailDropRowStatus			RowStatus,
+		qosMaxTailDropYellowTreshold    TTreshold,
+		qosMaxTailDropRedTreshold       TTreshold
+    }
+
+qosTailDropProfile  OBJECT-TYPE
+    SYNTAX      TTailDropId (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "qosTailDropProfile maintains the ID of the tail-drop profile"
+    ::= { qosTailDropProfileEntry 1 }
+        
+qosTailDropRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosTailDropProfileEntry 2 }
+
+qosMaxTailDropYellowTreshold  OBJECT-TYPE
+    SYNTAX       TTreshold
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "Maximum tail drop yellow treshold in %.Valid values are 25,50,75,100%"
+    DEFVAL { 100 }
+    ::= { qosTailDropProfileEntry 3 }
+    
+qosMaxTailDropRedTreshold  OBJECT-TYPE
+    SYNTAX       TTreshold
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Maximum tail drop red treshold in %.Valid values are 25,50,75,100%"
+    DEFVAL { 100 }
+    ::= { qosTailDropProfileEntry 4 }
+
+--
+-- SRED profile table
+--
+
+qosSredProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QoSSredProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "SRED profile configuration Table. 
+		Each entry in this table defines set of SRED parameters that may be enforced 
+		on a queue or a policy."
+    ::= { tCongestionAvoidanceProfileObjects 2 }
+
+qosSredProfileEntry OBJECT-TYPE
+    SYNTAX       QoSSredProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "SRED Profile Entry."
+    INDEX { qosTailDropProfile}
+    ::= { qosSredProfileTable 1 }
+
+QoSSredProfileEntry ::= SEQUENCE
+    {
+        qosSredProfile					TSredId,
+        qosSredRowStatus				RowStatus,
+		qosMaxSredYellowTreshold    	TTreshold,
+		qosMaxSredYellowProbaility  	TTreshold,
+		qosMaxSredRedTreshold   		TTreshold,
+		qosMaxSredRedProbability		TTreshold
+    }
+
+qosSredProfile  OBJECT-TYPE
+    SYNTAX      TSredId (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "qosSredProfile maintains the ID of the SRED profile"
+    ::= { qosSredProfileEntry 1 }
+        
+qosSredRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosSredProfileEntry 2 }
+
+qosMaxSredYellowTreshold  OBJECT-TYPE
+    SYNTAX       TTreshold
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "Maximum SRED yellow treshold in %.Valid values are 25,50,75,100%"
+    DEFVAL { 100 }
+    ::= { qosSredProfileEntry 3 }
+    
+qosMaxSredYellowProbaility  OBJECT-TYPE
+    SYNTAX       TTreshold
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Maximum SRED yellow probability in %.Valid values are 25,50,75,100%"
+    DEFVAL { 100 }
+    ::= { qosSredProfileEntry 4 }
+
+qosMaxSredRedTreshold  OBJECT-TYPE
+    SYNTAX       TTreshold
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "Maximum SRED Red treshold in %.Valid values are 25,50,75,100%"
+    DEFVAL { 100 }
+    ::= { qosSredProfileEntry 5 }
+    
+qosMaxSredRedProbability  OBJECT-TYPE
+    SYNTAX       TTreshold
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Maximum SRED Red probability in %.Valid values are 25,50,75,100%"
+    DEFVAL { 100 }
+    ::= { qosSredProfileEntry 6 }
+     
+--
+-- Shaper profile table
+--
+
+tShaperProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TShaperProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "Shaper profile Table. 
+		Each entry in this table defines set of shaping parameters that may be enforced 
+		on scheduler, port or queue."
+    ::= { tShaperObjects 1 }
+
+tShaperProfileEntry OBJECT-TYPE
+    SYNTAX       TShaperProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Shaper Profile Entry."
+    INDEX { tShaperProfileType, tShaperProfile, tShaperProfileDirection, tShaperProfileLevel}
+    ::= { tShaperProfileTable 1 }
+
+TShaperProfileEntry ::= SEQUENCE
+    {
+        tShaperProfileType		INTEGER,
+        tShaperProfile          TShaperId,
+        tShaperProfileDirection INTEGER,
+        tShaperProfileLevel		INTEGER,
+        tShaperRowStatus        RowStatus,
+        tShaperDescription      TItemDescription,
+		tShaperCIR              TRateValue,
+        tShaperPIR              TRateValue,
+		tShaperCBS              INTEGER,
+		tShaperMBS              INTEGER,
+        tShaperLastChanged      TimeStamp
+    }
+
+tShaperProfileType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+    			qos(1),
+    			hqos(2)  			
+    		   }
+    
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of the shaper. If used in QoS configuration(qos(1)) or
+        in HQoS configuration (hqos(2))"
+    ::= { tShaperProfileEntry 1 }
+
+tShaperProfile  OBJECT-TYPE
+    SYNTAX      TShaperId (1..216)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tShaperProfile maintains the ID of the shaping profile 
+        identifying the profile."
+    ::= { tShaperProfileEntry 2 }
+
+
+tShaperProfileDirection  OBJECT-TYPE
+    SYNTAX      INTEGER {
+    			serviceIngress(1),
+    			serviceEgress(2),
+    			networkEgress(3),
+			vlanEgress(4)    			
+    		   }
+    
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The direction of the shaper - service ingress, service egress,
+        network egress or vlan egress."
+    ::= { tShaperProfileEntry 3 }
+
+tShaperProfileLevel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+    			port(1),
+    			queue(2),
+    			l1Scheduler(3),
+    			l2Scheduler(4),
+    			qosPolicy(5)
+    		   }
+    
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Level of the shaper. For QoS shapers choose qosPolicy(5).
+		For HQoS configuration l1Scheduler(3) or l2Scheduler(4)"
+    ::= { tShaperProfileEntry 4 }
+        
+tShaperRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tShaperProfileEntry 5 }
+
+tShaperDescription  OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User-provided description of the shaper profile.
+        Not supported."
+    DEFVAL { ''H }
+    ::= { tShaperProfileEntry 6 }      
+    
+tShaperCIR  OBJECT-TYPE
+    SYNTAX       TRateValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Commited Information Rate in kbps."
+    DEFVAL { 0 }
+    ::= { tShaperProfileEntry 7 }
+    
+tShaperPIR  OBJECT-TYPE
+    SYNTAX       TRateValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Peak information rate allowed in kbps."
+    DEFVAL { 100 }
+    ::= { tShaperProfileEntry 8 }
+
+tShaperCBS  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The commited burst size allowed in kilobytes."
+    DEFVAL { 0 }
+    ::= { tShaperProfileEntry 9 }
+    
+tShaperMBS  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The max burst size allowed in kilobytes."
+    DEFVAL { 6000 }
+    ::= { tShaperProfileEntry 10 }
+
+tShaperLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Timestamp of when this entry was last changed.
+        Not supported."
+    ::= { tShaperProfileEntry 11 }
+      
+--
+-- Wfq object definition
+--  
+
+--
+-- Wfq service table
+-- 
+      
+tWfqServiceProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TWfqServiceProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        " "
+    ::= { tWfqObjects 1 }
+  
+tWfqServiceProfileEntry OBJECT-TYPE
+    SYNTAX       TWfqServiceProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about the service WFQ profiles available."
+    INDEX { tWfqServiceProfileNumber, tWfqServiceProfileDirection }
+    ::= { tWfqServiceProfileTable 1 }
+
+TWfqServiceProfileEntry ::= SEQUENCE
+    {
+        tWfqServiceProfileNumber       INTEGER,
+        tWfqServiceProfileDirection    INTEGER,
+        tWfqServiceProfileRowStatus    RowStatus,
+        tWfqServiceProfileWeight       INTEGER
+     }
+     
+tWfqServiceProfileNumber  OBJECT-TYPE
+    SYNTAX       INTEGER (0..61)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ID of the WFQ service profile.
+        Profile 0 can not be modified or deleted."
+    ::= { tWfqServiceProfileEntry 1 }   
+    
+tWfqServiceProfileDirection  OBJECT-TYPE
+    SYNTAX       INTEGER  {
+                 
+                 unknown(0),
+                 ingress(1),
+                 egress (2)
+                 
+                 }
+    
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The direction of the WFQ service profile - ingress or egress."
+    ::= { tWfqServiceProfileEntry 2 }
+ 
+tWfqServiceProfileRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status of the WFQ service profile."
+    ::= { tWfqServiceProfileEntry 3 }   
+    
+tWfqServiceProfileWeight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the WFQ service profile
+        is applied."
+    ::= { tWfqServiceProfileEntry 4 }   
+
+--
+-- Wfq network table
+-- 
+
+tWfqNetworkProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TWfqNetworkProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        " "
+    ::= { tWfqObjects 2 }   
+    
+tWfqNetworkProfileEntry OBJECT-TYPE
+    SYNTAX       TWfqNetworkProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a the service WFQ profiles available."
+    INDEX { tWfqNetworkProfileNumber }
+    ::= { tWfqNetworkProfileTable 1 }
+ 
+TWfqNetworkProfileEntry ::= SEQUENCE
+    {
+        tWfqNetworkProfileNumber       INTEGER,
+        tWfqNetworkProfileRowStatus    RowStatus,
+        tWfqNetworkProfileWeight       INTEGER,
+        tWfqNetworkProfileCIRWeight    INTEGER
+
+     }
+     
+tWfqNetworkProfileNumber  OBJECT-TYPE
+    SYNTAX       INTEGER (0..16)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ID of the WFQ network profile.
+         Profile 0 can not be modified or deleted."
+    ::= { tWfqNetworkProfileEntry 1 }   
+     
+tWfqNetworkProfileRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status of the WFQ network profile."
+    ::= { tWfqNetworkProfileEntry 2 }   
+    
+tWfqNetworkProfileWeight  OBJECT-TYPE
+    SYNTAX       INTEGER (1..220)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the WFQ network profile
+        is applied."
+    ::= { tWfqNetworkProfileEntry 3 }   
+    
+tWfqNetworkProfileCIRWeight  OBJECT-TYPE
+    SYNTAX       INTEGER (1..220)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative CIR weight for the packets where the WFQ network profile
+        is applied."
+    ::= { tWfqNetworkProfileEntry 4 }  
+  
+--
+-- Wfq scheduler table
+-- 
+
+tWfqSchedulerProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TWfqSchedulerProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        " "
+    ::= { tWfqObjects 3 }
+  
+tWfqSchedulerProfileEntry OBJECT-TYPE
+    SYNTAX       TWfqSchedulerProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a the scheduler WFQ profiles available."
+    INDEX { tWfqSchedulerProfileNumber, tWfqSchedulerProfileDirection }
+    ::= { tWfqSchedulerProfileTable 1 }
+
+TWfqSchedulerProfileEntry ::= SEQUENCE
+    {
+        tWfqSchedulerProfileNumber       INTEGER,
+        tWfqSchedulerProfileDirection    INTEGER,
+        tWfqSchedulerProfileRowStatus    RowStatus,
+        tWfqSchedulerProfileWeight       INTEGER,
+        tWfqSchedulerProfileCIRWeight	 INTEGER
+     }
+     
+tWfqSchedulerProfileNumber  OBJECT-TYPE
+    SYNTAX       INTEGER (0..48)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ID of the WFQ scheduler profile.
+         Profile 0 can not be modified or deleted."
+    ::= { tWfqSchedulerProfileEntry 1 }   
+    
+tWfqSchedulerProfileDirection  OBJECT-TYPE
+    SYNTAX       INTEGER  {
+                 
+                 unknown(0),
+                 ingress(1),
+                 egress (2)
+                 
+                 }
+    
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The direction of the WFQ scheduler profile - ingress or egress."
+    ::= { tWfqSchedulerProfileEntry 2 }
+ 
+tWfqSchedulerProfileRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status of the WFQ scheduler profile."
+    ::= { tWfqSchedulerProfileEntry 3 }   
+    
+tWfqSchedulerProfileWeight  OBJECT-TYPE
+    SYNTAX       INTEGER (1..220)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the WFQ scheduler profile
+        is applied."
+    ::= { tWfqSchedulerProfileEntry 4 }   
+
+tWfqSchedulerProfileCIRWeight  OBJECT-TYPE
+    SYNTAX       INTEGER (1..220)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative CIR weight for the packets where the WFQ scheduler profile
+        is applied."
+    ::= { tWfqSchedulerProfileEntry 5 }
+
+--
+-- QoS scheduling entry table
+-- 
+
+qosSchedulingProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosSchedulingProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about scheduling profiles "
+    ::= { qosSchedulingProfileObjects 1 }
+  
+qosSchedulingProfileEntry OBJECT-TYPE
+    SYNTAX       QosSchedulingProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a the scheduling profiles available."
+    INDEX { qosSchedulingProfile, qosSchedulingProfileDirection, qosSchedulingType}
+    ::= { qosSchedulingProfileTable 1 }
+
+
+QosSchedulingProfileEntry ::= SEQUENCE
+    {
+        qosSchedulingProfile			INTEGER,
+        qosSchedulingProfileDirection	INTEGER,
+		qosSchedulingType				INTEGER,
+		qosSchedulingRowStatus		    RowStatus,
+		qosSchedulingQ1Weight			INTEGER,
+		qosSchedulingQ2Weight			INTEGER,
+		qosSchedulingQ3Weight			INTEGER,
+		qosSchedulingQ4Weight			INTEGER,
+		qosSchedulingQ5Weight			INTEGER,
+		qosSchedulingQ6Weight			INTEGER,
+		qosSchedulingQ7Weight			INTEGER,
+		qosSchedulingQ8Weight			INTEGER
+     }
+     
+qosSchedulingProfile  OBJECT-TYPE
+    SYNTAX       INTEGER (1..26)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ID of the scheduling profile."
+    ::= { qosSchedulingProfileEntry 1 }   
+    
+qosSchedulingProfileDirection  OBJECT-TYPE
+    SYNTAX       INTEGER  {            
+                 unknown(0),
+                 ingress(1),
+                 egress (2) 
+                 }
+    
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The direction of the WFQ scheduler profile - ingress or egress.
+        Reserved for future use"
+    ::= { qosSchedulingProfileEntry 2 }
+
+qosSchedulingType  OBJECT-TYPE
+    SYNTAX       INTEGER  { 
+                 sp(1),
+                 wrr (2),
+                 hybrid-1 (3),
+                 hybrid-2 (4),
+                 hybrid-3 (5),
+                 hybrid-4 (6),
+                 hybrid-5 (7),
+                 hybrid-6 (8),
+                 drr (9),
+				 mdrr-1 (10),
+                 mdrr-2 (11),
+                 mdrr-3 (12),
+                 mdrr-4 (13),
+                 mdrr-5 (14),
+                 mdrr-6 (15)
+                 }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The the of scheduling profile.
+        One of the following values can be chosen
+		unknown(0),
+        sp(1),
+        wrr (2),
+        hybrid-1 (3),
+        hybrid-2 (4),
+        hybrid-3 (5),
+        hybrid-4 (6),
+        hybrid-5 (7),
+        hybrid-6 (8),
+		drr (9),
+		mdrr-1 (10),
+		mdrr-2 (11),
+		mdrr-3 (12),
+		mdrr-4 (13),
+		mdrr-5 (14),
+		mdrr-6 (15)"
+    ::= { qosSchedulingProfileEntry 3 }
+
+qosSchedulingRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status of the scheduling profile."
+    ::= { qosSchedulingProfileEntry 4 } 
+       
+qosSchedulingQ1Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 1."
+    ::= { qosSchedulingProfileEntry 5 }   
+
+qosSchedulingQ2Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 2."
+    ::= { qosSchedulingProfileEntry 6 } 
+
+qosSchedulingQ3Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 3."
+    ::= { qosSchedulingProfileEntry 7 } 
+    
+qosSchedulingQ4Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 4."
+    ::= { qosSchedulingProfileEntry 8 } 
+
+qosSchedulingQ5Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 5."
+    ::= { qosSchedulingProfileEntry 9 } 
+    
+qosSchedulingQ6Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 6."
+    ::= { qosSchedulingProfileEntry 10 } 
+    
+qosSchedulingQ7Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 7."
+    ::= { qosSchedulingProfileEntry 11 } 
+    
+qosSchedulingQ8Weight  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The relative weight for the packets where the scheduling profile
+        is applied for queue 8."
+    ::= { qosSchedulingProfileEntry 12 } 
+     
+--
+-- qos service policy table
+--
+
+qosServicePolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosServicePolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Qos service policy table. Keeps comman information for the QoS service policy "
+    ::= { qosServicePolicyObjects 1 }
+
+qosServicePolicyEntry OBJECT-TYPE
+    SYNTAX       QosServicePolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular QoS service Policy.
+        "
+    INDEX { qosServicePolicy }
+    ::= { qosServicePolicyTable 1 }
+
+QosServicePolicyEntry ::= SEQUENCE
+    {
+        qosServicePolicy							TNamedItem,
+		qosServicePolicyRowStatus					RowStatus,
+        qosServicePolicyDescription					TItemDescription
+    }
+
+qosServicePolicy  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "QoS service policy index. String up to 6 characters"
+    REFERENCE ""
+    ::= { qosServicePolicyEntry 1 }
+
+qosServicePolicyRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "Row status of the QoS network policy.
+    			 QoS service policy is created with createAndWait(5)."
+    ::= { qosServicePolicyEntry 2 }
+
+
+qosServicePolicyDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "User-defined description of the QoS service policy"
+    DEFVAL { ''H }
+    ::= { qosServicePolicyEntry 3 }
+  
+--
+-- service ingress policy table
+--
+
+qosServiceIngressPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosServiceIngressPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all QoS service ingress policies' configuration."
+    ::= { qosServicePolicyObjects 2 }
+
+qosServiceIngressPolicyEntry OBJECT-TYPE
+    SYNTAX       QosServiceIngressPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service policy's ingress
+         per-forwarding-class traffic disposition.
+
+         Entries are created/deleted as an action of creating/deleting
+         a row in the qosServiceIngressTable.
+        "
+    INDEX { qosServicePolicy}
+    ::= { qosServiceIngressPolicyTable 1 }
+
+    
+QosServiceIngressPolicyEntry ::= SEQUENCE
+    {           
+        qosServPolicyShaperProfile						TShaperId,
+        qosServPolicySchedulingProfile					TSSchedulingProfile,
+        qosServPolicyTailDropProfile					TTailDropId
+    }
+ 
+qosServPolicyShaperProfile  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Shaper profile ID. Valid shaper profile Id range is 9-57.
+        To remove the shaper profile use ID 0"
+    ::= { qosServiceIngressPolicyEntry 1 }
+
+qosServPolicySchedulingProfile  OBJECT-TYPE
+    SYNTAX       TSSchedulingProfile
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Scheduling profile ID. Valid scheduling profile Id range
+        is 1-8. To remove the scheduling profile use ID 0"
+    ::= { qosServiceIngressPolicyEntry 2 } 
+    
+qosServPolicyTailDropProfile  OBJECT-TYPE
+    SYNTAX       TTailDropId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Tail drop profile configured. Valid tail-drop profile Id range
+        is 1-5. To remove the scheduling profile use ID 0"
+    ::= { qosServiceIngressPolicyEntry 3 } 
+
+--
+-- service ingress queue table
+--
+
+qosServiceIngressQueueTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF QosServiceIngressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all QoS service ingress policies' configuration."
+    ::= { qosServicePolicyObjects 3 }
+
+qosServiceIngressQueueEntry OBJECT-TYPE
+    SYNTAX       QosServiceIngressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular service policy's ingress
+         per-forwarding-class traffic disposition.
+
+         Entries are created/deleted as an action of creating/deleting
+         a row in the qosServiceIngressTable.
+        "
+    INDEX { qosServicePolicy}
+    ::= { qosServiceIngressQueueTable 1 }
+
+    
+QosServiceIngressQueueEntry ::= SEQUENCE
+    {                                 
+        qosServInQueueQueue            		TQueueId,
+        qosServInQueueRowStatus        		RowStatus,
+        qosServInQueueShaperProfile			TShaperId,
+        qosServInQueueTailDropProfile		TTailDropId
+    }
+
+qosServInQueueQueue  OBJECT-TYPE
+    SYNTAX       TQueueId (1..8)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Service queue identifier.
+        The queue ID is used as an index of the table entry."
+    ::= { qosServiceIngressQueueEntry 1 }
+
+qosServInQueueRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosServiceIngressQueueEntry 2 }
+
+qosServInQueueTailDropProfile  OBJECT-TYPE
+    SYNTAX       TTailDropId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Tail drop profile configured. Valid tail-drop profile Id range
+        is 1-5. To remove the scheduling profile use ID 0"
+    ::= { qosServiceIngressQueueEntry 4 } 
+
+qosServInQueueShaperProfile  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Shaper profile ID. Valid shaper profile Id range is 9-57.
+        To remove the shaper profile use ID 0"
+    ::= { qosServiceIngressQueueEntry 3 } 
+
+--
+-- qos network policy table
+--
+
+qosNetworkPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosNetworkPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Qos network policy table. Keeps comman information for the QoS network policy "
+    ::= { qosNetworkPolicyObjects 1 }
+
+qosNetworkPolicyEntry OBJECT-TYPE
+    SYNTAX       QosNetworkPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular QoS network Policy.
+
+		 Default Entry is created by the agent, other entries are
+         created by user.
+        "
+    INDEX { qosNetworkPolicy }
+    ::= { qosNetworkPolicyTable 1 }
+
+QosNetworkPolicyEntry ::= SEQUENCE
+    {
+        qosNetworkPolicy							TNamedItem,
+		qosNetworkPolicyRowStatus					RowStatus,
+        qosNetworkPolicyDescription					TItemDescription
+    }
+
+qosNetworkPolicy  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "QoS network policy index. String up to 6 characters"
+    REFERENCE ""
+    ::= { qosNetworkPolicyEntry 1 }
+
+qosNetworkPolicyRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "Row status of the QoS network policy.
+    			 QoS Network policy is created with createAndWait(5)."
+    ::= { qosNetworkPolicyEntry 2 }
+
+
+qosNetworkPolicyDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "User-defined description of the QoS network policy"
+    DEFVAL { ''H }
+    ::= { qosNetworkPolicyEntry 3 }
+    
+--
+-- QoS network ingress policy table
+--
+
+qosNetworkIngressTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QoSNetworkIngressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about QoS network ingress policy."
+    ::= { qosNetworkPolicyObjects 2 }
+
+qosNetworkIngressEntry OBJECT-TYPE
+    SYNTAX       QoSNetworkIngressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a QoS network ingress policy.
+
+         Some default entries are created by the agent . These cannot be deleted 
+         Other entries are created/deleted by user.
+        "
+    INDEX { qosNetworkPolicy}
+    ::= { qosNetworkIngressTable 1 }
+
+QoSNetworkIngressEntry ::= SEQUENCE
+    {
+		qosNetworkIngressFC					TFCNameOrEmpty,
+		qosNetworkIngressConformance 		TConformanceLevel,
+        qosTrustDot1pMode            		TruthValue,
+		qosTrustDot1pModePreservePriority	TruthValue,
+		qosTrustDscpMode            		TruthValue
+    }
+
+qosNetworkIngressFC  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Mapping of ingress traffic to forwarding class."
+    ::= { qosNetworkIngressEntry 1 }
+
+qosNetworkIngressConformance  OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Indentifies conformance level green or yellow for a frames through a forwarding class."
+    ::= { qosNetworkIngressEntry 2 }
+
+qosTrustDot1pMode  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Enables/disables Dot1p trust mode.
+        802.1p is taken from packet.
+        Default mode is untrusted"
+    ::= { qosNetworkIngressEntry 3 }
+
+qosTrustDot1pModePreservePriority  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Enables/disables Dot1p trust mode and preserve priority.
+        802.1p is taken from packet and is preserved on egress.
+        Default mode is untrusted"
+    ::= { qosNetworkIngressEntry 4 }
+
+qosTrustDscpMode  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Enables/disables DSCP trust mode.
+        DSCP is taken from packet.
+        Default mode is untrusted"
+    ::= { qosNetworkIngressEntry 5 }
+
+--
+-- network egress policy table
+--
+
+qosNetworkEgressTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosNetworkEgressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all QoS network policies' egress FC traffic disposition."
+    ::= { qosNetworkPolicyObjects 3 }
+
+qosNetworkEgressEntry OBJECT-TYPE
+    SYNTAX       QosNetworkEgressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular network policy's egress
+         per-forwarding-class traffic disposition.
+
+         Entries are created/deleted as an action of creating/deleting
+         a row in the qosNetworkEgressTable.
+        "
+    INDEX { qosNetworkPolicy}
+    ::= { qosNetworkEgressTable 1 }
+
+    
+QosNetworkEgressEntry ::= SEQUENCE
+    {
+        qosNetPolicySchedulingProfile				TSSchedulingProfile, 
+        qosNetPolicyShaperProfile					TShaperId,
+        qosNetPolicyTailDropProfile					TTailDropId,
+        qosNetPolicySredProfile						TSredId
+    }
+
+   
+qosNetPolicySchedulingProfile  OBJECT-TYPE
+    SYNTAX       TSSchedulingProfile
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The ID of a scheduling profile configured. Valid scheduling profile Id range
+        is 1-8. To remove the scheduling profile use ID 0"
+    ::= { qosNetworkEgressEntry 1 }   
+
+ 
+qosNetPolicyShaperProfile  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Shaper profile ID. Valid shaper profile Id range is 1-8.
+        To remove the shaper profile use ID 0"
+    ::= { qosNetworkEgressEntry 2 }
+
+qosNetPolicyTailDropProfile  OBJECT-TYPE
+    SYNTAX       TTailDropId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Tail drop profile configured. Valid tail-drop profile Id range
+        is 1-8. To remove the scheduling profile use ID 0"
+    ::= { qosNetworkEgressEntry 3 }   
+
+ 
+qosNetPolicySredProfile  OBJECT-TYPE
+    SYNTAX       TSredId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The SRED profile ID. Valid SRED profile Id range is 1-8.
+        To remove the SRED profile use ID 0"
+    ::= { qosNetworkEgressEntry 4 }
+    
+--
+-- QoS network egress policy queue table
+--
+
+qosNetworkEgressQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosNetworkEgressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about QoS network queues."
+    ::= { qosNetworkPolicyObjects 4 }
+
+qosNetworkEgressQueueEntry OBJECT-TYPE
+    SYNTAX       QosNetworkEgressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Qos network queue configuration"
+    INDEX { qosNetworkPolicy,qosNetworkQueue }
+    ::= { qosNetworkEgressQueueTable 1 }
+
+QosNetworkEgressQueueEntry ::= SEQUENCE
+    {
+        qosNetworkQueue                 TQueueId,
+        qosNetworkQueueRowStatus        RowStatus,
+        qosNetworkQueueShaperProfile			TShaperId,
+        qosNetworkQueueTailDropProfile			TTailDropId,
+        qosNetworkQueueSredProfile				TSredId
+    }
+
+qosNetworkQueue  OBJECT-TYPE
+    SYNTAX       TQueueId (1..8)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Network queue identifier.
+        The queue ID is used as an index of the table entry."
+    ::= { qosNetworkEgressQueueEntry 1 }
+
+qosNetworkQueueRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosNetworkEgressQueueEntry 2 }
+
+
+qosNetworkQueueShaperProfile  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Shaper profile on this queue"
+    ::= { qosNetworkEgressQueueEntry 3 }
+
+qosNetworkQueueTailDropProfile  OBJECT-TYPE
+    SYNTAX       TTailDropId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Tail-drop profile on this queue"
+    ::= { qosNetworkEgressQueueEntry 4 }
+    
+qosNetworkQueueSredProfile  OBJECT-TYPE
+    SYNTAX       TSredId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Sred profile on this queue"
+    ::= { qosNetworkEgressQueueEntry 5 }
+     
+--
+-- QoS global table
+--
+
+qosGlobalIngressMapTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosGlobalIngressMapEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Global Qos Configuration table."
+    ::= { qosGlobalObjects 1 }
+
+qosGlobalIngressMapEntry OBJECT-TYPE
+    SYNTAX       QosGlobalIngressMapEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Global Ingress QoS Configuration table"
+    INDEX { qosIngressMapType, qosIngressMapValue }
+    ::= { qosGlobalIngressMapTable 1 }
+
+QosGlobalIngressMapEntry ::= SEQUENCE
+    {
+        qosIngressMapType				INTEGER,
+        qosIngressMapValue				INTEGER,
+        qosIngressRowStatus        		RowStatus,
+        qosIngressFC					TFCNameOrEmpty,
+        qosIngressFCConformance			TConformanceLevel
+    }
+
+qosIngressMapType  OBJECT-TYPE
+    SYNTAX		INTEGER {
+                dot1p(1),
+                dscp(2)
+    }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The type of the configuration entry for this mapping."
+    ::= { qosGlobalIngressMapEntry 1 }
+    
+
+qosIngressMapValue  OBJECT-TYPE
+    SYNTAX       INTEGER (0..64)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Specify DSCP or Dot1p value to be mapped to a Formawding class"
+    ::= { qosGlobalIngressMapEntry 2 }
+
+qosIngressRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table. The entry is created by qosIngressMapType and qosIngressMapValue"
+    ::= { qosGlobalIngressMapEntry 3 }
+
+qosIngressFC  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "Forwarding class to which the traffic will flow"
+    ::= { qosGlobalIngressMapEntry 4 }
+    
+qosIngressFCConformance  OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "Conformance level: green or yellow"
+    ::= { qosGlobalIngressMapEntry 5 }
+
+qosGlobalEgressRemarkTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosGlobalEgressRemarkEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Global Qos Egress Configuration table."
+    ::= { qosGlobalObjects 2 }
+    
+qosGlobalEgressRemarkEntry OBJECT-TYPE
+    SYNTAX       QosGlobalEgressRemarkEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Global Egress QoS Configuration table"
+    INDEX { qosEgressFC, qosEgressFCConformance }
+    ::= { qosGlobalEgressRemarkTable 1 }
+
+QosGlobalEgressRemarkEntry ::= SEQUENCE
+    {
+        qosEgressFC						TFCNameOrEmpty,
+        qosEgressFCConformance			TConformanceLevel,
+		qosEgressRowStatus        		RowStatus,
+        qosEgressRemarkType				INTEGER,
+        qosEgressRemarkValue			INTEGER
+    }
+
+qosEgressFC  OBJECT-TYPE
+    SYNTAX       TFCNameOrEmpty
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "Choose forwarding class to configure egress remarking"
+    ::= { qosGlobalEgressRemarkEntry 1 }
+ 
+qosEgressFCConformance  OBJECT-TYPE
+    SYNTAX       TConformanceLevel
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Previous conformance level: green or yellow"
+    ::= { qosGlobalEgressRemarkEntry 2 } 
+
+qosEgressRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosGlobalEgressRemarkEntry 3 }
+
+  
+qosEgressRemarkType  OBJECT-TYPE
+    SYNTAX		INTEGER {
+                dot1p(1),
+                dscp(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Choose what fields in frame are going to be remarked(DSCP or Dot1p).
+        Dscp type is not supported"
+    ::= { qosGlobalEgressRemarkEntry 4 }
+    
+
+qosEgressRemarkValue  OBJECT-TYPE
+    SYNTAX       INTEGER (0..63)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Choose new value of field specified in qosEgressRemarkType to be remarked."
+    ::= { qosGlobalEgressRemarkEntry 5 }
+
+--
+-- QoS Service Table.
+--
+
+qosServiceTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF QosServiceEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS service configuration"
+   ::= { qosServiceObjects 1 }
+
+qosServiceEntry OBJECT-TYPE
+   SYNTAX        QosServiceEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS configuration on a service."
+   INDEX       { qosServiceIndex}
+      ::= { qosServiceTable 1 }
+
+QosServiceEntry ::= SEQUENCE {
+	qosServiceIndex						Integer32,
+	qosServiceRowStatus        			RowStatus,
+	qosServicePolicyOnServ         		TNamedItem
+}
+
+qosServiceIndex OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        qosServiceTable."
+   REFERENCE
+       "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+        and F. Kastenholtz, June 2000"
+   ::= { qosServiceEntry 1 }
+
+qosServiceRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION	 "This object indicates the status of this row. The
+	values supported during a set operation are createAndGo(4) 
+	active(1), notInService(2) and destroy(6).
+	Creation or deletion of an entry in this table means enable or removal
+	of QoS policy on a specific service entry."
+    ::= { qosServiceEntry 2 }  
+    
+qosServicePolicyOnServ OBJECT-TYPE
+   SYNTAX        TNamedItem
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Service QoS Policy Id to be applied on a service."
+   ::= { qosServiceEntry 3 }
+
+--
+-- QoS SAP Table.
+--
+
+qosServiceSapTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF QosServiceSapEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION	"A table that contains QoS SAP information."
+   ::= { qosServiceObjects 2 }
+
+qosServiceSapEntry OBJECT-TYPE
+   SYNTAX        QosServiceSapEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS configuration on a SAP."
+   INDEX       { qosServiceIndex, qosServiceSapPortId, qosServiceSapEncapValue}
+      ::= { qosServiceSapTable 1 }
+
+QosServiceSapEntry ::= SEQUENCE {
+	qosServiceSapPortId					INTEGER,
+	qosServiceSapEncapValue				TQEncapVal,
+	qosServiceSapRowStatus        		RowStatus,
+	qosServiceSapPolicyEnable          	TruthValue
+}
+
+   
+qosServiceSapPortId OBJECT-TYPE
+   SYNTAX        INTEGER (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION	"The ID of the access port where this SAP
+				is defined."
+   ::= { qosServiceSapEntry 1 }
+
+qosServiceSapEncapValue OBJECT-TYPE
+    SYNTAX          TQEncapVal
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of the label used to identify this
+                     SAP on the access port specified by sapPortId."
+    ::= { qosServiceSapEntry 2 }
+    
+qosServiceSapRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION	 "This object indicates the status of this row. The
+	values supported during a set operation are createAndGo(4) 
+	active(1), notInService(2) and destroy(6).
+	Creation or deletion of an entry in this table means enable or disable
+	of QoS configuration on a specific SAP entry."
+    ::= { qosServiceSapEntry 3 }  
+    
+qosServiceSapPolicyEnable OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The object enables or disables QoS configuration on a specific SAP entry for the service."
+   ::= { qosServiceSapEntry 4 }
+   
+--
+-- QoS Interface Table.
+--
+
+qosInterfaceTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF QoSInterfaceEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS interface configuration"
+   ::= { qosInterfaceObjects 1 }
+
+qosInterfaceEntry OBJECT-TYPE
+   SYNTAX        QoSInterfaceEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS configuration on an 
+       interface."
+   INDEX       { qosInterfaceIndex}
+      ::= { qosInterfaceTable 1 }
+
+QoSInterfaceEntry ::= SEQUENCE {
+	qosInterfaceIndex					InterfaceIndexOrZero,
+	qosInterfaceRowStatus        		RowStatus,
+	qosInterfacePolicy             		TNamedItem
+}
+
+qosInterfaceIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        qosInterfaceTable."
+   REFERENCE
+       "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+        and F. Kastenholtz, June 2000"
+   ::= { qosInterfaceEntry 1 }
+
+qosInterfaceRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosInterfaceEntry 2 }  
+    
+qosInterfacePolicy OBJECT-TYPE
+   SYNTAX        TNamedItem
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Network QoS Policy Id to be applied on a port."
+   ::= { qosInterfaceEntry 3 }
+
+--
+-- QoS Statistics Table.
+--
+ 
+qosStatisticsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QoSStatisticsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table displays QoS statistics information based on port and queue."
+    ::= { qosStatisticsObjects 1 }
+
+qosStatisticsEntry OBJECT-TYPE
+    SYNTAX       QoSStatisticsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table is responsible for displaying common QoS statistics on an 
+       interface and/or queue."
+    INDEX { qosStatInterfaceIndex,  qosQueueIndex}
+    ::= { qosStatisticsTable 1 }
+
+ QoSStatisticsEntry ::= SEQUENCE
+ 	{
+		qosStatInterfaceIndex				InterfaceIndexOrZero,
+		qosQueueIndex        				TQueueId,
+		qosReceivedBytes             		Counter32,
+		qosDroppedBytes             		Counter32,
+		qosClearStatistics					TruthValue
+	}
+  
+qosStatInterfaceIndex  OBJECT-TYPE
+	SYNTAX       InterfaceIndexOrZero
+	MAX-ACCESS    not-accessible
+	STATUS       current
+	DESCRIPTION
+       "This is a unique index for an entry in the
+        qosStatisticsTable."
+   REFERENCE
+       "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+        and F. Kastenholtz, June 2000"
+    ::= { qosStatisticsEntry 1 }   
+
+qosQueueIndex  OBJECT-TYPE
+    SYNTAX       TQueueId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This is a unique index for an entry in the
+        qosStatisticsTable."
+    ::= { qosStatisticsEntry 2 }
+
+qosReceivedBytes  OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Received bytes on the port/queue."
+    ::= { qosStatisticsEntry 3 }   
+
+qosDroppedBytes  OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+   DESCRIPTION
+       "Dropped bytes on the port/queue."
+    ::= { qosStatisticsEntry 4 }
+
+qosClearStatistics  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"Clear statistics.Set to true to clear the statistics"
+    DEFVAL { false }
+    ::= { qosStatisticsEntry 5 }
+           
+--
+-- qos vlan policy table
+--
+
+qosVlanPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosVlanPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Qos VLAN policy table. Keeps comman information for the QoS VLAN policy "
+    ::= { qosVlanPolicyObjects 1 }
+
+qosVlanPolicyEntry OBJECT-TYPE
+    SYNTAX       QosVlanPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular QoS VLAN Policy.
+        "
+    INDEX { qosVlanPolicy }
+    ::= { qosVlanPolicyTable 1 }
+
+QosVlanPolicyEntry ::= SEQUENCE
+    {
+        qosVlanPolicy						TNamedItem,
+        qosVlanPolicyDescription				TItemDescription,
+	qosVlanPolicyRowStatus					RowStatus
+    }
+
+qosVlanPolicy  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "QoS VLAN policy index. String up to 6 characters"
+    REFERENCE ""
+    ::= { qosVlanPolicyEntry 1 }
+
+qosVlanPolicyDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "User-defined description of the QoS VLAN policy"
+    DEFVAL { ''H }
+    ::= { qosVlanPolicyEntry 2 }
+
+qosVlanPolicyRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "Row status of the QoS network policy.
+    			 QoS VLAN policy is created with createAndWait(5)."
+    ::= { qosVlanPolicyEntry 3 }
+  
+--
+-- vlan ingress policy table
+--
+
+qosVlanIngressPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosVlanIngressPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all QoS VLAN ingress policies' configuration."
+    ::= { qosVlanPolicyObjects 2 }
+
+qosVlanIngressPolicyEntry OBJECT-TYPE
+    SYNTAX       QosVlanIngressPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular VLAN policy's ingress
+         per-forwarding-class traffic disposition.
+
+         Entries are created/deleted as an action of creating/deleting
+         a row in the qosVlanIngressTable.
+        "
+    INDEX { qosVlanPolicy}
+    ::= { qosVlanIngressPolicyTable 1 }
+
+    
+QosVlanIngressPolicyEntry ::= SEQUENCE
+    {           
+        qosVlanPolicyShaperProfile					TShaperId,
+        qosVlanPolicySchedulingProfile					TSSchedulingProfile,
+        qosVlanPolicyTailDropProfile					TTailDropId
+    }
+ 
+qosVlanPolicyShaperProfile  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Shaper profile ID. Valid shaper profile Id range is 9-57.
+        To remove the shaper profile use ID 0"
+    ::= { qosVlanIngressPolicyEntry 1 }
+
+qosVlanPolicySchedulingProfile  OBJECT-TYPE
+    SYNTAX       TSSchedulingProfile
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Scheduling profile ID. Valid scheduling profile Id range
+        is 1-8. To remove the scheduling profile use ID 0"
+    ::= { qosVlanIngressPolicyEntry 2 } 
+    
+qosVlanPolicyTailDropProfile  OBJECT-TYPE
+    SYNTAX       TTailDropId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Tail drop profile configured. Valid tail-drop profile Id range
+        is 1-5. To remove the scheduling profile use ID 0"
+    ::= { qosVlanIngressPolicyEntry 3 } 
+
+--
+-- vlans ingress queue table
+--
+
+qosVlanIngressQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF QosVlanIngressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all QoS VLAN ingress policies' configuration."
+    ::= { qosVlanPolicyObjects 3 }
+
+qosVlanIngressQueueEntry OBJECT-TYPE
+    SYNTAX       QosVlanIngressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular VLAN policy's ingress
+         per-forwarding-class traffic disposition.
+
+         Entries are created/deleted as an action of creating/deleting
+         a row in the qosVlanIngressTable.
+        "
+    INDEX { qosVlanPolicy}
+    ::= { qosVlanIngressQueueTable 1 }
+
+    
+QosVlanIngressQueueEntry ::= SEQUENCE
+    {                                 
+        qosVlanInQueueQueue            		TQueueId,
+	qosVlanInQueueShaperProfile		TShaperId,
+        qosVlanInQueueTailDropProfile		TTailDropId,
+        qosVlanInQueueRowStatus        		RowStatus
+    }
+
+qosVlanInQueueQueue  OBJECT-TYPE
+    SYNTAX       TQueueId (1..8)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Service queue identifier.
+        The queue ID is used as an index of the table entry."
+    ::= { qosVlanIngressQueueEntry 1 }
+
+    qosVlanInQueueShaperProfile  OBJECT-TYPE
+    SYNTAX       TShaperId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Shaper profile ID. Valid shaper profile Id range is 9-57.
+        To remove the shaper profile use ID 0"
+    ::= { qosVlanIngressQueueEntry 2 } 
+
+qosVlanInQueueTailDropProfile  OBJECT-TYPE
+    SYNTAX       TTailDropId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The ID of a Tail drop profile configured. Valid tail-drop profile Id range
+        is 1-5. To remove the scheduling profile use ID 0"
+    ::= { qosVlanIngressQueueEntry 3 } 
+
+qosVlanInQueueRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { qosVlanIngressQueueEntry 4 }
+
+
+
+--
+-- QoS VLAN Table.
+--
+
+qosVlanTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF QosVlanEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS VLAN configuration"
+   ::= { qosVlanObjects 1 }
+
+qosVlanEntry OBJECT-TYPE
+   SYNTAX        QosVlanEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS configuration on a VLAN."
+   INDEX       { qosVlanIndex}
+      ::= { qosVlanTable 1 }
+
+QosVlanEntry ::= SEQUENCE {
+	qosVlanIndex				Integer32,
+	qosVlanPolicyOnVlan        		TNamedItem,
+	qosVlanRowStatus        		RowStatus
+}
+
+qosVlanIndex OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        qosVlanTable."
+   REFERENCE
+       "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+        and F. Kastenholtz, June 2000"
+   ::= { qosVlanEntry 1 }
+
+qosVlanPolicyOnVlan OBJECT-TYPE
+   SYNTAX        TNamedItem
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "VLAN QoS Policy Id to be applied on a VLAN."
+   ::= { qosVlanEntry 2 }
+
+qosVlanRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION	 "This object indicates the status of this row. The
+	values supported during a set operation are createAndGo(4) 
+	active(1), notInService(2) and destroy(6).
+	Creation or deletion of an entry in this table means enable or removal
+	of QoS policy on a specific VLAN entry."
+    ::= { qosVlanEntry 3 } 
+
+--
+-- QoS VLAN ingress Table.
+--
+
+qosVlanIngressPortTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF QosVlanIngressPortEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION	"A table that contains QoS VLAN Ingress Port information."
+   ::= { qosVlanObjects 2 }
+
+qosVlanIngressPortEntry OBJECT-TYPE
+   SYNTAX        QosVlanIngressPortEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table will be responsible for managing QoS configuration on a SAP."
+   INDEX       { qosVlanIndex, qosVlanIngressPortId}
+      ::= { qosVlanIngressPortTable 1 }
+
+QosVlanIngressPortEntry ::= SEQUENCE {
+	qosVlanIngressPortId			INTEGER,
+	qosVlanPortPolicyEnable          	TruthValue,
+	qosVlanPortRowStatus        		RowStatus
+}
+   
+qosVlanIngressPortId OBJECT-TYPE
+   SYNTAX        INTEGER (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION	"The ID of the access port where thingress port for given VLAN."
+   ::= { qosVlanIngressPortEntry 1 }
+
+qosVlanPortPolicyEnable OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The object enables or disables QoS configuration on a specific VLAN port."
+   ::= { qosVlanIngressPortEntry 2 }
+    
+qosVlanPortRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION	 "This object indicates the status of this row. The
+	values supported during a set operation are createAndGo(4) 
+	active(1), notInService(2) and destroy(6).
+	Creation or deletion of an entry in this table means enable or disable
+	of QoS configuration on a specific VLAN port."
+    ::= { qosVlanIngressPortEntry 3 }  
+           
+  END

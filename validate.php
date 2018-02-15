@@ -103,13 +103,13 @@ if (!str_contains(shell_exec('php scripts/composer_wrapper.php --version'), 'Com
 $dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
 preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
 if (!empty($dep_missing[0])) {
-    print_fail("Missing dependencies!", "composer install --no-dev");
+    print_fail("Missing dependencies!", "./scripts/composer_wrapper.php install --no-dev");
     $pre_checks_failed = true;
     print_list($dep_missing[1], "\t %s\n");
 }
 preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
 if (!empty($dep_outdated[0])) {
-    print_fail("Outdated dependencies", "composer install --no-dev");
+    print_fail("Outdated dependencies", "./scripts/composer_wrapper.php install --no-dev");
     print_list($dep_outdated[1], "\t %s\n");
 }
 
@@ -135,8 +135,7 @@ try {
     dbConnect();
 
     // pull in the database config settings
-    mergedb();
-    require 'includes/process_config.inc.php';
+    Config::loadFromDatabase();
 
     $validator->ok('Database connection successful', null, 'database');
 } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {

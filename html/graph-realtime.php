@@ -92,10 +92,10 @@ print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
     <text id="graph_out_txt" x="20" y="16" <?php echo($attribs['out']) ?>> </text>
     <text id="ifname" x="<?php echo($width-2) ?>" y="8" <?php echo($attribs['graphname']) ?> text-anchor="end"><?php echo($ifname) ?></text>
     <text id="hostname" x="<?php echo($width-2) ?>" y="14" <?php echo($attribs['hostname']) ?> text-anchor="end"><?php echo($hostname) ?></text>
-    <text id="switch_unit" x="<?php echo($width*0.55) ?>" y="5" <?php echo($attribs['switch_unit']) ?>>Switch to bytes/s</text>
-    <text id="switch_scale" x="<?php echo($width*0.55) ?>" y="11" <?php echo($attribs['switch_scale']) ?>>AutoScale (<?php echo($scale_type) ?>)</text>
+    <text id="switch_unit" x="<?php echo($width*0.48) ?>" y="5" <?php echo($attribs['switch_unit']) ?>>Switch to bytes/s</text>
+    <text id="switch_scale" x="<?php echo($width*0.48) ?>" y="11" <?php echo($attribs['switch_scale']) ?>>AutoScale (<?php echo($scale_type) ?>)</text>
     <text id="datetime" x="<?php echo($width*0.33) ?>" y="5" <?php echo($attribs['legend']) ?>> </text>
-    <text id="graphlast" x="<?php echo($width*0.55) ?>" y="17" <?php echo($attribs['legend']) ?>>Graph shows last <?php echo($time_interval*$nb_plot) ?> seconds</text>
+    <text id="graphlast" x="<?php echo($width*0.48) ?>" y="17" <?php echo($attribs['legend']) ?>>Graph shows last <?php echo($time_interval*$nb_plot) ?> seconds</text>
     <polygon id="axis_arrow_x" <?php echo($attribs['axis']) ?> points="<?php echo($width . "," . $height) ?> <?php echo(($width-2) . "," . ($height-2)) ?> <?php echo(($width-2) . "," . $height) ?>"/>
     <text id="error" x="<?php echo($width*0.5) ?>" y="<?php echo($height*0.5) ?>"  visibility="hidden" <?php echo($attribs['error']) ?> text-anchor="middle"><?php echo($error_text) ?></text>
     <text id="collect_initial" x="<?php echo($width*0.5) ?>" y="<?php echo($height*0.5) ?>"  visibility="hidden" <?php echo($attribs['collect_initial']) ?> text-anchor="middle">Collecting initial data, please wait...</text>

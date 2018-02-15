@@ -1,0 +1,102 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-CONFIGCHANGE-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-CONFIGCHANGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI;
+
+prvtConfigChangeMIB MODULE-IDENTITY
+    LAST-UPDATED "201009010000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Initial version. This MIB will provied traps for change"
+    REVISION    "201009010000Z"
+    DESCRIPTION 
+        "Initial release"
+    ::= { switch 150 }
+
+
+prvtConfigChangeNotifications OBJECT IDENTIFIER
+    ::= { prvtConfigChangeMIB 0 }
+
+prvtConfigChangeObjects OBJECT IDENTIFIER
+    ::= { prvtConfigChangeMIB 1 }
+
+prvtConfigChangeAlarmNamespace OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The configChangeAlarmNamespace specifies the Namespace
+         of an object whose value has been changed."
+    ::= { prvtConfigChangeObjects 1 }
+
+prvtConfigChangeAlarmKeypath OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The configChangeAlarmKeypath specifies the Keypath
+         of an object whose entry has been changed."
+    ::= { prvtConfigChangeObjects 2 }
+
+prvtConfigChangeAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtConfigChangeAlarmNamespace, 
+                  prvtConfigChangeAlarmKeypath }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated when the value of configurable
+         attribute has been changed. The notification can be used
+         to trigger maintenance polling of the running configuration
+         on the device. There is flood prevention that notification
+         with same varbinds will not be sent for certain time - i.e. 1 min"
+    ::= { prvtConfigChangeNotifications 1 }
+
+END -- end of module PRVT-CONFIGCHANGE-MIB.

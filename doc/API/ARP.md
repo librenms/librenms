@@ -24,7 +24,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1,
     "arp": [
         {

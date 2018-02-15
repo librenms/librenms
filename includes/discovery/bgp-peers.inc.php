@@ -49,32 +49,31 @@ if (Config::get('enable_bgp')) {
         $peerlist = build_bgp_peers($device, $peers_data, $peer2);
 
         // Process discovered peers
-        if (isset($peerlist)) {
+        if (!empty($peerlist)) {
+            $af_data = array();
+            $af_list = array();
+
             foreach ($peerlist as $peer) {
-                $astext = get_astext($peer['as']);
-                $peer['astext'] = $astext;
+                $peer['astext'] = get_astext($peer['as']);
 
                 add_bgp_peer($device, $peer);
 
-                $af_data = array();
-                $af_list = array();
-
-                if ($device['os_group'] == 'cisco') {
-                    if (empty($af_data)) {
+                if (empty($af_data)) {
+                    if ($device['os_group'] == 'cisco') {
                         if ($peer2 === true) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
-                        } else {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                         }
-                    }
-                }
 
-                if ($device['os_group'] === 'arista') {
-                    if (empty($af_data)) {
+                        if (empty($af_data)) {
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
+                            $peer2 = false;
+                        }
+                    } elseif ($device['os_group'] === 'arista') {
                         $af_data = snmpwalk_cache_oid($device, 'aristaBgp4V2PrefixInPrefixes', $af_data, 'ARISTA-BGP4V2-MIB');
                     }
                 }
 
+                // build the list
                 if (!empty($af_data)) {
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
@@ -126,7 +125,7 @@ if (Config::get('enable_bgp')) {
                     }
                 }
 
-                $af_query = "SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'";
+                $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'";
                 foreach (dbFetchRows($af_query) as $entry) {
                     $afi  = $entry['afi'];
                     $safi = $entry['safi'];
@@ -141,30 +140,20 @@ if (Config::get('enable_bgp')) {
             unset($j_peerIndexes);
         }
 
-        // Delete removed peers
-        $sql = "SELECT * FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND (context_name = '".$device['context_name']."' OR context_name IS NULL)";
+        $params = array_column($peerlist, 'ip');
+        $query = 'device_id=? AND bgpPeerIdentifier NOT IN ' . dbGenPlaceholders(count($params));
+        array_unshift($params, $device['device_id']);  // prepend device_id
 
-        foreach (dbFetchRows($sql) as $entry) {
-            unset($exists);
-            $i = 0;
-            while ($i < count($peerlist) && !isset($exists)) {
-                if ($peerlist[$i]['ip'] == $entry['bgpPeerIdentifier']) {
-                    $exists = 1;
-                }
+        $deleted = dbDelete('bgpPeers', $query, $params);
+        dbDelete('bgpPeers_cbgp', $query, $params);
 
-                $i++;
-            }
+        echo str_repeat('-', $deleted);
+        echo PHP_EOL;
 
-            if (!isset($exists)) {
-                dbDelete('bgpPeers', '`bgpPeer_id` = ?', array($entry['bgpPeer_id']));
-                dbDelete('bgpPeers_cbgp', '`bgpPeer_id` = ?', array($entry['bgpPeer_id']));
-                echo '-';
-            }
-        }
-        echo "\n";
         unset(
             $device['context_name'],
-            $peerlist
+            $peerlist,
+            $af_data
         );
     }
     unset(

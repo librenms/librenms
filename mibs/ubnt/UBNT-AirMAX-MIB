@@ -7,11 +7,11 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         ubntAirosGroups, ubntMIB FROM UBNT-MIB;
 
     ubntAirMAX MODULE-IDENTITY
-    LAST-UPDATED "201405250000Z"
+    LAST-UPDATED "201710030000Z"
     ORGANIZATION "Ubiquiti Networks, Inc."
     CONTACT-INFO "support@ubnt.com"
     DESCRIPTION  "The AirMAX MIB module for Ubiquiti Networks, Inc. entities"
-    REVISION "201405250000Z"
+    REVISION "201710030000Z"
     DESCRIPTION "ubntAirMAX revision"
     ::= { ubntMIB 4 }
 
@@ -189,7 +189,10 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         ubntAirMaxQuality     Integer32,
         ubntAirMaxCapacity    Integer32,
         ubntAirMaxPriority    INTEGER,
-        ubntAirMaxNoAck       TruthValue
+        ubntAirMaxNoAck       TruthValue,
+        ubntAirMaxAirtime     Integer32,
+        ubntAirMaxGpsSync     TruthValue,
+        ubntAirMaxTdd         TruthValue
     }
 
     ubntAirMaxIfIndex OBJECT-TYPE
@@ -238,6 +241,27 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION "airMAX NoACK mode - on/off"
         ::= { ubntAirMaxEntry 6 }
+
+    ubntAirMaxAirtime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX Airtime in % multiplied by 10"
+        ::= { ubntAirMaxEntry 7 }
+
+    ubntAirMaxGpsSync OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX GPS sync - on/off"
+        ::= { ubntAirMaxEntry 8 }
+
+    ubntAirMaxTdd OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "airMAX TDD framing - on/off"
+        ::= { ubntAirMaxEntry 9 }
 
     -- --------------------------------------------------------------------------------
     --                            airSync table
@@ -528,7 +552,12 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         ubntStaTxBytes    Counter64,
         ubntStaRxBytes    Counter64,
         ubntStaConnTime   TimeTicks,
-        ubntStaLocalCINR  Integer32
+        ubntStaLocalCINR  Integer32,
+        ubntStaTxCapacity Integer32,
+        ubntStaRxCapacity Integer32,
+        ubntStaTxAirtime  Integer32,
+        ubntStaRxAirtime  Integer32,
+        ubntStaTxLatency  Integer32
     }
 
     ubntStaMac OBJECT-TYPE
@@ -644,6 +673,158 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION "Local CINR"
         ::= { ubntStaEntry 16 }
 
+    ubntStaTxCapacity OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Uplink Capacity in Kbps"
+        ::= { ubntStaEntry 17 }
+
+    ubntStaRxCapacity OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Downlink Capacity in Kbps"
+        ::= { ubntStaEntry 18 }
+
+    ubntStaTxAirtime OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Uplink Airtime in % multiplied by 10"
+        ::= { ubntStaEntry 19 }
+
+    ubntStaRxAirtime OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Downlink Airtime in % multiplied by 10"
+        ::= { ubntStaEntry 20 }
+
+    ubntStaTxLatency OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Uplink Latency in milliseconds"
+        ::= { ubntStaEntry 21 }
+
+    -- --------------------------------------------------------------------------------
+    --                            host stats table
+    -- --------------------------------------------------------------------------------
+
+    ubntHostInfo OBJECT IDENTIFIER ::= { ubntAirMAX 8 }
+
+    ubntHostLocaltime OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Host local time"
+        ::= { ubntHostInfo 1 }
+
+    ubntHostNetrole OBJECT-TYPE
+        SYNTAX     INTEGER {
+        unknown(0),
+        bridge(1),
+        router(2),
+        soho(3)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Radio mode"
+        ::= { ubntHostInfo 2 }
+
+    ubntHostCpuLoad OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Host CPU load"
+        ::= { ubntHostInfo 3 }
+
+    ubntHostTemperature OBJECT-TYPE
+        SYNTAX     Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Host system temperature"
+        ::= { ubntHostInfo 4 }
+
+    -- --------------------------------------------------------------------------------
+    --                            gps stats table
+    -- --------------------------------------------------------------------------------
+
+    ubntGpsInfo OBJECT IDENTIFIER ::= { ubntAirMAX 9 }
+
+    ubntGpsStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+        absent(0),
+        off(1),
+        on(2)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS status"
+        ::= { ubntGpsInfo 1 }
+
+    ubntGpsFix OBJECT-TYPE
+        SYNTAX     INTEGER {
+        unknown(0),
+        nofix(1),
+        fix2d(2),
+        fix3d(3)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Fix Obtained"
+        ::= { ubntGpsInfo 2 }
+
+    ubntGpsLat OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Latitude"
+        ::= { ubntGpsInfo 3 }
+
+    ubntGpsLon OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Longitude"
+        ::= { ubntGpsInfo 4 }
+
+    ubntGpsAltMeters OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Altitude (m)"
+        ::= { ubntGpsInfo 5 }
+
+    ubntGpsAltFeet OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Altitude (ft)"
+        ::= { ubntGpsInfo 6 }
+
+    ubntGpsSatsVisible OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Satellites Visible"
+        ::= { ubntGpsInfo 7 }
+
+    ubntGpsSatsTracked OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Satellites Tracked"
+        ::= { ubntGpsInfo 8 }
+
+    ubntGpsHDOP OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "GPS Horizontal Dilution of Precision"
+        ::= { ubntGpsInfo 9 }
+
 
     ubntAirMAXStatusGroup OBJECT-GROUP OBJECTS {
         ubntStaName,
@@ -661,6 +842,11 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         ubntStaRxBytes,
         ubntStaConnTime,
         ubntStaLocalCINR,
+        ubntStaTxCapacity,
+        ubntStaRxCapacity,
+        ubntStaTxAirtime,
+        ubntStaRxAirtime,
+        ubntStaTxLatency,
         ubntRadioMode,
         ubntRadioCCode,
         ubntRadioFreq,
@@ -677,6 +863,9 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         ubntAirMaxCapacity,
         ubntAirMaxPriority,
         ubntAirMaxNoAck,
+        ubntAirMaxAirtime,
+        ubntAirMaxGpsSync,
+        ubntAirMaxTdd,
         ubntAirSyncMode,
         ubntAirSyncCount,
         ubntAirSyncDownUtil,
@@ -696,7 +885,20 @@ UBNT-AirMAX-MIB DEFINITIONS ::= BEGIN
         ubntWlStatWdsEnabled,
         ubntWlStatApRepeater,
         ubntWlStatChanWidth,
-        ubntWlStatStaCount }
+        ubntWlStatStaCount,
+        ubntHostLocaltime,
+        ubntHostNetrole,
+        ubntHostCpuLoad,
+        ubntHostTemperature,
+        ubntGpsStatus,
+        ubntGpsFix,
+        ubntGpsLat,
+        ubntGpsLon,
+        ubntGpsAltMeters,
+        ubntGpsAltFeet,
+        ubntGpsSatsVisible,
+        ubntGpsSatsTracked,
+        ubntGpsHDOP}
         STATUS current
         DESCRIPTION "Status and statistics for AirMax monitoring"
         ::= { ubntAirosGroups 1 }

@@ -26,10 +26,17 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Exceptions\AuthenticationException;
 
 // Note that as this test set depends on mres(), it is a DBTestCase even though the database is unused
 class AuthHTTPTest extends DBTestCase
 {
+    public function testReauthenticate()
+    {
+        $this->setExpectedException(AuthenticationException::class);
+        Auth::reset()->reauthenticate(null, null);
+    }
+
     // Document the modules current behaviour, so that changes trigger test failures
     public function testCapabilityFunctions()
     {
@@ -38,7 +45,6 @@ class AuthHTTPTest extends DBTestCase
 
         $a = Auth::reset();
 
-        $this->assertFalse($a->reauthenticate(null, null));
         $this->assertTrue($a->canUpdatePasswords() === 0);
         $this->assertTrue($a->changePassword(null, null) === 0);
         $this->assertTrue($a->canManageUsers() === 1);
@@ -49,7 +55,7 @@ class AuthHTTPTest extends DBTestCase
     public function testOldBehaviourAgainstCurrent()
     {
         global $config;
-        
+
         $old_username = null;
         $new_username = null;
 

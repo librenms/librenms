@@ -47,6 +47,10 @@ if (isset($hostname)) {
 
     if (isset($device['os']) && $device['os'] != 'generic') {
         $target_os = $device['os'];
+    } elseif (isset($options['o'])) {
+        $target_os = $options['o'];
+    } elseif (isset($options['os'])) {
+        $target_os = $options['os'];
     } else {
         echo "OS (-o, --os) required because device is generic.\n";
         exit;

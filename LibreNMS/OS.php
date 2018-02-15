@@ -25,14 +25,25 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Device\Discovery\Sensors\WirelessSensorDiscovery;
-use LibreNMS\Device\Discovery\Sensors\WirelessSensorPolling;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\UcdResources;
 
-class OS
+class OS implements ProcessorDiscovery
 {
+    use HostResources {
+        HostResources::discoverProcessors as discoverHrProcessors;
+    }
+    use UcdResources {
+        UcdResources::discoverProcessors as discoverUcdProcessors;
+    }
+
     private $device; // annoying use of references to make sure this is in sync with global $device variable
+    private $cache; // data cache
+    private $pre_cache; // pre-fetch data cache
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
@@ -63,6 +74,15 @@ class OS
         return (int)$this->device['device_id'];
     }
 
+    public function preCache()
+    {
+        if (is_null($this->pre_cache)) {
+            $this->pre_cache = YamlDiscovery::preCache($this);
+        }
+
+        return $this->pre_cache;
+    }
+
     /**
      * Snmpwalk the specified oid and return an array of the data indexed by the oid index.
      * If the data is cached, return the cached data.
@@ -71,25 +91,60 @@ class OS
      * @param string $oid textual oid
      * @param string $mib mib for this oid
      * @return array array indexed by the snmp index with the value as the data returned by snmp
-     * @throws \Exception
      */
-    protected function getCacheByIndex($oid, $mib = null)
+    public function getCacheByIndex($oid, $mib = null)
     {
         if (str_contains($oid, '.')) {
-            throw new \Exception('Error: don\'t use this with numeric oids');
+            echo "Error: don't use this with numeric oids!\n";
+            return null;
         }
 
-        if (!isset($this->$oid)) {
+        if (!isset($this->cache[$oid])) {
             $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib);
-            $this->$oid = array_map('current', $data);
+            $this->cache[$oid] = array_map('current', $data);
         }
 
-        return $this->$oid;
+        return $this->cache[$oid];
+    }
+
+    /**
+     * Snmpwalk the specified oid table and return an array of the data indexed by the oid index.
+     * If the data is cached, return the cached data.
+     * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
+     *
+     * @param string $oid textual oid
+     * @param string $mib mib for this oid
+     * @return array array indexed by the snmp index with the value as the data returned by snmp
+     */
+    public function getCacheTable($oid, $mib = null)
+    {
+        if (str_contains($oid, '.')) {
+            echo "Error: don't use this with numeric oids!\n";
+            return null;
+        }
+
+        if (!isset($this->cache[$oid])) {
+            $this->cache[$oid] = snmpwalk_group($this->getDevice(), $oid, $mib);
+        }
+
+        return $this->cache[$oid];
+    }
+
+    /**
+     * Check if an OID has been cached
+     *
+     * @param $oid
+     * @return bool
+     */
+    public function isCached($oid)
+    {
+        return isset($this->cache[$oid]);
     }
 
     /**
      * OS Factory, returns an instance of the OS for this device
-     * If no specific OS is found, returns Generic
+     * If no specific OS is found, Try the OS group.
+     * Otherwise, returns Generic
      *
      * @param array $device device array, must have os set
      * @return OS
@@ -103,7 +158,32 @@ class OS
             return new $class($device);
         }
 
+        // If not a specific OS, check for a group one.
+        if (isset($device['os_group'])) {
+            $class = str_to_class($device['os_group'], 'LibreNMS\\OS\\Shared\\');
+            d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
+            if (class_exists($class)) {
+                d_echo("OS initialized: $class\n");
+                return new $class($device);
+            }
+        }
+
+        d_echo("OS initilized as Generic\n");
         return new Generic($device);
+    }
+
+    public function getName()
+    {
+        if (isset($this->device['os'])) {
+            return $this->device['os'];
+        }
+
+        $rf = new \ReflectionClass($this);
+        $name = $rf->getShortName();
+        var_dump($name);
+        preg_match_all("/[A-Z][a-z]*/", $name, $segments);
+
+        return implode('-', array_map('strtolower', $segments[0]));
     }
 
     /**
@@ -138,5 +218,22 @@ class OS
         }
 
         return $data;
+    }
+
+    /**
+     * Discover processors.
+     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     *
+     * @return array Processors
+     */
+    public function discoverProcessors()
+    {
+        $processors = $this->discoverHrProcessors();
+
+        if (empty($processors)) {
+            $processors = $this->discoverUcdProcessors();
+        }
+
+        return $processors;
     }
 }
