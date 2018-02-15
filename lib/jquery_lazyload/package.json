@@ -1,37 +1,45 @@
 {
-  "name": "jquery-lazyload",
-  "version": "1.9.5",
-  "engines": {
-    "node": ">= 0.8.0"
+  "name": "vanilla-lazyload",
+  "version": "10.4.2",
+  "description": "A fast, lightweight script to load images as they enter the viewport. SEO friendly, it supports responsive images (both srcset + sizes and picture) and progressive JPEG",
+  "main": "dist/lazyload.min.js",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-object-assign": "^6.22.0",
+    "babel-preset-es2015": "^6.24.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-eslint": "^4.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-rollup": "^2.14.0",
+    "gulp-uglify": "^3.0.0",
+    "jest-cli": "^20.0.4"
   },
+  "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git@github.com:tuupola/jquery_lazyload.git"
+    "url": "https://github.com/verlok/lazyload"
   },
-  "author": "Mika Tuupola <tuupola@appelsiini.net>",
-  "scripts": {
-    "test": "grunt test"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.6.4",
-    "grunt-contrib-uglify": "~0.2.4",
-    "grunt-contrib-jasmine": "~0.5.2",
-    "grunt-contrib-watch": "~0.5.3"
-  },
-  "description": "Lazyload images with jQuery",
-  "bugs": {
-    "url": "https://github.com/tuupola/jquery_lazyload/issues"
-  },
-  "homepage": "http://www.appelsiini.net/projects/lazyload",
-  "main": "Gruntfile.js",
-  "files": [
-      "jquery.lazyload.js",
-      "jquery.scrollstop.js"
-  ],
   "keywords": [
-    "jquery-plugin",
-    "ecosystem:jquery"
+    "lazyload",
+    "vanilla",
+    "responsive",
+    "images",
+    "picture",
+    "srcset",
+    "SEO",
+    "intersectionObserver",
+    "sizes",
+    "progressive",
+    "performance",
+    "perfmatters",
+    "async",
+    "no-jquery"
   ],
-  "license": "MIT"
+  "author": "Andrea \"verlok\" Verlicchi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/verlok/lazyload/issues"
+  },
+  "homepage": "http://verlok.github.io/lazyload"
 }

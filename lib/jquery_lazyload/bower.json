@@ -1,27 +1,42 @@
 {
-  "name": "jquery_lazyload",
-  "version": "1.9.4",
-  "homepage": "http://www.appelsiini.net/projects/lazyload",
-  "authors": [
-    "Mika Tuupola <tuupola@appelsiini.net>"
-  ],
-  "description": "jQuery plugin for lazy loading images",
-  "main": [
-    "jquery.lazyload.js",
-    "jquery.scrollstop.js"
-  ],
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "**/*.min.js",
-    "**/*.html",
-    "**/*.textile",
-    "Gruntfile.js",
-    "lazyload.jquery.json",
-    "package.json",
-    "node_modules",
-    "bower_components",
-    "test",
-    "img"
-  ]
+    "name": "vanilla-lazyload",
+    "homepage": "http://verlok.github.io/lazyload/",
+    "authors": [
+        "Andrea Verlicchi <andrea.verlicchi@gmail.com>"
+    ],
+    "description": "A fast, lightweight script to load images as they enter the viewport. Supporting responsive images (both srcset + sizes and picture).",
+    "main": "dist/lazyload.min.js",
+    "keywords": [
+        "lazy",
+        "load",
+        "responsive",
+        "images",
+        "picture",
+        "srcset",
+        "sizes",
+        "progressive",
+        "SEO",
+        "JPEG",
+        "performance",
+        "perfmatters",
+        "no-jquery",
+        "vanilla"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests",
+        "src",
+        "img",
+        "demos",
+        "Gruntfile.js",
+        "README.md",
+        "todo.md",
+        "favicon.ico",
+        "index.html",
+        "package.json"
+    ]
 }
