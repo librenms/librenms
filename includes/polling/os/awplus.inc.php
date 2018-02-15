@@ -14,7 +14,7 @@ $version = snmp_get($device, "currSoftVersion.0", "-OQv", "AT-SETUP-MIB");
 $data = snmp_get_multi_oid($device, 'rscBoardName.5.6 rscBoardName.6.6 rscBoardSerialNumber.5.6 rscBoardSerialNumber.6.6', '-OQs', 'AT-RESOURCE-MIB');
 
 if (strpos($hardware, 'SBx81') !== false) {
-    $hardware = snmp_translate($device['sysObjectID'], 'AT-PRODUCT-MIB');
+    $hardware = snmp_translate($device['sysObjectID'], 'AT-PRODUCT-MIB', null, null, $device);
     $hardware = str_replace('at', 'AT-', $hardware);
 // Features and Serial is set to Controller card 1.5
     $features = $data['rscBoardName.5.6'];
