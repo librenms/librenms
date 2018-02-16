@@ -14,6 +14,17 @@ if (is_numeric($vars['bill_hist_id'])) {
     $vars['imgtype'] = 'historical';
 }
 
+// Reformat date labels
+for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
+    if ($graph_data['ticklabels'][$i]) {
+        $date = strtotime($graph_data['ticklabels'][$i]);
+        
+        if ($vars['imgtype'] === 'day') {
+            $graph_data['ticklabels'][$i] = strftime("%e\n%b", $date);
+        }
+    }
+}
+
 // Create the graph. These two calls are always required
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
 $graph->img->SetImgFormat('png');

@@ -7,6 +7,22 @@ use Amenadiel\JpGraph\Plot\LinePlot;
 
 $graph_data = getHistoricTransferGraphData($vars['id']);
 
+// Reformat date labels
+for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
+    if ($graph_data['ticklabels'][$i]) {
+        $parts = explode(' - ', $graph_data['ticklabels'][$i]);
+        $start = strtotime($parts[0]);
+        $end = strtotime($parts[1]);
+        
+        if (date('m', $start) == date('m', $end) && date('d', $start == 1)) {
+            // Calendar months, omit the date and the end!
+            $graph_data['ticklabels'][$i] = strftime("%b %Y", $start);
+        } else {
+            $graph_data['ticklabels'][$i] = strftime("%e %b %Y", $start) . "\n" . strftime("%e %b %Y", $end);
+        }
+    }
+}
+
 // Create the graph. These two calls are always required
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
 $graph->img->SetImgFormat('png');

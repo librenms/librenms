@@ -352,9 +352,9 @@ function getHistoricTransferGraphData($bill_id)
     $allowed_val  = null;
 
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', array($bill_id)) as $data) {
-        $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
-        $dateto        = strftime('%e %b %Y', strtotime($data['bill_dateto']));
-        $datelabel     = $datefrom."\n".$dateto;
+        $datefrom          = strftime('%Y-%m-%d', strtotime($data['bill_datefrom']));
+        $dateto        = strftime('%Y-%m-%d', strtotime($data['bill_dateto']));
+        $datelabel     = $datefrom." - ".$dateto;
 
         array_push($ticklabels, $datelabel);
         array_push($in_data, $data['traf_in']);
@@ -420,7 +420,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
     $average = 0;
     if ($imgtype == 'day') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $data) {
-            array_push($ticklabels, strftime("%e\n%b", $data['timestamp']));
+            array_push($ticklabels, strftime("%Y-%m-%d", $data['timestamp']));
             array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
             array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
             array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
@@ -438,8 +438,8 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
             array_push($tot_data, 0);
         }
     } elseif ($imgtype == 'hour') {
-        foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $data) {
-            array_push($ticklabels, strftime('%H:%M', $data['timestamp']));
+        foreach (dbFetch('SELECT DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY HOUR(timestamp) ASC', array($bill_id, $from, $to)) as $data) {
+            array_push($ticklabels, sprintf('%02d', $data['hour']) . ":00");
             array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
             array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
             array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
