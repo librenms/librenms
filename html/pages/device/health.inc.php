@@ -1,9 +1,10 @@
 <?php
 
-$storage   = dbFetchCell('select count(*) from storage WHERE device_id = ?', array($device['device_id']));
-$diskio    = get_disks($device['device_id']);
-$mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
-$processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
+$storage            = dbFetchCell('select count(*) from storage WHERE device_id = ?', array($device['device_id']));
+$diskio             = get_disks($device['device_id']);
+$mempools           = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
+$processor          = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
+$router_utilization = dbFetchCell('select count(*) from router_utilization WHERE device_id = ?', array($device['device_id']));
 
 $charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
 $temperatures          = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
@@ -45,6 +46,10 @@ if ($storage) {
 
 if ($diskio) {
     $datas[] = 'diskio';
+}
+
+if ($router_utilization) {
+    $datas[] = 'router_utilization';
 }
 
 if ($charge) {
@@ -146,6 +151,7 @@ $type_text['humidity']             = 'Humidity';
 $type_text['mempool']              = 'Memory';
 $type_text['storage']              = 'Disk Usage';
 $type_text['diskio']               = 'Disk I/O';
+$type_text['router_utilization']   = 'Routing Resources';
 $type_text['processor']            = 'Processor';
 $type_text['voltage']              = 'Voltage';
 $type_text['fanspeed']             = 'Fanspeed';

@@ -1,0 +1,306 @@
+ARISTA-HARDWARE-UTILIZATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, NOTIFICATION-TYPE      FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                FROM SNMPv2-CONF
+    TimeStamp, DisplayString          FROM SNMPv2-TC
+    aristaMibs                        FROM ARISTA-SMI-MIB;
+
+aristaHardwareUtilizationMIB  MODULE-IDENTITY
+    LAST-UPDATED "201605240000Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 5453 Great America Parkway
+                 Santa Clara, CA 95054
+
+         Tel: +1 408 547-5500
+
+         E-mail: snmp@arista.com"
+    DESCRIPTION
+            "This MIB contains information about the capacity and
+            utilization of hardware resources on Arista devices.
+
+            Arista ships and supports devices which perform packet
+            forwarding decisions in hardware. To make these forwarding
+            decisions (L2 bridging, input and output access list, L3
+            forwarding based on IP destination etc.), the devices use
+            information programmed in various hardware
+            resources. Examples of such hardware resources are the
+            hash table used for MAC address lookup, TCAM for
+            destination IP lookup etc.
+
+            Each of Arista's devices have different hardware resource
+            capacity or size limits. It is extremely useful for a
+            Network Management system to be able to query and monitor
+            the utilization of these hardware resources. Due to
+            unxpected network event or configuration change, it is
+            possible that a specific hardware resource is over
+            utilized and there is no room to program additional
+            entries. For example, a routing mis-configuration can
+            result in overflowing the L3 forwarding TCAM. This may
+            be detrimental to the network operation. So it's extremely
+            useful to monitor the utilization of the various hardware
+            resources of a specific device.
+
+            On some devices, due to hardware design considerations,
+            several features may have to share a single hardware
+            resource. If one feature ends up using more of the same
+            resource, it can affect the functionality of another
+            feature. This is another reason to have visibility into
+            the hardware resource usage.
+
+            The hardware element that makes the forwarding decision is
+            frequently referred to as the 'Forwarding ASIC' or
+            'Forwarding Chip'. In this MIB document we refer to this
+            hardware element as 'Forwarding Element'. Even though a
+            device can have multiple forwarding elements, the information
+            programmed in each of the forwarding element is typically
+            the same. But there are some cases, where this is not the
+            case. In such instances, the utilization of relevant
+            hardware resource(s) may not be the same across all the
+            forwarding elements.
+
+            This MIB module provides the hardware capacity and
+            utilization information for various resources in a generic
+            manner, that's applicable to all Arista devices."
+    REVISION     "201605240000Z"
+    DESCRIPTION
+           "Initial revision of the MIB module."
+    ::= { aristaMibs 22 }
+
+aristaHardwareUtilizationMibNotifications OBJECT IDENTIFIER
+    ::= { aristaHardwareUtilizationMIB 0 }
+
+aristaHardwareUtilizationMibObjects      OBJECT IDENTIFIER
+    ::= { aristaHardwareUtilizationMIB 1 }
+
+aristaHardwareUtilizationMibConformance  OBJECT IDENTIFIER
+    ::= { aristaHardwareUtilizationMIB 2 }
+
+aristaHardwareUtilizationTable   OBJECT-TYPE
+    SYNTAX                     SEQUENCE OF AristaHardwareUtilizationEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "This table contains information about various hardware
+        resources and their utilization."
+    ::= { aristaHardwareUtilizationMibObjects 1 }
+
+aristaHardwareUtilizationEntry    OBJECT-TYPE
+    SYNTAX                     AristaHardwareUtilizationEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "A single conceptual row containing utilization information
+        for a specific hardware resource.
+
+        There are many hardware resources on Arista devices. Each
+        resource is identified by a name. Several 'features' can be
+        using the same hardware resource. Every feature is identified
+        by a name. On several platforms, we have more than one
+        forwarding elements which is identified by a name.
+
+        A single conceptual row in the hardware utilization table
+        represents utilization of a specific hardware resource by a
+        specific feature on the specified forwarding element.
+
+        Note that it is possible to have an entry where feature and
+        forwarding element are both empty strings. In these cases, the
+        conceptual row describes the overall utilization for the
+        particular hardware resource."
+
+    INDEX                  { aristaHardwareUtilizationResource,
+                             aristaHardwareUtilizationFeature,
+                             aristaHardwareUtilizationForwardingElement
+                           }
+    ::= { aristaHardwareUtilizationTable 1 }
+
+AristaHardwareUtilizationEntry     ::= SEQUENCE {
+    aristaHardwareUtilizationResource            DisplayString,
+    aristaHardwareUtilizationFeature             DisplayString,
+    aristaHardwareUtilizationForwardingElement   DisplayString,
+    aristaHardwareUtilizationInUseEntries        Counter32,
+    aristaHardwareUtilizationFreeEntries         Counter32,
+    aristaHardwareUtilizationCommittedEntries    Counter32,
+    aristaHardwareUtilizationMaxEntries          Counter32,
+    aristaHardwareUtilizationHighWatermark       Counter32,
+    aristaHardwareUtilizationHighWatermarkTime   TimeStamp
+}
+
+aristaHardwareUtilizationResource         OBJECT-TYPE
+    SYNTAX                             DisplayString (SIZE(0..35))
+    MAX-ACCESS                         not-accessible
+    STATUS                             current
+    DESCRIPTION
+        "The name that identifies the specific hardware resource."
+    ::= { aristaHardwareUtilizationEntry 1 }
+
+aristaHardwareUtilizationFeature          OBJECT-TYPE
+    SYNTAX                             DisplayString (SIZE(0..35))
+    MAX-ACCESS                         not-accessible
+    STATUS                             current
+    DESCRIPTION
+        "The name that identifies the specific feature which is using
+        the hardware resource in question. As noted in the description
+        of this MIB module, multiple features can share a specific
+        hardware resource."
+    ::= { aristaHardwareUtilizationEntry 2 }
+
+aristaHardwareUtilizationForwardingElement  OBJECT-TYPE
+    SYNTAX                               DisplayString (SIZE(0..35))
+    MAX-ACCESS                           not-accessible
+    STATUS                               current
+    DESCRIPTION
+        "The name that identifies the specific forwarding element on
+        the device that this hardware resource belongs to. As noted in
+        the description of this MIB module, for some features
+        information is programmed differently across various
+        forwarding elements. In such cases, this MIB object represents
+        the forwarding element that corresponds to this entry's
+        hardware resource utilization. Otherwise this MIB object will
+        just be an empty string."
+    ::= { aristaHardwareUtilizationEntry 3 }
+
+aristaHardwareUtilizationInUseEntries  OBJECT-TYPE
+    SYNTAX                          Counter32
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION
+        "This MIB object represents the number of entries in the
+        specific hardware resource that is currently consumed by
+        a feature."
+    ::= { aristaHardwareUtilizationEntry 4 }
+
+aristaHardwareUtilizationFreeEntries   OBJECT-TYPE
+    SYNTAX                          Counter32
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION
+        "This MIB object represents the number of free entries in the
+        specific hardware resource."
+    ::= { aristaHardwareUtilizationEntry 5 }
+
+aristaHardwareUtilizationCommittedEntries   OBJECT-TYPE
+    SYNTAX                               Counter32
+    MAX-ACCESS                           read-only
+    STATUS                               current
+    DESCRIPTION
+        "This MIB object represents the number of entries of a
+        hardware resource that have been dedicated ('reserved') for a
+        particular feature. When features 'request' for a specific
+        hardware resource, entries are 'reserved' for the feature. It
+        is possible that the actual number of entries used is less
+        than what has been reserved for the feature."
+    ::= { aristaHardwareUtilizationEntry 6 }
+
+aristaHardwareUtilizationMaxEntries      OBJECT-TYPE
+    SYNTAX                               Counter32
+    MAX-ACCESS                           read-only
+    STATUS                               current
+    DESCRIPTION
+        "This MIB object represents the maximum number of 'logical'
+        entries that can be allocated for the given hardware resource
+        by the specific feature (assuming it is not being shared with
+        any other feature).
+
+        Even though the raw number of maximum entries is fixed for a
+        given hardware resource, the logical entries available to a
+        specific feature may vary.
+
+        An example: Consider a device where the width ('number of
+        bits') of a single TCAM entry is 128. It is possible to store an
+        IPv4 access control list (matching both source and destination
+        addresses) using a single entry of this TCAM. But given that
+        IPv6 addresses are 128 bits long, 2 TCAM entries will be
+        required to store an equivalent IPv6 access control list.
+
+        In this example above, the 'maximum number of entries'
+        available for the IPv4 feature is twice the number for
+        the IPv6 feature."
+    ::= { aristaHardwareUtilizationEntry 7 }
+
+aristaHardwareUtilizationHighWatermark      OBJECT-TYPE
+    SYNTAX                               Counter32
+    MAX-ACCESS                           read-only
+    STATUS                               current
+    DESCRIPTION
+        "This MIB object represents the maximum number of entries that
+        the specific feature has used up at any point in time. This
+        allows the Network Management system to monitor the hardware
+        resource utilization pattern for a given feature allowing the
+        operator to potentially take some action."
+    ::= { aristaHardwareUtilizationEntry 8 }
+
+aristaHardwareUtilizationHighWatermarkTime  OBJECT-TYPE
+    SYNTAX                               TimeStamp
+    MAX-ACCESS                           read-only
+    STATUS                               current
+    DESCRIPTION
+        "This MIB object represents the last time when a specific
+        feature hit the high watermark (number of entries of the given
+        hardware resource)."
+    ::= { aristaHardwareUtilizationEntry 9 }
+
+-- Notifications
+
+aristaHardwareUtilizationAlert NOTIFICATION-TYPE
+    OBJECTS { aristaHardwareUtilizationInUseEntries,
+              aristaHardwareUtilizationHighWatermark,
+              aristaHardwareUtilizationHighWatermarkTime
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is generated when the hardware utilization
+        crosses the specified threshold."
+    ::= { aristaHardwareUtilizationMibNotifications 1 }
+
+-- Conformance and Compliance
+
+aristaHardwareUtilizationMibCompliances OBJECT IDENTIFIER
+    ::= { aristaHardwareUtilizationMibConformance 1 }
+
+aristaHardwareUtilizationMibGroups      OBJECT IDENTIFIER
+    ::= { aristaHardwareUtilizationMibConformance 2 }
+
+aristaHardwareUtilizationMibCompliance  MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for Arista switches that implement
+        the ARISTA-HARDWARE-CAPACITY-MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS {
+        aristaHardwareUtilizationTableGroup,
+        aristaHardwareUtilizationNotificationsGroup
+    }
+    ::= { aristaHardwareUtilizationMibCompliances 1 }
+
+aristaHardwareUtilizationTableGroup  OBJECT-GROUP
+    OBJECTS {
+        aristaHardwareUtilizationInUseEntries,
+        aristaHardwareUtilizationFreeEntries,
+        aristaHardwareUtilizationCommittedEntries,
+        aristaHardwareUtilizationMaxEntries,
+        aristaHardwareUtilizationHighWatermark,
+        aristaHardwareUtilizationHighWatermarkTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects that provide counter information
+        for hardware resource utilization."
+    ::= { aristaHardwareUtilizationMibGroups 1 }
+
+aristaHardwareUtilizationNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        aristaHardwareUtilizationAlert
+    }
+    STATUS  current
+    DESCRIPTION
+        "The notification(s) generated by the system if the hardware
+        utilization of a specific resource exceeds configured
+        threshold."
+    ::= { aristaHardwareUtilizationMibGroups 2 }
+END                                     
