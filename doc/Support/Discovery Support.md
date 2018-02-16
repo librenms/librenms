@@ -92,6 +92,7 @@ $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
 $config['discovery_modules']['wireless']             = 1;
 $config['discovery_modules']['fdb-table']            = 1;
+$config['discovery_modules']['router-utilization'] = 0;
 ```
 
 #### OS based Discovery config
