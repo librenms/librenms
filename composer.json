@@ -38,8 +38,7 @@
         "phpunit/phpunit": "5.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
-        "fojuth/readmegen": "1.*",
-        "amenadiel/jpgraph": "^3.6"
+        "fojuth/readmegen": "1.*"
     },
     "autoload": {
         "psr-4": {
