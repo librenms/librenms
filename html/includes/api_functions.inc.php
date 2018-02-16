@@ -1361,11 +1361,7 @@ function get_bill_graphdata()
     if ($graph_type == 'bits') {
         $from = (isset($_GET['from']) ? $_GET['from'] : time() - 60 * 60 * 24);
         $to   = (isset($_GET['to']) ? $_GET['to'] : time());
-
-        $reducefactor = mres($_GET['reducefactor']);
-        if (!is_numeric($reducefactor) || $reducefactor < 2) {
-            $reducefactor = 20;
-        }
+        $reducefactor = $_GET['reducefactor'];
 
         $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
     } else if ($graph_type == 'monthly') {
@@ -1417,10 +1413,7 @@ function get_bill_history_graph()
     switch ($graph_type) {
         case 'bits':
             $graph_type = 'historicbits';
-
-            if (isset($_GET['reducefactor'])) {
-                $vars['reducefactor'] = $_GET['reducefactor'];
-            }
+            $vars['reducefactor'] = $_GET['reducefactor'];
             break;
             
         case 'day':
@@ -1461,10 +1454,8 @@ function get_bill_history_graphdata()
     
     switch ($graph_type) {
         case 'bits':
-            $reducefactor = mres($_GET['reducefactor']);
-            if (!is_numeric($reducefactor) || $reducefactor < 2) {
-                $reducefactor = 20;
-            }
+            $reducefactor = $_GET['reducefactor'];
+
             $graph_data = getBillingGraphData($bill_id, $bill_hist_id, $reducefactor);
             break;
         case 'day':

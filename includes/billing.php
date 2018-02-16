@@ -242,17 +242,32 @@ function getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor)
 function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
 {
     $i          = '0';
-    $iter       = 1;
+    $iter       = 0;
     $first      = null;
     $last       = null;
     $iter_in    = 0;
     $iter_out   = 0;
     $iter_period = 0;
+    $max_in     = 0;
+    $max_out    = 0;
+    $tot_in     = 0;
+    $tot_out    = 0;
+    $tot_period = 0;
+    $in_delta   = null;
+    $out_delta  = null;
+    $period     = null;
     $in_data    = array();
     $out_data   = array();
     $tot_data   = array();
     $ticks      = array();
     
+    if (!isset($reducefactor) || !is_numeric($reducefactor) || $reducefactor < 1) {
+        // Auto calculate reduce factor
+        $expectedpoints = ceil(($to - $from) / 300);
+        $desiredpoints = 400;
+        $reducefactor = max(1, floor($expectedpoints / $desiredpoints));
+    }
+
     $bill_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
 
     foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $row) {
@@ -264,27 +279,39 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         $period    = $row['period'];
         $in_delta  = $row['in_delta'];
         $out_delta = $row['out_delta'];
-        $last = $timestamp;
+        $last      = $timestamp;
 
         $iter_in     += $in_delta;
         $iter_out    += $out_delta;
         $iter_period += $period;
 
-        if ($iter == $reducefactor) {
-            $out_data[$i]     = round(($iter_out * 8 / $iter_period), 2);
-            $in_data[$i]      = round(($iter_in * 8 / $iter_period), 2);
-            $tot_data[$i]     = ($out_data[$i] + $in_data[$i]);
+        if ($period > 0) {
+            $max_in    = max($max_in, $in_delta / $period);
+            $max_out   = max($max_out, $out_delta / $period);
+            $tot_in    += $in_delta;
+            $tot_out   += $out_delta;
+            $tot_period+= $period;
 
-            $ticks[$i]    = $timestamp;
-            $iter         = '1';
-            $i++;
-            unset($iter_out, $iter_in, $iter_period);
+            if (++$iter >= $reducefactor) {
+                $out_data[$i] = round(($iter_out * 8 / $iter_period), 2);
+                $in_data[$i]  = round(($iter_in * 8 / $iter_period), 2);
+                $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
+                $ticks[$i]    = $timestamp;
+                $i++;
+                $iter         = 0;
+                unset($iter_out, $iter_in, $iter_period);
+            }
         }
-
-        $iter++;
     }//end foreach
 
-    return array(
+    if (isset($iter_in)) {  // Write last element
+        $out_data[$i] = round(($iter_out * 8 / $iter_period), 2);
+        $in_data[$i]  = round(($iter_in * 8 / $iter_period), 2);
+        $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
+        $ticks[$i]    = $timestamp;
+        $i++;
+    }
+    $result = array(
         'from'          => $from,
         'to'            => $to,
         'first'         => $first,
@@ -299,6 +326,16 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         'rate_average'  => $bill_data['rate_average'],
         'bill_type'     => $bill_data['bill_type']
     );
+
+    if ($period) {
+        $result['max_in']   = $max_in;
+        $result['max_out']  = $max_out;
+        $result['ave_in']   = $tot_in / $tot_period;
+        $result['ave_out']  = $tot_out / $tot_period;
+        $result['last_in']  = $in_delta / $period;
+        $result['last_out'] = $out_delta / $period;
+    }
+    return $result;
 }//end getBillingGraphData
 
 function getHistoricTransferGraphData($bill_id)

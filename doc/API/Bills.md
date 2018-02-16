@@ -159,12 +159,19 @@ Retrieve the data used to draw a graph so it can be rendered in an external syst
 
 Route: `/api/v0/bills/:id/graphdata/:graph_type`
 
+Input:
+
+The `reducefactor` parameter is used to reduce the number of data points.  Billing data has 5 minute granularity, so
+requesting a graph for a long time period will result in many data points.  If not supplied, it will be automatically
+calculated.  A reducefactor of 1 means return all items, 2 means half of the items etc.
+
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200&to=1517788800
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200&to=1517788800&reducefactor=5
 ```
 
 Output:
@@ -190,7 +197,16 @@ Output:
         "ticks": [
             "1517750401",
             "1517756101"
-        ]
+        ],
+        "rate_95th": "251880417",
+        "rate_average": "146575554",
+        "bill_type": "cdr",
+        "max_in": 9888289942,
+        "max_out": 75848756,
+        "ave_in": 18029660.242105871,
+        "ave_out": 196447.38060137472,
+        "last_in": 3790227.9500000002,
+        "last_out": 122731.63333333333
     }
 }
 
