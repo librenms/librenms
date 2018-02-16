@@ -252,7 +252,7 @@ if ($options['f'] === 'notify') {
     if (isset($config['alert']['default_mail'])) {
         send_mail(
             $config['alert']['default_mail'],
-            '[LibreNMS] Auto update has failed',
+            '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'),
             "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
         );
     }
