@@ -105,9 +105,9 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
 ### Background jobs
 
-If your upgrading LibreNMS, ensure to remove the crontab:
+If are upgrading LibreNMS, ensure to remove the crontab:
 
-    rm -fv /etc/cron.d/librenms
+    rm -fv /etc/cron.d/librenms*
 
 Copy, enable and start systemd timers:
 

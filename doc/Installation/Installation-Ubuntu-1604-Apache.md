@@ -100,15 +100,15 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
 ### Background jobs
 
-If your upgrading LibreNMS, ensure to remove the crontab:
+If you are upgrading LibreNMS, ensure to remove the crontab:
 
-    rm -fv /etc/cron.d/librenms
+    rm -fv /etc/cron.d/librenms*
 
 Copy, enable and start systemd timers:
 
-    cp /opt/librenms/contrib/systemd/* /lib/systemd/system/
+    cp /opt/librenms/contrib/systemd/* /etc/systemd/system/
     systemctl daemon-reload
-    for timer in /lib/systemd/system/librenms@*.timer; do systemctl enable $(basename $timer) && systemctl start $(basename $timer); done
+    for timer in /lib/systemd/system/librenms@*.timer; do systemctl enable --now $(basename $timer); done
 
 #### Copy logrotate config
 
