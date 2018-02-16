@@ -1400,9 +1400,11 @@ function create_edit_bill()
 {
     check_is_admin();
     $data = json_decode(file_get_contents('php://input'), true);
-
+    if (!$data) {
+        api_error(500, 'Invalid JSON data');
+    }
     //check ports
-    $ports_ok = [];
+    $ports_add = [];
     if (array_key_exists('ports', $data)) {
         $ports = $data['ports'];
         foreach ($ports as $port_id) {
@@ -1418,13 +1420,14 @@ function create_edit_bill()
     $bill = [];
     //find existing bill for update
     $bill_id = (int)$data['bill_id'];
-    $bills = dbFetchRows("SELECT * FROM `bills` WHERE bill_id = $bill_id LIMIT 1");
+    $bills = dbFetchRows("SELECT * FROM `bills` WHERE `bill_id` = $bill_id LIMIT 1");
 
     // update existing bill
     if (is_array($bills) && count($bills) == 1) {
         $bill = $bills[0];
+
         foreach ($data as $bill_key => $bill_value) {
-            $bill[$bill_key] = check_bill_key_value($bill_key, $bill_value);
+                $bill[$bill_key] = check_bill_key_value($bill_key, $bill_value);
         }
         $update_data = [
             'bill_name' => $bill['bill_name'],
@@ -1442,7 +1445,6 @@ function create_edit_bill()
         }
     } else {
         // create new bill
-
         if (array_key_exists('bill_id', $data)) {
             api_error(500, 'Argument bill_id is not allowed on bill create (auto assigned)');
         }
