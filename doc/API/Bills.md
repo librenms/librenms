@@ -134,7 +134,9 @@ Output:
 
 ### `get_bill_graph`
 
-Retrieve a graph associated with a bill
+Retrieve a graph image associated with a bill.
+
+NB: The graphs returned from this will always be png as they do not come from rrdtool, even if you have SVG set.
 
 Route: `/api/v0/bills/:id/graphs/:graph_type
 
@@ -149,13 +151,13 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/gra
 
 Output:
 
-(image)
+Graph Image
 
 ### `get_bill_graphdata`
 
 Retrieve the data used to draw a graph so it can be rendered in an external system
 
-Route: `/api/v0/bills/:id/graphdata/:graph_type
+Route: `/api/v0/bills/:id/graphdata/:graph_type`
 
 Example:
 
@@ -241,6 +243,8 @@ Output:
 ### `get_bill_history_graph`
 
 Retrieve a graph of a previous period of a bill
+
+NB: The graphs returned from this will always be png as they do not come from rrdtool, even if you have SVG set.
 
 Route: `/api/v0/bills/:id/history/:bill_hist_id/graphs/:graph_type`
 

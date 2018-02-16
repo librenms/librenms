@@ -1359,14 +1359,9 @@ function get_bill_graphdata()
     }
 
     if ($graph_type == 'bits') {
-        if (!is_numeric($_GET['from'])) {
-            api_error(400, 'from parameter must be supplied');
-        }
-        $from = mres($_GET['from']);
-        $to = mres($_GET['to']);
-        if (!is_numeric($to)) {
-            $to = time();
-        }
+        $from = (isset($_GET['from']) ? $_GET['from'] : time() - 60 * 60 * 24);
+        $to   = (isset($_GET['to']) ? $_GET['to'] : time());
+
         $reducefactor = mres($_GET['reducefactor']);
         if (!is_numeric($reducefactor) || $reducefactor < 2) {
             $reducefactor = 20;
