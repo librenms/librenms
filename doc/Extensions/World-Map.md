@@ -35,10 +35,6 @@ We have two current mapping engines available:
 - *Initial Zoom*: Initial zoom of the map. [More information about zoom levels](https://wiki.openstreetmap.org/wiki/Zoom_levels).
 - *Grouping radius*: Markers are grouped by area. This value define the maximum size of grouping areas.
 - *Show devices*: Show devices based on there status.
-- *Down devices over maintenance should be shown as*:
-  - Down device: default value, down devices under maintenance will be shown as is;
-  - Up device: down devices under maintenance will be shown as an up device (green marker);
-  - Warning device: down devices under maintenance will be shown with an orange marker;
 
 Example Settings:
 

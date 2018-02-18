@@ -1884,9 +1884,9 @@ label {
     color: white;
 }
 
-.orangeCluster {
-    background-color: rgba(234,163,86, 0);
-    background-color: rgba(234,163,86,0.7);
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
     text-align: center;
     width: 25px !important;
     height: 25px !important;
