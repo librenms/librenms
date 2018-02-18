@@ -19,7 +19,7 @@ $graph_type = 'toner_usage';
 
 $sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id';
 
-if (isset($searchPhrase) && !empty($searchPhrase)) {
+if (!empty($searchPhrase)) {
     $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `toner_descr` LIKE '%$searchPhrase%')";
 }
 
@@ -31,8 +31,11 @@ if (empty($count)) {
     $count = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
-    $sort = '`D`.`hostname`, `S`.`toner_descr`';
+if (empty($sort)) {
+    $sort = '`D`.`hostname`, `toner_descr`';
+} else {
+    // toner_used is an alias for toner_perc
+    $sort = str_replace('toner_used', 'toner_current', $sort);
 }
 
 $sql .= " ORDER BY $sort";
@@ -48,7 +51,6 @@ if ($rowCount != -1) {
 
 foreach (dbFetchRows($sql, $param) as $toner) {
     if (device_permitted($toner['device_id'])) {
-        $total = $toner['toner_capacity'];
         $perc  = $toner['toner_current'];
 
         $graph_array['type']        = $graph_type;
