@@ -1404,8 +1404,9 @@ function create_edit_bill()
         api_error(500, 'Invalid JSON data');
     }
     //check ports
-    $ports_add = [];
+    $ports_add = null;
     if (array_key_exists('ports', $data)) {
+	$ports_add = [];
         $ports = $data['ports'];
         foreach ($ports as $port_id) {
             $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [ $port_id ]);
@@ -1497,10 +1498,12 @@ function create_edit_bill()
     }
 
     // set previously checked ports
-    if (count($ports_add) > 0) {
+    if (is_array($ports_add)) {
         dbDelete('bill_ports', "`bill_id` =  $bill_id");
-        foreach ($ports_add as $port_id) {
-            dbInsert( [ 'bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0 ], 'bill_ports');
+        if (count($ports_add) > 0) {
+            foreach ($ports_add as $port_id) {
+                dbInsert( [ 'bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0 ], 'bill_ports');
+            }
         }
     }
 
