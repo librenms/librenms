@@ -170,7 +170,7 @@ bgpPeers:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bgpPeer_id], Unique: true, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id, context_name], Unique: false, Type: BTREE }
 bgpPeers_cbgp:
   Columns:
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
@@ -198,7 +198,7 @@ bgpPeers_cbgp:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     unique_index: { Name: unique_index, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id, bgpPeerIdentifier], Unique: false, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
 bills:
   Columns:
     - { Field: bill_id, Type: int(11), 'Null': false, Extra: auto_increment }
