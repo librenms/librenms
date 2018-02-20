@@ -1,0 +1,9 @@
+os: hiveos-wireless
+text: 'Aerohive HiveOS'
+type: wireless
+icon: aerohive
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescr_regex:
+        - '/^(Hive)*AP[0-9]+, HiveOS/'
