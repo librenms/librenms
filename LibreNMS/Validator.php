@@ -25,6 +25,9 @@
 
 namespace LibreNMS;
 
+use LibreNMS\Interfaces\ValidationGroup;
+use ReflectionClass;
+
 class Validator
 {
     private $validation_groups = array();
@@ -45,9 +48,13 @@ class Validator
         foreach (glob($pattern) as $file) {
             $class_name = basename($file, '.php');
             $class = '\LibreNMS\Validations\\' . $class_name;
-            $validation_name = strtolower($class_name);
-            $this->validation_groups[$validation_name] = new $class();
-            $this->results[$validation_name] = array();
+
+            $rc = new ReflectionClass($class);
+            if (!$rc->isAbstract()) {
+                $validation_name = strtolower($class_name);
+                $this->validation_groups[$validation_name] = new $class();
+                $this->results[$validation_name] = array();
+            }
         }
     }
 
@@ -61,8 +68,8 @@ class Validator
     public function validate($validation_groups = array(), $print_group_status = false)
     {
         foreach ($this->validation_groups as $group_name => $group) {
-            // try to only run each group once (some might not return any results)
-            if (!empty($this->results[$group_name])) {
+            // only run each group once
+            if ($group->isCompleted()) {
                 continue;
             }
 
@@ -71,6 +78,7 @@ class Validator
                     echo "Checking $group_name:";
                 }
 
+                /** @var ValidationGroup $group */
                 $group->validate($this);
 
                 if (isCli()) {
@@ -80,7 +88,12 @@ class Validator
                     }
 
                     $this->printResults($group_name);
+
+
                 }
+
+                // validation is complete for this group
+                $group->markCompleted();
             }
         }
     }
