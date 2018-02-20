@@ -200,7 +200,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
             } else {
                 $dataselected = "";
             }
-            $output .= "<option value='" . $data['ifType'] . "' " . $dataselected . ">" . $data['ifType'] . "</option>";
+            $output .= "<option value='" . clean_bootgrid($data['ifType']) . "' " . $dataselected . ">" . clean_bootgrid($data['ifType']) . "</option>";
         }
     }
 
@@ -223,7 +223,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
             } else {
                 $portdescrib = "";
             }
-            $output .= "<option value='" . $data['port_descr_type'] . "' " . $portdescrib . ">" . ucfirst(display($data['port_descr_type'])) . "</option>";
+            $output .= "<option value='" . clean_bootgrid($data['port_descr_type']) . "' " . $portdescrib . ">" . ucfirst(clean_bootgrid($data['port_descr_type'])) . "</option>";
         }
     }
 
@@ -252,7 +252,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
                 $locationselected = "";
             }
             $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
-            $output .= "<option value='" . $location . "' " . $locationselected . ">" . $ui_location . "</option>";
+            $output .= "<option value='" . clean_bootgrid($location) . "' " . $locationselected . ">" . clean_bootgrid($ui_location) . "</option>";
         }
     }
 

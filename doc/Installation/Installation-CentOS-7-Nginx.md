@@ -9,7 +9,7 @@ source: Installation/Installation-CentOS-7-Nginx.md
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php71w php71w-cli php71w-common php71w-curl php71w-fpm php71w-gd php71w-mcrypt php71w-mysql php71w-process php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
+    yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php72w php72w-cli php72w-common php72w-curl php72w-fpm php72w-gd php72w-mcrypt php72w-mysql php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 
 #### Add librenms user
 
@@ -19,7 +19,7 @@ source: Installation/Installation-CentOS-7-Nginx.md
 #### Install LibreNMS
 
     cd /opt
-    git clone https://github.com/librenms/librenms.git librenms
+    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
 
 ## DB Server ##
 
@@ -70,7 +70,7 @@ user = nginx
 group = apache   ; keep group as apache
 
 ;listen = 127.0.0.1:9000
-listen = /var/run/php-fpm/php7.1-fpm.sock
+listen = /var/run/php-fpm/php7.2-fpm.sock
 
 listen.owner = nginx
 listen.group = nginx
@@ -105,7 +105,7 @@ server {
  location ~ \.php {
   include fastcgi.conf;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
-  fastcgi_pass unix:/var/run/php-fpm/php7.1-fpm.sock;
+  fastcgi_pass unix:/var/run/php-fpm/php7.2-fpm.sock;
  }
  location ~ /\.ht {
   deny all;

@@ -119,4 +119,14 @@ class IPv4 extends IP
 
         return long2ip(ip2long($this->ip) & $this->cidr2long($cidr));
     }
+
+    /**
+     * Convert this IP to an snmp index hex encoded
+     *
+     * @return string
+     */
+    public function toSnmpIndex()
+    {
+        return (string)$this->ip;
+    }
 }

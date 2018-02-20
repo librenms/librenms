@@ -95,8 +95,8 @@ class Ptp650 extends OS implements
                 0,
                 'PTP650 Receive Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -106,8 +106,8 @@ class Ptp650 extends OS implements
                 0,
                 'PTP650 Transmit Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -115,10 +115,10 @@ class Ptp650 extends OS implements
                 $aggregate,
                 'ptp650-ag-rate',
                 0,
-                'PTP650 Aggragate Rate',
+                'PTP650 Aggregate Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -158,7 +158,9 @@ class Ptp650 extends OS implements
                 'ptp650',
                 0,
                 'PTP650 Signal Strength Ratio',
-                null
+                null,
+                1,
+                10
             )
         );
     }

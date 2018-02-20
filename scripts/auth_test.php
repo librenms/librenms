@@ -2,7 +2,6 @@
 <?php
 
 use LibreNMS\Authentication\Auth;
-use Phpass\PasswordHash;
 
 $options = getopt('u:rdvh');
 if (isset($options['h']) || !isset($options['u'])) {
@@ -96,8 +95,7 @@ try {
             exit;
         }
 
-        $hasher = new PasswordHash(8, false);
-        $token = $session['session_username'] . '|' . $hasher->HashPassword($session['session_username'] . $session['session_token']);
+        $token = $session['session_username'] . '|' . password_hash($session['session_username'] . $session['session_token'], PASSWORD_DEFAULT);
 
         $auth = $authorizer->reauthenticate($session['session_value'], $token);
         if ($auth) {

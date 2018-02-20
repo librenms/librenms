@@ -152,82 +152,82 @@ if ($updated && $update_message) {
             </select>
        </div>
     </div>
-<div class="form-group">
-    <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
-    <div class="col-sm-6">
-      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"
-            <?php
-            if ($override_sysLocation) {
-                echo(' checked="1"');
-            }
-            ?> />
+    <div class="form-group">
+        <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
+        <div class="col-sm-6">
+          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"
+                <?php
+                if ($override_sysLocation) {
+                    echo(' checked="1"');
+                }
+                ?> />
+        </div>
     </div>
-</div>
-<div class="form-group">
-    <div class="col-sm-2"></div>
-    <div class="col-sm-6">
-      <input id="sysLocation" name="sysLocation" class="form-control"
-            <?php
-            if (!$override_sysLocation) {
-                echo(' disabled="1"');
-            }
-            ?> value="<?php echo($override_sysLocation_string); ?>" />
+    <div class="form-group">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-6">
+          <input id="sysLocation" name="sysLocation" class="form-control"
+                <?php
+                if (!$override_sysLocation) {
+                    echo(' disabled="1"');
+                }
+                ?> value="<?php echo($override_sysLocation_string); ?>" />
+        </div>
     </div>
-</div>
-<div class="form-group">
-    <label for="parent_id" class="col-sm-2 control-label">This device depends on:</label>
-    <div class="col-sm-6">
-        <select multiple name="parent_id[]" id="parent_id" class="form-control">
-            <?php
-            $dev_parents = dbFetchColumn('SELECT device_id from devices WHERE device_id IN (SELECT dr.parent_device_id from devices as d, device_relationships as dr WHERE d.device_id = dr.child_device_id AND d.device_id = ?)', array($device['device_id']));
-            if (!$dev_parents) {
-                $selected = 'selected="selected"';
-            } else {
-                $selected = '';
-            }
-            ?>
-            <option value="0" <?=$selected?>>None</option>
-            <?php
-            $available_devs = dbFetchRows('SELECT `device_id`,`hostname` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
-            foreach ($available_devs as $dev) {
-                if (in_array($dev['device_id'], $dev_parents)) {
+    <div class="form-group">
+        <label for="parent_id" class="col-sm-2 control-label">This device depends on:</label>
+        <div class="col-sm-6">
+            <select multiple name="parent_id[]" id="parent_id" class="form-control">
+                <?php
+                $dev_parents = dbFetchColumn('SELECT device_id from devices WHERE device_id IN (SELECT dr.parent_device_id from devices as d, device_relationships as dr WHERE d.device_id = dr.child_device_id AND d.device_id = ?)', array($device['device_id']));
+                if (!$dev_parents) {
                     $selected = 'selected="selected"';
                 } else {
                     $selected = '';
                 }
-                echo "<option value=".$dev['device_id']." ".$selected.">".$dev['hostname']."</option>";
-            }
-            ?>
-        </select>
+                ?>
+                <option value="0" <?=$selected?>>None</option>
+                <?php
+                $available_devs = dbFetchRows('SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
+                foreach ($available_devs as $dev) {
+                    if (in_array($dev['device_id'], $dev_parents)) {
+                        $selected = 'selected="selected"';
+                    } else {
+                        $selected = '';
+                    }
+                    echo "<option value=". $dev['device_id']. " " . $selected . ">" . $dev['hostname'] . " (" . $dev['sysName'] .")</option>";
+                }
+                ?>
+            </select>
+        </div>
     </div>
-</div>
-<div class="form-group">
-    <label for="disabled" class="col-sm-2 control-label">Disable:</label>
-    <div class="col-sm-6">
-      <input name="disabled" type="checkbox" id="disabled" value="1"
-            <?php
-            if ($device["disabled"]) {
-                echo("checked=checked");
-            }
-            ?> />
+    <div class="form-group">
+        <label for="disabled" class="col-sm-2 control-label">Disable:</label>
+        <div class="col-sm-6">
+          <input name="disabled" type="checkbox" id="disabled" value="1"
+                <?php
+                if ($device["disabled"]) {
+                    echo("checked=checked");
+                }
+                ?> />
+        </div>
     </div>
-</div>
-<div class="form-group">
-    <label for="ignore" class="col-sm-2 control-label">Ignore</label>
-    <div class="col-sm-6">
-       <input name="ignore" type="checkbox" id="ignore" value="1"
-            <?php
-            if ($device['ignore']) {
-                echo("checked=checked");
-            }
-            ?> />
+    <div class="form-group">
+        <label for="ignore" class="col-sm-2 control-label">Ignore</label>
+        <div class="col-sm-6">
+           <input name="ignore" type="checkbox" id="ignore" value="1"
+                <?php
+                if ($device['ignore']) {
+                    echo("checked=checked");
+                }
+                ?> />
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-1 col-md-offset-2">
-        <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+    <div class="row">
+        <div class="col-md-1 col-md-offset-2">
+            <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+        </div>
     </div>
-</div>
 </form>
 <br />
 <script>

@@ -1,0 +1,97 @@
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+    ;
+
+-- netscreenSmiMibModule MODULE-IDENTITY
+
+ netscreen MODULE-IDENTITY
+    LAST-UPDATED  "200408310000Z" -- Aug 31, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "Modified SMI Mib Module"
+    REVISION      "200408310000Z" -- Aug 31, 2004
+    DESCRIPTION
+        "SMI Mib"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No comment"
+    REVISION      "200008020000Z" -- August 02, 2000
+    DESCRIPTION
+        "Creation Date"
+--    ::= { netscreen 50 }
+    ::= { enterprises 3224 }
+
+-- netscreen OBJECT IDENTIFIER ::= { enterprises 3224 }
+
+netscreenTrap OBJECT IDENTIFIER ::= { netscreen 0 }
+
+netscreenProducts OBJECT IDENTIFIER ::= { netscreen 1 }
+
+netscreenTrapInfo OBJECT IDENTIFIER ::= { netscreen 2 }
+
+netscreenIDS OBJECT IDENTIFIER ::= { netscreen 3 }
+
+netscreenVpn OBJECT IDENTIFIER ::= { netscreen 4 }
+
+netscreenQos OBJECT IDENTIFIER ::= { netscreen 5 }
+
+netscreenNsrp OBJECT IDENTIFIER ::= { netscreen 6 }
+
+netscreenSetting OBJECT IDENTIFIER ::= { netscreen 7 }
+
+netscreenZone OBJECT IDENTIFIER ::= { netscreen 8 }
+
+netscreenInterface OBJECT IDENTIFIER ::= { netscreen 9 }
+
+netscreenPolicy OBJECT IDENTIFIER ::= { netscreen 10 }
+
+netscreenNAT OBJECT IDENTIFIER ::= { netscreen 11 }
+
+netscreenAddr OBJECT IDENTIFIER ::= { netscreen 12 }
+
+netscreenService OBJECT IDENTIFIER ::= { netscreen 13 }
+
+netscreenSchedule OBJECT IDENTIFIER ::= { netscreen 14 }
+
+netscreenVsys OBJECT IDENTIFIER ::= { netscreen 15 }
+
+netscreenResource OBJECT IDENTIFIER ::= { netscreen 16 }
+
+netscreenIp OBJECT IDENTIFIER ::= { netscreen 17 }
+
+netscreenVR OBJECT IDENTIFIER ::= { netscreen 18 }
+
+netscreenChassis OBJECT IDENTIFIER ::= { netscreen 21 }
+
+netscreenUAC OBJECT IDENTIFIER ::= { netscreen 22 }
+
+netscreenSettingMibModule OBJECT IDENTIFIER ::= { netscreenSetting 0 }
+
+netscreenVpnMibModule OBJECT IDENTIFIER ::= { netscreenVpn 0 }
+
+END
+
+

@@ -182,7 +182,7 @@ here are those values:
 #### <a name="faq22"> Why does a device show as a warning?</a>
 
 This is indicating that the device has rebooted within the last 24 hours (by default). If you want to adjust this 
-threshold then you can do so by setting `$config['uptime_warning']` in config.php. The value must be in seconds.
+threshold then you can do so by setting `$config['uptime_warning'] = '84600';` in `config.php`. The value must be in seconds.
 
 #### <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
 

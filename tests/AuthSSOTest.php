@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Exceptions\AuthenticationException;
 
 class AuthSSOTest extends DBTestCase
 {
@@ -244,12 +245,17 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authenticate($this->makeBreakUser(), null));
     }
 
+    public function testReauthenticate()
+    {
+        $this->setExpectedException(AuthenticationException::class);
+        Auth::reset()->reauthenticate(null, null);
+    }
+
     // Document the modules current behaviour, so that changes trigger test failures
     public function testCapabilityFunctions()
     {
         $a = Auth::reset();
 
-        $this->assertFalse($a->reauthenticate(null, null));
         $this->assertTrue($a->canUpdatePasswords() === 0);
         $this->assertTrue($a->changePassword(null, null) === 0);
         $this->assertTrue($a->canManageUsers() === 1);

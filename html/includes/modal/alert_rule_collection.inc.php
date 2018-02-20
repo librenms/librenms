@@ -63,6 +63,7 @@ if (is_admin() === false) {
                     </table>
                     <script>
                         var grid = $("#rule_collection").bootgrid({
+                            caseSensitive: false,
                             formatters: {
                                 "action": function (column, row) {
                                     return "<button type=\"button\" id=\"rule_from_collection\" name=\"rule_from_collection\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">Select</button";

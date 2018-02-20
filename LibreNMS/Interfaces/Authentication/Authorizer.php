@@ -32,7 +32,7 @@ interface Authorizer
      * Check if a $username exists.
      *
      * @param string $username
-     * @param bool $throw_exception If this is enabled instead of returning false, this will throw an exception.
+     * @param bool $throw_exception Allows for a message to be sent to callers in case the user does not exist
      * @return bool
      */
     public function userExists($username, $throw_exception = false);

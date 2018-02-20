@@ -13,7 +13,6 @@
 # Others #
 ##########
 *.swp
-/composer.lock
 Thumbs.db
 config.php
 html/css/custom/*

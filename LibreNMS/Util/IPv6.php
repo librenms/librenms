@@ -147,4 +147,15 @@ class IPv6 extends IP
             return zeropad($section, 4);
         }, $parts));
     }
+
+    /**
+     * Convert this IP to an snmp index hex encoded
+     *
+     * @return string
+     */
+    public function toSnmpIndex()
+    {
+        $ipv6_split = str_split(str_replace(':', '', $this->uncompressed()), 2);
+        return implode('.', array_map('hexdec', $ipv6_split));
+    }
 }

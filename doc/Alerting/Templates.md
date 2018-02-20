@@ -75,21 +75,18 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 Ports Utilization Template:
 ```text
 %title
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
 Rule: {if %name}%name{else}%rule{/if}
-{if %faults}
 {foreach %faults}
-Device: %value.sysname
 Physical Interface: %value.ifDescr
 Interface Description: %value.ifAlias
-Interface Speed in Bits: %value.ifSpeed
-Inbound Utilization: {calc (((%value.ifInOctets_rte8)/%value.ifSpeed)100)}%
-Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
+Interface Speed: {calc (%value.ifSpeed/1000000000)} Gbs
+Inbound Utilization: {calc ((%value.ifInOctets_rate*8)/%value.ifSpeed)*100}%
+Outbound Utilization: {calc ((%value.ifOutOctets_rate*8)/%value.ifSpeed)*100}%
 {/foreach}
-{/if}
 ```
 
 Storage:
@@ -97,7 +94,7 @@ Storage:
 
 %title
 
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity 
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -110,6 +107,79 @@ Notes: %notes
 
 Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Utilized: %value.storage_perc{/foreach}
 ```
+
+Temperature Sensors:
+```text
+
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Temperature: %value.sensor_current°C
+** {calc(%value.sensor_current-%value.sensor_limit)}°C over limit
+Previous Measurement: %value.sensor_prev°C
+High Temperature Limit: %value.sensor_limit°C
+{/foreach}
+{/if}
+```
+
+Value Sensors:
+```text
+
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Sensor%value.sensor_current
+** {calc(%value.sensor_current-%value.sensor_limit)}over limit
+Previous Measurement: %value.sensor_prev
+Limit: %value.sensor_limit
+{/foreach}
+{/if}
+```
+
+Memory Alert:
+```text
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Notes: %notes
+
+Server: %hostname {foreach %faults}
+Memory Description: %value.mempool_descr 
+Percent Utilized: %value.mempool_perc{/foreach}
+```
+
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text

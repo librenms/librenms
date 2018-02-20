@@ -1,5 +1,5 @@
 os: aos
-group: aos
+group: nokia
 text: 'Alcatel-Lucent OS'
 type: network
 ifXmcbc: 1

@@ -3,7 +3,7 @@ group: printer
 text: 'Toshiba Printer'
 ifname: 1
 type: printer
-logo: toshiba
+icon: toshiba
 over:
     - { graph: device_toner, text: Toner }
 discovery:

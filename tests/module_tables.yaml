@@ -9,6 +9,7 @@ applications:
 arp-table:
     ipv4_mac:
         excluded_fields: [device_id, port_id]
+        order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
 bgp-peers:
     devices:
         included_fields: [bgpLocalAs]
@@ -41,6 +42,7 @@ sensors:
         joins:
             - { left: state_indexes.state_index_id, right: state_translations.state_index_id }
             - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
+        order_by: state_indexes.state_name, state_translations.state_value
         custom_where: ''
 storage:
     storage:
