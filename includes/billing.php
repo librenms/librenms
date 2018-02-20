@@ -336,7 +336,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         $result['last_out'] = $out_delta / $period;
     }
     return $result;
-}//end getBillingGraphData
+}//end getBillingBitsGraphData
 
 function getHistoricTransferGraphData($bill_id)
 {

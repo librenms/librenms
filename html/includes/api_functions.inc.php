@@ -1456,7 +1456,7 @@ function get_bill_history_graphdata()
         case 'bits':
             $reducefactor = $_GET['reducefactor'];
 
-            $graph_data = getBillingGraphData($bill_id, $bill_hist_id, $reducefactor);
+            $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
             break;
         case 'day':
         case 'hour':
