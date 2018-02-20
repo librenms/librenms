@@ -150,3 +150,5 @@ if (empty($ports_keys)) {
 
     $component->setComponentPrefs($device_id, $portsc);
 }
+
+update_application($app, $json, $ports);
