@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -106,21 +107,26 @@ if (!$snmpsim->isRunning()) {
 }
 
 
-$no_save = isset($options['n']) || isset($options['no-save']);
-foreach ($os_list as $full_os_name => $parts) {
-    list($target_os, $target_variant) = $parts;
-    echo "OS: $target_os\n";
-    echo "Module: $modules_input\n";
-    if ($target_variant) {
-        echo "Variant: $target_variant\n";
+try {
+    $no_save = isset($options['n']) || isset($options['no-save']);
+    foreach ($os_list as $full_os_name => $parts) {
+        list($target_os, $target_variant) = $parts;
+        echo "OS: $target_os\n";
+        echo "Module: $modules_input\n";
+        if ($target_variant) {
+            echo "Variant: $target_variant\n";
+        }
+        echo PHP_EOL;
+
+
+        $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
+
+        $test_data = $tester->generateTestData($snmpsim, $no_save);
+
+        if ($no_save) {
+            print_r($test_data);
+        }
     }
-    echo PHP_EOL;
-
-    $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
-
-    $test_data = $tester->generateTestData($snmpsim, $no_save);
-
-    if ($no_save) {
-        print_r($test_data);
-    }
+} catch (InvalidModuleException $e) {
+    echo $e->getMessage() . PHP_EOL;
 }
