@@ -216,6 +216,6 @@ while (isset($zfs{'pools'}{$pools_int})) {
     $pools_int++;
 }
 
-//replace $zfs{'pools'} with a array where the keys are the pool names update metrics
+//replace $zfs{'pools'} with a array where the keys are the pool names and update metrics
 $zfs{'pools'}=$pools_for_mertrics;
 update_application($app, $json, $zfs);
