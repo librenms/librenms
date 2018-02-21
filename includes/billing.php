@@ -277,8 +277,8 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         }
 
         $period    = $row['period'];
-        $in_delta  = $row['in_delta'];
-        $out_delta = $row['out_delta'];
+        $in_delta  = $row['in_delta'] * 8;
+        $out_delta = $row['out_delta'] * 8;
         $last      = $timestamp;
 
         $iter_in     += $in_delta;
@@ -293,8 +293,8 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
             $tot_period+= $period;
 
             if (++$iter >= $reducefactor) {
-                $out_data[$i] = round(($iter_out * 8 / $iter_period), 2);
-                $in_data[$i]  = round(($iter_in * 8 / $iter_period), 2);
+                $out_data[$i] = round(($iter_out / $iter_period), 2);
+                $in_data[$i]  = round(($iter_in / $iter_period), 2);
                 $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
                 $ticks[$i]    = $timestamp;
                 $i++;
@@ -305,8 +305,8 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
     }//end foreach
 
     if (isset($iter_in)) {  // Write last element
-        $out_data[$i] = round(($iter_out * 8 / $iter_period), 2);
-        $in_data[$i]  = round(($iter_in * 8 / $iter_period), 2);
+        $out_data[$i] = round(($iter_out / $iter_period), 2);
+        $in_data[$i]  = round(($iter_in / $iter_period), 2);
         $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
         $ticks[$i]    = $timestamp;
         $i++;
