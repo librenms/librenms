@@ -88,8 +88,6 @@ class Validator
                     }
 
                     $this->printResults($group_name);
-
-
                 }
 
                 // validation is complete for this group
