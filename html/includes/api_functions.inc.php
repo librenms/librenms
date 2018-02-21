@@ -1344,12 +1344,12 @@ function delete_bill()
     check_is_admin();
     $bill_id = (int)$router['id'];
 
-    if (is_numeric($bill_id) && $bill_id > 0 && dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ] )) {
-        dbDelete('bill_ports', '`bill_id` =  ? ', [ $bill_id ] );
-        dbDelete('bill_data', '`bill_id` =  ? ', [ $bill_id ] );
-        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ] );
-        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ] );
-        dbDelete('bill_perms', '`bill_id` =  ? ', [ $bill_id ] );
+    if (is_numeric($bill_id) && $bill_id > 0 && dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ])) {
+        dbDelete('bill_ports', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_data', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_perms', '`bill_id` =  ? ', [ $bill_id ]);
         api_success_noresult(200, 'Bill has been removed');
     }
     api_error(400, 'Could not remove bill with id '.$bill_id);
@@ -1406,7 +1406,7 @@ function create_edit_bill()
     //check ports
     $ports_add = null;
     if (array_key_exists('ports', $data)) {
-	$ports_add = [];
+        $ports_add = [];
         $ports = $data['ports'];
         foreach ($ports as $port_id) {
             $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [ $port_id ]);
@@ -1481,7 +1481,8 @@ function create_edit_bill()
             $bill[$bill_key] = check_bill_key_value($bill_key, $data[$bill_key]);
         }
 
-        $bill_id = dbInsert( [
+        $bill_id = dbInsert(
+            [
             'bill_name' => $bill['bill_name'],
             'bill_type' => $bill['bill_type'],
             'bill_cdr' => $bill['bill_cdr'],
@@ -1490,7 +1491,9 @@ function create_edit_bill()
             'bill_custid' => $bill['bill_custid'],
             'bill_ref' => $bill['bill_ref'],
             'bill_notes' => $bill['bill_notes']
-        ], 'bills');
+             ],
+            'bills'
+        );
 
         if (!$bill_id) {
             api_error(500, 'Failed to create new bill');
@@ -1502,7 +1505,7 @@ function create_edit_bill()
         dbDelete('bill_ports', "`bill_id` =  $bill_id");
         if (count($ports_add) > 0) {
             foreach ($ports_add as $port_id) {
-                dbInsert( [ 'bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0 ], 'bill_ports');
+                dbInsert([ 'bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0 ], 'bill_ports');
             }
         }
     }
