@@ -281,6 +281,7 @@ class ModuleTestHelper
         foreach ($modules as $module) {
             // only allow valid modules
             if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+                echo "Invalid module name: $module\n";
                 continue;
             }
 
