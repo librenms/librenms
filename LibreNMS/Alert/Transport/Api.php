@@ -45,7 +45,7 @@ class Api implements Transport
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
                 if (json_decode($api) !== NULL) {
-                        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+                    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
                 }
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $api);
                 $ret = curl_exec($curl);
