@@ -1474,9 +1474,15 @@ function get_bill_history_graphdata()
 function delete_bill()
 {
     check_is_admin();
+    $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = (int)$router['id'];
 
-    if (is_numeric($bill_id) && $bill_id > 0 && dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ])) {
+    if ($bill_id == 0) {
+        api_error(400, 'Could not remove bill with id '.$bill_id.'. Invalid id');
+    }
+
+    $res = dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ]);
+    if ($res == 1) {
         dbDelete('bill_ports', '`bill_id` =  ? ', [ $bill_id ]);
         dbDelete('bill_data', '`bill_id` =  ? ', [ $bill_id ]);
         dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
