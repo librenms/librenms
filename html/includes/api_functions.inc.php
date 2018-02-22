@@ -1634,7 +1634,7 @@ function create_edit_bill()
             'bills'
         );
 
-        if (!$bill_id) {
+        if ($bill_id === null) {
             api_error(500, 'Failed to create new bill');
         }
     }
