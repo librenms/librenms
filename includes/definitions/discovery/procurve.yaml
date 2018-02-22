@@ -34,8 +34,8 @@ modules:
                     index: 'hpicfFanState.{{ $index }}'
                     state_name: hpicfFanState
                     states:
-                        - { descr: removed, graph: 1, value: 1, generic: 2 }
-                        - { descr: off, graph: 1, value: 2, generic: 2 }
+                        - { descr: removed, graph: 1, value: 1, generic: 3 }
+                        - { descr: off, graph: 1, value: 2, generic: 3 }
                         - { descr: underspeed, graph: 1, value: 3, generic: 1 }
                         - { descr: overspeed, graph: 1, value: 4, generic: 1 }
                         - { descr: ok, graph: 1, value: 5, generic: 0 }
