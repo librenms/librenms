@@ -1474,6 +1474,7 @@ function get_bill_history_graphdata()
 function delete_bill()
 {
     check_is_admin();
+    $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = (int)$router['id'];
 
