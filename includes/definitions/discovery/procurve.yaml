@@ -48,7 +48,7 @@ modules:
                     index: 'hpicfPsState.{{ $index }}'
                     state_name: hpicfPsState
                     states:
-                        - { descr: psNotPresent, graph: 1, value: 1, generic: 2 }
+                        - { descr: psNotPresent, graph: 1, value: 1, generic: 3 }
                         - { descr: psNotPlugged, graph: 1, value: 2, generic: 2 }
                         - { descr: psPowered, graph: 1, value: 3, generic: 0 }
                         - { descr: psFailed, graph: 1, value: 4, generic: 2 }
