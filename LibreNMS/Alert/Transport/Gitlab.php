@@ -30,48 +30,49 @@ class Gitlab implements Transport
     public function deliverAlert($obj, $opts)
     {
         // Don't create tickets for resolutions
-        if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {
-            return true;
-        }
-
-        $device = device_by_id_cache($obj['device_id']); // for event logging
-
-        $project_host= $opts['host'];
-        $project_id  = $opts['project_id'];
-        $project_key = $opts['key'];
-        $details     = "Librenms alert for: " . $obj['hostname'];
-        $description = $obj['msg'];
-        $title       = urlencode($details);
-        $desc        = urlencode($description);
-        $url         = $opts['host'] . "/api/v4/projects/$project_id/issues?title=$title&description=$desc";
-        $curl        = curl_init();
-
-        $data       = array("title" => $details,
-                            "description" => $description
-                            );
-        $postdata   = array("fields" => $data);
-        $datastring = json_encode($postdata);
-
-        set_curl_proxy($curl);
-
-        $headers = array('Accept: application/json', 'Content-Type: application/json', 'PRIVATE-TOKEN: '.$project_key);
-
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_VERBOSE, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
-
-        $ret  = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code == 200) {
-            $gitlabout = json_decode($ret, true);
-            d_echo("Created Gitlab issue " . $gitlabout['key'] . " for " . $device);
+        if ($obj['state'] == 0) {
             return true;
         } else {
-            d_echo("Gitlab connection error: " . serialize($ret));
-            return false;
-        }
+
+		$device = device_by_id_cache($obj['device_id']); // for event logging
+
+		$project_host= $opts['host'];
+		$project_id  = $opts['project_id'];
+		$project_key = $opts['key'];
+		$details     = "Librenms alert for: " . $obj['hostname'];
+		$description = $obj['msg'];
+		$title       = urlencode($details);
+		$desc        = urlencode($description);
+		$url         = $opts['host'] . "/api/v4/projects/$project_id/issues?title=$title&description=$desc";
+		$curl        = curl_init();
+
+		$data       = array("title" => $details,
+							"description" => $description
+							);
+		$postdata   = array("fields" => $data);
+		$datastring = json_encode($postdata);
+
+		set_curl_proxy($curl);
+
+		$headers = array('Accept: application/json', 'Content-Type: application/json', 'PRIVATE-TOKEN: '.$project_key);
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_VERBOSE, 1);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
+
+		$ret  = curl_exec($curl);
+		$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($code == 200) {
+			$gitlabout = json_decode($ret, true);
+			d_echo("Created Gitlab issue " . $gitlabout['key'] . " for " . $device);
+			return true;
+		} else {
+			d_echo("Gitlab connection error: " . serialize($ret));
+			return false;
+		}
+	}
     }
 }
