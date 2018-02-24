@@ -111,9 +111,9 @@ If are upgrading LibreNMS, ensure to remove the crontab:
 
 Copy, enable and start systemd timers:
 
-    cp /opt/librenms/contrib/systemd/* /lib/systemd/system/
+    cp /opt/librenms/contrib/systemd/* /etc/systemd/system/
     systemctl daemon-reload
-    for timer in /lib/systemd/system/librenms@*.timer; do systemctl enable $(basename $timer) && systemctl start $(basename $timer); done
+    for timer in /etc/systemd/system/librenms@*.timer; do systemctl enable $(basename $timer) && systemctl start $(basename $timer); done
 
 #### Copy logrotate config
 

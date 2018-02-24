@@ -108,7 +108,7 @@ Copy, enable and start systemd timers:
 
     cp /opt/librenms/contrib/systemd/* /etc/systemd/system/
     systemctl daemon-reload
-    for timer in /lib/systemd/system/librenms@*.timer; do systemctl enable --now $(basename $timer); done
+    for timer in /etc/systemd/system/librenms@*.timer; do systemctl enable --now $(basename $timer); done
 
 #### Copy logrotate config
 
