@@ -40,7 +40,8 @@ We list below what we make use of including the license compliance.
   - [Graylog SSO Authentication Plugin](https://github.com/Graylog2/graylog-plugin-auth-sso)
   - [Select2](https://select2.org): MIT License
   - [JustGage](http://justgage.com): MIT
-
+  - [jQuery.extendext](https://github.com/mistic100/jQuery.extendext): MIT
+  - [doT](https://github.com/olado/doT): MIT
 
 ## 3rd Party GPLv3 Non-compliant
 

@@ -25,11 +25,85 @@
 use LibreNMS\Authentication\Auth;
 
 /**
+ * @param $rule
+ * @param $query_builder
+ * @return bool|string
+ */
+function GenSQL($rule, $query_builder = false)
+{
+    if ($query_builder) {
+        return GenSQLNew($query_builder);
+    } else {
+        return GenSQLOld($rule);
+    }
+}
+
+/**
+ * This is a copy of the GenSQL() function with some slight changes.
+ * @param $rule
+ * @return bool|string
+ */
+function GenSQLNew($rule)
+{
+    $rule = RunMacros($rule);
+    if (empty($rule)) {
+        //Cannot resolve Macros due to recursion. Rule is invalid.
+        return false;
+    }
+    $tmp = explode(" ", $rule);
+    $tables = array();
+    foreach ($tmp as $opt) {
+        if (strstr($opt, '%') && strstr($opt, '.')) {
+            $tmpp = explode(".", $opt, 2);
+            $tmpp[0] = str_replace("%", "", $tmpp[0]);
+            $tables[] = mres(str_replace("(", "", $tmpp[0]));
+            $rule = str_replace($opt, $tmpp[0].'.'.$tmpp[1], $rule);
+        }
+    }
+    $tables = array_keys(array_flip($tables));
+    if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
+        //Our first table has no valid glue, append the 'devices' table to it!
+        array_unshift($tables, 'devices');
+    }
+    $x = sizeof($tables)-1;
+    $i = 0;
+    $join = "";
+    while ($i < $x) {
+        if (isset($tables[$i+1])) {
+            $gtmp = ResolveGlues(array($tables[$i+1]), 'device_id');
+            if ($gtmp === false) {
+                //Cannot resolve glue-chain. Rule is invalid.
+                return false;
+            }
+            $last = "";
+            $qry = "";
+            foreach ($gtmp as $glue) {
+                if (empty($last)) {
+                    list($tmp,$last) = explode('.', $glue);
+                    $qry .= $glue.' = ';
+                } else {
+                    list($tmp,$new) = explode('.', $glue);
+                    $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
+                    $last = $new;
+                }
+                if (!in_array($tmp, $tables)) {
+                    $tables[] = $tmp;
+                }
+            }
+            $join .= "( ".$qry.$tables[0].".device_id ) && ";
+        }
+        $i++;
+    }
+    $sql = "SELECT * FROM ".implode(",", $tables)." WHERE (".$join."".str_replace("(", "", $tables[0]).".device_id = ?) && ($rule)";
+    return $sql;
+}
+
+/**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
  * @return string|boolean
  */
-function GenSQL($rule)
+function GenSQLOld($rule)
 {
     $rule = RunMacros($rule);
     if (empty($rule)) {
@@ -99,10 +173,11 @@ function RunMacros($rule, $x = 1)
     krsort($config['alert']['macros']['rule']);
     foreach ($config['alert']['macros']['rule'] as $macro => $value) {
         if (!strstr($macro, " ")) {
-            $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
+            $value = str_replace('%', '', $value);
+            $rule = str_replace('macros.'.$macro, '('.$value.')', $rule);
         }
     }
-    if (strstr($rule, "%macros")) {
+    if (strstr($rule, "macros.")) {
         if (++$x < 30) {
             $rule = RunMacros($rule, $x);
         } else {
@@ -167,7 +242,7 @@ function RunRules($device)
         d_echo(PHP_EOL);
         $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         if (empty($rule['query'])) {
-            $rule['query'] = GenSQL($rule['rule']);
+            $rule['query'] = GenSQL($rule['rule'], $rule['query_builder']);
         }
         $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
@@ -629,7 +704,7 @@ function IssueAlert($alert)
 
     if ($config['alert']['fixed-contacts'] == false) {
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['query_builder']);
         }
         $sql = $alert['query'];
         $qry = dbFetchRows($sql, array($alert['device_id']));
@@ -689,7 +764,7 @@ function RunFollowUp()
             $alert['rule_id'],
             $alert['device_id'],
         );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
+        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query, alert_rules.query_builder,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
         if (empty($alert['rule']) || !IsRuleValid($tmp[1], $tmp[0])) {
             // Alert-Rule does not exist anymore, let's remove the alert-state.
             echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
@@ -704,7 +779,7 @@ function RunFollowUp()
         }
 
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['query_builder']);
         }
         $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
         //make sure we can json_encode all the datas later
@@ -752,7 +827,7 @@ function RunAlerts()
             $alert['rule_id'],
             $alert['device_id'],
         );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
+        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.query_builder FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
         if (empty($alert['rule_id']) || !IsRuleValid($tmp[1], $tmp[0])) {
             echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
             // Alert-Rule does not exist anymore, let's remove the alert-state.

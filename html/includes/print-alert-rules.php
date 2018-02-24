@@ -72,6 +72,8 @@ echo '<div class="table-responsive">
 
 echo '<td colspan="7">';
 if ($_SESSION['userlevel'] >= '10') {
+    echo '<a href="'. generate_url(array('page' => 'newalert')) .'" class="btn btn-primary btn-sm" ><i class="fa fa-plus"></i> Create new new alert rule</a>';
+    echo '<i> - OR - </i>';
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
     echo '<i> - OR - </i>';
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
@@ -162,7 +164,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
-    echo '<i>'.htmlentities($rule['rule']).'</i></td>';
+    echo '<i>'.htmlentities($rule['rule'] ?: $rule['query']).'</i></td>';
     echo '<td>'.$rule['severity'].'</td>';
     echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
@@ -179,7 +181,15 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     echo '<td>';
     if ($_SESSION['userlevel'] >= '10') {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        if ($rule['query_builder']) {
+            echo "<a class='btn btn-primary' role='button' href='" . generate_url(array(
+                    'page' => 'newalert',
+                    'device' => $rule['device_id'],
+                    'rule_id' => $rule['id']
+                )) . "' name='edit-alert-rule' data-content='" . $popover_msg . "' data-container='body' data-toggle='modal'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
+        } else {
+            echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        }
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
 
