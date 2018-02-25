@@ -30,6 +30,7 @@ if (!device_permitted($vars['device'])) {
         ];
     }
 
+    print_r($db_schema);
     foreach ($db_schema as $table => $data) {
         foreach ($data['Columns'] as $index => $columns) {
             $tmp_filters[] = [
@@ -89,7 +90,7 @@ if (!device_permitted($vars['device'])) {
 
     ?>
 
-    <script src="js/sql-parser.js"></script>
+    <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
 
     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
@@ -204,7 +205,7 @@ if (!device_permitted($vars['device'])) {
                 }
             },
             sqlOperators: {
-                regexp: { op: 'REGEXP ?' }
+                regexp: { op: 'REGEXP' }
             },
             sqlRuleOperator: {
                 'REGEXP': function(v) {
@@ -248,9 +249,6 @@ if (!device_permitted($vars['device'])) {
                 }
             }
         });
-
-        $("[name^='builder_rule_']").select2({});
-
     </script>
 
     <?php
