@@ -29,8 +29,8 @@ if (!device_permitted($vars['device'])) {
             'id' => 'macros.' . $macro,
         ];
     }
-    
-    foreach ($db_schema as $table => $data) {
+
+    foreach ((array) $db_schema as $table => $data) {
         foreach ($data['Columns'] as $index => $columns) {
             $tmp_filters[] = [
                 'id' => "$table.{$columns['Field']}",
