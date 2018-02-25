@@ -29,8 +29,7 @@ if (!device_permitted($vars['device'])) {
             'id' => 'macros.' . $macro,
         ];
     }
-
-    print_r($db_schema);
+    
     foreach ($db_schema as $table => $data) {
         foreach ($data['Columns'] as $index => $columns) {
             $tmp_filters[] = [
