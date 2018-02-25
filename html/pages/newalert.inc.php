@@ -177,7 +177,7 @@ if (!device_permitted($vars['device'])) {
     </form>
 
     <script>
-        var sql_import_export = <?php echo $sql_query; ?>;
+        var sql_import_export = "<?php echo $rule['query_builder']; ?>";
 
         $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
             $("[name$='_filter']").each(function () {
@@ -205,13 +205,19 @@ if (!device_permitted($vars['device'])) {
             },
             sqlOperators: {
                 regexp: { op: 'REGEXP' }
+            },
+            sqlRuleOperator: {
+                'REGEXP': function(v) {
+                    return { val: v, op: 'regexp' };
+                }
             }
         });
 
 
         <?php
         if (is_numeric($rule_id)) {
-            echo '$("#builder").queryBuilder("setRules", sql_import_export);';
+            //echo '$("#builder").queryBuilder("setRules", sql_import_export);';
+            echo '$("#builder").queryBuilder("setRulesFromSQL", sql_import_export);';
         }
         ?>
 

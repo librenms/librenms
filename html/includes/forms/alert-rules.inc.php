@@ -36,7 +36,8 @@ if (is_admin() === false) {
     );
 }
 
-$query_builder = serialize(json_encode(json_decode(str_replace('%', '', $_POST['json']))));
+//$query_builder = serialize(json_encode(json_decode(str_replace('%', '', $_POST['json']))));
+$query_builder = str_replace('%', '', $_POST['query']);
 $query         = GenSQL($_POST['rule'], $_POST['query']);
 $rule_id       = $_POST['rule_id'];
 $count         = mres($_POST['count']);
