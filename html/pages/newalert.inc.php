@@ -23,6 +23,13 @@ if (!device_permitted($vars['device'])) {
     $rule_id = $vars['rule_id'] ?: '';
     $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents($config['install_dir'] . '/misc/db_schema.yaml'));
 
+    krsort($config['alert']['macros']['rule']);
+    foreach ($config['alert']['macros']['rule'] as $macro => $value) {
+        $tmp_filters[] = [
+            'id' => 'macros.' . $macro,
+        ];
+    }
+
     foreach ($db_schema as $table => $data) {
         foreach ($data['Columns'] as $index => $columns) {
             $tmp_filters[] = [
@@ -30,13 +37,6 @@ if (!device_permitted($vars['device'])) {
                 'type' => mysql_type_to_php_type($columns['Type']),
             ];
         }
-    }
-
-    krsort($config['alert']['macros']['rule']);
-    foreach ($config['alert']['macros']['rule'] as $macro => $value) {
-        $tmp_filters[] = [
-            'id' => 'macros.' . $macro,
-        ];
     }
 
     $filters = json_encode($tmp_filters);
@@ -89,7 +89,7 @@ if (!device_permitted($vars['device'])) {
 
     ?>
 
-    <script src="js/sql-parser.min.js"></script>
+    <script src="js/sql-parser.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
 
     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
@@ -196,7 +196,7 @@ if (!device_permitted($vars['device'])) {
 
             filters: <?php echo $filters; ?>,
             operators: $.fn.queryBuilder.constructor.DEFAULTS.operators.concat([
-                { type: 'regexp',    nb_inputs: 1, multiple: false, apply_to: ['string'] }
+                { type: 'regexp', nb_inputs: 1, multiple: false, apply_to: ['string'] }
             ]),
             lang: {
                 operators: {
@@ -204,7 +204,7 @@ if (!device_permitted($vars['device'])) {
                 }
             },
             sqlOperators: {
-                regexp: { op: 'REGEXP' }
+                regexp: { op: 'REGEXP ?' }
             },
             sqlRuleOperator: {
                 'REGEXP': function(v) {
