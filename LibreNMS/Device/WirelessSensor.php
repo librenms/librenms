@@ -208,7 +208,7 @@ class WirelessSensor extends Sensor
             'errors' => array(
                 'short' => 'Errors',
                 'long' => 'Errors',
-                'unit' => 'bps',
+                'unit' => '',
                 'icon' => 'exclamation-triangle',
                 'type' => 'counter',
             ),
