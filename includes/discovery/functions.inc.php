@@ -699,11 +699,11 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
                 'mempool_descr' => $descr,
             );
 
-            if (!empty($entPhysicalIndex)) {
+            if (is_numeric($entPhysicalIndex)) {
                 $update_data['entPhysicalIndex'] = $entPhysicalIndex;
             }
 
-            if (!empty($hrDeviceIndex)) {
+            if (is_numeric($hrDeviceIndex)) {
                 $update_data['hrDeviceIndex'] = $hrDeviceIndex;
             }
 
