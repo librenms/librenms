@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
@@ -53,6 +54,8 @@ class OSModulesTest extends DBTestCase
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($snmpsim, true);
         } catch (FileNotFoundException $e) {
+            $this->fail($e->getMessage());
+        } catch (InvalidModuleException $e) {
             $this->fail($e->getMessage());
         }
 
