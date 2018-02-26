@@ -72,11 +72,9 @@ echo '<div class="table-responsive">
 
 echo '<td colspan="7">';
 if ($_SESSION['userlevel'] >= '10') {
-    echo '<a href="'. generate_url(array('page' => 'newalert')) .'" class="btn btn-primary btn-sm" ><i class="fa fa-plus"></i> Create new new alert rule</a>';
+    echo '<a href="'. generate_url(['page' => 'newalert', 'device' => $device['device_id']]) .'" class="btn btn-primary btn-sm" ><i class="fa fa-plus"></i> Create new alert rule</a>';
     echo '<i> - OR - </i>';
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
-    echo '<i> - OR - </i>';
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
+    echo '<a href="'. generate_url(['page' => 'newalert', 'popup' => 'collection']) .'" class="btn btn-primary btn-sm" ><i class="fa fa-plus"></i> Create rule from collection</a>';
 }
 echo '</td>
     <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
@@ -153,11 +151,13 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     $rule_extra = json_decode($rule['extra'], true);
     if ($rule['device_id'] == ':-1' || $rule['device_id'] == '-1') {
         $popover_msg = 'Global alert rule';
+        $icon_indicator = 'fa fa-globe fa-fw text-success';
     } else {
         $popover_msg = 'Device specific rule';
+        $icon_indicator = 'fa fa-server fa-fw text-primary';
     }
     echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
-    echo '<td><i>#'.((int) $rule['id']).'</i></td>';
+    echo "<td><i>#".((int) $rule['id'])."</i><br /><i class=\"$icon_indicator\"></i></td>";
     echo '<td>'.$rule['name'].'</td>';
     echo "<td class='col-sm-4'>";
     if ($rule_extra['invert'] === true) {

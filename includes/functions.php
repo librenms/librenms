@@ -2465,9 +2465,10 @@ function lock_and_purge($table, $sql)
 
 /**
  * @param $type
+ * @param null $field
  * @return string
  */
-function mysql_type_to_php_type($type)
+function mysql_type_to_php_type($type, $field = null)
 {
     $php_type = 'string';
     if (str_contains('char', $type)) {

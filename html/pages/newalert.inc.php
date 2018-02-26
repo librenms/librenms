@@ -16,6 +16,8 @@
 $page_title = 'New Alert';
 $no_refresh = true;
 
+require_once 'includes/modal/alert_rule_collection.inc.php';
+
 if (!device_permitted($vars['device'])) {
     include 'includes/error-no-perm.inc.php';
 } else {
@@ -34,7 +36,7 @@ if (!device_permitted($vars['device'])) {
         foreach ($data['Columns'] as $index => $columns) {
             $tmp_filters[] = [
                 'id' => "$table.{$columns['Field']}",
-                'type' => mysql_type_to_php_type($columns['Type']),
+                'type' => mysql_type_to_php_type($columns['Type'], $columns['Field']),
             ];
         }
     }
@@ -100,7 +102,22 @@ if (!device_permitted($vars['device'])) {
         <input type="hidden" name="query" id="query" value="">
         <input type="hidden" name="json" id="json" value="">
         <div class="form-group">
-            <div class="col-sm-5 col-sm-offset-3">
+            <div class="col-sm-3">
+                <div class="pull-right">
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="import-from" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Import from
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
+                            <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
+                            <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
+                            <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5">
                 <div id="builder"></div>
             </div>
         </div>
@@ -151,8 +168,7 @@ if (!device_permitted($vars['device'])) {
                     <input type='text' id='map-stub' name='map-stub' class='form-control'/>
                 </div>
                 <div class="col-sm-1">
-                    <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add
-                    </button>
+                    <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
                 </div>
             </div>
             <div class="row">
@@ -195,9 +211,14 @@ if (!device_permitted($vars['device'])) {
             ],
 
             filters: <?php echo $filters; ?>,
-            operators: $.fn.queryBuilder.constructor.DEFAULTS.operators.concat([
-                { type: 'regexp', nb_inputs: 1, multiple: false, apply_to: ['string'] }
-            ]),
+            operators: [
+                'equal', 'not_equal', 'in', 'not_in', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null',
+                { type: 'regexp', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+                { type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+                { type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+                { type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+                { type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+            ],
             lang: {
                 operators: {
                     regexp: 'regex'
@@ -216,7 +237,6 @@ if (!device_permitted($vars['device'])) {
 
         <?php
         if (is_numeric($rule_id)) {
-            //echo '$("#builder").queryBuilder("setRules", sql_import_export);';
             echo '$("#builder").queryBuilder("setRulesFromSQL", sql_import_export);';
         }
         ?>
@@ -248,7 +268,49 @@ if (!device_permitted($vars['device'])) {
                 }
             }
         });
+        $('#import-query').on('click', function (e) {
+            e.preventDefault();
+            var sql_import=window.prompt ("Enter your SQL query:");
+            if (sql_import) {
+                try {
+                    $("#builder").queryBuilder("setRulesFromSQL", sql_import);
+                } catch (e) {
+                    alert('Your query could not be parsed');
+                }
+            }
+        });
+
+        $('#import-old-format').on('click', function (e) {
+            e.preventDefault();
+            var old_import=window.prompt ("Enter your old alert rule:");
+            if (old_import) {
+                try {
+                    old_import = old_import.replace(/&&/g, 'AND');
+                    old_import = old_import.replace(/\|\|/g, 'OR');
+                    old_import = old_import.replace(/%/g, '');
+                    old_import = old_import.replace(/"/g, "'");
+                    old_import = old_import.replace(/~/g, "REGEXP");
+                    console.log(old_import);
+                    $("#builder").queryBuilder("setRulesFromSQL", old_import);
+                } catch (e) {
+                    alert('Your query could not be parsed');
+                }
+            }
+        });
+
+        $('#import-collection').on('click', function (e) {
+            e.preventDefault();
+            $("#search_rule_modal").modal('show');
+        });
+
     </script>
 
     <?php
+    if ($vars['popup'] === 'collection') {
+?>
+<script>
+    $("#search_rule_modal").modal('show');
+</script>
+<?php
+    }
 }
