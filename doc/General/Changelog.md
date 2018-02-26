@@ -1,3 +1,76 @@
+## 1.37
+*(2018-02-25)*
+
+#### Features
+* Added ironware syslog notify code ([#8268](https://github.com/librenms/librenms/issues/8268))
+* Copy all email alerts to default contact ([#8178](https://github.com/librenms/librenms/issues/8178))
+* Added GateOne Link ([#8189](https://github.com/librenms/librenms/pull/8189))
+* Added ironware syslog notify code ([#8268](https://github.com/librenms/librenms/pull/8268))
+
+#### Bugfixes
+* Switch detached head for daily updates ([#8194](https://github.com/librenms/librenms/issues/8194))
+* Fixed arp-tables updates ([#8180](https://github.com/librenms/librenms/issues/8180))
+* Fixed FusionSwitch portname for sensors ([#8188](https://github.com/librenms/librenms/issues/8188))
+* Fixed cbgp peers data on some devices ([#8208](https://github.com/librenms/librenms/pull/8208))
+* Awplus fix cpu ([#8215](https://github.com/librenms/librenms/pull/8215))
+* Fixed linkify to work with with ip addresses ([#8226](https://github.com/librenms/librenms/pull/8226))
+* Changed e-mail validation TLD max length to 18 ([#8236](https://github.com/librenms/librenms/pull/8236))
+* Fixed the HTML Purifier config so allowed values work ([#8239](https://github.com/librenms/librenms/pull/8239))
+* Fixed issues with new config init ([#8242](https://github.com/librenms/librenms/pull/8242)) 
+* Mitigate Cisco IOS 15 Stack State Issue ([#8256](https://github.com/librenms/librenms/pull/8256))
+* Fix bgp peers discovery cleanup ([#8263](https://github.com/librenms/librenms/pull/8263))
+* Fixed Dell N1548 CPU graphs ([#8280](https://github.com/librenms/librenms/pull/8280))
+
+#### Documentation
+* Changed err-msg to message for API docs ([#8182](https://github.com/librenms/librenms/issues/8182))
+* Fix for syslog-ng config in the docs ([#8160](https://github.com/librenms/librenms/issues/8160))
+
+#### Refactoring
+* Removed Unused Billing PDF reports ([#8235](https://github.com/librenms/librenms/issues/8235))
+* Update awplus to new processor discovery ([#8204](https://github.com/librenms/librenms/issues/8204))
+* Major Processors rewrite ([#8066](https://github.com/librenms/librenms/issues/8066))
+* Remove composer deps from the repository ([#6920](https://github.com/librenms/librenms/pull/6920))
+* Share code between all mysql based authorizers ([#8174](https://github.com/librenms/librenms/pull/8174))
+* Use more secure password hashes ([#8213](https://github.com/librenms/librenms/pull/8213))
+* Adding invalid hostnames is no longer fatal ([#8233](https://github.com/librenms/librenms/pull/8233))
+* Correct unix socket handling to match poller-wrapper ([#8214](https://github.com/librenms/librenms/pull/8214))
+* Move config loading into the Config class ([#8100](https://github.com/librenms/librenms/pull/8100))
+* Generic snmp_translate() function ([#8156](https://github.com/librenms/librenms/pull/8156))
+
+#### Devices
+* Added support for ScreenOS arp tables ([#8273](https://github.com/librenms/librenms/issues/8273))
+* Added support for OpenBSD PF states ([#8211](https://github.com/librenms/librenms/issues/8211))
+* Added support for F5 GTM ([#8161](https://github.com/librenms/librenms/issues/8161))
+* Added support for Airos CPU, GPS, and Temp ([#8203](https://github.com/librenms/librenms/pull/8203)) 
+* Updated support for XOS X480 and X650 desc and tests ([#8206](https://github.com/librenms/librenms/pull/8206))
+* Updated Cisco Processor support ([#8216](https://github.com/librenms/librenms/pull/8216))
+* Added OPNsense support ([#8199](https://github.com/librenms/librenms/pull/8199))
+* Updated StoneOs support ([#8155](https://github.com/librenms/librenms/pull/8155))
+* Added Allied Telesis Environmental Monitoring ([#8140](https://github.com/librenms/librenms/pull/8140))
+* Update support for Brocade G620 description ([#8250](https://github.com/librenms/librenms/pull/8250)) 
+* Added CeraOS wireless sensors ([#8167](https://github.com/librenms/librenms/pull/8167))
+
+#### WebUI
+* Updated jquery_lazyload ([#8287](https://github.com/librenms/librenms/issues/8287))
+* Updated datetime lib ([#8288](https://github.com/librenms/librenms/pull/8288))
+* Allow sorting by toner and searching ([#8247](https://github.com/librenms/librenms/issues/8247))
+* Updated vis js and moment js ([#8240](https://github.com/librenms/librenms/issues/8240))
+* Added sysNames to pulldowns and the main page ([#8137](https://github.com/librenms/librenms/issues/8137))
+* Adding invalid hostnames is no longer fatal. ([#8233](https://github.com/librenms/librenms/issues/8233))
+* Allow administrators to edit devices sysName ([#8149](https://github.com/librenms/librenms/pull/8149))
+* Allow frameborder attribute in notes widget ([#8219](https://github.com/librenms/librenms/pull/8219))
+* Updated vis js and moment js ([#8240](https://github.com/librenms/librenms/pull/8240))
+
+#### API
+* Added Billing Graphs & Data ([#8245](https://github.com/librenms/librenms/issues/8245))
+* Added History to Billing API Functions ([#8209](https://github.com/librenms/librenms/pull/8209))
+
+#### Alerting
+* Case insensitive alert rule searching ([#8231](https://github.com/librenms/librenms/pull/8231))
+* Updated email subject for failed updates to include hostname ([#8258](https://github.com/librenms/librenms/pull/8258))
+* Set Content-type header in the API transport if the text to be sent is valid JSON ([#8282](https://github.com/librenms/librenms/pull/8282))
+---
+
 ## 1.36
 *(2018-01-30)*
 
