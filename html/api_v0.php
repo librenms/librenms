@@ -112,6 +112,7 @@ $app->group(
                     '/bills',
                     function () use ($app) {
                         $app->get('/:bill_id', 'authToken', 'list_bills')->name('get_bill');
+                        $app->delete('/:id', 'authToken', 'delete_bill')->name('delete_bill');
                         // api/v0/bills/$bill_id
                         $app->get('/:bill_id/graphs/:graph_type', 'authToken', 'get_bill_graph')->name('get_bill_graph');
                         $app->get('/:bill_id/graphdata/:graph_type', 'authToken', 'get_bill_graphdata')->name('get_bill_graphdata');
@@ -121,6 +122,7 @@ $app->group(
                     }
                 );
                 $app->get('/bills', 'authToken', 'list_bills')->name('list_bills');
+                $app->post('/bills', 'authToken', 'create_edit_bill')->name('create_bill');
                 // api/v0/bills
                 // /api/v0/alerts
                 $app->group(
