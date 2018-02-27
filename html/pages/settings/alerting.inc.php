@@ -1384,7 +1384,52 @@ echo '
                     </div>
                 </div>
             </div>
+	</div>';
+// Gitlab Transport Section
+
+$gitlab_host = get_config_by_name('alert.transports.gitlab.host');
+$gitlab_project = get_config_by_name('alert.transports.gitlab.project_id');
+$gitlab_key = get_config_by_name('alert.transports.gitlab.key');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#gitlab_transport_expand"><i class="fa fa-caret-down"></i> Gitlab transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="gitlab" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="gitlab_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_host" class="col-sm-4 control-label">Gitlab Host</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_host" class="form-control validation" type="url" name="global-config-input" value="'.$gitlab_host['config_value'].'" data-config_id="'.$gitlab_host['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_project" class="col-sm-4 control-label">Gitlab Project ID</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_project" class="form-control" type="text" name="global-config-input" value="'.$gitlab_project['config_value'].'" data-config_id="'.$gitlab_project['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_key" class="col-sm-4 control-label">Gitlab API Key</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_key" class="form-control" type="text" name="global-config-input" value="'.$gitlab_key['config_value'].'" data-config_id="'.$gitlab_key['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>';
+
 // Jira Transport Section
 $jira_prj     = get_config_by_name('alert.transports.jira.prjkey');
 $jira_url    = get_config_by_name('alert.transports.jira.url');
