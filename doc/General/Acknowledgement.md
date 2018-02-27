@@ -9,7 +9,7 @@ We list below what we make use of including the license compliance.
   - [Font Awesome](http://fontawesome.io/icons/): MIT License
   - [Jquery Bootgrid](http://www.jquery-bootgrid.com/): MIT License
   - [Pace](https://github.com/HubSpot/pace): Open License
-  - [Twitter typeahead](http://twitter.github.io/typeahead.js/): Open License
+  - [Twitter typeahead](https://github.com/corejavascript/typeahead.js): Open License
   - [Vis](http://visjs.org/): MIT / Apache 2.0
   - [TCPDF](http://www.tcpdf.org): LGPLv3
   - [Bootstrap 3 Datepicker](http://eonasdan.github.io/bootstrap-datetimepicker/): MIT
