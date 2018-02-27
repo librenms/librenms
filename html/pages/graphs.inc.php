@@ -71,7 +71,6 @@ if (!$auth) {
 
     print_optionbar_end();
 
-    print_optionbar_start();
 
     $thumb_array = $config['graphs']['row']['normal'];
 
