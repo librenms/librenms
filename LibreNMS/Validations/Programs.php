@@ -26,10 +26,9 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
-class Programs implements ValidationGroup
+class Programs extends BaseValidation
 {
     /**
      * Validate this module.
@@ -99,16 +98,11 @@ class Programs implements ValidationGroup
             return Config::get($bin);
         }
 
-        return is_executable(locate_binary($bin));
-    }
+        $located = locate_binary($bin);
+        if (is_executable($located)) {
+            return $located;
+        }
 
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
+        return false;
     }
 }
