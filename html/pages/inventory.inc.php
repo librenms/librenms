@@ -53,20 +53,8 @@ foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY 
                  "</div>"+
                  "<div class=\"form-group\">"+
                  "<strong>&nbsp;Device&nbsp;</strong>"+
-                 "<select name=\"device\" id=\"device\" class=\"form-control input-sm\">"+
-                 "<option value=\"\">All Devices</option>"+
-<?php
-foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
-    if (device_permitted($data['device_id'])) {
-        echo '"<option value=\"'.$data['device_id'].'\""+';
-        if ($data['device_id'] == $_POST['device']) {
-            echo '" selected"+';
-        }
-
-        echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
-    }
-}
-?>
+                 "<select name=\"device\" id=\"device\" class=\"form-control input-sm\" style=\"width: 220px\">"+
+                 "<option></option>"+
                  "</select>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
@@ -94,6 +82,17 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
         };
     },
     url: "ajax_table.php"
+});
+
+
+$(document).ready(function() {
+
+    var Devices = $('#device').select2({
+        placeholder: 'All Devices',
+        allowClear: true
+    });
+
+    load_devices(Devices);
 });
 
 </script>
