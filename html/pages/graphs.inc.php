@@ -146,8 +146,6 @@ if (!$auth) {
     }
     echo('</center>');
 
-    print_optionbar_end();
-
     echo generate_graph_js_state($graph_array);
 
     echo('<div style="width: '.$graph_array['width'].'; margin: auto;"><center>');
