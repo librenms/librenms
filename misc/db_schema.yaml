@@ -170,7 +170,7 @@ bgpPeers:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bgpPeer_id], Unique: true, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id, context_name], Unique: false, Type: BTREE }
 bgpPeers_cbgp:
   Columns:
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
@@ -198,7 +198,7 @@ bgpPeers_cbgp:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     unique_index: { Name: unique_index, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id, bgpPeerIdentifier], Unique: false, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
 bills:
   Columns:
     - { Field: bill_id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -1163,11 +1163,13 @@ ports_adsl:
     interface_id: { Name: interface_id, Columns: [port_id], Unique: true, Type: BTREE }
 ports_fdb:
   Columns:
+    - { Field: ports_fdb_id, Type: 'bigint(20) unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: vlan_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ports_fdb_id], Unique: true, Type: BTREE }
     mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

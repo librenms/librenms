@@ -19,9 +19,9 @@ if ($int_colour) {
     $row_colour = $int_colour;
 } else {
     if (!is_integer($i / 2)) {
-        $row_colour = $list_colour_a;
+        $row_colour = $config['list_colour']['even'];
     } else {
-        $row_colour = $list_colour_b;
+        $row_colour = $config['list_colour']['odd'];
     }
 }
 
@@ -39,7 +39,7 @@ if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', arr
     $mac = '';
 }
 
-echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
+echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='{$config['list_colour']['highlight']}';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
     <td valign=top width=350>";
 
 if (is_admin() || is_read()) {

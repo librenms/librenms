@@ -86,6 +86,13 @@ function api_error($statusCode, $message)
     $app->stop();
 } // end api_error()
 
+function check_bill_permission($bill_id)
+{
+    if (!bill_permitted($bill_id)) {
+        api_error(403, 'Insufficient permissions to access this bill');
+    }
+}
+
 function check_device_permission($device_id)
 {
     if (!device_permitted($device_id)) {
@@ -1248,6 +1255,7 @@ function list_bills()
     $bill_id = mres($router['bill_id']);
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
+    $period = $_GET['period'];
     $param = array();
 
     if (!empty($bill_custid)) {
@@ -1266,8 +1274,21 @@ function list_bills()
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
         $param[] = $_SESSION['user_id'];
     }
+    
+    if ($period === 'previous') {
+        $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+        $query = 'FROM `bills`
+            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
+            INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
+    ';
+    } else {
+        $select = "SELECT bills.*,
+            IF(bills.bill_type = 'CDR', bill_cdr, bill_quota) AS bill_allowed
+        ";
+        $query = "FROM `bills`\n";
+    }
 
-    foreach (dbFetchRows("SELECT * FROM `bills` WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
+    foreach (dbFetchRows("$select $query WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
         $rate_data    = $bill;
         $allowed = '';
         $used = '';
@@ -1297,6 +1318,157 @@ function list_bills()
         $bills[] = $bill;
     }
     api_success($bills, 'bills');
+}
+
+function get_bill_graph()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    if ($graph_type == 'monthly') {
+        $graph_type = 'historicmonthly';
+    }
+
+    $vars = array();
+    $vars['type'] = "bill_$graph_type";
+    $vars['id'] = $bill_id;
+    $vars['width']  = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+
+    $app->response->headers->set('Content-Type', 'image/png');
+    include 'includes/graphs/graph.inc.php';
+}
+
+function get_bill_graphdata()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    if ($graph_type == 'bits') {
+        $from = (isset($_GET['from']) ? $_GET['from'] : time() - 60 * 60 * 24);
+        $to   = (isset($_GET['to']) ? $_GET['to'] : time());
+        $reducefactor = $_GET['reducefactor'];
+
+        $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+    } else if ($graph_type == 'monthly') {
+        $graph_data = getHistoricTransferGraphData($bill_id);
+    }
+    
+    if (!isset($graph_data)) {
+        api_error(400, "Unsupported graph type $graph_type");
+    } else {
+        api_success($graph_data, 'graph_data');
+    }
+}
+
+function get_bill_history()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    $result = [];
+    foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
+        $result[] = $history;
+    }
+
+    api_success($result, 'bill_history');
+}
+
+function get_bill_history_graph()
+{
+    global $config;
+    
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $bill_hist_id = mres($router['bill_hist_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    $vars = array();
+
+    switch ($graph_type) {
+        case 'bits':
+            $graph_type = 'historicbits';
+            $vars['reducefactor'] = $_GET['reducefactor'];
+            break;
+            
+        case 'day':
+        case 'hour':
+            $vars['imgtype'] = $graph_type;
+            $graph_type = 'historictransfer';
+            break;
+            
+        default:
+            api_error(400, "Unknown Graph Type $graph_type");
+            break;
+    }
+
+    global $dur;        // Needed for callback within graph code
+    $vars['type'] = "bill_$graph_type";
+    $vars['id'] = $bill_id;
+    $vars['bill_hist_id'] = $bill_hist_id;
+    $vars['width']  = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+
+    $app->response->headers->set('Content-Type', 'image/png');
+    include 'includes/graphs/graph.inc.php';
+}
+
+function get_bill_history_graphdata()
+{
+    global $config;
+
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $bill_hist_id = mres($router['bill_hist_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    switch ($graph_type) {
+        case 'bits':
+            $reducefactor = $_GET['reducefactor'];
+
+            $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+            break;
+        case 'day':
+        case 'hour':
+            $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+            break;
+    }
+    
+    if (!isset($graph_data)) {
+        api_error(400, "Unsupported graph type $graph_type");
+    } else {
+        api_success($graph_data, 'graph_data');
+    }
 }
 
 function update_device()

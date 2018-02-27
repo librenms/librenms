@@ -135,8 +135,7 @@ try {
     dbConnect();
 
     // pull in the database config settings
-    mergedb();
-    require 'includes/process_config.inc.php';
+    Config::loadFromDatabase();
 
     $validator->ok('Database connection successful', null, 'database');
 } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {

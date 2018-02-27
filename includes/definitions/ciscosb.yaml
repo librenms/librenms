@@ -18,6 +18,7 @@ bad_ifXEntry:
     - SG300-20
     - SG300-28
     - SG300-28MP
+    - SG350-10
 poller_modules:
     bgp-peers: 0
     hr-mib: 0

@@ -15,7 +15,7 @@ High and Low values. List of these sensors can be found here [Link](../Developin
 
 ### Wireless Sensors
 
-Some Wireless have  High and Low values of these sensors can be edited in Web UI by going to the device settings -> Health. There you can set your own custom High and Low values. List of these sensors can be found here [Link](../Developing/os/Wireless-Sensors.md)
+Some Wireless have  High and Low values of these sensors can be edited in Web UI by going to the device settings -> Wireless Sensors There you can set your own custom High and Low values. List of these sensors can be found here [Link](../Developing/os/Wireless-Sensors.md)
 
 **Note** Some values are defined by the manufactures and others are auto calculated when you add the device into librenms. Keep in mind every environment is different and may require user input.
 
@@ -46,3 +46,7 @@ the default alert rules, there are more device-specific alert rules in the alert
 **State Sensor Critical:** Will alert on any state that returns critical = 2
 
 **State Sensor Warning:** Will alert on any state that returns warning = 1
+
+**Wireless Sensor Over Limit Alert Rule:** Will Alert on sensors that listed in device settings under Wireless.
+
+**Wireless Sensor Under Limit Alert Rule:** Will Alert on sensors that listed in device settings under Wireless.

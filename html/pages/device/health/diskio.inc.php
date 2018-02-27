@@ -4,9 +4,9 @@ $row = 1;
 
 foreach (get_disks($device['device_id']) as $drive) {
     if (is_integer($row / 2)) {
-        $row_colour = $list_colour_a;
+        $row_colour = $config['list_colour']['even'];
     } else {
-        $row_colour = $list_colour_b;
+        $row_colour = $config['list_colour']['odd'];
     }
 
     $fs_url = 'device/device='.$device['device_id'].'/tab=health/metric=diskio/';
