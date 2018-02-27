@@ -452,7 +452,7 @@ $config['alert']['transports']['jira']['issuetype'][]  = 'Myissuetype';
 
 ## Gitlab
 
-LibreNMS will create issues for warning and critical level alerts however only title and description are set.  Uses Peronal access tokens to authenticate with Gitlab and will store the token in cleartext.
+LibreNMS will create issues for warning and critical level alerts however only title and description are set.  Uses Personal access tokens to authenticate with Gitlab and will store the token in cleartext.
 
 ```php
 $config['alert']['transports']['gitlab']['host'] = 'http://gitlab.host.tld';
