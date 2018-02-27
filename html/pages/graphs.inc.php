@@ -71,7 +71,6 @@ if (!$auth) {
 
     print_optionbar_end();
 
-    print_optionbar_start();
 
     $thumb_array = $config['graphs']['row']['normal'];
 
@@ -146,8 +145,6 @@ if (!$auth) {
         echo(generate_link("Show RRD Command", $vars, array('page' => "graphs", 'showcommand' => "yes")));
     }
     echo('</center>');
-
-    print_optionbar_end();
 
     echo generate_graph_js_state($graph_array);
 
