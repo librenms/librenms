@@ -295,3 +295,59 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/his
 ```
 
 Output:
+
+### `delete_bill`
+
+Delete a specific bill and all dependent data
+
+Route: `/api/v0/bills/:id`
+
+- id is the specific bill id
+
+Input:
+
+Example:
+```curl
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "Bill has been removed"
+}
+```
+
+### `create_edit_bill`
+
+Creates a new bill or updates an existing one
+
+Route: `/api/v0/bills`
+
+Method: `POST`
+
+- If you send an existing bill_id the call replaces all values it receives.  
+  For example if you send 2 ports it will delete the existing ports and add the the 2 new ports.  
+  So to add ports you have to get the current ports first and add them to your update call.
+
+Input:
+
+Example (create):
+```curl
+curl -X POST -d '{"ports":[ 1021 ],"bill_name":"NEWBILL","bill_day":"1","bill_type":"quota","bill_quota":"2000000000000","bill_custid":"1337","bill_ref":"reference1","bill_notes":"mynote"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+```
+
+Example (set):
+```curl
+curl -X POST -d '{"bill_id":"32","ports":[ 1021 ],"bill_name":"NEWNAME","bill_quota":"1000000000000"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "bill_id": 32
+}
+```
+
