@@ -1478,7 +1478,7 @@ function delete_bill()
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = (int)$router['id'];
 
-    if ($bill_id == 0) {
+    if ($bill_id < 1) {
         api_error(400, 'Could not remove bill with id '.$bill_id.'. Invalid id');
     }
 
