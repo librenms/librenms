@@ -1471,6 +1471,187 @@ function get_bill_history_graphdata()
     }
 }
 
+function delete_bill()
+{
+    check_is_admin();
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = (int)$router['id'];
+
+    if ($bill_id < 1) {
+        api_error(400, 'Could not remove bill with id '.$bill_id.'. Invalid id');
+    }
+
+    $res = dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ]);
+    if ($res == 1) {
+        dbDelete('bill_ports', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_data', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_perms', '`bill_id` =  ? ', [ $bill_id ]);
+        api_success_noresult(200, 'Bill has been removed');
+    }
+    api_error(400, 'Could not remove bill with id '.$bill_id);
+}
+
+function check_bill_key_value($bill_key, $bill_value)
+{
+    $return_value = null;
+    $bill_types = ['quota', 'cdr'];
+    switch ($bill_key) {
+        case "bill_type":
+            if (in_array($bill_value, $bill_types)) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key: $bill_value. Allowed: quota,cdr");
+            }
+            break;
+        case "bill_cdr":
+            if (is_numeric($bill_value)) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key. Must be numeric.");
+            }
+            break;
+        case "bill_day":
+            if ($bill_value > 0 && $bill_value <= 31) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key. range: 1-31");
+            }
+            break;
+        case "bill_quota":
+            if (is_numeric($bill_value)) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key. Must be numeric");
+            }
+            break;
+        default:
+            $return_value = mres($bill_value);
+            break;
+    }
+
+    return $return_value;
+}
+
+function create_edit_bill()
+{
+    check_is_admin();
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data) {
+        api_error(500, 'Invalid JSON data');
+    }
+    //check ports
+    $ports_add = null;
+    if (array_key_exists('ports', $data)) {
+        $ports_add = [];
+        $ports = $data['ports'];
+        foreach ($ports as $port_id) {
+            $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [ $port_id ]);
+            $result = $result[0];
+            if (!is_array($result) || !array_key_exists('port_id', $result)) {
+                api_error(500, 'Port ' . $port_id . ' does not exists');
+            }
+            $ports_add[] = $port_id;
+        }
+    }
+
+    $bill = [];
+    //find existing bill for update
+    $bill_id = (int)$data['bill_id'];
+    $bills = dbFetchRows("SELECT * FROM `bills` WHERE `bill_id` = $bill_id LIMIT 1");
+
+    // update existing bill
+    if (is_array($bills) && count($bills) == 1) {
+        $bill = $bills[0];
+
+        foreach ($data as $bill_key => $bill_value) {
+                $bill[$bill_key] = check_bill_key_value($bill_key, $bill_value);
+        }
+        $update_data = [
+            'bill_name' => $bill['bill_name'],
+            'bill_type' => $bill['bill_type'],
+            'bill_cdr' => $bill['bill_cdr'],
+            'bill_day' => $bill['bill_day'],
+            'bill_quota' => $bill['bill_quota'],
+            'bill_custid' => $bill['bill_custid'],
+            'bill_ref' => $bill['bill_ref'],
+            'bill_notes' => $bill['bill_notes']
+        ];
+        $update = dbUpdate($update_data, 'bills', 'bill_id=?', array($bill_id));
+        if ($update === false || $update < 0) {
+            api_error(500, 'Failed to update existing bill');
+        }
+    } else {
+        // create new bill
+        if (array_key_exists('bill_id', $data)) {
+            api_error(500, 'Argument bill_id is not allowed on bill create (auto assigned)');
+        }
+
+        $bill_keys = [
+            'bill_name',
+            'bill_type',
+            'bill_cdr',
+            'bill_day',
+            'bill_quota',
+            'bill_custid',
+            'bill_ref',
+            'bill_notes'
+        ];
+
+        if ($data['bill_type'] == 'quota') {
+            $data['bill_cdr'] = 0;
+        }
+        if ($data['bill_type'] == 'cdr') {
+            $data['bill_quota'] = 0;
+        }
+
+        $missing_keys = '';
+        $missing = array_diff_key(array_flip($bill_keys), $data);
+        if (count($missing) > 0) {
+            foreach ($missing as $missing_key => $dummy) {
+                $missing_keys .= " $missing_key";
+            }
+            api_error(500, 'Missing parameters: ' . $missing_keys);
+        }
+
+        foreach ($bill_keys as $bill_key) {
+            $bill[$bill_key] = check_bill_key_value($bill_key, $data[$bill_key]);
+        }
+
+        $bill_id = dbInsert(
+            [
+            'bill_name' => $bill['bill_name'],
+            'bill_type' => $bill['bill_type'],
+            'bill_cdr' => $bill['bill_cdr'],
+            'bill_day' => $bill['bill_day'],
+            'bill_quota' => $bill['bill_quota'],
+            'bill_custid' => $bill['bill_custid'],
+            'bill_ref' => $bill['bill_ref'],
+            'bill_notes' => $bill['bill_notes']
+             ],
+            'bills'
+        );
+
+        if ($bill_id === null) {
+            api_error(500, 'Failed to create new bill');
+        }
+    }
+
+    // set previously checked ports
+    if (is_array($ports_add)) {
+        dbDelete('bill_ports', "`bill_id` =  $bill_id");
+        if (count($ports_add) > 0) {
+            foreach ($ports_add as $port_id) {
+                dbInsert([ 'bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0 ], 'bill_ports');
+            }
+        }
+    }
+
+    api_success($bill_id, 'bill_id');
+}
+
 function update_device()
 {
     check_is_admin();
