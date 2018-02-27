@@ -95,7 +95,7 @@ if (!file_exists('vendor/autoload.php')) {
     $pre_checks_failed = true;
 }
 
-if (!str_contains(shell_exec('php scripts/composer_wrapper.php --version'), 'Composer version')) {
+if (!str_contains(shell_exec('php scripts/composer_wrapper.php --version'), 'Composer ')) {
     print_fail("No composer available, please install composer", "https://getcomposer.org/");
     $pre_checks_failed = true;
 }
