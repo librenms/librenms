@@ -26,11 +26,10 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
-class User implements ValidationGroup
+class User extends BaseValidation
 {
     /**
      * Validate this module.
@@ -98,17 +97,5 @@ class User implements ValidationGroup
         if (!check_file_permissions($log_dir, '660')) {
             $validator->fail("The log folder has improper permissions.", "chmod ug+rw $log_dir");
         }
-    }
-
-
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }
