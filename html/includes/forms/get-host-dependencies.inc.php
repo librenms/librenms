@@ -19,13 +19,13 @@ if (is_admin() === false) {
         if ($_POST['viewtype'] == 'fulllist') {
             $count_query = "SELECT count(device_id) from devices";
 
-            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname";
+            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName";
 
             if (isset($_POST['format'])) {
                 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
                     #This is a bit ugly
                     $deps_query = "SELECT * FROM (".$deps_query;
-                    $deps_query .= " ) as t WHERE t.hostname LIKE ? OR t.parents LIKE ? ";
+                    $deps_query .= " ) as t WHERE t.hostname LIKE ? OR t.parents LIKE ? OR t.sysname LIKE ? ";
                     $deps_query .= " ORDER BY t.hostname";
                 } else {
                     $deps_query .= " ORDER BY a.hostname";
@@ -42,7 +42,7 @@ if (is_admin() === false) {
 
             if (isset($_POST['format']) && !empty($_POST['searchPhrase'])) {
                 $searchphrase = '%'.mres($_POST['searchPhrase']).'%';
-                $device_deps = dbFetchRows($deps_query, array($searchphrase, $searchphrase));
+                $device_deps = dbFetchRows($deps_query, array($searchphrase, $searchphrase, $searchphrase));
             } else {
                 $device_deps = dbFetchRows($deps_query);
             }
@@ -62,7 +62,8 @@ if (is_admin() === false) {
                         $parent = $myrow['parents'];
                     }
                     
-                    array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "parent" => $parent, "parentid" => $myrow['parentid'] ));
+                    $hostname = get_device_name($myrow);
+                    array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "sysname" => $hostname, "parent" => $parent, "parentid" => $myrow['parentid'] ));
                 }
                 $status = array('current' => $_POST['current'], 'rowCount' => $_POST['rowCount'], 'rows' => $res_arr, 'total' => $rec_count);
             } else {

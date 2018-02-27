@@ -20,7 +20,7 @@ if (isset($vars['database'])) {
 
 $rrd_filename = rrd_name($device['hostname'], $rrd_name_array);
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,

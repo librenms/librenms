@@ -48,7 +48,7 @@ Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings and set the 
 
 Using the Notes Widget.
 ```html
-<iframe src="url/" width="1200" height="800">
+<iframe src="your_url" frameBorder="0" width="100%" height = "100%">
   <p>Your browser does not support iframes.</p>
 </iframe>
 ```

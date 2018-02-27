@@ -299,12 +299,29 @@ function rewrite_fortinet_hardware($hardware)
         '.1.3.6.1.4.1.12356.101.1.800'   => 'FortiGate 80C',
         '.1.3.6.1.4.1.12356.1688'        => 'FortiMail 2000A',
         '.1.3.6.1.4.1.12356.103.1.1000'  => 'FortiManager 100',
-        '.1.3.6.1.4.1.12356.103.1.20000' => 'FortiManager 2000XL',
+        '.1.3.6.1.4.1.12356.103.1.1001'  => 'FortiManager VM',
+        '.1.3.6.1.4.1.12356.103.1.1003'  => 'FortiManager 100C',
+        '.1.3.6.1.4.1.12356.103.1.2004'  => 'FortiManager 200D',
+        '.1.3.6.1.4.1.12356.103.1.2005'  => 'FortiManager 200E',
         '.1.3.6.1.4.1.12356.103.1.3004'  => 'FortiManager 300D',
-        '.1.3.6.1.4.1.12356.103.1.30000' => 'FortiManager 3000',
-        '.1.3.6.1.4.1.12356.103.1.30002' => 'FortiManager 3000B',
+        '.1.3.6.1.4.1.12356.103.1.3005'  => 'FortiManager 300E',
         '.1.3.6.1.4.1.12356.103.1.4000'  => 'FortiManager 400',
         '.1.3.6.1.4.1.12356.103.1.4001'  => 'FortiManager 400A',
+        '.1.3.6.1.4.1.12356.103.1.4002'  => 'FortiManager 400B',
+        '.1.3.6.1.4.1.12356.103.1.4003'  => 'FortiManager 400C',
+        '.1.3.6.1.4.1.12356.103.1.4005'  => 'FortiManager 400E',
+        '.1.3.6.1.4.1.12356.103.1.10003'  => 'FortiManager 1000C',
+        '.1.3.6.1.4.1.12356.103.1.10004'  => 'FortiManager 1000D',
+        '.1.3.6.1.4.1.12356.103.1.20005'  => 'FortiManager 2000E',
+        '.1.3.6.1.4.1.12356.103.1.20000'  => 'FortiManager 2000XL',
+        '.1.3.6.1.4.1.12356.103.1.30000'  => 'FortiManager 3000',
+        '.1.3.6.1.4.1.12356.103.1.30002'  => 'FortiManager 3000B',
+        '.1.3.6.1.4.1.12356.103.1.30003'  => 'FortiManager 3000C',
+        '.1.3.6.1.4.1.12356.103.1.30006'  => 'FortiManager 3000F',
+        '.1.3.6.1.4.1.12356.103.1.39005'  => 'FortiManager 3900E',
+        '.1.3.6.1.4.1.12356.103.1.40004'  => 'FortiManager 4000D',
+        '.1.3.6.1.4.1.12356.103.1.40005'  => 'FortiManager 4000E',
+        '.1.3.6.1.4.1.12356.103.1.50011'  => 'FortiManager 5001A',
         '.1.3.6.1.4.1.12356.106.1.50030' => 'FortiSwitch 5003A',
         '.1.3.6.1.4.1.12356.101.1.510'   => 'FortiWiFi 50B',
         '.1.3.6.1.4.1.12356.101.1.610'   => 'FortiWiFi 60',
@@ -397,6 +414,8 @@ function rewrite_extreme_hardware($hardware)
         '.1.3.6.1.4.1.1916.2.141' => 'Summit x480-48x',
         '.1.3.6.1.4.1.1916.2.167' => 'Summit x670-48x',
         '.1.3.6.1.4.1.1916.2.168' => 'Summit x670v-48x',
+        '.1.3.6.1.4.1.1916.2.118' => 'Summit X650-24x(SSns)',
+        '.1.3.6.1.4.1.1916.2.139' => 'Summit X480-24x(10G4X)',
     );
 
     // $hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
@@ -939,6 +958,7 @@ function rewrite_junos_hardware($hardware)
         'jnxProductNameMX80'           => 'MX80',
         'jnxProductName'               => '',
         'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
+        'jnxProductQFX511048S4Q'       => 'QFX5110-48S4Q',
     );
 
 
@@ -1293,6 +1313,12 @@ function rewrite_brocade_fc_switches($descr)
             break;
         case "148":
             $hardware = "Brocade 7840 Switch";
+            break;
+        case "162":
+            $hardware = "Brocade G620 Switch";
+            break;
+        case "170":
+            $hardware = "Brocade G610 Switch";
             break;
         default:
             $hardware = "Unknown Brocade FC Switch";

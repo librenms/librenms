@@ -127,10 +127,10 @@ if (!isset($_POST['format'])) {
 list($format, $subformat) = explode('_', $_POST['format']);
 
 foreach (dbFetchRows($sql, $param) as $device) {
-    if (isset($bg) && $bg == $list_colour_b) {
-        $bg = $list_colour_a;
+    if (isset($bg) && $bg == $config['list_colour']['odd']) {
+        $bg = $config['list_colour']['even'];
     } else {
-        $bg = $list_colour_b;
+        $bg = $config['list_colour']['odd'];
     }
 
     if ($device['status'] == '0') {
@@ -177,14 +177,26 @@ foreach (dbFetchRows($sql, $param) as $device) {
     if ($subformat == 'detail') {
         $actions .= '</div><div class="row">';
     }
-
-    $actions .= '
-                <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
-                <div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
-                <div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+    
+    
+        $actions .= '
+                    <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
+                    ';
+    if (isset($config['gateone']['server'])) {
+        if ($config['gateone']['use_librenms_user'] == true) {
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $_SESSION['username'] . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+        } else {
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+        }
+    } else {
+        $actions .= '<div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
+        ';
+    }
+        $actions .= '<div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+                </div>
             </div>
-        </div>
-    ';
+        ';
+    
     $hostname = generate_device_link($device);
 
     if (extension_loaded('mbstring')) {
@@ -198,11 +210,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $os = $device['os_text'] . '<br>' . $device['version'];
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
-        if (format_hostname($device) !== $device['sysName']) {
-            $hostname .= '<br />' . $device['sysName'];
-        } elseif ($device['hostname'] !== $device['ip']) {
-            $hostname .= '<br />' . $device['hostname'];
-        }
+        $hostname .= '<br />' . get_device_name($device);
 
         $metrics = array();
         if ($port_count) {

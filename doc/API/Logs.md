@@ -38,7 +38,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 5,
     "total": "15",
     "logs": [

@@ -357,8 +357,7 @@ function check_exec($exec)
         return find_exec($exec);
     } catch (Exception $e) {
         try {
-            $composer_bin = find_exec(array('composer', 'composer.phar'));
-            shell_exec("$composer_bin update");
+            shell_exec("scripts/composer_wrapper.php install");
             return find_exec($exec);
         } catch (Exception $ce) {
             echo "\nCould not find $exec. Please install composer.\nYou can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";

@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -47,6 +48,10 @@ if (isset($hostname)) {
 
     if (isset($device['os']) && $device['os'] != 'generic') {
         $target_os = $device['os'];
+    } elseif (isset($options['o'])) {
+        $target_os = $options['o'];
+    } elseif (isset($options['os'])) {
+        $target_os = $options['os'];
     } else {
         echo "OS (-o, --os) required because device is generic.\n";
         exit;
@@ -100,17 +105,21 @@ if ($variant) {
 }
 echo PHP_EOL;
 
-$capture = new ModuleTestHelper($modules, $target_os, $variant);
+try {
+    $capture = new ModuleTestHelper($modules, $target_os, $variant);
 
 
-if (isset($options['f'])) {
-    $capture->setSnmprecSavePath($options['f']);
-} elseif (isset($options['file'])) {
-    $capture->setSnmprecSavePath($options['file']);
+    if (isset($options['f'])) {
+        $capture->setSnmprecSavePath($options['f']);
+    } elseif (isset($options['file'])) {
+        $capture->setSnmprecSavePath($options['file']);
+    }
+
+    $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
+
+
+    echo "Capturing Data: ";
+    $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
+} catch (InvalidModuleException $e) {
+    echo $e->getMessage() . PHP_EOL;
 }
-
-$prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
-
-
-echo "Capturing Data: ";
-$capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);

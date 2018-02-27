@@ -12,10 +12,10 @@
  * the source code distribution for details.
  */
 
-if ($bg == $list_colour_b) {
-    $bg = $list_colour_a;
+if ($bg == $config['list_colour']['odd']) {
+    $bg = $config['list_colour']['even'];
 } else {
-    $bg = $list_colour_b;
+    $bg = $config['list_colour']['odd'];
 }
 
 if ($device['status'] == '0') {

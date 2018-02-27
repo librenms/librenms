@@ -20,7 +20,6 @@
 //
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
-error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
 // Default directories
 $config['project_name'] = 'LibreNMS';
@@ -123,7 +122,7 @@ $config['int_customers'] = 1;
 // Enable Customer Port Parsing
 $config['customers_descr'] = 'cust';
 $config['transit_descr'][]   = 'transit';
-// Add custom transit descriptions (can be an string) 
+// Add custom transit descriptions (can be an string)
 $config['peering_descr'][] = 'peering';
 // Add custom peering descriptions (can be an string)
 $config['core_descr'][] = 'core';
@@ -229,17 +228,22 @@ $config['rrdgraph_real_percentile'] = false;
 $config['percentile_value'] = 95;
 // Set to TRUE if you want to display the 95% based on the highest value. (aka real 95%)
 $config['overlib_defaults'] = ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'";
-$config['web_mouseover']    = true;
+
 // Set this to false if you want to disable the mouseover popup graphs
-$list_colour_a   = '#ffffff';
-$list_colour_b   = '#eeeeee';
-$list_colour_a_a = '#f9f9f9';
-$list_colour_a_b = '#f0f0f0';
-$list_colour_b_a = '#f0f0f0';
-$list_colour_b_b = '#e3e3e3';
-$list_highlight  = '#ffcccc';
-$warn_colour_a   = '#ffeeee';
-$warn_colour_b   = '#ffcccc';
+$config['web_mouseover']    = true;
+
+// list colors
+$config['list_colour'] = array(
+    'even' => '#ffffff',
+    'even_alt' => '#f9f9f9',
+    'even_alt2' => '#f0f0f0',
+    'odd' => '#eeeeee',
+    'odd_alt' => '#f0f0f0',
+    'odd_alt2' => '#e3e3e3',
+    'highlight' => '#ffcccc',
+);
+$config['warn_colour'] = '#ffeeee';
+$config['warn_colour_alt'] = '#ffcccc';
 
 // $config['graph_colours'] = array("000066","330066","990066","990066","CC0033","FF0000"); // Purple to Red
 // $config['graph_colours'] = array("006600","336600","996600","996600","CC3300","FF0000"); // Green to Red
@@ -871,13 +875,13 @@ $config['ipmi']['type'][] = 'lan';
 $config['ipmi']['type'][] = 'imb';
 $config['ipmi']['type'][] = 'open';
 
-// Options needed for dyn config - do NOT edit
-$dyn_config['email_backend']     = array(
+// Options needed for dynamic config - do NOT edit
+$config['email_backend_options'] = array(
     'mail',
     'sendmail',
     'smtp',
 );
-$dyn_config['email_smtp_secure'] = array(
+$config['email_smtp_secure_options'] = array(
     '',
     'tls',
     'ssl',

@@ -254,7 +254,7 @@ class Sensor implements DiscoveryModule, PollerModule
      *
      * @param OS $os
      */
-    public static function discover(OS $os)
+    public static function runDiscovery(OS $os)
     {
         // Add discovery types here
     }
@@ -611,7 +611,8 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index']
             );
-            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
+            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : 'GAUGE';
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = array(
                 'sensor' => isset($sensor_value) ? $sensor_value : 'U',

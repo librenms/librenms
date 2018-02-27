@@ -2,6 +2,8 @@ os: fortios
 text: FortiOS
 type: appliance
 icon: fortinet
+mib_dir:
+    - fortinet
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }

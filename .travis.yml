@@ -42,7 +42,7 @@ after_failure:
 script:
   - php scripts/pre-commit.php -l
   - php scripts/pre-commit.php -s
-  - SNMPSIM=1 DBTEST=1 vendor/bin/phpunit --stop-on-failure
+  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
   - bash scripts/deploy-docs.sh

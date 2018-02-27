@@ -278,6 +278,11 @@ $config['graph_types']['device']['screenos_sessions']['section']   = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
 
+//FortiOS Graphs
+$config['graph_types']['device']['fortios_lograte']['section']  = 'Analyzer';
+$config['graph_types']['device']['fortios_lograte']['order']    = '0';
+$config['graph_types']['device']['fortios_lograte']['descr']    = 'Log Rate';
+
 //PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']           = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']             = '0';
@@ -300,6 +305,25 @@ $config['graph_types']['device']['panos_sessions_sslutil']['descr']     = 'Activ
 $config['graph_types']['device']['panos_activetunnels']['section']      = 'firewall';
 $config['graph_types']['device']['panos_activetunnels']['order']        = '0';
 $config['graph_types']['device']['panos_activetunnels']['descr']        = 'Active GlobalProtect Tunnels';
+
+//PF Graphs
+$config['graph_types']['device']['pf_states']['section']           = 'firewall';
+$config['graph_types']['device']['pf_states']['order']             = '1';
+$config['graph_types']['device']['pf_states']['descr']             = 'States';
+$config['graph_types']['device']['pf_searches']['section']           = 'firewall';
+$config['graph_types']['device']['pf_searches']['order']             = '2';
+$config['graph_types']['device']['pf_searches']['descr']             = 'Searches';
+$config['graph_types']['device']['pf_inserts']['section']           = 'firewall';
+$config['graph_types']['device']['pf_inserts']['order']             = '3';
+$config['graph_types']['device']['pf_inserts']['descr']             = 'Inserts';
+$config['graph_types']['device']['pf_removals']['section']           = 'firewall';
+$config['graph_types']['device']['pf_removals']['order']             = '4';
+$config['graph_types']['device']['pf_removals']['descr']             = 'Removals';
+
+
+
+
+
 
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';

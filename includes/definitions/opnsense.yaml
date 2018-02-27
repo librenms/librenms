@@ -1,0 +1,11 @@
+os: opnsense
+type: firewall
+group: unix
+text: OPNsense
+processor_stacked: 1
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - OPNsense

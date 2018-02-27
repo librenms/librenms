@@ -1,0 +1,186 @@
+-- This module defines enterprise MIBs for VPN Phase 1
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-PHASEONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnPhaseoneMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for VPN Phase 1"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 5 }
+
+NsVpnPhOneEntry ::= SEQUENCE
+{
+    nsVpnPhOneIndex           Integer32,
+    nsVpnPhOneName            DisplayString,
+    nsVpnPhOneAuthMethod      INTEGER,
+    nsVpnPhOneDhGroup         Integer32,
+    nsVpnPhOneEncryp          INTEGER,
+    nsVpnPhOneHash            INTEGER,
+    nsVpnPhOneLifetime        Integer32,
+    nsVpnPhOneLifetimeMeasure INTEGER,
+    nsVpnPhOneVsys            Integer32
+}
+
+nsVpnPhaseOneCfg OBJECT IDENTIFIER ::= { netscreenVpn 5 }
+
+nsVpnPhOneTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnPhOneEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "To establish an IKE IPSec tunnel, two phases of negotiation
+         are required. This table specifies the configuration attributes
+         for Phase One negotiation. In Phase 1, the participants
+         establish a secure channel in which to negotiate the IPSec
+         SAs."
+    ::= { nsVpnPhaseOneCfg 1 }
+
+nsVpnPhOneEntry OBJECT-TYPE
+    SYNTAX        NsVpnPhOneEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnPhOneTable holds a set of configuration
+         parameters associated with an instance of Phase 1 setting."
+    INDEX
+        { nsVpnPhOneIndex }
+    ::= { nsVpnPhOneTable 1 }
+
+nsVpnPhOneIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for phase one table.  Its value ranges between
+         1 and 65535 and may not be contiguous.  The index has no other
+         meaning but a pure index"
+    ::= { nsVpnPhOneEntry 1 }
+
+nsVpnPhOneName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase one proposal name."
+    ::= { nsVpnPhOneEntry 2 }
+
+nsVpnPhOneAuthMethod OBJECT-TYPE
+    SYNTAX        INTEGER {
+        preshare(0),
+        rsa-sig(1),
+        dsa-sig(2),
+        rsa-enc(3),
+        rsa-rev(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase one proposal authentication method."
+    ::= { nsVpnPhOneEntry 3 }
+
+nsVpnPhOneDhGroup OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase one proposal Diffie-Hellman exchange group id."
+    ::= { nsVpnPhOneEntry 4 }
+
+nsVpnPhOneEncryp OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        des(1),
+        des3(2),
+        aes(3),
+        aes-192(4),
+        aes-256(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase one proposal encryption exchange id."
+    ::= { nsVpnPhOneEntry 5 }
+
+nsVpnPhOneHash OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase one proposal hash algorithm."
+    ::= { nsVpnPhOneEntry 6 }
+
+nsVpnPhOneLifetime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Lifetime of this phase one setting."
+    ::= { nsVpnPhOneEntry 7 }
+
+nsVpnPhOneLifetimeMeasure OBJECT-TYPE
+    SYNTAX        INTEGER {
+        second(0),
+        minute(1),
+        hours(2),
+        days(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "life time measurement."
+    ::= { nsVpnPhOneEntry 8 }
+
+nsVpnPhOneVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this phase one proposal configuration belongs to."
+    ::= { nsVpnPhOneEntry 9 }
+
+END
+
+

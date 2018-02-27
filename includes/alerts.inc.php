@@ -317,6 +317,11 @@ function GetContacts($results)
         }
     }
 
+    # Copy all email alerts to default contact if configured.
+    if (!isset($tmp_contacts[$config['alert']['default_mail']]) && ($config['alert']['default_copy'])) {
+        $tmp_contacts[$config['alert']['default_mail']] = '';
+    }
+
     # Send email to default contact if no other contact found
     if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
         $tmp_contacts[$config['alert']['default_mail']] = '';

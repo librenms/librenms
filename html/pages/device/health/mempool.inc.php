@@ -14,9 +14,9 @@ if (count_mib_mempools($device) > 0) {
 // FIXME css alternating colours
 foreach ($mempools as $mempool) {
     if (!is_integer($i / 2)) {
-        $row_colour = $list_colour_a;
+        $row_colour = $config['list_colour']['even'];
     } else {
-        $row_colour = $list_colour_b;
+        $row_colour = $config['list_colour']['odd'];
     }
 
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
