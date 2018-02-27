@@ -1,8 +1,8 @@
 <?php
 /**
- * ValidationGroup.php
+ * BaseValidation.php
  *
- * An interface for validation groups, this will be run by Validator.
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,42 +19,46 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces;
+namespace LibreNMS\Validations;
 
-use LibreNMS\Validator;
+use LibreNMS\Interfaces\ValidationGroup;
 
-interface ValidationGroup
+abstract class BaseValidation implements ValidationGroup
 {
-    /**
-     * Validate this module.
-     * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
-     *
-     * @param Validator $validator
-     */
-    public function validate(Validator $validator);
+    protected $completed = false;
+    protected static $RUN_BY_DEFAULT = true;
 
     /**
      * Returns if this test should be run by default or not.
      *
      * @return bool
      */
-    public function isDefault();
+    public function isDefault()
+    {
+        return static::$RUN_BY_DEFAULT;
+    }
 
     /**
      * Returns true if this group has been run
      *
      * @return bool
      */
-    public function isCompleted();
+    public function isCompleted()
+    {
+        return $this->completed ;
+    }
 
     /**
      * Mark this group as completed
      *
      * @return void
      */
-    public function markCompleted();
+    public function markCompleted()
+    {
+        $this->completed = true;
+    }
 }

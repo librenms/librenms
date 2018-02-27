@@ -26,12 +26,11 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
 
-class Database implements ValidationGroup
+class Database extends BaseValidation
 {
     public function validate(Validator $validator)
     {
@@ -307,15 +306,5 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
         }, $index_data['Columns']));
 
         return sprintf($index, $columns);
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }
