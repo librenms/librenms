@@ -44,7 +44,7 @@ require_once $install_dir . '/includes/common.php';
 if (!is_file($install_dir . '/vendor/autoload.php')) {
     c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
 }
-require $install_dir . '/vendor/autoload.php';
+require_once $install_dir . '/vendor/autoload.php';
 
 if (!function_exists('module_selected')) {
     function module_selected($module, $modules)
