@@ -113,13 +113,8 @@
     "sql": "wireless_sensors.sensor_class = 'clients' AND wireless_sensors.sensor_current >= wireless_sensors.sensor_limit AND wireless_sensors.sensor_alert = '1' AND macros.device_up = '1'"
   },
   {
-<<<<<<< HEAD
-    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ \"@authentication failure@\"",
-    "name": "Syslog, Authentication failure on Device"
-=======
     "name": "Syslog, Authentication failure on Device",
-    "sql": "syslog.timestamp > = macros.past_5m AND syslog.msg REGEXP '@authentication failure@'"
->>>>>>> Updated to include import options + various other fixes
+    "sql": "syslog.timestamp >= macros.past_5m AND syslog.msg REGEXP '@authentication failure@'"
   },
   {
     "name": "Service warning",
