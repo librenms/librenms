@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-foreach ($emu2_temp as $id => $temp) {
+foreach ($pre_cache['emu2_temp'] as $id => $temp) {
     if (isset($temp['emsProbeStatusProbeHumidity']) && $temp['emsProbeStatusProbeHumidity'] > 0) {
         $index           = $temp['emsProbeStatusProbeIndex'];
         $oid             = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;
