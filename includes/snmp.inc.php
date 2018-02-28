@@ -998,7 +998,7 @@ function snmp_mib_load($mib, $module, $included_by, $mibdir = null, $device = ar
  * snmptranslate -m all -M mibs .1.3.6.1.4.1.8072.3.2.10 2>/dev/null
  * NET-SNMP-TC::linux
  */
-function snmp_translate($oid, $module, $mibdir = null, $device = array())
+function snmp_mib_translate($oid, $module, $mibdir = null, $device = array())
 {
     if ($module !== 'all') {
         $oid = "$module::$oid";
@@ -1026,7 +1026,40 @@ function snmp_translate($oid, $module, $mibdir = null, $device = array())
         $matches[1],
         $matches[2],
     );
-} // snmp_translate
+}
+
+/**
+ * SNMP translate between numeric and textual oids
+ *
+ * Default options for a numeric oid is -Os
+ * Default options for a textual oid is -On
+ * You may override these by setting $options (an empty string for no options)
+ *
+ * @param string $oid
+ * @param string $mib
+ * @param string $mibdir the mib directory (relative to the LibreNMS mibs directory)
+ * @param string $options Options to pass to snmptranslate
+ * @param array $device
+ * @return string
+ */
+function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = array())
+{
+    $cmd = Config::get('snmptranslate', 'snmptranslate');
+    $cmd .= mibdir($mibdir, $device);
+    $cmd .= " -m $mib";
+
+    if (oid_is_numeric($oid)) {
+        $default_options = '-Os';
+    } else {
+        if ($mib != 'ALL') {
+            $oid = "$mib::$oid";
+        }
+        $default_options = '-On';
+    }
+    $options = is_null($options) ? $default_options : $options;
+
+    return trim(external_exec("$cmd $options $oid 2>/dev/null"));
+}
 
 
 /**
@@ -1252,7 +1285,7 @@ function register_mibs($device, $mibs, $included_by)
     d_echo("MIB: registering\n");
 
     foreach ($mibs as $name => $module) {
-        $translated = snmp_translate($name, $module, null, $device);
+        $translated = snmp_mib_translate($name, $module, null, $device);
         if ($translated) {
             $mod = $translated[0];
             $nam = $translated[1];
@@ -1362,4 +1395,15 @@ function get_device_max_repeaters($device)
     } else {
         return false;
     }
+}
+
+/**
+ * Check if a given oid is numeric.
+ *
+ * @param string $oid
+ * @return bool
+ */
+function oid_is_numeric($oid)
+{
+    return (bool)preg_match('/^[.\d]+$/', $oid);
 }

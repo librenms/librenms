@@ -8,3 +8,7 @@ type: printer
 discovery:
     - sysDescr_regex:
         - '/^KYOCERA/'
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1

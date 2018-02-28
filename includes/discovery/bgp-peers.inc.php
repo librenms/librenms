@@ -8,7 +8,7 @@ if (Config::get('enable_bgp')) {
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
     } else {
-        $vrfs_lite_cisco = array(array('context_name'=>null));
+        $vrfs_lite_cisco = array(array('context_name'=>''));
     }
 
     $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-Oqvn', 'BGP4-MIB');
@@ -125,12 +125,16 @@ if (Config::get('enable_bgp')) {
                     }
                 }
 
-                $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'";
-                foreach (dbFetchRows($af_query) as $entry) {
+                $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?";
+                foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'], $device['context_name']]) as $entry) {
                     $afi  = $entry['afi'];
                     $safi = $entry['safi'];
                     if (!$af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
-                        dbDelete('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi));
+                        dbDelete(
+                            'bgpPeers_cbgp',
+                            '`device_id`=? AND `bgpPeerIdentifier`=? AND context_name=? AND afi=? AND safi=?',
+                            [$device['device_id'], $peer['ip'], $device['context_name'], $afi, $safi]
+                        );
                     }
                 }
             }
@@ -140,9 +144,13 @@ if (Config::get('enable_bgp')) {
             unset($j_peerIndexes);
         }
 
-        $params = array_column($peerlist, 'ip');
-        $query = 'device_id=? AND bgpPeerIdentifier NOT IN ' . dbGenPlaceholders(count($params));
-        array_unshift($params, $device['device_id']);  // prepend device_id
+        // clean up peers
+        $params = [$device['device_id'], $device['context_name']];
+        $query = 'device_id=? AND context_name=?';
+        if (!empty($peerlist)) {
+            $query .= ' AND bgpPeerIdentifier NOT IN ' . dbGenPlaceholders(count($peerlist));
+            $params = array_merge($params, array_column($peerlist, 'ip'));
+        }
 
         $deleted = dbDelete('bgpPeers', $query, $params);
         dbDelete('bgpPeers_cbgp', $query, $params);
@@ -156,8 +164,27 @@ if (Config::get('enable_bgp')) {
             $af_data
         );
     }
+
+    // delete unknown contexts
+    $contexts = dbFetchColumn(
+        'SELECT DISTINCT context_name FROM bgpPeers WHERE device_id=?',
+        [$device['device_id']]
+    );
+    $existing_contexts = array_column($vrfs_lite_cisco, 'context_name');
+    foreach ($contexts as $context) {
+        if (!in_array($context, $existing_contexts)) {
+            dbDelete('bgpPeers', 'device_id=? and context_name=?', [$device['device_id'], $context]);
+            dbDelete('bgpPeers_cbgp', 'device_id=? and context_name=?', [$device['device_id'], $context]);
+            echo '-';
+        }
+    }
+
     unset(
         $device['context_name'],
+        $vrfs_lite_cisco,
+        $peers_data,
+        $af_data,
+        $contexts,
         $vrfs_c
     );
 }
