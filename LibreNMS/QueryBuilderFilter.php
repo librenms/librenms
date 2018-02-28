@@ -123,7 +123,6 @@ class QueryBuilderFilter implements JsonSerializable
                         'id' => "$table.$column",
                         'type' => $type,
                     ];
-
                 }
             }
         }
@@ -136,7 +135,6 @@ class QueryBuilderFilter implements JsonSerializable
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
             return 'integer';
-
         } elseif (starts_with($type, 'double')) {
             return 'double';
         } elseif ($type == 'timestamp') {
