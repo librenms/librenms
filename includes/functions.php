@@ -2462,23 +2462,3 @@ function lock_and_purge($table, $sql)
         return -1;
     }
 }
-
-/**
- * @param $type
- * @param null $field
- * @return string
- */
-function mysql_type_to_php_type($type, $field = null)
-{
-    $php_type = 'string';
-    if (str_contains('char', $type)) {
-        $php_type = 'string';
-    } elseif (str_contains('int', $type)) {
-        $php_type = 'integer';
-    } elseif (str_contains('date', $type) || str_contains('timestamp', $type)) {
-        $php_type = 'date';
-    } elseif (str_contains('double', $type)) {
-        $php_type = 'double';
-    }
-    return $php_type;
-}

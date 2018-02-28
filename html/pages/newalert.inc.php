@@ -13,6 +13,8 @@
  * @author     Neil Lathwood <gh+n@laf.io>
 */
 
+use LibreNMS\QueryBuilderFilter;
+
 $page_title = 'New Alert';
 $no_refresh = true;
 
@@ -23,25 +25,7 @@ if (!device_permitted($vars['device'])) {
 } else {
     $device['device_id'] = $vars['device'] ?: '-1';
     $rule_id = $vars['rule_id'] ?: '';
-    $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents($config['install_dir'] . '/misc/db_schema.yaml'));
-
-    krsort($config['alert']['macros']['rule']);
-    foreach ($config['alert']['macros']['rule'] as $macro => $value) {
-        $tmp_filters[] = [
-            'id' => 'macros.' . $macro,
-        ];
-    }
-
-    foreach ((array) $db_schema as $table => $data) {
-        foreach ($data['Columns'] as $index => $columns) {
-            $tmp_filters[] = [
-                'id' => "$table.{$columns['Field']}",
-                'type' => mysql_type_to_php_type($columns['Type'], $columns['Field']),
-            ];
-        }
-    }
-
-    $filters = json_encode($tmp_filters);
+    $filters = json_encode(new QueryBuilderFilter('alert'));
 
     if (is_numeric($rule_id)) {
         $rule = dbFetchRow('SELECT * FROM `alert_rules` WHERE `id` = ? LIMIT 1', [$rule_id]);
