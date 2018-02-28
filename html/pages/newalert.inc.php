@@ -124,7 +124,7 @@ if (!device_permitted($vars['device'])) {
         <div class="form-group">
             <label for='severity' class='col-sm-3 control-label'>Severity: </label>
             <div class="col-sm-5">
-                <select name='severity' id='severity' placeholder='Severity' class='form-control'>
+                <select name='severity' id='severity' class='form-control'>
                     <option value='ok'>OK</option>
                     <option value='warning'>Warning</option>
                     <option value='critical' selected>Critical</option>
