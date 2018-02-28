@@ -1,17 +1,126 @@
 {
-    "processors": {
+    "arp-table": {
         "discovery": {
-            "processors": [
+            "ipv4_mac": [
                 {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "0",
-                    "processor_oid": ".1.3.6.1.4.1.3224.16.1.3.0",
-                    "processor_index": "1",
-                    "processor_type": "screenos",
-                    "processor_usage": "1",
-                    "processor_descr": "Processor",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "mac_address": "f47f3500100d",
+                    "ipv4_address": "192.168.102.1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001013",
+                    "ipv4_address": "192.168.102.122",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500101b",
+                    "ipv4_address": "192.168.102.176",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500101a",
+                    "ipv4_address": "192.168.102.177",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001015",
+                    "ipv4_address": "192.168.102.178",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001014",
+                    "ipv4_address": "192.168.102.180",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001006",
+                    "ipv4_address": "192.168.102.24",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500101d",
+                    "ipv4_address": "192.168.102.250",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500101c",
+                    "ipv4_address": "192.168.102.251",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500100b",
+                    "ipv4_address": "192.168.102.4",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001012",
+                    "ipv4_address": "192.168.102.44",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500100a",
+                    "ipv4_address": "192.168.102.5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001009",
+                    "ipv4_address": "192.168.102.6",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001008",
+                    "ipv4_address": "192.168.102.7",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500100e",
+                    "ipv4_address": "192.168.103.15",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500100c",
+                    "ipv4_address": "192.168.103.2",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001002",
+                    "ipv4_address": "192.168.103.21",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001001",
+                    "ipv4_address": "192.168.103.23",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001007",
+                    "ipv4_address": "192.168.103.24",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001005",
+                    "ipv4_address": "192.168.103.25",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001004",
+                    "ipv4_address": "192.168.103.26",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001003",
+                    "ipv4_address": "192.168.103.28",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f35001011",
+                    "ipv4_address": "192.168.103.32",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f47f3500100f",
+                    "ipv4_address": "192.168.103.33",
+                    "context_name": ""
                 }
             ]
         },
@@ -3207,128 +3316,19 @@
             ]
         }
     },
-    "arp-table": {
+    "processors": {
         "discovery": {
-            "ipv4_mac": [
+            "processors": [
                 {
-                    "mac_address": "f47f3500100d",
-                    "ipv4_address": "192.168.102.1",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001013",
-                    "ipv4_address": "192.168.102.122",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500101b",
-                    "ipv4_address": "192.168.102.176",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500101a",
-                    "ipv4_address": "192.168.102.177",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001015",
-                    "ipv4_address": "192.168.102.178",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001014",
-                    "ipv4_address": "192.168.102.180",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001006",
-                    "ipv4_address": "192.168.102.24",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500101d",
-                    "ipv4_address": "192.168.102.250",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500101c",
-                    "ipv4_address": "192.168.102.251",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500100b",
-                    "ipv4_address": "192.168.102.4",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001012",
-                    "ipv4_address": "192.168.102.44",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500100a",
-                    "ipv4_address": "192.168.102.5",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001009",
-                    "ipv4_address": "192.168.102.6",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001008",
-                    "ipv4_address": "192.168.102.7",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500100e",
-                    "ipv4_address": "192.168.103.15",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500100c",
-                    "ipv4_address": "192.168.103.2",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001002",
-                    "ipv4_address": "192.168.103.21",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001001",
-                    "ipv4_address": "192.168.103.23",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001007",
-                    "ipv4_address": "192.168.103.24",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001005",
-                    "ipv4_address": "192.168.103.25",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001004",
-                    "ipv4_address": "192.168.103.26",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001003",
-                    "ipv4_address": "192.168.103.28",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f35001011",
-                    "ipv4_address": "192.168.103.32",
-                    "context_name": ""
-                },
-                {
-                    "mac_address": "f47f3500100f",
-                    "ipv4_address": "192.168.103.33",
-                    "context_name": ""
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.3224.16.1.3.0",
+                    "processor_index": "1",
+                    "processor_type": "screenos",
+                    "processor_usage": "1",
+                    "processor_descr": "Processor",
+                    "processor_precision": "1",
+                    "processor_perc_warn": "75"
                 }
             ]
         },
