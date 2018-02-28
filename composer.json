@@ -12,12 +12,15 @@
         "issues": "https://github.com/librenms/librenms/issues/",
         "irc": "irc://irc.freenode.org/#librenms"
     },
-    "config": {
-        "optimize-autoloader": true,
-        "platform": {"php": "5.6.4"}
-    },
     "require": {
         "php": ">=5.6.4",
+        "ext-mysqli": "*",
+        "ext-pcre": "*",
+        "ext-curl": "*",
+        "ext-session": "*",
+        "ext-snmp": "*",
+        "ext-xml": "*",
+        "ext-gd": "*",
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2.21",
         "slim/slim": "^2.6",
@@ -40,6 +43,10 @@
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
         "fojuth/readmegen": "1.*"
+    },
+    "suggest": {
+        "ext-memcached": "Required if you utilize distributed polling",
+        "ext-posix": "Allows for additional validation tests"
     },
     "autoload": {
         "psr-4": {
