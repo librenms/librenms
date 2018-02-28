@@ -102,7 +102,6 @@ if (!file_exists('vendor/autoload.php')) {
 // init autoloading
 require_once 'vendor/autoload.php';
 
-
 $dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
 preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
 if (!empty($dep_missing[0])) {

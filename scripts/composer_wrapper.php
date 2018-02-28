@@ -54,10 +54,10 @@ if (!empty($path_exec)) {
     }
 
     // Download composer.phar (code from the composer web site)
-    $good_sha = trim(@file_get_contents('http://composer.github.io/installer.sig'));
+    $good_sha = trim(@file_get_contents('https://composer.github.io/installer.sig'));
 
     // Download composer.phar (code from the composer web site)
-    @copy('http://getcomposer.org/installer', 'composer-setup.php');
+    @copy('https://getcomposer.org/installer', 'composer-setup.php');
     if (!empty($good_sha) && @hash_file('SHA384', 'composer-setup.php') === $good_sha) {
         // Installer verified
         shell_exec('php composer-setup.php');
