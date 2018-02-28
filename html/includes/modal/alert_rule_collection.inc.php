@@ -85,6 +85,7 @@ if (is_admin() === false) {
                                         if (data.status == 'ok') {
                                             $("#search_rule_modal").modal('hide');
                                             $("#builder").queryBuilder("setRulesFromSQL", data.sql);
+                                            $("#name").val(data.name)
                                         } else {
                                             toastr.error(data.message);
                                         }

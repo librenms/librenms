@@ -42,6 +42,7 @@ $sql         = '';
 if (is_numeric($template_id)) {
     $status    = 'ok';
     $tmp_rules = get_rules_from_json();
+    $name = $tmp_rules[$template_id]['name'];
     $sql = $tmp_rules[$template_id]['sql'];
 } else {
     $message = 'Invalid template';
@@ -51,5 +52,6 @@ if (is_numeric($template_id)) {
 die(json_encode(array(
     'status'       => $status,
     'message'      => $message,
+    'name'         => $name,
     'sql'          => $sql,
 )));
