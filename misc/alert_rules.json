@@ -31,7 +31,7 @@
   {
     "name": "Port utilisation over threshold",
     "default": true,
-    "sql": "macros.port_usage_perc >= '80' AND macros.port_up = '1' AND macros.port = '1'"
+    "sql": "macros.port_usage_perc >= 80 AND macros.port_up = '1' AND macros.port = '1'"
   },
   {
     "name": "Sensor over limit - Check Device Health Settings",

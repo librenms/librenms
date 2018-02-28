@@ -165,7 +165,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
-    echo '<i>'.htmlentities($rule['rule'] ?: $rule['query']).'</i></td>';
+    echo '<i>'.htmlentities($rule['rule'] ?: $rule['query_builder']).'</i></td>';
     echo '<td>'.$rule['severity'].'</td>';
     echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
