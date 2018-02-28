@@ -39,13 +39,13 @@ class Dependencies extends BaseValidation
     public function validate(Validator $validator)
     {
         $composer_output = trim(shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php --version'));
-        $found = preg_match('/Composer version ([.0-9]+)/', $composer_output, $matches);
+        $found = preg_match('/Composer (version )?([.0-9]+)/', $composer_output, $matches);
 
         if (!$found) {
             $validator->fail("No composer available, please install composer", "https://getcomposer.org/");
             return;
         } else {
-            $validator->ok("Composer Version: " . $matches[1]);
+            $validator->ok("Composer Version: " . $matches[2]);
         }
 
         $dep_check = shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php install --no-dev --dry-run');
