@@ -33,19 +33,14 @@ if (isset($_POST['create-default'])) {
 
         $insert = array(
             'device_id' => -1,
-            'severity'  => 'critical',
-            'extra'     => json_encode($extra),
-            'disabled'  => 0,
-            'name'      => $add_rule['name']
+            'rule' => $add_rule['rule'],
+            'query_builder' => $add_rule['query_builder'],
+            'query' => GenSQL($add_rule['sql'], $add_rule['query_builder']),
+            'severity' => 'critical',
+            'extra' => json_encode($extra),
+            'disabled' => 0,
+            'name' => $add_rule['name']
         );
-
-        if (isset($add_rule['query_builder'])) {
-            $insert['query_builder'] = $add_rule['query_builder'];
-            $insert['query'] = GenSQL($add_rule['query_builder'], true);
-        } else {
-            $insert['rule'] = $add_rule['sql'];
-            $insert['query'] = GenSQL($add_rule['sql']);
-        }
 
         dbInsert($insert, 'alert_rules');
     }
