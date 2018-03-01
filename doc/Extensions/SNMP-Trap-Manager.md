@@ -10,7 +10,7 @@ SNMP Trap Manager is a plugin which adds SNMP Trap functionality into LibreNMS t
 
 ## Setup
 
-Mandatory configuration lines are available into specific configuration files, taht you can found into `src/etc/` directory. Please see these files to configure correctly this plugin.
+Mandatory configuration lines are available into specific configuration files, that you can found into `misc/` directory. Please see these files to configure correctly this plugin.
 
     1. LibreNMS installed. At the moment it is compatible and validated with `DB Schema #118`
     2. Install : `snmptrapd` and `snmptt`, see your distribution for the good packages.
@@ -21,7 +21,7 @@ Mandatory configuration lines are available into specific configuration files, t
     7. Add required plugin configuraton lines into `config.php`. See `src/librenms/config.php`
     8. Enable the plugin through `Plugin Admin`
     9. Go to plugin index page to init the database. Actually this step is not made during a trap reception for performance optimization
-    10. Fill the `ssh/config` file from `mibuploader` directory and configure SSH commands into configuration. The SSH keys copy is mandatory.
+    10. Fill the `ssh/config` file from `misc` directory and configure SSH commands into configuration. The SSH keys copy is mandatory.
 
 Note from `snmp.conf` : it is not possible to modify thi file, you can use the environment variable `MIBDIRS` before all PHP/snmptt script launch.
 
