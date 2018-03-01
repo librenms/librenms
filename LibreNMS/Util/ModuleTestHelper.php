@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
+use LibreNMS\Exceptions\InvalidModuleException;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -57,6 +58,7 @@ class ModuleTestHelper
      * @param array|string $modules
      * @param string $os
      * @param string $variant
+     * @throws InvalidModuleException
      */
     public function __construct($modules, $os, $variant = '')
     {
@@ -273,6 +275,7 @@ class ModuleTestHelper
      *
      * @param array $modules
      * @return array
+     * @throws InvalidModuleException
      */
     private function resolveModuleDependencies($modules)
     {
@@ -281,7 +284,7 @@ class ModuleTestHelper
         foreach ($modules as $module) {
             // only allow valid modules
             if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
-                continue;
+                throw new InvalidModuleException("Invalid module name: $module");
             }
 
             if (isset($this->module_deps[$module])) {

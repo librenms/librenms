@@ -25,11 +25,10 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
-class Poller implements ValidationGroup
+class Poller extends BaseValidation
 {
     /**
      * Validate this module.
@@ -144,15 +143,5 @@ class Poller implements ValidationGroup
                 "Check the cron job to make sure it is running and using discovery-wrapper.py"
             );
         }
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }

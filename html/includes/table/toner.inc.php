@@ -17,7 +17,11 @@
 
 $graph_type = 'toner_usage';
 
-$sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.toner_descr';
+$sql = 'SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id';
+
+if (!empty($searchPhrase)) {
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `toner_descr` LIKE '%$searchPhrase%')";
+}
 
 $count_sql = "SELECT COUNT(`toner_id`) FROM `toner`";
 $param[] = $_SESSION['user_id'];
@@ -26,6 +30,15 @@ $count     = dbFetchCell($count_sql, $param);
 if (empty($count)) {
     $count = 0;
 }
+
+if (empty($sort)) {
+    $sort = '`D`.`hostname`, `toner_descr`';
+} else {
+    // toner_used is an alias for toner_perc
+    $sort = str_replace('toner_used', 'toner_current', $sort);
+}
+
+$sql .= " ORDER BY $sort";
 
 if (isset($current)) {
     $limit_low  = (($current * $rowCount) - ($rowCount));
@@ -38,7 +51,6 @@ if ($rowCount != -1) {
 
 foreach (dbFetchRows($sql, $param) as $toner) {
     if (device_permitted($toner['device_id'])) {
-        $total = $toner['toner_capacity'];
         $perc  = $toner['toner_current'];
 
         $graph_array['type']        = $graph_type;
@@ -52,15 +64,15 @@ foreach (dbFetchRows($sql, $param) as $toner) {
         $graph_array_zoom['width']  = '400';
         $link       = 'graphs/id='.$graph_array['id'].'/type='.$graph_array['type'].'/from='.$graph_array['from'].'/to='.$graph_array['to'].'/';
         $mini_graph = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
-        $bar_link   = print_percentage_bar(400, 20, $perc, "$perc%", 'ffffff', $background['left'], $free, 'ffffff', $background['right']);
         $background = get_percentage_colours(100 - $perc);
+        $bar_link   = print_percentage_bar(400, 20, $perc, "$perc%", 'ffffff', $background['left'], $free, 'ffffff', $background['right']);
 
         $response[] = array(
             'hostname' => generate_device_link($toner),
             'toner_descr' => $toner['toner_descr'],
             'graph' => $mini_graph,
             'toner_used' => $bar_link,
-            'toner_perc' => $perc.'%',
+            'toner_current' => $perc.'%',
         );
 
         if ($vars['view'] == 'graphs') {

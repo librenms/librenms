@@ -1559,7 +1559,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1877,6 +1877,16 @@ label {
 .redCluster {
     background-color: rgba(255,0,0, 0);
     background-color: rgba(255,0,0,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
     text-align: center;
     width: 25px !important;
     height: 25px !important;

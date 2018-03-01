@@ -143,8 +143,10 @@ $pool_rrd_def = RrdDefinition::make()
     ->addDataset('dedup', 'GAUGE', 0);
 
 $pools_int=0;
+$pools_for_metrics=array(); // used later for replacing pools when inserting into the metrics table
 while (isset($zfs{'pools'}{$pools_int})) {
     $pools[]=$zfs{'pools'}{$pools_int}{'name'};
+    $pools_for_mertrics[$zfs{'pools'}{$pools_int}{'name'}]=$zfs{'pools'}{$pools_int}; // copy the pool over later
     $rrd_name = array('app', $name, $app_id, $zfs{'pools'}{$pools_int}{'name'});
     $fields = array(
         'size' => $zfs{'pools'}{$pools_int}{'size'},
@@ -195,3 +197,7 @@ if (empty($pools)) {
 
     $component->setComponentPrefs($device_id, $zfsc);
 }
+
+//replace $zfs{'pools'} with a array where the keys are the pool names and update metrics
+$zfs{'pools'}=$pools_for_mertrics;
+update_application($app, $json, $zfs);
