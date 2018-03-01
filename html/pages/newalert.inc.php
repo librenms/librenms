@@ -29,7 +29,16 @@ if (!device_permitted($vars['device'])) {
 
     if (is_numeric($rule_id)) {
         $rule = dbFetchRow('SELECT * FROM `alert_rules` WHERE `id` = ? LIMIT 1', [$rule_id]);
-        $sql_query = unserialize($rule['query_builder']);
+        if (empty($rule['query_builder']) && $rule['rule']) {
+            // This must be an old rule so process it
+            $sql_query = $rule['rule'];
+            $sql_query = str_replace('&&', 'AND', $sql_query);
+            $sql_query = str_replace('||', 'OR', $sql_query);
+            $sql_query = str_replace('%', '', $sql_query);
+            $sql_query = str_replace('"', "'", $sql_query);
+            $sql_query = str_replace('~', "REGEXP", $sql_query);
+            $rule['query_builder'] = $sql_query;
+        }
 ?>
 <script>
     $.ajax({
@@ -274,7 +283,6 @@ if (!device_permitted($vars['device'])) {
                     old_import = old_import.replace(/%/g, '');
                     old_import = old_import.replace(/"/g, "'");
                     old_import = old_import.replace(/~/g, "REGEXP");
-                    console.log(old_import);
                     $("#builder").queryBuilder("setRulesFromSQL", old_import);
                 } catch (e) {
                     alert('Your query could not be parsed');

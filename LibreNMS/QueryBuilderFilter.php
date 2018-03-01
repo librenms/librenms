@@ -131,13 +131,11 @@ class QueryBuilderFilter implements JsonSerializable
 
     private function getColumnType($type)
     {
-        if (starts_with($type, 'varchar')) {
+        if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
             return 'integer';
-        } elseif (starts_with($type, 'double')) {
-            return 'double';
-        } elseif ($type == 'timestamp') {
+        } elseif (starts_with($type, ['timestamp', 'datetime'])) {
             return 'datetime';
         } elseif (starts_with($type, 'enum')) {
             return 'enum';

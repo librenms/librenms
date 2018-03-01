@@ -165,7 +165,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
-    echo '<i>'.htmlentities($rule['rule'] ?: $rule['query_builder']).'</i></td>';
+    echo '<i>'.htmlentities($rule['query_builder'] ?: $rule['rule']).'</i></td>';
     echo '<td>'.$rule['severity'].'</td>';
     echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
@@ -182,15 +182,11 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     echo '<td>';
     if ($_SESSION['userlevel'] >= '10') {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        if ($rule['query_builder']) {
-            echo "<a class='btn btn-primary' role='button' href='" . generate_url(array(
-                    'page' => 'newalert',
-                    'device' => $rule['device_id'],
-                    'rule_id' => $rule['id']
-                )) . "' name='edit-alert-rule' data-content='" . $popover_msg . "' data-container='body' data-toggle='modal'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
-        } else {
-            echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        }
+        echo "<a class='btn btn-primary' role='button' href='" . generate_url(array(
+                'page' => 'newalert',
+                'device' => $rule['device_id'],
+                'rule_id' => $rule['id']
+            )) . "' name='edit-alert-rule' data-content='" . $popover_msg . "' data-container='body' data-toggle='modal'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
 
