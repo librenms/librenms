@@ -599,6 +599,7 @@ $config['irc_authtime']     = 3;
 $config['irc_debug']        = false;
 $config['irc_alert']        = false;
 $config['irc_alert_utf8']   = false;
+$config['irc_alert_short']  = false;
 $config['irc_ctcp']         = false;
 $config['irc_ctcp_version'] = "LibreNMS IRCbot. https://www.librenms.org/";
 
