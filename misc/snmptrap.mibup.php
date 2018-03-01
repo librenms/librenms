@@ -18,10 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       https://librenms.org
- * @copyright  2016 Florent Peterschmitt  
- * @author     Florent Peterschmitt <fpeterschmitt@capensis.fr>
+ * @package   LibreNMS
+ * @link      https://librenms.org
+ * @copyright 2016 Florent Peterschmitt
+ * @author    Florent Peterschmitt <fpeterschmitt@capensis.fr>
  */
 
 
