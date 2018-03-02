@@ -33,9 +33,8 @@ if (isset($_POST['create-default'])) {
 
         $insert = array(
             'device_id' => -1,
-            'rule' => $add_rule['rule'],
-            'query_builder' => $add_rule['query_builder'],
-            'query' => GenSQL($add_rule['sql'], $add_rule['query_builder']),
+            'query_builder' => $add_rule['sql'],
+            'query' => GenSQLNew($add_rule['sql']),
             'severity' => 'critical',
             'extra' => json_encode($extra),
             'disabled' => 0,
