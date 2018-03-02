@@ -52,8 +52,7 @@ foreach ($contacts['emu2_contacts'] as $id => $contact) {
                 dbInsert($insert, 'state_translations');
             }
         }
-    }
-    elseif (is_array($contacts['emu2_contacts']) && $normalstate == 'normallyOpenEMS') {
+    } elseif (is_array($contacts['emu2_contacts']) && $normalstate == 'normallyOpenEMS') {
         $state_name_no  = 'emsInputContactNormalState_NO';
         $state_index_id = create_state_index($state_name_no);
         if ($state_index_id !== null) {
@@ -76,8 +75,7 @@ foreach ($contacts['emu2_contacts'] as $id => $contact) {
     if ($normalstate == 'normallyClosedEMS') {
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_nc, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
         create_sensor_to_state_index($device, $state_name_nc, $index);
-    }
-    elseif ($normalstate == 'normallyOpenEMS') {
+    } elseif ($normalstate == 'normallyOpenEMS') {
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_no, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
         create_sensor_to_state_index($device, $state_name_no, $index);
     }
@@ -112,8 +110,7 @@ foreach ($relays['emu2_relays'] as $id => $relay) {
                 dbInsert($insert, 'state_translations');
             }
         }
-    }
-    elseif (is_array($relays['emu2_relays']) && $normalstate == 'normallyOpenEMS') {
+    } elseif (is_array($relays['emu2_relays']) && $normalstate == 'normallyOpenEMS') {
         $state_name_no  = 'emsOutputRelayNormalState_NO';
         $state_index_id = create_state_index($state_name_no);
         if ($state_index_id !== null) {
@@ -136,8 +133,7 @@ foreach ($relays['emu2_relays'] as $id => $relay) {
     if ($normalstate == 'normallyClosedEMS') {
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_nc, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
         create_sensor_to_state_index($device, $state_name_nc, $index);
-    }
-    elseif ($normalstate == 'normallyOpenEMS') {
+    } elseif ($normalstate == 'normallyOpenEMS') {
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_no, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
         create_sensor_to_state_index($device, $state_name_no, $index);
     }
@@ -172,8 +168,7 @@ foreach ($outlets['emu2_outlets'] as $id => $outlet) {
                 dbInsert($insert, 'state_translations');
             }
         }
-    }
-    elseif (is_array($outlets['emu2_outlets']) && $normalstate == 'normallyOffEMS') {
+    } elseif (is_array($outlets['emu2_outlets']) && $normalstate == 'normallyOffEMS') {
         $state_name_off  = 'emsOutletNormalState_OFF';
         $state_index_id = create_state_index($state_name_off);
         if ($state_index_id !== null) {
@@ -196,8 +191,7 @@ foreach ($outlets['emu2_outlets'] as $id => $outlet) {
     if ($normalstate == 'normallyOnEMS') {
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_on, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
         create_sensor_to_state_index($device, $state_name_on, $index);
-    }
-    elseif ($normalstate == 'normallyOffEMS') {
+    } elseif ($normalstate == 'normallyOffEMS') {
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_off, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
         create_sensor_to_state_index($device, $state_name_off, $index);
     }
