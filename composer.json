@@ -18,7 +18,6 @@
         "ext-pcre": "*",
         "ext-curl": "*",
         "ext-session": "*",
-        "ext-snmp": "*",
         "ext-xml": "*",
         "ext-gd": "*",
         "ezyang/htmlpurifier": "^4.8",
