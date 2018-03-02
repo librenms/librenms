@@ -462,7 +462,7 @@ $config['alert']['transports']['gitlab']['key'] = 'AbCdEf12345';
 
 ## Phillips Hue
 
-Want to spice up your noc life? LibreNMS will flash all lights connected to your phillips hue bridge whenever an alert is triggered. Uses Personal access tokens to authenticate with Gitlab and will store the token in cleartext.
+Want to spice up your noc life? LibreNMS will flash all lights connected to your phillips hue bridge whenever an alert is triggered. 
 
 To setup, go to the you http://`your-bridge-ip`/debug/clip.html
 
