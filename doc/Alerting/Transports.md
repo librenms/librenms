@@ -459,3 +459,24 @@ $config['alert']['transports']['gitlab']['host'] = 'http://gitlab.host.tld';
 $config['alert']['transports']['gitlab']['project_id'] = '1';
 $config['alert']['transports']['gitlab']['key'] = 'AbCdEf12345';
 ```
+
+## Phillips Hue
+
+Want to spice up your noc life? LibreNMS will flash all lights connected to your phillips hue bridge whenever an alert is triggered. Uses Personal access tokens to authenticate with Gitlab and will store the token in cleartext.
+
+To setup, go to the you http://`your-bridge-ip`/debug/clip.html
+
+- Update the "URL:" field to `/api`
+- Paste this in the "Message Body" {"devicetype":"librenms"}
+- Press the round button on your `Phillips Hue Bridge`
+- Click on `POST`
+- In the `Command Response` You should see output with your username. Copy this without the quotes
+
+
+More Info: [Phillips Hue Documentation](https://www.developers.meethue.com/documentation/getting-started)
+
+```php
+$config['alert']['transports']['hue']['bridge'] = 'http://bridge.example.com';
+$config['alert']['transports']['hue']['user'] = 'af89jauaf98aj34r';
+$config['alert']['transports']['hue']['duration'] = 'lselect';
+```
