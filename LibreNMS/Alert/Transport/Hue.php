@@ -34,7 +34,7 @@ class Hue implements Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        // 
+        // Don't alert on resolve at this time
         if ($obj['state'] == 0) {
             return true;
         } else {
