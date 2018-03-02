@@ -26,32 +26,28 @@
 header('Content-type: application/json');
 
 if (is_admin() === false) {
-    die(
-        json_encode(
-            [
-                'status' => 'error',
-                'message' => 'ERROR: You need to be admin',
-            ]
-        )
-    );
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'ERROR: You need to be admin',
+    ]));
 }
 
 $template_id = $vars['template_id'];
-$sql         = '';
 
 if (is_numeric($template_id)) {
-    $status    = 'ok';
-    $tmp_rules = get_rules_from_json();
-    $name = $tmp_rules[$template_id]['name'];
-    $sql = $tmp_rules[$template_id]['sql'];
-} else {
-    $message = 'Invalid template';
-    $status  = 'error';
-}//end if
+    $rules = get_rules_from_json();
 
-die(json_encode(array(
-    'status'       => $status,
-    'message'      => $message,
-    'name'         => $name,
-    'sql'          => $sql,
-)));
+    $output = [
+        'status' => 'ok',
+        'name' => $rules[$template_id]['name'],
+        'query_builder' => $rules[$template_id]['sql'],
+        'extra' => $rules[$template_id]['extra']
+    ];
+} else {
+    $output = [
+        'status' => 'error',
+        'message' => 'Invalid template'
+    ];
+}
+
+die(json_encode($output));

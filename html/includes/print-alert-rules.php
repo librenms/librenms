@@ -72,9 +72,9 @@ echo '<div class="table-responsive">
 
 echo '<td colspan="7">';
 if ($_SESSION['userlevel'] >= '10') {
-    echo '<a href="'. generate_url(['page' => 'newalert', 'device' => $device['device_id']]) .'" class="btn btn-primary btn-sm" ><i class="fa fa-plus"></i> Create new alert rule</a>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
     echo '<i> - OR - </i>';
-    echo '<a href="'. generate_url(['page' => 'newalert', 'popup' => 'collection']) .'" class="btn btn-primary btn-sm" ><i class="fa fa-plus"></i> Create rule from collection</a>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
 }
 echo '</td>
     <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
@@ -107,17 +107,15 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $param = array($device['device_id']);
 }
 
-$query       = " FROM alert_rules $sql";
-$count_query = $count_query.$query;
-$count       = dbFetchCell($count_query, $param);
-if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
-    $page_number = 1;
-} else {
+$count = dbFetchCell("$count_query FROM alert_rules $sql", $param);
+if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
     $page_number = $_POST['page_number'];
+} else {
+    $page_number = 1;
 }
 
 $start      = (($page_number - 1) * $results);
-$full_query = $full_query.$query." ORDER BY id ASC LIMIT $start,$results";
+$full_query = $full_query. " FROM alert_rules $sql" ." ORDER BY id ASC LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $rule) {
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
@@ -179,13 +177,9 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     echo '</td>';
     echo '<td>';
-    if ($_SESSION['userlevel'] >= '10') {
+    if (is_admin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<a class='btn btn-primary' role='button' href='" . generate_url(array(
-                'page' => 'newalert',
-                'device' => $rule['device_id'],
-                'rule_id' => $rule['id']
-            )) . "' name='edit-alert-rule' data-content='" . $popover_msg . "' data-container='body' data-toggle='modal'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
+        echo "<a class='btn btn-primary' role='button' name='edit-alert-rule' data-content='" . $popover_msg . "' data-rule_id='" . $rule['id'] . "' data-container='body' data-target='#create-alert' data-toggle='modal'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
 

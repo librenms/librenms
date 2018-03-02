@@ -27,15 +27,12 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     $rule = $tmp_rules[$template_id];
 }
 if (is_array($rule)) {
-    $rule_split         = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@\|]+[&&|\|\|]{2})/', $rule['rule'], -1, (PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
-    $count              = (count($rule_split) - 1);
-    $rule_split[$count] = $rule_split[$count].'  &&';
     $output             = array(
-        'severity' => $rule['severity'],
-        'extra'    => $rule['extra'],
-        'name'     => $rule['name'],
-        'proc'     => $rule['proc'],
-        'rules'    => $rule_split,
+        'severity'      => $rule['severity'],
+        'extra'         => $rule['extra'],
+        'name'          => $rule['name'],
+        'proc'          => $rule['proc'],
+        'query_builder' => $rule['query_builder'],
     );
     header('Content-type: application/json');
     echo _json_encode($output);

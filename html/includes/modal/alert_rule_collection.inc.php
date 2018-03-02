@@ -30,7 +30,7 @@ if (is_admin() === false) {
 ?>
 
 <div class="modal fade" id="search_rule_modal" tabindex="-1" role="dialog" aria-labelledby="search_rule" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -84,8 +84,8 @@ if (is_admin() === false) {
                                     success: function (data) {
                                         if (data.status == 'ok') {
                                             $("#search_rule_modal").modal('hide');
-                                            $("#builder").queryBuilder("setRulesFromSQL", data.sql);
-                                            $("#name").val(data.name)
+                                            loadRule(data);
+                                            $('#create-alert').modal('show');
                                         } else {
                                             toastr.error(data.message);
                                         }
