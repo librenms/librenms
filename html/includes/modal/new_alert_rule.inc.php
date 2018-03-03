@@ -34,9 +34,8 @@ if (is_admin()) {
                 <div class="modal-body">
 
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
-                        <input type="hidden" name="device_id" id="device_id"
-                               value="<?php echo $device['device_id']; ?>">
-                        <input type="hidden" name="rule_id" id="rule_id" value="<?php echo $rule_id; ?>">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']; ?>">
+                        <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="type" id="type" value="alert-rules">
                         <input type="hidden" name="template_id" id="template_id" value="">
                         <input type="hidden" name="query" id="query" value="">
@@ -212,7 +211,7 @@ if (is_admin()) {
                             if (data.status == 'ok') {
                                 toastr.success(data.message);
                                 $('#create-alert').modal('hide');
-                                location.reload(); // FIXME: reload table not page
+
                             } else {
                                 toastr.error(data.message);
                             }
@@ -261,6 +260,7 @@ if (is_admin()) {
         $('#create-alert').on('show.bs.modal', function(e) {
             //get data-id attribute of the clicked element
             var rule_id = $(e.relatedTarget).data('rule_id');
+            $('#rule_id').val(rule_id);
 
             if (rule_id >= 0) {
                 $.ajax({
