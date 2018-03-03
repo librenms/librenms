@@ -24,9 +24,10 @@
  */
 
 $tables = array(
-    // One could add more entrys from deviceGroup, but this will do as a start
-    array('cpqDaPhyDrvStatus','.1.3.6.1.4.1.232.3.2.5.1.1.6.','cpqDaPhyDrvStatus','DriveStatus','CPQSINFO-MIB'),
-    array('cpqDaPhyDrvSmartStatus','.1.3.6.1.4.1.232.3.2.5.1.1.57.','cpqDaPhyDrvSmartStatus','SmartStatus','CPQSINFO-MIB'),
+    array('cpqDaPhyDrvTable','.1.3.6.1.4.1.232.3.2.5.1.1.6.','cpqDaPhyDrvStatus','cpqDaPhyDrvBay','CPQIDA-MIB'),
+    array('cpqDaAccelTable','.1.3.6.1.4.1.232.3.2.2.2.1.2.','cpqDaAccelCondition','cpqDaAccelCntlrIndex','CPQIDA-MIB'),
+    array('cpqHeFltTolPowerSupplyTable','.1.3.6.1.4.1.232.6.2.9.3.1.4.','cpqHeFltTolPowerSupplyCondition','cpqHeFltTolPowerSupplyBay','CPQHLTH-MIB','cpqHeFltTolPowerSupplyPresent'),
+    array('cpqHeFltTolFanTable','.1.3.6.1.4.1.232.6.2.6.7.1.9.','cpqHeFltTolFanCondition','cpqHeFltTolFanIndex ','CPQHLTH-MIB','cpqHeFltTolFanPresent'),
 );
 
 $x=0;
@@ -53,12 +54,26 @@ foreach ($tables as $tablevalue) {
                     array($state_index_id,'ssdWearOut',1,8,2),
                     array($state_index_id,'notAuthenticated',1,9,3),
                 );
-            } elseif ($state_name == 'cpqDaPhyDrvSmartStatus') {
+            } elseif ($state_name == 'cpqDaAccelCondition') {
                 $states = array(
                     array($state_index_id,'other',1,1,3),
                     array($state_index_id,'ok',1,2,0),
-                    array($state_index_id,'replaceDrive',1,3,1),
-                    array($state_index_id,'replaceDriveSSDWearOut',1,4,1),
+                    array($state_index_id,'degraded',1,3,2),
+                    array($state_index_id,'failed',1,4,3),
+                );
+            } elseif ($state_name == 'cpqHeFltTolPowerSupplyCondition') {
+                $states = array(
+                    array($state_index_id,'other',1,1,3),
+                    array($state_index_id,'ok',1,2,0),
+                    array($state_index_id,'degraded',1,3,1),
+                    array($state_index_id,'failed',1,4,1),
+                );
+            } elseif ($state_name == 'cpqHeFltTolFanCondition') {
+                $states = array(
+                    array($state_index_id,'other',1,1,3),
+                    array($state_index_id,'ok',1,2,0),
+                    array($state_index_id,'degraded',1,3,1),
+                    array($state_index_id,'failed',1,4,2),
                 );
             }
 
@@ -75,11 +90,21 @@ foreach ($tables as $tablevalue) {
         }
 
         foreach ($temp as $index => $entry) {
-            $descr = 'Disk #'.trim(snmp_get($device, ".1.3.6.1.4.1.232.3.2.5.1.1.5.1.$index", "-Ovqn"), '"');
+            if ($state_name == 'cpqDaPhyDrvStatus') {
+                $descr = 'HDD #'.trim(snmp_get($device, ".1.3.6.1.4.1.232.3.2.5.1.1.5.$index", "-Ovqn"), '"'). " Status";
+            } elseif ($state_name == 'cpqDaAccelCondition') {
+                $descr = 'CTRL #'.trim(snmp_get($device, ".1.3.6.1.4.1.232.3.2.2.2.1.1.$index", "-Ovqn"), '"'). " Status";
+            } elseif ($state_name == 'cpqHeFltTolPowerSupplyCondition' && $temp[$index][$tablevalue[5]] == 'present') {
+                $descr = 'PSU #'.trim(snmp_get($device, "1.3.6.1.4.1.232.6.2.9.3.1.2.$index", "-Ovqn"), '"')." Status";
+            } elseif ($state_name == 'cpqHeFltTolFanCondition' && $temp[$index][$tablevalue[5]] == 'present') {
+                $descr = 'FAN #'.trim(snmp_get($device, "1.3.6.1.4.1.232.6.2.6.7.1.2.$index", "-Ovqn"), '"')." Status";
+            } else {
+                continue;
+            }
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $x . $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
             //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
+            create_sensor_to_state_index($device, $state_name, $x . $index);
         }
     }
     $x++;
