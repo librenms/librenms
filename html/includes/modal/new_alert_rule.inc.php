@@ -155,8 +155,9 @@ if (is_admin()) {
         $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
             $("[name$='_filter']").each(function () {
                 $(this).select2({
-                    width: '200px',
-                    dropdownParent: $("#create-alert")
+                    dropdownParent: $("#create-alert"),
+                    dropdownAutoWidth : true,
+                    width: 'auto'
                 });
             });
         }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
