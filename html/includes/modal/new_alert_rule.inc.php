@@ -2,7 +2,8 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
+ * Copyright (c) 2018 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
+ * Copyright (c) 2018 Tony Murray <murraytony@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,7 +15,6 @@
 use LibreNMS\QueryBuilderFilter;
 
 if (is_admin()) {
-
     $device['device_id'] = isset($vars['device']) ? $vars['device'] : '-1';
     $filters = json_encode(new QueryBuilderFilter('alert'));
 
@@ -37,6 +37,12 @@ if (is_admin()) {
                         <input type="hidden" name="template_id" id="template_id" value="">
                         <input type="hidden" name="query" id="query" value="">
                         <input type="hidden" name="json" id="json" value="">
+                        <div class='form-group'>
+                            <label for='name' class='col-sm-3 control-label'>Rule name: </label>
+                            <div class='col-sm-9'>
+                                <input type='text' id='name' name='name' class='form-control' maxlength='200'>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="col-sm-3">
                                 <div class="pull-right">
@@ -97,12 +103,6 @@ if (is_admin()) {
                                 <input type='checkbox' name='invert' id='invert'>
                             </div>
                         </div>
-                        <div class='form-group'>
-                            <label for='name' class='col-sm-3 control-label'>Rule name: </label>
-                            <div class='col-sm-9'>
-                                <input type='text' id='name' name='name' class='form-control' maxlength='200'>
-                            </div>
-                        </div>
                         <div id="preseed-maps">
                             <div class="form-group">
                                 <label for='map-stub' class='col-sm-3 control-label'>Map To: </label>
@@ -147,8 +147,6 @@ if (is_admin()) {
     <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
     <script>
-        window.rule_id = -1;
-
         $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
             $("[name$='_filter']").each(function () {
                 $(this).select2({
