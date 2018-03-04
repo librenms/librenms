@@ -212,7 +212,7 @@ if (is_admin()) {
                             if (data.status == 'ok') {
                                 toastr.success(data.message);
                                 $('#create-alert').modal('hide');
-
+                                window.reload(); // FIXME: reload table
                             } else {
                                 toastr.error(data.message);
                             }
