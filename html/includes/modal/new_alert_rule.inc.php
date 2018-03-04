@@ -13,12 +13,9 @@
 
 use LibreNMS\QueryBuilderFilter;
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 if (is_admin()) {
 
-//    $device['device_id'] = $vars['device'] ?: '-1';
+    $device['device_id'] = isset($vars['device']) ? $vars['device'] : '-1';
     $filters = json_encode(new QueryBuilderFilter('alert'));
 
     ?>
