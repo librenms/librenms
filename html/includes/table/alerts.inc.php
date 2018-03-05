@@ -148,21 +148,21 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     switch ($severity) {
         case 'critical':
-            $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
+            $severity_ico = 'label-danger';
             break;
         case 'warning':
-            $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
+            $severity_ico = 'label-warning';
             break;
         case 'ok':
-            $severity_ico = '<span class="alert-status label-success">&nbsp;</span>';
+            $severity_ico = 'label-success';
             break;
         default:
-            $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
+            $severity_ico = 'label-info';
             break;
     }
 
     if ((int)$alert['state'] === 2) {
-        $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
+        $severity_ico = 'label-warning';
     }
 
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert['id']));

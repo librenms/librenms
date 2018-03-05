@@ -188,7 +188,7 @@ if (defined('SHOW_SETTINGS')) {
     <table id="alerts_' . $unique_id . '" class="table table-hover table-condensed alerts">
         <thead>
             <tr>
-                <th data-column-id="severity"></th>
+                <th data-column-id="state" data-width="7px" data-formatter="severity">&nbsp;</th>
                 <th data-column-id="timestamp">Timestamp</th>
                 <th data-column-id="rule">Rule</th>
                 <th data-column-id="details" data-sortable="false"></th>
@@ -207,6 +207,11 @@ if (defined('SHOW_SETTINGS')) {
 <script>
 var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     ajax: true,
+    formatters: {
+       "severity": function (column, row) {
+            return "<span class=\'alert-status " + row.severity + "\'></span>";
+       }, 
+    },
     post: function ()
     {
         return {

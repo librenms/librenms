@@ -35,7 +35,7 @@ echo '<div class="panel panel-default panel-condensed">
     <table id="alertlog" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
-            <th data-column-id="status" data-sortable="false"></th>
+            <th data-column-id="state" data-width="7px" data-formatter="status">&nbsp;</th>
             <th data-column-id="time_logged" data-order="desc">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
@@ -51,6 +51,11 @@ echo '<div class="panel panel-default panel-condensed">
     var grid = $("#alertlog").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
+        formatters: {
+          'status': function (column, row) {
+              return "<span class='alert-status " + row.status + "'></span>";
+          },
+        },
         templates: {
             header: '<div id="{{ctx.id}}" class="{{css.header}}"><div class="row"> \
                 <div class="col-sm-8 actionBar"><span class="pull-left"> \
