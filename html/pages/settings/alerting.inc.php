@@ -1430,7 +1430,7 @@ echo '
             </div>
         </div>';
 
-        // Phillips Hue Transport Section
+        // Philips Hue Transport Section
 
 $hue_bridge = get_config_by_name('alert.transports.hue.bridge');
 $hue_user = get_config_by_name('alert.transports.hue.user');
@@ -1439,7 +1439,7 @@ echo '
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#hue_transport_expand"><i class="fa fa-caret-down"></i> Phillips Hue transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hue" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#hue_transport_expand"><i class="fa fa-caret-down"></i> Philips Hue transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hue" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="hue_transport_expand" class="panel-collapse collapse">
@@ -1454,7 +1454,7 @@ echo '
                         </div>
                     </div>
                     <div class="form-group has-feedback">
-                        <label for="hue_user" class="col-sm-4 control-label">Phillips Hue User</label>
+                        <label for="hue_user" class="col-sm-4 control-label">Philips Hue User</label>
                         <div class="col-sm-4">
                             <input id="hue_user" class="form-control" type="text" name="global-config-input" value="'.$hue_user['config_value'].'" data-config_id="'.$hue_user['config_id'].'">
                             <span class="form-control-feedback">
@@ -1463,7 +1463,7 @@ echo '
                         </div>
                     </div>
                     <div class="form-group has-feedback">
-                        <label for="hue_duration" class="col-sm-4 control-label">Phillips Hue Duration</label>
+                        <label for="hue_duration" class="col-sm-4 control-label">Philips Hue Duration</label>
                         <div class="col-sm-4">
                             <select id="hue_duration" class="form-control" name="global-config-select" data-config_id="'.$hue_duration['config_id'].'">
                                 <option '.( $hue_duration['config_value'] == "select" ? "selected" : ""). ' value="select">1 Second</option>
