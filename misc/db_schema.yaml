@@ -1395,7 +1395,7 @@ services:
     - { Field: service_changed, Type: int(11), 'Null': false, Extra: '', Default: '0' }
     - { Field: service_message, Type: text, 'Null': false, Extra: '' }
     - { Field: service_disabled, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
-    - { Field: service_ds, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: service_ds, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [service_id], Unique: true, Type: BTREE }
     service_host: { Name: service_host, Columns: [device_id], Unique: false, Type: BTREE }
