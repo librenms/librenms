@@ -179,7 +179,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     echo '<td>';
     if (is_admin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<a class='btn btn-primary' role='button' name='edit-alert-rule' data-content='" . $popover_msg . "' data-rule_id='" . $rule['id'] . "' data-container='body' data-target='#create-alert' data-toggle='modal'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
 
