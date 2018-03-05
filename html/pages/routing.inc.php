@@ -10,16 +10,15 @@ if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
 
 // $datas[] = 'overview';
 // $routing_count is populated by print-menubar.inc.php
-// $type_text['overview'] = "Overview";
 $type_text['bgp']  = 'BGP';
 $type_text['cef']  = 'CEF';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
 $type_text['cisco-otv']  = 'OTV';
 
-print_optionbar_start();
+echo '<div class="panel panel-default">';
+echo '<div class="panel-heading">';
 
-// if (!$vars['protocol']) { $vars['protocol'] = "overview"; }
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
 unset($sep);
@@ -45,7 +44,7 @@ foreach ($routing_count as $type => $value) {
     }
 }//end foreach
 
-print_optionbar_end();
+echo '<br><br>';
 
 switch ($vars['protocol']) {
     case 'overview':

@@ -9,8 +9,6 @@ if ($_SESSION['userlevel'] >= '5') {
         $_GET['optc'] = 'basic';
     }
 
-    print_optionbar_start();
-
     echo '<span style="font-weight: bold;">VRF</span> &#187; ';
 
     if ($_GET['opta'] == 'vrf' && $_GET['optb'] == 'all') {
@@ -84,7 +82,8 @@ if ($_SESSION['userlevel'] >= '5') {
 
     echo ' )';
 
-    print_optionbar_end();
+    echo '</div>';
+    echo '<div class="panel-body">';
 
     if ($_GET['optb'] == 'all') {
         // Pre-Cache in arrays
@@ -187,7 +186,7 @@ if ($_SESSION['userlevel'] >= '5') {
             $i++;
         }//end foreach
 
-        echo '</table></div>';
+        echo '</table></div></div>';
     } else {
         echo "<div style='background: {$config['list_colour']['even']}; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?', array($_GET['optb']));
@@ -234,6 +233,7 @@ if ($_SESSION['userlevel'] >= '5') {
             echo '</table></div>';
             echo "<div style='height: 10px;'></div>";
         }//end foreach
+        echo '</div>';
     }//end if
 } else {
     include 'includes/error-no-perm.inc.php';
