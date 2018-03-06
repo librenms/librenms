@@ -37,7 +37,7 @@ if (is_admin() === false) {
 }
 
 $query_builder = $_POST['query'];
-$query         = GenSQL($_POST['rule'], $_POST['query']);
+$query         = GenSQLNew($query_builder);
 $rule_id       = $_POST['rule_id'];
 $count         = mres($_POST['count']);
 $delay         = mres($_POST['delay']);

@@ -129,9 +129,8 @@ if (is_admin()) {
                         </div>
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-3">
-                                <button type="button" class="btn btn-success parse-sql" id="btn-save" name="save-alert"
-                                        data-target="import_export"
-                                        data-stmt="false">Save Rule
+                                <button type="button" class="btn btn-success" id="btn-save" name="save-alert">
+                                    Save Rule
                                 </button>
                             </div>
                         </div>
@@ -159,7 +158,6 @@ if (is_admin()) {
             if (rule.operator === 'regexp') {
                 e.value += ' \'' + rule.value + '\'';
             }
-            e.value = "%" + e.value;
         }).queryBuilder({
             plugins: [
                 'bt-tooltip-errors',
@@ -192,8 +190,9 @@ if (is_admin()) {
 
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
-            var result_sql = $('#builder').queryBuilder('getSQL', $(this).data('stmt'));
-            var result_json = $('#builder').queryBuilder('getRules');
+            var $builder = $('#builder');
+            var result_sql = $builder.queryBuilder('getSQL', false);
+            var result_json = $builder.queryBuilder('getRules');
             if (result_sql) {
                 if (result_sql.sql.length) {
                     $('#query').val(result_sql.sql);
@@ -207,7 +206,7 @@ if (is_admin()) {
                             if (data.status == 'ok') {
                                 toastr.success(data.message);
                                 $('#create-alert').modal('hide');
-                                window.reload(); // FIXME: reload table
+                                window.location.reload(); // FIXME: reload table
                             } else {
                                 toastr.error(data.message);
                             }
