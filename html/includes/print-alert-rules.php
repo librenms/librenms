@@ -67,11 +67,11 @@ echo '<div class="table-responsive">
     <th>Status</th>
     <th>Extra</th>
     <th>Enabled</th>
-    <th>Action</th>
+    <th style="width:86px;">Action</th>
     </tr>';
 
 echo '<td colspan="7">';
-if ($_SESSION['userlevel'] >= '10') {
+if (is_admin()) {
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
     echo '<i> - OR - </i>';
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
@@ -98,24 +98,24 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$count_query = 'SELECT COUNT(*)';
-$full_query  = 'SELECT *';
-$sql         = '';
-$param       = array();
+$query = 'FROM alert_rules';
+$where = '';
+$param = [];
 if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $sql   = 'WHERE (device_id=? OR device_id="-1")';
-    $param = array($device['device_id']);
+    $query .= ' LEFT JOIN alert_device_map ON alert_rules.id=alert_device_map.rule_id';
+    $where   = 'WHERE (device_id=? OR device_id IS NULL)';
+    $param[] = $device['device_id'];
 }
 
-$count = dbFetchCell("$count_query FROM alert_rules $sql", $param);
+$count = dbFetchCell("SELECT COUNT(*) $query $where", $param);
 if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
     $page_number = $_POST['page_number'];
 } else {
     $page_number = 1;
 }
 
-$start      = (($page_number - 1) * $results);
-$full_query = $full_query. " FROM alert_rules $sql" ." ORDER BY id ASC LIMIT $start,$results";
+$start = (($page_number - 1) * $results);
+$full_query = "SELECT alert_rules.* $query $where ORDER BY alert_rules.id ASC LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $rule) {
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
@@ -147,13 +147,23 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     }
 
     $rule_extra = json_decode($rule['extra'], true);
-    if ($rule['device_id'] == ':-1' || $rule['device_id'] == '-1') {
+
+    $device_count = dbFetchCell('SELECT COUNT(*) FROM alert_device_map WHERE rule_id=?', [$rule['id']]);
+    $group_count = dbFetchCell('SELECT COUNT(*) FROM alert_group_map WHERE rule_id=?', [$rule['id']]);
+    if ($device_count && $group_count) {
+        $popover_msg = 'Restricted rule';
+        $icon_indicator = 'fa fa-connectdevelop fa-fw text-primary';
+    } elseif ($device_count) {
+        $popover_msg = 'Device restricted rule';
+        $icon_indicator = 'fa fa-server fa-fw text-primary';
+    } elseif ($group_count) {
+        $popover_msg = 'Group restricted rule';
+        $icon_indicator = 'fa fa-th fa-fw text-primary';
+    } else {
         $popover_msg = 'Global alert rule';
         $icon_indicator = 'fa fa-globe fa-fw text-success';
-    } else {
-        $popover_msg = 'Device specific rule';
-        $icon_indicator = 'fa fa-server fa-fw text-primary';
     }
+
     echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
     echo "<td><i>#".((int) $rule['id'])."</i><br /><i class=\"$icon_indicator\"></i></td>";
     echo '<td>'.$rule['name'].'</td>';

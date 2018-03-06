@@ -15,7 +15,6 @@
 use LibreNMS\QueryBuilderFilter;
 
 if (is_admin()) {
-    $device['device_id'] = isset($vars['device']) ? $vars['device'] : '-1';
     $filters = json_encode(new QueryBuilderFilter('alert'));
 
     ?>
@@ -31,7 +30,8 @@ if (is_admin()) {
                 <div class="modal-body">
 
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
-                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']; ?>">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php echo format_hostname($device); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="type" id="type" value="alert-rules">
                         <input type="hidden" name="template_id" id="template_id" value="">
@@ -103,22 +103,10 @@ if (is_admin()) {
                                 <input type='checkbox' name='invert' id='invert'>
                             </div>
                         </div>
-                        <div id="preseed-maps">
-                            <div class="form-group">
-                                <label for='map-stub' class='col-sm-3 control-label'>Map To: </label>
-                                <div class="col-sm-4">
-                                    <input type='text' id='map-stub' name='map-stub' class='form-control'/>
-                                </div>
-                                <div class="col-sm-1">
-                                    <button class="btn btn-primary btn-sm" type="button" name="add-map"
-                                            id="add-map" value="Add">Add
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <span id="map-tags"></span>
-                                </div>
+                        <div class="form-group">
+                            <label for='maps' class='col-sm-3 control-label'data-toggle="tooltip" title="Restricts this alert rule to the selected devices or groups.">Map To: </label>
+                            <div class="col-sm-9">
+                                <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
                         <div class='form-group'>
@@ -276,41 +264,85 @@ if (is_admin()) {
                 $("#mute").bootstrapSwitch('state', false);
                 $("#invert").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
+
+                var $maps = $('#maps');
+                $maps.empty();
+                $maps.val(null).trigger('change');
+                setRuleDevice() // pre-populate device in the maps if this is a per-device rule
             }
         });
 
         function loadRule(rule) {
-            $("#builder").queryBuilder("setRulesFromSQL", rule['query_builder']);
-            $('#severity').val(rule['severity']).change();
-            var extra = $.parseJSON(rule['extra']);
-            if (extra != null) {
-                $('#count').val(extra['count']);
-                if ((extra['delay'] / 86400) >= 1) {
-                    var delay = extra['delay'] / 86400 + ' d';
-                } else if ((extra['delay'] / 3600) >= 1) {
-                    var delay = extra['delay'] / 3600 + ' h';
-                } else if ((extra['delay'] / 60) >= 1) {
-                    var delay = extra['delay'] / 60 + ' m';
-                } else {
-                    var delay = extra['delay'];
-                }
-                $('#delay').val(delay);
-                if ((extra['interval'] / 86400) >= 1) {
-                    var interval = extra['interval'] / 86400 + ' d';
-                } else if ((extra['interval'] / 3600) >= 1) {
-                    var interval = extra['interval'] / 3600 + ' h';
-                } else if ((extra['interval'] / 60) >= 1) {
-                    var interval = extra['interval'] / 60 + ' m';
-                } else {
-                    var interval = extra['interval'];
-                }
-                $('#interval').val(interval);
-                $("[name='mute']").bootstrapSwitch('state', extra['mute']);
-                $("[name='invert']").bootstrapSwitch('state', extra['invert']);
+            $('#name').val(rule.name);
+            $('#proc').val(rule.proc);
+            $('#builder').queryBuilder("setRulesFromSQL", rule['query_builder']);
+            $('#severity').val(rule.severity).trigger('change');
+
+            var $maps = $('#maps');
+            $maps.empty();
+            $maps.val(null).trigger('change'); // clear
+            if (rule.map == null) {
+                // collection rule
+                setRuleDevice()
+            } else {
+                $.each(rule.map, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $maps.append(option).trigger('change')
+                });
             }
-            $('#name').val(rule['name']);
-            $('#proc').val(rule['proc']);
+
+            if (rule.extra != null) {
+                var extra = rule.extra;
+                $('#count').val(extra.count);
+                if ((extra.delay / 86400) >= 1) {
+                    $('#delay').val(extra.delay / 86400 + ' d');
+                } else if ((extra.delay / 3600) >= 1) {
+                    $('#delay').val( extra.delay / 3600 + ' h');
+                } else if ((extra.delay / 60) >= 1) {
+                    $('#delay').val( extra.delay / 60 + ' m');
+                } else {
+                    $('#delay').val(extra.delay);
+                }
+
+                if ((extra.interval / 86400) >= 1) {
+                    $('#interval').val(extra.interval / 86400 + ' d');
+                } else if ((extra.interval / 3600) >= 1) {
+                    $('#interval').val(extra.interval / 3600 + ' h');
+                } else if ((extra.interval / 60) >= 1) {
+                    $('#interval').val(extra.interval / 60 + ' m');
+                } else {
+                    $('#interval').val(extra.interval);
+                }
+
+                $("[name='mute']").bootstrapSwitch('state', extra.mute);
+                $("[name='invert']").bootstrapSwitch('state', extra.invert);
+            }
         }
+
+        function setRuleDevice() {
+            // pre-populate device in the maps if this is a per-device rule
+            var device_id = $('#device_id').val();
+            if (device_id > 0) {
+                var device_name = $('#device_name').val();
+                var option = new Option(device_name, device_id, true, true);
+                $('#maps').append(option).trigger('change')
+            }
+        }
+
+        $("#maps").select2({
+            width: '100%',
+            placeholder: "Devices or Groups",
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        type: 'devices_groups',
+                        search: params.term
+                    };
+                }
+            }
+        });
     </script>
     <?php
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * hostnames.inc.php
+ * groups.inc.php
  *
  * -Description-
  *
@@ -19,16 +19,40 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (is_admin() || is_read()) {
-    echo json_encode(dbFetchRows('SELECT `device_id` AS id, `hostname` AS value FROM `devices`'));
-} else {
-    $sql = 'SELECT `devices`.`device_id` AS id, `hostname` AS value FROM `devices`
-            LEFT JOIN `devices_perms` ON `devices`.`device_id` = `devices_perms`.`device_id`
-            WHERE `devices_perms`.`user_id` = ?';
-
-    echo json_encode(dbFetchRows($sql, $_SESSION['user_id']));
+if (!is_admin() && !is_read()) {
+    return [];
 }
+
+$query = '';
+$params = [];
+
+if (!empty($_REQUEST['search'])) {
+    $query .= ' WHERE `name` LIKE ?';
+    $params[] = '%' . mres($_REQUEST['search']) . '%';
+}
+
+
+$total = dbFetchCell("SELECT COUNT(*) FROM `device_groups` $query", $params);
+$more = false;
+
+if (!empty($_REQUEST['limit'])) {
+    $limit = (int) $_REQUEST['limit'];
+    $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+    $offset = ($page - 1) * $limit;
+
+    $query .= " LIMIT $offset, $limit";
+} else {
+    $offset = 0;
+}
+
+
+$sql = "SELECT `id`, `name` AS `text` FROM `device_groups` $query";
+$groups = dbFetchRows($sql, $params);
+
+$more = ($offset + count($groups)) < $total;
+
+return [$groups, $more];

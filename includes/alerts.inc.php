@@ -195,13 +195,15 @@ function RunMacros($rule, $x = 1)
 function GetRules($device)
 {
     $groups = GetGroupsFromDevice($device);
-    $params = array($device,$device);
+    $params = array($device, $device);
     $where = "";
     foreach ($groups as $group) {
-        $where .= " || alert_map.target = ?";
-        $params[] = 'g'.$group;
+        $where .= " || group_id = ?";
+        $params[] = $group;
     }
-    return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE alert_rules.disabled = 0 && ( (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || alert_map.target = ? '.$where.' )', $params);
+
+    $query = "SELECT DISTINCT a.* FROM alert_rules a LEFT JOIN alert_device_map d ON a.id=d.rule_id LEFT JOIN alert_group_map g ON a.id=d.rule_id WHERE a.disabled = 0 AND ((device_id=? OR device_id IS NULL) $where)";
+    return dbFetchRows($query, $params);
 }
 
 /**
