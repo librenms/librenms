@@ -1,5 +1,6 @@
 sudo: required
 language: php
+dist: trusty
 services:
   - mysql
 matrix:
