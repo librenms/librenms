@@ -166,8 +166,10 @@ class QueryBuilderFilter implements \JsonSerializable
      */
     public function getFilter($id)
     {
-        if (array_key_exists($id, $this->filter)) {
-            return $this->filter[$id];
+        foreach ($this->filter as $filter) {
+            if ($filter['id'] == $id) {
+                return $filter;
+            }
         }
 
         return null;
