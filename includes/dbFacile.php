@@ -686,7 +686,7 @@ function recordDbStatistic($stat, $start_time)
  * @param array $list list of related ids
  * @return array [$inserted, $deleted]
  */
-function dbSyncRelationship($table, $target_column=null, $target=null, $list_column=null, $list=null)
+function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
 {
     $inserted = 0;
 
