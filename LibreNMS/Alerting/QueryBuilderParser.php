@@ -23,8 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
-
+namespace LibreNMS\Alerting;
 
 class QueryBuilderParser
 {

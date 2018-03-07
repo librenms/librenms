@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\QueryBuilderFilter;
+use LibreNMS\Alerting\QueryBuilderFilter;
 
 if (is_admin()) {
     $filters = json_encode(new QueryBuilderFilter('alert'));

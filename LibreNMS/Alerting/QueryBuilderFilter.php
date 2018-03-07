@@ -2,7 +2,7 @@
 /**
  * QueryBuilderFilter.php
  *
- * Creates filter for jQuery Query Builder
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
+namespace LibreNMS\Alerting;
 
-use Cache;
-use DB;
 use JsonSerializable;
 use LibreNMS\Config;
-use Settings;
 use Symfony\Component\Yaml\Yaml;
 
 class QueryBuilderFilter implements JsonSerializable
