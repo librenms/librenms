@@ -1,0 +1,22 @@
+[
+    [
+        "",
+        [],
+        ""
+    ],
+    [
+        "%sensors.sensor_current > %sensors.sensor_limit",
+        {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"}],"not":false,"valid":true},
+        "SELECT * FROM sensors WHERE sensors.device_id = ? AND sensors.sensors_current > sensors.sensors_limit"
+    ],
+    [
+        "%devices.hostname ~ \"@ocal@\" ",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"ocal"}],"not":false,"valid":true},
+        "SELECT * FROM devices WHERE devices.device_id = ? AND devices.hostname LIKE \"%ocal%\""
+    ],
+    [
+        "%devices.hostname ~ \".*ocal.*\" ",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regexp","value":".*ocal.*"}],"not":false,"valid":true},
+        "SELECT * FROM devices WHERE devices.device_id = ? AND devices.hostname REGEXP \".*ocal.*\""
+    ]
+]
