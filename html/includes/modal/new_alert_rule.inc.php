@@ -148,8 +148,8 @@ if (is_admin()) {
             }
         }).queryBuilder({
             plugins: [
-                'bt-tooltip-errors',
-                'not-group'
+                'bt-tooltip-errors'
+                // 'not-group'
             ],
 
             filters: <?php echo $filters; ?>,

@@ -16,7 +16,7 @@
     ],
     [
         "%devices.hostname ~ \".*ocal.*\" ",
-        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regexp","value":".*ocal.*"}],"not":false,"valid":true},
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":".*ocal.*"}],"not":false,"valid":true},
         "SELECT * FROM devices WHERE devices.device_id = ? AND devices.hostname REGEXP \".*ocal.*\""
     ]
 ]

@@ -25,11 +25,10 @@
 
 namespace LibreNMS\Alerting;
 
-use JsonSerializable;
 use LibreNMS\Config;
 use Symfony\Component\Yaml\Yaml;
 
-class QueryBuilderFilter implements JsonSerializable
+class QueryBuilderFilter implements \JsonSerializable
 {
     private $filter = [];
 
@@ -153,5 +152,22 @@ class QueryBuilderFilter implements JsonSerializable
     public function jsonSerialize()
     {
         return $this->filter;
+    }
+
+    /**
+     * Get the filter for a specific item
+     *
+     * @param string $id
+     * @return array|null
+     */
+    public function getFilter($id)
+    {
+        foreach ($this->filter as $filter) {
+            if ($filter['id'] == $id) {
+                return $filter;
+            }
+        }
+
+        return null;
     }
 }

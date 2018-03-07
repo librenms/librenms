@@ -50,6 +50,7 @@ class QueryBuilderParser
         'is_null' => "IS NULL",
         'is_not_null' => "IS NOT NULL",
         'regex' => 'REGEXP',
+        'not_regex' => 'NOT REGEXP',
     ];
 
     private $like_operators = [
@@ -59,6 +60,17 @@ class QueryBuilderParser
         'not_contains',
         'ends_with',
         'not_ends_with',
+    ];
+
+    private static $legacy_operators = [
+        '=' => 'equal',
+        '!=' => 'not_equal',
+        '~' => 'regex',
+        '!~' => 'not_regex',
+        '<' => 'less',
+        '>' => 'greater',
+        '<=' => 'less_or_equal',
+        '>=' => 'greater_or_equal',
     ];
 
 
@@ -74,14 +86,52 @@ class QueryBuilderParser
 
     public static function fromOld($query)
     {
+        $condition = null;
         $rules = [];
-        $tables = [];
-        preg_match_all('/%[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+/', $query, $fields);
+        $filter = new QueryBuilderFilter();
 
+        $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
 
-        var_dump($fields);
+        foreach ($split as $chunk) {
+            list($rule_text, $rule_operator) = $chunk;
+            if (!isset($condition)) {
+                // only allow one condition.  Since old rules had no grouping, this should hold logically
+                $condition = ($rule_operator == '||' ? 'OR' : 'AND');
+            }
 
-        return new static($rules);
+            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
+            $field = ltrim($field, '%');
+            $value = trim($value, '"');
+
+            if (starts_with($value, '%')) {
+                $value = '`' . ltrim($value, '%') . '`';
+            }
+
+            $filter_item = $filter->getFilter($field);
+
+            $type = $filter_item['type'];
+            $input = isset($filter_item['input']) ? $filter_item['input'] : 'text';
+            $operator = isset(self::$legacy_operators[$op]) ? self::$legacy_operators[$op] : 'equals';
+            $value = is_null($value) ? '1' : $value;
+
+            $rules[] = [
+                'id' => $field,
+                'field' => $field,
+                'type' => $type,
+                'input' => $input,
+                'operator' => $operator,
+                'value' => $value,
+            ];
+        }
+
+        $builder = [
+            'condition' => $condition,
+            'rules' => $rules,
+            'not' => false,
+            'valid' => true,
+        ];
+
+        return new static($builder);
     }
 
     public function toSql()
@@ -92,7 +142,7 @@ class QueryBuilderParser
         $params = array();
 
 
-        if(!array_key_exists('condition', $this->builder)) {
+        if (!array_key_exists('condition', $this->builder)) {
             throw new \Exception("Invalid data, missing condition");
         }
 
@@ -101,17 +151,17 @@ class QueryBuilderParser
         $counter = 0;
         $total = count($this->builder['rules']);
 
-        foreach($this->builder['rules'] as $index => $rule) {
-            if(array_key_exists('condition', $rule)) {
+        foreach ($this->builder['rules'] as $index => $rule) {
+            if (array_key_exists('condition', $rule)) {
                 $result .= $this->parseGroup($rule, $params);
                 $total--;
-                if($counter < $total) {
+                if ($counter < $total) {
                     $result .= " $global_bool_operator ";
                 }
             } else {
                 $result .= $this->parseRule($rule, $params);
                 $total--;
-                if($counter < $total) {
+                if ($counter < $total) {
                     $result .= " $global_bool_operator ";
                 }
             }
@@ -122,12 +172,13 @@ class QueryBuilderParser
 
     public function toJson()
     {
-        return $this->rules;
+        return $this->builder;
     }
 
     /**
      * Parse a group of conditions */
-    private function parseGroup($rule, &$param) {
+    private function parseGroup($rule, &$param)
+    {
         $parseResult = "(";
         $bool_operator = $rule['condition'];
         // counters to avoid boolean operator at the end of the cycle
@@ -135,34 +186,36 @@ class QueryBuilderParser
         $counter = 0;
         $total = count($rule['rules']);
 
-        foreach($rule['rules'] as $i => $r) {
-            if(array_key_exists('condition', $r)) {
-                $parseResult .= "\n".$this->parseGroup($r, $param);
+        foreach ($rule['rules'] as $i => $r) {
+            if (array_key_exists('condition', $r)) {
+                $parseResult .= "\n" . $this->parseGroup($r, $param);
             } else {
                 $parseResult .= $this->parseRule($r, $param);
                 $total--;
-                if($counter < $total)
-                    $parseResult .= " ".$bool_operator." ";
+                if ($counter < $total) {
+                    $parseResult .= " " . $bool_operator . " ";
+                }
             }
         }
 
-        return $parseResult.")";
+        return $parseResult . ")";
     }
 
     /**
      * Parsing of a single condition */
-    private function parseRule($rule, &$param) {
+    private function parseRule($rule, &$param)
+    {
 
         global $fields, $operators;
 
         $parseResult = "";
-        $parseResult .= $fields[$rule['id']]." ";
+        $parseResult .= $fields[$rule['id']] . " ";
 
-        if($this->isLikeOp($rule['operator'])) {
+        if ($this->isLikeOp($rule['operator'])) {
             $parseResult .= $this->setLike($rule['operator'], $rule['value'], $param);
         } else {
             $param[] = array($rule['type'][0] => $rule['value']);
-            $parseResult .= $operators[$rule['operator']]." ?";
+            $parseResult .= $operators[$rule['operator']] . " ?";
         }
         return $parseResult;
     }
