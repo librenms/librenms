@@ -96,10 +96,10 @@ if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_
             'alert_rules',
             'id=?',
             array($rule_id)
-        ) >= 0) {
+        ) > 0) {
             $message = "Edited Rule: <i>$name</i>";
         } else {
-            $messsage = "Failed to edit Rule <i>$name</i>";
+            $message = "Failed to edit Rule <i>$name</i>";
             $status   = 'error';
         }
     } else {
