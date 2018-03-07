@@ -23,14 +23,25 @@
  * @subpackage Frontpage
  */
 
+/**
+ * Fullscreen variant
+ * I have mostly axed a lot of stuff and added a tiny bit of CSS
+ * To make use of this, your config.php needs to contain
+ * something like this:
+
+$config['front_page'] = "pages/front/fullscreenmap.php";
+$config['map']['engine'] = 'leaflet';
+$config['leaflet']['default_zoom'] = 5;
+$config['leaflet']['default_lat'] = 65.3258792;
+$config['leaflet']['default_lng'] = 14.1115485;
+
+ */
 
 if ($config['map']['engine'] == 'leaflet') {
     require_once 'includes/common/worldmap.inc.php';
     echo implode('', $common_output);
-} else {
-//    echo "This works with map engine leaflet only"
-    }
-
+} 
+/* Yes, this code requires the leaflet map engine  */
 ?>
 
 <link href="css/fullscreenmap.css" rel="stylesheet" type="text/css" />
