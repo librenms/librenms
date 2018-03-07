@@ -261,7 +261,7 @@ if (is_admin()) {
                 $.ajax({
                     type: "POST",
                     url: "ajax_form.php",
-                    data: {type: "parse-alert-rule", alert_id: rule_id },
+                    data: { type: "parse-alert-rule", alert_id: rule_id },
                     dataType: "json",
                     success: function (data) {
                         loadRule(data);

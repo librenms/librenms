@@ -27,6 +27,15 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     $rule = $tmp_rules[$template_id];
 }
 if (is_array($rule)) {
+    if (empty($rule['query_builder'])) {
+        $sql_query = $rule['rule'];
+        $sql_query = str_replace('&&', 'AND', $sql_query);
+        $sql_query = str_replace('||', 'OR', $sql_query);
+        $sql_query = str_replace('%', '', $sql_query);
+        $sql_query = str_replace('"', "'", $sql_query);
+        $sql_query = str_replace('~', "REGEXP", $sql_query);
+        $rule['query_builder'] = $sql_query;
+    }
     $output             = array(
         'severity'      => $rule['severity'],
         'extra'         => $rule['extra'],
