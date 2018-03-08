@@ -30,6 +30,16 @@ use Symfony\Component\Yaml\Yaml;
 
 class QueryBuilderParser implements \JsonSerializable
 {
+    private static $table_blacklist = [
+        'devices_perms',
+        'bill_perms',
+        'ports_perms',
+    ];
+
+    private static $key_aliases = [
+        'app_id' => 'applications',
+    ];
+
     private static $legacy_operators = [
         '=' => 'equal',
         '!=' => 'not_equal',
@@ -72,29 +82,31 @@ class QueryBuilderParser implements \JsonSerializable
     ];
 
     private $builder = [];
-    private $tables = [];
 
     private function __construct(array $builder)
     {
         $this->builder = $builder;
-        $this->tables = $this->findTables($builder);
     }
 
     // FIXME macros
-    public function findTables($rules)
+    public function getTables()
     {
-        $tables = [];
+        if (!isset($this->tables)) {
+            $tables = [];
 
-        foreach ($rules['rules'] as $rule) {
-            if (array_key_exists('rules', $rule)) {
-                $tables = array_merge($tables, $this->findTables($rule));
-            } elseif (str_contains($rule['field'], '.')) {
-                list($table, $column) = explode('.', $rule['field']);
-                $tables[] = $table;
+            foreach ($this->builder['rules'] as $rule) {
+                if (array_key_exists('rules', $rule)) {
+                    $tables = array_merge($tables, $this->findTables($rule));
+                } elseif (str_contains($rule['field'], '.')) {
+                    list($table, $column) = explode('.', $rule['field']);
+                    $tables[] = $table;
+                }
             }
+
+            $this->tables = array_keys(array_flip($tables));
         }
 
-        return array_keys(array_flip($tables));
+        return $this->tables;
     }
 
     public static function fromJson($json)
@@ -219,23 +231,184 @@ class QueryBuilderParser implements \JsonSerializable
         return $sql;
     }
 
+    private function mapRecursive(array $tables, $target, $history = [])
+    {
+        $relationships = $this->getTableRelationships();
+
+        d_echo("Starting Tables: " . json_encode($tables) . PHP_EOL);
+        if (!empty($history)) {
+            $tables = array_diff($tables, $history);
+            d_echo("Filtered Tables: " . json_encode($tables) . PHP_EOL);
+        }
+
+        foreach ($tables as $table) {
+            $table_relations = $relationships[$table];
+            $path = [$table];
+            d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
+
+            if (!empty($table_relations)) {
+                if (in_array($target, $relationships[$table])) {
+                    d_echo("Found in $table\n");
+                    return $path; // found it
+                } else {
+                    $recurse = $this->mapRecursive($relationships[$table], $target, array_merge($history, $tables));
+                    if ($recurse) {
+                        $path = array_merge($path, $recurse);
+                        return $path;
+                    }
+                }
+            } else {
+                $relations = array_keys(array_filter($relationships, function ($related) use ($table) {
+                    return in_array($table, $related);
+                }));
+
+                d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
+                $recurse = $this->mapRecursive($relations, $target, array_merge($history, $tables));
+                if ($recurse) {
+                    $path = array_merge($path, $recurse);
+                    return $path;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function buildMap(array $start, $target = 'devices')
+    {
+        d_echo("Searching for target: $target, starting with $start\n");
+
+        if (in_array($target, $start)) {
+            // um, yeah, we found it...
+            return [$target];
+        }
+
+        return $this->mapRecursive($start, $target);
+    }
+
+    private function getSchema()
+    {
+        if (!isset($this->schema)) {
+            $this->schema = Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
+        }
+
+        return $this->schema;
+    }
+
+    public function getTableFromKey($key)
+    {
+        if (ends_with($key, '_id')) {
+            // hardcoded
+            if ($key == 'app_id') {
+                return 'applications';
+            }
+
+            // try to guess assuming key_id = keys table
+            $guessed_table = substr($key, 0, -3);
+
+            if (!ends_with($guessed_table, 's')) {
+                if (ends_with($guessed_table, 'x')) {
+                    $guessed_table .= 'es';
+                } else {
+                    $guessed_table .= 's';
+                }
+            }
+
+            if (array_key_exists($guessed_table, $this->getSchema())) {
+                return $guessed_table;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the primary key column(s) for a table
+     *
+     * @param string $table
+     * @return string|array if a single column just the name is returned, otherwise an array of column names
+     */
+    public function getPrimaryKey($table) {
+        $schema = $this->getSchema();
+
+        $columns = $schema[$table]['Indexes']['PRIMARY']['Columns'];
+
+        if (count($columns) == 1) {
+            return reset($columns);
+        }
+
+        return $columns;
+    }
+
+    public function getTableRelationships()
+    {
+        if (!isset($this->relationships)) {
+            $schema = $this->getSchema();
+
+            $relations = array_column(array_map(function ($table, $data) {
+                $columns = array_column($data['Columns'], 'Field');
+
+                $related = array_filter(array_map(function ($column) use ($table) {
+                    $guess = $this->getTableFromKey($column);
+                    if ($guess != $table) {
+                        return $guess;
+                    }
+
+                    return null;
+                }, $columns));
+//            echo "$table:";
+//            var_dump($valid_parents);
+
+                return [$table, $related];
+            }, array_keys($schema), $schema), 1, 0);
+
+            // filter out blacklisted tables
+            $this->relationships = array_diff_key($relations, array_flip(self::$table_blacklist));
+        }
+
+        return $this->relationships;
+    }
+
+    public function columnExists($table, $column)
+    {
+        $schema = $this->getSchema();
+
+        $fields = array_column($schema[$table]['Columns'], 'Field');
+
+        return in_array($column, $fields);
+    }
+
     public function generateGlue($target = 'device_id')
     {
-        if (array_key_exists('devices', $this->tables)) {
+        $tables = $this->getTables();  // get all tables in query
+
+        if (array_key_exists('devices', $tables)) {
             return 'devices.device_id = ?';
         }
 
-        $schema = Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
-        $schema = array_map(function ($data) {
-            return array_column($data['Columns'], 'Field');
-        }, $schema);
+        $glues = $this->buildMap($tables, $target);
 
-        $glues = [];
-        $possible_id_fields = [];
+        $where = [];
 
-        $glues = $this->recursiveGlue($target, array_keys($this->tables), $schema);
+        // scan through in pairs
+        for ($i = 1; $i < count($glues); $i++) {
+            $left = $glues[$i - 1];
+            $right = $glues[$i];
 
-        return $glues;
+            $rkey = $this->getPrimaryKey($right);
+            $lkey = $rkey;
+
+            if (!$this->columnExists($left, $lkey)) {
+                $lkey = rtrim($right, 's') . '_id';
+                if (!$this->columnExists($left, $lkey)) {
+                    throw new \Exception('FIXME');
+                }
+            }
+
+            $sql[] = "`$left`.`$lkey` = `$right`.`$rkey`";
+        }
+
+        return '(' . implode(' AND ', $where) . ')';
     }
 
     private function recursiveGlue($target = 'device_id', $tables, $schema, $depth = 0, $limit = 30)
