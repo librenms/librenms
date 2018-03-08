@@ -61,12 +61,12 @@
   {
     "name": "State Sensor Critical",
     "default": true,
-    "sql": "macros.state_sensor_critical"
+    "sql": "macros.state_sensor_critical = 1"
   },
   {
     "name": "State Sensor Warning",
     "default": false,
-    "sql": "macros.state_sensor_warning"
+    "sql": "macros.state_sensor_warning = 1"
   },
   {
     "name": "Quota bills over 75% used",
