@@ -7,7 +7,7 @@ modules:
                     oid: lenovoEnvMibPowerSupplyEntry
                     value: lenovoEnvMibPowerSupplyState
                     num_oid: .1.3.6.1.4.1.19046.2.3.11.1.1.1.5.
-                    descr: lenovoEnvMibPowerSupplyID
+                    descr: 'PS{{ $lenovoEnvMibPowerSupplyID }}'
                     index: 'lenovoEnvMibPowerSupplyState.{{ $index }}'
                     states:
                         - { value: 0, descr: off, graph: 1, generic: 1 }
