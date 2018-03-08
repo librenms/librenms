@@ -43,11 +43,16 @@ if ($proxy = getenv("HTTPS_PROXY") ?: getenv("https_proxy")) {
 
 $exec = false;
 
-$path_exec = shell_exec("which composer 2> /dev/null");
-if (!empty($path_exec)) {
-    $exec = trim($path_exec);
-} elseif (is_file($install_dir . '/composer.phar')) {
+if (is_file($install_dir . '/composer.phar')) {
     $exec = 'php ' . $install_dir . '/composer.phar';
+
+    // self-update
+    $output = shell_exec("$exec self-update 2>&1");
+    foreach (explode(PHP_EOL, $output) as $line) {
+        if (strpos($line, 'Updat') !== false) {
+            echo $line . PHP_EOL;
+        }
+    }
 } else {
     if ($proxy) {
         $stream_default_opts = array(
@@ -73,6 +78,14 @@ if (!empty($path_exec)) {
         echo "Corrupted download.\n";
     }
     @unlink('composer-setup.php');
+}
+
+// if nothing else, use system supplied composer
+if (!$exec) {
+    $path_exec = trim(shell_exec("which composer 2> /dev/null"));
+    if ($path_exec) {
+        $exec = $path_exec;
+    }
 }
 
 if ($exec) {
