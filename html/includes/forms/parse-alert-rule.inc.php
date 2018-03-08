@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
+
 if (is_admin() === false) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
@@ -23,40 +25,38 @@ $template_id = $_POST['template_id'];
 if (is_numeric($alert_id) && $alert_id > 0) {
     $rule = dbFetchRow('SELECT * FROM `alert_rules` WHERE `id` = ? LIMIT 1', [$alert_id]);
 
-    $map = [];
+    $maps = [];
 
     $devices = dbFetchRows('SELECT `device_id`, `hostname`, `sysName` FROM `alert_device_map` LEFT JOIN `devices` USING (`device_id`) WHERE `rule_id`=?', [$alert_id]);
     foreach ($devices as $device) {
-        $map[] = ['id' => $device['device_id'], 'text' => format_hostname($device)];
+        $maps[] = ['id' => $device['device_id'], 'text' => format_hostname($device)];
     }
 
     $groups = dbFetchRows('SELECT `group_id`, `name` FROM `alert_group_map` LEFT JOIN `device_groups` ON `device_groups`.`id`=`alert_group_map`.`group_id` WHERE `rule_id`=?', [$alert_id]);
     foreach ($groups as $group) {
-        $map[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
+        $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
     }
 } elseif (is_numeric($template_id) && $template_id >= 0) {
     $tmp_rules = get_rules_from_json();
     $rule = $tmp_rules[$template_id];
-    $map = [];
+    $maps = [];
 }
+
 if (is_array($rule)) {
-    if (empty($rule['query_builder'])) {
-        $sql_query = $rule['rule'];
-        $sql_query = str_replace('&&', 'AND', $sql_query);
-        $sql_query = str_replace('||', 'OR', $sql_query);
-        $sql_query = str_replace('%', '', $sql_query);
-        $sql_query = str_replace('"', "'", $sql_query);
-        $sql_query = str_replace('~', "REGEXP", $sql_query);
-        $rule['query_builder'] = $sql_query;
+    if (empty($rule['builder'])) {
+        // convert old rules when editing
+        $builder = QueryBuilderParser::fromOld($rule['rule'])->toArray();
+    } else {
+        $builder = json_decode($rule['builder']);
     }
-    $output = [
-        'extra'         => isset($rule['extra']) ? json_decode($rule['extra']) : null,
-        'map'           => $map,
-        'name'          => $rule['name'],
-        'proc'          => $rule['proc'],
-        'query_builder' => $rule['query_builder'],
-        'severity'      => $rule['severity'],
-    ];
+
     header('Content-type: application/json');
-    echo json_encode($output);
+    echo json_encode([
+        'extra'    => isset($rule['extra']) ? json_decode($rule['extra']) : null,
+        'maps'     => $maps,
+        'name'     => $rule['name'],
+        'proc'     => $rule['proc'],
+        'builder'  => $builder,
+        'severity' => $rule['severity'],
+    ]);
 }

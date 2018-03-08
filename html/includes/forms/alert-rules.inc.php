@@ -35,17 +35,17 @@ if (is_admin() === false) {
 $status = 'ok';
 $message = '';
 
-$query_builder = $_POST['query'];
-$query         = GenSQLNew($query_builder);
-$rule_id       = $_POST['rule_id'];
-$count         = mres($_POST['count']);
-$delay         = mres($_POST['delay']);
-$interval      = mres($_POST['interval']);
-$mute          = mres($_POST['mute']);
-$invert        = mres($_POST['invert']);
-$name          = mres($_POST['name']);
-$proc          = mres($_POST['proc']);
-$severity      = mres($_POST['severity']);
+$builder_json  = $_POST['builder_json'];
+$query    = 'SELECT 1;'; //GenSQLNew($builder); // FIXME
+$rule_id  = $_POST['rule_id'];
+$count    = mres($_POST['count']);
+$delay    = mres($_POST['delay']);
+$interval = mres($_POST['interval']);
+$mute     = mres($_POST['mute']);
+$invert   = mres($_POST['invert']);
+$name     = mres($_POST['name']);
+$proc     = mres($_POST['proc']);
+$severity = mres($_POST['severity']);
 
 if (!is_numeric($count)) {
     $count = '-1';
@@ -66,7 +66,7 @@ if ($invert == 'on') {
     $invert = false;
 }
 
-$extra      = array(
+$extra = array(
     'mute'     => $mute,
     'count'    => $count,
     'delay'    => $delay_sec,
@@ -84,7 +84,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
-            'query_builder' => $query_builder
+            'builder' => $builder_json
         ),
         'alert_rules',
         'id=?',
@@ -99,20 +99,20 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     if (empty($name)) {
         $status = 'error';
         $message = 'No rule name provided';
-    } elseif (empty($query_builder) || empty($query)) {
+    } elseif (empty($builder_json) || empty($query)) {
         $status  = 'error';
         $message = 'No rules provided';
     } else {
         $rule_id = dbInsert(array(
+            'rule' => '',
             'severity' => $severity,
             'extra' => $extra_json,
             'disabled' => 0,
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
-            'query_builder' => $query_builder
+            'builder' => $builder_json
         ), 'alert_rules');
-
 
         if ($rule_id) {
             $message = "Added Rule: <i>$name</i>";

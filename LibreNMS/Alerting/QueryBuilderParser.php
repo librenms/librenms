@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Alerting;
 
-class QueryBuilderParser
+class QueryBuilderParser implements \JsonSerializable
 {
     private $builder = [];
     private $rules = [];
@@ -101,18 +101,24 @@ class QueryBuilderParser
 
             list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
             $field = ltrim($field, '%');
-            $value = trim($value, '"');
 
-            if (starts_with($value, '%')) {
-                $value = '`' . ltrim($value, '%') . '`';
+            // for rules missing values just use '= 1'
+            $operator = isset(self::$legacy_operators[$op]) ? self::$legacy_operators[$op] : 'equal';
+            if (is_null($value)) {
+                $value = '1';
+            } else {
+                $value = trim($value, '"');
+
+                // value is a field, mark it with backticks
+                if (starts_with($value, '%')) {
+                    $value = '`' . ltrim($value, '%') . '`';
+                }
             }
 
             $filter_item = $filter->getFilter($field);
 
             $type = $filter_item['type'];
             $input = isset($filter_item['input']) ? $filter_item['input'] : 'text';
-            $operator = isset(self::$legacy_operators[$op]) ? self::$legacy_operators[$op] : 'equals';
-            $value = is_null($value) ? '1' : $value;
 
             $rules[] = [
                 'id' => $field,
@@ -127,7 +133,6 @@ class QueryBuilderParser
         $builder = [
             'condition' => $condition,
             'rules' => $rules,
-            'not' => false,
             'valid' => true,
         ];
 
@@ -170,7 +175,19 @@ class QueryBuilderParser
         return $result;
     }
 
-    public function toJson()
+    public function toArray()
+    {
+        return $this->builder;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
     {
         return $this->builder;
     }

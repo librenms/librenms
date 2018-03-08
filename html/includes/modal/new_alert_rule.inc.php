@@ -35,8 +35,7 @@ if (is_admin()) {
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="type" id="type" value="alert-rules">
                         <input type="hidden" name="template_id" id="template_id" value="">
-                        <input type="hidden" name="query" id="query" value="">
-                        <input type="hidden" name="json" id="json" value="">
+                        <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div class='form-group'>
                             <label for='name' class='col-sm-3 control-label'>Rule name: </label>
                             <div class='col-sm-9'>
@@ -178,32 +177,27 @@ if (is_admin()) {
 
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
-            var $builder = $('#builder');
-            var result_sql = $builder.queryBuilder('getSQL', false);
-            var result_json = $builder.queryBuilder('getRules');
-            if (result_sql) {
-                if (result_sql.sql.length) {
-                    $('#query').val(result_sql.sql);
-                    $('#json').val(JSON.stringify(result_json, null, 2));
-                    $.ajax({
-                        type: "POST",
-                        url: "ajax_form.php",
-                        data: $('form.alerts-form').serialize(),
-                        dataType: "json",
-                        success: function (data) {
-                            if (data.status == 'ok') {
-                                toastr.success(data.message);
-                                $('#create-alert').modal('hide');
-                                window.location.reload(); // FIXME: reload table
-                            } else {
-                                toastr.error(data.message);
-                            }
-                        },
-                        error: function () {
-                            toastr.error('Failed to process rule');
+            var result_json = $('#builder').queryBuilder('getRules');
+            if (result_json !== null && result_json.valid) {
+                $('#builder_json').val(JSON.stringify(result_json));
+                $.ajax({
+                    type: "POST",
+                    url: "ajax_form.php",
+                    data: $('form.alerts-form').serializeArray(),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == 'ok') {
+                            toastr.success(data.message);
+                            $('#create-alert').modal('hide');
+                            window.location.reload(); // FIXME: reload table
+                        } else {
+                            toastr.error(data.message);
                         }
-                    });
-                }
+                    },
+                    error: function () {
+                        toastr.error('Failed to process rule');
+                    }
+                });
             }
         });
         $('#import-query').on('click', function (e) {
@@ -275,17 +269,17 @@ if (is_admin()) {
         function loadRule(rule) {
             $('#name').val(rule.name);
             $('#proc').val(rule.proc);
-            $('#builder').queryBuilder("setRulesFromSQL", rule['query_builder']);
+            $('#builder').queryBuilder("setRules", rule.builder);
             $('#severity').val(rule.severity).trigger('change');
 
             var $maps = $('#maps');
             $maps.empty();
             $maps.val(null).trigger('change'); // clear
-            if (rule.map == null) {
+            if (rule.maps == null) {
                 // collection rule
                 setRuleDevice()
             } else {
-                $.each(rule.map, function(index, value) {
+                $.each(rule.maps, function(index, value) {
                     var option = new Option(value.text, value.id, true, true);
                     $maps.append(option).trigger('change')
                 });
