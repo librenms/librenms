@@ -267,7 +267,11 @@ class QueryBuilderParser implements \JsonSerializable
             }
         }
 
-        return false;
+        if (empty($glues)) {
+            return false;
+        }
+
+        return $glues;
     }
 
 
