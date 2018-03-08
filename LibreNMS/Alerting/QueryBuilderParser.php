@@ -25,12 +25,22 @@
 
 namespace LibreNMS\Alerting;
 
+use LibreNMS\Config;
+use Symfony\Component\Yaml\Yaml;
+
 class QueryBuilderParser implements \JsonSerializable
 {
-    private $builder = [];
-    private $rules = [];
-
-    private $operators = [
+    private static $legacy_operators = [
+        '=' => 'equal',
+        '!=' => 'not_equal',
+        '~' => 'regex',
+        '!~' => 'not_regex',
+        '<' => 'less',
+        '>' => 'greater',
+        '<=' => 'less_or_equal',
+        '>=' => 'greater_or_equal',
+    ];
+    private static $operators = [
         'equal' => "=",
         'not_equal' => "!=",
         'in' => "IN (?)",
@@ -52,8 +62,7 @@ class QueryBuilderParser implements \JsonSerializable
         'regex' => 'REGEXP',
         'not_regex' => 'NOT REGEXP',
     ];
-
-    private $like_operators = [
+    private static $like_operators = [
         'begins_with',
         'not_begins_with',
         'contains',
@@ -62,25 +71,38 @@ class QueryBuilderParser implements \JsonSerializable
         'not_ends_with',
     ];
 
-    private static $legacy_operators = [
-        '=' => 'equal',
-        '!=' => 'not_equal',
-        '~' => 'regex',
-        '!~' => 'not_regex',
-        '<' => 'less',
-        '>' => 'greater',
-        '<=' => 'less_or_equal',
-        '>=' => 'greater_or_equal',
-    ];
-
+    private $builder = [];
+    private $tables = [];
 
     private function __construct(array $builder)
     {
         $this->builder = $builder;
+        $this->tables = $this->findTables($builder);
     }
 
-    public static function fromJson(array $json)
+    // FIXME macros
+    public function findTables($rules)
     {
+        $tables = [];
+
+        foreach ($rules['rules'] as $rule) {
+            if (array_key_exists('rules', $rule)) {
+                $tables = array_merge($tables, $this->findTables($rule));
+            } elseif (str_contains($rule['field'], '.')) {
+                list($table, $column) = explode('.', $rule['field']);
+                $tables[] = $table;
+            }
+        }
+
+        return array_keys(array_flip($tables));
+    }
+
+    public static function fromJson($json)
+    {
+        if (!is_array($json)) {
+            $json = json_decode($json, true);
+        }
+
         return new static($json);
     }
 
@@ -99,7 +121,8 @@ class QueryBuilderParser implements \JsonSerializable
                 $condition = ($rule_operator == '||' ? 'OR' : 'AND');
             }
 
-            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
+            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2,
+                PREG_SPLIT_DELIM_CAPTURE);
             $field = ltrim($field, '%');
 
             // for rules missing values just use '= 1'
@@ -139,41 +162,112 @@ class QueryBuilderParser implements \JsonSerializable
         return new static($builder);
     }
 
-    public function toSql()
+    public function getRules()
     {
-        $jsonResult = array("data" => array());
-        $getAllResults = false;
-        $result = "";
-        $params = array();
 
+    }
 
-        if (!array_key_exists('condition', $this->builder)) {
-            throw new \Exception("Invalid data, missing condition");
+    public function toSql($expand = false)
+    {
+        if (empty($this->builder) || !array_key_exists('condition', $this->builder)) {
+            return null;
         }
 
-        $global_bool_operator = $this->builder['condition'];
-
-        $counter = 0;
-        $total = count($this->builder['rules']);
-
-        foreach ($this->builder['rules'] as $index => $rule) {
+        $result = [];
+        foreach ($this->builder['rules'] as $rule) {
             if (array_key_exists('condition', $rule)) {
-                $result .= $this->parseGroup($rule, $params);
-                $total--;
-                if ($counter < $total) {
-                    $result .= " $global_bool_operator ";
-                }
+                $result[] = $this->parseGroup($rule);
             } else {
-                $result .= $this->parseRule($rule, $params);
-                $total--;
-                if ($counter < $total) {
-                    $result .= " $global_bool_operator ";
+                $result[] = $this->parseRule($rule);
+            }
+        }
+
+        return implode(" {$this->builder['condition']} ", $result);
+    }
+
+    private function parseGroup($rule)
+    {
+        $group_rules = [];
+
+        foreach ($rule['rules'] as $group_rule) {
+            if (array_key_exists('condition', $group_rule)) {
+                $group_rules[] = $this->parseGroup($group_rule);
+            } else {
+                $group_rules[] = $this->parseRule($group_rule);
+            }
+        }
+
+        $sql = implode(" {$rule['condition']} ", $group_rules);
+        return "($sql)";
+    }
+
+    private function parseRule($rule)
+    {
+        $op = self::$operators[$rule['operator']];
+        $value = $rule['value'];
+
+        if (starts_with($value, '`') && ends_with($value, '`')) {
+            // pass through value such as field
+            $value = trim($value, '`');
+
+        } elseif ($rule['type'] != 'integer') {
+            $value = "\"$value\"";
+        }
+
+        $sql = "{$rule['field']} $op $value";
+
+        return $sql;
+    }
+
+    public function generateGlue($target = 'device_id')
+    {
+        if (array_key_exists('devices', $this->tables)) {
+            return 'devices.device_id = ?';
+        }
+
+        $schema = Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
+        $schema = array_map(function ($data) {
+            return array_column($data['Columns'], 'Field');
+        }, $schema);
+
+        $glues = [];
+        $possible_id_fields = [];
+
+        $glues = $this->recursiveGlue($target, array_keys($this->tables), $schema);
+
+        return $glues;
+    }
+
+    private function recursiveGlue($target = 'device_id', $tables, $schema, $glues = [], $depth = 0, $limit = 30)
+    {
+        if ($depth >= $limit) {
+            return false;
+        }
+
+        // breadth first
+        foreach ($tables as $table) {
+            if (in_array($target, $schema[$table])) {
+                $glues[] = [$table, $target];
+                return $glues;
+            }
+        }
+
+        // find keys to go deeper
+        foreach ($tables as $table) {
+            foreach ($schema[$table] as $column) {
+                if (ends_with($column, '_id')) {
+                    $result = $this->recursiveGlue($column, $this->tables, $schema, $glues, $depth + 1);
+                    if ($result !== false) {
+                        $glues[] = $result;
+                        return $glues;
+                    }
                 }
             }
         }
 
-        return $result;
+        return false;
     }
+
 
     public function toArray()
     {
@@ -191,60 +285,4 @@ class QueryBuilderParser implements \JsonSerializable
     {
         return $this->builder;
     }
-
-    /**
-     * Parse a group of conditions */
-    private function parseGroup($rule, &$param)
-    {
-        $parseResult = "(";
-        $bool_operator = $rule['condition'];
-        // counters to avoid boolean operator at the end of the cycle
-        // if there are no more conditions
-        $counter = 0;
-        $total = count($rule['rules']);
-
-        foreach ($rule['rules'] as $i => $r) {
-            if (array_key_exists('condition', $r)) {
-                $parseResult .= "\n" . $this->parseGroup($r, $param);
-            } else {
-                $parseResult .= $this->parseRule($r, $param);
-                $total--;
-                if ($counter < $total) {
-                    $parseResult .= " " . $bool_operator . " ";
-                }
-            }
-        }
-
-        return $parseResult . ")";
-    }
-
-    /**
-     * Parsing of a single condition */
-    private function parseRule($rule, &$param)
-    {
-
-        global $fields, $operators;
-
-        $parseResult = "";
-        $parseResult .= $fields[$rule['id']] . " ";
-
-        if ($this->isLikeOp($rule['operator'])) {
-            $parseResult .= $this->setLike($rule['operator'], $rule['value'], $param);
-        } else {
-            $param[] = array($rule['type'][0] => $rule['value']);
-            $parseResult .= $operators[$rule['operator']] . " ?";
-        }
-        return $parseResult;
-    }
-
-    private function isLikeOp($operator)
-    {
-        $like_ops = [
-            ''
-        ];
-
-        return in_array($operator, $like_ops);
-    }
-
-
 }

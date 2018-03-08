@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Alerting\QueryBuilderParser;
+
 $no_refresh = true;
 
 ?>
@@ -172,7 +174,13 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
-    echo '<i>'.htmlentities($rule['query_builder'] ?: $rule['rule']).'</i></td>';
+    if (empty($rule['builder'])) {
+        $rule_display = $rule['rule'];
+    } else {
+        $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql();
+    }
+    echo '<i>'.htmlentities($rule_display).'</i></td>';
+
     echo '<td>'.$rule['severity'].'</td>';
     echo "<td><span id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
@@ -181,7 +189,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
     echo '<td>';
-    if ($_SESSION['userlevel'] >= '10') {
+    if (is_admin()) {
         echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$popover_msg."' data-toggle='modal'>";
     }
 

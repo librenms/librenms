@@ -58,14 +58,16 @@ class QueryBuilderFilter implements \JsonSerializable
         krsort($macros);
 
         foreach ($macros as $key => $value) {
+            $field = 'macros.' . $key;
+
             if (ends_with($key, '_usage_perc')) {
-                $this->filter[] = [
-                    'id' => 'macros.' . $key,
+                $this->filter[$field] = [
+                    'id' => $field,
                     'type' => 'integer',
                 ];
             } else {
-                $this->filter[] = [
-                    'id' => 'macros.' . $key,
+                $this->filter[$field] = [
+                    'id' => $field,
                     'type' => 'integer',
                     'input' => 'radio',
                     'values' => ['1' => 'Yes', '0' => 'No'],
@@ -100,6 +102,8 @@ class QueryBuilderFilter implements \JsonSerializable
                     continue;
                 }
 
+                $field = "$table.$column";
+
                 // format enums as radios
                 if ($type == 'enum') {
                     $values = explode(',', substr($column_type, 4));
@@ -107,16 +111,16 @@ class QueryBuilderFilter implements \JsonSerializable
                         return trim($val, "()' ");
                     }, $values);
 
-                    $this->filter[] = [
-                        'id' => "$table.$column",
+                    $this->filter[$field] = [
+                        'id' => $field,
                         'type' => 'integer',
                         'input' => 'radio',
                         'values' => $values,
                         'operators' => ['equal'],
                     ];
                 } else {
-                    $this->filter[] = [
-                        'id' => "$table.$column",
+                    $this->filter[$field] = [
+                        'id' => $field,
                         'type' => $type,
                     ];
                 }
@@ -151,7 +155,7 @@ class QueryBuilderFilter implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return $this->filter;
+        return array_values($this->filter);
     }
 
     /**
@@ -162,10 +166,8 @@ class QueryBuilderFilter implements \JsonSerializable
      */
     public function getFilter($id)
     {
-        foreach ($this->filter as $filter) {
-            if ($filter['id'] == $id) {
-                return $filter;
-            }
+        if (array_key_exists($id, $this->filter)) {
+            return $this->filter[$id];
         }
 
         return null;
