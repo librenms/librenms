@@ -42,7 +42,7 @@ $config['leaflet']['default_lng'] = 14.1115485;
 if ($config['map']['engine'] == 'leaflet') {
     require_once 'includes/common/worldmap.inc.php';
     echo implode('', $common_output);
-} 
+}
 /* Yes, this code requires the leaflet map engine  */
 ?>
 
