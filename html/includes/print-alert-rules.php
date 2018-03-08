@@ -313,11 +313,4 @@ function changePage(page,e) {
     $('#result_form').submit();
 }
 
-function newRule(data, e) {
-    $('#template_id').val(data.value);
-    $('#create-alert').modal({
-        show: true
-    });
-}
-
 </script>

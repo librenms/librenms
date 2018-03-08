@@ -25,7 +25,7 @@ if (is_admin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Create">Alert Rules</h5>
+                    <h5 class="modal-title" id="Create">Alert Rules :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
                 </div>
                 <div class="modal-body">
 
@@ -39,7 +39,7 @@ if (is_admin()) {
                         <div class='form-group'>
                             <label for='name' class='col-sm-3 control-label'>Rule name: </label>
                             <div class='col-sm-9'>
-                                <input type='text' id='name' name='name' class='form-control' maxlength='200'>
+                                <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -70,7 +70,7 @@ if (is_admin()) {
                         </div>
                         <div class="form-group">
                             <label for='severity' class='col-sm-3 control-label'>Severity: </label>
-                            <div class="col-sm-9">
+                            <div class="col-sm-2">
                                 <select name='severity' id='severity' class='form-control'>
                                     <option value='ok'>OK</option>
                                     <option value='warning'>Warning</option>
@@ -81,7 +81,7 @@ if (is_admin()) {
                         <div class="form-group form-inline">
                             <label for='count' class='col-sm-3 control-label'>Max alerts: </label>
                             <div class="col-sm-2">
-                                <input type='text' id='count' name='count' class='form-control' size="4">
+                                <input type='text' id='count' name='count' class='form-control' size="4" value="123">
                             </div>
                             <div class="col-sm-3">
                                 <label for='delay' class='control-label' style="vertical-align: top;">Delay: </label>
@@ -111,7 +111,7 @@ if (is_admin()) {
                         <div class='form-group'>
                             <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
                             <div class='col-sm-5'>
-                                <input type='text' id='proc' name='proc' class='form-control' maxlength='80'>
+                                <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
                             </div>
                         </div>
                         <div class="form-group">
@@ -258,6 +258,9 @@ if (is_admin()) {
                 $("#mute").bootstrapSwitch('state', false);
                 $("#invert").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
+                $('#count').val('-1');
+                $('#delay').val('5 m');
+                $('#interval').val('5 m');
 
                 var $maps = $('#maps');
                 $maps.empty();
@@ -310,6 +313,8 @@ if (is_admin()) {
 
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
+            } else {
+                $('#count').val('-1');
             }
         }
 
