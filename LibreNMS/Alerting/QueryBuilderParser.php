@@ -238,11 +238,13 @@ class QueryBuilderParser implements \JsonSerializable
         return $glues;
     }
 
-    private function recursiveGlue($target = 'device_id', $tables, $schema, $glues = [], $depth = 0, $limit = 30)
+    private function recursiveGlue($target = 'device_id', $tables, $schema, $depth = 0, $limit = 30)
     {
         if ($depth >= $limit) {
             return false;
         }
+
+        $glues = [];
 
         // breadth first
         foreach ($tables as $table) {
@@ -252,14 +254,14 @@ class QueryBuilderParser implements \JsonSerializable
             }
         }
 
+        // TODO track searched keys
         // find keys to go deeper
         foreach ($tables as $table) {
             foreach ($schema[$table] as $column) {
                 if (ends_with($column, '_id')) {
                     $result = $this->recursiveGlue($column, $this->tables, $schema, $glues, $depth + 1);
                     if ($result !== false) {
-                        $glues[] = $result;
-                        return $glues;
+                        return array_merge($glues, $result);
                     }
                 }
             }
