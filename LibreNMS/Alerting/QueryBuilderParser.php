@@ -274,16 +274,28 @@ class QueryBuilderParser implements \JsonSerializable
         return false;
     }
 
-    public function buildMap(array $start, $target = 'devices')
+    public function buildMap($start, $target = 'devices')
     {
         d_echo("Searching for target: $target, starting with $start\n");
 
-        if (in_array($target, $start)) {
+        if ($start == $target) {
             // um, yeah, we found it...
             return [$target];
         }
 
-        return $this->mapRecursive($start, $target);
+        $path = $this->mapRecursive([$start], $target);
+
+        if ($path === false) {
+            return $path;
+        }
+
+        $pairs = [];
+        // scan through in pairs
+        for ($i = 1; $i < count($path); $i++) {
+            $pairs[] = [$path[$i -1], $path[$i]];
+        }
+
+        return $pairs;
     }
 
     private function getSchema()
@@ -386,14 +398,18 @@ class QueryBuilderParser implements \JsonSerializable
             return 'devices.device_id = ?';
         }
 
-        $glues = $this->buildMap($tables, $target);
+        $glues = [];
+        foreach ($tables as $table) {
+            $glue = $this->buildMap($table, $target);
+            var_dump($glue);exit;
+            $glues = array_merge($glues, $glue);
+        }
+        $glues = array_unique($glues);
 
         $where = [];
 
-        // scan through in pairs
-        for ($i = 1; $i < count($glues); $i++) {
-            $left = $glues[$i - 1];
-            $right = $glues[$i];
+        foreach ($glues as $glue) {
+            list($left, $right) = $glue;
 
             $rkey = $this->getPrimaryKey($right);
             $lkey = $rkey;
@@ -410,43 +426,6 @@ class QueryBuilderParser implements \JsonSerializable
 
         return '(' . implode(' AND ', $where) . ')';
     }
-
-    private function recursiveGlue($target = 'device_id', $tables, $schema, $depth = 0, $limit = 30)
-    {
-        if ($depth >= $limit) {
-            return false;
-        }
-
-        $glues = [];
-
-        // breadth first
-        foreach ($tables as $table) {
-            if (in_array($target, $schema[$table])) {
-                $glues[] = [$table, $target];
-                return $glues;
-            }
-        }
-
-        // TODO track searched keys
-        // find keys to go deeper
-        foreach ($tables as $table) {
-            foreach ($schema[$table] as $column) {
-                if (ends_with($column, '_id')) {
-                    $result = $this->recursiveGlue($column, $this->tables, $schema, $glues, $depth + 1);
-                    if ($result !== false) {
-                        return array_merge($glues, $result);
-                    }
-                }
-            }
-        }
-
-        if (empty($glues)) {
-            return false;
-        }
-
-        return $glues;
-    }
-
 
     public function toArray()
     {
