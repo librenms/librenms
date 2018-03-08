@@ -27,6 +27,11 @@
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
+if (!is_writable(getenv('HOME'))) {
+    // set COMPOSER_HOME in case HOME isn't set or writable
+    putenv("COMPOSER_HOME=$install_dir/.composer");
+}
+
 $use_https = true;
 // Set up proxy if needed, check git config for proxies too
 if ($proxy = getenv("HTTPS_PROXY") ?: getenv("https_proxy")) {
@@ -43,16 +48,17 @@ if ($proxy = getenv("HTTPS_PROXY") ?: getenv("https_proxy")) {
 
 $exec = false;
 
+$extra_args = '';
+if (php_sapi_name() == 'cli' && isset($_SERVER['TERM'])) {
+    // running interactively, set output to ansi
+    $extra_args .= ' --ansi';
+}
+
 if (is_file($install_dir . '/composer.phar')) {
     $exec = 'php ' . $install_dir . '/composer.phar';
 
     // self-update
-    $output = shell_exec("$exec self-update 2>&1");
-    foreach (explode(PHP_EOL, $output) as $line) {
-        if (strpos($line, 'Updat') !== false) {
-            echo $line . PHP_EOL;
-        }
-    }
+    passthru("$exec self-update -q" . $extra_args);
 } else {
     if ($proxy) {
         $stream_default_opts = array(
@@ -89,7 +95,7 @@ if (!$exec) {
 }
 
 if ($exec) {
-    passthru("$exec " . implode(' ', array_splice($argv, 1)) . ' 2>&1');
+    passthru("$exec " . implode(' ', array_splice($argv, 1)) . "$extra_args 2>&1");
 } else {
     echo "Composer not available, please manually install composer.\n";
 }
