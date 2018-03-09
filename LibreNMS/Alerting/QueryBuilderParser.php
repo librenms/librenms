@@ -25,21 +25,10 @@
 
 namespace LibreNMS\Alerting;
 
-use LibreNMS\Config;
-use Symfony\Component\Yaml\Yaml;
+use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
 {
-    private static $table_blacklist = [
-        'devices_perms',
-        'bill_perms',
-        'ports_perms',
-    ];
-
-    private static $key_aliases = [
-        'app_id' => 'applications',
-    ];
-
     private static $legacy_operators = [
         '=' => 'equal',
         '!=' => 'not_equal',
@@ -81,22 +70,27 @@ class QueryBuilderParser implements \JsonSerializable
         'not_ends_with',
     ];
 
-    private $builder = [];
+    private $builder;
+    private $schema;
 
     private function __construct(array $builder)
     {
         $this->builder = $builder;
+        $this->schema = new Schema();
     }
 
     // FIXME macros
-    public function getTables()
+    public function getTables($rules = null)
     {
         if (!isset($this->tables)) {
             $tables = [];
+            if (is_null($rules)) {
+                $rules = $this->builder['rules'];
+            }
 
-            foreach ($this->builder['rules'] as $rule) {
+            foreach ($rules as $rule) {
                 if (array_key_exists('rules', $rule)) {
-                    $tables = array_merge($tables, $this->findTables($rule));
+                    $tables = array_merge($tables, $this->getTables($rule));
                 } elseif (str_contains($rule['field'], '.')) {
                     list($table, $column) = explode('.', $rule['field']);
                     $tables[] = $table;
@@ -231,162 +225,6 @@ class QueryBuilderParser implements \JsonSerializable
         return $sql;
     }
 
-    private function findPathRecursive(array $tables, $target, $history = [])
-    {
-        $relationships = $this->getTableRelationships();
-
-        d_echo("Starting Tables: " . json_encode($tables) . PHP_EOL);
-        if (!empty($history)) {
-            $tables = array_diff($tables, $history);
-            d_echo("Filtered Tables: " . json_encode($tables) . PHP_EOL);
-        }
-
-        foreach ($tables as $table) {
-            $table_relations = $relationships[$table];
-            $path = [$table];
-            d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
-
-            if (!empty($table_relations)) {
-                if (in_array($target, $relationships[$table])) {
-                    d_echo("Found in $table\n");
-                    return $path; // found it
-                } else {
-                    $recurse = $this->findPathRecursive($relationships[$table], $target, array_merge($history, $tables));
-                    if ($recurse) {
-                        $path = array_merge($path, $recurse);
-                        return $path;
-                    }
-                }
-            } else {
-                $relations = array_keys(array_filter($relationships, function ($related) use ($table) {
-                    return in_array($table, $related);
-                }));
-
-                d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
-                $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
-                if ($recurse) {
-                    $path = array_merge($path, $recurse);
-                    return $path;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public function findRelationshipPath($start, $target = 'devices')
-    {
-        d_echo("Searching for target: $target, starting with $start\n");
-
-        if ($start == $target) {
-            // um, yeah, we found it...
-            return [$target];
-        }
-
-        $path = $this->findPathRecursive([$start], $target);
-
-        if ($path === false) {
-            return $path;
-        }
-
-        if (count($path) == 1) {
-            return true;
-        }
-
-        return $path;
-    }
-
-    private function getSchema()
-    {
-        if (!isset($this->schema)) {
-            $this->schema = Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
-        }
-
-        return $this->schema;
-    }
-
-    public function getTableFromKey($key)
-    {
-        if (ends_with($key, '_id')) {
-            // hardcoded
-            if ($key == 'app_id') {
-                return 'applications';
-            }
-
-            // try to guess assuming key_id = keys table
-            $guessed_table = substr($key, 0, -3);
-
-            if (!ends_with($guessed_table, 's')) {
-                if (ends_with($guessed_table, 'x')) {
-                    $guessed_table .= 'es';
-                } else {
-                    $guessed_table .= 's';
-                }
-            }
-
-            if (array_key_exists($guessed_table, $this->getSchema())) {
-                return $guessed_table;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the primary key column(s) for a table
-     *
-     * @param string $table
-     * @return string|array if a single column just the name is returned, otherwise an array of column names
-     */
-    public function getPrimaryKey($table) {
-        $schema = $this->getSchema();
-
-        $columns = $schema[$table]['Indexes']['PRIMARY']['Columns'];
-
-        if (count($columns) == 1) {
-            return reset($columns);
-        }
-
-        return $columns;
-    }
-
-    public function getTableRelationships()
-    {
-        if (!isset($this->relationships)) {
-            $schema = $this->getSchema();
-
-            $relations = array_column(array_map(function ($table, $data) {
-                $columns = array_column($data['Columns'], 'Field');
-
-                $related = array_filter(array_map(function ($column) use ($table) {
-                    $guess = $this->getTableFromKey($column);
-                    if ($guess != $table) {
-                        return $guess;
-                    }
-
-                    return null;
-                }, $columns));
-//            echo "$table:";
-//            var_dump($valid_parents);
-
-                return [$table, $related];
-            }, array_keys($schema), $schema), 1, 0);
-
-            // filter out blacklisted tables
-            $this->relationships = array_diff_key($relations, array_flip(self::$table_blacklist));
-        }
-
-        return $this->relationships;
-    }
-
-    public function columnExists($table, $column)
-    {
-        $schema = $this->getSchema();
-
-        $fields = array_column($schema[$table]['Columns'], 'Field');
-
-        return in_array($column, $fields);
-    }
 
     public function generateGlue($target = 'devices')
     {
@@ -395,7 +233,7 @@ class QueryBuilderParser implements \JsonSerializable
         $singles = [];
         $chains = [];
         foreach ($tables as $table) {
-            $path = $this->findRelationshipPath($table, $target);
+            $path = $this->schema->findRelationshipPath($table, $target);
 
             if ($path === true) {
                 // just a single table
@@ -447,12 +285,12 @@ class QueryBuilderParser implements \JsonSerializable
 
     private function getGlue($table1, $table2)
     {
-        $key2 = $this->getPrimaryKey($table2);
+        $key2 = $this->schema->getPrimaryKey($table2);
         $key1 = $key2;
 
-        if (!$this->columnExists($table1, $key1)) {
+        if (!$this->schema->columnExists($table1, $key1)) {
             $key1 = rtrim($table2, 's') . '_id';
-            if (!$this->columnExists($table1, $key1)) {
+            if (!$this->schema->columnExists($table1, $key1)) {
                 throw new \Exception("FIXME: Could not make glue from $table1 to $table2");
             }
         }
