@@ -231,7 +231,7 @@ class QueryBuilderParser implements \JsonSerializable
         return $sql;
     }
 
-    private function mapRecursive(array $tables, $target, $history = [])
+    private function findPathRecursive(array $tables, $target, $history = [])
     {
         $relationships = $this->getTableRelationships();
 
@@ -251,7 +251,7 @@ class QueryBuilderParser implements \JsonSerializable
                     d_echo("Found in $table\n");
                     return $path; // found it
                 } else {
-                    $recurse = $this->mapRecursive($relationships[$table], $target, array_merge($history, $tables));
+                    $recurse = $this->findPathRecursive($relationships[$table], $target, array_merge($history, $tables));
                     if ($recurse) {
                         $path = array_merge($path, $recurse);
                         return $path;
@@ -263,7 +263,7 @@ class QueryBuilderParser implements \JsonSerializable
                 }));
 
                 d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
-                $recurse = $this->mapRecursive($relations, $target, array_merge($history, $tables));
+                $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
                 if ($recurse) {
                     $path = array_merge($path, $recurse);
                     return $path;
@@ -274,7 +274,7 @@ class QueryBuilderParser implements \JsonSerializable
         return false;
     }
 
-    public function buildMap($start, $target = 'devices')
+    public function findRelationshipPath($start, $target = 'devices')
     {
         d_echo("Searching for target: $target, starting with $start\n");
 
@@ -283,19 +283,17 @@ class QueryBuilderParser implements \JsonSerializable
             return [$target];
         }
 
-        $path = $this->mapRecursive([$start], $target);
+        $path = $this->findPathRecursive([$start], $target);
 
         if ($path === false) {
             return $path;
         }
 
-        $pairs = [];
-        // scan through in pairs
-        for ($i = 1; $i < count($path); $i++) {
-            $pairs[] = [$path[$i -1], $path[$i]];
+        if (count($path) == 1) {
+            return true;
         }
 
-        return $pairs;
+        return $path;
     }
 
     private function getSchema()
@@ -390,41 +388,76 @@ class QueryBuilderParser implements \JsonSerializable
         return in_array($column, $fields);
     }
 
-    public function generateGlue($target = 'device_id')
+    public function generateGlue($target = 'devices')
     {
         $tables = $this->getTables();  // get all tables in query
 
-        if (array_key_exists('devices', $tables)) {
-            return 'devices.device_id = ?';
-        }
-
-        $glues = [];
+        $singles = [];
+        $chains = [];
         foreach ($tables as $table) {
-            $glue = $this->buildMap($table, $target);
-            var_dump($glue);exit;
-            $glues = array_merge($glues, $glue);
+            $path = $this->findRelationshipPath($table, $target);
+
+            if ($path === true) {
+                // just a single table
+                $singles[] = $table;
+            } elseif (is_array($path)) {
+                // append glue to the glues array
+                $chains[] = $path;
+            }
         }
-        $glues = array_unique($glues);
 
-        $where = [];
+        // remove duplicate single tables
+        $singles = array_unique($singles);
+//        $tables = $singles;
 
-        foreach ($glues as $glue) {
-            list($left, $right) = $glue;
+        $glue = [];
 
-            $rkey = $this->getPrimaryKey($right);
-            $lkey = $rkey;
+        // add the anchor
+        if (!empty($singles)) {
+            $anchor = array_shift($singles);
+        } else {
+            $anchor = $chains[0][0];
+        }
+        $glue[] = "$anchor.device_id = ?"; // start with anchor
 
-            if (!$this->columnExists($left, $lkey)) {
-                $lkey = rtrim($right, 's') . '_id';
-                if (!$this->columnExists($left, $lkey)) {
-                    throw new \Exception('FIXME');
-                }
+        // add singles
+        foreach ($singles as $single) {
+            if ($single != $anchor) {
+                $glue[] = "$anchor.device_id = $single.device_id";
+            }
+        }
+
+        foreach ($chains as $chain) {
+            $first = array_shift($chain);
+            if ($first != $anchor) {
+                $glue[] = "$anchor.device_id = $first.device_id"; // attach to anchor
             }
 
-            $sql[] = "`$left`.`$lkey` = `$right`.`$rkey`";
+            foreach (array_pairs($chain) as $pair) {
+                list($left, $right) = $pair;
+                $glue[] = $this->getGlue($left, $right);
+            }
         }
 
-        return '(' . implode(' AND ', $where) . ')';
+        // remove duplicates
+        $glue = array_unique($glue);
+
+        return '(' . implode(' AND ', $glue) . ')';
+    }
+
+    private function getGlue($table1, $table2)
+    {
+        $key2 = $this->getPrimaryKey($table2);
+        $key1 = $key2;
+
+        if (!$this->columnExists($table1, $key1)) {
+            $key1 = rtrim($table2, 's') . '_id';
+            if (!$this->columnExists($table1, $key1)) {
+                throw new \Exception("FIXME: Could not make glue from $table1 to $table2");
+            }
+        }
+
+        return "$table1.$key1 = $table2.$key2";
     }
 
     public function toArray()
