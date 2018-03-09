@@ -459,6 +459,7 @@ function RunJail($code, $obj)
  */
 function DescribeAlert($alert)
 {
+    global $alerts_id;
     $obj         = array();
     $i           = 0;
     $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
@@ -479,6 +480,7 @@ function DescribeAlert($alert)
     $obj['description']  = $device['purpose'];
     $obj['notes']        = $device['notes'];
     $obj['device_id']    = $alert['device_id'];
+    $obj['alerts_id']    = $alerts_id;
     $extra               = $alert['details'];
     if (!isset($tpl['template'])) {
         $obj['template'] = $default_tpl;
@@ -747,7 +749,9 @@ function RunFollowUp()
 function RunAlerts()
 {
     global $config;
-    foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 1') as $alert) {
+    global $alerts_id;
+    foreach (dbFetchRows('SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 1') as $alert) {
+        $alerts_id = $alert['id'];
         $tmp   = array(
             $alert['rule_id'],
             $alert['device_id'],
