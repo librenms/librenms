@@ -33,103 +33,89 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
         if ($ssh_ok || !str_contains($method, 'ssh')) {
             // Fetch virtual machine list
             unset($domlist);
-            exec(Config::get('virsh').' -rc '.$uri.' list', $domlist);
+            exec(Config::get('virsh').' -rc '.$uri.' list --uuid --all', $domlist);
 
             foreach ($domlist as $dom) {
-                list($dom_id,) = explode(' ', trim($dom), 2);
+                $dom_id = trim($dom);
+                $dom_info = array();
 
-                if (is_numeric($dom_id)) {
+                if (strlen($dom_id) == 36) {
                     // Fetch the Virtual Machine information.
                     unset($vm_info_array);
-                    exec(Config::get('virsh').' -rc '.$uri.' dumpxml '.$dom_id, $vm_info_array);
-
-                    // Example xml:
-                    // <domain type='kvm' id='3'>
-                    // <name>moo.example.com</name>
-                    // <uuid>48cf6378-6fd5-4610-0611-63dd4b31cfd6</uuid>
-                    // <memory>1048576</memory>
-                    // <currentMemory>1048576</currentMemory>
-                    // <vcpu>8</vcpu>
-                    // <os>
-                    // <type arch='x86_64' machine='pc-0.12'>hvm</type>
-                    // <boot dev='hd'/>
-                    // </os>
-                    // <features>
-                    // <acpi/>
-                    // (...)
-                    // See spec at https://libvirt.org/formatdomain.html
-
-                    // Convert array to string
-                    unset($vm_info_xml);
+                    exec(Config::get('virsh').' -rc '.$uri.' dominfo '.$dom_id, $vm_info_array);
                     foreach ($vm_info_array as $line) {
-                        $vm_info_xml .= $line;
+                        list($field, $value) = explode(':', $line, 2);
+                        $field = preg_replace('/[\s\(\)]/', '', $field);
+                        $value = trim($value);
+                        $dom_info[$field] = $value;
                     }
+                    d_echo($dom_info);
 
-                    $xml = simplexml_load_string('<?xml version="1.0"?> '.$vm_info_xml);
-                    d_echo($xml);
-
-                    $vmwVmDisplayName = $xml->name;
-                    $vmwVmGuestOS     = '';
-                    // libvirt does not supply this
-                    exec(Config::get('virsh').' -rc '.$uri.' domstate '.$dom_id, $vm_state);
-                    $vmwVmState = ucfirst($vm_state[0]);
-
-                    $vmwVmCpus  = $xml->vcpu['current'];
-                    if (!isset($vmwVmCpus)) {
-                        $vmwVmCpus  = $xml->vcpu;
-                    }
-                    $vmwVmMemSize = $xml->memory;
                     // Convert memory size to MiB
-                    switch ($vmwVmMemSize['unit']) {
+                    list($mem_size, $mem_unit) = explode(' ', $dom_info['Maxmemory'], 2);
+                    switch ($mem_unit) {
                         case 'T':
                         case 'TiB':
-                            $vmwVmMemSize = $vmwVmMemSize * 1048576;
+                            $mem_size = $mem_size * 1048576;
                             break;
                         case 'TB':
-                            $vmwVmMemSize = $vmwVmMemSize * 1000000;
+                            $mem_size = $mem_size * 1000000;
                             break;
                         case 'G':
                         case 'GiB':
-                            $vmwVmMemSize = $vmwVmMemSize * 1024;
+                            $mem_size = $mem_size * 1024;
                             break;
                         case 'GB':
-                            $vmwVmMemSize = $vmwVmMemSize * 1000;
+                            $mem_size = $mem_size * 1000;
                             break;
                         case 'M':
                         case 'MiB':
                             break;
                         case 'MB':
-                            $vmwVmMemSize = $vmwVmMemSize * 1000000 / 1048576;
+                            $mem_size = $mem_size * 1000000 / 1048576;
                             break;
                         case 'KB':
-                            $vmwVmMemSize = $vmwVmMemSize / 1000;
+                            $mem_size = $mem_size / 1000;
                             break;
                         case 'b':
                         case 'bytes':
-                            $vmwVmMemSize = $vmwVmMemSize / 1048576;
+                            $mem_size = $mem_size / 1048576;
                             break;
                         default:
                             // KiB or k or no value
-                            $vmwVmMemSize = $vmwVmMemSize / 1024;
+                            $mem_size = $mem_size / 1024;
                             break;
                     }
+
+                    $db_data = array(
+                        'vmwVmDisplayName' => mres($dom_info['Name']),
+                        'vmwVmGuestOS'     => '',
+                        'vmwVmState'       => mres($dom_info['State']),
+                        'vmwVmCpus'        => mres($dom_info['CPUs']),
+                        'vmwVmMemSize'     => mres($mem_size)
+                    );
+
 
                     // Check whether the Virtual Machine is already known for this host.
                     $result = dbFetchRow("SELECT * FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND `vm_type` = 'libvirt'", array($device['device_id'], $dom_id));
                     if (count($result['device_id']) == 0) {
-                        $inserted_id = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
+                        $db_data['device_id'] = $device['device_id'];
+                        $db_data['vm_type'] = 'libvirt';
+                        $db_data['vmwVmVMID'] = $dom_id;
+                        $inserted_id = dbInsert($db_data, 'vminfo');
                         echo '+';
-                        log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', 3, $inserted_id);
+                        log_event('Virtual Machine added: '.$db_data['vmwVmDisplayName'].' ('.$db_data['vmwVmMemSize'].' MB)', $device, 'vm', 3, $inserted_id);
                     } else {
-                        if ($result['vmwVmState'] != $vmwVmState
-                            || $result['vmwVmDisplayName'] != $vmwVmDisplayName
-                            || $result['vmwVmCpus'] != $vmwVmCpus
-                            || $result['vmwVmGuestOS'] != $vmwVmGuestOS
-                            || $result['vmwVmMemSize'] != $vmwVmMemSize
-                        ) {
-                            dbUpdate(array('vmwVmState' => mres($vmwVmState), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus)), 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", array($device['device_id'], $dom_id));
+                        $updated = false;
+                        foreach (array('State', 'DisplayName', 'Cpus', 'GuestOS', 'MemSize') as $field) {
+                            if ($result['vmwVm'.$field] != $db_data['vmwVm'.$field]) {
+                                $updated = true;
+                                log_event("Virtual Machine: $field: ".$result['vmwVm'.$field]." -> ".$db_data['vmwVm'.$field], $device, 'vm', 3);
+                            }
+                        }
+                        if ($updated) {
+                            dbUpdate(db_data, 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", array($device['device_id'], $dom_id));
                             echo 'U';
-                            // FIXME eventlog
                         } else {
                             echo '.';
                         }

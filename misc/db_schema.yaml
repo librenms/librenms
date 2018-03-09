@@ -1599,7 +1599,7 @@ vminfo:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: vm_type, Type: varchar(16), 'Null': false, Extra: '', Default: vmware }
-    - { Field: vmwVmVMID, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: vmwVmVMID, Type: char(36), 'Null': false, Extra: '' }
     - { Field: vmwVmDisplayName, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: vmwVmGuestOS, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: vmwVmMemSize, Type: int(11), 'Null': false, Extra: '' }
