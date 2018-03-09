@@ -40,66 +40,6 @@ function GenSQL($rule, $query_builder = false)
 }
 
 /**
- * This is a copy of the GenSQL() function with some slight changes.
- * @param $rule
- * @return bool|string
- */
-function GenSQLNew($rule)
-{
-    $rule = RunMacros($rule);
-    if (empty($rule)) {
-        //Cannot resolve Macros due to recursion. Rule is invalid.
-        return false;
-    }
-    $tmp = explode(" ", $rule);
-    $tables = array();
-    foreach ($tmp as $opt) {
-        if (strstr($opt, '%') && strstr($opt, '.')) {
-            $tmpp = explode(".", $opt, 2);
-            $tmpp[0] = str_replace("%", "", $tmpp[0]);
-            $tables[] = mres(str_replace("(", "", $tmpp[0]));
-            $rule = str_replace($opt, $tmpp[0].'.'.$tmpp[1], $rule);
-        }
-    }
-    $tables = array_keys(array_flip($tables));
-    if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
-        //Our first table has no valid glue, append the 'devices' table to it!
-        array_unshift($tables, 'devices');
-    }
-    $x = sizeof($tables)-1;
-    $i = 0;
-    $join = "";
-    while ($i < $x) {
-        if (isset($tables[$i+1])) {
-            $gtmp = ResolveGlues(array($tables[$i+1]), 'device_id');
-            if ($gtmp === false) {
-                //Cannot resolve glue-chain. Rule is invalid.
-                return false;
-            }
-            $last = "";
-            $qry = "";
-            foreach ($gtmp as $glue) {
-                if (empty($last)) {
-                    list($tmp,$last) = explode('.', $glue);
-                    $qry .= $glue.' = ';
-                } else {
-                    list($tmp,$new) = explode('.', $glue);
-                    $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
-                    $last = $new;
-                }
-                if (!in_array($tmp, $tables)) {
-                    $tables[] = $tmp;
-                }
-            }
-            $join .= "( ".$qry.$tables[0].".device_id ) && ";
-        }
-        $i++;
-    }
-    $sql = "SELECT * FROM ".implode(",", $tables)." WHERE (".$join."".str_replace("(", "", $tables[0]).".device_id = ?) && ($rule)";
-    return $sql;
-}
-
-/**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
  * @return string|boolean
