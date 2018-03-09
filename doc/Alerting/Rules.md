@@ -72,7 +72,7 @@ Alert when:
 - Any storage gets fuller than the 'warning': `storage.storage_perc >= storage_perc_warn`
 - If device is a server and the used storage is above the warning level, but ignore /boot partitions: `storage.storage_perc > storage.storage_perc_warn AND devices.type = "server" AND storage.storage_descr != "/boot"`
 - VMware LAG is not using "Source ip address hash" load balancing: `devices.os = "vmware" AND ports.ifType = "ieee8023adLag" AND ports.ifDescr REGEXP "Link Aggregation .*, load balancing algorithm: Source ip address hash"`
-- Syslog, authentication failure during the last 5m: `syslog.timestamp >= macros.past_5m && syslog.msg REGEXP ".*authentication failure.*"`
+- Syslog, authentication failure during the last 5m: `syslog.timestamp >= macros.past_5m AND syslog.msg REGEXP ".*authentication failure.*"`
 - High memory usage: `macros.device_up = 1 AND mempools.mempool_perc >= 90 AND mempools.mempool_descr REGEXP "Virtual.*"`
 - High CPU usage(per core usage, not overall): `macros.device_up = 1 AND processors.processor_usage >= 90`
 - High port usage, where description is not client & ifType is not softwareLoopback: `macros.port_usage_perc >= 80 AND port.port_descr_type != "client" AND ports.ifType != "softwareLoopback"`

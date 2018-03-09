@@ -8,7 +8,7 @@ You can define your own macros in your `config.php`.
 
 Example macro-implementation of Debian-Devices
 ```php
-$config['alert']['macros']['rule']['is_debian'] = '%devices.features ~ "@debian@"';
+$config['alert']['macros']['rule']['is_debian'] = 'devices.features ~ "@debian@"';
 ```
 And in the Rule:
 ```
@@ -161,7 +161,7 @@ Example: `macros.port_out_usage_perc > 50
 
 ### Ports now down (Boolean)
 
-Entity: `ports.ifOperStatus != ports.ifOperStatus_prev && ports.ifOperStatus_prev = "up" AND ports.ifAdminStatus = "up"`
+Entity: `ports.ifOperStatus != ports.ifOperStatus_prev AND ports.ifOperStatus_prev = "up" AND ports.ifAdminStatus = "up"`
 
 Description: Ports that were previously up and have now gone down.
 
