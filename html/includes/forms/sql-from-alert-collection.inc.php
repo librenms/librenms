@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
+
 header('Content-type: application/json');
 
 if (is_admin() === false) {
@@ -40,7 +42,7 @@ if (is_numeric($template_id)) {
     $output = [
         'status' => 'ok',
         'name' => $rules[$template_id]['name'],
-        'query_builder' => $rules[$template_id]['sql'],
+        'builder' => QueryBuilderParser::fromOld($rules[$template_id]['rule'])->toArray(),
         'extra' => $rules[$template_id]['extra']
     ];
 } else {

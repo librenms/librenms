@@ -71,7 +71,7 @@ alert_rules:
     - { Field: disabled, Type: tinyint(1), 'Null': false, Extra: '' }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: query, Type: text, 'Null': false, Extra: '' }
-    - { Field: query_builder, Type: text, 'Null': false, Extra: '' }
+    - { Field: builder, Type: text, 'Null': false, Extra: '' }
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }

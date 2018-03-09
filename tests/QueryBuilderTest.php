@@ -34,15 +34,17 @@ class QueryBuilderTest extends TestCase
     /**
      *
      * @dataProvider loadQueryData
-     * @param $legacy
-     * @param $builder
-     * @param $sql
+     * @param string $legacy
+     * @param array $builder
+     * @param string $display
+     * @param string $sql
      */
-    public function testQueryConversion($legacy, $builder, $sql) {
+    public function testQueryConversion($legacy, $builder, $display, $sql) {
         if (!empty($legacy)) {
             // some rules don't have a legacy representation
-            $this->assertEquals($builder, QueryBuilderParser::fromOld($legacy)->toJson());
+            $this->assertEquals($builder, QueryBuilderParser::fromOld($legacy)->toArray());
         }
+        $this->assertEquals($display, QueryBuilderParser::fromJson($builder)->toSql(false));
         $this->assertEquals($sql, QueryBuilderParser::fromJson($builder)->toSql());
     }
 

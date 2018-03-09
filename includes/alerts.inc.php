@@ -22,6 +22,7 @@
  * @subpackage Alerts
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\Auth;
 
 /**
@@ -32,7 +33,7 @@ use LibreNMS\Authentication\Auth;
 function GenSQL($rule, $query_builder = false)
 {
     if ($query_builder) {
-        return GenSQLNew($query_builder);
+        return QueryBuilderParser::fromJson($query_builder);
     } else {
         return GenSQLOld($rule);
     }
@@ -244,7 +245,7 @@ function RunRules($device)
         d_echo(PHP_EOL);
         $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         if (empty($rule['query'])) {
-            $rule['query'] = GenSQL($rule['rule'], $rule['query_builder']);
+            $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
         }
         $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
@@ -706,7 +707,7 @@ function IssueAlert($alert)
 
     if ($config['alert']['fixed-contacts'] == false) {
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule'], $alert['query_builder']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
         }
         $sql = $alert['query'];
         $qry = dbFetchRows($sql, array($alert['device_id']));
@@ -738,8 +739,8 @@ function RunAcks()
             $alert['rule_id'],
             $alert['device_id'],
         );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query_builder, alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
-        if ((empty($alert['rule']) && empty($alert['query_builder'])) || !IsRuleValid($tmp[1], $tmp[0])) {
+        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.builder, alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
+        if ((empty($alert['rule']) && empty($alert['builder'])) || !IsRuleValid($tmp[1], $tmp[0])) {
             // Alert-Rule does not exist anymore, let's remove the alert-state.
             echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
             dbDelete('alerts', 'rule_id = ? && device_id = ?', array($tmp[0], $tmp[1]));
@@ -766,8 +767,8 @@ function RunFollowUp()
             $alert['rule_id'],
             $alert['device_id'],
         );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query,alert_rules.query_builder, alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
-        if (empty($alert['rule']) && empty($alert['query_builder']) || !IsRuleValid($tmp[1], $tmp[0])) {
+        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query,alert_rules.builder, alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
+        if (empty($alert['rule']) && empty($alert['builder']) || !IsRuleValid($tmp[1], $tmp[0])) {
             // Alert-Rule does not exist anymore, let's remove the alert-state.
             echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
             dbDelete('alerts', 'rule_id = ? && device_id = ?', array($tmp[0], $tmp[1]));
@@ -781,7 +782,7 @@ function RunFollowUp()
         }
 
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule'], $alert['query_builder']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
         }
         $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
         //make sure we can json_encode all the datas later

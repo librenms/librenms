@@ -106,11 +106,9 @@ class QueryBuilderParser implements \JsonSerializable
             // resolve glue tables (remove duplicates
             foreach (array_keys(array_flip($tables)) as $table) {
                 $rp = $this->schema->findRelationshipPath($table);
-                var_dump($table, $rp);
                 if (is_array($rp)) {
                     $tables = array_merge($tables, $rp);
                 }
-//                var_dump($tables);
             }
 
             // remove duplicates
@@ -159,6 +157,11 @@ class QueryBuilderParser implements \JsonSerializable
                 if (starts_with($value, '%')) {
                     $value = '`' . ltrim($value, '%') . '`';
                 }
+
+                // replace regex placeholder, don't think we can safely convert to like operators
+                if ($operator == 'regex' || $operator == 'not_regex') {
+                    $value = str_replace('@', '.*', $value);
+                }
             }
 
             $filter_item = $filter->getFilter($field);
@@ -185,7 +188,7 @@ class QueryBuilderParser implements \JsonSerializable
         return new static($builder);
     }
 
-    public function toSql($expand = false)
+    public function toSql($expand = true)
     {
         if (empty($this->builder) || !array_key_exists('condition', $this->builder)) {
             return null;
@@ -305,8 +308,6 @@ class QueryBuilderParser implements \JsonSerializable
 
         // remove duplicate single tables
         $singles = array_unique($singles);
-//        $tables = $singles;
-
         $glue = [];
 
         // add the anchor
@@ -324,11 +325,8 @@ class QueryBuilderParser implements \JsonSerializable
             }
         }
 
-        var_dump($chains);
         foreach ($chains as $chain) {
             $first = array_shift($chain);
-            echo "FIRST:";
-            var_dump($first);
             if ($first != $anchor) {
                 $glue[] = "$anchor.device_id = $first.device_id"; // attach to anchor
             }

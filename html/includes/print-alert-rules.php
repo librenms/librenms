@@ -25,18 +25,17 @@ if (isset($_POST['create-default'])) {
         'interval' => 300,
     );
 
-    require_once '../includes/alerts.inc.php';
-
     foreach ($default_rules as $add_rule) {
         $extra = $default_extra;
         if (isset($add_rule['extra'])) {
             $extra = array_replace($extra, json_decode($add_rule['extra'], true));
         }
 
+        $qb = QueryBuilderParser::fromOld($add_rule['rule']);
         $insert = array(
             'rule' => '',
-            'query_builder' => $add_rule['sql'],
-            'query' => GenSQLNew($add_rule['sql']),
+            'builder' => json_encode($qb),
+            'query' => $qb->toSql(),
             'severity' => 'critical',
             'extra' => json_encode($extra),
             'disabled' => 0,
@@ -45,7 +44,8 @@ if (isset($_POST['create-default'])) {
 
         dbInsert($insert, 'alert_rules');
     }
-}//end if
+    unset($qb);
+}
 
 require_once 'includes/modal/new_alert_rule.inc.php';
 require_once 'includes/modal/delete_alert_rule.inc.php';
@@ -177,7 +177,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     if (empty($rule['builder'])) {
         $rule_display = $rule['rule'];
     } else {
-        $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql();
+        $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
     }
     echo '<i>'.htmlentities($rule_display).'</i></td>';
 

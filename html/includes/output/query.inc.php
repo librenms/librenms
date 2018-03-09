@@ -41,7 +41,7 @@ switch ($type) {
         $results = array();
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
-                $rule['query'] = GenSQL($rule['rule'], $rule['query_builder']);
+                $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
             $qry = dbFetchRow($sql, array($device_id));
