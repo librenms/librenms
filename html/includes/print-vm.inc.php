@@ -10,10 +10,10 @@ if (getidbyname($vm['vmwVmDisplayName'])) {
 
 echo '</td>';
 
-if ($vm['vmwVmState'] == 'powered off') {
-    echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">OFF</span></td>';
-} else {
+if ($vm['vmwVmState'] == 'running') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-success">ON</span></td>';
+} else {
+    echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">OFF</span></td>';
 }
 
 if ($vm['vmwVmGuestOS'] == 'E: tools not installed') {

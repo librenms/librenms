@@ -1,0 +1,1 @@
+ALTER TABLE `vminfo` MODIFY `vmwVmVMID` CHAR(36) NOT NULL;
