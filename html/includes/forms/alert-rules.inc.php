@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
+
 header('Content-type: application/json');
 
 if (is_admin() === false) {
@@ -36,7 +38,7 @@ $status = 'ok';
 $message = '';
 
 $builder_json  = $_POST['builder_json'];
-$query    = 'SELECT 1;'; //GenSQLNew($builder); // FIXME
+$query    = QueryBuilderParser::fromJson($builder_json)->toSql();
 $rule_id  = $_POST['rule_id'];
 $count    = mres($_POST['count']);
 $delay    = mres($_POST['delay']);
