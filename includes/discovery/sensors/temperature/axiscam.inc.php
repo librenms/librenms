@@ -15,5 +15,5 @@ foreach (array_keys($oids) as $index) {
     $current         = $cur_oid[$index]['tempSensorValue'];
     $oid             = $cur_oid.$index;
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'axiscam', 'Temperature Sensor '.$index, '1', '1', '', '', '', '', $current);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'axiscam', 'Temperature Sensor '.$index, '1', '1', '5', '10', '30', '35', $current);
 }
