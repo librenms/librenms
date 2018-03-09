@@ -166,8 +166,7 @@ class QueryBuilderParser implements \JsonSerializable
                 $condition = ($rule_operator == '||' ? 'OR' : 'AND');
             }
 
-            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2,
-                PREG_SPLIT_DELIM_CAPTURE);
+            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
             $field = ltrim($field, '%');
 
             // for rules missing values just use '= 1'

@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Tests;
 
-
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 
@@ -39,7 +38,8 @@ class QueryBuilderTest extends TestCase
      * @param string $display
      * @param string $sql
      */
-    public function testQueryConversion($legacy, $builder, $display, $sql) {
+    public function testQueryConversion($legacy, $builder, $display, $sql)
+    {
         if (!empty($legacy)) {
             // some rules don't have a legacy representation
             $this->assertEquals($builder, QueryBuilderParser::fromOld($legacy)->toArray());
@@ -48,7 +48,8 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($sql, QueryBuilderParser::fromJson($builder)->toSql());
     }
 
-    public function loadQueryData() {
+    public function loadQueryData()
+    {
         $base = Config::get('install_dir');
         $data = file_get_contents("$base/tests/data/misc/querybuilder.json");
         return json_decode($data, true);
