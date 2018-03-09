@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Alerting;
 
+use LibreNMS\Config;
 use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
@@ -79,11 +80,11 @@ class QueryBuilderParser implements \JsonSerializable
         $this->schema = new Schema();
     }
 
-    // FIXME macros
     public function getTables($rules = null)
     {
         if (!isset($this->tables)) {
             $tables = [];
+
             if (is_null($rules)) {
                 $rules = $this->builder['rules'];
             }
@@ -93,10 +94,26 @@ class QueryBuilderParser implements \JsonSerializable
                     $tables = array_merge($tables, $this->getTables($rule));
                 } elseif (str_contains($rule['field'], '.')) {
                     list($table, $column) = explode('.', $rule['field']);
-                    $tables[] = $table;
+
+                    if ($table == 'macros') {
+                        $tables = array_merge($tables, $this->expandMacro($rule['field'], true));
+                    } else {
+                        $tables[] = $table;
+                    }
                 }
             }
 
+            // resolve glue tables (remove duplicates
+            foreach (array_keys(array_flip($tables)) as $table) {
+                $rp = $this->schema->findRelationshipPath($table);
+                var_dump($table, $rp);
+                if (is_array($rp)) {
+                    $tables = array_merge($tables, $rp);
+                }
+//                var_dump($tables);
+            }
+
+            // remove duplicates
             $this->tables = array_keys(array_flip($tables));
         }
 
@@ -168,11 +185,6 @@ class QueryBuilderParser implements \JsonSerializable
         return new static($builder);
     }
 
-    public function getRules()
-    {
-
-    }
-
     public function toSql($expand = false)
     {
         if (empty($this->builder) || !array_key_exists('condition', $this->builder)) {
@@ -182,24 +194,29 @@ class QueryBuilderParser implements \JsonSerializable
         $result = [];
         foreach ($this->builder['rules'] as $rule) {
             if (array_key_exists('condition', $rule)) {
-                $result[] = $this->parseGroup($rule);
+                $result[] = $this->parseGroup($rule, $expand);
             } else {
-                $result[] = $this->parseRule($rule);
+                $result[] = $this->parseRule($rule, $expand);
             }
         }
 
-        return implode(" {$this->builder['condition']} ", $result);
+        $sql = '';
+        if ($expand) {
+            $sql = 'SELECT * FROM ' . implode(',', $this->getTables());
+            $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
+        }
+        return $sql . implode(" {$this->builder['condition']} ", $result);
     }
 
-    private function parseGroup($rule)
+    private function parseGroup($rule, $expand = false)
     {
         $group_rules = [];
 
         foreach ($rule['rules'] as $group_rule) {
             if (array_key_exists('condition', $group_rule)) {
-                $group_rules[] = $this->parseGroup($group_rule);
+                $group_rules[] = $this->parseGroup($group_rule, $expand);
             } else {
-                $group_rules[] = $this->parseRule($group_rule);
+                $group_rules[] = $this->parseRule($group_rule, $expand);
             }
         }
 
@@ -207,7 +224,7 @@ class QueryBuilderParser implements \JsonSerializable
         return "($sql)";
     }
 
-    private function parseRule($rule)
+    private function parseRule($rule, $expand = false)
     {
         $op = self::$operators[$rule['operator']];
         $value = $rule['value'];
@@ -215,14 +232,56 @@ class QueryBuilderParser implements \JsonSerializable
         if (starts_with($value, '`') && ends_with($value, '`')) {
             // pass through value such as field
             $value = trim($value, '`');
-
+            $value = $this->expandMacro($value); // check for macros
         } elseif ($rule['type'] != 'integer') {
             $value = "\"$value\"";
         }
 
-        $sql = "{$rule['field']} $op $value";
+        $field = $rule['field'];
+        if ($expand) {
+            $field = $this->expandMacro($field);
+        }
+
+        $sql = "$field $op $value";
 
         return $sql;
+    }
+
+    public function expandMacro($subject, $tables_only = false)
+    {
+        if (!str_contains($subject, 'macros.')) {
+            return $subject;
+        }
+
+        $macros = Config::get('alert.macros.rule');
+
+        $count = 0;
+        $limit = 20; // replacement limit
+        while ($count++ < $limit && str_contains($subject, 'macros.')) {
+            $subject = preg_replace_callback('/%?macros.([^ =()]+)/', function ($matches) use ($macros) {
+                $name = $matches[1];
+                if (isset($macros[$name])) {
+                    return $macros[$name];
+                } else {
+                    return $matches[0]; // this isn't a macro, don't replace
+                }
+            }, $subject);
+        }
+
+        if ($tables_only) {
+            preg_match_all('/%([^%.]+)\./', $subject, $matches);
+            return array_unique($matches[1]);
+        }
+
+        // clean leading %
+        $subject = preg_replace('/%([^%.]+)\./', '$1.', $subject);
+
+        // wrap entire macro result in parenthesis if needed
+        if (!(starts_with($subject, '(') && ends_with($subject, ')'))) {
+            $subject = "($subject)";
+        }
+
+        return $subject;
     }
 
 
@@ -265,8 +324,11 @@ class QueryBuilderParser implements \JsonSerializable
             }
         }
 
+        var_dump($chains);
         foreach ($chains as $chain) {
             $first = array_shift($chain);
+            echo "FIRST:";
+            var_dump($first);
             if ($first != $anchor) {
                 $glue[] = "$anchor.device_id = $first.device_id"; // attach to anchor
             }
@@ -289,7 +351,12 @@ class QueryBuilderParser implements \JsonSerializable
         $key1 = $key2;
 
         if (!$this->schema->columnExists($table1, $key1)) {
-            $key1 = rtrim($table2, 's') . '_id';
+            if (ends_with($table1, 'xes')) {
+                $key1 = substr($table1, 0, -2) . '_id';
+            } else {
+                $key1 = preg_replace('/s$/', '_id', $table1);
+            }
+
             if (!$this->schema->columnExists($table1, $key1)) {
                 throw new \Exception("FIXME: Could not make glue from $table1 to $table2");
             }

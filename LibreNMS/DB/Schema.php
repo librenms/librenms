@@ -109,7 +109,7 @@ class Schema
                 } else {
                     $recurse = $this->findPathRecursive($relationships[$table], $target, array_merge($history, $tables));
                     if ($recurse) {
-                        $path = array_merge($path, $recurse);
+                        $path = array_merge($recurse, $path);
                         return $path;
                     }
                 }
@@ -121,7 +121,7 @@ class Schema
                 d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
                 $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
                 if ($recurse) {
-                    $path = array_merge($path, $recurse);
+                    $path = array_merge($recurse, $path);
                     return $path;
                 }
             }
