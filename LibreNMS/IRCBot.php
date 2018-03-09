@@ -259,11 +259,13 @@ class IRCBot
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
                     $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']));
-                    foreach (explode("\n", $alert['msg']) as $line) {
-                        // We don't need to repeat the title
-                        $line = strip_tags($line);
-                        if (trim($line) != trim($alert['title'])) {
-                            $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
+                    if (!$this->config['irc_alert_short']) { // Only send the title if set to short
+                        foreach (explode("\n", $alert['msg']) as $line) {
+                            // We don't need to repeat the title
+                            $line = strip_tags($line);
+                            if (trim($line) != trim($alert['title'])) {
+                                $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
+                            }
                         }
                     }
                 }
@@ -271,11 +273,13 @@ class IRCBot
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
                         $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']));
-                        foreach (explode("\n", $alert['msg']) as $line) {
-                            // We don't need to repeat the title
-                            $line = strip_tags($line);
-                            if (trim($line) != trim($alert['title'])) {
-                                $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
+                        if (!$this->config['irc_alert_short']) { // Only send the title if set to short
+                            foreach (explode("\n", $alert['msg']) as $line) {
+                                // We don't need to repeat the title
+                                $line = strip_tags($line);
+                                if (trim($line) != trim($alert['title'])) {
+                                    $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
+                                }
                             }
                         }
                     }

@@ -26,10 +26,9 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
-class Configuration implements ValidationGroup
+class Configuration extends BaseValidation
 {
     /**
      * Validate this module.
@@ -43,15 +42,5 @@ class Configuration implements ValidationGroup
         if (Config::get('alerts.email.enable') == true) {
             $validator->warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
         }
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }

@@ -27,11 +27,18 @@
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-// Set up proxy if needed
-$proxy = getenv("HTTP_PROXY") ?: getenv("http_proxy");
-if (!$proxy && $proxy = rtrim(shell_exec('git config --global --get http.proxy'))) {
-    // Use git http.proxy if available
+$use_https = true;
+// Set up proxy if needed, check git config for proxies too
+if ($proxy = getenv("HTTPS_PROXY") ?: getenv("https_proxy")) {
+    $use_https = true;
+} elseif ($proxy = getenv("HTTP_PROXY") ?: getenv("http_proxy")) {
+    $use_https = false;
+} elseif ($proxy = trim(shell_exec('git config --global --get https.proxy'))) {
+    putenv("HTTPS_PROXY=$proxy");
+    $use_https = true;
+} elseif ($proxy = trim(shell_exec('git config --global --get http.proxy'))) {
     putenv("HTTP_PROXY=$proxy");
+    $use_https = false;
 }
 
 $exec = false;
@@ -44,8 +51,8 @@ if (!empty($path_exec)) {
 } else {
     if ($proxy) {
         $stream_default_opts = array(
-            'http' => array(
-                'proxy' => str_replace('http://', 'tcp://', $proxy),
+            ($use_https ? 'https' : 'http') => array(
+                'proxy' => str_replace(array('http://', 'https://'), 'tcp://', $proxy),
                 'request_fulluri' => true,
             )
         );
@@ -54,10 +61,10 @@ if (!empty($path_exec)) {
     }
 
     // Download composer.phar (code from the composer web site)
-    $good_sha = trim(@file_get_contents('http://composer.github.io/installer.sig'));
+    $good_sha = trim(@file_get_contents(($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig'));
 
     // Download composer.phar (code from the composer web site)
-    @copy('http://getcomposer.org/installer', 'composer-setup.php');
+    @copy(($use_https ? 'https' : 'http') . '://getcomposer.org/installer', 'composer-setup.php');
     if (!empty($good_sha) && @hash_file('SHA384', 'composer-setup.php') === $good_sha) {
         // Installer verified
         shell_exec('php composer-setup.php');

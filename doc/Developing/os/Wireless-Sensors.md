@@ -11,15 +11,18 @@ Currently we have support for the following wireless metrics along with the valu
 | ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
 | clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
 | distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
+| error-rate  | bps         | WirelessErrorRateDiscovery   | The rate of errored packets or bits, etc                                                        |
 | error-ratio | %           | WirelessErrorRatioDiscovery  | The percent of errored packets or bits, etc                                                     |
+| errors      | count       | WirelessErrorsDiscovery      | The total bits of errored packets or bits, etc                                                  |
 | frequency   | MHz         | WirelessFrequencyDiscovery   | The frequency of the radio in MHz, channels can be converted                                    |
+| mse         | dB          | WirelessMseDiscovery         | The Mean Square Error                                                                           |
 | noise-floor | dBm/Hz      | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
 | power       | dBm         | WirelessPowerDiscovery       | The power of transmit or receive, including signal level                                        |
 | quality     | %           | WirelessQualityDiscovery     | The % of quality of the link, 100% = perfect link                                               |
 | rate        | bps         | WirelessRateDiscovery        | The negotiated rate of the connection (not data transfer)                                       |
 | rssi        | dBm         | WirelessRssiDiscovery        | The Received Signal Strength Indicator                                                          |
-| snr         | dBm         | WirelessSnrDiscovery         | The Signal to Noise ratio, which is signal - noise floor                                        |
-| ssr         | dBm         | WirelessSsrDiscovery         | The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power |
+| snr         | dB          | WirelessSnrDiscovery         | The Signal to Noise ratio, which is signal - noise floor                                        |
+| ssr         | dB          | WirelessSsrDiscovery         | The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power |
 | utilization | %           | WirelessUtilizationDiscovery | The % of utilization compared to the current rate                                               |
 
 You will need to create a new OS class for your os if one doen't exist under `LibreNMS/OS`.  The name of this file
@@ -54,9 +57,9 @@ All discovery interfaces will require you to return an array of WirelessSensor o
   - $device_id = Required. You can get this value with $this->getDeviceId()
   - $oids = Required. This must be the numerical OID for where the data can be found, i.e .1.2.3.4.5.6.7.0.
   If this is an array of oids, you should probably specify an $aggregator.
+  - $subtype = Required. This should be the OS name, i.e airos.
   - $index = Required. This must be unique for this sensor type, device and subtype.
   Typically it's the index from the table being walked or it could be the name of the OID if it's a single value.
-  - $subtype = Required. This should be the OS name, i.e airos.
   - $description = Required. This is a descriptive value for the sensor.
   Shown to the user, if this is a per-ssid statistic, using `SSID: $ssid` here is appropriate
   - $current = Defaults to null. Can be used to set the current value on discovery.

@@ -78,6 +78,12 @@ function external_exec($command)
 
     if ($debug && !$vdebug) {
         $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
+        $debug_command = preg_replace('/-u [\S]+/', '-u USER', $debug_command);
+        $debug_command = preg_replace('/-U [\S]+/', '-u USER', $debug_command);
+        $debug_command = preg_replace('/-A [\S]+/', '-A PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-X [\S]+/', '-X PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-P [\S]+/', '-P PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-H [\S]+/', '-H HOSTNAME', $debug_command);
         $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
