@@ -480,7 +480,7 @@ function DescribeAlert($alert)
     $obj['description']  = $device['purpose'];
     $obj['notes']        = $device['notes'];
     $obj['device_id']    = $alert['device_id'];
-    $obj['alerts_id']    = $alerts_id;
+    $obj['alert_id']     = $alerts_id;
     $extra               = $alert['details'];
     if (!isset($tpl['template'])) {
         $obj['template'] = $default_tpl;
