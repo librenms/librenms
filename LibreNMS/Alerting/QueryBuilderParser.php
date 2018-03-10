@@ -62,14 +62,6 @@ class QueryBuilderParser implements \JsonSerializable
         'regex' => 'REGEXP',
         'not_regex' => 'NOT REGEXP',
     ];
-    private static $like_operators = [
-        'begins_with',
-        'not_begins_with',
-        'contains',
-        'not_contains',
-        'ends_with',
-        'not_ends_with',
-    ];
 
     private $builder;
     private $schema;
@@ -106,23 +98,23 @@ class QueryBuilderParser implements \JsonSerializable
 
         foreach ($rules['rules'] as $rule) {
             if (array_key_exists('rules', $rule)) {
-                $tables = array_merge($tables, $this->findTablesRecursive($rule));
+                $tables = array_merge($this->findTablesRecursive($rule), $tables);
             } elseif (str_contains($rule['field'], '.')) {
                 list($table, $column) = explode('.', $rule['field']);
 
                 if ($table == 'macros') {
-                    $tables = array_merge($tables, $this->expandMacro($rule['field'], true));
+                    $tables = array_merge($this->expandMacro($rule['field'], true), $tables);
                 } else {
                     $tables[] = $table;
                 }
             }
         }
 
-        // resolve glue tables (remove duplicates
+        // resolve glue tables (remove duplicates)
         foreach (array_keys(array_flip($tables)) as $table) {
             $rp = $this->schema->findRelationshipPath($table);
-            if (is_array($rp)) {
-                $tables = array_merge($tables, $rp);
+            if ($rp) {
+                $tables = array_merge($rp, $tables);
             }
         }
 
@@ -349,48 +341,17 @@ class QueryBuilderParser implements \JsonSerializable
     {
         $tables = $this->getTables();  // get all tables in query
 
-        $singles = [];
-        $chains = [];
+        // always add the anchor to the target table
+        $anchor = $target . '.' . $this->schema->getPrimaryKey($target) . ' = ?';
+        $glue = [$anchor];
+
         foreach ($tables as $table) {
             $path = $this->schema->findRelationshipPath($table, $target);
-
-            if ($path === true) {
-                // just a single table
-                $singles[] = $table;
-            } elseif (is_array($path)) {
-                // append glue to the glues array
-                $chains[] = $path;
-            }
-        }
-
-        // remove duplicate single tables
-        $singles = array_unique($singles);
-        $glue = [];
-
-        // add the anchor
-        if (!empty($singles)) {
-            $anchor = array_shift($singles);
-        } else {
-            $anchor = $chains[0][0];
-        }
-        $glue[] = "$anchor.device_id = ?"; // start with anchor
-
-        // add singles
-        foreach ($singles as $single) {
-            if ($single != $anchor) {
-                $glue[] = "$anchor.device_id = $single.device_id";
-            }
-        }
-
-        foreach ($chains as $chain) {
-            $first = array_shift($chain);
-            if ($first != $anchor) {
-                $glue[] = "$anchor.device_id = $first.device_id"; // attach to anchor
-            }
-
-            foreach (array_pairs($chain) as $pair) {
-                list($left, $right) = $pair;
-                $glue[] = $this->getGlue($left, $right);
+            if ($path) {
+                foreach (array_pairs($path) as $pair) {
+                    list($left, $right) = $pair;
+                    $glue[] = $this->getGlue($left, $right);
+                }
             }
         }
 

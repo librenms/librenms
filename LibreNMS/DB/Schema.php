@@ -36,6 +36,9 @@ class Schema
         'ports_perms',
     ];
 
+    private $relationships;
+    private $schema;
+
     /**
      * Get the primary key column(s) for a table
      *
@@ -65,6 +68,23 @@ class Schema
         return $this->schema;
     }
 
+    /**
+     * Get a list of all tables.
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        return array_keys($this->getSchema());
+    }
+
+    /**
+     * Find the relationship path from $start to $target
+     *
+     * @param string $start
+     * @param string $target Default: devices
+     * @return array|bool list of tables in path order, or false if no path is found
+     */
     public function findRelationshipPath($start, $target = 'devices')
     {
         d_echo("Searching for target: $target, starting with $start\n");
@@ -74,17 +94,7 @@ class Schema
             return [$target];
         }
 
-        $path = $this->findPathRecursive([$start], $target);
-
-        if ($path === false) {
-            return $path;
-        }
-
-        if (count($path) == 1) {
-            return true;
-        }
-
-        return $path;
+        return $this->findPathRecursive([$start], $target);
     }
 
     private function findPathRecursive(array $tables, $target, $history = [])
@@ -99,18 +109,16 @@ class Schema
 
         foreach ($tables as $table) {
             $table_relations = $relationships[$table];
-            $path = [$table];
             d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
 
             if (!empty($table_relations)) {
                 if (in_array($target, $relationships[$table])) {
                     d_echo("Found in $table\n");
-                    return $path; // found it
+                    return [$target, $table]; // found it
                 } else {
                     $recurse = $this->findPathRecursive($relationships[$table], $target, array_merge($history, $tables));
                     if ($recurse) {
-                        $path = array_merge($recurse, $path);
-                        return $path;
+                        return array_merge($recurse, [$table]);
                     }
                 }
             } else {
@@ -121,8 +129,7 @@ class Schema
                 d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
                 $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
                 if ($recurse) {
-                    $path = array_merge($recurse, $path);
-                    return $path;
+                    return array_merge($recurse, [$table]);
                 }
             }
         }
@@ -146,6 +153,9 @@ class Schema
 
                     return null;
                 }, $columns));
+
+                // renumber $related array
+                $related = array_values($related);
 
                 return [$table, $related];
             }, array_keys($schema), $schema), 1, 0);
