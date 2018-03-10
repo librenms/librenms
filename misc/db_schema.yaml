@@ -231,7 +231,7 @@ bills:
     - { Field: bill_notes, Type: varchar(256), 'Null': false, Extra: '' }
     - { Field: bill_autoadded, Type: tinyint(1), 'Null': false, Extra: '' }
   Indexes:
-    bill_id: { Name: bill_id, Columns: [bill_id], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
 bill_data:
   Columns:
     - { Field: bill_id, Type: int(11), 'Null': false, Extra: '' }
