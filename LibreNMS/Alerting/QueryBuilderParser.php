@@ -44,7 +44,7 @@ class QueryBuilderParser implements \JsonSerializable
         'equal' => "=",
         'not_equal' => "!=",
         'in' => "IN (?)",
-        'not_in' => "NOT IN (_REP_)",
+        'not_in' => "NOT IN (?)",
         'less' => "<",
         'less_or_equal' => "<=",
         'greater' => ">",
@@ -281,7 +281,13 @@ class QueryBuilderParser implements \JsonSerializable
             $field = $this->expandMacro($field);
         }
 
-        $sql = "$field $op $value";
+        if (str_contains($op, '?')) {
+            // op with value inside it aka IN and NOT IN
+            $sql = "$field " . str_replace('?', $value, $op);
+        } else {
+            $sql = "$field $op $value";
+        }
+
 
         return $sql;
     }
