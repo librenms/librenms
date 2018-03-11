@@ -156,7 +156,7 @@ $(document).ready(function() {
                 editSelect.append($('<option>', { value: 0, text: 'None'}));
                 manParentDevstoClr.append($('<option>', { value: 0, text: 'None'}));
                 $.each(output.deps, function (i,elem) {
-                    var devtext = elem.hostname + ' (' + elem.sysname + ')';
+                    var devtext = elem.hostname + ' (' + elem.sysName + ')';
                     manParentDevs.append($('<option>',{value:elem.id, text:devtext}));
                     editSelect.append($('<option>',{value:elem.id, text:devtext}));
                     manAllDevs.append($('<option>',{value:elem.id, text:devtext}));
