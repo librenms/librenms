@@ -44,11 +44,7 @@ if ($config['map']['engine'] == 'leaflet') {
 
 <link href="css/fullscreenmap.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
-$timeout(function() {
-    var evt = $window.document.createEvent('UIEvents'); 
-    evt.initUIEvent('resize', true, false, $window, 0); 
-    $window.dispatchEvent(evt);
-});
+    window.dispatchEvent(new Event('resize'));
 </script>
 
 <script src='js/jquery.mousewheel.min.js'></script>
