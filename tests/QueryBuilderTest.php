@@ -30,6 +30,16 @@ use LibreNMS\Config;
 
 class QueryBuilderTest extends TestCase
 {
+    private $data_file = 'tests/data/misc/querybuilder.json';
+
+    public function testHasQueryData()
+    {
+        $this->assertNotEmpty(
+            $this->loadQueryData(),
+            "Could not load query builder test data from $this->data_file"
+        );
+    }
+
     /**
      *
      * @dataProvider loadQueryData
@@ -51,7 +61,7 @@ class QueryBuilderTest extends TestCase
     public function loadQueryData()
     {
         $base = Config::get('install_dir');
-        $data = file_get_contents("$base/tests/data/misc/querybuilder.json");
+        $data = file_get_contents("$base/$this->data_file");
         return json_decode($data, true);
     }
 }

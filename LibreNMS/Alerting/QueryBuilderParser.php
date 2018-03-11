@@ -370,28 +370,52 @@ class QueryBuilderParser implements \JsonSerializable
     /**
      * Get glue sql between tables. Resolve fields to use.
      *
-     * @param string $table1
-     * @param string $table2
+     * @param string $parent
+     * @param string $child
      * @return string
      */
-    private function getGlue($table1, $table2)
+    public function getGlue($parent, $child)
     {
-        $key2 = $this->schema->getPrimaryKey($table2);
-        $key1 = $key2;
+        // first check to see if there is a single shared column name ending with _id
+        $shared_keys = array_filter(array_intersect(
+            $this->schema->getColumns($parent),
+            $this->schema->getColumns($child)
+        ), function ($table) {
+            return ends_with($table, '_id');
+        });
 
-        if (!$this->schema->columnExists($table1, $key1)) {
-            if (ends_with($table1, 'xes')) {
-                $key1 = substr($table1, 0, -2) . '_id';
+        if (count($shared_keys) === 1) {
+            $shared_key = reset($shared_keys);
+            return "$parent.$shared_key = $child.$shared_key";
+        }
+
+        $parent_key = $this->schema->getPrimaryKey($parent);
+        $flipped = empty($parent_key);
+        if ($flipped) {
+            // if the "parent" table doesn't have a primary key, flip them
+            list($parent, $child) = [$child, $parent];
+            $parent_key = $this->schema->getPrimaryKey($parent);
+        }
+        $child_key = $parent_key;  // assume the column names match
+
+        if (!$this->schema->columnExists($child, $child_key)) {
+            // if they don't match, guess the column name from the parent
+            if (ends_with($parent, 'xes')) {
+                $child_key = substr($parent, 0, -2) . '_id';
             } else {
-                $key1 = preg_replace('/s$/', '_id', $table1);
+                $child_key = preg_replace('/s$/', '_id', $parent);
             }
 
-            if (!$this->schema->columnExists($table1, $key1)) {
-                echo"FIXME: Could not make glue from $table1 to $table2\n";
+            if (!$this->schema->columnExists($child, $child_key)) {
+                echo"FIXME: Could not make glue from $child to $parent\n";
             }
         }
 
-        return "$table1.$key1 = $table2.$key2";
+        if ($flipped) {
+            return "$child.$child_key = $parent.$parent_key";
+        }
+
+        return "$parent.$parent_key = $child.$child_key";
     }
 
     /**

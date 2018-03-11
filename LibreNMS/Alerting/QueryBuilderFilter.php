@@ -26,16 +26,17 @@
 namespace LibreNMS\Alerting;
 
 use LibreNMS\Config;
+use LibreNMS\DB\Schema;
 use Symfony\Component\Yaml\Yaml;
 
 class QueryBuilderFilter implements \JsonSerializable
 {
-    private $filter = [];
+    private static $table_blacklist = [
+        'device_group_device'
+    ];
 
-    /**
-     * @var array List of tables we can resolve glue from (not directly containing device_id)
-     */
-    private static $table_whitelist = ['state_translations', 'application_metrics'];
+    private $filter = [];
+    private $schema;
 
     /**
      * QueryBuilderFilter constructor.
@@ -43,6 +44,8 @@ class QueryBuilderFilter implements \JsonSerializable
      */
     public function __construct($type = 'alert')
     {
+        $this->schema = new Schema();
+
         if ($type == 'alert') {
             $this->generateMacroFilter('alert.macros.rule');
         } elseif ($type == 'group') {
@@ -79,13 +82,14 @@ class QueryBuilderFilter implements \JsonSerializable
 
     private function generateTableFilter()
     {
-        $db_schema = Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
+        $db_schema = $this->schema->getSchema();
+        $valid_tables = array_diff(array_keys($this->schema->getAllRelationshipPaths()), self::$table_blacklist);
 
         foreach ((array)$db_schema as $table => $data) {
             $columns = array_column($data['Columns'], 'Type', 'Field');
 
             // only allow tables with a direct association to device_id
-            if (!isset($columns['device_id']) && !in_array($table, self::$table_whitelist)) {
+            if (!in_array($table, $valid_tables)) {
                 continue;
             }
 

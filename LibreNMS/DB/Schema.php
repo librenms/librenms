@@ -79,22 +79,75 @@ class Schema
     }
 
     /**
-     * Find the relationship path from $start to $target
+     * Return all columns for the given table
      *
-     * @param string $start
-     * @param string $target Default: devices
-     * @return array|bool list of tables in path order, or false if no path is found
+     * @param $table
+     * @return array
      */
-    public function findRelationshipPath($start, $target = 'devices')
+    public function getColumns($table)
     {
-        d_echo("Searching for target: $target, starting with $start\n");
+        $schema = $this->getSchema();
+        return array_column($schema[$table]['Columns'], 'Field');
+    }
 
-        if ($start == $target) {
-            // um, yeah, we found it...
-            return [$target];
+    /**
+     * Get all relationship paths.
+     * Caches the data after the first call as long as the schema hasn't changed
+     *
+     * @param string $base
+     * @return mixed
+     */
+    public function getAllRelationshipPaths($base = 'devices')
+    {
+        $update_cache = true;
+        $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+
+        if (is_file($cache_file)) {
+            $cache = unserialize(file_get_contents($cache_file));
+            if ($cache['version'] == get_db_schema()) {
+                $update_cache = false;  // cache is valid skip update
+            }
         }
 
-        return $this->findPathRecursive([$start], $target);
+        if ($update_cache) {
+            $paths = [];
+            foreach ($this->getTables() as $table) {
+                $path = $this->findPathRecursive([$table], $base);
+                if ($path) {
+                    $paths[$table] = $path;
+                }
+            }
+
+            $cache = [
+                'version' => get_db_schema(),
+                $base => $paths
+            ];
+
+            file_put_contents($cache_file, serialize($cache));
+        }
+
+        return $cache[$base];
+    }
+
+    /**
+     * Find the relationship path from $start to $target
+     *
+     * @param string $target
+     * @param string $start Default: devices
+     * @return array|false list of tables in path order, or false if no path is found
+     */
+    public function findRelationshipPath($target, $start = 'devices')
+    {
+        d_echo("Searching for target: $start, starting with $target\n");
+
+        if ($target == $start) {
+            // um, yeah, we found it...
+            return [$start];
+        }
+
+        $all = $this->getAllRelationshipPaths($start);
+
+        return isset($all[$target]) ? $all[$target] : false;
     }
 
     private function findPathRecursive(array $tables, $target, $history = [])
@@ -196,10 +249,6 @@ class Schema
 
     public function columnExists($table, $column)
     {
-        $schema = $this->getSchema();
-
-        $fields = array_column($schema[$table]['Columns'], 'Field');
-
-        return in_array($column, $fields);
+        return in_array($column, $this->getColumns($table));
     }
 }
