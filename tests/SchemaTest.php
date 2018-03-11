@@ -147,6 +147,4 @@ class SchemaTest extends TestCase
             $schema->findRelationshipPath('state_translations')
         );
     }
-
-
 }

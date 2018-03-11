@@ -53,7 +53,7 @@ if (is_admin() === false) {
                             echo "
                                 <tr>
                                     <td>{$rule['name']}</td>
-                                    <td>{$rule['sql']}</td>
+                                    <td>{$rule['rule']}</td>
                                     <td>{$rule['rule_id']}</td>
                                 </tr>
                             ";
