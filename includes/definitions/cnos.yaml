@@ -1,4 +1,4 @@
-os: lenovo-cnos
+os: cnos
 text: 'Lenovo Cloud Network Operating System'
 type: network
 icon: lenovo
