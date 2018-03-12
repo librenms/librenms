@@ -521,8 +521,20 @@ class ModuleTestHelper
 
         $this->qPrint(PHP_EOL);
 
+        // Figure out what discovery modules were run, could be a little janky doing this
+        $discovered_modules = array_reduce(get_included_files(), function ($results, $file) {
+            if (preg_match('#/includes/discovery/([^/]+)\.inc\.php#', $file, $matches)) {
+                $module = $matches[1];
+                if ($module != 'functions') {
+                    $results[] = $module;
+                }
+            }
+
+            return $results;
+        }, []);
+
         // Dump the discovered data
-        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
+        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $discovered_modules, 'discovery'));
         $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
@@ -541,8 +553,20 @@ class ModuleTestHelper
             $vdebug = $save_vedbug;
         }
 
+        // Figure out what poller modules were run
+        $polled_modules = array_reduce(get_included_files(), function ($results, $file) {
+            if (preg_match('#/includes/polling/([^/]+)\.inc\.php#', $file, $matches)) {
+                $module = $matches[1];
+                if ($module != 'functions') {
+                    $results[] = $module;
+                }
+            }
+
+            return $results;
+        }, []);
+
         // Dump polled data
-        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'poller'));
+        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
@@ -582,23 +606,23 @@ class ModuleTestHelper
      * Mostly used for testing
      *
      * @param int $device_id The test device id
+     * @param array modules to capture data for (should be a list of modules that were actually run)
      * @param string $key a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    public function dumpDb($device_id, $key = null)
+    public function dumpDb($device_id, $modules, $key = null)
     {
         $data = array();
         $module_dump_info = $this->getTableData();
 
         // don't dump some modules by default unless they are manually listed
         if (empty($this->modules)) {
-            foreach ($this->exclude_from_all as $module) {
-                unset($module_dump_info[$module]);
-            }
+            $modules = array_diff($modules, $this->exclude_from_all);
         }
 
-        foreach ($module_dump_info as $module => $module_tables) {
-            foreach ($module_tables as $table => $info) {
+        // only dump data for the given modules
+        foreach ($modules as $module) {
+            foreach ($module_dump_info[$module] as $table => $info) {
                 // check for custom where
                 $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
                 $params = array($device_id);
