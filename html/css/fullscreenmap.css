@@ -24,6 +24,10 @@ html, body, .container, .pace, .pace-done, .mapcontainer, .map, .row, .col-md-12
 
 }
 
+.leaflet-container {
+   background: #fff;
+}
+
 .navbar, .navbar-default, .navbar-fixed-top, .navbar-fixed-bottom {
    display: none;
    margin-bottom: 0;
