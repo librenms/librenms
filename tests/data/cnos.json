@@ -42,7 +42,7 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "lenovo-cnos",
+                    "os": "cnos",
                     "type": "network",
                     "serial": null,
                     "icon": "lenovo.svg"
