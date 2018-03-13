@@ -59,7 +59,7 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 2. Make the script executable (chmod +x /etc/snmp/apache-stats.py)
 
 3. Verify it is working by running /etc/snmp/apache-stats.py
-(In some cases urlgrabber needs to be installed, in Debian it can be achieved by: apt-get install python-urlgrabber)
+In some cases urlgrabber and pycurl needs to be installed, in Debian this can be achieved by: apt-get install python-urlgrabber python-pycurl . Make sure to remove /tmp/apache-snmp afterwards.
 
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
@@ -67,6 +67,11 @@ extend apache /etc/snmp/apache-stats.py
 ```
 
 5. Restart snmpd on your host
+
+6. Test by running
+```
+snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB::nsExtendOutput2Table
+```
 
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
