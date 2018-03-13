@@ -1,11 +1,13 @@
-html, body, .container, .pace, .pace-done, .mapcontainer, .map, .row, .col-md-12, #leaflet-map {
+html, body, .container, .pace-done, .mapcontainer, .map, .row, .col-md-12, #leaflet-map {
    height: 100%;
    width: 100%;
-   padding-top: 0;
    padding-bottom: 0;
-   margin-top: 0;
    margin-bottom: 0;
 }
+
+body {
+   line-height: 0;
+   }
 
 .container-fluid, .row, .col-md-12 {
    padding-right: 0;
@@ -17,21 +19,39 @@ html, body, .container, .pace, .pace-done, .mapcontainer, .map, .row, .col-md-12
 .container-fluid {
    height: 100%;
    width: 100%;
-   margin-top: -20px;
    margin-bottom: 0;
    padding-top: 0;
    padding-bottom: 0;
 
+/*   margin-top: -20px; */
 }
 
 .leaflet-container {
    background: #fff;
 }
 
-.navbar, .navbar-default, .navbar-fixed-top, .navbar-fixed-bottom {
-   display: none;
-   margin-bottom: 0;
-   margin-top: 0;
-   padding-top: 0;
-   padding-bottom: 0;
+/*
+.navbar .navbar-default, .navbar-fixed-top, .navbar-fixed-bottom {
+margin-bottom: 0;
+padding-bottom: 0;
+margin-top: 0;
+padding-top: 0;
 }
+*/
+
+/*
+ *.navbar, .navbar-default, .navbar-fixed-top, .navbar-fixed-bottom {
+ *  display: none;
+ *  margin-bottom: 0;
+ *  margin-top: 0;
+ *  padding-top: 0;
+ *  padding-bottom: 0;
+ *}
+ */
+
+/*
+html, body, .container, .pace-done, .mapcontainer, .map, .row, .col-md-12, #leaflet-map {
+   padding-top: 0;
+   margin-top: 0;
+}
+  */  
