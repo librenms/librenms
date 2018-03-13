@@ -3,8 +3,8 @@ $name = 'smart';
 $app_id = $app['app_id'];
 $unit_text     = '';
 $unitlen       = 10;
-$bigdescrlen   = 10;
-$smalldescrlen = 10;
+$bigdescrlen   = 25;
+$smalldescrlen = 25;
 $colours       = 'mega';
 $dostack       = 0;
 $printtotal    = 0;
@@ -16,27 +16,27 @@ $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id, $vars
 if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 5',
+        'descr'    => 'Reallocated_Sector_Ct',
         'ds'       => 'id5',
     );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 187',
+        'descr'    => 'Reported_Uncorrect',
         'ds'       => 'id187',
     );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 188',
+        'descr'    => 'Command_Timeout',
         'ds'       => 'id188',
     );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 197',
+        'descr'    => 'Current_Pending_Sector',
         'ds'       => 'id197',
     );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
-        'descr'    => 'ID# 198',
+        'descr'    => 'Offline_Uncorrectable',
         'ds'       => 'id198',
     );
 }
