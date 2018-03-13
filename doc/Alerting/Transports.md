@@ -200,6 +200,14 @@ __Note__: Currently ACK notifications are not transported to PagerDuty, This is 
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
+If you want to change the [notification sounds](https://pushover.net/api#sounds) then add it in config options as:
+
+```php
+sound_critical=falling
+```
+
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
 Firstly you need to create a new Application (called LibreNMS, for example) in your account on the Pushover website (https://pushover.net/apps)
