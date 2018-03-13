@@ -202,7 +202,8 @@ $config['allow_unauth_graphs'] = true;
 ```
 
 Service Alert:
-```<div style="font-family:Helvetica;">
+```
+<div style="font-family:Helvetica;">
 <h2>{if %state == 1}<span style="color:red;">%severity{/if}
 {if %state == 2}<span style="color:goldenrod;">acknowledged{/if}</span>
 {if %state == 3}<span style="color:green;">recovering{/if}</span>
@@ -222,7 +223,8 @@ Service Alert:
 ```
 
 Processor Alert with Graph:
-```%title <br>
+```
+%title <br>
 Severity: %severity  <br>
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp <br>
