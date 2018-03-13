@@ -229,7 +229,7 @@ function poll_device($device, $options)
     echo 'Hostname: ' . $device['hostname'] . PHP_EOL;
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
-    $ip = dnslookup($device);
+    $ip = dnslookup($device['hostname'], $device['transport']);
     $db_ip = inet_pton($ip);
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {

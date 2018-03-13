@@ -169,7 +169,12 @@ vi /etc/snmp/snmpd.conf
 
 ```
 # Change RANDOMSTRINGGOESHERE to your preferred SNMP community string
-com2sec readonly  default         RANDOMSTRINGGOESHERE
+com2sec  readonly  default      RANDOMSTRINGGOESHERE
+com2sec6 readonly  default      RANDOMSTRINGGOESHERE
+
+# listen on IPv4 and IPv6
+agentaddress udp:161
+agentaddress udp6:161
 
 group MyROGroup v2c        readonly
 view all    included  .1                               80
@@ -179,7 +184,7 @@ syslocation Rack, Room, Building, City, Country [GPSX,Y]
 syscontact Your Name <your@email.address>
 
 #Distro Detection
-extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+extend distro /usr/bin/distro
 ```
 
 If you have 'dmidecode' installed on your host, you can add the following lines for additional hardware detection.

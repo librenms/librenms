@@ -67,7 +67,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
     }
 
     try {
-        $remote_device_id = addHost($hostname, '', '161', 'udp', Config::get('distributed_poller_group'));
+        $remote_device_id = addHost($hostname, '', '161', 'auto', Config::get('distributed_poller_group'));
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
         discover_device($remote_device);

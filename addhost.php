@@ -73,7 +73,7 @@ if (!empty($argv[1])) {
     $snmpver   = strtolower($argv[3]);
 
     $port      = 161;
-    $transport = 'udp';
+    $transport = 'auto';
 
     $additional = array();
     if (isset($options['b'])) {
