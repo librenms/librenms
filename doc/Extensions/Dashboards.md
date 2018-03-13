@@ -73,6 +73,7 @@ In the dashboard, you want to create an interface graph select the widget called
 When using the Generic-image widget you can provide the width and height of the widget with your request.
 This will ensure that the image will fit nicely with the dimensions if the Generic-image widget.
 You can add @AUTO_HEIGHT@ and @AUTO_WIDTH@ to the Image URL as parameters.
-Examples: 
+
+#### Examples: 
 + http://librenms.example.com/graph.php?id=333%2C444&type=multiport_bits_separate&legend=no&absolute=1&from=-14200&width=@AUTO_WIDTH@&height=@AUTO_HEIGHT@
 + http://example.com/myimage.php?size=@AUTO_WIDTH@x@AUTO_HEIGHT@
