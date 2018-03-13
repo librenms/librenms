@@ -36,7 +36,7 @@ if (!empty($vars['group']) && is_numeric($vars['group'])) {
 
 $sql .= " WHERE $where ";
 
-if (!empty($vars['searchquery'])) {  
+if (!empty($vars['searchquery'])) {
     $sql .= ' AND (sysName LIKE "%'.$vars['searchquery'].'%" OR hostname LIKE "%'.$vars['searchquery'].'%" OR hardware LIKE "%'.$vars['searchquery'].'%"  OR os LIKE "%'.$vars['searchquery'].'%"  OR location LIKE "%'.$vars['searchquery'].'%")';
 }
 
