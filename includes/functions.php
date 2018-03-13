@@ -488,7 +488,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'auto', 
         $ip = dnslookup($host, $transport);
 
         // check if we have the host by IP
-        if ($force_add !== true && ip_exists($ip)) {
+        if ($check_ip && $force_add !== true && ip_exists($ip)) {
             $desc = $host == $ip ? $host : "$host ($ip)";
             throw new HostIpExistsException("Already have host with this IP $desc");
         }
