@@ -13,40 +13,38 @@ $link_array = array(
     'app'    => 'smart',
 );
 
-echo generate_link('All Disks', $link_array);
-echo '| disks:';
+$drives = array();
 
-$disks_int=0;
-while (isset($disks[$disks_int])) {
-    $disk=$disks[$disks_int];
-    $label=$disk;
+foreach ($disks as $label) {
+    $disk = $label;
 
     if ($vars['disk'] == $disk) {
-        $label='>>'.$disk.'<<';
+        $label = sprintf('⚫ %s', $label);
     }
 
-    echo generate_link($label, $link_array, array('disk'=>$disk)).', ';
-
-    $disks_int++;
+    array_push($drives, generate_link($label, $link_array, array('disk'=>$disk)));
 }
+
+printf("%s | drives: %s", generate_link('All Drives', $link_array), implode(', ', $drives));
 
 print_optionbar_end();
 
 if (isset($vars['disk'])) {
     $graphs = array(
-        'smart_big5'=>'Big 5: Reallocated Sector Count(5), Reported Uncorrectable Errors(187), Command Timeout(188), Current Pending Sector Count(197), Offline Uncorrectable(198)',
-        'smart_temp'=>'Temperature(C)(190), Air Temperature(C)(194)',
-        'smart_ssd'=>'SSD: Wear Leveling Count(173), SSD Life Left(231), Media Wearout Indicator(233)',
-        'smart_other'=>'Other: Spin Retry Count(10), Detected Uncorrentable Bad Blocks(183), End-to-End error(184), Reallocation Event Count(196), UltraDMA CRC Error Count(199)',
-        'smart_tests_status'=>'Tallies various selftest statuses',
-        'smart_tests_ran'=>'Tallies various selftest types',
+        'smart_big5'        => 'Reliability / Age',
+        'smart_temp'        => 'Temperature',
+        'smart_ssd'         => 'SSD-specific',
+        'smart_other'       => 'Other',
+        'smart_tests_status'=> 'S.M.A.R.T self-tests results',
+        'smart_tests_ran'   => 'S.M.A.R.T self-tests run count',
     );
 } else {
     $graphs = array(
         'smart_id5'=>'ID# 5, Reallocated Sectors Count',
         'smart_id10'=>'ID# 10, Spin Retry Count',
-        'smart_id173'=>'ID# 173 SSD Wear Leveling Count',
-        'smart_id183'=>'ID# 183, Detected Uncorrentable Bad Blocks',
+        'smart_id173'=>'ID# 173, SSD Wear Leveller Worst Case Erase Count',
+        'smart_id177'=>'ID# 177, SSD Wear Leveling Count',
+        'smart_id183'=>'ID# 183, Detected Uncorrectable Bad Blocks',
         'smart_id184'=>'ID# 184, End-to-End error / IOEDC',
         'smart_id187'=>'ID# 187, Reported Uncorrectable Errors',
         'smart_id188'=>'ID# 188, Command Timeout',
@@ -54,7 +52,7 @@ if (isset($vars['disk'])) {
         'smart_id194'=>'ID# 194, Temperature (C)',
         'smart_id196'=>'ID# 196, Reallocation Event Count',
         'smart_id197'=>'ID# 197, Current Pending Sector Count',
-        'smart_id198'=>'ID# 198, Uncorrectable Sector Count or Offline Uncorrectable or Off-Line Scan Uncorrectable Sector Count',
+        'smart_id198'=>'ID# 198, Uncorrectable Sector Count / Offline Uncorrectable / Off-Line Scan Uncorrectable Sector Count',
         'smart_id199'=>'ID# 199, UltraDMA CRC Error Count',
         'smart_id231'=>'ID# 231, SSD Life Left',
         'smart_id233'=>'ID# 233, Media Wearout Indicator'
