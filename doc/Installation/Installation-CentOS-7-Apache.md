@@ -102,6 +102,9 @@ Install the policy tool for SELinux:
     setsebool -P httpd_can_sendmail=1
 
 ##### Allow fping
+
+    cd /opt/librenms
+
 Create the file http_fping.tt with the following contents:
 ```
 module http_fping 1.0;
