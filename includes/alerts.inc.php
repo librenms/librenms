@@ -539,6 +539,7 @@ function DescribeAlert($alert)
         return 'Unknown State';
     }//end if
     $obj['uid']       = $alert['id'];
+    $obj['alert_id']  = $alert['alert_id'];
     $obj['severity']  = $alert['severity'];
     $obj['rule']      = $alert['rule'];
     $obj['name']      = $alert['name'];
