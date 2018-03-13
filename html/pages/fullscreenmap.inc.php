@@ -33,7 +33,7 @@ $config['leaflet']['default_lng'] = 14.1115485;
   Dag B <dag@bakke.com>
  */
  
-$pagetitle[] = 'Fullscreen Map';
+$pagetitle[] = 'Geographical Map';
 
 if ($config['map']['engine'] == 'leaflet') {
     require_once 'includes/common/worldmap.inc.php';
@@ -43,7 +43,29 @@ if ($config['map']['engine'] == 'leaflet') {
 ?>
 
 <link href="css/fullscreenmap.css" rel="stylesheet" type="text/css" />
+
 <script type="text/javascript">
+     var isFullscreen = false;
+     window.addEventListener('resize', function () {
+         if (window.innerHeight > (screen.height - 10)) {
+             isFullscreen = true;
+             setStyle();
+         } else {
+             isFullscreen = false;
+             setStyle();
+         };
+    }, false);
+    
+    function setStyle() {
+        if(isFullscreen) {
+            document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
+            document.getElementsByTagName('body')[0].style.paddingTop = 0;
+        } else {
+            document.getElementsByClassName('navbar-fixed-top')[0].style.removeProperty("display");
+            document.getElementsByTagName('body')[0].style.paddingTop = "50px";
+        };
+    }; 
+
     window.dispatchEvent(new Event('resize'));
 </script>
 
