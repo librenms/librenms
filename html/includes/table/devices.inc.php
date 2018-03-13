@@ -36,9 +36,8 @@ if (!empty($_POST['group']) && is_numeric($_POST['group'])) {
 
 $sql .= " WHERE $where ";
 
-if (!empty($_POST['hostname'])) {
-    $sql .= ' AND hostname LIKE ?';
-    $param[] = '%' . $_POST['hostname'] . '%';
+if (!empty($_POST['searchquery'])) {
+    $sql .= ' AND (sysName LIKE "%'.$_POST['searchquery'].'%" OR hostname LIKE "%'.$_POST['searchquery'].'%" OR hardware LIKE "%'.$_POST['searchquery'].'%"  OR os LIKE "%'.$_POST['searchquery'].'%"  OR location LIKE "%'.$_POST['searchquery'].'%")';
 }
 
 if (!empty($_POST['os'])) {
