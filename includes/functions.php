@@ -21,6 +21,7 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
 use LibreNMS\Util\MemcacheLock;
 
 function set_debug($debug)
@@ -495,7 +496,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'auto', 
         // determine transport, if auto (auto assumes udp)
         if ($transport == 'auto') {
             $transports = ['udp'];
-            // check if ip is ipv6,if so, try ipv6 first
+            // check if ip is ipv6, if so, try ipv6 first
             try {
                 if (IP::parse($ip)->getFamily() == 'ipv6') {
                     $transports = ['udp6', 'udp'];
@@ -1601,7 +1602,7 @@ function dnslookup($hostname, $type = 'auto')
 
     // try ipv4, we use gethostbyname here to so we also pull in hosts file
     $ipv4 = gethostbyname($hostname);
-    if (IP::isValid($ipv4)) {
+    if (IPv4::isValid($ipv4)) {
         return $ipv4;
     }
 
