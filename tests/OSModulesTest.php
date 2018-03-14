@@ -49,8 +49,8 @@ class OSModulesTest extends DBTestCase
         try {
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
-            $filename = $helper->getJsonFilepath(true);
 
+            $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($snmpsim, true);
         } catch (FileNotFoundException $e) {
@@ -65,6 +65,9 @@ class OSModulesTest extends DBTestCase
             $this->fail("$os: Failed to collect data.");
         }
 
+        // output all discovery and poller output if debug mode is enabled for phpunit
+        $debug = in_array('--debug', $_SERVER['argv'], true);
+
         foreach ($modules as $module) {
             $expected = $expected_data[$module]['discovery'];
             $actual = $results[$module]['discovery'];
@@ -73,7 +76,7 @@ class OSModulesTest extends DBTestCase
                 $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($module)
+                . $helper->getDiscoveryOutput($debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
 
@@ -88,7 +91,7 @@ class OSModulesTest extends DBTestCase
                 $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($module)
+                . $helper->getPollerOutput($debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }

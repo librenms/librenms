@@ -32,6 +32,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
 {
+    private static $module_tables;
+
     private $quiet = false;
     private $modules;
     private $variant;
@@ -41,7 +43,6 @@ class ModuleTestHelper
     private $snmprec_dir;
     private $json_dir;
     private $file_name;
-    private $module_tables;
     private $discovery_module_output = [];
     private $poller_module_output = [];
     private $discovery_output;
@@ -88,7 +89,10 @@ class ModuleTestHelper
         $influxdb = false;
         Config::set('nographite', true);
 
-        $this->module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
+        if (is_null(self::$module_tables)) {
+            // only load the yaml once, then keep it in memory
+            self::$module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
+        }
     }
 
     private static function compareOid($a, $b)
@@ -667,7 +671,7 @@ class ModuleTestHelper
      */
     public function getTableData()
     {
-        return array_intersect_key($this->module_tables, array_flip($this->getModules()));
+        return array_intersect_key(self::$module_tables, array_flip($this->getModules()));
     }
 
     /**
@@ -686,6 +690,8 @@ class ModuleTestHelper
                 return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
             }
         }
+
+        return $this->discovery_output;
     }
 
     /**
@@ -716,7 +722,7 @@ class ModuleTestHelper
      */
     public function getSupportedModules()
     {
-        return array_keys($this->module_tables);
+        return array_keys(self::$module_tables);
     }
 
     /**
