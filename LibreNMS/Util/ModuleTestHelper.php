@@ -596,7 +596,8 @@ class ModuleTestHelper
      * @param string $type poller|disco identified by "#### Load disco module" string
      * @return array
      */
-    private function extractModuleOutput($output, $type) {
+    private function extractModuleOutput($output, $type)
+    {
         $module_output = [];
         $module_start = "#### Load $type module ";
         $module_end = "#### Unload $type module %s ####";
