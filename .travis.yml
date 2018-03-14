@@ -31,10 +31,7 @@ before_install:
 
 install:
   - composer install --prefer-dist --no-interaction
-  - pip install --user pyasn1==0.2.2
-  - pip install --user snmpsim==0.3.1
-  - pip install --user pylint
-  - pip install --user mysql-python
+  - pip install --user snmpsim pylint mysql-python
 
 after_failure:
   - tail /tmp/snmpsimd.log

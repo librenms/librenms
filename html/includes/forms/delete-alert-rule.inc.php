@@ -22,11 +22,8 @@ if (!is_numeric($_POST['alert_id'])) {
     exit;
 } else {
     if (dbDelete('alert_rules', '`id` =  ?', array($_POST['alert_id']))) {
-        if (dbDelete('alert_map', 'rule = ?', array($_POST['alert_id'])) || dbFetchCell('SELECT COUNT(*) FROM alert_map WHERE rule = ?', array($_POST['alert_id'])) == 0) {
-            echo 'Maps has been deleted.';
-        } else {
-            echo 'WARNING: Maps could not be deleted.';
-        }
+        dbDelete('alert_device_map', 'rule_id=?', [$_POST['alert_id']]);
+        dbDelete('alert_group_map', 'rule_id=?', [$_POST['alert_id']]);
 
         echo 'Alert rule has been deleted.';
         exit;
