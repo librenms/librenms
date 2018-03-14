@@ -91,7 +91,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
         'alert_rules',
         'id=?',
         array($rule_id)
-    ) > 0) {
+    ) >= 0) {
         $message = "Edited Rule: <i>$name</i>";
     } else {
         $message = "Failed to edit Rule <i>$name</i>";
