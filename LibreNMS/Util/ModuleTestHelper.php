@@ -189,7 +189,7 @@ class ModuleTestHelper
             'sysObjectID.0_get' => array('oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'),
         );
         foreach ($snmp_matches[0] as $index => $line) {
-            preg_match('/-m ([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
+            preg_match('/-m \+?([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
             $mib = $mib_matches[1];
             $method = $snmp_matches[1][$index];
             $oids = explode(' ', trim($snmp_matches[2][$index]));
