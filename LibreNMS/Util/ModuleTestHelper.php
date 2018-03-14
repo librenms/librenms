@@ -42,6 +42,8 @@ class ModuleTestHelper
     private $json_dir;
     private $file_name;
     private $module_tables;
+    private $discovery_module_output = [];
+    private $poller_module_output = [];
     private $discovery_output;
     private $poller_output;
 
@@ -521,17 +523,10 @@ class ModuleTestHelper
 
         $this->qPrint(PHP_EOL);
 
-        // Figure out what discovery modules were run, could be a little janky doing this
-        $discovered_modules = array_reduce(get_included_files(), function ($results, $file) {
-            if (preg_match('#/includes/discovery/([^/]+)\.inc\.php#', $file, $matches)) {
-                $module = $matches[1];
-                if ($module != 'functions') {
-                    $results[] = $module;
-                }
-            }
-
-            return $results;
-        }, []);
+        // Parse discovered modules
+        preg_match_all('/#### Load disco module ([\w-]+) ####.*?#### Unload disco module [\w-]+ ####/s', $this->discovery_output, $matches);
+        $discovered_modules = $matches[1];
+        $this->discovery_module_output = array_combine($discovered_modules, $matches[0]);
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $discovered_modules, 'discovery'));
@@ -553,17 +548,10 @@ class ModuleTestHelper
             $vdebug = $save_vedbug;
         }
 
-        // Figure out what poller modules were run
-        $polled_modules = array_reduce(get_included_files(), function ($results, $file) {
-            if (preg_match('#/includes/polling/([^/]+)\.inc\.php#', $file, $matches)) {
-                $module = $matches[1];
-                if ($module != 'functions') {
-                    $results[] = $module;
-                }
-            }
-
-            return $results;
-        }, []);
+        // Parse polled modules
+        preg_match_all('/#### Load poller module ([\w-]+) ####.*?#### Unload poller module [\w-]+ ####/s', $this->poller_output, $matches);
+        $polled_modules = $matches[1];
+        $this->poller_module_output = array_combine($polled_modules, $matches[0]);
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
@@ -682,15 +670,46 @@ class ModuleTestHelper
         return array_intersect_key($this->module_tables, array_flip($this->getModules()));
     }
 
-    public function getLastDiscoveryOutput()
+    /**
+     * Get the output from the last discovery that was run
+     * If module was specified, only return that module's output
+     *
+     * @param null $module
+     * @return mixed
+     */
+    public function getDiscoveryOutput($module = null)
     {
-        return $this->discovery_output;
+        if ($module) {
+            if (isset($this->discovery_module_output[$module])) {
+                return $this->discovery_module_output[$module];
+            } else {
+                // requested module not run don't spam all output
+                return '';
+            }
+        }
     }
 
-    public function getLastPollerOutput()
+    /**
+     * Get output from the last poller that was run
+     * If module was specified, only return that module's output
+     *
+     * @param null $module
+     * @return mixed
+     */
+    public function getPollerOutput($module = null)
     {
+        if ($module) {
+            if (isset($this->poller_module_output[$module])) {
+                return $this->poller_module_output[$module];
+            } else {
+                // requested module not run don't spam all output
+                return '';
+            }
+        }
+
         return $this->poller_output;
     }
+
 
     /**
      * Get a list of all modules that support capturing data

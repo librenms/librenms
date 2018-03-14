@@ -71,7 +71,7 @@ class OSModulesTest extends DBTestCase
                 $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getLastDiscoveryOutput()
+                . $helper->getDiscoveryOutput($module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
 
@@ -82,7 +82,7 @@ class OSModulesTest extends DBTestCase
                 $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getLastPollerOutput()
+                . $helper->getPollerOutput($module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }
