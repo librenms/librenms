@@ -683,8 +683,7 @@ class ModuleTestHelper
             if (isset($this->discovery_module_output[$module])) {
                 return $this->discovery_module_output[$module];
             } else {
-                // requested module not run don't spam all output
-                return '';
+                return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
             }
         }
     }
@@ -702,8 +701,7 @@ class ModuleTestHelper
             if (isset($this->poller_module_output[$module])) {
                 return $this->poller_module_output[$module];
             } else {
-                // requested module not run don't spam all output
-                return '';
+                return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
             }
         }
 

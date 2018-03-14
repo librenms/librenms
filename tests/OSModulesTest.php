@@ -55,8 +55,10 @@ class OSModulesTest extends DBTestCase
             $results = $helper->generateTestData($snmpsim, true);
         } catch (FileNotFoundException $e) {
             $this->fail($e->getMessage());
+            return;
         } catch (InvalidModuleException $e) {
             $this->fail($e->getMessage());
+            return;
         }
 
         if (is_null($results)) {
@@ -75,7 +77,11 @@ class OSModulesTest extends DBTestCase
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
 
-            $expected = $expected_data[$module]['poller'] == 'matches discovery' ? $expected_data[$module]['discovery'] : $expected_data[$module]['poller'];
+            if ($expected_data[$module]['poller'] == 'matches discovery') {
+                $expected = $expected_data[$module]['discovery'];
+            } else {
+                $expected = $expected_data[$module]['poller'];
+            }
             $actual = $results[$module]['poller'];
             $this->assertEquals(
                 $expected,
