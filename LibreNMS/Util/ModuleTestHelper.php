@@ -508,10 +508,10 @@ class ModuleTestHelper
         $data = array();  // array to hold dumped data
 
         // Run discovery
+        $save_debug = $debug;
+        $save_vedbug = $vdebug;
         if ($this->quiet) {
             ob_start();
-            $save_debug = $debug;
-            $save_vedbug = $vdebug;
             $debug = true;
             $vdebug = false;
         }

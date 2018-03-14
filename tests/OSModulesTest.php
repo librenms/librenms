@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
@@ -37,8 +36,8 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $target_os name of the (and variant) to test
-     * @param string $filename file name of the json data
+     * @param string $os base os
+     * @param string $variant optional variant
      * @param array $modules modules to test for this os
      */
     public function testOS($os, $variant, $modules)
