@@ -15,7 +15,7 @@
 function graphite_update($device, $measurement, $tags, $fields)
 {
     global $graphite, $config;
-    if ($graphite !== false) {
+    if ($graphite != false) {
         $timestamp = time();
         $graphite_prefix = $config['graphite']['prefix'];
         // metrics will be built as prefix.hostname.measurement.field value timestamp

@@ -1,11 +1,4 @@
 {
-    "applications": {
-        "discovery": {
-            "applications": [],
-            "application_metrics": []
-        },
-        "poller": "matches discovery"
-    },
     "arp-table": {
         "discovery": {
             "ipv4_mac": [
@@ -16,19 +9,7 @@
                 }
             ]
         },
-        "poller": "matches discovery"
-    },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
+        "poller": null
     },
     "mempools": {
         "discovery": {
@@ -10670,25 +10651,6 @@
     "processors": {
         "discovery": {
             "processors": []
-        },
-        "poller": "matches discovery"
-    },
-    "sensors": {
-        "discovery": {
-            "sensors": [],
-            "state_indexes": []
-        },
-        "poller": "matches discovery"
-    },
-    "storage": {
-        "discovery": {
-            "storage": []
-        },
-        "poller": "matches discovery"
-    },
-    "wireless": {
-        "discovery": {
-            "wireless_sensors": []
         },
         "poller": "matches discovery"
     }
