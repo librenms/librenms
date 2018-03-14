@@ -1,35 +1,4 @@
 {
-    "applications": {
-        "discovery": {
-            "applications": [],
-            "application_metrics": []
-        },
-        "poller": "matches discovery"
-    },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
-    },
-    "ports": {
-        "discovery": {
-            "ports": []
-        },
-        "poller": "matches discovery"
-    },
     "os": {
         "discovery": {
             "devices": [
@@ -48,31 +17,6 @@
                     "icon": "lenovo.svg"
                 }
             ]
-        },
-        "poller": "matches discovery"
-    },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
-    "sensors": {
-        "discovery": {
-            "sensors": [],
-            "state_indexes": []
-        },
-        "poller": "matches discovery"
-    },
-    "storage": {
-        "discovery": {
-            "storage": []
-        },
-        "poller": "matches discovery"
-    },
-    "wireless": {
-        "discovery": {
-            "wireless_sensors": []
         },
         "poller": "matches discovery"
     }
