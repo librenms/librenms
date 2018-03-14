@@ -22,14 +22,29 @@
  * @subpackage Alerts
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\Auth;
+
+/**
+ * @param $rule
+ * @param $query_builder
+ * @return bool|string
+ */
+function GenSQL($rule, $query_builder = false)
+{
+    if ($query_builder) {
+        return QueryBuilderParser::fromJson($query_builder);
+    } else {
+        return GenSQLOld($rule);
+    }
+}
 
 /**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
  * @return string|boolean
  */
-function GenSQL($rule)
+function GenSQLOld($rule)
 {
     $rule = RunMacros($rule);
     if (empty($rule)) {
@@ -99,10 +114,11 @@ function RunMacros($rule, $x = 1)
     krsort($config['alert']['macros']['rule']);
     foreach ($config['alert']['macros']['rule'] as $macro => $value) {
         if (!strstr($macro, " ")) {
-            $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
+            $value = str_replace('%', '', $value);
+            $rule = str_replace('macros.'.$macro, '('.$value.')', $rule);
         }
     }
-    if (strstr($rule, "%macros")) {
+    if (strstr($rule, "macros.")) {
         if (++$x < 30) {
             $rule = RunMacros($rule, $x);
         } else {
@@ -120,13 +136,15 @@ function RunMacros($rule, $x = 1)
 function GetRules($device)
 {
     $groups = GetGroupsFromDevice($device);
-    $params = array($device,$device);
+    $params = array($device, $device);
     $where = "";
     foreach ($groups as $group) {
-        $where .= " || alert_map.target = ?";
-        $params[] = 'g'.$group;
+        $where .= " || group_id = ?";
+        $params[] = $group;
     }
-    return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE alert_rules.disabled = 0 && ( (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || alert_map.target = ? '.$where.' )', $params);
+
+    $query = "SELECT DISTINCT a.* FROM alert_rules a LEFT JOIN alert_device_map d ON a.id=d.rule_id LEFT JOIN alert_group_map g ON a.id=d.rule_id WHERE a.disabled = 0 AND ((device_id=? OR device_id IS NULL) $where)";
+    return dbFetchRows($query, $params);
 }
 
 /**
@@ -167,7 +185,7 @@ function RunRules($device)
         d_echo(PHP_EOL);
         $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         if (empty($rule['query'])) {
-            $rule['query'] = GenSQL($rule['rule']);
+            $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
         }
         $sql = $rule['query'];
         $qry = dbFetchRows($sql, array($device));
@@ -630,7 +648,7 @@ function IssueAlert($alert)
 
     if ($config['alert']['fixed-contacts'] == false) {
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
         }
         $sql = $alert['query'];
         $qry = dbFetchRows($sql, array($alert['device_id']));
@@ -657,12 +675,12 @@ function IssueAlert($alert)
  */
 function RunAcks()
 {
+
     foreach (loadAlerts('alerts.state = 2 && alerts.open = 1') as $alert) {
         IssueAlert($alert);
         dbUpdate(array('open' => 0), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
     }
 }//end RunAcks()
-
 
 /**
  * Run Follow-Up alerts
@@ -677,7 +695,7 @@ function RunFollowUp()
         }
 
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
         }
         $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
         //make sure we can json_encode all the datas later
@@ -749,6 +767,7 @@ function RunAlerts()
         $updet            = false;
         $rextra           = json_decode($alert['extra'], true);
         $chk              = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', array($alert['device_id'], $alert['rule_id']));
+
         if ($chk['alerted'] == $alert['state']) {
             $noiss = true;
         }

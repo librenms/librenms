@@ -29,6 +29,14 @@ echo '<div class="panel panel-default panel-condensed">
                     </div>
                 </div>
             ';
+
+if (isset($_POST['device_id'])) {
+    $default_option = '<option value="' . (int)$_POST['device_id'] . '" selected="selected">';
+    $default_option .= htmlentities($_POST['hostname']) . '</option>';
+} else {
+    $default_option = '';
+}
+
 ?>
 
 <div class="table-responsive">
@@ -55,12 +63,13 @@ echo '<div class="panel panel-default panel-condensed">
             header: '<div id="{{ctx.id}}" class="{{css.header}}"><div class="row"> \
                 <div class="col-sm-8 actionBar"><span class="pull-left"> \
                 <form method="post" action="" class="form-inline" role="form" id="result_form"> \
+                <input type=hidden name="hostname" id="hostname"> \
                 <div class="form-group"> \
                 <label> \
                 <strong>Device&nbsp;</strong> \
                 </label> \
                 <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
-                <option value="">All Devices</option> \
+                <?php echo $default_option; ?> \
                </select> \
                </div> \
                <div class="form-group"> \
@@ -118,5 +127,22 @@ echo '<div class="panel panel-default panel-condensed">
         });
     });
 
-    <?php echo generate_fill_select_js('hostnames', '#device_id', $_POST['device_id']); ?>
+    $("#device_id").select2({
+        allowClear: true,
+        placeholder: "All Devices",
+        ajax: {
+            url: 'ajax_list.php',
+            delay: 250,
+            data: function (params) {
+                return {
+                    type: 'devices',
+                    search: params.term,
+                    limit: 8,
+                    page: params.page || 1
+                };
+            }
+        }
+    }).on('select2:select', function (e) {
+        $('#hostname').val(e.params.data.text);
+    });
 </script>

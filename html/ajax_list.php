@@ -23,11 +23,15 @@ if (!$_SESSION['authenticated']) {
 
 set_debug($_REQUEST['debug']);
 
-$id = mres($_REQUEST['id']);
+$type = mres($_REQUEST['type']);
 
-if (isset($id)) {
-    if (file_exists("includes/list/$id.inc.php")) {
-        header('Content-type: application/json');
-        include_once "includes/list/$id.inc.php";
-    }
+if (isset($type) && file_exists("includes/list/$type.inc.php")) {
+    header('Content-type: application/json');
+
+    list($results, $more) = include "includes/list/$type.inc.php";
+
+    die(json_encode([
+        'results' => $results,
+        'pagination' => ['more' => $more]
+    ]));
 }

@@ -47,6 +47,10 @@ class Config
         require $install_dir . '/includes/defaults.inc.php';
         require $install_dir . '/includes/definitions.inc.php';
 
+        // import standard settings
+        $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
+        self::set('alert.macros.rule', $macros);
+
         // variable definitions (remove me)
         require $install_dir . '/includes/vmware_guestid.inc.php';
 

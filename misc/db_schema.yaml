@@ -33,6 +33,22 @@ alerts:
     unique_alert: { Name: unique_alert, Columns: [device_id, rule_id], Unique: true, Type: BTREE }
     rule_id: { Name: rule_id, Columns: [rule_id], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+alert_device_map:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_device_map_rule_id_device_id_uindex: { Name: alert_device_map_rule_id_device_id_uindex, Columns: [rule_id, device_id], Unique: true, Type: BTREE }
+alert_group_map:
+  Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: group_id, Type: int(11), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_group_map_rule_id_group_id_uindex: { Name: alert_group_map_rule_id_group_id_uindex, Columns: [rule_id, group_id], Unique: true, Type: BTREE }
 alert_log:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -46,28 +62,20 @@ alert_log:
     rule_id: { Name: rule_id, Columns: [rule_id], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     time_logged: { Name: time_logged, Columns: [time_logged], Unique: false, Type: BTREE }
-alert_map:
-  Columns:
-    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: rule, Type: int(11), 'Null': false, Extra: '', Default: '0' }
-    - { Field: target, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 alert_rules:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: rule, Type: text, 'Null': false, Extra: '' }
     - { Field: severity, Type: 'enum(''ok'',''warning'',''critical'')', 'Null': false, Extra: '' }
     - { Field: extra, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: disabled, Type: tinyint(1), 'Null': false, Extra: '' }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: query, Type: text, 'Null': false, Extra: '' }
+    - { Field: builder, Type: text, 'Null': false, Extra: '' }
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     name: { Name: name, Columns: [name], Unique: true, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 alert_schedule:
   Columns:
     - { Field: schedule_id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -223,7 +231,7 @@ bills:
     - { Field: bill_notes, Type: varchar(256), 'Null': false, Extra: '' }
     - { Field: bill_autoadded, Type: tinyint(1), 'Null': false, Extra: '' }
   Indexes:
-    bill_id: { Name: bill_id, Columns: [bill_id], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
 bill_data:
   Columns:
     - { Field: bill_id, Type: int(11), 'Null': false, Extra: '' }
