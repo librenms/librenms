@@ -164,7 +164,7 @@ if (is_admin()) {
             lang: {
                 operators: {
                     regexp: 'regex',
-                    not_regexp: 'not regex'
+                    not_regex: 'not regex'
                 }
             },
             sqlOperators: {
