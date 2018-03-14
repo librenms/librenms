@@ -158,19 +158,25 @@ if (is_admin()) {
                 {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
                 {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
                 {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
-                {type: 'regexp', nb_inputs: 1, multiple: false, apply_to: ['string']}
+                {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string']},
+                {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string']}
             ],
             lang: {
                 operators: {
-                    regexp: 'regex'
+                    regexp: 'regex',
+                    not_regex: 'not regex'
                 }
             },
             sqlOperators: {
-                regexp: {op: 'REGEXP'}
+                regexp: {op: 'REGEXP'},
+                not_regexp: {op: 'NOT REGEXP'}
             },
             sqlRuleOperator: {
                 'REGEXP': function (v) {
                     return {val: v, op: 'regexp'};
+                },
+                'NOT REGEXP': function (v) {
+                    return {val: v, op: 'not_regexp'};
                 }
             }
         });
