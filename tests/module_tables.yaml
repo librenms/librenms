@@ -25,6 +25,7 @@ ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
+        order_by: ports.ifIndex, ports.ifDescr, ports.ifName
 os:
     devices:
         included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
