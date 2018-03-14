@@ -1,0 +1,38 @@
+[
+    [
+        "%macros.device_up = 1",
+        {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+        "macros.device_up = 1",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1"
+    ],
+    [
+        "%sensors.sensor_current > %sensors.sensor_limit",
+        {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"}],"valid":true},
+        "sensors.sensor_current > sensors.sensor_limit",
+        "SELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit"
+    ],
+    [
+        "%devices.hostname ~ \"@ocal@\" ",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":".*ocal.*"}],"valid":true},
+        "devices.hostname REGEXP \".*ocal.*\"",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \".*ocal.*\""
+    ],
+    [
+        "%macros.state_sensor_critical",
+        {"condition":"AND","rules":[{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+        "macros.state_sensor_critical = 1",
+        "SELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge12"},{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge13"}]},{"id":"ports.ifInOctets_delta","field":"ports.ifInOctets_delta","type":"integer","input":"number","operator":"greater","value":"42"}],"valid":true},
+        "macros.device = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42"
+    ],
+    [
+        "%bills.bill_name = \"Neil's Bill\"",
+        {"condition":"AND","rules":[{"id":"bills.bill_name","field":"bills.bill_name","type":"string","input":"text","operator":"equal","value":"Neil's Bill"}],"valid":true},
+        "bills.bill_name = \"Neil's Bill\"",
+        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\""
+    ]
+]

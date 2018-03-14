@@ -4,6 +4,8 @@ source: Alerting/Entities.md
 
 Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
 
+Below are some common entities that you can use within the alerting system. This list is not exhaustive and you should look at the MySQL database schema for the full list.
+
 ## Devices
 Entity | Description
 ---|---
@@ -54,7 +56,7 @@ Entity | Description
 `ports.ifOperStatus` | The operational status of the port (up or down)
 `ports.ifAdminStatus` | The administrative status of the port (up or down)
 `ports.ifDuplex` | Duplex setting of the port
-`ports.ifMtu` | The MTU setting of the port.
+`ports.ifMtu` | The MTU setting of the port.`
 
 ## Processors
 Entity | Description

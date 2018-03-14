@@ -23,7 +23,7 @@ if (!is_numeric($alert_id)) {
     exit;
 } else {
     if ($state == 2) {
-        $state = dbFetchCell('SELECT alerted FROM alerts WHERE id = ?', array($alert_id));
+        $state = 1;
         $open  = 1;
     } elseif ($state >= 1) {
         $state = 2;

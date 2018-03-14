@@ -675,3 +675,60 @@ function recordDbStatistic($stat, $start_time)
 
     return $runtime;
 }
+
+/**
+ * Synchronize a relationship to a list of related ids
+ *
+ * @param string $table
+ * @param string $target_column column name for the target
+ * @param int $target column target id
+ * @param string $list_column related column names
+ * @param array $list list of related ids
+ * @return array [$inserted, $deleted]
+ */
+function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
+{
+    $inserted = 0;
+
+    $delete_query = "`$target_column`=? AND `$list_column`";
+    $delete_params = [$target];
+    if (!empty($list)) {
+        $delete_query .= ' NOT IN ' . dbGenPlaceholders(count($list));
+        $delete_params = array_merge($delete_params, $list);
+    }
+    $deleted = (int)dbDelete($table, $delete_query, $delete_params);
+
+    $db_list = dbFetchColumn("SELECT `$list_column` FROM `$table` WHERE `$target_column`=?", [$target]);
+    foreach ($list as $item) {
+        if (!in_array($item, $db_list)) {
+            dbInsert([$target_column => $target, $list_column => $item], $table);
+            $inserted++;
+        }
+    }
+
+    return [$inserted, $deleted];
+}
+
+/**
+ * Synchronize a relationship to a list of relations
+ *
+ * @param string $table
+ * @param array $relationships array of relationship pairs with columns as keys and ids as values
+ * @return array [$inserted, $deleted]
+ */
+function dbSyncRelationships($table, $relationships = array())
+{
+    $changed = [[0, 0]];
+    list($target_column, $list_column) = array_keys(reset($relationships));
+
+    $grouped = [];
+    foreach ($relationships as $relationship) {
+        $grouped[$relationship[$target_column]][] = $relationship[$list_column];
+    }
+
+    foreach ($grouped as $target => $list) {
+        $changed[] = dbSyncRelationship($table, $target_column, $target, $list_column, $list);
+    }
+
+    return [array_sum(array_column($changed, 0)), array_sum(array_column($changed, 1))];
+}
