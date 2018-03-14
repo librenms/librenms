@@ -528,9 +528,8 @@ class ModuleTestHelper
         $this->qPrint(PHP_EOL);
 
         // Parse discovered modules
-        preg_match_all('/#### Load disco module ([\w-]+) ####.*?#### Unload disco module [\w-]+ ####/s', $this->discovery_output, $matches);
-        $discovered_modules = $matches[1];
-        $this->discovery_module_output = array_combine($discovered_modules, $matches[0]);
+        $this->discovery_module_output = $this->extractModuleOutput($this->discovery_output, 'disco');
+        $discovered_modules = array_keys($this->discovery_module_output);
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $discovered_modules, 'discovery'));
@@ -553,9 +552,8 @@ class ModuleTestHelper
         }
 
         // Parse polled modules
-        preg_match_all('/#### Load poller module ([\w-]+) ####.*?#### Unload poller module [\w-]+ ####/s', $this->poller_output, $matches);
-        $polled_modules = $matches[1];
-        $this->poller_module_output = array_combine($polled_modules, $matches[0]);
+        $this->poller_module_output = $this->extractModuleOutput($this->poller_output, 'poller');
+        $polled_modules = array_keys($this->poller_module_output);
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
@@ -591,6 +589,34 @@ class ModuleTestHelper
         }
 
         return $data;
+    }
+
+    /**
+     * @param string $output poller or discovery output
+     * @param string $type poller|disco identified by "#### Load disco module" string
+     * @return array
+     */
+    private function extractModuleOutput($output, $type) {
+        $module_output = [];
+        $module_start = "#### Load $type module ";
+        $module_end = "#### Unload $type module %s ####";
+        $parts = explode($module_start, $output);
+        array_shift($parts); // throw away first part of output
+        foreach ($parts as $part) {
+            // find the module name
+            $module = strtok($part, ' ');
+
+            // insert the name into the end string
+            $end = sprintf($module_end, $module);
+
+            // find the end
+            $end_pos = strrpos($part, $end) ?: -1;
+
+            // save output, re-add bits we used for parsing
+            $module_output[$module] = $module_start . substr($part, 0, $end_pos) . $end;
+        }
+
+        return $module_output;
     }
 
     /**
