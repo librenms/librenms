@@ -143,7 +143,7 @@ function GetRules($device)
         $params[] = $group;
     }
 
-    $query = "SELECT DISTINCT a.* FROM alert_rules a LEFT JOIN alert_device_map d ON a.id=d.rule_id LEFT JOIN alert_group_map g ON a.id=d.rule_id WHERE a.disabled = 0 AND ((device_id=? OR device_id IS NULL) $where)";
+    $query = "SELECT DISTINCT a.* FROM alert_rules a LEFT JOIN alert_device_map d ON a.id=d.rule_id LEFT JOIN alert_group_map g ON a.id=d.rule_id WHERE a.disabled = 0 AND ((d.device_id=? OR d.device_id IS NULL) $where)";
     return dbFetchRows($query, $params);
 }
 
