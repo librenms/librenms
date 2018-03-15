@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\SnmpsimException;
 use LibreNMS\Proc;
 
 class Snmpsim
@@ -45,7 +46,14 @@ class Snmpsim
         $this->snmprec_dir = Config::get('install_dir') . "/tests/snmpsim/";
     }
 
-    public function fork()
+    /**
+     * Run snmpsimd and fork it into the background
+     * Captures all output to the log
+     *
+     * @param int $wait Wait for x seconds after starting before returning
+     * @throws SnmpsimException
+     */
+    public function fork($wait = 1)
     {
         if ($this->isRunning()) {
             echo "Snmpsim is already running!\n";
@@ -61,11 +69,20 @@ class Snmpsim
 
         $this->proc = new Proc($cmd);
 
+        if ($wait) {
+            sleep($wait);
+        }
+
         if (isCli() && !$this->proc->isRunning()) {
             echo `tail -5 $this->log` . PHP_EOL;
         }
     }
 
+    /**
+     * Stop and start the running snmpsim process
+     *
+     * @throws SnmpsimException
+     */
     public function restart()
     {
         $this->stop();
@@ -82,6 +99,12 @@ class Snmpsim
         }
     }
 
+    /**
+     * Run snmpsimd but keep it in the foreground
+     * Outputs to stdout
+     *
+     * @throws SnmpsimException
+     */
     public function run()
     {
         echo "Starting snmpsim listening on {$this->ip}:{$this->port}... \n";
@@ -121,9 +144,24 @@ class Snmpsim
         return $this->port;
     }
 
+    /**
+     * Generate the command for snmpsimd
+     *
+     * @param bool $with_log
+     * @return string
+     * @throws SnmpsimException
+     */
     private function getCmd($with_log = true)
     {
-        $cmd = "snmpsimd.py --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
+        $bin = locate_binary('snmpsimd');
+        if (!is_executable($bin)) {
+            $bin = locate_binary('snmpsimd.py');
+            if (!is_executable($bin)) {
+                throw new SnmpsimException("Snmpsim could not be located, please install it.\n");
+            }
+        }
+
+        $cmd = "$bin --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
         if ($with_log) {
             $cmd .= " --logging-method=file:{$this->log}";

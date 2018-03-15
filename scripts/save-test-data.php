@@ -2,6 +2,7 @@
 <?php
 
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Exceptions\SnmpsimException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -32,8 +33,12 @@ $vdebug = $debug;
 
 
 if (isset($options['snmpsim'])) {
-    $snmpsim = new Snmpsim();
-    $snmpsim->run();
+    try {
+        $snmpsim = new Snmpsim();
+        $snmpsim->run();
+    } catch (SnmpsimException $e) {
+        echo $e->getMessage() . PHP_EOL;
+    }
     exit;
 }
 
@@ -96,13 +101,18 @@ if ($os_name) {
 
 
 // Now use the saved data to update the saved database data
-$snmpsim = new Snmpsim();
-$snmpsim->fork();
-$snmpsim_ip = $snmpsim->getIp();
-$snmpsim_port = $snmpsim->getPort();
+try {
+    $snmpsim = new Snmpsim();
+    $snmpsim->fork();
+    $snmpsim_ip = $snmpsim->getIp();
+    $snmpsim_port = $snmpsim->getPort();
 
-if (!$snmpsim->isRunning()) {
-    echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
+    if (!$snmpsim->isRunning()) {
+        echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
+        exit;
+    }
+} catch (SnmpsimException $e) {
+    echo $e->getMessage() . PHP_EOL;
     exit;
 }
 

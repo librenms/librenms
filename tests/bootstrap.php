@@ -23,6 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Exceptions\SnmpsimException;
 use LibreNMS\Proc;
 use LibreNMS\Util\Snmpsim;
 
@@ -53,13 +54,18 @@ ini_set('display_errors', 1);
 update_os_cache(true); // Force update of OS Cache
 
 if (getenv('SNMPSIM')) {
-    $snmpsim = new Snmpsim('127.1.6.2');
-    $snmpsim->fork();
+    try {
+        $snmpsim = new Snmpsim('127.1.6.2');
+        $snmpsim->fork();
 
-    // make PHP hold on a reference to $snmpsim so it doesn't get destructed
-    register_shutdown_function(function (Snmpsim $ss) {
-        $ss->stop();
-    }, $snmpsim);
+        // make PHP hold on a reference to $snmpsim so it doesn't get destructed
+        register_shutdown_function(function (Snmpsim $ss) {
+            $ss->stop();
+        }, $snmpsim);
+    } catch (SnmpsimException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        putenv('SNMPSIM'); // disable snmpsim
+    }
 }
 
 if (getenv('DBTEST')) {
