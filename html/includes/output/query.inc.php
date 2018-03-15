@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
+
 if (!is_admin()) {
     echo("Insufficient Privileges");
     exit();
@@ -41,7 +43,7 @@ switch ($type) {
         $results = array();
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
-                $rule['query'] = GenSQL($rule['rule']);
+                $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
             $qry = dbFetchRow($sql, array($device_id));
@@ -51,8 +53,15 @@ switch ($type) {
             } else {
                 $response = 'no match';
             }
+
+            if ($rule['builder']) {
+                $qb = QueryBuilderParser::fromJson($rule['builder']);
+            } else {
+                $qb = QueryBuilderParser::fromOld($rule['rule']);
+            }
+
             $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
-            $output .= 'Alert rule: ' . $rule['rule'] . PHP_EOL;
+            $output .= 'Alert rule: ' . $qb->toSql(false) . PHP_EOL;
             $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
