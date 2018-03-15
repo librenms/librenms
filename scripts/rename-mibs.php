@@ -35,8 +35,8 @@ $renamed_count = 0;
 foreach ($argv as $item) {
     if (is_dir($item)) {
         foreach (scandir($item) as $file) {
-	    if ($file != '.' && $file != '..') {
-                $renamed_count += (int)rename_mib_file($item.$file);
+            if ($file != '.' && $file != '..') {
+                $renamed_count += (int)rename_mib_file($item . $file);
             }
         }
     } else {
