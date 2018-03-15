@@ -130,20 +130,18 @@ function RunMacros($rule, $x = 1)
 
 /**
  * Get Alert-Rules for Devices
- * @param int $device Device-ID
+ * @param int $device_id Device-ID
  * @return array
  */
-function GetRules($device)
+function GetRules($device_id)
 {
-    $groups = GetGroupsFromDevice($device);
-    $params = array($device, $device);
-    $where = "";
-    foreach ($groups as $group) {
-        $where .= " || group_id = ?";
-        $params[] = $group;
-    }
+    $query = "SELECT DISTINCT a.* FROM alert_rules a
+  LEFT JOIN alert_device_map d ON a.id=d.rule_id
+  LEFT JOIN alert_group_map g ON a.id=g.rule_id
+  LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id
+  WHERE a.disabled = 0 AND ((d.device_id IS NULL AND g.group_id IS NULL) OR d.device_id=? OR dg.device_id=?)";
 
-    $query = "SELECT DISTINCT a.* FROM alert_rules a LEFT JOIN alert_device_map d ON a.id=d.rule_id LEFT JOIN alert_group_map g ON a.id=g.rule_id WHERE a.disabled = 0 AND ((d.device_id=? OR d.device_id IS NULL) $where)";
+    $params = [$device_id, $device_id];
     return dbFetchRows($query, $params);
 }
 
@@ -165,16 +163,16 @@ function IsMaintenance($device)
 }
 /**
  * Run all rules for a device
- * @param int $device Device-ID
+ * @param int $device_id Device-ID
  * @return void
  */
-function RunRules($device)
+function RunRules($device_id)
 {
-    if (IsMaintenance($device) > 0) {
+    if (IsMaintenance($device_id) > 0) {
         echo "Under Maintenance, Skipping alerts.\r\n";
         return false;
     }
-    foreach (GetRules($device) as $rule) {
+    foreach (GetRules($device_id) as $rule) {
         c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
         $extra = json_decode($rule['extra'], true);
         if (isset($extra['invert'])) {
@@ -183,12 +181,12 @@ function RunRules($device)
             $inv = false;
         }
         d_echo(PHP_EOL);
-        $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
+        $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device_id));
         if (empty($rule['query'])) {
             $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
         }
         $sql = $rule['query'];
-        $qry = dbFetchRows($sql, array($device));
+        $qry = dbFetchRows($sql, array($device_id));
         $cnt = count($qry);
         for ($i = 0; $i < $cnt; $i++) {
             if (isset($qry[$i]['ip'])) {
@@ -212,7 +210,7 @@ function RunRules($device)
                 c_echo('Status: %bNOCHG');
                 // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                 // So we update the details column with any fresh changes to the alert output we might have.
-                $alert_log           = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device, $rule['id']));
+                $alert_log           = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device_id, $rule['id']));
                 $details             = json_decode(gzuncompress($alert_log['details']), true);
                 $details['contacts'] = GetContacts($qry);
                 $details['rule']     = $qry;
@@ -220,9 +218,9 @@ function RunRules($device)
                 dbUpdate(array('details' => $details), 'alert_log', 'id = ?', array($alert_log['id']));
             } else {
                 $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
-                if (dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
-                        dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
+                if (dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
+                    if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
+                        dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
                     }
                     c_echo(PHP_EOL . 'Status: %rALERT');
                 }
@@ -231,9 +229,9 @@ function RunRules($device)
             if ($chk['state'] === "0") {
                 c_echo('Status: %bNOCHG');
             } else {
-                if (dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id']), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 0, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
-                        dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
+                if (dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id']), 'alert_log')) {
+                    if (!dbUpdate(array('state' => 0, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
+                        dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
                     }
                     c_echo(PHP_EOL . 'Status: %gOK');
                 }
@@ -613,20 +611,20 @@ function ClearStaleAlerts()
 
 /**
  * Re-Validate Rule-Mappings
- * @param integer $device Device-ID
+ * @param integer $device_id Device-ID
  * @param integer $rule   Rule-ID
  * @return boolean
  */
-function IsRuleValid($device, $rule)
+function IsRuleValid($device_id, $rule)
 {
     global $rulescache;
-    if (empty($rulescache[$device]) || !isset($rulescache[$device])) {
-        foreach (GetRules($device) as $chk) {
-            $rulescache[$device][$chk['id']] = true;
+    if (empty($rulescache[$device_id]) || !isset($rulescache[$device_id])) {
+        foreach (GetRules($device_id) as $chk) {
+            $rulescache[$device_id][$chk['id']] = true;
         }
     }
 
-    if ($rulescache[$device][$rule] === true) {
+    if ($rulescache[$device_id][$rule] === true) {
         return true;
     }
 
