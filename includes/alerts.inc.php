@@ -139,7 +139,7 @@ function GetRules($device_id)
   LEFT JOIN alert_device_map d ON a.id=d.rule_id
   LEFT JOIN alert_group_map g ON a.id=g.rule_id
   LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id
-  WHERE a.disabled = 0 AND ((d.device_id IS NULL AND g.group_id IS NULL) OR d.device_id=? OR dg.device_id=?);";
+  WHERE a.disabled = 0 AND ((d.device_id IS NULL AND g.group_id IS NULL) OR d.device_id=? OR dg.device_id=?)";
 
     $params = [$device_id, $device_id];
     return dbFetchRows($query, $params);
