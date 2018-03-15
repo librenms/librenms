@@ -20,7 +20,7 @@ Table of Content:
     - [Palo Alto](#palo-alto)
         - [PANOS 6.x/7.x](#panos-6x7x)
     - [VMware](#vmware)
-        - [ESX/ESXi 5.x/6.x](#esx-5x6x)
+        - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
 - [Operating systems](#operating-systems)
     - [Linux (snmpd v2)](#linux-snmpd)
     - [Linux (snmpd v3)](#linux-snmpd-v3)
