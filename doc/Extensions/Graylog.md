@@ -47,12 +47,28 @@ Additionally, the certificate's Common Name (CN) has to match the FQDN or IP add
 ## Suppressing/enabling the domain part of a hostname for specific platforms
 You should see if what you get in syslog/Graylog matches up with your configured hosts first. If you need to modify the syslog messages from specific platforms, this may be of assistance:
 
-### PanOS (Palo Alto Networks)
+### IOS (Cisco)
 ```
-set deviceconfig setting management hostname-type-in-syslog hostname  (or FQDN)
+router(config)# logging origin-id hostname
+```
+or
+```
+router(config)# logging origin-id string
 ```
 
 ### JunOS (Juniper Networks)
 ```
-set system syslog host yourlogserver.corp log-prefix <log-prefix>
+set system syslog host yourlogserver.corp log-prefix YOUR_PREFERRED_STRING
 ```
+
+### PanOS (Palo Alto Networks)
+```
+set deviceconfig setting management hostname-type-in-syslog hostname
+```
+or
+
+```
+set deviceconfig setting management hostname-type-in-syslog FQDN
+```
+
+
