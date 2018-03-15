@@ -143,7 +143,7 @@ set snmp v3 usm local-engine user authpriv authentication-sha authentication-pas
 set snmp v3 usm local-engine user authpriv privacy-aes128 privacy-password YOUR_PRIV_SECRET
 set snmp v3 vacm security-to-group security-model usm security-name authpriv group mysnmpv3
 set snmp v3 vacm access group mysnmpv3 default-context-prefix security-model any security-level authentication read-view mysnmpv3view
-set snmp v3 vacm access group lsgv3 default-context-prefix security-model any security-level privacy read-view mysnmpv3view
+set snmp v3 vacm access group mysnmpv3 default-context-prefix security-model any security-level privacy read-view mysnmpv3view
 set snmp view mysnmpv3view oid iso include
 ```
 
@@ -169,6 +169,24 @@ set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
 6. Click Apply
 
 Note that you need to allow SNMP on the needed interfaces. To do that you need to create a network "Interface Mgmt" profile for standard interface and allow SNMP under "Device > Management > Management Interface Settings" for out of band management interface.
+
+One may also configure SNMP from the command line, which is useful when you need to configure more than one firewall for SNMP monitoring. Log into the firewall(s) via ssh, and perform these commands for basic SNMPv3 configuration:
+```
+username@devicename> configure
+username@devicename# set deviceconfig system service disable-snmp no
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso oid 1.3.6.1
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso option include
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso mask 0xf0
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv authpwd YOUR_AUTH_SECRET
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv privpwd YOUR_PRIV_SECRET
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv view pa
+username@devicename# set deviceconfig system snmp-setting snmp-system location "Yourcity, Yourcountry [60.4,5.31]"
+username@devicename# set deviceconfig system snmp-setting snmp-system contact noc@your.org
+username@devicename# commit
+username@devicename# exit
+```
+
+
 
 ### VMware
 #### ESX/ESXi 5.x/6.x
