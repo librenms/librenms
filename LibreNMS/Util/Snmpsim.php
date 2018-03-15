@@ -53,7 +53,7 @@ class Snmpsim
      * @param int $wait Wait for x seconds after starting before returning
      * @throws SnmpsimException
      */
-    public function fork($wait = 1)
+    public function fork($wait = 2)
     {
         if ($this->isRunning()) {
             echo "Snmpsim is already running!\n";
