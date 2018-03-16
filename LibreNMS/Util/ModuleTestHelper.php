@@ -511,19 +511,21 @@ class ModuleTestHelper
         $save_debug = $debug;
         $save_vedbug = $vdebug;
         if ($this->quiet) {
-            ob_start();
             $debug = true;
             $vdebug = false;
         }
+        ob_start();
 
         discover_device($device, $this->getArgs());
 
+        $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            $this->discovery_output = ob_get_contents();
-            ob_end_clean();
             $debug = $save_debug;
             $vdebug = $save_vedbug;
+        } else {
+            ob_flush();
         }
+        ob_end_clean();
 
         $this->qPrint(PHP_EOL);
 
@@ -537,19 +539,21 @@ class ModuleTestHelper
 
         // Run the poller
         if ($this->quiet) {
-            ob_start();
             $debug = true;
             $vdebug = false;
         }
+        ob_start();
 
         poll_device($device, $this->getArgs());
 
+        $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            $this->poller_output = ob_get_contents();
-            ob_end_clean();
             $debug = $save_debug;
             $vdebug = $save_vedbug;
+        } else {
+            ob_flush();
         }
+        ob_end_clean();
 
         // Parse polled modules
         $this->poller_module_output = $this->extractModuleOutput($this->poller_output, 'poller');
