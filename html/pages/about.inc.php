@@ -178,6 +178,7 @@ echo "
 
     <p>
       <a href="http://www.librenms.org/">Web site</a> |
+      <a href="https://docs.librenms.org/">Docs</a> |
       <a href="https://github.com/librenms/">GitHub</a> |
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
       <a href="https://community.librenms.org">Community Forum</a> |
