@@ -49,12 +49,12 @@ class QueryBuilderParser implements \JsonSerializable
         'less_or_equal' => "<=",
         'greater' => ">",
         'greater_or_equal' => ">=",
-        'begins_with' => "ILIKE",
-        'not_begins_with' => "NOT ILIKE",
-        'contains' => "ILIKE",
-        'not_contains' => "NOT ILIKE",
-        'ends_with' => "ILIKE",
-        'not_ends_with' => "NOT ILIKE",
+        'begins_with' => "LIKE (\"%?\")",
+        'not_begins_with' => "NOT LIKE (\"%?\")",
+        'contains' => "LIKE (\"%?%\")",
+        'not_contains' => "NOT LIKE (\"%?%\")",
+        'ends_with' => "LIKE (\"?%\")",
+        'not_ends_with' => "NOT LIKE (\"?%\")",
         'is_empty' => "=''",
         'is_not_empty' => "!=''",
         'is_null' => "IS NULL",
@@ -283,6 +283,7 @@ class QueryBuilderParser implements \JsonSerializable
 
         if (str_contains($op, '?')) {
             // op with value inside it aka IN and NOT IN
+            $value = str_replace('"', '', $value);
             $sql = "$field " . str_replace('?', $value, $op);
         } else {
             $sql = "$field $op $value";
