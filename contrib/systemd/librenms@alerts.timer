@@ -1,0 +1,10 @@
+[Unit]
+Description=LibreNMS alerts
+
+[Timer]
+Unit=librenms@alerts.service
+OnCalendar=minutely
+RandomizedDelaySec=5s
+
+[Install]
+WantedBy=basic.target

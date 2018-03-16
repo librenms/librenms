@@ -1,0 +1,10 @@
+[Unit]
+Description=LibreNMS billing-calculate
+
+[Timer]
+Unit=librenms@billing-calculate.service
+OnCalendar=daily
+RandomizedDelaySec=15m
+
+[Install]
+WantedBy=basic.target

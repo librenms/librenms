@@ -98,9 +98,17 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
     chmod +x /usr/bin/distro
     systemctl restart snmpd
 
-### Cron job
+### Background jobs
 
-    cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+If you are upgrading LibreNMS, ensure to remove the crontab:
+
+    rm -fv /etc/cron.d/librenms*
+
+Copy, enable and start systemd timers:
+
+    cp /opt/librenms/contrib/systemd/* /etc/systemd/system/
+    systemctl daemon-reload
+    for timer in /etc/systemd/system/librenms@*.timer; do systemctl enable --now $(basename $timer); done
 
 #### Copy logrotate config
 

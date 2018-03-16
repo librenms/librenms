@@ -1,0 +1,12 @@
+[Unit]
+Description=LibreNMS check-services
+
+[Timer]
+Unit=librenms@check-services.service
+OnBootSec=60
+OnUnitInactiveSec=5m
+RandomizedDelaySec=30s
+
+[Install]
+WantedBy=basic.target
+

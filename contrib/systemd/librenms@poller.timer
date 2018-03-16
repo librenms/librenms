@@ -1,0 +1,9 @@
+[Unit]
+Description=LibreNMS poller
+
+[Timer]
+Unit=librenms@poller.service
+OnCalendar=*-*-* *:1/5:00
+
+[Install]
+WantedBy=basic.target
