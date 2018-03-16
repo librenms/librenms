@@ -43,8 +43,6 @@ class QueryBuilderParser implements \JsonSerializable
     private static $operators = [
         'equal' => "=",
         'not_equal' => "!=",
-        'in' => "IN (?)",
-        'not_in' => "NOT IN (?)",
         'less' => "<",
         'less_or_equal' => "<=",
         'greater' => ">",
@@ -272,7 +270,7 @@ class QueryBuilderParser implements \JsonSerializable
             // pass through value such as field
             $value = trim($value, '`');
             $value = $this->expandMacro($value); // check for macros
-        } elseif ($rule['type'] != 'integer') {
+        } elseif ($rule['type'] != 'integer' && !str_contains($op, '?')) {
             $value = "\"$value\"";
         }
 
@@ -283,7 +281,6 @@ class QueryBuilderParser implements \JsonSerializable
 
         if (str_contains($op, '?')) {
             // op with value inside it aka IN and NOT IN
-            $value = str_replace('"', '', $value);
             $sql = "$field " . str_replace('?', $value, $op);
         } else {
             $sql = "$field $op $value";
