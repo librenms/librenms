@@ -43,18 +43,16 @@ class QueryBuilderParser implements \JsonSerializable
     private static $operators = [
         'equal' => "=",
         'not_equal' => "!=",
-        'in' => "IN (?)",
-        'not_in' => "NOT IN (?)",
         'less' => "<",
         'less_or_equal' => "<=",
         'greater' => ">",
         'greater_or_equal' => ">=",
-        'begins_with' => "ILIKE",
-        'not_begins_with' => "NOT ILIKE",
-        'contains' => "ILIKE",
-        'not_contains' => "NOT ILIKE",
-        'ends_with' => "ILIKE",
-        'not_ends_with' => "NOT ILIKE",
+        'begins_with' => "LIKE (\"%?\")",
+        'not_begins_with' => "NOT LIKE (\"%?\")",
+        'contains' => "LIKE (\"%?%\")",
+        'not_contains' => "NOT LIKE (\"%?%\")",
+        'ends_with' => "LIKE (\"?%\")",
+        'not_ends_with' => "NOT LIKE (\"?%\")",
         'is_empty' => "=''",
         'is_not_empty' => "!=''",
         'is_null' => "IS NULL",
@@ -272,7 +270,7 @@ class QueryBuilderParser implements \JsonSerializable
             // pass through value such as field
             $value = trim($value, '`');
             $value = $this->expandMacro($value); // check for macros
-        } elseif ($rule['type'] != 'integer') {
+        } elseif ($rule['type'] != 'integer' && !str_contains($op, '?')) {
             $value = "\"$value\"";
         }
 
