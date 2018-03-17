@@ -48,6 +48,10 @@ sensors:
 storage:
     storage:
         excluded_fields: [device_id, storage_id]
+toner:
+    toner:
+        excluded_fields: [device_id]
+        order_by: toner_oid, toner_index
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
