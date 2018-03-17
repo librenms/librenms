@@ -25,7 +25,7 @@
 
  // Input Contact discovery
 
-$contacts['emu2_contacts'] = snmpwalk_group($device, 'emsInputContactStatusEntry','PowerNet-MIB');
+$contacts['emu2_contacts'] = snmpwalk_group($device, 'emsInputContactStatusEntry', 'PowerNet-MIB');
 
 foreach ($contacts['emu2_contacts'] as $id => $contact) {
     $index          = $contact['emsInputContactStatusInputContactIndex'];
