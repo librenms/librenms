@@ -53,8 +53,8 @@ class QueryBuilderParser implements \JsonSerializable
         'not_contains' => "NOT LIKE (\"%?%\")",
         'ends_with' => "LIKE (\"?%\")",
         'not_ends_with' => "NOT LIKE (\"?%\")",
-        'is_empty' => "=''",
-        'is_not_empty' => "!=''",
+        'is_empty' => "=",  // value will be empty
+        'is_not_empty' => "!=", // value will be empty
         'is_null' => "IS NULL",
         'is_not_null' => "IS NOT NULL",
         'regex' => 'REGEXP',
