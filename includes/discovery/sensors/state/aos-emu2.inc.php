@@ -25,7 +25,7 @@
 
  // Input Contact discovery
 
-$contacts['emu2_contacts'] = snmpwalk_cache_oid($device, 'emsInputContactStatusEntry', array(), 'PowerNet-MIB');
+$contacts['emu2_contacts'] = snmpwalk_group($device, 'emsInputContactStatusEntry','PowerNet-MIB');
 
 foreach ($contacts['emu2_contacts'] as $id => $contact) {
     $index          = $contact['emsInputContactStatusInputContactIndex'];
@@ -33,33 +33,29 @@ foreach ($contacts['emu2_contacts'] as $id => $contact) {
     $descr          = $contact['emsInputContactStatusInputContactName'];
     $currentstate   = $contact['emsInputContactStatusInputContactState'];
     $normalstate    = $contact['emsInputContactStatusInputContactNormalState'];
-    if (is_array($contacts['emu2_contacts']) && $normalstate == 'normallyClosedEMS') {
-        $state_name_nc = 'emsInputContactNormalState_NC';
+    if (is_array($contacts['emu2_contacts']) && $normalstate == '1') {
+        $state_name = 'emsInputContactNormalState_NC';
         $states = array(
             array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Closed'),
             array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Open'),
         );
-        create_state_index($state_name_nc, $states);
-    } elseif (is_array($contacts['emu2_contacts']) && $normalstate == 'normallyOpenEMS') {
-        $state_name_no = 'emsInputContactNormalState_NO';
+        create_state_index($state_name, $states);
+    } elseif (is_array($contacts['emu2_contacts']) && $normalstate == '2') {
+        $state_name = 'emsInputContactNormalState_NO';
         $states = array(
             array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Closed'),
             array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Open'),
         );
-        create_state_index($state_name_no, $states);
+        create_state_index($state_name, $states);
     }
-    if ($normalstate == 'normallyClosedEMS') {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_nc, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
-        create_sensor_to_state_index($device, $state_name_nc, $index);
-    } elseif ($normalstate == 'normallyOpenEMS') {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_no, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
-        create_sensor_to_state_index($device, $state_name_no, $index);
-    }
+
+    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // Output Relay discovery
 
-$relays['emu2_relays'] = snmpwalk_cache_oid($device, 'emsOutputRelayStatusEntry', array(), 'PowerNet-MIB');
+$relays['emu2_relays'] = snmpwalk_group($device, 'emsOutputRelayStatusEntry', 'PowerNet-MIB');
 
 foreach ($relays['emu2_relays'] as $id => $relay) {
     $index          = $relay['emsOutputRelayStatusOutputRelayIndex'];
@@ -67,33 +63,29 @@ foreach ($relays['emu2_relays'] as $id => $relay) {
     $descr          = $relay['emsOutputRelayStatusOutputRelayName'];
     $currentstate   = $relay['emsOutputRelayStatusOutputRelayState'];
     $normalstate    = $relay['emsOutputRelayStatusOutputRelayNormalState'];
-    if (is_array($relays['emu2_relays']) && $normalstate == 'normallyClosedEMS') {
-        $state_name_nc = 'emsOutputRelayNormalState_NC';
+    if (is_array($relays['emu2_relays']) && $normalstate == '1') {
+        $state_name = 'emsOutputRelayNormalState_NC';
         $states = array(
             array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Closed'),
             array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Open'),
         );
-        create_state_index($state_name_nc, $states);
-    } elseif (is_array($relays['emu2_relays']) && $normalstate == 'normallyOpenEMS') {
-        $state_name_no = 'emsOutputRelayNormalState_NO';
+        create_state_index($state_name, $states);
+    } elseif (is_array($relays['emu2_relays']) && $normalstate == '2') {
+        $state_name = 'emsOutputRelayNormalState_NO';
         $states = array(
             array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Closed'),
             array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Open'),
         );
-        create_state_index($state_name_no, $states);
+        create_state_index($state_name, $states);
     }
-    if ($normalstate == 'normallyClosedEMS') {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_nc, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
-        create_sensor_to_state_index($device, $state_name_nc, $index);
-    } elseif ($normalstate == 'normallyOpenEMS') {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_no, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
-        create_sensor_to_state_index($device, $state_name_no, $index);
-    }
+
+    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
+    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // Outlet discovery
 
-$outlets['emu2_outlets'] = snmpwalk_cache_oid($device, 'emsOutletStatusEntry', array(), 'PowerNet-MIB');
+$outlets['emu2_outlets'] = snmpwalk_group($device, 'emsOutletStatusEntry', 'PowerNet-MIB');
 
 foreach ($outlets['emu2_outlets'] as $id => $outlet) {
     $index          = $outlet['emsOutletStatusOutletIndex'];
@@ -101,26 +93,22 @@ foreach ($outlets['emu2_outlets'] as $id => $outlet) {
     $descr          = $outlet['emsOutletStatusOutletName'];
     $currentstate   = $outlet['emsOutletStatusOutletState'];
     $normalstate    = $outlet['emsOutletStatusOutletNormalState'];
-    if (is_array($outlets['emu2_outlets']) && $normalstate == 'normallyOnEMS') {
-        $state_name_on = 'emsOutletNormalState_ON';
+    if (is_array($outlets['emu2_outlets']) && $normalstate == '1') {
+        $state_name = 'emsOutletNormalState_ON';
         $states = array(
             array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'On'),
             array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Off'),
         );
-        create_state_index($state_name_on, $states);
-    } elseif (is_array($outlets['emu2_outlets']) && $normalstate == 'normallyOffEMS') {
-        $state_name_off = 'emsOutletNormalState_OFF';
+        create_state_index($state_name, $states);
+    } elseif (is_array($outlets['emu2_outlets']) && $normalstate == '2') {
+        $state_name = 'emsOutletNormalState_OFF';
         $states = array(
             array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'On'),
             array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Off'),
         );
-        create_state_index($state_name_off, $states);
+        create_state_index($state_name, $states);
     }
-    if ($normalstate == 'normallyOnEMS') {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_on, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
-        create_sensor_to_state_index($device, $state_name_on, $index);
-    } elseif ($normalstate == 'normallyOffEMS') {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name_off, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
-        create_sensor_to_state_index($device, $state_name_off, $index);
-    }
+
+    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $currentstate, 'snmp', $index);
+    create_sensor_to_state_index($device, $state_name, $index);
 }
