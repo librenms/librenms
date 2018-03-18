@@ -32,8 +32,8 @@ if (is_array($nimble_storage)) {
         $fstype = $storage['volOnline'];
         $descr  = $storage['volName'];
         //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
-        $size = ($storage['volSizeHigh'].$storage['volSizeLow']) * $units;
-        $used = ($storage['volUsageHigh'].$storage['volUsageLow']) * $units;
+        $size = (($storage['volSizeHigh'] << 32 ) + $storage['volSizeLow']) * $units;
+        $used = (($storage['volUsageHigh'] << 32 ) + $storage['volUsageLow']) * $units;
         if (is_numeric($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'nimbleos', $descr, $size, $units, $used);
         }
