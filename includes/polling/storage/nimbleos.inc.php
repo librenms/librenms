@@ -29,6 +29,6 @@ if (!is_array($storage_cache['nimbleos'])) {
 $entry = $storage_cache['nimbleos'][$storage[storage_index]];
 $storage['units'] = 1024*1024;
 //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
-$storage['size'] = ($entry['volSizeHigh'].$entry['volSizeLow']) * $storage['units'];
-$storage['used'] = ($entry['volUsageHigh'].$entry['volUsageLow']) * $storage['units'];
+$storage['size'] = (($entry['volSizeHigh'] << 32 ) + $entry['volSizeLow']) * $storage['units'];
+$storage['used'] = (($entry['volUsageHigh'] << 32 ) + $entry['volUsageLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);
