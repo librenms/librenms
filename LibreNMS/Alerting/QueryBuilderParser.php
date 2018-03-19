@@ -47,6 +47,8 @@ class QueryBuilderParser implements \JsonSerializable
         'less_or_equal' => "<=",
         'greater' => ">",
         'greater_or_equal' => ">=",
+        'between' => 'BETWEEN',
+        'not_between' => 'NOT BETWEEN',
         'begins_with' => "LIKE",
         'not_begins_with' => "NOT LIKE",
         'contains' => "LIKE",
@@ -62,6 +64,8 @@ class QueryBuilderParser implements \JsonSerializable
     ];
 
     private static $values = [
+        'between' => '? AND ?',
+        'not_between' => '? AND ?',
         'begins_with' => '"?%"',
         'not_begins_with' => '"?%"',
         'contains' => '"%?%"',
@@ -279,13 +283,15 @@ class QueryBuilderParser implements \JsonSerializable
         $op = self::$operators[$builder_op];
         $value = $rule['value'];
 
-        if (starts_with($value, '`') && ends_with($value, '`')) {
+        if (is_string($value) && starts_with($value, '`') && ends_with($value, '`')) {
             // pass through value such as field
             $value = trim($value, '`');
-            $value = $this->expandMacro($value); // check for macros
         } elseif (isset(self::$values[$builder_op])) {
             // wrap values as needed (is null values don't contain ? so '' is returned)
-            $value = str_replace('?', $value, self::$values[$builder_op]);
+            $values = (array) $value;
+            $value = preg_replace_callback('/\?/', function($matches) use (&$values) {
+                return array_shift($values);
+            }, self::$values[$builder_op]);
         } elseif (!is_numeric($value)) {
             // wrap quotes around non-numeric values
             $value = "\"$value\"";
@@ -293,6 +299,7 @@ class QueryBuilderParser implements \JsonSerializable
 
         if ($expand) {
             $field = $this->expandMacro($field);
+            $value = $this->expandMacro($value);
         }
 
         return trim("$field $op $value");

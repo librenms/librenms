@@ -48,6 +48,18 @@
         "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NOT NULL"
     ],
     [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"between","value":["3","99"]}],"valid":true},
+        "devices.device_id BETWEEN 3 AND 99",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id BETWEEN 3 AND 99"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"not_between","value":["2","4"]}],"valid":true},
+        "devices.device_id NOT BETWEEN 2 AND 4",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id NOT BETWEEN 2 AND 4"
+    ],
+    [
         "%macros.device_up = 1",
         {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.device_up = 1",
