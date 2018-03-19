@@ -2,6 +2,7 @@ source: Extensions/Syslog.md
 # Setting up syslog support
 
 This document will explain how to send syslog data to LibreNMS.
+Please also refer to the file Graylog.md for an alternate way of integrating syslog with LibreNMS.
 
 ### Syslog server installation
 
@@ -163,6 +164,7 @@ See here for more Clean Up Options [Link](https://docs.librenms.org/#Support/Con
 ### Client configuration
 
 Below are sample configurations for a variety of clients. You should understand the config before using it as you may want to make some slight changes.
+Further configuration hints may be found in the file Graylog.md.
 
 Replace librenms.ip with IP or hostname of your LibreNMS install.
 

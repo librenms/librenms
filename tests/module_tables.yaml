@@ -25,6 +25,7 @@ ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
+        order_by: ports.ifIndex, ports.ifDescr, ports.ifName
 os:
     devices:
         included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
@@ -37,6 +38,7 @@ sensors:
         joins:
             - { left: sensors.sensor_id, right: sensors_to_state_indexes.sensor_id }
             - { left: sensors_to_state_indexes.state_index_id, right: state_indexes.state_index_id }
+        order_by: sensors.sensor_class, sensors.sensor_type, sensors.sensor_index
     state_indexes:
         excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, state_lastupdated]
         joins:
@@ -47,6 +49,10 @@ sensors:
 storage:
     storage:
         excluded_fields: [device_id, storage_id]
+toner:
+    toner:
+        excluded_fields: [device_id]
+        order_by: toner_oid, toner_index
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]

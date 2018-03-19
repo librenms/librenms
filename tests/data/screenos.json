@@ -4333,6 +4333,6 @@
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": null
     }
 }

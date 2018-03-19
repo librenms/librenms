@@ -2194,3 +2194,8 @@ label {
   margin-right: 8px;
   float: left;
 }
+
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
+}

@@ -1,8 +1,8 @@
 <?php
 /**
- * hostnames.inc.php
+ * devices_groups.inc.php
  *
- * -Description-
+ * List devices and groups in one
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,21 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (is_admin() || is_read()) {
-    echo json_encode(dbFetchRows('SELECT `device_id` AS id, `hostname` AS value FROM `devices`'));
-} else {
-    $sql = 'SELECT `devices`.`device_id` AS id, `hostname` AS value FROM `devices`
-            LEFT JOIN `devices_perms` ON `devices`.`device_id` = `devices_perms`.`device_id`
-            WHERE `devices_perms`.`user_id` = ?';
+list($devices, $d_more) = include 'devices.inc.php';
+list($groups, $g_more) = include 'groups.inc.php';
 
-    echo json_encode(dbFetchRows($sql, $_SESSION['user_id']));
-}
+$groups = array_map(function ($group) {
+    $group['id'] = 'g' . $group['id'];
+    return $group;
+}, $groups);
+
+$data = [
+    ['text' => 'Devices', 'children' => $devices],
+    ['text' => 'Groups', 'children' => $groups]
+];
+
+return [$data, $d_more || $g_more];

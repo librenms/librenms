@@ -32,6 +32,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
 {
+    private static $module_tables;
+
     private $quiet = false;
     private $modules;
     private $variant;
@@ -41,7 +43,8 @@ class ModuleTestHelper
     private $snmprec_dir;
     private $json_dir;
     private $file_name;
-    private $module_tables;
+    private $discovery_module_output = [];
+    private $poller_module_output = [];
     private $discovery_output;
     private $poller_output;
 
@@ -86,7 +89,10 @@ class ModuleTestHelper
         $influxdb = false;
         Config::set('nographite', true);
 
-        $this->module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
+        if (is_null(self::$module_tables)) {
+            // only load the yaml once, then keep it in memory
+            self::$module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
+        }
     }
 
     private static function compareOid($a, $b)
@@ -189,7 +195,7 @@ class ModuleTestHelper
             'sysObjectID.0_get' => array('oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'),
         );
         foreach ($snmp_matches[0] as $index => $line) {
-            preg_match('/-m ([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
+            preg_match('/-m \+?([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
             $mib = $mib_matches[1];
             $method = $snmp_matches[1][$index];
             $oids = explode(' ', trim($snmp_matches[2][$index]));
@@ -502,47 +508,59 @@ class ModuleTestHelper
         $data = array();  // array to hold dumped data
 
         // Run discovery
+        $save_debug = $debug;
+        $save_vedbug = $vdebug;
         if ($this->quiet) {
-            ob_start();
-            $save_debug = $debug;
-            $save_vedbug = $vdebug;
             $debug = true;
             $vdebug = false;
         }
+        ob_start();
 
         discover_device($device, $this->getArgs());
 
+        $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            $this->discovery_output = ob_get_contents();
-            ob_end_clean();
             $debug = $save_debug;
             $vdebug = $save_vedbug;
+        } else {
+            ob_flush();
         }
+        ob_end_clean();
 
         $this->qPrint(PHP_EOL);
 
+        // Parse discovered modules
+        $this->discovery_module_output = $this->extractModuleOutput($this->discovery_output, 'disco');
+        $discovered_modules = array_keys($this->discovery_module_output);
+
         // Dump the discovered data
-        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
+        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $discovered_modules, 'discovery'));
         $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
         if ($this->quiet) {
-            ob_start();
             $debug = true;
             $vdebug = false;
         }
+        ob_start();
 
         poll_device($device, $this->getArgs());
 
+        $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            $this->poller_output = ob_get_contents();
-            ob_end_clean();
             $debug = $save_debug;
             $vdebug = $save_vedbug;
+        } else {
+            ob_flush();
         }
+        ob_end_clean();
+
+        // Parse polled modules
+        $this->poller_module_output = $this->extractModuleOutput($this->poller_output, 'poller');
+        $polled_modules = array_keys($this->poller_module_output);
 
         // Dump polled data
-        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'poller'));
+        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
@@ -578,27 +596,56 @@ class ModuleTestHelper
     }
 
     /**
+     * @param string $output poller or discovery output
+     * @param string $type poller|disco identified by "#### Load disco module" string
+     * @return array
+     */
+    private function extractModuleOutput($output, $type)
+    {
+        $module_output = [];
+        $module_start = "#### Load $type module ";
+        $module_end = "#### Unload $type module %s ####";
+        $parts = explode($module_start, $output);
+        array_shift($parts); // throw away first part of output
+        foreach ($parts as $part) {
+            // find the module name
+            $module = strtok($part, ' ');
+
+            // insert the name into the end string
+            $end = sprintf($module_end, $module);
+
+            // find the end
+            $end_pos = strrpos($part, $end) ?: -1;
+
+            // save output, re-add bits we used for parsing
+            $module_output[$module] = $module_start . substr($part, 0, $end_pos) . $end;
+        }
+
+        return $module_output;
+    }
+
+    /**
      * Dump the current database data for the module to an array
      * Mostly used for testing
      *
      * @param int $device_id The test device id
+     * @param array modules to capture data for (should be a list of modules that were actually run)
      * @param string $key a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    public function dumpDb($device_id, $key = null)
+    public function dumpDb($device_id, $modules, $key = null)
     {
         $data = array();
         $module_dump_info = $this->getTableData();
 
         // don't dump some modules by default unless they are manually listed
         if (empty($this->modules)) {
-            foreach ($this->exclude_from_all as $module) {
-                unset($module_dump_info[$module]);
-            }
+            $modules = array_diff($modules, $this->exclude_from_all);
         }
 
-        foreach ($module_dump_info as $module => $module_tables) {
-            foreach ($module_tables as $table => $info) {
+        // only dump data for the given modules
+        foreach ($modules as $module) {
+            foreach ($module_dump_info[$module] as $table => $info) {
                 // check for custom where
                 $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
                 $params = array($device_id);
@@ -655,18 +702,49 @@ class ModuleTestHelper
      */
     public function getTableData()
     {
-        return array_intersect_key($this->module_tables, array_flip($this->getModules()));
+        return array_intersect_key(self::$module_tables, array_flip($this->getModules()));
     }
 
-    public function getLastDiscoveryOutput()
+    /**
+     * Get the output from the last discovery that was run
+     * If module was specified, only return that module's output
+     *
+     * @param null $module
+     * @return mixed
+     */
+    public function getDiscoveryOutput($module = null)
     {
+        if ($module) {
+            if (isset($this->discovery_module_output[$module])) {
+                return $this->discovery_module_output[$module];
+            } else {
+                return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
+            }
+        }
+
         return $this->discovery_output;
     }
 
-    public function getLastPollerOutput()
+    /**
+     * Get output from the last poller that was run
+     * If module was specified, only return that module's output
+     *
+     * @param null $module
+     * @return mixed
+     */
+    public function getPollerOutput($module = null)
     {
+        if ($module) {
+            if (isset($this->poller_module_output[$module])) {
+                return $this->poller_module_output[$module];
+            } else {
+                return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
+            }
+        }
+
         return $this->poller_output;
     }
+
 
     /**
      * Get a list of all modules that support capturing data
@@ -675,7 +753,7 @@ class ModuleTestHelper
      */
     public function getSupportedModules()
     {
-        return array_keys($this->module_tables);
+        return array_keys(self::$module_tables);
     }
 
     /**
