@@ -167,7 +167,7 @@ if ($graphite !== false) {
 }
 
 if ($polled_devices) {
-    dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices, 'poller' => $config['distributed_poller_name'] ), 'perf_times');
+    dbInsert(array('dtype' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices, 'poller' => $config['distributed_poller_name'] ), 'perf_times');
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $polled_devices devices polled in $poller_time secs";

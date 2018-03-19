@@ -118,7 +118,7 @@ function dbQuery($sql, $parameters = array())
         if (isset($config['mysql_log_level']) && ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || in_array($config['mysql_log_level'], array('DEBUG')))) {
             if (!empty($mysql_error)) {
                 $output_log = date($config['dateformat']['compact']) . " MySQL Error: $mysql_error ($fullSql)";
-                c_echo("[%r$output_log%n]");
+                c_echo("[%r$output_log%n]\n");
                 logfile($output_log);
             }
         }
