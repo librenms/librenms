@@ -270,7 +270,7 @@ class QueryBuilderParser implements \JsonSerializable
             // pass through value such as field
             $value = trim($value, '`');
             $value = $this->expandMacro($value); // check for macros
-        } elseif ($rule['type'] != 'integer' && !str_contains($op, '?')) {
+        } elseif (!is_numeric($value) && !str_contains($op, '?')) {
             $value = "\"$value\"";
         }
 
