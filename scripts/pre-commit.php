@@ -186,16 +186,7 @@ function check_style($passthru = false, $command_only = false)
 {
     $phpcs_bin = check_exec('phpcs');
 
-    // matches a substring of the full path
-    $cs_excludes = array(
-        '/vendor/',
-        '/lib/',
-        '/html/plugins/',
-        '/config.php',
-    );
-
-    $cs_exclude = build_excludes('--ignore=', $cs_excludes);
-    $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=PSR2 $cs_exclude ./";
+    $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml ./";
 
     if ($command_only) {
         echo $cs_cmd . PHP_EOL;
@@ -294,23 +285,6 @@ function check_opt($options)
     }
 
     return false;
-}
-
-/**
- * Build a list of exclude arguments from an array
- *
- * @param string $exclude_string such as "--exclude"
- * @param array $excludes array of directories to exclude
- * @return string resulting string
- */
-function build_excludes($exclude_string, $excludes)
-{
-    $result = '';
-    foreach ($excludes as $exclude) {
-        $result .= $exclude_string . $exclude . ' ';
-    }
-
-    return $result;
 }
 
 /**
