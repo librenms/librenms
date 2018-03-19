@@ -73,7 +73,8 @@ foreach ($tables as $tablevalue) {
                 null,
                 $entry[$oid],
                 'snmp',
-                $index);
+                $index
+            );
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
