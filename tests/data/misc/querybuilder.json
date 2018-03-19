@@ -49,6 +49,18 @@
     ],
     [
         "",
+        {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_empty","value":null}],"valid":true},
+        "devices.hardware = ''",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware = ''"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_not_empty","value":null}],"valid":true},
+        "devices.hardware != ''",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware != ''"
+    ],
+    [
+        "",
         {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"between","value":["3","99"]}],"valid":true},
         "devices.device_id BETWEEN 3 AND 99",
         "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id BETWEEN 3 AND 99"
