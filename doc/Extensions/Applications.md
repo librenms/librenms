@@ -20,7 +20,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
-1. [NGINX](#nginx) - Agent
+1. [NGINX](#nginx) - SNMP extend, Agent
 1. [NFS-server](#nfs-server) - SNMP extend
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server](#ntp-server) - SNMP extend
@@ -508,7 +508,7 @@ extend nginx /etc/snmp/nginx-stats
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
-##### NFS-server
+### NFS-server
 Export the NFS stats from as server.
 
 ##### SNMP Extend
