@@ -2,38 +2,38 @@
     [
         "",
         {"condition":"OR","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"begins_with","value":"begin"}],"valid":true},
-        "devices.hostname LIKE \"begin%\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE \"begin%\""
+        "devices.hostname LIKE 'begin%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE 'begin%'"
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_begins_with","value":"notbegin"}],"valid":true},
-        "devices.hostname NOT LIKE \"notbegin%\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE \"notbegin%\""
+        "devices.hostname NOT LIKE 'notbegin%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE 'notbegin%'"
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"contains"}],"valid":true},
-        "devices.hostname LIKE \"%contains%\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE \"%contains%\""
+        "devices.hostname LIKE '%contains%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%contains%'"
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_contains","value":"notcontains"}],"valid":true},
-        "devices.hostname NOT LIKE \"%notcontains%\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE \"%notcontains%\""
+        "devices.hostname NOT LIKE '%notcontains%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notcontains%'"
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"ends_with","value":"ends"}],"valid":true},
-        "devices.hostname LIKE \"%ends\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE \"%ends\""
+        "devices.hostname LIKE '%ends'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%ends'"
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_ends_with","value":"notends"}],"valid":true},
-        "devices.hostname NOT LIKE \"%notends\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE \"%notends\""
+        "devices.hostname NOT LIKE '%notends'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notends'"
     ],
     [
         "",

@@ -64,16 +64,16 @@ class QueryBuilderParser implements \JsonSerializable
     ];
 
     private static $values = [
-        'between' => '? AND ?',
-        'not_between' => '? AND ?',
-        'begins_with' => '"?%"',
-        'not_begins_with' => '"?%"',
-        'contains' => '"%?%"',
-        'not_contains' => '"%?%"',
-        'ends_with' => '"%?"',
-        'not_ends_with' => '"%?"',
-        'is_null' => false,
-        'is_not_null' => false,
+        'between' => "? AND ?",
+        'not_between' => "? AND ?",
+        'begins_with' => "'?%'",
+        'not_begins_with' => "'?%'",
+        'contains' => "'%?%'",
+        'not_contains' => "'%?%'",
+        'ends_with' => "'%?'",
+        'not_ends_with' => "'%?'",
+        'is_null' => "",
+        'is_not_null' => "",
         'is_empty' => "''",
         'is_not_empty' => "''",
     ];
