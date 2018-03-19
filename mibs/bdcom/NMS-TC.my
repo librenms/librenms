@@ -121,12 +121,11 @@ NMSNetworkAddress ::= TEXTUAL-CONVENTION
         "
     SYNTAX    OCTET STRING
 
-SMI Unsigned32
---Unsigned32 ::= TEXTUAL-CONVENTION
---    STATUS    current
---    DESCRIPTION
---        "An unsigned 32-bit quantity indistinguishable from Gauge32."
---    SYNTAX    Gauge32
+Unsigned32 ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "An unsigned 32-bit quantity indistinguishable from Gauge32."
+    SYNTAX    Gauge32
 
 Unsigned64 ::= TEXTUAL-CONVENTION
     STATUS current

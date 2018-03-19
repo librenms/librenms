@@ -25,19 +25,34 @@ if (is_admin() === false) {
                 <h5 class="modal-title" id="mandeps">Device Dependency for Multiple Devices</h5>
             </div>
             <div class="modal-body">
-                <div id="mandeps-msg"></div>
-                <p>Here you can modify multiple device dependencies. Setting the parent device to "None" will clear the dependency.</p>
-                <br />
-                <div class="form-group">
-                    <label for="manavailableparents">Parent Host:</label>
-                    <select multiple name="parent_id" class="form-control" id="manavailableparents" style='width: 100%'>
-                    </select>
-                </div>
+                <ul class="nav nav-tabs" role="tablist" id="manhostdepstabs">
+                    <li role="presentation" class="active"><a href="#bulkadd" aria-controls="bulkadd" role="tab" data-toggle="tab">Bulk Add</a></li>
+                    <li role="presentation"><a href="#clearall" aria-controls="clearall" role="tab" data-toggle="tab">Clear All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="bulkadd">
+                        <p>Here you can modify multiple device dependencies. Setting the parent device to "None" will clear the dependency.</p>
+                        <br />
+                        <div class="form-group">
+                            <label for="manavailableparents">Parent Host:</label>
+                            <select multiple name="parent_id" class="form-control" id="manavailableparents" style='width: 100%'>
+                            </select>
+                        </div>
 
-                <div class="form-group">
-                    <label for="manalldevices">Child Hosts:</label>
-                    <select multiple name="device_ids" class="form-control" id="manalldevices" style='width: 100%'>
-                    </select>
+                        <div class="form-group">
+                            <label for="manalldevices">Child Hosts:</label>
+                            <select multiple name="device_ids" class="form-control" id="manalldevices" style='width: 100%'>
+                            </select>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="clearall">
+                        <p>Select the parent device to delete its child devices</p>
+                        <div class="form-group">
+                            <label for="manclearchildren">Parent Host:</label>
+                            <select multiple name="parent_id" class="form-control" id="manclearchildren" style='width: 100%'>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -71,7 +86,7 @@ function changeParents(e, evttype)
     }
 
     // Set parents to new value
-    $('#manavailableparents').val(temp_arr).trigger('change');
+    $('#manavailableparents').val(parent_ids).trigger('change');
 
     $.ajax({
         type: 'POST',
@@ -104,6 +119,9 @@ $('#manage-dependencies').on('hide.bs.modal', function() {
     $('#manavailableparents').val('0');
     $('#manavailableparents').trigger('change');
 
+    $('#manclearchildren').val('0');
+    $('#manclearchildren').trigger('change');
+
     $('#manalldevices').val(null);
     $('#manalldevices').trigger('change');
 });
@@ -123,8 +141,12 @@ $('#manage-dependencies').on('show.bs.modal', function() {
                 });
                 $('#manalldevices').val(tempArr);
                 $('#manalldevices').trigger('change');
+
                 $('#manavailableparents').val(device_id);
                 $('#manavailableparents').trigger('change');
+
+                $('#manclearchildren').val(device_id);
+                $('#manclearchildren').trigger('change');
             } else {
                 toastr.error(output.message);
             }
@@ -141,44 +163,80 @@ $('#manhostdep-save').click('', function(event) {
     var children = [];
     var parent_id = [];
     var parent_host = '';
+    var btn_text = $('#manhostdep-save').text();
 
-    // Get selections
-    var parents = $('#manavailableparents').select2('data');
-    var devices = $('#manalldevices').select2('data');
+    if (btn_text == 'Save') {
+        // Get selections
+        var parents = $('#manavailableparents').select2('data');
+        var devices = $('#manalldevices').select2('data');
 
-    for (var i=0;i<parents.length;i++) {
-        parent_id.push(parents[i].id);
-        parent_host = parent_host + '<a href="device/device='+ parents[i].id +'/">' + parents[i].text + '</a>, ';
-    }
-    for (var i=0;i<devices.length;i++) {
-        device_ids.push(devices[i].id);
-        children.push(devices[i].text);
-    }
-    parent_host = parent_host.slice(0, -2);
-
-    $.ajax({
-        type: 'POST',
-        url: 'ajax_form.php',
-        data: { type: "save-host-dependency", device_ids: device_ids, parent_ids: parent_id },
-        dataType: "json",
-        success: function(output) {
-            $("#manage-dependencies").modal('hide');
-            $('#hostdeps').bootgrid('reload');
-            if (output.status == 0) {
-                toastr.success('Device dependencies saved successfully');
-            } else {
-                toastr.error('The device dependency could not be saved.');
-            }
-        },
-        error: function() {
-            toastr.error('The device dependency could not be saved.');
-            $("#manage-dependencies").modal('hide');
+        for (var i=0;i<parents.length;i++) {
+            parent_id.push(parents[i].id);
+            parent_host = parent_host + '<a href="device/device='+ parents[i].id +'/">' + parents[i].text + '</a>, ';
         }
-    });
+        for (var i=0;i<devices.length;i++) {
+            device_ids.push(devices[i].id);
+            children.push(devices[i].text);
+        }
+        parent_host = parent_host.slice(0, -2);
+
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "save-host-dependency", device_ids: device_ids, parent_ids: parent_id },
+            dataType: "json",
+            success: function(output) {
+                $("#manage-dependencies").modal('hide');
+                $('#hostdeps').bootgrid('reload');
+                if (output.status == 0) {
+                    toastr.success('Device dependencies saved successfully');
+                } else {
+                    toastr.error('The device dependency could not be saved.');
+                }
+            },
+            error: function() {
+                toastr.error('The device dependency could not be saved.');
+                $("#manage-dependencies").modal('hide');
+            }
+        });
+    } else if(btn_text == 'Clear') {
+        var parents = $('#manclearchildren').select2('data');
+        for (var i=0;i<parents.length;i++) {
+            parent_id.push(parents[i].id);
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "delete-host-dependency", parent_ids: parent_id },
+            dataType: "json",
+            success: function(output) {
+                $("#manage-dependencies").modal('hide');
+                $('#hostdeps').bootgrid('reload');
+                if (output.status == 0) {
+                    toastr.success(output.message);
+                } else {
+                    toastr.error(output.message);
+                }
+            },
+            error: function() {
+                toastr.error('The device dependency could not be deleted.');
+                $("#manage-dependencies").modal('hide');
+            }
+        });
+    }
 });
 
 $(document).ready(function() {
     $('#manavailableparents').on('select2:select', function(e) {changeParents(e, 'select')});
     $('#manavailableparents').on('select2:unselect', function(e) {changeParents(e, 'unselect')});
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        if ($(e.target).closest('li').index() == 0) {
+            $('#manhostdep-save').text('Save');
+        } else if ($(e.target).closest('li').index() == 1) {
+            $('#manhostdep-save').text('Clear');
+        }
+
+    });
 });
 </script>

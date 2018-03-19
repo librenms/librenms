@@ -1,0 +1,73 @@
+-- LENOVO-SMI-MIB: Lenovo structure of management information
+-- Copyright (c) 2014-2016 Lenovo.  All rights reserved.
+
+LENOVO-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+
+lenovo MODULE-IDENTITY
+    LAST-UPDATED "201608150000Z"
+    ORGANIZATION "Lenovo Group Ltd."
+    CONTACT-INFO
+        "Lenovo
+         Postal: 1009 Think Place
+         Morrisville, NC 27560
+         USA
+         Tel: +1 (919) 968-4465
+         E-mail: snmp@lenovo.com"
+    DESCRIPTION
+         "The Structure of Management Information for the
+         Lenovo Enterprise Business Group."
+    REVISION      "201610271830Z"
+    DESCRIPTION
+        "Initial version."
+        ::= { enterprises 19046 } -- assigned by IANA
+
+lenovoProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root object identifier from which sysObjectID values are assigned.  
+		 Values are defined in LENOVO-PRODUCTS-MIB."
+    ::= { lenovo 1 }
+	
+lenovoNetworkMibs OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root object identifier for management-related Lenovo network MIBs."
+    ::= { lenovo 2 }
+
+tor-mibs OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root for pre-10.x Lenovo RackSwitch switch MIBs."
+    ::= { lenovoNetworkMibs 7 }
+
+flex-mibs OBJECT-IDENTITY 
+    STATUS current
+    DESCRIPTION
+        "Root for pre-10.x Lenovo Flex chassis switch MIBs."
+    ::= { lenovoNetworkMibs 18 }
+
+network-mibs OBJECT-IDENTITY 
+    STATUS current
+    DESCRIPTION
+        "Root for Lenovo device-independent switch MIBs."
+    ::= { lenovoNetworkMibs 3 }
+
+lenovoServerMibs OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root object identifier for management-related Lenovo server MIBs."
+    ::= { lenovo 11 }
+
+lenovoModules OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root bject identifier from which MODULE-IDENTITY values may be assigned."
+    ::= { lenovo 4 }	
+
+END

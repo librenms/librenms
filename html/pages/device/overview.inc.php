@@ -11,14 +11,14 @@ $services = get_service_status($device['device_id']);
 $services['total'] = array_sum($services);
 
 if ($services[2]) {
-    $services_colour = $warn_colour_a;
+    $services_colour = $config['warn_colour'];
 } else {
-    $services_colour = $list_colour_a;
+    $services_colour = $config['list_colour']['even'];
 }
 if ($ports['down']) {
-    $ports_colour = $warn_colour_a;
+    $ports_colour = $config['warn_colour'];
 } else {
-    $ports_colour = $list_colour_a;
+    $ports_colour = $config['list_colour']['even'];
 }
 
 echo('
@@ -76,6 +76,8 @@ require 'overview/sensors/delay.inc.php';
 require 'overview/sensors/quality_factor.inc.php';
 require 'overview/sensors/chromatic_dispersion.inc.php';
 require 'overview/sensors/ber.inc.php';
+require 'overview/sensors/eer.inc.php';
+require 'overview/sensors/waterflow.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';

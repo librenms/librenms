@@ -1,6 +1,23 @@
 mib: KELVIN-pCOWeb-Chiller-MIB
 modules:
     sensors:
+        waterflow:
+            data:
+                -
+                    oid: flow-value.0
+                    value: flow-value
+                    divisor: 10
+                    num_oid: .1.3.6.1.4.1.9839.2.1.2.73.
+                    descr: Water Flow Rate
+                    index: 'flow-value.{{ $index }}'
+        eer:
+            data:
+                -
+                    oid: analogObjects.120
+                    value: analogObjects
+                    num_oid: .1.3.6.1.4.1.9839.2.1.3.
+                    descr: Energy Efficiency Ratio
+                    index: 'analogObjects.{{ $index }}'
         power:
             data:
                 -

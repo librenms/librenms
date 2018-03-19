@@ -32,7 +32,7 @@ discovery_modules:
     cisco-pw: 0
     cisco-sla: 0
     cisco-vrf-lite: 0
-    cisco-vrf: 0
+    vrf: 0
     libvirt-vminfo: 0
     ntp: 0
     stp: 0

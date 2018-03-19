@@ -9,6 +9,7 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.9.1.2319
+        - .1.3.6.1.4.1.9.1.2409
 discovery_modules:
     entity-physical: 0
     processors: 0

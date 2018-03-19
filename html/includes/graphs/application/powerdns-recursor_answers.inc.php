@@ -29,7 +29,7 @@ $colours = 'oranges';
 $unit_text = 'Answers/sec';
 $print_total = true;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list = array(
         array(
             'ds' => 'answers0-1',

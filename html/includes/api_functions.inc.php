@@ -86,6 +86,13 @@ function api_error($statusCode, $message)
     $app->stop();
 } // end api_error()
 
+function check_bill_permission($bill_id)
+{
+    if (!bill_permitted($bill_id)) {
+        api_error(403, 'Insufficient permissions to access this bill');
+    }
+}
+
 function check_device_permission($device_id)
 {
     if (!device_permitted($device_id)) {
@@ -239,6 +246,24 @@ function get_graph_generic_by_hostname()
     rrdtool_close();
 }
 
+
+function list_locations()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+
+    $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
+    $total_locations = count($locations);
+    if ($total_locations == 0) {
+        api_error(404, 'Locations do not exist');
+    }
+
+    api_success($locations, 'locations');
+}
+
+
 function get_device()
 {
     // return details of a single device
@@ -285,17 +310,17 @@ function list_devices()
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     } elseif ($type == 'location') {
-        $sql = "`location` LIKE '%".$query."%'";
+        $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
-        $sql = "`ignore`='1' AND `disabled`='0'";
+        $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
-        $sql = "`status`='1' AND `ignore`='0' AND `disabled`='0'";
+        $sql = "`d`.`status`='1' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'down') {
-        $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
+        $sql = "`d`.`status`='0' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'disabled') {
-        $sql = "`disabled`='1'";
+        $sql = "`d`.`disabled`='1'";
     } elseif ($type == 'os') {
-        $sql = "`os`=?";
+        $sql = "`d`.`os`=?";
         $param[] = $query;
     } elseif ($type == 'mac') {
         $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_mac` AS m ON p.`port_id` = m.`port_id` ";
@@ -532,6 +557,41 @@ function get_bgp()
     }
 
     api_success($bgp_session, 'bgp_session');
+}
+
+
+function list_cbgp()
+{
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $bgp_counters = array();
+    foreach (dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params) as $bgp_counter) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $bgp_counters[] = $bgp_counter;
+    }
+    $total_bgp_counters = count($bgp_counters);
+    if ($total_bgp_counters == 0) {
+        api_error(404, 'BGP counters does not exist');
+    }
+
+    api_success($bgp_counters, 'bgp_counters');
 }
 
 
@@ -831,11 +891,28 @@ function get_ip_addresses()
         check_device_permission($device_id);
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Device $device_id does not have any IP addresses");
+        }
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
         check_port_permission($port_id, null);
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Port $port_id does not have any IP addresses");
+        }
+    } elseif (isset($router['id'])) {
+        check_is_read();
+        $network_id = $router['id'];
+        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", array($network_id));
+        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "IP network $network_id does not exist or is empty");
+        }
     }
 
     api_success(array_merge($ipv4, $ipv6), 'addresses');
@@ -1178,8 +1255,9 @@ function list_bills()
     $bill_id = mres($router['bill_id']);
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
+    $period = $_GET['period'];
     $param = array();
-    
+
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
         $param[] = $bill_custid;
@@ -1197,7 +1275,20 @@ function list_bills()
         $param[] = $_SESSION['user_id'];
     }
 
-    foreach (dbFetchRows("SELECT * FROM `bills` WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
+    if ($period === 'previous') {
+        $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+        $query = 'FROM `bills`
+            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
+            INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
+    ';
+    } else {
+        $select = "SELECT bills.*,
+            IF(bills.bill_type = 'CDR', bill_cdr, bill_quota) AS bill_allowed
+        ";
+        $query = "FROM `bills`\n";
+    }
+
+    foreach (dbFetchRows("$select $query WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
         $rate_data    = $bill;
         $allowed = '';
         $used = '';
@@ -1227,6 +1318,338 @@ function list_bills()
         $bills[] = $bill;
     }
     api_success($bills, 'bills');
+}
+
+function get_bill_graph()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    if ($graph_type == 'monthly') {
+        $graph_type = 'historicmonthly';
+    }
+
+    $vars = array();
+    $vars['type'] = "bill_$graph_type";
+    $vars['id'] = $bill_id;
+    $vars['width']  = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+
+    $app->response->headers->set('Content-Type', 'image/png');
+    include 'includes/graphs/graph.inc.php';
+}
+
+function get_bill_graphdata()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    if ($graph_type == 'bits') {
+        $from = (isset($_GET['from']) ? $_GET['from'] : time() - 60 * 60 * 24);
+        $to   = (isset($_GET['to']) ? $_GET['to'] : time());
+        $reducefactor = $_GET['reducefactor'];
+
+        $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+    } elseif ($graph_type == 'monthly') {
+        $graph_data = getHistoricTransferGraphData($bill_id);
+    }
+
+    if (!isset($graph_data)) {
+        api_error(400, "Unsupported graph type $graph_type");
+    } else {
+        api_success($graph_data, 'graph_data');
+    }
+}
+
+function get_bill_history()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    $result = [];
+    foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
+        $result[] = $history;
+    }
+
+    api_success($result, 'bill_history');
+}
+
+function get_bill_history_graph()
+{
+    global $config;
+
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $bill_hist_id = mres($router['bill_hist_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    $vars = array();
+
+    switch ($graph_type) {
+        case 'bits':
+            $graph_type = 'historicbits';
+            $vars['reducefactor'] = $_GET['reducefactor'];
+            break;
+
+        case 'day':
+        case 'hour':
+            $vars['imgtype'] = $graph_type;
+            $graph_type = 'historictransfer';
+            break;
+
+        default:
+            api_error(400, "Unknown Graph Type $graph_type");
+            break;
+    }
+
+    global $dur;        // Needed for callback within graph code
+    $vars['type'] = "bill_$graph_type";
+    $vars['id'] = $bill_id;
+    $vars['bill_hist_id'] = $bill_hist_id;
+    $vars['width']  = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+
+    $app->response->headers->set('Content-Type', 'image/png');
+    include 'includes/graphs/graph.inc.php';
+}
+
+function get_bill_history_graphdata()
+{
+    global $config;
+
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $bill_hist_id = mres($router['bill_hist_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    switch ($graph_type) {
+        case 'bits':
+            $reducefactor = $_GET['reducefactor'];
+
+            $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+            break;
+        case 'day':
+        case 'hour':
+            $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+            break;
+    }
+
+    if (!isset($graph_data)) {
+        api_error(400, "Unsupported graph type $graph_type");
+    } else {
+        api_success($graph_data, 'graph_data');
+    }
+}
+
+function delete_bill()
+{
+    check_is_admin();
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = (int)$router['id'];
+
+    if ($bill_id < 1) {
+        api_error(400, 'Could not remove bill with id '.$bill_id.'. Invalid id');
+    }
+
+    $res = dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ]);
+    if ($res == 1) {
+        dbDelete('bill_ports', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_data', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
+        dbDelete('bill_perms', '`bill_id` =  ? ', [ $bill_id ]);
+        api_success_noresult(200, 'Bill has been removed');
+    }
+    api_error(400, 'Could not remove bill with id '.$bill_id);
+}
+
+function check_bill_key_value($bill_key, $bill_value)
+{
+    $return_value = null;
+    $bill_types = ['quota', 'cdr'];
+    switch ($bill_key) {
+        case "bill_type":
+            if (in_array($bill_value, $bill_types)) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key: $bill_value. Allowed: quota,cdr");
+            }
+            break;
+        case "bill_cdr":
+            if (is_numeric($bill_value)) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key. Must be numeric.");
+            }
+            break;
+        case "bill_day":
+            if ($bill_value > 0 && $bill_value <= 31) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key. range: 1-31");
+            }
+            break;
+        case "bill_quota":
+            if (is_numeric($bill_value)) {
+                $return_value = mres($bill_value);
+            } else {
+                api_error(400, "Invalid value for $bill_key. Must be numeric");
+            }
+            break;
+        default:
+            $return_value = mres($bill_value);
+            break;
+    }
+
+    return $return_value;
+}
+
+function create_edit_bill()
+{
+    check_is_admin();
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data) {
+        api_error(500, 'Invalid JSON data');
+    }
+    //check ports
+    $ports_add = null;
+    if (array_key_exists('ports', $data)) {
+        $ports_add = [];
+        $ports = $data['ports'];
+        foreach ($ports as $port_id) {
+            $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [ $port_id ]);
+            $result = $result[0];
+            if (!is_array($result) || !array_key_exists('port_id', $result)) {
+                api_error(500, 'Port ' . $port_id . ' does not exists');
+            }
+            $ports_add[] = $port_id;
+        }
+    }
+
+    $bill = [];
+    //find existing bill for update
+    $bill_id = (int)$data['bill_id'];
+    $bills = dbFetchRows("SELECT * FROM `bills` WHERE `bill_id` = $bill_id LIMIT 1");
+
+    // update existing bill
+    if (is_array($bills) && count($bills) == 1) {
+        $bill = $bills[0];
+
+        foreach ($data as $bill_key => $bill_value) {
+                $bill[$bill_key] = check_bill_key_value($bill_key, $bill_value);
+        }
+        $update_data = [
+            'bill_name' => $bill['bill_name'],
+            'bill_type' => $bill['bill_type'],
+            'bill_cdr' => $bill['bill_cdr'],
+            'bill_day' => $bill['bill_day'],
+            'bill_quota' => $bill['bill_quota'],
+            'bill_custid' => $bill['bill_custid'],
+            'bill_ref' => $bill['bill_ref'],
+            'bill_notes' => $bill['bill_notes']
+        ];
+        $update = dbUpdate($update_data, 'bills', 'bill_id=?', array($bill_id));
+        if ($update === false || $update < 0) {
+            api_error(500, 'Failed to update existing bill');
+        }
+    } else {
+        // create new bill
+        if (array_key_exists('bill_id', $data)) {
+            api_error(500, 'Argument bill_id is not allowed on bill create (auto assigned)');
+        }
+
+        $bill_keys = [
+            'bill_name',
+            'bill_type',
+            'bill_cdr',
+            'bill_day',
+            'bill_quota',
+            'bill_custid',
+            'bill_ref',
+            'bill_notes'
+        ];
+
+        if ($data['bill_type'] == 'quota') {
+            $data['bill_cdr'] = 0;
+        }
+        if ($data['bill_type'] == 'cdr') {
+            $data['bill_quota'] = 0;
+        }
+
+        $missing_keys = '';
+        $missing = array_diff_key(array_flip($bill_keys), $data);
+        if (count($missing) > 0) {
+            foreach ($missing as $missing_key => $dummy) {
+                $missing_keys .= " $missing_key";
+            }
+            api_error(500, 'Missing parameters: ' . $missing_keys);
+        }
+
+        foreach ($bill_keys as $bill_key) {
+            $bill[$bill_key] = check_bill_key_value($bill_key, $data[$bill_key]);
+        }
+
+        $bill_id = dbInsert(
+            [
+            'bill_name' => $bill['bill_name'],
+            'bill_type' => $bill['bill_type'],
+            'bill_cdr' => $bill['bill_cdr'],
+            'bill_day' => $bill['bill_day'],
+            'bill_quota' => $bill['bill_quota'],
+            'bill_custid' => $bill['bill_custid'],
+            'bill_ref' => $bill['bill_ref'],
+            'bill_notes' => $bill['bill_notes']
+             ],
+            'bills'
+        );
+
+        if ($bill_id === null) {
+            api_error(500, 'Failed to create new bill');
+        }
+    }
+
+    // set previously checked ports
+    if (is_array($ports_add)) {
+        dbDelete('bill_ports', "`bill_id` =  $bill_id");
+        if (count($ports_add) > 0) {
+            foreach ($ports_add as $port_id) {
+                dbInsert([ 'bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0 ], 'bill_ports');
+            }
+        }
+    }
+
+    api_success($bill_id, 'bill_id');
 }
 
 function update_device()
@@ -1336,6 +1759,68 @@ function get_devices_by_group()
     api_success($devices, 'devices');
 }
 
+
+function list_vrf()
+{
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'];
+    $vrfname    = $_GET['vrfname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!empty($vrfname)) {
+        $sql        = "  AND `vrfs`.`vrf_name`=?";
+        $sql_params = array($vrfname);
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $vrfs       = array();
+    foreach (dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params) as $vrf) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $vrfs[] = $vrf;
+    }
+    $total_vrfs = count($vrfs);
+    if ($total_vrfs == 0) {
+        api_error(404, 'VRFs do not exist');
+    }
+
+    api_success($vrfs, 'vrfs');
+}
+
+
+function get_vrf()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $vrfId  = $router['id'];
+    if (!is_numeric($vrfId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
+    $vrf_count = count($vrf);
+    if ($vrf_count == 0) {
+        api_error(404, "VRF $vrfId does not exist");
+    }
+
+    api_success($vrf, 'vrf');
+}
+
+
 function list_ipsec()
 {
     check_is_read();
@@ -1351,6 +1836,82 @@ function list_ipsec()
     $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
     api_success($ipsec, 'ipsec');
 }
+
+
+function list_vlans()
+{
+    $app      = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $vlans       = array();
+    foreach (dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params) as $vlan) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $vlans[] = $vlan;
+    }
+    $vlans_count = count($vlans);
+    if ($vlans_count == 0) {
+        api_error(404, 'VLANs do not exist');
+    }
+
+    api_success($vlans, 'vlans');
+}
+
+
+function list_ip_addresses()
+{
+    check_is_read();
+
+    $app            = \Slim\Slim::getInstance();
+    $router         = $app->router()->getCurrentRoute()->getParams();
+    $ipv4_addresses = array();
+    $ipv6_addresses = array();
+
+    $ipv4_addresses   = dbFetchRows("SELECT * FROM `ipv4_addresses`");
+    $ipv6_addresses   = dbFetchRows("SELECT * FROM `ipv6_addresses`");
+    $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
+    if ($ip_addresses_count == 0) {
+        api_error(404, 'IP addresses do not exist');
+    }
+
+    api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+}
+
+
+function list_ip_networks()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+    $ipv4_networks = array();
+    $ipv6_networks = array();
+
+    $ipv4_networks   = dbFetchRows("SELECT * FROM `ipv4_networks`");
+    $ipv6_networks   = dbFetchRows("SELECT * FROM `ipv6_networks`");
+    $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
+    if ($ip_networks_count == 0) {
+        api_error(404, 'IP networks do not exist');
+    }
+
+    api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+}
+
 
 function list_arp()
 {
@@ -1511,5 +2072,54 @@ function validate_column_list($columns, $tableName)
         $app->response->headers->set('Content-Type', 'application/json');
         echo _json_encode($output);
         $app->stop();
+    }
+}
+
+function add_service_for_host()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
+    $data = json_decode(file_get_contents('php://input'), true);
+    $missing_fields = array();
+
+    // Check if some required fields are empty
+    if (empty($data['type'])) {
+        $missing_fields[] = 'type';
+    }
+    if (empty($data['ip'])) {
+        $missing_fields[] = 'ip';
+    }
+
+    // Print error if required fields are missing
+    if (!empty($missing_fields)) {
+        api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
+    }
+    if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
+        api_error(400, 'service_ip is not a valid IP address.');
+    }
+
+    // Check if service type exists
+    if (!in_array($data['type'], list_available_services())) {
+        api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    }
+
+    // Get parameters
+    $service_type = $data['type'];
+    $service_ip   = $data['ip'];
+    $service_desc = $data['desc'] ? mres($data['desc']) : '';
+    $service_param = $data['param'] ? mres($data['param']) : '';
+    $service_ignore = $data['ignore'] ? true : false; // Default false
+
+    // Set the service
+    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
+    if ($service_id != false) {
+        api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
+    } else {
+        api_error(500, 'Failed to add the service');
     }
 }

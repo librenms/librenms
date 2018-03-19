@@ -226,7 +226,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, avg(`processor_usage`) as `cpuload`, `d`.`sysName`
                       FROM `processors` AS procs, `devices` AS `d`, `devices_perms` AS `P`
-					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` 
+					  WHERE `P`.`user_id` = :user AND `P`.`device_id` = `procs`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval
                       GROUP BY `procs`.`device_id`, `d`.`hostname`, `d`.`last_polled`, `d`.`sysName`
                       ORDER BY `cpuload` ' . $sort_order . '
@@ -244,7 +244,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `mempool_perc`, `d`.`sysName`
                       FROM `mempools` as `mem`, `devices` as `d`, `devices_perms` AS `P`
-                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id`
+                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `mem`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
                       AND `mempool_descr` IN (\'Physical memory\',\'Memory\')
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `mempool_perc` ' . $sort_order . '
@@ -262,7 +262,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         } else {
             $query = 'SELECT `hostname`, `last_polled`, `d`.`device_id`, `storage_perc`, `d`.`sysName`, `storage_descr`, `storage_perc_warn`, `storage_id`
                       FROM `storage` as `disk`, `devices` as `d`, `devices_perms` AS `P`
-                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `disk`.`device_id`
+                      WHERE `P`.`user_id` = :user AND `P`.`device_id` = `disk`.`device_id` AND `P`.`device_id` = `d`.`device_id` 
                       AND `d`.`type` = \'server\'
                       AND unix_timestamp() - UNIX_TIMESTAMP(`last_polled`) < :interval 
                       ORDER BY `storage_perc` ' . $sort_order . '

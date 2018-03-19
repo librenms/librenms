@@ -24,7 +24,7 @@ Output:
 ```json
 {
   "status": "ok",
-  "err-msg": "",
+  "message": "",
   "ports": [
         {
           "ifName": "Gi0/0/0",
@@ -65,7 +65,7 @@ Output:
 ```json
 {
   "status": "ok",
-  "err-msg": "",
+  "message": "",
   "port": [
     {
       "port_id": "323",
@@ -167,7 +167,7 @@ Output:
 ```json
 {
   "status": "ok",
-  "err-msg": "",
+  "message": "",
   "addresses": [
     {
       "ipv4_address_id": "290",

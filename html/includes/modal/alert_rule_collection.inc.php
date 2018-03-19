@@ -30,7 +30,7 @@ if (is_admin() === false) {
 ?>
 
 <div class="modal fade" id="search_rule_modal" tabindex="-1" role="dialog" aria-labelledby="search_rule" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -63,19 +63,37 @@ if (is_admin() === false) {
                     </table>
                     <script>
                         var grid = $("#rule_collection").bootgrid({
+                            caseSensitive: false,
                             formatters: {
                                 "action": function (column, row) {
                                     return "<button type=\"button\" id=\"rule_from_collection\" name=\"rule_from_collection\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">Select</button";
                                 }
+                            },
+                            templates: {
+                                footer: "<div id=\"{{ctx.id}}\" class=\"{{css.footer}}\"><div class=\"row\"><div class=\"col-sm-12\"><p class=\"{{css.pagination}}\"></p></div></div></div>"
                             }
                         }).on("loaded.rs.jquery.bootgrid", function()
                         {
-                            grid.find(".rule_from_collection").on("click", function(e)
-                            {
+                            grid.find(".rule_from_collection").on("click", function(e) {
                                 var template_rule_id = $(this).data("rule_id");
-                                    $("#template_id").val(template_rule_id);
-                                    $("#search_rule_modal").modal('hide');
-                                    $("#create-alert").modal('show');
+                                $.ajax({
+                                    type: "POST",
+                                    url: "ajax_form.php",
+                                    data: {type: 'sql-from-alert-collection', template_id: template_rule_id},
+                                    dataType: "json",
+                                    success: function (data) {
+                                        if (data.status == 'ok') {
+                                            $("#search_rule_modal").modal('hide');
+                                            loadRule(data);
+                                            $('#create-alert').modal('show');
+                                        } else {
+                                            toastr.error(data.message);
+                                        }
+                                    },
+                                    error: function () {
+                                        toastr.error('Failed to process template');
+                                    }
+                                });
                             }).end();
                         });
                     </script>

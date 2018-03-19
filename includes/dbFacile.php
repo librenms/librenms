@@ -101,6 +101,7 @@ function dbQuery($sql, $parameters = array())
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
         if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
+            $fullSql = str_replace(PHP_EOL, '', $fullSql);
             if (preg_match('/(INSERT INTO `alert_log`).*(details)/i', $fullSql)) {
                 echo "\nINSERT INTO `alert_log` entry masked due to binary data\n";
             } else {
@@ -623,4 +624,112 @@ function dbRollbackTransaction()
 function dbGenPlaceholders($count)
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
+}
+
+/**
+ * Update statistics for db operations
+ *
+ * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordDbStatistic($stat, $start_time)
+{
+    global $db_stats;
+
+    if (!isset($db_stats)) {
+        $db_stats = array(
+            'ops' => array(
+                'insert' => 0,
+                'update' => 0,
+                'delete' => 0,
+                'fetchcell' => 0,
+                'fetchcolumn' => 0,
+                'fetchrow' => 0,
+                'fetchrows' => 0,
+            ),
+            'time' => array(
+                'insert' => 0.0,
+                'update' => 0.0,
+                'delete' => 0.0,
+                'fetchcell' => 0.0,
+                'fetchcolumn' => 0.0,
+                'fetchrow' => 0.0,
+                'fetchrows' => 0.0,
+            ),
+        );
+    }
+
+    $runtime = microtime(true) - $start_time;
+    $db_stats['ops'][$stat]++;
+    $db_stats['time'][$stat] += $runtime;
+
+    //double accounting corrections
+    if ($stat == 'fetchcolumn') {
+        $db_stats['ops']['fetchrows']--;
+        $db_stats['time']['fetchrows'] -= $runtime;
+    }
+    if ($stat == 'fetchcell') {
+        $db_stats['ops']['fetchrow']--;
+        $db_stats['time']['fetchrow'] -= $runtime;
+    }
+
+    return $runtime;
+}
+
+/**
+ * Synchronize a relationship to a list of related ids
+ *
+ * @param string $table
+ * @param string $target_column column name for the target
+ * @param int $target column target id
+ * @param string $list_column related column names
+ * @param array $list list of related ids
+ * @return array [$inserted, $deleted]
+ */
+function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
+{
+    $inserted = 0;
+
+    $delete_query = "`$target_column`=? AND `$list_column`";
+    $delete_params = [$target];
+    if (!empty($list)) {
+        $delete_query .= ' NOT IN ' . dbGenPlaceholders(count($list));
+        $delete_params = array_merge($delete_params, $list);
+    }
+    $deleted = (int)dbDelete($table, $delete_query, $delete_params);
+
+    $db_list = dbFetchColumn("SELECT `$list_column` FROM `$table` WHERE `$target_column`=?", [$target]);
+    foreach ($list as $item) {
+        if (!in_array($item, $db_list)) {
+            dbInsert([$target_column => $target, $list_column => $item], $table);
+            $inserted++;
+        }
+    }
+
+    return [$inserted, $deleted];
+}
+
+/**
+ * Synchronize a relationship to a list of relations
+ *
+ * @param string $table
+ * @param array $relationships array of relationship pairs with columns as keys and ids as values
+ * @return array [$inserted, $deleted]
+ */
+function dbSyncRelationships($table, $relationships = array())
+{
+    $changed = [[0, 0]];
+    list($target_column, $list_column) = array_keys(reset($relationships));
+
+    $grouped = [];
+    foreach ($relationships as $relationship) {
+        $grouped[$relationship[$target_column]][] = $relationship[$list_column];
+    }
+
+    foreach ($grouped as $target => $list) {
+        $changed[] = dbSyncRelationship($table, $target_column, $target, $list_column, $list);
+    }
+
+    return [array_sum(array_column($changed, 0)), array_sum(array_column($changed, 1))];
 }

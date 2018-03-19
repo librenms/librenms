@@ -75,21 +75,18 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 Ports Utilization Template:
 ```text
 %title
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
 Rule: {if %name}%name{else}%rule{/if}
-{if %faults}
 {foreach %faults}
-Device: %value.sysname
 Physical Interface: %value.ifDescr
 Interface Description: %value.ifAlias
-Interface Speed in Bits: %value.ifSpeed
-Inbound Utilization: {calc (((%value.ifInOctets_rte8)/%value.ifSpeed)100)}%
-Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
+Interface Speed: {calc (%value.ifSpeed/1000000000)} Gbs
+Inbound Utilization: {calc ((%value.ifInOctets_rate*8)/%value.ifSpeed)*100}%
+Outbound Utilization: {calc ((%value.ifOutOctets_rate*8)/%value.ifSpeed)*100}%
 {/foreach}
-{/if}
 ```
 
 Storage:
@@ -97,7 +94,7 @@ Storage:
 
 %title
 
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity 
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -111,6 +108,79 @@ Notes: %notes
 Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Utilized: %value.storage_perc{/foreach}
 ```
 
+Temperature Sensors:
+```text
+
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Temperature: %value.sensor_current°C
+** {calc(%value.sensor_current-%value.sensor_limit)}°C over limit
+Previous Measurement: %value.sensor_prev°C
+High Temperature Limit: %value.sensor_limit°C
+{/foreach}
+{/if}
+```
+
+Value Sensors:
+```text
+
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Sensor%value.sensor_current
+** {calc(%value.sensor_current-%value.sensor_limit)}over limit
+Previous Measurement: %value.sensor_prev
+Limit: %value.sensor_limit
+{/foreach}
+{/if}
+```
+
+Memory Alert:
+```text
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Notes: %notes
+
+Server: %hostname {foreach %faults}
+Memory Description: %value.mempool_descr 
+Percent Utilized: %value.mempool_perc{/foreach}
+```
+
+
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
 {if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>
@@ -120,6 +190,58 @@ Conditional formatting example, will display a link to the host in email or just
 ```
 
 Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped (replaced with `\'`) in the output and should therefore be avoided.
+
+## Examples HTML
+
+Note: To use HTML emails you must set HTML email to Yes in the WebUI under Global Settings > Alerting Settings > Email transport > Use HTML emails
+
+Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+```
+$config['allow_unauth_graphs_cidr'] = array(127.0.0.1/32');  
+$config['allow_unauth_graphs'] = true;
+```
+
+Service Alert:
+```
+<div style="font-family:Helvetica;">
+<h2>{if %state == 1}<span style="color:red;">%severity{/if}
+{if %state == 2}<span style="color:goldenrod;">acknowledged{/if}</span>
+{if %state == 3}<span style="color:green;">recovering{/if}</span>
+{if %state == 0}<span style="color:green;">recovered{/if}</span>
+</h2>
+<b>Host:</b> %hostname<br>
+<b>Duration:</b> %elapsed<br>
+<br>
+
+{if %faults}                                                                                       
+{foreach %faults}<b>%value.service_desc - %value.service_type</b><br>                                         
+%value.service_message<br>
+<br>                                                                                         
+{/foreach}                                                                                                             
+{/if}
+</div>
+```
+
+Processor Alert with Graph:
+```
+%title <br>
+Severity: %severity  <br>
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp <br>
+Alert-ID: %id <br>
+Rule: {if %name}%name{else}%rule{/if} <br>
+{if %faults}Faults:
+{foreach %faults}
+#%key: %value.string <br>
+{/foreach}
+{if %faults}<b>Faults:</b><br>
+{foreach %faults}<img src="https://server/graph.php?device=%value.device_id&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h%22/%3E<br>
+https://server/graphs/id=%value.device_id/type=device_processor/<br>
+{/foreach}
+Template: CPU alert <br>
+{/if}
+{/if}
+```
 
 ## Included
 

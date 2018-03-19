@@ -1,6 +1,10 @@
 mib: MIKROTIK-MIB
 modules:
     sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - mtxrInterfaceStatsName
         temperature:
             data:
                 -
@@ -12,18 +16,35 @@ modules:
                 -
                     oid: mtxrHlSensorTemperature
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.5.
+                    divisor: 10
                     descr: 'Sensor chip'
                     index: 'mtxrHlSensorTemperature.{{ $index }}'
                 -
                     oid: mtxrHlCpuTemperature
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.6.
+                    divisor: 10
                     descr: 'Processor'
                     index: 'mtxrHlCpuTemperature.{{ $index }}'
                 -
                     oid: mtxrHlBoardTemperature
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.7.
+                    divisor: 10
                     descr: 'System board'
                     index: 'mtxrHlBoardTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.10.
+                    divisor: 10
+                    descr: 'Temperature {{ $index }}'
+                    low_limit: -40
+                    low_warn_limit: -35
+                    warn_limit: 65
+                    high_limit: 70
+                -
+                    oid: mtxrHlProcessorTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.11.
+                    divisor: 10
+                    descr: 'Processor Temperature {{ $index }}'
         voltage:
             data:
                 -
@@ -60,6 +81,11 @@ modules:
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.4.
                     descr: '12V'
                     index: 'mtxrHlTwelveVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.8.
+                    divisor: 10
+                    descr: 'Voltage {{ $index }}'
         current:
             data:
                 -
@@ -79,8 +105,9 @@ modules:
                 -
                     oid: mtxrHlCurrent
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.13.
-                    descr: 'System'
-                    index: 'mtxrHlCurrent.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Current'
+                    index: '0'
         dbm:
             data:
                 -
@@ -151,17 +178,18 @@ modules:
                 -
                     oid: mtxrHlPower
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.12.
-                    descr: 'System'
-                    index: 'mtxrHlPower.{{ $index }}'
+                    divisor: 10
+                    descr: 'Power Usage'
+                    index: '1'
         fanspeed:
             data:
                 -
                     oid: mtxrHlFanSpeed1
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.17.
                     descr: 'Fan #1'
-                    index: 'mtxrHlFanSpeed1.{{ $index }}'
+                    index: '0'
                 -
                     oid: mtxrHlFanSpeed2
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.18.
                     descr: 'Fan #2'
-                    index: 'mtxrHlFanSpeed2.{{ $index }}'
+                    index: '1'

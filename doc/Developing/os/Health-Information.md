@@ -29,6 +29,8 @@ Currently we have support for the following health metrics along with the values
 | quality_factor                  | dB                          |
 | chromatic_disperision           | ps/nm                       |
 | ber                             | ratio                       |
+| eer                             | eer                         |
+| waterflow                       | l/m                         |
 
 #### Simple health discovery
 

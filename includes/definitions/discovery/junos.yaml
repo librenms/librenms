@@ -1,5 +1,18 @@
-mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB
 modules:
+    processors:
+          data:
+              -
+                  oid: jnxOperatingEntry
+                  value: jnxOperatingCPU
+                  num_oid: '.1.3.6.1.4.1.2636.3.1.13.1.8.{{ $index }}'
+                  descr: jnxOperatingDescr
+                  skip_values: 0
+              -
+                  oid: jnxJsSPUMonitoringCPUUsage
+                  value: jnxOperatingCPU
+                  num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4.{{ $index }}'
+                  descr: CPU
     sensors:
         pre-cache:
             data:
@@ -39,7 +52,7 @@ modules:
                     index: 'jnxPMCurRxInputPower.{{ $index }}'
                 -
                     oid: jnxOpticsPMCurrentTable
-                    value: jnxPMCurTxOutputPower 
+                    value: jnxPMCurTxOutputPower
                     num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.7.
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
@@ -50,8 +63,8 @@ modules:
             data:
                 -
                     oid: jnxOpticsPMCurrentTable
-                    value: jnxPMCurQ 
-                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.5. 
+                    value: jnxPMCurQ
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.5.
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10

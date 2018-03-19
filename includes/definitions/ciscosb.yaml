@@ -1,9 +1,10 @@
 os: ciscosb
-group: cisco
 text: 'Cisco Small Business'
 ifname: 1
 type: network
 icon: cisco
+mib_dir:
+    - cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -17,6 +18,7 @@ bad_ifXEntry:
     - SG300-20
     - SG300-28
     - SG300-28MP
+    - SG350-10
 poller_modules:
     bgp-peers: 0
     hr-mib: 0

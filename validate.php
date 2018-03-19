@@ -14,9 +14,12 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 chdir(__DIR__); // cwd to the directory containing this script
+
+ini_set('display_errors', 1);
 
 require_once 'includes/common.php';
 require_once 'includes/functions.php';
@@ -39,6 +42,7 @@ if (isset($options['h'])) {
           Default groups:
           - configuration: checks various config settings are correct
           - database: checks the database for errors
+          - dependencies: checks that all required libraries are installed and up-to-date
           - disk: checks for disk space and other disk related issues
           - php: check that various PHP modules and functions exist
           - poller: check that the poller and discovery are running properly
@@ -92,6 +96,29 @@ if (str_contains(`tail config.php`, '?>')) {
 // Composer checks
 if (!file_exists('vendor/autoload.php')) {
     print_fail('Composer has not been run, dependencies are missing', 'composer install --no-dev');
+    exit;
+}
+
+// init autoloading
+require_once 'vendor/autoload.php';
+
+
+$dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
+preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
+if (!empty($dep_missing[0])) {
+    print_fail("Missing dependencies!", "./scripts/composer_wrapper.php install --no-dev");
+    $pre_checks_failed = true;
+    print_list($dep_missing[1], "\t %s\n");
+}
+preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
+if (!empty($dep_outdated[0])) {
+    print_fail("Outdated dependencies", "./scripts/composer_wrapper.php install --no-dev");
+    print_list($dep_outdated[1], "\t %s\n");
+}
+
+$validator = new Validator();
+$validator->validate(array('dependencies'));
+if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {
     $pre_checks_failed = true;
 }
 
@@ -104,12 +131,10 @@ require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
 if (!file_exists(Config::get('install_dir').'/config.php')) {
-    $suggested = realpath(__DIR__ . '/../..');
+    $suggested = realpath(__DIR__);
     print_fail('$config[\'install_dir\'] is not set correctly.', "It should probably be set to: $suggested");
     exit;
 }
-
-$validator = new Validator();
 
 
 // Connect to MySQL
@@ -117,8 +142,7 @@ try {
     dbConnect();
 
     // pull in the database config settings
-    mergedb();
-    require 'includes/process_config.inc.php';
+    Config::loadFromDatabase();
 
     $validator->ok('Database connection successful', null, 'database');
 } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
@@ -143,7 +167,7 @@ $validator->validate($modules, isset($options['s'])||!empty($modules));
 function print_header($versions)
 {
     $output = ob_get_clean();
-    ob_end_clean();
+    @ob_end_clean();
 
     echo <<< EOF
 ====================================

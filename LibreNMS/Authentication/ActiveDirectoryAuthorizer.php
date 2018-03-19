@@ -10,6 +10,8 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
+    protected static $CAN_UPDATE_PASSWORDS = 0;
+
     protected $ldap_connection;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
@@ -118,12 +120,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         return ($entries["count"] > 0);
-    }
-
-    protected function userExistsInDb($username)
-    {
-        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
-        return $return;
     }
 
     public function userExists($username, $throw_exception = false)
@@ -245,7 +241,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $ldap_groups = $this->getGroupList();
 
         foreach ($ldap_groups as $ldap_group) {
-            $search_filter = "(memberOf=$ldap_group)";
+            $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
             if (Config::get('auth_ad_user_filter')) {
                 $search_filter = "(&" . Config::get('auth_ad_user_filter') . $search_filter .")";
             }

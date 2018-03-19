@@ -9,7 +9,7 @@ We list below what we make use of including the license compliance.
   - [Font Awesome](http://fontawesome.io/icons/): MIT License
   - [Jquery Bootgrid](http://www.jquery-bootgrid.com/): MIT License
   - [Pace](https://github.com/HubSpot/pace): Open License
-  - [Twitter typeahead](http://twitter.github.io/typeahead.js/): Open License
+  - [Twitter typeahead](https://github.com/corejavascript/typeahead.js): Open License
   - [Vis](http://visjs.org/): MIT / Apache 2.0
   - [TCPDF](http://www.tcpdf.org): LGPLv3
   - [Bootstrap 3 Datepicker](http://eonasdan.github.io/bootstrap-datetimepicker/): MIT
@@ -40,7 +40,10 @@ We list below what we make use of including the license compliance.
   - [Graylog SSO Authentication Plugin](https://github.com/Graylog2/graylog-plugin-auth-sso)
   - [Select2](https://select2.org): MIT License
   - [JustGage](http://justgage.com): MIT
-
+  - [jQuery.extendext](https://github.com/mistic100/jQuery.extendext): MIT
+  - [doT](https://github.com/olado/doT): MIT
+  - [jQuery-queryBuilder](https://github.com/mistic100/jQuery-QueryBuilder/): MIT
+  - [sql-parser](https://github.com/mistic100/sql-parser/): MIT (Currently a custom build is used)
 
 ## 3rd Party GPLv3 Non-compliant
 

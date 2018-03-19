@@ -125,9 +125,9 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $config['percentile_value'] . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $config['percentile_value'] . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
-    $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
+    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,-1,*,+';
+    $rrd_options .= ' VDEF:dpercentile_outXpercn=dpercentile_outXnd,FIRST';
 }
 
 if ($_GET['previous'] == 'yes') {

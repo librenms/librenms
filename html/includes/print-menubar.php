@@ -70,6 +70,7 @@ if ($config['title_image']) {
                     echo '</ul></li>';
                 }
                 ?>
+              <li><a href="<?php echo(generate_url(array('page'=>'fullscreenmap'))); ?>"><i class="fa fa-expand fa-fw fa-lg" aria-hidden="true"></i> Geographical</a></li>
             </ul>
           </li>
           <li class="dropdown-submenu">
@@ -399,6 +400,8 @@ $icons = array(
     'chromatic_dispersion' => 'indent',
     'ber' => 'sort-amount-desc',
     'quality_factor' => 'arrows',
+    'eer' => 'snowflake-o',
+    'waterflow' => 'tint',
 
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
@@ -603,7 +606,6 @@ if ($alerts['active_count'] > 0) {
                     ?>
                   <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                   <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-map'))); ?>"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> Rule Mapping</a></li>
                   <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
                     <?php
                 }

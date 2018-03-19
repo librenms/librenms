@@ -2,6 +2,7 @@ source: Extensions/Syslog.md
 # Setting up syslog support
 
 This document will explain how to send syslog data to LibreNMS.
+Please also refer to the file Graylog.md for an alternate way of integrating syslog with LibreNMS.
 
 ### Syslog server installation
 
@@ -45,24 +46,24 @@ options {
         bad_hostname("^gconfd$");
 };
 
-
+ 
 source s_sys {
     system();
     internal();
-
+ 
 };
 
 source s_net {
         tcp(port(514) flags(syslog-protocol));
         udp(port(514) flags(syslog-protocol));
 };
-
+ 
 
 ########################
 # Destinations
 ########################
 destination d_librenms {
-        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGR$
+        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n") template-escape(yes));
 };
 
 filter f_kernel     { facility(kern); };
@@ -163,6 +164,7 @@ See here for more Clean Up Options [Link](https://docs.librenms.org/#Support/Con
 ### Client configuration
 
 Below are sample configurations for a variety of clients. You should understand the config before using it as you may want to make some slight changes.
+Further configuration hints may be found in the file Graylog.md.
 
 Replace librenms.ip with IP or hostname of your LibreNMS install.
 

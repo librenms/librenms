@@ -5,10 +5,12 @@ namespace LibreNMS\Authentication;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
-class ADAuthorizationAuthorizer extends AuthorizerBase
+class ADAuthorizationAuthorizer extends MysqlAuthorizer
 {
-    protected $ldap_connection;
     protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
+
+    protected $ldap_connection;
 
     public function __construct()
     {
@@ -83,12 +85,6 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
         } else {
             return false;
         }
-    }
-
-    protected function userExistsInDb($username)
-    {
-        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
-        return $return;
     }
 
     public function userExists($username, $throw_exception = false)
@@ -176,18 +172,6 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
         return $user_id;
     }
 
-
-    public function deleteUser($userid)
-    {
-        dbDelete('bill_perms', '`user_id` =  ?', array($userid));
-        dbDelete('devices_perms', '`user_id` =  ?', array($userid));
-        dbDelete('ports_perms', '`user_id` =  ?', array($userid));
-        dbDelete('users_prefs', '`user_id` =  ?', array($userid));
-        dbDelete('users', '`user_id` =  ?', array($userid));
-        return dbDelete('users', '`user_id` =  ?', array($userid));
-    }
-
-
     public function getUserlist()
     {
         $userlist = array();
@@ -196,7 +180,7 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
         $ldap_groups = $this->getGroupList();
 
         foreach ($ldap_groups as $ldap_group) {
-            $search_filter = "(memberOf=$ldap_group)";
+            $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
             if (Config::get('auth_ad_user_filter')) {
                 $search_filter = "(&{" . Config::get('auth_ad_user_filter') . $search_filter . ")";
             }
@@ -232,19 +216,6 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
 
         return $userlist;
     }
-
-    public function getUser($user_id)
-    {
-        // not supported so return 0
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
-    }
-
-
-    public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
-    {
-        dbUpdate(array('realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
-    }
-
 
     protected function getFullname($username)
     {

@@ -2,9 +2,10 @@ source: Alerting/Rules.md
 
 # Rules
 Rules are defined using a logical language.
-The GUI provides a simple way of creating basic rules.
-Creating more complicated rules which may include maths calculations and MySQL queries can be 
-done using [macros](Macros.md)
+
+The GUI provides a simple way of creating rules.
+
+Creating more complicated rules which may include maths calculations and MySQL queries can be done using [macros](Macros.md)
 
 #### Video on how the alert rules work in LibreNMS 
 [Alert Rules](https://youtu.be/ryv0j8GEkhM)
@@ -14,25 +15,35 @@ done using [macros](Macros.md)
 ## Syntax
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
 Rules can contain braces and __Glues__.
-__Entities__ are provided from Table and Field from the database. For Example: `%ports.ifOperStatus`.
-> Please note that % is not required when adding alert rules via the WebUI. 
+__Entities__ are provided from Table and Field from the database. For Example: `ports.ifOperStatus`.
+ 
 __Conditions__ can be any of:
 
 - Equals `=`
 - Not Equals `!=`
-- Like `~`
-- Not Like `!~`
+- In `IN`
+- Not In `NOT IN`
+- Begins with `LIKE ('%...')`
+- Doesn't begin with `NOT LIKE ('%...')`
+- Contains `LIKE ('%...%')`
+- Doesn't Contain `NOT LIKE ('%...%')`
+- Ends with `LIKE ('...%')`
+- Doesn't end with `NOT LIKE ('...%')`
+- Between `BETWEEN`
+- Not Between `NOT BETWEEN`
+- Is Empty `= ''`
+- Is Not Empty `!= '''`
+- Is Null `IS NULL`
+- Is Not Null `IS NOT NULL`
 - Greater `>`
 - Greater or Equal `>=`
-- Smaller `<`
-- Smaller or Equal `<=`
+- Less `<`
+- Less or Equal `<=`
+- Regex `REGEXP`
 
-__Values__ can be an entity or any single-quoted data.
-__Glues__ can be `&&` for `AND`.
+__Values__ can be an entity or any data.
 
-**Note** if you need to use `OR` `||` please use a [macros](Macros.md)
-
-__Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of MySQL RegExp.
+__Note__: Regex supports MySQL Regular expressions
 
 Arithmetics are allowed as well.
 
@@ -55,17 +66,17 @@ You can associate a rule to a procedure by giving the URL of the procedure when 
 
 Alert when:
 
-- Device goes down: `%devices.status != '1'`
-- Any port changes: `%ports.ifOperStatus != 'up'`
-- Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
-- Any storage gets fuller than the 'warning': `%storage.storage_perc >= %storage_perc_warn`
-- If device is a server and the used storage is above the warning level, but ignore /boot partitions: `%storage.storage_perc > %storage.storage_perc_warn && %devices.type = "server" && %storage.storage_descr !~ "/boot"`
-- VMware LAG is not using "Source ip address hash" load balancing: `%devices.os = "vmware" && %ports.ifType = "ieee8023adLag" && %ports.ifDescr !~ "Link Aggregation @, load balancing algorithm: Source ip address hash"`
-- Syslog, authentication failure during the last 5m: `%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ "@authentication failure@"`
-- High memory usage: `%macros.device_up = "1" && %mempools.mempool_perc >= "90" && %mempools.mempool_descr = "Virtual@"`
-- High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
-- High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
-- Alert when mac address is located on your network `%ipv4_mac.mac_address = "2c233a756912"`
+- Device goes down: `devices.status = 1`
+- Any port changes: `ports.ifOperStatus != 'up'`
+- Root-directory gets too full: `storage.storage_descr = '/' AND storage.storage_perc >= '75'`
+- Any storage gets fuller than the 'warning': `storage.storage_perc >= storage_perc_warn`
+- If device is a server and the used storage is above the warning level, but ignore /boot partitions: `storage.storage_perc > storage.storage_perc_warn AND devices.type = "server" AND storage.storage_descr != "/boot"`
+- VMware LAG is not using "Source ip address hash" load balancing: `devices.os = "vmware" AND ports.ifType = "ieee8023adLag" AND ports.ifDescr REGEXP "Link Aggregation .*, load balancing algorithm: Source ip address hash"`
+- Syslog, authentication failure during the last 5m: `syslog.timestamp >= macros.past_5m AND syslog.msg REGEXP ".*authentication failure.*"`
+- High memory usage: `macros.device_up = 1 AND mempools.mempool_perc >= 90 AND mempools.mempool_descr REGEXP "Virtual.*"`
+- High CPU usage(per core usage, not overall): `macros.device_up = 1 AND processors.processor_usage >= 90`
+- High port usage, where description is not client & ifType is not softwareLoopback: `macros.port_usage_perc >= 80 AND port.port_descr_type != "client" AND ports.ifType != "softwareLoopback"`
+- Alert when mac address is located on your network `ipv4_mac.mac_address = "2c233a756912"`
 
 ### Alert Rules Collection
 You can also select Alert Rule from the Alerts Collection. These Alert Rules are submitted by users in the community :)

@@ -78,6 +78,12 @@ function external_exec($command)
 
     if ($debug && !$vdebug) {
         $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
+        $debug_command = preg_replace('/-u [\S]+/', '-u USER', $debug_command);
+        $debug_command = preg_replace('/-U [\S]+/', '-u USER', $debug_command);
+        $debug_command = preg_replace('/-A [\S]+/', '-A PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-X [\S]+/', '-X PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-P [\S]+/', '-P PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-H [\S]+/', '-H HOSTNAME', $debug_command);
         $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
@@ -1385,83 +1391,78 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
     return false;
 }
 
+if (!function_exists('str_contains')) {
+    /**
+     * Determine if a given string contains a given substring.
+     *
+     * @param  string $haystack
+     * @param  string|array $needles
+     * @return bool
+     */
+    function str_contains($haystack, $needles)
+    {
+        foreach ((array)$needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 /**
  * Determine if a given string contains a given substring.
  *
  * @param  string $haystack
  * @param  string|array $needles
- * @param  bool $case_insensitive
  * @return bool
  */
-function str_contains($haystack, $needles, $case_insensitive = false)
+function str_i_contains($haystack, $needles)
 {
-    if ($case_insensitive) {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && stripos($haystack, $needle) !== false) {
-                return true;
-            }
-        }
-    } else {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
-                return true;
-            }
+    foreach ((array)$needles as $needle) {
+        if ($needle != '' && stripos($haystack, $needle) !== false) {
+            return true;
         }
     }
     return false;
 }
 
-/**
- * Determine if a given string ends with a given substring.
- *
- * @param  string $haystack
- * @param  string|array $needles
- * @param  bool $case_insensitive
- * @return bool
- */
-function ends_with($haystack, $needles, $case_insensitive = false)
-{
-    if ($case_insensitive) {
-        $lower_haystack = strtolower($haystack);
-        foreach ((array)$needles as $needle) {
-            if (strtolower($needle) === substr($lower_haystack, -strlen($needle))) {
-                return true;
-            }
-        }
-    } else {
+if (!function_exists('ends_with')) {
+    /**
+     * Determine if a given string ends with a given substring.
+     *
+     * @param  string $haystack
+     * @param  string|array $needles
+     * @return bool
+     */
+    function ends_with($haystack, $needles)
+    {
         foreach ((array)$needles as $needle) {
             if ((string)$needle === substr($haystack, -strlen($needle))) {
                 return true;
             }
         }
+        return false;
     }
-    return false;
 }
 
-/**
- * Determine if a given string starts with a given substring.
- *
- * @param  string $haystack
- * @param  string|array $needles
- * @param  bool $case_insensitive
- * @return bool
- */
-function starts_with($haystack, $needles, $case_insensitive = false)
-{
-    if ($case_insensitive) {
-        foreach ((array)$needles as $needle) {
-            if ($needle != '' && stripos($haystack, $needle) === 0) {
-                return true;
-            }
-        }
-    } else {
+if (!function_exists('starts_with')) {
+    /**
+     * Determine if a given string starts with a given substring.
+     *
+     * @param  string $haystack
+     * @param  string|array $needles
+     * @return bool
+     */
+    function starts_with($haystack, $needles)
+    {
         foreach ((array)$needles as $needle) {
             if ($needle != '' && strpos($haystack, $needle) === 0) {
                 return true;
             }
         }
+        return false;
     }
-    return false;
 }
 
 function get_auth_ad_user_filter($username)
@@ -1861,4 +1862,22 @@ function check_file_permissions($file, $mask)
 function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
+}
+
+/**
+ * Get all consecutive pairs of values in an array.
+ * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
+ *
+ * @param array $array
+ * @return array
+ */
+function array_pairs($array)
+{
+    $pairs = [];
+
+    for ($i = 1; $i < count($array); $i++) {
+        $pairs[] = [$array[$i -1], $array[$i]];
+    }
+
+    return $pairs;
 }

@@ -1,0 +1,127 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-LLDP-MIB
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-LLDP-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Integer32
+FROM SNMPv2-SMI
+
+TEXTUAL-CONVENTION,
+TruthValue,
+RowStatus
+FROM SNMPv2-TC
+
+switch FROM PRVT-SWITCH-MIB;
+    -------------------------------------------------------------------------------
+    --     PRIVATE BRANCH 
+    -------------------------------------------------------------------------------
+
+prvtLldpMIB MODULE-IDENTITY
+    LAST-UPDATED "200907280000Z"
+    ORGANIZATION "BATM Advanced Communication"
+    CONTACT-INFO 
+         "BATM/Telco Systems Support team
+            Email: 
+            For North America: techsupport@telco.com
+            For North Europe: support@batm.de, info@batm.de
+            For the rest of the world: techsupport@telco.com"
+    DESCRIPTION
+            "Management Information Base module for LLDP configuration"
+
+   -- revision history       
+    REVISION     "200907280000Z"
+    DESCRIPTION 
+    "Initial revision."
+   ::= { switch 145 }
+
+
+prvtLldpObjects              OBJECT IDENTIFIER ::= { prvtLldpMIB 0 }
+
+
+
+     prvtLldpEnable OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+         "Enable/disable the LLDP on the device"
+     DEFVAL { false }
+     ::= { prvtLldpObjects 1 }
+
+END

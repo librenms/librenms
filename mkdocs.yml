@@ -69,6 +69,7 @@ pages:
       - Extensions/SNMP-Trap-Handler.md
       - Support/Cleanup-options.md
   - 6. 3rd Party Integration:
+      - Extensions/Gateone.md
       - Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
       - Extensions/NFSen.md
@@ -104,7 +105,6 @@ pages:
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Testing.md
-      - Alerting/Rule-Mapping.md
       - Alerting/Device-Dependencies.md
   - 9. Getting help:
       - How to get help: Support/index.md

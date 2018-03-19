@@ -5,11 +5,11 @@ $sensor_present_root_oid    = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.17';
 $temperature_root_oid       = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18';
 $threshold_root_oid         = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.19';
 
-$temp_sensors = snmpwalk_cache_oid($device, 'tmnxHwID', $temp_sensors = array(), 'TIMETRA-CHASSIS-MIB', 'aos');
-$temp_sensors = snmpwalk_cache_oid($device, $description_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
-$temp_sensors = snmpwalk_cache_oid($device, $sensor_present_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
-$temp_sensors = snmpwalk_cache_oid($device, $temperature_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
-$temp_sensors = snmpwalk_cache_oid($device, $threshold_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
+$temp_sensors = snmpwalk_cache_oid($device, 'tmnxHwID', $temp_sensors = array(), 'TIMETRA-CHASSIS-MIB');
+$temp_sensors = snmpwalk_cache_oid($device, $description_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB');
+$temp_sensors = snmpwalk_cache_oid($device, $sensor_present_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB');
+$temp_sensors = snmpwalk_cache_oid($device, $temperature_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB');
+$temp_sensors = snmpwalk_cache_oid($device, $threshold_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB');
 
 foreach ($temp_sensors as $sub_oid => $component) {
     $descr             = $component['tmnxHwName'];

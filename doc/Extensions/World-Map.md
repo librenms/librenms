@@ -5,7 +5,7 @@ LibreNMS comes with a configurable Geo Map based on World Map Widget to visualiz
 
 ### World Map Widget
 
-World Map Widget, requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. 
+World Map Widget, requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database.
 
 Location resolution happens as follows
 
@@ -17,11 +17,11 @@ Location resolution happens as follows
 Example:
 
 [40.424521, -86.912755]
- 
+
 or
- 
+
 1100 Congress Ave, Austin, TX 78701
- 
+
 
 We have two current mapping engines available:
 
@@ -30,6 +30,11 @@ We have two current mapping engines available:
 
 
 ### World Map Widget Settings
+
+- *Initial Latitude / Longitude*: The map will be centered on those coordinates.
+- *Initial Zoom*: Initial zoom of the map. [More information about zoom levels](https://wiki.openstreetmap.org/wiki/Zoom_levels).
+- *Grouping radius*: Markers are grouped by area. This value define the maximum size of grouping areas.
+- *Show devices*: Show devices based on there status.
 
 Example Settings:
 
