@@ -51,7 +51,6 @@ class Snmpsim
      * Captures all output to the log
      *
      * @param int $wait Wait for x seconds after starting before returning
-     * @throws SnmpsimException
      */
     public function fork($wait = 2)
     {
@@ -80,8 +79,6 @@ class Snmpsim
 
     /**
      * Stop and start the running snmpsim process
-     *
-     * @throws SnmpsimException
      */
     public function restart()
     {
@@ -103,7 +100,6 @@ class Snmpsim
      * Run snmpsimd but keep it in the foreground
      * Outputs to stdout
      *
-     * @throws SnmpsimException
      */
     public function run()
     {
@@ -149,19 +145,10 @@ class Snmpsim
      *
      * @param bool $with_log
      * @return string
-     * @throws SnmpsimException
      */
     private function getCmd($with_log = true)
     {
-        $bin = locate_binary('snmpsimd');
-        if (!is_executable($bin)) {
-            $bin = locate_binary('snmpsimd.py');
-            if (!is_executable($bin)) {
-                throw new SnmpsimException("Snmpsim could not be located, please install it.\n");
-            }
-        }
-
-        $cmd = "$bin --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
+        $cmd = "snmpsimd.py --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
         if ($with_log) {
             $cmd .= " --logging-method=file:{$this->log}";
