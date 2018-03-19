@@ -70,6 +70,7 @@ if ($config['title_image']) {
                     echo '</ul></li>';
                 }
                 ?>
+              <li><a href="<?php echo(generate_url(array('page'=>'fullscreenmap'))); ?>"><i class="fa fa-expand fa-fw fa-lg" aria-hidden="true"></i> Geographical</a></li>
             </ul>
           </li>
           <li class="dropdown-submenu">
