@@ -286,6 +286,9 @@ class QueryBuilderParser implements \JsonSerializable
         if (is_string($value) && starts_with($value, '`') && ends_with($value, '`')) {
             // pass through value such as field
             $value = trim($value, '`');
+            if ($expand) {
+                $value = $this->expandMacro($value);
+            }
         } elseif (isset(self::$values[$builder_op])) {
             // wrap values as needed (is null values don't contain ? so '' is returned)
             $values = (array) $value;
@@ -299,7 +302,6 @@ class QueryBuilderParser implements \JsonSerializable
 
         if ($expand) {
             $field = $this->expandMacro($field);
-            $value = $this->expandMacro($value);
         }
 
         return trim("$field $op $value");
