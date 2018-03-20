@@ -82,6 +82,8 @@ class ComposerHelper
             self::exec('php artisan key:generate');
 
             $config = [
+                'db_host' => '',
+                'db_port' => '',
                 'db_name' => '',
                 'db_user' => '',
                 'db_pass' => '',
