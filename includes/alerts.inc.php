@@ -529,12 +529,18 @@ function DescribeAlert($alert)
             $obj['diff'] = $extra['diff'];
         }
     } elseif ($alert['state'] == 0) {
+        // Alert is now cleared
         $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id'], $alert['id']));
         if (empty($id['id'])) {
             return false;
         }
 
-        $extra          = json_decode(gzuncompress($id['details']), true);
+        $extra = json_decode(gzuncompress($id['details']), true);
+
+        // Reset count to 0 so alerts will continue
+        $extra['count'] = 0;
+        dbUpdate(array('details' => gzcompress(json_encode($id['details']), 9)), 'alert_log', 'id = ?', array($alert['id']));
+
         if (!empty($tpl['title_rec'])) {
             $obj['title'] = $tpl['title_rec'];
         } else {
@@ -836,6 +842,11 @@ function RunAlerts()
         if (IsParentDown($alert['device_id'])) {
             $noiss = true;
             log_event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
+        }
+
+        if ($alert['state'] == 0 && $rextra['no_recovery']) {
+            // Rule is set to not send a recovery alert
+            $noiss = true;
         }
 
         if (!$noiss) {

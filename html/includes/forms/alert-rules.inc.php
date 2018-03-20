@@ -38,16 +38,17 @@ $status = 'ok';
 $message = '';
 
 $builder_json  = $_POST['builder_json'];
-$query    = QueryBuilderParser::fromJson($builder_json)->toSql();
-$rule_id  = $_POST['rule_id'];
-$count    = mres($_POST['count']);
-$delay    = mres($_POST['delay']);
-$interval = mres($_POST['interval']);
-$mute     = mres($_POST['mute']);
-$invert   = mres($_POST['invert']);
-$name     = mres($_POST['name']);
-$proc     = mres($_POST['proc']);
-$severity = mres($_POST['severity']);
+$query         = QueryBuilderParser::fromJson($builder_json)->toSql();
+$rule_id       = $_POST['rule_id'];
+$count         = mres($_POST['count']);
+$delay         = mres($_POST['delay']);
+$interval      = mres($_POST['interval']);
+$mute          = mres($_POST['mute']);
+$invert        = mres($_POST['invert']);
+$name          = mres($_POST['name']);
+$proc          = mres($_POST['proc']);
+$no_recovery    = ($_POST['no_recovery']);
+$severity      = mres($_POST['severity']);
 
 if (!is_numeric($count)) {
     $count = '-1';
@@ -68,12 +69,15 @@ if ($invert == 'on') {
     $invert = false;
 }
 
+$no_recovery = empty($no_recovery) ? $no_recovery = false : true;
+
 $extra = array(
-    'mute'     => $mute,
-    'count'    => $count,
-    'delay'    => $delay_sec,
-    'invert'   => $invert,
-    'interval' => $interval_sec,
+    'mute'        => $mute,
+    'count'       => $count,
+    'delay'       => $delay_sec,
+    'invert'      => $invert,
+    'interval'    => $interval_sec,
+    'no_recovery' => $no_recovery,
 );
 
 $extra_json = json_encode($extra);
