@@ -70,7 +70,6 @@ if ($invert == 'on') {
 }
 
 $recovery = empty($recovery) ? $recovery = false : true;
-print_r($recovery);exit;
 
 $extra = array(
     'mute'     => $mute,
