@@ -136,8 +136,14 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(&(' . Config::get('auth_ldap_prefix') . '*)(memberOf=' . trim(Config::get('auth_ldap_group'), ',') . '))';
-            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+            $filters = array(
+                '(' . Config::get('auth_ldap_prefix') . '*)',
+            );
+            $ldapGroup = trim(Config::get('auth_ldap_group'), ',');
+            if (!empty($ldapGroup)) {
+                $filters[] = '(memberOf=' . $ldapGroup . ')';
+            }
+            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), '(&' . implode('', $filters) . ')');
             $entries = ldap_get_entries($connection, $search);
 
             if ($entries['count']) {
