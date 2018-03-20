@@ -28,7 +28,7 @@ modules:
                 -
                     oid: st4InputCordFrequency
                     num_oid: .1.3.6.1.4.1.1718.4.1.3.3.1.11.
-                    index: 'st4InputCordFrequency.{{ $index }}'
+                    index: 'st4InputCord.{{ $index }}'
                     descr: Line, {{ $st4InputCordName }}, Frequency
                     divisor: 10
         power:
@@ -36,7 +36,7 @@ modules:
                 -
                     oid: st4InputCordActivePower
                     num_oid: .1.3.6.1.4.1.1718.4.1.3.3.1.3.
-                    index: 'st4InputCordActivePower.{{ $index }}'
+                    index: 'st4InputCord.{{ $index }}'
                     descr: Cord, {{ $st4InputCordName }}, Active Power
                     divisor: 0
                 -
