@@ -294,7 +294,7 @@ class QueryBuilderParser implements \JsonSerializable
         } elseif (isset(self::$values[$builder_op])) {
             // wrap values as needed (is null values don't contain ? so '' is returned)
             $values = (array) $value;
-            $value = preg_replace_callback('/\?/', function($matches) use (&$values) {
+            $value = preg_replace_callback('/\?/', function ($matches) use (&$values) {
                 return array_shift($values);
             }, self::$values[$builder_op]);
         } elseif (!is_numeric($value)) {
