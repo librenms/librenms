@@ -51,7 +51,7 @@ storage:
         excluded_fields: [device_id, storage_id]
 toner:
     toner:
-        excluded_fields: [device_id]
+        excluded_fields: [device_id, toner_id]
         order_by: toner_oid, toner_index
 wireless:
     wireless_sensors:
