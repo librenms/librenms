@@ -249,4 +249,3 @@ vmwVCAlarmNotificationGroup NOTIFICATION-GROUP
     ::= { vmwVCMIBGroups 4 }
 
 END -- end of VMWARE-VC-EVENT-MIB.
-
