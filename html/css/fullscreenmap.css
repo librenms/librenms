@@ -1,0 +1,30 @@
+html, body, .container, .pace-done, .mapcontainer, .map, .row, .col-md-12, #leaflet-map {
+   height: 100%;
+   width: 100%;
+   padding-bottom: 0;
+   margin-bottom: 0;
+}
+
+body {
+   line-height: 0;
+   }
+
+.container-fluid, .row, .col-md-12 {
+   padding-right: 0;
+   padding-left: 0;
+   margin-right: 0;
+   margin-left: 0;
+}
+
+.container-fluid {
+   height: 100%;
+   width: 100%;
+   margin-bottom: 0;
+   padding-top: 0;
+   padding-bottom: 0;
+
+}
+
+.leaflet-container {
+   background: #fff;
+}

@@ -1,5 +1,77 @@
 [
     [
+        "",
+        {"condition":"OR","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"begins_with","value":"begin"}],"valid":true},
+        "devices.hostname LIKE 'begin%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE 'begin%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_begins_with","value":"notbegin"}],"valid":true},
+        "devices.hostname NOT LIKE 'notbegin%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE 'notbegin%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"contains"}],"valid":true},
+        "devices.hostname LIKE '%contains%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%contains%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_contains","value":"notcontains"}],"valid":true},
+        "devices.hostname NOT LIKE '%notcontains%'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notcontains%'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"ends_with","value":"ends"}],"valid":true},
+        "devices.hostname LIKE '%ends'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%ends'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_ends_with","value":"notends"}],"valid":true},
+        "devices.hostname NOT LIKE '%notends'",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notends'"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_null","value":""}],"valid":true},
+        "ports.ifDescr IS NULL",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NULL"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_not_null","value":""}],"valid":true},
+        "ports.ifDescr IS NOT NULL",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NOT NULL"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_empty","value":null}],"valid":true},
+        "devices.hardware = ''",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware = ''"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_not_empty","value":null}],"valid":true},
+        "devices.hardware != ''",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware != ''"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"between","value":["3","99"]}],"valid":true},
+        "devices.device_id BETWEEN 3 AND 99",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id BETWEEN 3 AND 99"
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"not_between","value":["2","4"]}],"valid":true},
+        "devices.device_id NOT BETWEEN 2 AND 4",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id NOT BETWEEN 2 AND 4"
+    ],
+    [
         "%macros.device_up = 1",
         {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.device_up = 1",

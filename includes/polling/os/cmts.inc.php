@@ -30,7 +30,7 @@ $data = explode(".", $device["sysObjectID"]);
 $id = end($data);
 if ($id == "1") {
     $hardware = "C4";
-} else if ($id == "2") {
+} elseif ($id == "2") {
     $hardware = "C4c";
 }
 unset($data);
