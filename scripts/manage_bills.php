@@ -89,7 +89,7 @@ if (!empty($options['h'])) {
 }
 if (empty($options['s']) && empty($options['h'])) {
     echo "Please set -s or -h\n";
-} else if (!empty($options['s']) && !empty($options['h'])) {
+} elseif (!empty($options['s']) && !empty($options['h'])) {
     echo "Please set either -s or -h, not both\n";
 }
 if (!empty($options['i']) && !empty($options['h'])) {
