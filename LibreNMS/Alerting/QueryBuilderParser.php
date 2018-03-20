@@ -47,18 +47,35 @@ class QueryBuilderParser implements \JsonSerializable
         'less_or_equal' => "<=",
         'greater' => ">",
         'greater_or_equal' => ">=",
-        'begins_with' => "LIKE (\"%?\")",
-        'not_begins_with' => "NOT LIKE (\"%?\")",
-        'contains' => "LIKE (\"%?%\")",
-        'not_contains' => "NOT LIKE (\"%?%\")",
-        'ends_with' => "LIKE (\"?%\")",
-        'not_ends_with' => "NOT LIKE (\"?%\")",
-        'is_empty' => "=",  // value will be empty
-        'is_not_empty' => "!=", // value will be empty
+        'between' => 'BETWEEN',
+        'not_between' => 'NOT BETWEEN',
+        'begins_with' => "LIKE",
+        'not_begins_with' => "NOT LIKE",
+        'contains' => "LIKE",
+        'not_contains' => "NOT LIKE",
+        'ends_with' => "LIKE",
+        'not_ends_with' => "NOT LIKE",
+        'is_empty' => "=",
+        'is_not_empty' => "!=",
         'is_null' => "IS NULL",
         'is_not_null' => "IS NOT NULL",
         'regex' => 'REGEXP',
         'not_regex' => 'NOT REGEXP',
+    ];
+
+    private static $values = [
+        'between' => "? AND ?",
+        'not_between' => "? AND ?",
+        'begins_with' => "'?%'",
+        'not_begins_with' => "'?%'",
+        'contains' => "'%?%'",
+        'not_contains' => "'%?%'",
+        'ends_with' => "'%?'",
+        'not_ends_with' => "'%?'",
+        'is_null' => "",
+        'is_not_null' => "",
+        'is_empty' => "''",
+        'is_not_empty' => "''",
     ];
 
     private $builder;
@@ -263,31 +280,33 @@ class QueryBuilderParser implements \JsonSerializable
      */
     private function parseRule($rule, $expand = false)
     {
-        $op = self::$operators[$rule['operator']];
+        $field = $rule['field'];
+        $builder_op = $rule['operator'];
+        $op = self::$operators[$builder_op];
         $value = $rule['value'];
 
-        if (starts_with($value, '`') && ends_with($value, '`')) {
+        if (is_string($value) && starts_with($value, '`') && ends_with($value, '`')) {
             // pass through value such as field
             $value = trim($value, '`');
-            $value = $this->expandMacro($value); // check for macros
-        } elseif ($rule['type'] != 'integer' && !str_contains($op, '?')) {
+            if ($expand) {
+                $value = $this->expandMacro($value);
+            }
+        } elseif (isset(self::$values[$builder_op])) {
+            // wrap values as needed (is null values don't contain ? so '' is returned)
+            $values = (array) $value;
+            $value = preg_replace_callback('/\?/', function ($matches) use (&$values) {
+                return array_shift($values);
+            }, self::$values[$builder_op]);
+        } elseif (!is_numeric($value)) {
+            // wrap quotes around non-numeric values
             $value = "\"$value\"";
         }
 
-        $field = $rule['field'];
         if ($expand) {
             $field = $this->expandMacro($field);
         }
 
-        if (str_contains($op, '?')) {
-            // op with value inside it aka IN and NOT IN
-            $sql = "$field " . str_replace('?', $value, $op);
-        } else {
-            $sql = "$field $op $value";
-        }
-
-
-        return $sql;
+        return trim("$field $op $value");
     }
 
     /**
