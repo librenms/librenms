@@ -145,9 +145,7 @@ function check_lint($passthru = false, $command_only = false)
 
     // matches a substring of the relative path, leading / is treated as absolute path
     $lint_excludes = array('vendor/');
-    if (defined('HHVM_VERSION') || version_compare(PHP_VERSION, '5.6', '<')) {
-        $lint_excludes[] = 'lib/influxdb-php/';
-    }
+
 
     $lint_exclude = build_excludes('--exclude ', $lint_excludes);
     $lint_cmd = "$parallel_lint_bin $lint_exclude ./";
@@ -285,6 +283,23 @@ function check_opt($options)
     }
 
     return false;
+}
+
+/**
+ * Build a list of exclude arguments from an array
+ *
+ * @param string $exclude_string such as "exclude"
+ * @param array $excludes array of directories to exclude
+ * @return string resulting string
+ */
+function build_excludes($exclude_string, $excludes)
+{
+        $result = '';
+        foreach ($excludes as $exclude) {
+                $result .= $exclude_string . $exclude . ' ';
+            }
+
+    return $result;
 }
 
 /**
