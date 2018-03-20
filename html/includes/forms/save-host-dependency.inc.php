@@ -40,7 +40,7 @@ if (is_admin() === false) {
         foreach ($_POST['parent_ids'] as $parent) {
             if (is_numeric($parent) && $parent != 0) {
                 $insert[] = array('parent_device_id' => $parent, 'child_device_id' => $dev);
-            } else if ($parent == 0) {
+            } elseif ($parent == 0) {
                 // In case we receive a mixed array with $parent = 0 (which shouldn't happen)
                 // Empty the insert array so we remove any previous dependency so 'None' takes precedence
                 $insert = array();
