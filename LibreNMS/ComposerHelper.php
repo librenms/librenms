@@ -32,12 +32,18 @@ class ComposerHelper
 {
     public static function postRootPackageInstall(Event $event)
     {
-        self::populateEnv();
+        if (!file_exists('.env')) {
+            self::setPermissions();
+            self::populateEnv();
+        }
     }
 
     public static function postInstall(Event $event)
     {
-        self::populateEnv();
+        if (!file_exists('.env')) {
+            self::setPermissions();
+            self::populateEnv();
+        }
     }
 
     public static function preUpdate(Event $event)
@@ -75,17 +81,23 @@ class ComposerHelper
             copy('.env.example', '.env');
             self::exec('php artisan key:generate');
 
+            $config = [
+                'db_name' => '',
+                'db_user' => '',
+                'db_pass' => '',
+                'db_socket' => '',
+            ];
+
             @include 'config.php';
-            if (isset($config)) {
-                self::setEnv([
-                    'DB_HOST'     => isset($config['db_host']) ? $config['db_host'] : '',
-                    'DB_PORT'     => isset($config['db_port']) ? $config['db_port'] : '',
-                    'DB_USERNAME' => isset($config['db_user']) ? $config['db_user'] : '',
-                    'DB_PASSWORD' => isset($config['db_pass']) ? $config['db_pass'] : '',
-                    'DB_DATABASE' => isset($config['db_name']) ? $config['db_name'] : '',
-                    'DB_SOCKET'   => isset($config['db_socket']) ? $config['db_socket'] : '',
-                ]);
-            }
+
+            self::setEnv([
+                'DB_HOST'     => $config['db_host'],
+                'DB_PORT'     => $config['db_port'],
+                'DB_USERNAME' => $config['db_user'],
+                'DB_PASSWORD' => $config['db_pass'],
+                'DB_DATABASE' => $config['db_name'],
+                'DB_SOCKET'   => $config['db_socket'],
+            ]);
         }
     }
 
@@ -113,6 +125,16 @@ class ComposerHelper
         }
 
         file_put_contents($file, $content);
+    }
+
+    private static function setPermissions()
+    {
+        $permissions_cmds = [
+            'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+            'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+        ];
+
+        self::exec($permissions_cmds);
     }
 
     /**
