@@ -297,4 +297,3 @@ vmwSRMNotificationGroup NOTIFICATION-GROUP
        ::= { vmwSRMMIBGroups 2 }
 
 END
-

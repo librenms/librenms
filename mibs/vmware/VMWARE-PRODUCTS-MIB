@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007-2015 VMware, Inc.  All rights reserved. 
+-- Copyright 2007-2017 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
@@ -11,7 +11,7 @@ IMPORTS
         FROM VMWARE-ROOT-MIB;
 
 vmwProducts MODULE-IDENTITY
-       LAST-UPDATED "201409190000Z"
+       LAST-UPDATED "201710130000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -19,13 +19,22 @@ vmwProducts MODULE-IDENTITY
                 Palo Alto, CA 94304
                 Tel: 1-877-486-9273 or 650-427-5000
                 Fax: 650-427-5001
-                Web: http://communities.vmware.com/community/developer/forums/managementapi
+                Web: http://kb.vmware.com/kb/1013445
                 "
        DESCRIPTION
                "This MIB module provides the OID identifiers
-                which are returned from SNMPv2-MIB sysObjectId for 
+                which are returned from SNMPv2-MIB sysObjectId for
                 agents in specific VMware products.
                "
+       REVISION      "201710130000Z"
+       DESCRIPTION
+               "Changed vmwNSXManagerAppliance, vmwNSXManagerAppliance, and vmwNSXControllerAppliance oid."
+       REVISION      "201705170000Z"
+       DESCRIPTION
+               "Add vmwHCX appliance sysObjectIds."
+       REVISION      "201507170000Z"
+       DESCRIPTION
+               "Add vmwNSX"
        REVISION      "201409190000Z"
        DESCRIPTION
                "Add vSphere appliance sysObjectIds."
@@ -64,8 +73,25 @@ vmwInfrastructureAppliance OBJECT IDENTIFIER
 vmwManagementAppliance OBJECT IDENTIFIER
     ::= { vmwProductSpecific 9 }
 
+vmwNSX OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 10 }
+
+vmwNSXEdgeAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 130 }
+
+vmwNSXManagerAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 131 }
+
+vmwNSXControllerAppliance OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 132 }
+
+vmwHCXManager OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 230 }
+
+vmwHCXGateway OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 31 }
+
 oidESX OBJECT IDENTIFIER
     ::= { vmwOID 1 }
 
 END -- end of module VMWARE-PRODUCTS-MIB.
-
