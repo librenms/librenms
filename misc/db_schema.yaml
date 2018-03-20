@@ -1484,7 +1484,7 @@ stp:
     - { Field: topChanges, Type: mediumint(9), 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: rootCost, Type: mediumint(9), 'Null': false, Extra: '' }
-    - { Field: rootPort, Type: mediumint(9), 'Null': false, Extra: '' }
+    - { Field: rootPort, Type: int(11), 'Null': true, Extra: '' }
     - { Field: maxAge, Type: mediumint(9), 'Null': false, Extra: '' }
     - { Field: helloTime, Type: mediumint(9), 'Null': false, Extra: '' }
     - { Field: holdTime, Type: mediumint(9), 'Null': false, Extra: '' }
