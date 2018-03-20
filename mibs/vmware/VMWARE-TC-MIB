@@ -178,5 +178,11 @@ VmwLongSnmpAdminString ::= TEXTUAL-CONVENTION
 
     SYNTAX       OCTET STRING
 
-END
+VmwUnixAbsFilePath ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1024a"
+    STATUS       current
+    DESCRIPTION "Represents the absolute path of a file on Unix system."
 
+    SYNTAX       OCTET STRING (SIZE (0..1024))
+
+END
