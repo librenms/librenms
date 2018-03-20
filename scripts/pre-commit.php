@@ -288,16 +288,16 @@ function check_opt($options)
 /**
  * Build a list of exclude arguments from an array
  *
- * @param string $exclude_string such as "exclude"
+ * @param string $exclude_string such as "--exclude"
  * @param array $excludes array of directories to exclude
  * @return string resulting string
  */
 function build_excludes($exclude_string, $excludes)
 {
-        $result = '';
-        foreach ($excludes as $exclude) {
-                $result .= $exclude_string . $exclude . ' ';
-            }
+    $result = '';
+    foreach ($excludes as $exclude) {
+        $result .= $exclude_string . $exclude . ' ';
+    }
 
     return $result;
 }
