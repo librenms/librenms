@@ -21,8 +21,9 @@ if (isset($options['d'])) {
 }
 
 if (isset($options['v'])) {
-    // might need more options for other auth methods
-    $config['auth_ad_debug'] = 1; // active_directory
+    // Enable debug mode for auth methods that have it
+    $config['auth_ad_debug'] = 1;
+    $config['auth_ldap_debug'] = 1;
 }
 
 $init_modules = array('web', 'auth');

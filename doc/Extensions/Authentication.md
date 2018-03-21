@@ -87,23 +87,24 @@ Cleanup of old accounts is done by checking the authlog. You will need to set th
 
 ### Sample configuration
 
-```
-$config['auth_mechanism'] = "active_directory";
-$config['auth_ad_url']                     = "ldaps://<your-domain.controll.er>";  // you can add multiple servers, separated by a space
-$config['auth_ad_domain']                  = "<your-domain.com>";
-$config['auth_ad_base_dn']                 = "<dc=your-domain,dc=com>";  // groups and users must be under this dn
-$config['auth_ad_check_certificates']      = true;  // require a valid ssl certificate
-$config['auth_ad_binduser']                = 'examplebinduser';
-$config['auth_ad_bindpassword']            = 'examplepassword';
-$config['auth_ad_timeout']                 = 5; // time to wait before giving up (or trying the next server)
-$config['auth_ad_debug']                   = false; // enable for verbose debug messages
-$config['active_directory']['users_purge'] = 30;    // purge users who haven't logged in for 30 days.
-$config['auth_ad_require_groupmembership'] = false; // require users to be members of a group listed below
-$config['auth_ad_groups']['<ad-admingroup>']['level'] = 10;
-$config['auth_ad_groups']['<ad-usergroup>']['level']  = 7;
+```php
+$config['auth_mechanism'] = 'active_directory';
+$config['auth_ad_url'] = 'ldaps://server.example.com';    // Set server(s), space separated. Prefix with ldaps:// for ssl
+$config['auth_ad_domain'] = 'example.com';
+$config['auth_ad_base_dn'] = 'dc=example,dc=com';         // groups and users must be under this dn
+$config['auth_ad_check_certificates'] = true;             // require a valid ssl certificate
+$config['auth_ad_binduser'] = 'examplebinduser';          // bind user (non-admin)
+$config['auth_ad_bindpassword'] = 'examplepassword';      // bind password
+$config['auth_ad_timeout'] = 5;                           // time to wait before giving up (or trying the next server)
+$config['auth_ad_debug'] = false;                         // enable for verbose debug messages
+$config['active_directory']['users_purge'] = 30;          // purge users who haven't logged in for 30 days.
+$config['auth_ad_require_groupmembership'] = true;        // false: allow all users to auth level 0
+$config['auth_ad_groups']['ad-admingroup']['level'] = 10; // set the "AD AdminGroup" group to admin level
+$config['auth_ad_groups']['ad-usergroup']['level'] = 5;   // set the "AD UserGroup" group to global read only level
+
 ```
 
-Replace `<ad-admingroup>` with your Active Directory admin-user group and `<ad-usergroup>` with your standard user group.
+Replace `ad-admingroup` with your Active Directory admin-user group and `ad-usergroup` with your standard user group.
 It is __highly suggested__ to create a bind user, otherwise "remember me", alerting users, and the API will not work.
 
 ### Active Directory redundancy
@@ -132,24 +133,32 @@ This yields `(&(objectclass=user)(sAMAccountName=$username))` for the user filte
 
 Config option: `ldap`
 
-Install __php_ldap__  or __php7.0-ldap__, making sure to install the same version as PHP.
+Install __php_ldap__ or __php7.0-ldap__, making sure to install the same version as PHP.
+
+### Standard config
+
+```php
+$config['auth_mechanism'] = 'ldap';
+$config['auth_ldap_server'] = 'ldap.example.com';               // Set server(s), space separated. Prefix with ldaps:// for ssl
+$config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';   // appended to usernames
+$config['auth_ldap_groupbase'] = 'ou=groups,dc=example,dc=com'; // all groups must be inside this
+$config['auth_ldap_groups']['admin']['level'] = 10;             // set admin group to admin level
+$config['auth_ldap_groups']['pfy']['level'] = 5;                // set pfy group to global read only level
+$config['auth_ldap_groups']['support']['level'] = 1;            // set support group as a normal user
+```
+
+### Additional options (usually not needed):
 
 ```php
 $config['auth_ldap_version'] = 3; # v2 or v3
-$config['auth_ldap_server'] = "ldap.example.com";
-$config['auth_ldap_port']   = 389;
-$config['auth_ldap_prefix'] = "uid=";
-$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-$config['auth_ldap_group']  = "cn=groupname,ou=groups,dc=example,dc=com";
-$config['auth_ldap_groupbase'] = "ou=groups,dc=example,dc=com";
-$config['auth_ldap_groups']['admin']['level'] = 10;
-$config['auth_ldap_groups']['pfy']['level'] = 7;
-$config['auth_ldap_groups']['support']['level'] = 1;
-$config['auth_ldap_groupmemberattr'] = "memberUid";
-$config['auth_ldap_uid_attribute'] = 'uidnumber';
+$config['auth_ldap_port'] = 389;                    // 389 or 636 for ssl
+$config['auth_ldap_starttls'] = True;               // Enable TLS on port 389
+$config['auth_ldap_prefix'] = 'uid=';               // prepended to usernames
+$config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com'; // generic group with level 0
+$config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see if a user is a member of a group
+$config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
+$config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
 ```
-
-Typically auth_ldap_suffix, auth_ldap_group, auth_ldap_groupbase, auth_ldap_groups are what's required to be configured.
 
 ### LDAP bind user (optional)
 If your ldap server does not allow anonymous bind, it is highly suggested to create a bind user, otherwise "remember me", alerting users, and the API will not work.
@@ -171,9 +180,6 @@ An example config setup for use with Jumpcloud LDAP as a service is:
 
 ```php
 $config['auth_mechanism'] = "ldap";
-unset($config['auth_ldap_group']);
-unset($config['auth_ldap_groups']);
-$config['auth_ldap_groups']['librenms']['level'] = 10;
 $config['auth_ldap_version'] = 3;
 $config['auth_ldap_server'] = "ldap.jumpcloud.com";
 $config['auth_ldap_port'] = 389;
@@ -181,6 +187,7 @@ $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=Users,o={id},dc=jumpcloud,dc=com";
 $config['auth_ldap_groupbase'] = "cn=librenms,ou=Users,o={id},dc=jumpcloud,dc=com";
 $config['auth_ldap_groupmemberattr'] = "memberUid";
+$config['auth_ldap_groups']['librenms']['level'] = 10;
 ```
 
 Replace {id} with the unique ID provided by Jumpcloud.
