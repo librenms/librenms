@@ -16,7 +16,7 @@ if (is_admin() === false) {
 } else {
     oxidized_reload_nodes();
     $status = 'ok';
-    $message = 'Oxdized node list was reloaded';
+    $message = 'Oxidized node list was reloaded';
 }
 $output = array(
     'status'  => $status,
