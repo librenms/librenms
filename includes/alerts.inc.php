@@ -33,7 +33,7 @@ use LibreNMS\Authentication\Auth;
 function GenSQL($rule, $query_builder = false)
 {
     if ($query_builder) {
-        return QueryBuilderParser::fromJson($query_builder);
+        return QueryBuilderParser::fromJson($query_builder)->toSql();
     } else {
         return GenSQLOld($rule);
     }

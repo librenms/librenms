@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007-2010 VMware, Inc.  All rights reserved. 
+-- Copyright 2007-2016 VMware, Inc.  All rights reserved. 
 -- **********************************************************
 
 VMWARE-ROOT-MIB DEFINITIONS ::= BEGIN
@@ -9,7 +9,7 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 vmware MODULE-IDENTITY
-       LAST-UPDATED "201004020000Z"
+       LAST-UPDATED "201611030000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -24,6 +24,13 @@ vmware MODULE-IDENTITY
                 This module defines the VMware SNMP MIB root
                 and its primary subtrees.
                "
+       REVISION      "201611030000Z"
+       DESCRIPTION
+               "Arc vmwNetworkInsight defined."
+
+       REVISION      "201601022000Z"
+       DESCRIPTION
+               "Arc vmwNsxManager defined."
 
        REVISION      "201004020000Z"
        DESCRIPTION
@@ -88,6 +95,20 @@ DESCRIPTION
      notifications from Site Recovery Manager and can not be polled."
 ::= { vmware 51 }
 
+vmwVCHA OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are only visible in
+     notifications from VMware Virtual Center High Availability and can not be polled."
+::= { vmware 53 }
+
+vmwVmon OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are for VMware Service Lifecycle
+    Manager."
+::= { vmware 55 }
+
 vmwOID OBJECT-IDENTITY
 STATUS  deprecated
 DESCRIPTION
@@ -99,6 +120,18 @@ STATUS  current
 DESCRIPTION
     "All agent capabilities defnitions occur under this."
 ::= { vmware 70 }
+
+vmwNsxManager OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware NSX Manager and related components."
+::= { vmware 90 }
+
+vmwNetworkInsight OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware vRealize Network Insight and related components."
+::= { vmware 100 }
 
 vmwExperimental OBJECT-IDENTITY
 STATUS  current

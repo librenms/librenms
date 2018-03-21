@@ -11,7 +11,7 @@ if (is_numeric($bill_hist_id)) {
         $extents = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($bill_id, $bill_hist_id));
         $dur = $extents['to'] - $extents['from'];
         $reducefactor = round(($dur / 300 / (($vars['height'] - 100) * 3)), 0);
-        
+
         if ($reducefactor < 2) {
             $reducefactor = 2;
         }
@@ -21,7 +21,7 @@ if (is_numeric($bill_hist_id)) {
     if ($reducefactor < 2) {
         $dur = $vars['to'] - $vars['from'];
         $reducefactor = round(($dur / 300 / (($vars['height'] - 100) * 3)), 0);
-        
+
         if ($reducefactor < 2) {
             $reducefactor = 2;
         }
@@ -111,7 +111,7 @@ $lineplot_out->SetWeight(1);
 if (strtolower($graph_data['bill_type']) == 'cdr') {
     $lineplot_95th = new LinePlot(array($graph_data['rate_95th'], $graph_data['rate_95th']), array($xmin, $xmax));
     $lineplot_95th->SetColor('red');
-} else if (strtolower($graph_data['bill_type']) == 'quota') {
+} elseif (strtolower($graph_data['bill_type']) == 'quota') {
     $lineplot_ave = new LinePlot(array($graph_data['rate_average'], $graph_data['rate_average']), array($xmin, $xmax));
     $lineplot_ave->SetColor('red');
 }
@@ -125,7 +125,7 @@ $graph->Add($lineplot_out);
 
 if (strtolower($graph_data['bill_type']) == 'cdr') {
     $graph->Add($lineplot_95th);
-} else if (strtolower($graph_data['bill_type']) == 'quota') {
+} elseif (strtolower($graph_data['bill_type']) == 'quota') {
     $graph->Add($lineplot_ave);
 }
 
