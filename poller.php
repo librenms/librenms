@@ -117,7 +117,7 @@ if (isset($options['f'])) {
 }
 
 if (isset($options['p'])) {
-   $prometheus = false;
+    $prometheus = false;
 }
 
 if (isset($options['g'])) {

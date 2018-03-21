@@ -36,20 +36,14 @@ if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
 }
 
-if (isset($options['p'])) { 
-    $config['noprometheus'] = true;
+if (isset($options['p'])) {
+    $prometheus = false;
 }
 
 if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;
-}
-
-if ($config['noprometheus'] !== true && $config['prometheus']['enable'] === true) {
-   $prometheus = true;
-} else {
-   $prometheus = false;
 }
 
 rrdtool_initialize();

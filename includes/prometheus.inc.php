@@ -45,7 +45,7 @@ function prometheus_push($device, $measurement, $tags, $fields)
                 d_echo($fields);
                 d_echo($vals);
                 d_echo($promurl);
-                d_echo("\nEND\n"); 
+                d_echo("\nEND\n");
 
                 curl_setopt($ch, CURLOPT_URL, $promurl);
                 curl_setopt($ch, CURLOPT_POST, 1);
