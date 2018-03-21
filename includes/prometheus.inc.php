@@ -20,7 +20,7 @@ function prometheus_push($device, $measurement, $tags, $fields)
             try {
                 $ch = curl_init();
 
-                set_curl_proxy($curl);
+                set_curl_proxy($ch);
                 $vals = "";
                 $promtags = "/measurement/".$measurement;
 
@@ -57,7 +57,7 @@ function prometheus_push($device, $measurement, $tags, $fields)
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         
-                $result = curl_exec($ch);
+                curl_exec($ch);
  
                 if (curl_errno($ch)) {
                     d_echo('Error:' . curl_error($ch));
