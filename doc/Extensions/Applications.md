@@ -21,7 +21,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
 1. [NGINX](#nginx) - SNMP extend, Agent
-1. [NFS-server](#nfs-server) - SNMP extend
+1. [NFS Server](#nfs-server) - SNMP extend
 1. [NTP Client](#ntp-client) - SNMP extend
 1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
 1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
