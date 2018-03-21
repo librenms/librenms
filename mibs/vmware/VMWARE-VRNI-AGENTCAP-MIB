@@ -1,0 +1,132 @@
+-- **********************************************************
+-- Copyright 2016-2017 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VRNI-AGENTCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+       FROM SNMPv2-SMI
+    vmwareAgentCapabilities
+       FROM VMWARE-ROOT-MIB
+    AGENT-CAPABILITIES
+       FROM SNMPv2-CONF;
+
+vmwVRNIAgentCapabilityMIB MODULE-IDENTITY
+   LAST-UPDATED "201710130000Z"
+   ORGANIZATION "VMware, Inc"
+   CONTACT-INFO
+      "VMware, Inc
+      3401 Hillview Ave
+      Palo Alto, CA 94304
+      Tel: 1-877-486-9273 or 650-427-5000
+      Fax: 650-427-5001
+      Web: http://kb.vmware.com/kb/1013445
+      "
+   DESCRIPTION
+     "This module defines agent capabilities for deployed VRNI agents by release."
+
+   REVISION     "201710130000Z"
+   DESCRIPTION
+         "Change vmwVRNIAgentCapabilityMIB root oid to fix duplicate oid."
+
+   REVISION     "201709050000Z"
+   DESCRIPTION
+         "Notifications send by VRNI as updated in 3.5 release"
+
+   REVISION     "201706010000Z"
+   DESCRIPTION
+         "Notifications send by VRNI as updated in 3.4 release"
+
+   REVISION     "201703020000Z"
+   DESCRIPTION
+         "Notifications send by VRNI as updated in 3.3 release"
+   REVISION     "201611220001Z"
+   DESCRIPTION
+         "Describe SNMP agent capabilities for each VRNI appliance release."
+        ::= { vmwareAgentCapabilities 125 }
+
+vmwVRNICapability OBJECT IDENTIFIER ::= { vmwVRNIAgentCapabilityMIB 10 }
+
+vmwVRNIAgent2016v350 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "3.5.0"
+  STATUS  current
+  DESCRIPTION
+     "Release 3.5.0 for VMware VRNI supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the VRNI appliance."
+  REFERENCE
+     "http://www.vmware.com/products"
+     -- REVISION 201709050000Z Fourth Version
+     SUPPORTS VMWARE-VRNI-MIB
+     INCLUDES {
+         vmwNetworkInsightNotificationGroup1,
+         vmwNetworkInsightNotificationGroup2,
+         vmwNetworkInsightNotificationGroup3,
+         vmwNetworkInsightNotificationGroup4,
+         vmwNetworkInsightNotificationInfoGroup2
+     }
+   ::= { vmwVRNICapability 9 }
+
+vmwVRNIAgent2017v340 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "3.4.0"
+  STATUS  current
+  DESCRIPTION
+     "Release 3.4.0 for VMware VRNI supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the VRNI appliance.
+     This mib module is backward compatible with next version."
+  REFERENCE
+     "http://www.vmware.com/products"
+     -- REVISION 201706010000Z Third Version
+     SUPPORTS VMWARE-VRNI-MIB
+     INCLUDES {
+         vmwNetworkInsightNotificationGroup1,
+         vmwNetworkInsightNotificationGroup2,
+         vmwNetworkInsightNotificationGroup3,
+         vmwNetworkInsightNotificationInfoGroup2
+     }
+   ::= { vmwVRNICapability 8 }
+
+
+vmwVRNIAgent2017v330 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "3.3.0"
+  STATUS  current
+  DESCRIPTION
+     "Release 3.3.0 for VMware VRNI supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the VRNI appliance.
+     This mib module is backward compatible with next version. It
+     extends 3.2 release events by appending eventName managed object
+     to each notification's variable binding and adding a new set of
+     notifications."
+  REFERENCE
+     "http://www.vmware.com/products"
+     -- REVISION 201702200000Z Second Version.
+     SUPPORTS VMWARE-VRNI-MIB
+     INCLUDES {
+         vmwNetworkInsightNotificationGroup1,
+         vmwNetworkInsightNotificationGroup2,
+         vmwNetworkInsightNotificationInfoGroup2
+     }
+   ::= { vmwVRNICapability 7 }
+
+vmwVRNIAgent2016v320 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "3.2.0"
+  STATUS  current
+  DESCRIPTION
+     "Release 3.2.0 for VMware VRNI supporting only SNMPv2c trap PDUs.
+     It describes all the notifications sent from the VRNI appliance.
+     WARNING: This mib module will not be backward compatible with next version.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     -- REVISION 201610260000Z First Version.
+     SUPPORTS VMWARE-VRNI-MIB
+     INCLUDES {
+         vmwNetworkInsightMIBGroups
+     }
+   ::= { vmwVRNICapability 6 }
+
+END
