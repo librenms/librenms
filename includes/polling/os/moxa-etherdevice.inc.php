@@ -10,9 +10,18 @@
  * the source code distribution for details.
  */
 
-// switchModel:
-$hardware = snmp_get($device, $device['sysObjectID'].'.1.2.0', '-OQvs');
-// firmwareVersion:
-$version = snmp_get($device, $device['sysObjectID'].'.1.4.0', '-OQvs');
-// serialNumber (not supported on all models):
-$serial = snmp_get($device, $device['sysObjectID'].'.1.78.0', '-OQvs');
+// hardware => switchModel.0
+// version => firmwareVersion.0
+// serial => serialNumber.0 (not supported on all models)
+
+$oids = array(
+    'hardware' => $device['sysObjectID'].'.1.2.0',
+    'version' => $device['sysObjectID'].'.1.4.0', 
+    'serial' => $device['sysObjectID'].'.1.78.0', 
+);
+  
+$os_data = snmp_get_multi_oid($device, $oids);
+
+foreach ($oids as $var => $oid) {
+    $$var = trim($os_data[$oid], '"');
+}
