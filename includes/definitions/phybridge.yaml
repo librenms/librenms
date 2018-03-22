@@ -1,6 +1,7 @@
 os: phybridge
 text: 'NVT Phybridge'
-type: wireless
+icon: phybridge
+type: network
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
