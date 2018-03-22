@@ -55,7 +55,7 @@ class DeviceGroup extends Model
      *
      * @var string
      */
-    protected $appends = ['patternSql', 'deviceCount'];
+    protected $appends = ['patternSql'];
 
     /**
      * The attributes that can be mass assigned.
@@ -289,25 +289,6 @@ class DeviceGroup extends Model
     }
 
     /**
-     * Fetch the device counts for groups
-     * Use DeviceGroups::with('deviceCountRelation') to eager load
-     *
-     * @return int
-     */
-    public function getDeviceCountAttribute()
-    {
-        // if relation is not loaded already, let's do it first
-        if (!$this->relationLoaded('deviceCountRelation')) {
-            $this->load('deviceCountRelation');
-        }
-
-        $related = $this->getRelation('deviceCountRelation')->first();
-
-        // then return the count directly
-        return ($related) ? (int)$related->count : 0;
-    }
-
-    /**
      * Custom mutator for params attribute
      * Allows already encoded json to pass through
      *
@@ -342,18 +323,6 @@ class DeviceGroup extends Model
 
 
     // ---- Define Relationships ----
-
-    /**
-     * Relationship allows us to eager load device counts
-     * DeviceGroups::with('deviceCountRelation')
-     *
-     * @return mixed
-     */
-    public function deviceCountRelation()
-    {
-        // FIXME this query doesn't work in strict mode
-        return $this->devices()->selectRaw('`device_group_device`.`device_group_id`, count(*) as count')->groupBy('device_group_device.device_group_id');
-    }
 
     /**
      * Relationship to App\Models\Device

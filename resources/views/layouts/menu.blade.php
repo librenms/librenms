@@ -100,7 +100,7 @@
                     @if($device_groups)
                         <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups</a>
                             <ul class="dropdown-menu scrollable-menu">
-                            @foreach($device_groups as $device_group)
+                            @foreach($device_groups as $group)
                                 <li><a href="{{ url("devices/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                             @endforeach
                             </ul>

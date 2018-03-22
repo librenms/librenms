@@ -31,7 +31,6 @@ class Device extends Model
      * @var array
      */
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
-    protected $appends = ['portCount', 'sensorCount'];
 
     /**
      * Initialize this class
@@ -92,16 +91,6 @@ class Device extends Model
     }
 
     // ---- Accessors/Mutators ----
-    public function getPortCountAttribute()
-    {
-        return is_null($this->portCountRelation) ? 0 : $this->portCountRelation->count;
-    }
-
-    public function getSensorCountAttribute()
-    {
-        return is_null($this->sensorCountRelation) ? 0 : $this->sensorCountRelation->count;
-    }
-
     public function getIconAttribute($icon)
     {
         if (isset($icon)) {
@@ -209,12 +198,6 @@ class Device extends Model
         return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
     }
 
-    public function portCountRelation()
-    {
-        return $this->hasOne('App\Models\Port', 'device_id')
-            ->selectRaw('device_id, count(*) as count')->groupBy('device_id');
-    }
-
     /**
      * Relationship to App\Models\Processor
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
@@ -240,12 +223,6 @@ class Device extends Model
     public function sensors()
     {
         return $this->hasMany('App\Models\Sensor', 'device_id');
-    }
-
-    public function sensorCountRelation()
-    {
-        return $this->hasOne('App\Models\Sensor', 'device_id')
-            ->selectRaw('device_id, count(*) as count')->groupBy('device_id');
     }
 
     /**
