@@ -160,7 +160,6 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
                             $primary = true;
                         }
                         $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field'], $primary);
-
                     } elseif ($cdata !== $current_columns[$column]) {
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
