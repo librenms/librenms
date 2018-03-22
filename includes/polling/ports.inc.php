@@ -169,6 +169,11 @@ $shared_oids = array(
     'ifMtu',
 );
 
+$dot3_oids = [
+    'dot3StatsIndex',
+    'dot3StatsDuplexStatus',
+];
+
 echo 'Caching Oids: ';
 $port_stats = array();
 $data       = array();
@@ -195,12 +200,14 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                     } else {
                         $full_oids = array_merge($nonhc_oids, $shared_oids);
                     }
-                    $oids = implode(".$i ", $full_oids) . ".$i";
+                    $oids       = implode(".$i ", $full_oids) . ".$i";
+                    $extra_oids = implode(".$i ", $dot3_oids) . ".$i";
                     unset($full_oids);
                     if (is_array($data[$i])) {
                         $port_stats[$i] = $data[$i];
                     }
                     $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
+                    $port_stats = snmp_get_multi($device, $extra_oids, '-OQUst', 'EtherLike-MIB', null, $port_stats);
                 }
             }
         }
@@ -224,15 +231,14 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
             }
         }
+        if ($device['os'] != 'asa') {
+            echo 'dot3StatsDuplexStatus';
+            if ($config['enable_ports_poe'] || $config['enable_ports_etherlike']) {
+                $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
+            }
+            $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
+        }
     }
-}
-
-if ($device['os'] != 'asa') {
-    echo 'dot3StatsDuplexStatus';
-    if ($config['enable_ports_poe'] || $config['enable_ports_etherlike']) {
-        $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
-    }
-    $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
 
 if ($device['os'] == 'procera') {
