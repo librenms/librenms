@@ -10,10 +10,6 @@
  * the source code distribution for details.
  */
 
-// hardware => switchModel.0
-// version => firmwareVersion.0
-// serial => serialNumber.0 (not supported on all models)
-
 $oids = array(
     'hardware' => $device['sysObjectID'].'.1.2.0',
     'version' => $device['sysObjectID'].'.1.4.0', 
@@ -25,3 +21,6 @@ $os_data = snmp_get_multi_oid($device, $oids);
 foreach ($oids as $var => $oid) {
     $$var = trim($os_data[$oid], '"');
 }
+
+unset($oids);
+unset($os_data);
