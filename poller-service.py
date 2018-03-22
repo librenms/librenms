@@ -48,6 +48,10 @@ config_file = install_dir + '/config.php'
 
 log.info('INFO: Starting poller-service')
 
+locklist = {}
+locklistlock = threading.Lock()
+
+dupedetect = {}
 
 class DB:
     conn = None
@@ -193,20 +197,37 @@ except KeyError:
 db = DB()
 
 
-def lockFree(lock, db=db):
-    query = "SELECT IS_FREE_LOCK('{0}')".format(lock)
-    return db.query(query)[0][0] == 1
+def isLocked(lock):
+    global locklist;
 
+    if lock in locklist:
+        return locklist[lock].locked()
+
+    return False
 
 def getLock(lock, db=db):
-    query = "SELECT GET_LOCK('{0}', 0)".format(lock)
-    return db.query(query)[0][0] == 1
+    global locklist;
+    global locklistlock;
 
+    if not lock in locklist:
+        # When creating a lock, we lock the list itself to avoid a race condition where thread A creates and obtains a lock, but thread B overwrites it mid operation
+        if locklistlock.acquire(True):
+            # Check a second time just in case we weren't the first process waiting for the locklistlock
+            if not lock in locklist:
+               locklist[lock] = threading.Lock()
+
+            locklistlock.release()
+
+    return locklist[lock].acquire(False)
 
 def releaseLock(lock, db=db):
-    query = "SELECT RELEASE_LOCK('{0}')".format(lock)
-    cursor = db.query(query)
-    return db.query(query)[0][0] == 1
+    global locklist;
+
+    # There are no code paths where a non-created lock may be released
+    if locklist[lock].locked():
+        return locklist[lock].release()
+
+    return True
 
 
 def sleep_until(timestamp):
@@ -243,9 +264,6 @@ dev_query = ('SELECT device_id, status,                                         
              ') as next_discovery                                                '
              'FROM devices WHERE                                                 '
              'disabled = 0                                                       '
-             'AND IS_FREE_LOCK(CONCAT("poll.", device_id))                       '
-             'AND IS_FREE_LOCK(CONCAT("discovery.", device_id))                       '
-             'AND IS_FREE_LOCK(CONCAT("queue.", device_id))                       '
              'AND ( last_poll_attempted < DATE_SUB(NOW(), INTERVAL {2} SECOND )  '
              '  OR last_poll_attempted IS NULL )                                 '
              '{3}                                                                '
@@ -261,6 +279,7 @@ devices_scanned = 0
 dont_query_until = datetime.fromtimestamp(0)
 
 def poll_worker():
+    global dupe_detect
     global dev_query
     global devices_scanned
     global dont_query_until
@@ -273,6 +292,11 @@ def poll_worker():
         db = DB()
 
     while True:
+        device_id = None
+        status = None
+        next_poll = None
+        next_discovery = None
+
         if datetime.now() < dont_query_until:
             time.sleep(1)
             continue
@@ -282,10 +306,21 @@ def poll_worker():
             dont_query_until = datetime.now() + timedelta(seconds=retry_query)
             time.sleep(1)
             continue
-            
-        device_id, status, next_poll, next_discovery  = dev_row[0]
+
+        for row in dev_row:
+
+            # Find first unlocked device
+            if not (isLocked('queue.{0}'.format(row[0]))
+                 or isLocked('poll.{0}'.format(row[0])) 
+                 or isLocked('discovery.{0}'.format(row[0]))):
+                device_id, status, next_poll, next_discovery = row
+
+        if not device_id:
+            time.sleep(1)
+            continue
 
         if not getLock('queue.{0}'.format(device_id), db):
+            log.debug('DEBUG: Thread {0} failed to aquire lock for {1}, finding something else to poll'.format(thread_id, device_id))
             releaseLock('queue.{0}'.format(device_id), db)
             continue
 
@@ -297,18 +332,20 @@ def poll_worker():
         if (not next_discovery or next_discovery < datetime.now()) and status == 1:
             action = 'discovery'
 
-        log.debug('DEBUG: Thread {0} Starting {1} of device {2}'.format(thread_id, action, device_id))
         devices_scanned += 1
 
         db.query('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {0}'.format(device_id))
 
         if not getLock('{0}.{1}'.format(action, device_id), db):
+            log.debug('DEBUG: Thread {0} failed to aquire lock for {1}, finding something else to poll'.format(thread_id, device_id))
             releaseLock('{0}.{1}'.format(action, device_id), db)
             releaseLock('queue.{0}'.format(device_id), db)
             continue
 
         releaseLock('queue.{0}'.format(device_id), db)
         try:
+            log.debug('DEBUG: Thread {0} Starting {1} of device {2}'.format(thread_id, action, device_id))
+
             start_time = time.time()
             path = poller_path
             if action == 'discovery':
@@ -320,6 +357,12 @@ def poll_worker():
                 log.debug("DEBUG: Thread {0} finished {1} of device {2} in {3} seconds".format(thread_id, action, device_id, elapsed_time))
             else:
                 log.warning("WARNING: Thread {0} finished {1} of device {2} in {3} seconds".format(thread_id, action, device_id, elapsed_time))
+
+            if device_id in dupedetect:
+                dupedetect[device_id] +=1
+            else:
+                dupedetect[device_id] = 0
+
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
@@ -357,4 +400,11 @@ while True:
         sys.exit(2)
     log.info('INFO: {0} devices scanned in the last minute'.format(devices_scanned))
     devices_scanned = 0
+
+    for key, value in dupedetect.iteritems():
+        # Two is permissable if the timing is off, or a discovery run occured
+        if value > 2:
+            dupedetect[key] = 0
+            log.warning('WARNING: Device {} appeared to be scanned multiple times - may be down, or poller may not be locking correctly'.format(key))
+
     next_update = datetime.now() + timedelta(minutes=1)
