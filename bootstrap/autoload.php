@@ -14,6 +14,14 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
-$install_dir = realpath(__DIR__.'/../');
+if (!is_file(__DIR__.'/../vendor/autoload.php')) {
+    $message = 'Error: Missing dependencies! Run the following command to fix:';
+    $fix = './scripts/composer_wrapper.php install --no-dev';
+    if (PHP_SAPI == 'cli') {
+        printf("\n%s\n\n%s\n\n", $message, $fix);
+    } else {
+        printf("<h3 style='color: firebrick;'>%s</h3><p>%s</p>", $message, $fix);
+    }
+}
 
 require __DIR__.'/../vendor/autoload.php';
