@@ -37,12 +37,12 @@
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 {!! \LibreNMS\Plugins::call('menu') !!}
-                                @if(auth()->user()->isAdmin())
+                                @admin
                                     @if(\LibreNMS\Plugins::count())
                                         <li role="presentation" class="divider"></li>
                                     @endif
                                     <li><a href="{{ url('plugin', ['view' => 'admin']) }}"> <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>Plugin Admin</a></li>
-                                @endif
+                                @endadmin
                             </ul>
                         </li>
                         <li class="dropdown-submenu">
