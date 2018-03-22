@@ -10,12 +10,9 @@
  * the source code distribution for details.
  */
 
-
-// Moxa people enjoy creating MIBs for each model!
-if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
-    $mibmod = 'MOXA-IKS6726A-MIB';
-} elseif ($device['sysDescr'] == 'EDS-G508E-T') {
-    $mibmod = 'MOXA-EDSG508E-MIB';
-}
-$version = snmp_get($device, "firmwareVersion.0", "-OQvs", $mibmod);
-$hardware =  $device['sysDescr'];
+// switchModel:
+$hardware = snmp_get($device, $device['sysObjectID'].'.1.2.0', '-OQvs');
+// firmwareVersion:
+$version = snmp_get($device, $device['sysObjectID'].'.1.4.0', '-OQvs');
+// serialNumber (not supported on all models):
+$serial = snmp_get($device, $device['sysObjectID'].'.1.78.0', '-OQvs');
