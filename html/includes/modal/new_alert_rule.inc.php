@@ -97,9 +97,15 @@ if (is_admin()) {
                             <div class='col-sm-2'>
                                 <input type="checkbox" name="mute" id="mute">
                             </div>
-                            <label for='invert' class='col-sm-3 control-label'>Invert match: </label>
+                            <label for='invert' class='col-sm-2 control-label'>Invert match: </label>
                             <div class='col-sm-2'>
                                 <input type='checkbox' name='invert' id='invert'>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for='recovery' class='col-sm-3 control-label'>Recovery alerts: </label>
+                            <div class='col-sm-2'>
+                                <input type='checkbox' name='recovery' id='recovery'>
                             </div>
                         </div>
                         <div class="form-group">
@@ -110,7 +116,7 @@ if (is_admin()) {
                         </div>
                         <div class='form-group'>
                             <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
-                            <div class='col-sm-5'>
+                            <div class='col-sm-9'>
                                 <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
                             </div>
                         </div>
@@ -263,6 +269,7 @@ if (is_admin()) {
                 $severity.val($severity.find("option[selected]").val());
                 $("#mute").bootstrapSwitch('state', false);
                 $("#invert").bootstrapSwitch('state', false);
+                $("#recovery").bootstrapSwitch('state', true);
                 $(this).find("input[type=text]").val("");
                 $('#count').val('-1');
                 $('#delay').val('5 m');
@@ -319,6 +326,10 @@ if (is_admin()) {
 
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
+                if (typeof extra.recovery == 'undefined') {
+                    extra.recovery = true;
+                }
+                $("[name='recovery']").bootstrapSwitch('state', extra.recovery)
             } else {
                 $('#count').val('-1');
             }

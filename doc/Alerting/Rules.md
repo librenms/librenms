@@ -58,6 +58,7 @@ Here are some of the other options available when adding an alerting rule:
 - Interval: The interval of time in seconds between alerts for an event until Max alert is reached.
 - Mute alerts: Disables sending alert rule through alert transport. But will still show the alert in the Web UI.
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
+- Recovery alerts: This will disable the recovery notification from being sent if turned off.
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
