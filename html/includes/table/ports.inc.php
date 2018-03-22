@@ -40,7 +40,7 @@ $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
 if (!empty($vars['hostname'])) {
     $where .= ' AND (D.hostname LIKE ? OR D.sysName LIKE ?)';
-    $param += array_fill(count($param),2,'%' . $vars['hostname'] . '%');
+    $param += array_fill(count($param), 2, '%' . $vars['hostname'] . '%');
 }
 
 if (!empty($vars['location'])) {
