@@ -38,7 +38,7 @@ $sql .= " WHERE $where ";
 
 if (!empty($vars['searchquery'])) {
     $sql .= ' AND (sysName LIKE ? OR hostname LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
-    for($i=0;$i<5;$i++) $param[] = '%' . $vars['searchquery'] . '%';
+    $param += array_fill(count($param),5,'%' . $vars['searchquery'] . '%');
 }
 
 if (!empty($vars['os'])) {
