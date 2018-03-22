@@ -39,7 +39,8 @@ if (is_admin() === false && is_read() === false) {
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
 
 if (!empty($vars['hostname'])) {
-    $where .= ' AND (D.hostname LIKE "%i'.$vars['hostname'].'%" OR D.sysName LIKE "%'.$vars['hostname'].'%")';
+    $where .= ' AND (D.hostname LIKE ? OR D.sysName LIKE ?)';
+    for($i=0;$i<2;$i++) $param[] = '%' . $vars['hostname'] . '%';
 }
 
 if (!empty($vars['location'])) {
