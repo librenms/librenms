@@ -22,5 +22,4 @@ foreach ($oids as $var => $oid) {
     $$var = trim($os_data[$oid], '"');
 }
 
-unset($oids);
-unset($os_data);
+unset($oids, $os_data);
