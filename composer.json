@@ -42,7 +42,8 @@
         "phpunit/phpunit": "5.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
-        "fojuth/readmegen": "1.*"
+        "fojuth/readmegen": "1.*",
+        "barryvdh/laravel-ide-helper": "^2.4"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
@@ -53,7 +54,10 @@
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "includes/dbFacile.php"
+        ]
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
