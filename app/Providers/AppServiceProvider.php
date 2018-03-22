@@ -58,8 +58,11 @@ class AppServiceProvider extends ServiceProvider
 
 
         // Blade directives (Yucky because of < L5.5)
-        Blade::directive('config', function ($key, $default=false) {
-            return "<?php if (\LibreNMS\Config::get(\$key, \$default)): ?>";
+        Blade::directive('config', function ($key) {
+            return "<?php if (\LibreNMS\Config::get(($key))): ?>";
+        });
+        Blade::directive('notconfig', function ($key) {
+            return "<?php if (!\LibreNMS\Config::get(($key))): ?>";
         });
         Blade::directive('endconfig', function () {
             return "<?php endif; ?>";

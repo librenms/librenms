@@ -49,19 +49,19 @@
                             <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
-                                @if(\LibreNMS\Config::get('oxidized.enabled') && Config::has('oxidized.url'))
+                                @config('oxidized.enabled')
                                     <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>
-                                @endif
+                                @endconfig
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('eventlog') }}"><i class="fa fa-bookmark fa-fw fa-lg" aria-hidden="true"></i> Eventlog</a></li>
-                        @if(\LibreNMS\Config::get('enable_syslog'))
+                        @config('enable_syslog')
                             <li><a href="{{ url('syslog') }}"><i class="fa fa-clone fa-fw fa-lg" aria-hidden="true"></i> Syslog</a></li>
-                        @endif
-                        @if(\LibreNMS\Config::has('graylog.server') && \LibreNMS\Config::has('graylog.port'))
+                        @endconfig
+                        @config('graylog.server')
                             <li><a href="{{ url('graylog') }}"><i class="fa fa-clone fa-fw fa-lg" aria-hidden="true"></i> Graylog</a></li>
-                        @endif
+                        @endconfig
 
                         <li><a href="{{ url('inventory') }}"><i class="fa fa-cube fa-fw fa-lg" aria-hidden="true"></i> Inventory</a></li>
                         @if($package_count)
@@ -74,10 +74,10 @@
                         <li><a href="{{ url('search/search=mac') }}"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> MAC Address</a></li>
                         <li><a href="{{ url('search/search=arp') }}"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> ARP Tables</a></li>
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> FDB Tables</a></li>
-                        @if(\LibreNMS\Config::get('poller_modules.mib'))
+                        @config('poller_modules.mib')
                             <li role="presentation" class="divider"></li>
                             <li><a href="{{ url('mibs') }}"><i class="fa fa-file-text-o fa-fw fa-lg" aria-hidden="true"></i> MIB definitions</a></li>
-                        @endif
+                        @endconfig
                     </ul>
                 </li>
 
@@ -118,25 +118,25 @@
                             </ul>
                         </li>
                     @endif
-                    @if(auth()->user()->isAdmin())
+                    @admin
                         <li role="presentation" class="divider"></li>
-                        @if(\LibreNMS\Config::get('poller_modules.mib'))
+                        @config('poller_modules.mib')
                             <li><a href="{{ url('mib_assoc') }}"><i class="fa fa-file-text-o fa-fw fa-lg" aria-hidden="true"></i> MIB associations</a></li>
                             <li role="presentation" class="divider"></li>
-                        @endif
+                        @endconfig
 
-                        @if(!\LibreNMS\Config::get('navbar.manage_groups.hide', false))
+                        @notconfig('navbar.manage_groups.hide')
                                 <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Manage Groups</a></li>
-                        @endif
+                        @endconfig
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Device</a></li>
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg" aria-hidden="true"></i> Delete Device</a></li>
-                    @endif
+                    @endadmin
 
                     </ul>
                 </li>
-                @if(\LibreNMS\Config::get('show_services'))
+                @config('show_services')
                     <li class="dropdown">
                         <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Services</span></a>
                         <ul class="dropdown-menu">
@@ -150,14 +150,13 @@
                                     <li><a href="{{ url('services/state=critical') }}"><i class="fa fa-bell fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ({{ $service_critical }})</a></li>
                                 @endif
                             @endif
-                            @if(auth()->user()->isAdmin())
+                            @admin
                                 <li role="presentation" class="divider"></li>
                                 <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Service</a></li>
-                            @endif
+                            @endadmin
                         </ul>
                     </li>
-                @endif
-
+                @endconfig
 
             </ul>
 
