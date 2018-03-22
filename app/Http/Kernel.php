@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Preflight;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -57,4 +58,11 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     ];
+
+
+    public function bootstrap()
+    {
+        Preflight::checkAll();
+        parent::bootstrap();
+    }
 }

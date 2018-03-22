@@ -26,35 +26,8 @@ class AppServiceProvider extends ServiceProvider
             Log::error("Error connecting to database.\n" . $dbce->getMessage() . PHP_EOL);
         }
 
-        $log_file = Config::get('log_file', base_path('logs/librenms.log'));
-
-        // check file/folder permissions
-        $check = [
-            base_path('bootstrap/cache'),
-            base_path('storage'),
-            $log_file
-        ];
-        foreach ($check as $path) {
-            if (!is_writable($path)) {
-                $user = Config::get('user', 'librenms');
-                $group = Config::get('group', $user);
-                $message = [
-                    "Error: $path is not writable! Run these commands to fix:",
-                    "chown -R $user:$group rrd/ logs/ storage/ bootstrap/cache/",
-                    'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
-                    'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/'
-                ];
-                if (App::runningInConsole()) {
-                    vprintf("%s\n\n%s\n%s\n%s\n", $message);
-                } else {
-                    vprintf("<h3 style='color: firebrick;'>%s</h3><p>%s<br />%s<br />%s</p>", $message);
-                }
-                exit;
-            }
-        }
-
         // direct log output to librenms.log
-        Log::useFiles($log_file);
+        Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')));
 
 
         // Blade directives (Yucky because of < L5.5)

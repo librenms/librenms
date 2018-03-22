@@ -88,7 +88,7 @@
 
 @if(Request::get('bare') == 'yes')
     <style>body { padding-top: 0 !important; padding-bottom: 0 !important; }</style>
-@elseif(Auth::check() || true)  {{-- FIXME --}}
+@elseif(auth()->check())
     @include('layouts.menu')
 @endif
 
