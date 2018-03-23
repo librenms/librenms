@@ -2,7 +2,7 @@
 /**
  * nimbleos.inc.php
  *
- * LibreNMS storage discovery module for Nimble Storage
+ * LibreNMS storage polling module for Nimble Storage
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 theherodied
+ * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
 if (!is_array($storage_cache['nimbleos'])) {
@@ -28,6 +28,7 @@ if (!is_array($storage_cache['nimbleos'])) {
 }
 $entry = $storage_cache['nimbleos'][$storage[storage_index]];
 $storage['units'] = 1024*1024;
-$storage['size'] = ($entry['volSizeLow'] * $storage['units']);
-$storage['used'] = ($entry['volUsageLow'] * $storage['units']);
+//nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
+$storage['size'] = (($entry['volSizeHigh'] << 32 ) + $entry['volSizeLow']) * $storage['units'];
+$storage['used'] = (($entry['volUsageHigh'] << 32 ) + $entry['volUsageLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);
