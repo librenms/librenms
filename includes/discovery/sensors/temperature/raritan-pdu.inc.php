@@ -1,6 +1,6 @@
 <?php
 /**
- * raritan.inc.php
+ * raritan-pdu.inc.php
  *
  * LibreNMS temperature sensor discovery module for Raritan
  *

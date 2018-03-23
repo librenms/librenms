@@ -1,6 +1,6 @@
 <?php
 /**
- * raritan.inc.php
+ * raritan-pdu.inc.php
  *
  * LibreNMS pre-cache discovery module for Raritan
  *
