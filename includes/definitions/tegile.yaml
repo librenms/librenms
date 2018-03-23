@@ -10,4 +10,3 @@ mib_dir:
 discovery:
     - sysDescr:
       - Tegile IntelliFlash
-
