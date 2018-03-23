@@ -231,21 +231,18 @@ class QueryBuilderParser implements \JsonSerializable
             return null;
         }
 
-        $result = [];
-        foreach ($this->builder['rules'] as $rule) {
-            if (array_key_exists('condition', $rule)) {
-                $result[] = $this->parseGroup($rule, $expand);
-            } else {
-                $result[] = $this->parseRule($rule, $expand);
-            }
-        }
-
         $sql = '';
+        $wrap = false;
+
         if ($expand) {
             $sql = 'SELECT * FROM ' . implode(',', $this->getTables());
             $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
+
+            // only wrap in ( ) if the condition is OR and there is more than one rule
+            $wrap = $this->builder['condition'] == 'OR' && count($this->builder['rules']) > 1;
         }
-        return $sql . implode(" {$this->builder['condition']} ", $result);
+
+        return $sql . $this->parseGroup($this->builder, $expand, $wrap);
     }
 
     /**
@@ -253,9 +250,10 @@ class QueryBuilderParser implements \JsonSerializable
      *
      * @param $rule
      * @param bool $expand Expand macros?
+     * @param bool $wrap Wrap in parenthesis
      * @return string
      */
-    private function parseGroup($rule, $expand = false)
+    private function parseGroup($rule, $expand = false, $wrap = true)
     {
         $group_rules = [];
 
@@ -268,7 +266,12 @@ class QueryBuilderParser implements \JsonSerializable
         }
 
         $sql = implode(" {$rule['condition']} ", $group_rules);
-        return "($sql)";
+
+        if ($wrap) {
+            return "($sql)";
+        } else {
+            return "$sql";
+        }
     }
 
     /**
