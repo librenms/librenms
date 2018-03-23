@@ -1,6 +1,6 @@
 <?php
 /**
- * raritan.inc.php
+ * raritan-pdu.inc.php
  *
  * LibreNMS voltage sensor discovery module for Raritan
  *
