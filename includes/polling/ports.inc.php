@@ -760,7 +760,7 @@ foreach ($ports as $port) {
 
         $port_descr_type = $port['port_descr_type'];
         $ifName = $port['ifName'];
-        $ifAlias = $port['ifAlias']; 
+        $ifAlias = $port['ifAlias'];
         $tags = compact('ifName', 'ifAlias', 'port_descr_type', 'rrd_name', 'rrd_def');
         rrdtool_data_update($device, 'ports', $tags, $fields);
 
