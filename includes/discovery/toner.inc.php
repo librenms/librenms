@@ -35,6 +35,11 @@ if ($device['os_group'] == 'printer') {
             $descr = snmp_get($device, $descr_oid, '-Oqva');
         }
 
+        // trim part & serial number from devices that include it
+        if (str_contains($descr, ', PN')) {
+            $descr = explode(', PN', $descr)[0];
+        }
+
         $type = 'jetdirect';
         $capacity = get_toner_capacity($data['prtMarkerSuppliesMaxCapacity']);
         $current = get_toner_levels($device, $raw_toner, $capacity);
