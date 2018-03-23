@@ -114,11 +114,10 @@ function RunMacros($rule, $x = 1)
     krsort($config['alert']['macros']['rule']);
     foreach ($config['alert']['macros']['rule'] as $macro => $value) {
         if (!strstr($macro, " ")) {
-            $value = str_replace('%', '', $value);
-            $rule = str_replace('macros.'.$macro, '('.$value.')', $rule);
+            $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
         }
     }
-    if (strstr($rule, "macros.")) {
+    if (strstr($rule, "%macros.")) {
         if (++$x < 30) {
             $rule = RunMacros($rule, $x);
         } else {
