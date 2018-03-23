@@ -153,7 +153,13 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
                     $column = $cdata['Field'];
                     if (empty($current_columns[$column])) {
                         $validator->fail("Database: missing column ($table/$column)");
-                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field']);
+                        $primary = false;
+                        if ($data['Indexes']['PRIMARY']['Columns'] == [$column]) {
+                            // include the primary index with the add statement
+                            unset($data['Indexes']['PRIMARY']);
+                            $primary = true;
+                        }
+                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field'], $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
@@ -217,10 +223,15 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
         return "CREATE TABLE `$table` ($def);";
     }
 
-    private function addColumnSql($table, $schema, $previous_column)
+    private function addColumnSql($table, $schema, $previous_column, $primary = false)
     {
         $sql = "ALTER TABLE `$table` ADD " . $this->columnToSql($schema);
-        if (!empty($previous_column)) {
+        if ($primary) {
+            $sql .= ' PRIMARY KEY';
+        }
+        if (empty($previous_column)) {
+            $sql .= ' FIRST';
+        } else {
             $sql .= " AFTER `$previous_column`";
         }
         return $sql . ';';
@@ -264,25 +275,27 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
      */
     private function columnToSql($column_data)
     {
+        $segments = ["`${column_data['Field']}`", $column_data['Type']];
+
+        $segments[] = $column_data['Null'] ? 'NULL' : 'NOT NULL';
+
+        if (isset($column_data['Default'])) {
+            if ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
+                $segments[] = 'DEFAULT CURRENT_TIMESTAMP';
+            } elseif ($column_data['Default'] == 'NULL') {
+                $segments[] = 'DEFAULT NULL';
+            } else {
+                $segments[] = "DEFAULT '${column_data['Default']}'";
+            }
+        }
+
         if ($column_data['Extra'] == 'on update current_timestamp()') {
-            $extra = 'on update CURRENT_TIMESTAMP';
+            $segments[] = 'on update CURRENT_TIMESTAMP';
         } else {
-            $extra = $column_data['Extra'];
+            $segments[] = $column_data['Extra'];
         }
 
-        $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
-
-        if (!isset($column_data['Default'])) {
-            $default = '';
-        } elseif ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
-            $default = 'DEFAULT CURRENT_TIMESTAMP';
-        } elseif ($column_data['Default'] == 'NULL') {
-            $default = 'DEFAULT NULL';
-        } else {
-            $default = "DEFAULT '${column_data['Default']}'";
-        }
-
-        return trim("`${column_data['Field']}` ${column_data['Type']} $null $default $extra");
+        return implode(' ', $segments);
     }
 
     /**
