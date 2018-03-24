@@ -31,7 +31,7 @@ if (is_array($tegile_storage)) {
         $units  = 1;
         $fstype = $storage['poolState'];
         $descr  = $storage['poolName'];
-        //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
+        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
         $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
         $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
         if (is_numeric($index)) {
