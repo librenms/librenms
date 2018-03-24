@@ -39,6 +39,7 @@ if (is_array($tegile_storage)) {
         }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
+/**
 $tegile_storage = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
     foreach ($tegile_storage as $index => $storage) {
         $units  = 1;
@@ -52,4 +53,5 @@ $tegile_storage = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB'
         }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
+*/
 }

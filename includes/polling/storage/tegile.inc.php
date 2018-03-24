@@ -33,6 +33,7 @@ $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $
 $storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);
 
+/**
 if (!is_array($storage_cache['tegile2'])) {
     $storage_cache['tegile'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
@@ -61,5 +62,6 @@ $tegile_storage = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB'
         }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
+*/
 }
 
