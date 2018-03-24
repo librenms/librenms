@@ -32,36 +32,3 @@ $storage['units'] = 1;
 $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];
 $storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);
-
-/**
-if (!is_array($storage_cache['tegile2'])) {
-    $storage_cache['tegile'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
-    d_echo($storage_cache);
-}
-$entry = $storage_cache['tegile2'][$storage[storage_index]];
-$storage['units'] = 1;
-//Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-$storage['size'] = (($entry['projectDadaSizeHigh'] << 32 ) + $entry['projectDataSizeLow']) * $storage['units'];
-$storage['
-$storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
-$storage['free'] = ($storage['size'] - $storage['used']);
-
-
-
-
-$tegile_storage = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
-    foreach ($tegile_storage as $index => $storage) {
-        $units  = 1;
-        $descr  = $storage['projectName'];
-        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
-        $size = (($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units;
-        $free = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
-        $used =  ($size - $free);
-        if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'tegile', $descr, $size, $units, $used);
-        }
-        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
-    }
-*/
-}
-
