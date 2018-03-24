@@ -34,10 +34,9 @@ if (is_array($tegile_storage)) {
         //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
         $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
         $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
-        $dedup = (($storage['poolPostDedupDataSizeHigh'] << 32 ) + $storage['poolPostDedupDataSizeLow']) * $units;
         if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'tegile', $descr, $size, $units, $used, $dedup);
+            discover_storage($valid_storage, $device, $index, $fstype, 'tegile', $descr, $size, $units, $used);
         }
-        unset($deny, $fstype, $descr, $size, $used, $dedup, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
+        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }
