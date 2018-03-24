@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="631.64pt" height="642.25pt" version="1.0" viewBox="0 0 631.63818 642.25153" xmlns="http://www.w3.org/2000/svg">
-<metadata>Created by potrace 1.13, written by Peter Selinger 2001-2015
-<rdf:RDF>
-<cc:Work rdf:about="">
-<dc:format>image/svg+xml</dc:format>
-<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-<dc:title/>
-</cc:Work>
-</rdf:RDF>
-</metadata>
-<g transform="matrix(.1 0 0 -.1 -7.1072 650.98)">
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 20010904//EN'  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="643pt" height="656pt" version="1.0" viewBox="0 0 643.000000 656.000000" xmlns="http://www.w3.org/2000/svg">
+<metadata>Created by potrace 1.13, written by Peter Selinger 2001-2015</metadata>
+<g transform="translate(0 656) scale(.1 -.1)">
 <path d="m2127 6489c-237-58-450-227-559-444-55-109-80-211-85-350-6-143 11-241 61-365 55-134 178-285 302-371 65-44 197-104 279-125 97-26 312-26 410 0 498 130 770 652 590 1132-97 258-326 459-597 524-111 27-291 26-401-1z"/>
 <path d="m4484 6061c-140-22-254-80-354-181-197-197-243-472-120-725 69-143 198-258 350-312 59-21 98-28 186-31 130-5 201 10 314 65 104 50 223 170 273 274 91 187 89 404-5 582-47 89-174 215-264 260-118 59-266 85-380 68z"/>
 <path d="m959 4520c-223-40-413-135-567-284-165-159-261-337-308-569-22-109-15-340 14-449 81-300 279-546 547-678 611-301 1322 22 1495 680 28 108 38 308 20 418-56 349-278 645-597 794-135 63-253 90-418 94-77 1-161-1-186-6z"/>
