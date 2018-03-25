@@ -159,7 +159,11 @@ For local RRDCached server
 $config['rrdtool_version'] = '1.5.5';
 $config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
-For remote RRDCached server
+For remote RRDCached server 
+Make sure you have network option in /var/default/rrdcached
+```bash
+NETWORK_OPTIONS="-L" 
+```
 ```php
 $config['rrdtool_version'] = '1.5.5';
 $config['rrdcached'] = "0:42217";
