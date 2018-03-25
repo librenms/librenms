@@ -18,24 +18,24 @@ if (is_admin() === false && is_read() === false) {
     $param[] = $_SESSION['user_id'];
 }
 
-if (is_numeric($_POST['device_id'])) {
+if (is_numeric($vars['device_id'])) {
     $where    .= ' AND `F`.`device_id`=?';
-    $param[] = $_POST['device_id'];
+    $param[] = $vars['device_id'];
 }
 
-if (is_numeric($_POST['port_id'])) {
+if (is_numeric($vars['port_id'])) {
     $where    .= ' AND `F`.`port_id`=?';
-    $param[] = $_POST['port_id'];
+    $param[] = $vars['port_id'];
 }
 
-if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-    $search = mres(trim($_POST['searchPhrase']));
+if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
+    $search = mres(trim($vars['searchPhrase']));
     $mac_search = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', $search).'%';
 
-    if (isset($_POST['searchby']) && $_POST['searchby'] == 'vlan') {
+    if (isset($vars['searchby']) && $vars['searchby'] == 'vlan') {
         $where  .= ' AND `V`.`vlan_vlan` = ?';
         $param[] = (int)$search;
-    } elseif ((isset($_POST['searchby']) && $_POST['searchby'] == 'mac') ||
+    } elseif ((isset($vars['searchby']) && $vars['searchby'] == 'mac') ||
         (!is_numeric($search) || $search > 4096)
     ) {
         $where  .= ' AND `F`.`mac_address` LIKE ?';
