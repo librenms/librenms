@@ -2,7 +2,7 @@
 
 $row = 1;
 
-$device_id = $_POST['device_id'];
+$device_id = $vars['device_id'];
 
 $OBJCOMP = new LibreNMS\Component();
 

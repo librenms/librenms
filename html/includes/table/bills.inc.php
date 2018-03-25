@@ -1,29 +1,29 @@
 <?php
 
 // Calculate filters
-$prev = !empty($_POST['period']) && ($_POST['period'] == 'prev');
+$prev = !empty($vars['period']) && ($vars['period'] == 'prev');
 $wheres = array();
 $param = array();
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $wheres[] = 'bills.bill_name LIKE ?';
     $param[] = "%$searchPhrase%";
 }
-if (!empty($_POST['bill_type'])) {
+if (!empty($vars['bill_type'])) {
     if ($prev) {
         $wheres[] = 'bill_history.bill_type = ?';
     } else {
         $wheres[] = 'bill_type = ?';
     }
-    $param[] = $_POST['bill_type'];
+    $param[] = $vars['bill_type'];
 }
-if (!empty($_POST['state'])) {
-    if ($_POST['state'] === 'under') {
+if (!empty($vars['state'])) {
+    if ($vars['state'] === 'under') {
         if ($prev) {
             $wheres[] = "((bill_history.bill_type = 'cdr' AND bill_history.rate_95th <= bill_history.bill_allowed) OR (bill_history.bill_type = 'quota' AND bill_history.traf_total <= bill_history.bill_allowed))";
         } else {
             $wheres[] = "((bill_type = 'cdr' AND rate_95th <= bill_cdr) OR (bill_type = 'quota' AND total_data <= bill_quota))";
         }
-    } elseif ($_POST['state'] === 'over') {
+    } elseif ($vars['state'] === 'over') {
         if ($prev) {
             $wheres[] = "((bill_history.bill_type = 'cdr' AND bill_history.rate_95th > bill_history.bill_allowed) OR (bill_history.bill_type = 'quota' AND bill_history.traf_total > bill_allowed))";
         } else {

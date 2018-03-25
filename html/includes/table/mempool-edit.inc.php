@@ -1,6 +1,6 @@
 <?php
 
-$device_id = mres($_POST['device_id']);
+$device_id = mres($vars['device_id']);
 
 $sql = " FROM `mempools` AS `M` LEFT JOIN `devices` AS `D` ON `M`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?";
 $param[] = $device_id;
