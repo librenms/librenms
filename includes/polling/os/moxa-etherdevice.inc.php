@@ -10,12 +10,16 @@
  * the source code distribution for details.
  */
 
+$oids = array(
+    'hardware' => $device['sysObjectID'].'.1.2.0',
+    'version' => $device['sysObjectID'].'.1.4.0',
+    'serial' => $device['sysObjectID'].'.1.78.0',
+);
+  
+$os_data = snmp_get_multi_oid($device, $oids);
 
-// Moxa people enjoy creating MIBs for each model!
-if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
-    $mibmod = 'MOXA-IKS6726A-MIB';
-} elseif ($device['sysDescr'] == 'EDS-G508E-T') {
-    $mibmod = 'MOXA-EDSG508E-MIB';
+foreach ($oids as $var => $oid) {
+    $$var = trim($os_data[$oid], '"');
 }
-$version = snmp_get($device, "firmwareVersion.0", "-OQvs", $mibmod);
-$hardware =  $device['sysDescr'];
+
+unset($oids, $os_data);
