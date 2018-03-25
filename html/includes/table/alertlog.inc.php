@@ -9,20 +9,20 @@
  * @package    LibreNMS
  * @subpackage graphs
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 $where = 1;
 
-if (is_numeric($_POST['device_id'])) {
+if (is_numeric($vars['device_id'])) {
     $where .= ' AND E.device_id = ?';
-    $param[] = $_POST['device_id'];
+    $param[] = $vars['device_id'];
 }
 
-if ($_POST['state'] >= 0) {
+if ($vars['state'] >= 0) {
     $where .= ' AND `E`.`state` = ?';
-    $param[] = mres($_POST['state']);
+    $param[] = mres($vars['state']);
 }
 
 if ($_SESSION['userlevel'] >= '5') {
@@ -33,7 +33,7 @@ if ($_SESSION['userlevel'] >= '5') {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`time_logged` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `D`.`sysName` LIKE '%$searchPhrase%' OR `E`.`time_logged` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(`E`.`id`) $sql";

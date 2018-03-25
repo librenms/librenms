@@ -431,7 +431,7 @@ if ($format == "graph") {
                 return {
                     id: "devices",
                     format: ' <?php echo mres($vars['format']); ?>',
-                    hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
+                    searchquery: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
                     os: '<?php echo mres($vars['os']); ?>',
                     version: '<?php echo mres($vars['version']); ?>',
                     hardware: '<?php echo mres($vars['hardware']); ?>',
@@ -454,7 +454,7 @@ if ($format == "graph") {
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<div class='form-group'>" +
-            "<input type='text' name='hostname' id='hostname' value=''<?php echo $vars['hostname']; ?>'' class='form-control input-sm' placeholder='Hostname'>" +
+            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control input-sm' placeholder='Search'>" +
             "</div>" +
             "<div class='form-group'><?php echo $os_options; ?></div>" +
             "<div class='form-group'><?php echo $ver_options; ?></div>" +
