@@ -959,6 +959,7 @@ function rewrite_junos_hardware($hardware)
         'jnxProductName'               => '',
         'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
         'jnxProductQFX511048S4Q'       => 'QFX5110-48S4Q',
+        'jnxProductQFX510096S8Q'       => 'QFX5100-96S8Q',
     );
 
 
