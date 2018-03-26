@@ -1,0 +1,11 @@
+os: wti
+text: 'WTI'
+type: power
+icon: wti
+over:
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - 2.4.18_mvl30-cllf
+
