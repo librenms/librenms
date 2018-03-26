@@ -25,6 +25,7 @@
 
 namespace App\Http\ViewComposers;
 
+use App\Models\Alert;
 use App\Models\Application;
 use App\Models\BgpPeer;
 use App\Models\CefSwitching;
@@ -202,7 +203,7 @@ class MenuComposer
         }
         $vars['routing_menu'] = $routing_menu;
 
-
+        $vars['active_alert_count'] = Alert::active()->count();
 
         $view->with($vars);
     }

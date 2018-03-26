@@ -157,13 +157,11 @@ class Device extends Model
     // ---- Define Relationships ----
 
     /**
-     * Relationship to App\Models\Alerting\Alert
-     *
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
      */
     public function alerts()
     {
-        return $this->hasMany('App\Models\Alerting\Alert', 'device_id');
+        return $this->hasMany('App\Models\Alert', 'device_id');
     }
 
     public function applications()
