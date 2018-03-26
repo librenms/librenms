@@ -156,7 +156,6 @@ BASE_OPTIONS="-B -F -R"
 
 For local RRDCached server
 ```php
-$config['rrdtool_version'] = '1.5.5';
 $config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
 For remote RRDCached server 
@@ -165,7 +164,6 @@ Make sure you have network option in /var/default/rrdcached
 NETWORK_OPTIONS="-L" 
 ```
 ```php
-$config['rrdtool_version'] = '1.5.5';
 $config['rrdcached'] = "0:42217";
 ```
 
