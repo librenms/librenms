@@ -48,10 +48,22 @@ class Alert extends Model
 
     /**
      * Only select active alerts
+     * @param Builder $query
+     * @return Builder
      */
-    public function scopeActive(Builder $query)
+    public function scopeActive($query)
     {
-        return $query->where('state', '!=', '0');
+        return $query->where('state', '=', '1');
+    }
+
+    /**
+     * Only select active alerts
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeAcknowledged($query)
+    {
+        return $query->where('state', '=', '2');
     }
 
     // ---- Define Relationships ----
