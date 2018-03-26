@@ -1595,7 +1595,7 @@ function get_disks_with_smart($device, $app_id)
     foreach (glob($pattern) as $rrd) {
         $filename = basename($rrd, '.rrd');
 
-        list(,,, $disk) = explode("-", $filename);
+        list(,,, $disk) = explode("-", $filename, 4);
 
         if ($disk) {
             array_push($disks, $disk);
