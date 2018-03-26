@@ -7,5 +7,9 @@ mib_dir:
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
-    - sysDescr_regex:
-        - '/^(Aerohive )*SR[\d\w]+/'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.26928.1
+            - .1.3.6.1.4.1.4413
+        sysDescr_regex:
+            - '/^(Aerohive )*SR[\d\w]+/'
