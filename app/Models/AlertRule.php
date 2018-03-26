@@ -1,8 +1,8 @@
 <?php
 /**
- * Vrf.php
+ * app/Models/AlertRule.php
  *
- * -Description-
+ * Model for access to alert_rules table data
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,25 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2016 Neil Lathwood
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-namespace App\Models;
+namespace App\Models\Alerting;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Vrf extends Model
+class Rule extends Model
 {
     public $timestamps = false;
-    protected $primaryKey = 'vrf_id';
+
 
     // ---- Define Relationships ----
+
+    public function alert()
+    {
+        return $this->hasMany('App\Models\Alert', 'rule_id');
+    }
 
     public function device()
     {

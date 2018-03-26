@@ -30,19 +30,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Alert extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'alerts';
 
     // ---- Query scopes ----
 
@@ -68,25 +56,16 @@ class Alert extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function rule()
     {
         return $this->belongsTo('App\Models\Rule', 'rule_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
     public function user()
     {
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');

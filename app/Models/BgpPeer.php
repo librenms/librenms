@@ -30,25 +30,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BgpPeer extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'bgpPeers';
-
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'bgpPeer_id';
 
 
@@ -64,9 +47,6 @@ class BgpPeer extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');

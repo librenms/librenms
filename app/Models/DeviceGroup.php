@@ -32,47 +32,12 @@ use Settings;
 
 class DeviceGroup extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'device_groups';
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-    /**
-     * Virtual attributes
-     *
-     * @var string
-     */
     protected $appends = ['patternSql'];
-
-    /**
-     * The attributes that can be mass assigned.
-     *
-     * @var array
-     */
     protected $fillable = ['name', 'desc', 'pattern', 'params'];
-
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
     protected $casts = ['params' => 'array'];
 
     // ---- Helper Functions ----
-
 
     public function updateRelations()
     {
@@ -324,11 +289,6 @@ class DeviceGroup extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * Relationship to App\Models\Device
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
     public function devices()
     {
         return $this->belongsToMany('App\Models\Device', 'device_group_device', 'device_group_id', 'device_id');

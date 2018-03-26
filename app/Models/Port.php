@@ -6,23 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Port extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'ports';
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'port_id';
 
     // ---- Helper Functions ----
@@ -102,34 +86,22 @@ class Port extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * Get the device this port belongs to.
-     *
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
     }
 
-    /**
-     * Returns a list of users that can access this port.
-     */
     public function users()
     {
+        // FIXME does not include global read
         return $this->belongsToMany('App\Models\User', 'ports_perms', 'port_id', 'user_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function ipv4()
     {
         return $this->hasMany('App\Models\General\IPv4', 'port_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function ipv6()
     {
         return $this->hasMany('App\Models\General\IPv6', 'port_id');

@@ -29,23 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WirelessSensor extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'wireless_sensors';
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'sensors_id';
 
     // ---- Helper Functions ----
@@ -66,9 +50,6 @@ class WirelessSensor extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');

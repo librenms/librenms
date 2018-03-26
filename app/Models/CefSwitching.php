@@ -29,32 +29,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class CefSwitching extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'cef_switching';
-
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'cef_switching_id';
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');

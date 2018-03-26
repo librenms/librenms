@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sensor extends Model
 {
+    public $timestamps = false;
+    protected $primaryKey = 'sensors_id';
+
     protected static $icons = array(
         'fanspeed' => 'tachometer',
         'humidity' => 'tint',
@@ -32,25 +35,6 @@ class Sensor extends Model
         'waterflow' => 'tint',
     );
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'sensors';
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'sensors_id';
-
     // ---- Helper Functions ----
 
     public function classDescr()
@@ -71,9 +55,6 @@ class Sensor extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');

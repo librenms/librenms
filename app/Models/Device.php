@@ -6,30 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'devices';
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'device_id';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
 
     /**
@@ -156,9 +134,6 @@ class Device extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function alerts()
     {
         return $this->hasMany('App\Models\Alert', 'device_id');
@@ -184,19 +159,11 @@ class Device extends Model
         return $this->hasMany('App\Models\Component', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\General\Eventlog
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function eventlogs()
     {
         return $this->hasMany('App\Models\General\Eventlog', 'host', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\DeviceGroup
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
@@ -212,77 +179,44 @@ class Device extends Model
         return $this->hasMany('App\Models\Package', 'device_id', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\Port
-     * Returns a list of the ports this device has.
-     */
     public function ports()
     {
         return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\Processor
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function processors()
     {
         return $this->hasMany('App\Models\Processor', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\Alerting\Rule
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function rules()
+    public function alertRules()
     {
-        return $this->hasMany('App\Models\Alerting\Rule', 'device_id');
+        return $this->hasMany('App\Models\AlertRule', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\Sensor
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function sensors()
     {
         return $this->hasMany('App\Models\Sensor', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\Service
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function services()
     {
         return $this->hasMany('App\Models\Service', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\Storage
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
     public function storage()
     {
         return $this->hasMany('App\Models\Storage', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\General\Syslog
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function syslogs()
     {
         return $this->hasMany('App\Models\General\Syslog', 'device_id', 'device_id');
     }
 
-    /**
-     * Relationship to App\Models\User
-     * Does not include users with global permissions.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
     public function users()
     {
+        // FIXME does not include global read
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
     }
 

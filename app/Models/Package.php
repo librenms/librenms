@@ -30,8 +30,9 @@ use Illuminate\Database\Eloquent\Model;
 class Package extends Model
 {
     public $timestamps = false;
-    protected $table = 'packages';
     protected $primaryKey = 'pkg_id';
+
+    // ---- Define Relationships ----
 
     public function device()
     {

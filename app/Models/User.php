@@ -9,31 +9,9 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'realname', 'username', 'email', 'level', 'descr',
-    ];
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'user_id';
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-        'pivot',
-    ];
-
+    protected $fillable = ['realname', 'username', 'email', 'level', 'descr'];
+    protected $hidden = ['password', 'remember_token', 'pivot'];
 
     // ---- Helper Functions ----
 
@@ -71,9 +49,6 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
 
-    /**
-     * Returns a list of devices this user has access to
-     */
     public function devices()
     {
         if ($this->hasGlobalRead()) {
@@ -85,9 +60,6 @@ class User extends Authenticatable
         }
     }
 
-    /**
-     * Returns a list of ports this user has access to
-     */
     public function ports()
     {
         if ($this->hasGlobalRead()) {
@@ -98,17 +70,11 @@ class User extends Authenticatable
         }
     }
 
-    /**
-     * Returns a list of dashboards this user has
-     */
     public function dashboards()
     {
         return $this->hasMany('App\Models\Dashboard', 'user_id');
     }
 
-    /**
-     * Returns a list of dashboards this user has
-     */
     public function widgets()
     {
         return $this->hasMany('App\Models\UsersWidgets', 'user_id');

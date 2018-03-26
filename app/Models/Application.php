@@ -37,12 +37,6 @@ class Application extends Model
     public $timestamps = false;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'applications';
-    /**
      * The primary key column name.
      *
      * @var string
@@ -88,9 +82,6 @@ class Application extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');
