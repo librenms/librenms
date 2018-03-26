@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 
 class AjaxController extends Controller
 {
-    public function setResolution(Request $request) {
+    public function setResolution(Request $request)
+    {
         $this->validate($request, [
             'width' => 'required|numeric',
             'height' => 'required|numeric'

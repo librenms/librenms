@@ -11,7 +11,6 @@ class LegacyController extends Controller
         $html = ob_get_clean();
 
         return response($html);
-
     }
 
     public function api($path = '')

@@ -25,7 +25,6 @@
 
 namespace App;
 
-
 use Illuminate\Support\Facades\App;
 use LibreNMS\Config;
 
@@ -70,7 +69,7 @@ class Preflight
     {
         $content = array_wrap($content);
 
-        if(PHP_SAPI == 'cli') {
+        if (PHP_SAPI == 'cli') {
             $format = "%s\n\n%s\n\n";
             $message = implode(PHP_EOL, $content);
         } else {
