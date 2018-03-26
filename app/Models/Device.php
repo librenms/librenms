@@ -166,6 +166,26 @@ class Device extends Model
         return $this->hasMany('App\Models\Alerting\Alert', 'device_id');
     }
 
+    public function applications()
+    {
+        return $this->hasMany('App\Models\Application', 'device_id');
+    }
+
+    public function bgppeers()
+    {
+        return $this->hasMany('App\Models\BgpPeer', 'device_id');
+    }
+
+    public function cefSwitching()
+    {
+        return $this->hasMany('App\Models\CefSwitching', 'device_id');
+    }
+
+    public function components()
+    {
+        return $this->hasMany('App\Models\Component', 'device_id');
+    }
+
     /**
      * Relationship to App\Models\General\Eventlog
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -182,6 +202,11 @@ class Device extends Model
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function ospfInstances()
+    {
+        return $this->hasMany('App\Models\OspfInstance', 'device_id');
     }
 
     public function packages()
@@ -261,5 +286,10 @@ class Device extends Model
     public function users()
     {
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
+    }
+
+    public function vrfs()
+    {
+        return $this->hasMany('App\Models\Vrf', 'device_id');
     }
 }

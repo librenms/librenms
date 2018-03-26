@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable
 {
@@ -16,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'realname', 'username', 'password', 'email', 'level', 'descr',
+        'realname', 'username', 'email', 'level', 'descr',
     ];
     /**
      * The primary key column name.
@@ -70,40 +69,6 @@ class User extends Authenticatable
         return $this->hasGlobalRead() || $this->devices->contains($device);
     }
 
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->user_id;
-        // TODO: Implement getJWTIdentifier() method.
-    }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        // TODO: Implement getJWTCustomClaims() method.
-        return ['app' => 'LibreNMS', 'username' => $this->username];
-    }
-
-    // ---- Accessors/Mutators ----
-
-    /**
-     * Encrypt passwords before saving
-     *
-     * @param $password
-     */
-    public function setPasswordAttribute($password)
-    {
-        $this->attributes['password'] = bcrypt($password);
-    }
-
     // ---- Define Relationships ----
 
     /**
@@ -112,6 +77,8 @@ class User extends Authenticatable
     public function devices()
     {
         if ($this->hasGlobalRead()) {
+//            $instance = $this->newRelatedInstance('App\Models\Device');
+//            return new HasAll($instance);
             return Device::query();
         } else {
             return $this->belongsToMany('App\Models\Device', 'devices_perms', 'user_id', 'device_id');
