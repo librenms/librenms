@@ -25,7 +25,7 @@
 
 namespace App\Http\ViewComposers;
 
-use App\Models\Alert;
+use App\Models\AlertRule;
 use App\Models\Application;
 use App\Models\BgpPeer;
 use App\Models\CefSwitching;
@@ -65,6 +65,7 @@ class MenuComposer
             $vars['title_image'] = Config::get('project_name', 'LibreNMS');
         }
 
+        // Device menu
         $vars['device_groups'] = DeviceGroup::select('id', 'name', 'desc')->get();
         $vars['package_count'] = Package::count();
 
@@ -76,6 +77,7 @@ class MenuComposer
             $vars['locations'] = [];
         }
 
+        // Service menu
         if (Config::get('show_services')) {
             $vars['service_status'] = Service::groupBy('service_status')
                 ->select('service_status', DB::raw('count(*) as count'))
@@ -124,7 +126,7 @@ class MenuComposer
         }
         $vars['sensor_menu'] = $sensor_menu;
 
-        // Wireless Menu
+        // Wireless menu
         $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
         $vars['wireless_menu'] = WirelessSensor::select('sensor_class')
             ->groupBy('sensor_class')
@@ -134,7 +136,7 @@ class MenuComposer
                 return $pos === false ? 100 : $pos; // unknown at bottom
             });
 
-        // Application Menu
+        // Application menu
         if ($user->hasGlobalRead()) {
             $vars['app_menu'] = Application::select('app_type', 'app_instance')
                 ->groupBy('app_type', 'app_instance')
@@ -145,7 +147,7 @@ class MenuComposer
             $vars['app_menu'] = false;
         }
 
-        // Routing Menu
+        // Routing menu
         // FIXME queries use relationships to user
         $routing_menu = [];
         if ($user->hasGlobalRead()) {
@@ -203,7 +205,21 @@ class MenuComposer
         }
         $vars['routing_menu'] = $routing_menu;
 
-        $vars['active_alert_count'] = Alert::active()->count();
+        // Alert menu
+        $vars['alert_menu_class'] = 'success';
+
+        if ($user->hasGlobalRead()) {
+            $alert_status = AlertRule::select('severity')
+                ->active()
+                ->groupBy('severity')
+                ->pluck('severity');
+
+            if ($alert_status->contains('critical')) {
+                $vars['alert_menu_class'] = 'danger';
+            } elseif ($alert_status->contains('warning')) {
+                $vars['alert_menu_class'] = 'warning';
+            }
+        }
 
         $view->with($vars);
     }

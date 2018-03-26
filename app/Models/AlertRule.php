@@ -23,18 +23,39 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-namespace App\Models\Alerting;
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Rule extends Model
+class AlertRule extends Model
 {
     public $timestamps = false;
 
+    // ---- Query scopes ----
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeEnabled($query)
+    {
+        return $query->where('disabled', 0);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->enabled()->whereHas('alerts', function ($query) {
+            return $query->active();
+        });
+    }
     // ---- Define Relationships ----
 
-    public function alert()
+    public function alerts()
     {
         return $this->hasMany('App\Models\Alert', 'rule_id');
     }

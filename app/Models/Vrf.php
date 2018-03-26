@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
 class Vrf extends Model
 {
     public $timestamps = false;
+    protected $table = 'vrfs';
     protected $primaryKey = 'vrf_id';
 
     // ---- Define Relationships ----
