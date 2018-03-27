@@ -20,31 +20,6 @@
         },
         "poller": "matches discovery"
     },
-    "ports": {
-        "discovery": {
-            "ports": []
-        },
-        "poller": "matches discovery"
-    },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
-    },
-    "sensors": {
-        "discovery": {
-            "sensors": [],
-            "state_indexes": []
-        },
-        "poller": "matches discovery"
-    },
     "storage": {
         "discovery": {
             "storage": [
@@ -131,30 +106,6 @@
                     "storage_deleted": "0"
                 }
             ]
-        }
-    },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
-    },
-    "wireless": {
-        "discovery": {
-            "wireless_sensors": []
-        },
-        "poller": "matches discovery"
-    },
-    "applications": {
-        "poller": {
-            "applications": [],
-            "application_metrics": []
         }
     }
 }
