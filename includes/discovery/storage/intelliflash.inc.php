@@ -46,8 +46,11 @@ if (is_array($tegile_storage2)) {
     foreach ($tegile_storage2 as $index => $storage) {
         $units  = 1;
         $descr  = $storage['projectName'];
-        $size = 100000000;
-        $used = 50000000;
+       // $size = 100000000;
+       // $used = 50000000;
+      	$size = (((($storage['projectPostCompressionDataSizeHigh'] << 32 ) + $storage['projectPostCompressionDataSizeLow']) * $units) + ((($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units));
+       // $free = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
+        $used = ($size - ((($storage['projectPostCompressionDataSizeHigh'] << 32 ) + ($storage['projectPostCompressionDataSizeLow']) * $units) ));
         if (is_numeric($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash2', $descr, $size, $units, $used);
         }
