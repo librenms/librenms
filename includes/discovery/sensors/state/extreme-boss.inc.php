@@ -1,6 +1,6 @@
 <?php
 /**
- * avaya-ers.inc.php
+ * extreme-boss.inc.php
  *
  * LibreNMS Fan and Power Supply state Discovery module for Avaya ERS
  */
