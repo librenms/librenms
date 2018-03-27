@@ -1,8 +1,8 @@
 <?php
 /**
- * raritan.inc.php
+ * ipolis.inc.php
  *
- * LibreNMS pre-cache discovery module for Raritan
+ * LibreNMS os poller module for Hanwha Techwin devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,19 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
- */
+ * @copyright  2018 Priit Mustasaar
+ * @author     Priit Mustasaar <priit.mustasaar@gmail.com>
+*/
 
-echo 'inletTable ';
-$pre_cache['raritan_inletTable'] = snmpwalk_group($device, 'inletTable', 'PDU-MIB');
+$oids = array(
+    'hardware' => $device['sysObjectID'].'.1.0',
+    'version' => $device['sysObjectID'].'.2.1.1.0'
+);
 
-echo 'inletPoleTable ';
-$pre_cache['raritan_inletPoleTable'] = snmpwalk_group($device, 'inletPoleTable', 'PDU-MIB', 2);
+$os_data = snmp_get_multi_oid($device, $oids);
 
-echo 'inletLabel ';
-$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', array(), 'PDU2-MIB');
+foreach ($oids as $var => $oid) {
+    $$var = trim($os_data[$oid], '"');
+}
+
+unset($oids, $os_data);

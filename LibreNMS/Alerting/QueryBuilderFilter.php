@@ -32,7 +32,9 @@ use Symfony\Component\Yaml\Yaml;
 class QueryBuilderFilter implements \JsonSerializable
 {
     private static $table_blacklist = [
-        'device_group_device'
+        'device_group_device',
+        'alerts',
+        'alert_log',
     ];
 
     private $filter = [];

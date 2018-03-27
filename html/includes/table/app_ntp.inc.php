@@ -6,8 +6,8 @@ $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'ntp';
 $components = $component->getComponents(null, $options);
 
-$first = $_POST['current']-1;           // Which record do we start on.
-$last = $first + $_POST['rowCount'];    // Which record do we end on.
+$first = $vars['current']-1;           // Which record do we start on.
+$last = $first + $vars['rowCount'];    // Which record do we end on.
 $count = 0;
 // Loop through each device in the component array
 foreach ($components as $devid => $comp) {
@@ -16,7 +16,7 @@ foreach ($components as $devid => $comp) {
     // Loop through each component
     foreach ($comp as $compid => $array) {
         $display = true;
-        if ($_POST['view'] == 'error') {
+        if ($vars['view'] == 'error') {
             // Only display peers with errors
             if ($array['status'] != 2) {
                 $display = false;
@@ -29,11 +29,11 @@ foreach ($components as $devid => $comp) {
         }
 
         // Let's process some searching..
-        if (($display === true) && ($_POST['searchPhrase'] != "")) {
+        if (($display === true) && ($vars['searchPhrase'] != "")) {
             $searchfound = false;
             $searchdata = array($device['hostname'],$array['peer'],$array['stratum'],$array['error']);
             foreach ($searchdata as $value) {
-                if (strstr($value, $_POST['searchPhrase'])) {
+                if (strstr($value, $vars['searchPhrase'])) {
                     $searchfound = true;
                 }
             }
@@ -57,13 +57,13 @@ foreach ($components as $devid => $comp) {
                 $graph_array['height'] = 20;
 
                 // Which graph type do we want?
-                if ($_POST['graph'] == "stratum") {
+                if ($vars['graph'] == "stratum") {
                     $graph_array['type']   = 'device_ntp_stratum';
-                } elseif ($_POST['graph'] == "offset") {
+                } elseif ($vars['graph'] == "offset") {
                     $graph_array['type']   = 'device_ntp_offset';
-                } elseif ($_POST['graph'] == "delay") {
+                } elseif ($vars['graph'] == "delay") {
                     $graph_array['type']   = 'device_ntp_delay';
-                } elseif ($_POST['graph'] == "dispersion") {
+                } elseif ($vars['graph'] == "dispersion") {
                     $graph_array['type']   = 'device_ntp_dispersion';
                 } else {
                     // No Graph
