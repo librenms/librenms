@@ -45,11 +45,31 @@ $components = $keep;
 $tblBigIP = array();
 
 // Let's gather some data..
-$ltmVirtualServEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1', 0);
-$ltmVsStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1', 0);
-$ltmPoolEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1', 0);
-$ltmPoolMemberEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1', 0);
-$ltmPoolMbrStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1', 0);
+// Virtual Server Data
+$ltmVirtualServEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.1', 0);
+$ltmVirtualServEntry[ip] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.3', 0);
+$ltmVirtualServEntry[port] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.6', 0);
+$ltmVirtualServEntry[defaultpool] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.19', 0);
+$ltmVsStatusEntry[state] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
+$ltmVsStatusEntry[errorcode] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.5', 0);
+// Pools Server Data
+$ltmPoolEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.1', 0);
+$ltmPoolEntry[mode] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.2', 0);
+$ltmPoolEntry[minup] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.4', 0);
+$ltmPoolEntry[minupstatus] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
+$ltmPoolEntry[minupaction] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
+$ltmPoolEntry[currentup] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
+$ltmPoolEntry[monitor] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.17', 0);
+// Pool Member Data
+$ltmPoolMemberEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1', 0);
+$ltmPoolMemberEntry[ip] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.3', 0);
+$ltmPoolMemberEntry[port] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.4', 0);
+$ltmPoolMemberEntry[ratio] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.6', 0);
+$ltmPoolMemberEntry[weight] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.7', 0);
+$ltmPoolMemberEntry[priority] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.8', 0);
+$ltmPoolMbrStatusEntry[state] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.5', 0);
+$ltmPoolMbrStatusEntry[available] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.6', 0);
+$ltmPoolMbrStatusEntry[errorcode] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.8', 0);
 
 /*
  * False == no object found - this is not an error, OID doesn't exist.
@@ -60,13 +80,13 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
     d_echo("Objects Found:\n");
 
     // Process the Virtual Servers
-    if (is_array($ltmVsStatusEntry)) {
-        foreach ($ltmVsStatusEntry as $oid => $value) {
+    if (is_array($ltmVirtualServEntry[name])) {
+        foreach ($ltmVirtualServEntry[name] as $oid => $value) {
             $result = array();
 
             // Find all Virtual server names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.10.13.2.1.1.') !== false) {
-                list($null, $index) = explode('1.3.6.1.4.1.3375.2.2.10.13.2.1.1.', $oid);
+            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.10.1.2.1.1.') !== false) {
+                list($null, $index) = explode('1.3.6.1.4.1.3375.2.2.10.1.2.1.1.', $oid);
                 $result['type'] = 'f5-ltm-vs';
                 $result['UID'] = (string)$index;
                 $result['label'] = $value;
@@ -74,25 +94,25 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
                 $result['hash'] = hash('crc32', $result['UID']);
 
                 // Trim IPv4 response to remove route domain ID
-                if (strlen($ltmVirtualServEntry['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index]) == 23) {
-                    $ltmVirtualServEntry['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index] = substr($ltmVirtualServEntry['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index], 0, 11);
+                if (strlen($ltmVirtualServEntry[ip]['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index]) == 23) {
+                    $ltmVirtualServEntry[ip]['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index] = substr($ltmVirtualServEntry[ip]['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index], 0, 11);
                 }
 
                 // Now that we have our UID we can pull all the other data we need.
-                $result['IP'] = IP::fromHexString($ltmVirtualServEntry['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index], true);
-                $result['port'] = $ltmVirtualServEntry['1.3.6.1.4.1.3375.2.2.10.1.2.1.6.'.$index];
-                $result['pool'] = $ltmVirtualServEntry['1.3.6.1.4.1.3375.2.2.10.1.2.1.19.'.$index];
+                $result['IP'] = IP::fromHexString($ltmVirtualServEntry[ip]['1.3.6.1.4.1.3375.2.2.10.1.2.1.3.'.$index], true);
+                $result['port'] = $ltmVirtualServEntry[port]['1.3.6.1.4.1.3375.2.2.10.1.2.1.6.'.$index];
+                $result['pool'] = $ltmVirtualServEntry[defaultpool]['1.3.6.1.4.1.3375.2.2.10.1.2.1.19.'.$index];
 
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
-                $result['state'] = $ltmVsStatusEntry['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$index];
+                $result['state'] = $ltmVsStatusEntry[state]['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$index];
                 if ($result['state'] == 2) {
                     // Looks like one of the VS Pool members is down.
                     $result['status'] = 1;
-                    $result['error'] = $ltmVsStatusEntry['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
+                    $result['error'] = $ltmVsStatusEntry[errorcode]['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
                 } elseif ($result['state'] == 3) {
                     // Looks like ALL of the VS Pool members is down.
                     $result['status'] = 2;
-                    $result['error'] = $ltmVsStatusEntry['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
+                    $result['error'] = $ltmVsStatusEntry[errorcode]['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
                 } else {
                     // All is good.
                     $result['status'] = 0;
@@ -114,8 +134,8 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
     }
 
     // Process the Pools
-    if (is_array($ltmPoolEntry)) {
-        foreach ($ltmPoolEntry as $oid => $value) {
+    if (is_array($ltmPoolEntry[name])) {
+        foreach ($ltmPoolEntry[name] as $oid => $value) {
             $result = array ();
 
             // Find all Pool names and UID's, then we can find everything else we need.
@@ -128,12 +148,12 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
                 $result['hash'] = hash('crc32', $result['UID']);
 
                 // Now that we have our UID we can pull all the other data we need.
-                $result['mode'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.2.'.$index];
-                $result['minup'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$index];
-                $result['minupstatus'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$index];
-                $result['currentup'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$index];
-                $result['minupaction'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$index];
-                $result['monitor'] = $ltmPoolEntry['1.3.6.1.4.1.3375.2.2.5.1.2.1.17.'.$index];
+                $result['mode'] = $ltmPoolEntry[mode]['1.3.6.1.4.1.3375.2.2.5.1.2.1.2.'.$index];
+                $result['minup'] = $ltmPoolEntry[minup]['1.3.6.1.4.1.3375.2.2.5.1.2.1.4.'.$index];
+                $result['minupstatus'] = $ltmPoolEntry[minupstatus]['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$index];
+                $result['currentup'] = $ltmPoolEntry[currentup]['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$index];
+                $result['minupaction'] = $ltmPoolEntry[minupaction]['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$index];
+                $result['monitor'] = $ltmPoolEntry[monitor]['1.3.6.1.4.1.3375.2.2.5.1.2.1.17.'.$index];
 
                 // If we have less pool members than the minimum, we should error.
                 if ($result['currentup'] < $result['minup']) {
@@ -161,34 +181,39 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
     }
 
     // Process the Pool Members
-    if (is_array($ltmPoolMemberEntry)) {
-        foreach ($ltmPoolMemberEntry as $oid => $value) {
+    if (is_array($ltmPoolMemberEntry[name])) {
+        foreach ($ltmPoolMemberEntry[name] as $oid => $value) {
             $result = array ();
 
             // Find all Pool member names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.19.') !== false) {
-                list($null, $index) = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.19.', $oid);
+            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1.') !== false) {
+                list($null, $index) = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.1.', $oid);
                 $result['type'] = 'f5-ltm-poolmember';
                 $result['UID'] = (string)$index;
                 $result['label'] = $value;
                 // The UID is far too long to have in a RRD filename, use a hash of it instead.
                 $result['hash'] = hash('crc32', $result['UID']);
 
+                //Remove route domain ID from v4 IPs
+                if (strlen($ltmPoolMemberEntry[ip]['1.3.6.1.4.1.3375.2.2.5.3.2.1.3.'.$index]) == 23) {
+                    $ltmPoolMemberEntry[ip]['1.3.6.1.4.1.3375.2.2.5.3.2.1.3.'.$index] = substr($ltmPoolMemberEntry[ip]['1.3.6.1.4.1.3375.2.2.5.3.2.1.3.'.$index], 0, 11);
+                }
+
                 // Now that we have our UID we can pull all the other data we need.
-                $result['IP'] = IP::fromHexString($ltmPoolMemberEntry['1.3.6.1.4.1.3375.2.2.5.3.2.1.3.'.$index], true);
-                $result['port'] = $ltmPoolMemberEntry['1.3.6.1.4.1.3375.2.2.5.3.2.1.4.'.$index];
-                $result['ratio'] = $ltmPoolMemberEntry['1.3.6.1.4.1.3375.2.2.5.3.2.1.6.'.$index];
-                $result['weight'] = $ltmPoolMemberEntry['1.3.6.1.4.1.3375.2.2.5.3.2.1.7.'.$index];
-                $result['priority'] = $ltmPoolMemberEntry['1.3.6.1.4.1.3375.2.2.5.3.2.1.8.'.$index];
-                $result['state'] = $ltmPoolMbrStatusEntry['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$index];
-                $result['available'] = $ltmPoolMbrStatusEntry['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$index];
+                $result['IP'] = IP::fromHexString($ltmPoolMemberEntry[ip]['1.3.6.1.4.1.3375.2.2.5.3.2.1.3.'.$index], true);
+                $result['port'] = $ltmPoolMemberEntry[port]['1.3.6.1.4.1.3375.2.2.5.3.2.1.4.'.$index];
+                $result['ratio'] = $ltmPoolMemberEntry[ratio]['1.3.6.1.4.1.3375.2.2.5.3.2.1.6.'.$index];
+                $result['weight'] = $ltmPoolMemberEntry[weight]['1.3.6.1.4.1.3375.2.2.5.3.2.1.7.'.$index];
+                $result['priority'] = $ltmPoolMemberEntry[priority]['1.3.6.1.4.1.3375.2.2.5.3.2.1.8.'.$index];
+                $result['state'] = $ltmPoolMbrStatusEntry[state]['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$index];
+                $result['available'] = $ltmPoolMbrStatusEntry[available]['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$index];
 
                 // If available and bad state
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
                 if (($result['available'] == 1) && ($result['state'] == 3)) {
                     // Warning Alarm, the pool member is down.
                     $result['status'] = 1;
-                    $result['error'] = "Pool Member is Down: ".$ltmPoolMbrStatusEntry['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$index];
+                    $result['error'] = "Pool Member is Down: ".$ltmPoolMbrStatusEntry[errorcode]['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$index];
                 } else {
                     // All is good.
                     $result['status'] = 0;
