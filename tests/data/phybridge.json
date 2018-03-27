@@ -11,10 +11,10 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "linux",
-                    "type": "server",
+                    "os": "phybridge",
+                    "type": "network",
                     "serial": null,
-                    "icon": "linux.svg"
+                    "icon": "phybridge.svg"
                 }
             ]
         },
@@ -25,14 +25,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Phybridge FLEX 24 Switch 7.0.0",
                     "sysContact": "<private>",
-                    "version": "24",
+                    "version": null,
                     "hardware": "",
                     "features": null,
                     "location": "<private>",
-                    "os": "linux",
-                    "type": "server",
+                    "os": "phybridge",
+                    "type": "network",
                     "serial": null,
-                    "icon": "linux.svg"
+                    "icon": "phybridge.svg"
                 }
             ]
         }
