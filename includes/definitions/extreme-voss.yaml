@@ -1,4 +1,4 @@
-os: avaya-vsp
+os: extreme-voss
 text: 'Extreme VOSS'
 type: network
 icon: extremevoss
