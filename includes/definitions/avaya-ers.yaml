@@ -1,4 +1,4 @@
-os: avaya-ers
+os: extreme-boss
 text: 'Extreme BOSS'
 type: network
 icon: extremeboss
@@ -14,3 +14,4 @@ discovery:
           - 'Ethernet Routing Switch'
           - 'ERS'
           - 'Virtual Services Platform 7024XLS'
+          - 'Virtual Services Platform 7024XT'
