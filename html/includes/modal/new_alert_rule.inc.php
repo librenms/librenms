@@ -114,6 +114,12 @@ if (is_admin()) {
                                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="contacts" class="col-sm-3 control-label" data-toggle="tooltip" title="Restricts this alert rule to specified contacts.">Contact: </label>
+                            <div class="col-sm-9">
+                                <select id="contacts" name="contacts[]" class="form-control" multiple="multiple"></select>
+                            </div>
+                        </div>
                         <div class='form-group'>
                             <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
                             <div class='col-sm-9'>
@@ -354,6 +360,21 @@ if (is_admin()) {
                 data: function (params) {
                     return {
                         type: 'devices_groups',
+                        search: params.term
+                    };
+                }
+            }
+        });
+
+        $("#contacts").select2({
+            width: '100%',
+            placeholder: "Email or Contact Name",
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        type: 'contacts',
                         search: params.term
                     };
                 }

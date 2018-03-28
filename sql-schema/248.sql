@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS alert_transport_map (id int(11) NOT NULL AUTO_INCREMENT, rule_id int(11) NOT NULL, transport_id int(11) NOT NULL,transport_type varchar(20) NOT NULL DEFAULT 'email', PRIMARY KEY (id));
+CREATE TABLE IF NOT EXISTS transport_email (transport_id int(11) NOT NULL AUTO_INCREMENT, email varchar(64) COLLATE utf8_unicode_ci NOT NULL, contact_name varchar(30) COLLATE utf8_unicode_ci, PRIMARY KEY (transport_id));
