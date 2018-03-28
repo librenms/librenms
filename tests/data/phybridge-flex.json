@@ -11,7 +11,7 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "phybridge",
+                    "os": "phybridge-flex",
                     "type": "network",
                     "serial": null,
                     "icon": "phybridge.svg"
@@ -29,7 +29,7 @@
                     "hardware": "",
                     "features": null,
                     "location": "<private>",
-                    "os": "phybridge",
+                    "os": "phybridge-flex",
                     "type": "network",
                     "serial": null,
                     "icon": "phybridge.svg"
