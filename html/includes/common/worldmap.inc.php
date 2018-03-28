@@ -121,6 +121,8 @@ if ($config['map']['engine'] == 'leaflet') {
         }
         if (!empty($widget_settings['group_radius'])) {
             $group_radius = $widget_settings['group_radius'];
+        } elseif (!empty($config['custom_worldmap'])) {
+            $group_radius = $config['custom_worldmap']['group_radius'];
         } else {
             $group_radius = 80;
         }
