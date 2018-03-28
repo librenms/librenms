@@ -27,7 +27,7 @@ if (!empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `transport_id` AS `id`, `email` AS `text` FROM `transport_email` $query";
+$sql = "SELECT `transport_id` AS `id`, `contact_name` AS `text` FROM `transport_email` $query";
 $contacts = dbFetchRows($sql, $params);
 $more = ($offset + count($contacts)) < $total;
 $contacts = array_map(function ($contact) {
