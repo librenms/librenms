@@ -353,6 +353,5 @@ If alert un-mutes itself then it most likely means that the alert cleared and is
 Please review eventlog as it will tell you in there.
 
 ### <a name ="faq33"> How do I change the Device Type?</a>
-You can change the Device Type by going to the device you would like to change, then click on the gear Icon -> Edit.
-From there you can change the Type. Unfortunately you are limted to what is in the list. We recommned that you make deivce group.
-See [Device Groups](/Extensions/Device-Groups/)
+You can change the Device Type by going to the device you would like to change, then click on the Gear Icon -> Edit.
+If you would like to define custom types, we suggest using [Device Groups](/Extensions/Device-Groups/). They will be listed in the menu similarly to device types.
