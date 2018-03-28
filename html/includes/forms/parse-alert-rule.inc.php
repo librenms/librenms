@@ -36,6 +36,13 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     foreach ($groups as $group) {
         $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
     }
+
+    $contacts = [];
+    $emails = dbFetchRows('SELECT `alert_transport_map`.`transport_id`, `email` FROM `alert_transport_map` LEFT JOIN `transport_email` ON `transport_email`.`transport_id`=`alert_transport_map`.`transport_id` WHERE `rule_id` = ?', [$alert_id]);
+    foreach($emails as $email) {
+        $contacts[] = ['id' => 'e'. $email['transport_id'], 'text' => $email['email']];
+    }
+
 } elseif (is_numeric($template_id) && $template_id >= 0) {
     $tmp_rules = get_rules_from_json();
     $rule = $tmp_rules[$template_id];
@@ -54,6 +61,7 @@ if (is_array($rule)) {
     echo json_encode([
         'extra'    => isset($rule['extra']) ? json_decode($rule['extra']) : null,
         'maps'     => $maps,
+        'contacts' => $contacts,
         'name'     => $rule['name'],
         'proc'     => $rule['proc'],
         'builder'  => $builder,

@@ -307,6 +307,16 @@ if (is_admin()) {
                 });
             }
 
+            var $contacts = $('#contacts');
+            $contacts.empty();
+            $contacts.val(null).trigger('change');
+            if(rule.contacts != null) {
+                $.each(rule.contacts, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $contacts.append(option).trigger('change');
+                });
+            }
+
             if (rule.extra != null) {
                 var extra = rule.extra;
                 $('#count').val(extra.count);
