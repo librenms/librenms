@@ -30,7 +30,7 @@ source: Support/FAQ.md
  - [What is the Demo User for?](#faq30)
  - [Why does modifying 'Default Alert Template' fail?](#faq31)
  - [Why would alert un-mute itself](#faq32)
- 
+ - [How do I change the Device Type?](#faq33)
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What information do you need to add a new OS?](#faq20)
@@ -351,3 +351,8 @@ mysql -u librenms -p < sql-schema/202.sql
 ### <a name="faq32"> Why would alert un-mute itself?</a> 
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
 Please review eventlog as it will tell you in there.
+
+### <a name ="faq33"> How do I change the Device Type?</a>
+You can change the Device Type by going to the device you would like to change, then click on the gear Icon -> Edit.
+From there you can change the Type. Unfortunately you are limted to what is in the list. We recommned that you make deivce group.
+See [Device Groups](/Extensions/Device-Groups/)
