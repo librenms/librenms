@@ -8,7 +8,7 @@ $query = '';
 $params = [];
 
 if (!empty($_REQUEST['search'])) {
-    $query .= ' WHERE `email` LIKE ? or `contact_name` LIKE ?';
+    $query .= ' WHERE `email` LIKE ? OR `contact_name` LIKE ?';
     $search = '%' . mres($_REQUEST['search']) . '%';
     $params[] = $search;
     $params[] = $search;
@@ -27,7 +27,7 @@ if (!empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `transport_id` as `id`, `email` as `text` FROM `transport_email` $query";
+$sql = "SELECT `transport_id` AS `id`, `email` AS `text` FROM `transport_email` $query";
 $contacts = dbFetchRows($sql, $params);
 $more = ($offset + count($contacts)) < $total;
 $contacts = array_map(function ($contact) {
