@@ -106,6 +106,8 @@ or it's disabled then we still collect data. For the most part this is fine as t
 either deleted or disabled then this approach isn't optimal. So to counter this you can enable 'selected port polling' per device within the edit device -> misc section or by
 globally enabling it (**not recommended**): `$config['polling']['selected_ports'] = true;`. You can also set it for a specific OS: `$config['os']['ios']['polling']['selected_ports'] = true;`. 
 
+When using Per Port Polling, devices that do not properly support ifHighSpeed reporting may fail to use ifXEntry. If your device OS has this issue you can force use of ifXEntry on a specified OS by setting: `$config['os']['pmp']['polling']['force_hc'] = true;`.
+
 Running `./scripts/collect-port-polling.php` will poll your devices with both full and selective polling, display a table with the difference and optionally enable or disable selected ports polling for devices which would benefit from a change.
 Note that it doesn't continously re-evaluate this, it will only be updated when the script is run. There are a number of options:
 
