@@ -22,11 +22,11 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (!is_array($storage_cache['intelliflash'])) {
-    $storage_cache['intelliflash'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
+if (!is_array($storage_cache['intelliflash1'])) {
+    $storage_cache['intelliflash1'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
-$entry = $storage_cache['intelliflash'][$storage[storage_index]];
+$entry = $storage_cache['intelliflash1'][$storage[storage_index]];
 $storage['units'] = 1;
 //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];

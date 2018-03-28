@@ -35,7 +35,7 @@ if (is_array($tegile_storage)) {
         $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
         $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
         if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash', $descr, $size, $units, $used);
+            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash1', $descr, $size, $units, $used);
         }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
