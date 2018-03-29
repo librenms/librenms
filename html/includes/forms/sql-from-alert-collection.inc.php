@@ -38,12 +38,21 @@ $template_id = $vars['template_id'];
 
 if (is_numeric($template_id)) {
     $rules = get_rules_from_json();
-
+    $rule = $rules[$template_id];
+    $default_extra = [
+        'mute' => false,
+        'count' => '-1',
+        'delay' => 60,
+        'invert' => false,
+        'interval' => 300,
+        'recovery' => true,
+    ];
     $output = [
         'status' => 'ok',
-        'name' => $rules[$template_id]['name'],
-        'builder' => QueryBuilderParser::fromOld($rules[$template_id]['rule'])->toArray(),
-        'extra' => $rules[$template_id]['extra']
+        'name' => $rule['name'],
+        'builder' => $rule['builder'] ?: QueryBuilderParser::fromOld($rule['rule'])->toArray(),
+        'extra' => array_replace($default_extra, (array)$rule['extra']),
+        'severity' => $rule['severity'] ?: 'critical'
     ];
 } else {
     $output = [
