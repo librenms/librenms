@@ -44,38 +44,56 @@ $components = $keep;
 // Begin our master array, all other values will be processed into this array.
 $tblBigIP = array();
 
-// Let's gather some data..
 // Virtual Server Data
-$ltmVirtualServEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.1', 0);
-$ltmVirtualServEntry[ip] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.3', 0);
-$ltmVirtualServEntry[port] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.6', 0);
-$ltmVirtualServEntry[defaultpool] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.19', 0);
-$ltmVsStatusEntry[state] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
-$ltmVsStatusEntry[errorcode] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.5', 0);
+$ltmVirtualServOID = array(
+    name => '1.3.6.1.4.1.3375.2.2.10.1.2.1.1',
+    ip => '1.3.6.1.4.1.3375.2.2.10.1.2.1.3',
+    port => '1.3.6.1.4.1.3375.2.2.10.1.2.1.6',
+    defaultpool => '1.3.6.1.4.1.3375.2.2.10.1.2.1.19',
+    state => '1.3.6.1.4.1.3375.2.2.10.13.2.1.2',
+    errorcode => '1.3.6.1.4.1.3375.2.2.10.13.2.1.5',
+);
+
+foreach ($ltmVirtualServOID as $key => $value) {
+    $ltmVirtualServEntry[$key] = snmpwalk_array_num($device, $value, 0);
+};
+
 // Pools Server Data
-$ltmPoolEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.1', 0);
-$ltmPoolEntry[mode] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.2', 0);
-$ltmPoolEntry[minup] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.4', 0);
-$ltmPoolEntry[minupstatus] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
-$ltmPoolEntry[minupaction] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
-$ltmPoolEntry[currentup] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
-$ltmPoolEntry[monitor] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.17', 0);
+$ltmPoolEntryOID = array(
+    name => '1.3.6.1.4.1.3375.2.2.5.1.2.1.1',
+    mode => '1.3.6.1.4.1.3375.2.2.5.1.2.1.2',
+    minup => '1.3.6.1.4.1.3375.2.2.5.1.2.1.4',
+    minupstatus => '1.3.6.1.4.1.3375.2.2.5.1.2.1.5',
+    minupaction => '1.3.6.1.4.1.3375.2.2.5.1.2.1.6',
+    currentup => '1.3.6.1.4.1.3375.2.2.5.1.2.1.8',
+    monitor => '1.3.6.1.4.1.3375.2.2.5.1.2.1.17',
+);
+
+foreach ($ltmPoolEntryOID as $key => $value) {
+    $ltmPoolEntry[$key] = snmpwalk_array_num($device, $value, 0);
+};
 // Pool Member Data
-$ltmPoolMemberEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1', 0);
-$ltmPoolMemberEntry[ip] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.3', 0);
-$ltmPoolMemberEntry[port] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.4', 0);
-$ltmPoolMemberEntry[ratio] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.6', 0);
-$ltmPoolMemberEntry[weight] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.7', 0);
-$ltmPoolMemberEntry[priority] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.8', 0);
-$ltmPoolMbrStatusEntry[state] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.5', 0);
-$ltmPoolMbrStatusEntry[available] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.6', 0);
-$ltmPoolMbrStatusEntry[errorcode] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1.8', 0);
+$ltmPoolMemberEntryOID = array(
+    name => '1.3.6.1.4.1.3375.2.2.5.3.2.1.1',
+    ip => '1.3.6.1.4.1.3375.2.2.5.3.2.1.3',
+    port => '1.3.6.1.4.1.3375.2.2.5.3.2.1.4',
+    ratio => '1.3.6.1.4.1.3375.2.2.5.3.2.1.6',
+    weight => '1.3.6.1.4.1.3375.2.2.5.3.2.1.7',
+    priority => '1.3.6.1.4.1.3375.2.2.5.3.2.1.8',
+    state => '1.3.6.1.4.1.3375.2.2.5.6.2.1.5',
+    available => '1.3.6.1.4.1.3375.2.2.5.6.2.1.6',
+    errorcode => '1.3.6.1.4.1.3375.2.2.5.6.2.1.8',
+);
+
+foreach ($ltmPoolMemberEntryOID as $key => $value) {
+    $ltmPoolMemberEntry[$key] = snmpwalk_array_num($device, $value, 0);
+};
 
 /*
  * False == no object found - this is not an error, OID doesn't exist.
  * null  == timeout or something else that caused an error, OID may exist but we couldn't get it.
  */
-if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($ltmPoolEntry) || !is_null($ltmPoolMemberEntry) || !is_null($ltmPoolMbrStatusEntry)) {
+if (!is_null($ltmVirtualServEntry) || !is_null($ltmPoolEntry) || !is_null($ltmPoolMemberEntry)) {
     // No Nulls, lets go....
     d_echo("Objects Found:\n");
 
@@ -104,15 +122,15 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
                 $result['pool'] = $ltmVirtualServEntry[defaultpool]['1.3.6.1.4.1.3375.2.2.10.1.2.1.19.'.$index];
 
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
-                $result['state'] = $ltmVsStatusEntry[state]['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$index];
+                $result['state'] = $ltmVirtualServEntry[state]['1.3.6.1.4.1.3375.2.2.10.13.2.1.2.'.$index];
                 if ($result['state'] == 2) {
                     // Looks like one of the VS Pool members is down.
                     $result['status'] = 1;
-                    $result['error'] = $ltmVsStatusEntry[errorcode]['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
+                    $result['error'] = $ltmVirtualServEntry[errorcode]['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
                 } elseif ($result['state'] == 3) {
                     // Looks like ALL of the VS Pool members is down.
                     $result['status'] = 2;
-                    $result['error'] = $ltmVsStatusEntry[errorcode]['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
+                    $result['error'] = $ltmVirtualServEntry[errorcode]['1.3.6.1.4.1.3375.2.2.10.13.2.1.5.'.$index];
                 } else {
                     // All is good.
                     $result['status'] = 0;
@@ -205,15 +223,15 @@ if (!is_null($ltmVirtualServEntry) || !is_null($ltmVsStatusEntry) || !is_null($l
                 $result['ratio'] = $ltmPoolMemberEntry[ratio]['1.3.6.1.4.1.3375.2.2.5.3.2.1.6.'.$index];
                 $result['weight'] = $ltmPoolMemberEntry[weight]['1.3.6.1.4.1.3375.2.2.5.3.2.1.7.'.$index];
                 $result['priority'] = $ltmPoolMemberEntry[priority]['1.3.6.1.4.1.3375.2.2.5.3.2.1.8.'.$index];
-                $result['state'] = $ltmPoolMbrStatusEntry[state]['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$index];
-                $result['available'] = $ltmPoolMbrStatusEntry[available]['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$index];
+                $result['state'] = $ltmPoolMemberEntry[state]['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.'.$index];
+                $result['available'] = $ltmPoolMemberEntry[available]['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.'.$index];
 
                 // If available and bad state
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue
                 if (($result['available'] == 1) && ($result['state'] == 3)) {
                     // Warning Alarm, the pool member is down.
                     $result['status'] = 1;
-                    $result['error'] = "Pool Member is Down: ".$ltmPoolMbrStatusEntry[errorcode]['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$index];
+                    $result['error'] = "Pool Member is Down: ".$ltmPoolMemberEntry[errorcode]['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.'.$index];
                 } else {
                     // All is good.
                     $result['status'] = 0;
