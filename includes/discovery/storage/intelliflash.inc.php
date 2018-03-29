@@ -23,7 +23,6 @@
  * @author     https://github.com/theherodied/
  */
 use LibreNMS\Config;
-
 $tegile_storage = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
 if (is_array($tegile_storage)) {
     echo 'poolEntry ';
@@ -41,7 +40,6 @@ if (is_array($tegile_storage)) {
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }
-
 $tegile_storage2 = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
 if (is_array($tegile_storage2)) {
     echo 'projectEntry ';
