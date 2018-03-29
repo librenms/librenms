@@ -1,0 +1,198 @@
+VPLS-LDP-DRAFT-01-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Unsigned32, Counter32, transmission
+         FROM SNMPv2-SMI                    -- RFC2578
+
+      OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                   -- RFC2580
+
+      TruthValue, RowStatus, StorageType, TEXTUAL-CONVENTION
+         FROM SNMPv2-TC                     -- RFC2579
+
+      jnxExperiment
+	FROM JUNIPER-SMI
+
+      jnxVplsConfigIndex, jnxVplsPwBindIndex
+               FROM VPLS-GENERIC-DRAFT-01-MIB;
+
+   jnxVplsLdpDraft01MIB MODULE-IDENTITY
+      LAST-UPDATED "200608301200Z"  -- 20 August 2006 12:00:00 GMT
+      ORGANIZATION "Layer 2 Virtual Private Networks (L2VPN)
+                                 Working  Group"
+      CONTACT-INFO
+          "
+           Thomas D. Nadeau
+           Email:  tnadeau@cisco.com
+
+           The L2VPN Working Group (email distribution l2vpn@ietf.org,
+           http://www.ietf.org/html.charters/l2vpn-charter.html)
+           "
+        
+
+      DESCRIPTION
+          "Copyright (C) The IETF Trust (2010). The initial
+           version of this MIB module was published in RFC XXXX.
+
+   -- RFC Editor: Please replace XXXX with RFC number & remove
+   --                    this note.
+
+           For full legal notices see the RFC itself or see:
+           http://www.ietf.org/copyrights/ianamib.html
+
+           This MIB module contains managed object definitions for
+           LDP signalled Virtual Private LAN Services as in
+           [RFC4762]
+
+           This MIB module enables the use of any underlying PseudoWire
+           network. "
+
+      -- Revision history.
+
+      REVISION
+          "200608301200Z"  -- 30 Aug 2006 12:00:00 GMT
+      DESCRIPTION "Initial version published as part of RFC YYYY."
+   -- RFC Editor: please replace YYYY with IANA assigned value, and
+   -- delete this note.
+
+         ::= { jnxExperiment 9}
+
+   -- Top-level components of this MIB.
+
+
+   -- Notifications
+   jnxVplsLdpNotifications OBJECT IDENTIFIER
+                                 ::= { jnxVplsLdpDraft01MIB 0 }
+
+   -- Tables, Scalars
+   jnxVplsLdpObjects       OBJECT IDENTIFIER
+                                 ::= { jnxVplsLdpDraft01MIB 1 }
+   -- Conformance
+   jnxVplsLdpConformance   OBJECT IDENTIFIER
+                                 ::= { jnxVplsLdpDraft01MIB 2 }
+
+   jnxVplsLdpConfigTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF JnxVplsLdpConfigEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "This table specifies information for configuring
+                and monitoring LDP specific parameters for
+                Virtual Private Lan Services(VPLS)."
+          ::= { jnxVplsLdpObjects 1 }
+
+   jnxVplsLdpConfigEntry OBJECT-TYPE
+          SYNTAX          JnxVplsLdpConfigEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+           "A row in this table represents LDP specific information
+            for Virtual Private Lan Service(VPLS) in a packet network.
+            It is indexed by jnxVplsConfigIndex, which uniquely
+            identifies a single VPLS.
+
+            A row is automatically created when a VPLS service is
+            configured using LDP signalling.
+
+            None of the read-create objects values can be
+            changed when jnxVplsRowStatus is in the active(1)
+            state. Changes are allowed when the jnxVplsRowStatus
+            is in notInService(2) or notReady(3) states only.
+            If the operator need to change one of the values
+            for an active row the jnxVplsConfigRowStatus should be
+            first changed to notInService(2), the objects may
+            be changed now, and later to active(1) in order to
+            re-initiate the signaling process with the new
+            values in effect.
+            "
+          INDEX           { jnxVplsConfigIndex }
+          ::= { jnxVplsLdpConfigTable 1 }
+
+     JnxVplsLdpConfigEntry ::=
+        SEQUENCE {
+         jnxVplsLdpConfigMacAddrWithdraw                   TruthValue
+          }
+
+      jnxVplsLdpConfigMacAddrWithdraw OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This object specifies if MAC address withdrawal
+                is enabled in this service. If this object is true then
+                Mac address withdrawl Learning is enabled. If false,
+                then Mac Learning is disabled."
+          DEFVAL          { true }
+          ::= { jnxVplsLdpConfigEntry 1 }
+
+      -- VPLS LDP PW Binding Table
+
+      jnxVplsLdpPwBindTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF JnxVplsLdpPwBindEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "This table provides LDP specific information for
+                an association between a VPLS service and the
+                corresponding Pseudo Wires. A service can have more
+                than one Pseudo Wire association. Pseudo Wires are
+                defined in the pwTable."
+          ::= { jnxVplsLdpObjects 2 }
+
+      jnxVplsLdpPwBindEntry OBJECT-TYPE
+          SYNTAX          JnxVplsLdpPwBindEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Each row represents an association between a
+                VPLS instance and one or more Pseudo Wires
+                defined in the pwTable. Each index is unique
+                in describing an entry in this table. However
+                both indexes are required to define the one
+                to many association of service to pseudowire.
+
+                An entry in this table in instantiated only when
+                LDP signalling is used to configure VPLS service.
+
+                Each entry in this table provides LDP specific
+                information for the VPlS represented by 
+
+
+                jnxVplsConfigIndex."
+          INDEX  { jnxVplsConfigIndex, jnxVplsPwBindIndex }
+          ::= { jnxVplsLdpPwBindTable 1 }
+
+      JnxVplsLdpPwBindEntry ::=
+          SEQUENCE {
+              jnxVplsLdpPwBindMacAddressLimit       Unsigned32
+          }
+
+      jnxVplsLdpPwBindMacAddressLimit OBJECT-TYPE
+          SYNTAX          Unsigned32 (0.. 4294967295)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "The value of this object specifies the maximum number
+                of learned and static entries allowed in the
+                Forwarding database for this PW Binding. The value 0
+                means there is no limit for this PW Binding."
+          DEFVAL          { 0 }
+          ::= { jnxVplsLdpPwBindEntry 1 }
+
+      -- VPLS Ldp Service Notifications
+
+      jnxVplsLdpPwBindMacTableFull NOTIFICATION-TYPE
+          OBJECTS {
+              jnxVplsConfigIndex, 
+              jnxVplsPwBindIndex
+          }
+          STATUS          current
+          DESCRIPTION
+               "The jnxVplsLdpPwBindMacTableFull notification is generated
+                when the number of learned MAC-Addresses increases to 
+                the value specified in jnxVplsLdpPwBindMacAddressLimit."
+          ::= { jnxVplsLdpNotifications 1 }
+
+     END
+

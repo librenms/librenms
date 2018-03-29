@@ -1,0 +1,1022 @@
+
+
+-- *****************************************************************
+-- NMS-SYS.my:  NMS System MIB file
+--
+-- Jun 2000
+-- 
+-- *****************************************************************
+
+   NMS-SYS DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    IpAddress
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmslocal
+			FROM NMS-SMI;
+          
+               nmslsystem             OBJECT IDENTIFIER ::= { nmslocal 1 }
+
+          -- Local Variable Section
+
+          -- This section describes the local variables within the NMS
+          -- product line.  Groups may or may not be present depending
+          -- on the software options present in the managed device.
+
+
+          -- Local System Group
+
+          -- This group is present in all products.
+
+               nmsromId OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable contains a printable octet
+                           string which contains the System Bootstrap
+                           description and version identification."
+                   ::= { nmslsystem 1 }
+
+               nmswhyReload OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable contains a printable octet
+                           string which contains the reason why the
+                           system was last restarted."
+                   ::= { nmslsystem 2 }
+
+               nmshostName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable represents the name of the
+                           host in printable ascii characters."
+                   ::= { nmslsystem 3 }
+
+               nmsdomainName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable is the domain portion of the
+                           domain name of the host."
+                   ::= { nmslsystem 4 }
+
+               nmsauthAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable contains the last SNMP
+                           authorization failure IP address."
+                   ::= { nmslsystem 5 }
+
+               nmsbootHost OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the IP address of the host that
+                           supplied the currently running software."
+                   ::= { nmslsystem 6 }
+
+               nmsping OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "The ping mib object is obsolete as of IOS 10.2
+			   It has been superseded by the NMS Ping MIB"
+                   ::= { nmslsystem 7 }
+
+               nmsfreeMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "The freeMem mib object is obsolete as of IOS 11.1
+			   It has been replaced with the NMS memory pool mib"
+                   ::= { nmslsystem 8 }
+
+               nmsbufferElFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free buffer
+                           elements."
+                   ::= { nmslsystem 9 }
+
+               nmsbufferElMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of buffer
+                           elements."
+                   ::= { nmslsystem 10 }
+
+               nmsbufferElHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element hits."
+                   ::= { nmslsystem 11 }
+
+               nmsbufferElMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element
+                           misses."
+                   ::= { nmslsystem 12 }
+
+               nmsbufferElCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element
+                           creates."
+                   ::= { nmslsystem 13 }
+
+               nmsbufferSmSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of small buffers."
+                   ::= { nmslsystem 14 }
+
+               nmsbufferSmTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of small buffers."
+                   ::= { nmslsystem 15 }
+
+               nmsbufferSmFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free small buffers."
+                   ::= { nmslsystem 16 }
+
+               nmsbufferSmMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of small
+                           buffers."
+                   ::= { nmslsystem 17 }
+
+               nmsbufferSmHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer hits."
+                   ::= { nmslsystem 18 }
+
+               nmsbufferSmMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer misses."
+                   ::= { nmslsystem 19 }
+
+               nmsbufferSmTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer trims."
+                   ::= { nmslsystem 20 }
+
+               nmsbufferSmCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer
+                           creates."
+                   ::= { nmslsystem 21 }
+
+               nmsbufferMdSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of medium buffers."
+                   ::= { nmslsystem 22 }
+
+               nmsbufferMdTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of medium
+                           buffers."
+                   ::= { nmslsystem 23 }
+
+               nmsbufferMdFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free medium buffers."
+                   ::= { nmslsystem 24 }
+
+               nmsbufferMdMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of medium
+                           buffers."
+                   ::= { nmslsystem 25 }
+
+               nmsbufferMdHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer hits."
+                   ::= { nmslsystem 26 }
+
+               nmsbufferMdMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer
+                           misses."
+                   ::= { nmslsystem 27 }
+
+               nmsbufferMdTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer trims."
+                   ::= { nmslsystem 28 }
+
+               nmsbufferMdCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer
+                           creates."
+                   ::= { nmslsystem 29 }
+
+               nmsbufferBgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of big buffers."
+                   ::= { nmslsystem 30 }
+
+               nmsbufferBgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of big buffers."
+                   ::= { nmslsystem 31 }
+
+               nmsbufferBgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free big buffers."
+                   ::= { nmslsystem 32 }
+
+               nmsbufferBgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of big buffers."
+                   ::= { nmslsystem 33 }
+
+               nmsbufferBgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer hits."
+                   ::= { nmslsystem 34 }
+
+               nmsbufferBgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer misses."
+                   ::= { nmslsystem 35 }
+
+               nmsbufferBgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer trims."
+                   ::= { nmslsystem 36 }
+
+               nmsbufferBgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer creates."
+                   ::= { nmslsystem 37 }
+
+               nmsbufferLgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of large buffers."
+                   ::= { nmslsystem 38 }
+
+               nmsbufferLgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of large buffers."
+                   ::= { nmslsystem 39 }
+
+               nmsbufferLgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free large buffers."
+                   ::= { nmslsystem 40 }
+
+               nmsbufferLgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of large
+                           buffers."
+                   ::= { nmslsystem 41 }
+
+               nmsbufferLgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer hits."
+                   ::= { nmslsystem 42 }
+
+               nmsbufferLgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer misses."
+                   ::= { nmslsystem 43 }
+
+               nmsbufferLgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer trims."
+                   ::= { nmslsystem 44 }
+
+               nmsbufferLgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer
+                           creates."
+                   ::= { nmslsystem 45 }
+
+               nmsbufferFail OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of the number of buffer allocation
+                           failures."
+                   ::= { nmslsystem 46 }
+
+               nmsbufferNoMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of the number of buffer create
+                           failures due to no free memory."
+                   ::= { nmslsystem 47 }
+
+               nmsnetConfigAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the address of the host that supplied
+                           the network-confg file."
+                   ::= { nmslsystem 48 }
+
+               nmsnetConfigName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the name of the network configuration
+                           file."
+                   ::= { nmslsystem 49 }
+
+               nmsnetConfigSet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Cause the loading of a new network-confg
+                           file using TFTP."
+                   ::= { nmslsystem 50 }
+
+               nmshostConfigAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Contains the address of the host that
+                           provided the host-config file."
+                   ::= { nmslsystem 51 }
+
+               nmshostConfigName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Contains the name of the last configured
+                           host-confg file."
+                   ::= { nmslsystem 52 }
+
+               nmshostConfigSet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Cause the loading of a new host-confg file
+                           using TFTP."
+                   ::= { nmslsystem 53 }
+
+               nmswriteMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write configuration into non-volatile memory
+                           / erase config memory if 0."
+                   ::= { nmslsystem 54 }
+
+               nmswriteNet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write configuration to host using TFTP."
+                   ::= { nmslsystem 55 }
+
+               nmsbusyPer OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CPU busy percentage in the last 5 second
+                           period. Not the last 5 realtime seconds but
+                           the last 5 second period in the scheduler."
+                   ::= { nmslsystem 56 }
+
+               nmsavgBusy1 OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "1 minute exponentially-decayed moving
+                           average of the CPU busy percentage."
+                   ::= { nmslsystem 57 }
+
+               nmsavgBusy5 OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "5 minute exponentially-decayed moving
+                           average of the CPU busy percentage."
+                   ::= { nmslsystem 58 }
+
+               nmsidleCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS internal variable. not to be used"
+                   ::= { nmslsystem 59 }
+
+               nmsidleWired OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS internal variable. not to be used"
+                   ::= { nmslsystem 60 }
+
+               nmsContactInfo OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS's name and address"
+                   ::= { nmslsystem 61 }
+
+               nmsbufferHgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of huge buffers."
+                   ::= { nmslsystem 62 }
+
+               nmsbufferHgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of huge buffers."
+                   ::= { nmslsystem 63 }
+
+               nmsbufferHgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free huge buffers."
+                   ::= { nmslsystem 64 }
+
+               nmsbufferHgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of huge
+                           buffers."
+                   ::= { nmslsystem 65 }
+
+               nmsbufferHgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer hits."
+                   ::= { nmslsystem 66 }
+
+               nmsbufferHgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer misses."
+                   ::= { nmslsystem 67 }
+
+               nmsbufferHgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer trims."
+                   ::= { nmslsystem 68 }
+
+               nmsbufferHgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer creates."
+                   ::= { nmslsystem 69 }
+
+               nmsnetConfigProto OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the protocol that supplied the
+                           network-confg file."
+                   ::= { nmslsystem 70 }
+
+               nmshostConfigProto OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the protocol that supplied the host-
+                           confg file."
+                   ::= { nmslsystem 71 }
+
+               nmssysConfigAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the address of the host that supplied
+                           the system boot image."
+                   ::= { nmslsystem 72 }
+
+               nmssysConfigName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the name of the system boot image."
+                   ::= { nmslsystem 73 }
+
+               nmssysConfigProto OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the protocol that supplied the system
+                           boot image."
+                   ::= { nmslsystem 74 }
+
+               nmssysClearARP OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Perform a clearing of the entire ARP cache
+                           and invalidation of route caches."
+                   ::= { nmslsystem 75 }
+
+               nmssysClearInt OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Clear interface given IfIndex as value."
+                   ::= { nmslsystem 76 }
+
+               nmsenvPresent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is there an environmental monitor card in
+                           this box?, 0 - No, 1-AGS card present, wrong
+                           firmware, 2-AGS CARD present, firmware ok,
+                           3-7000 support"
+                   ::= { nmslsystem 77 }
+
+               nmsenvTestPt1Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 1. Typically
+                           ambient air or the temperature of air
+                           entering the router"
+                   ::= { nmslsystem 78 }
+
+               nmsenvTestPt1Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 1. Typically a
+                           temperature in centigrade."
+                   ::= { nmslsystem 79 }
+
+               nmsenvTestPt2Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 2. Typically
+                           airflow or the temperature of air leaving the
+                           router"
+                   ::= { nmslsystem 80 }
+
+               nmsenvTestPt2Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 2. Typically a
+                           temperature in centigrade."
+                   ::= { nmslsystem 81 }
+
+               nmsenvTestPt3Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 3. Typically
+                           +5 volt"
+                   ::= { nmslsystem 82 }
+
+               nmsenvTestPt3Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 3. Typically the
+                           value in millivolts of the +5v supply"
+                   ::= { nmslsystem 83 }
+
+               nmsenvTestPt4Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 4. Typically
+                           +12 volt"
+                   ::= { nmslsystem 84 }
+
+               nmsenvTestPt4Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 4. Typically the
+                           value in millivolts of the +12v supply"
+                   ::= { nmslsystem 85 }
+
+               nmsenvTestPt5Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 5. Typically
+                           -12 volt"
+                   ::= { nmslsystem 86 }
+
+               nmsenvTestPt5Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 5. Typically the
+                           value in millivolts of the -12v supply"
+                   ::= { nmslsystem 87 }
+
+               nmsenvTestPt6Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 6. Typically
+                           -5 volt"
+                   ::= { nmslsystem 88 }
+
+               nmsenvTestPt6Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 6. Typically the
+                           value in millivolts of the -5v supply"
+                   ::= { nmslsystem 89 }
+
+               nmsenvTestPt1MarginVal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value at which the router will shutdown.
+                           Typically the ambient air temperature that
+                           will shut the router down. (e.g. 43)"
+                   ::= { nmslsystem 90 }
+
+               nmsenvTestPt2MarginVal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value at which the router will shutdown.
+                           Typically the airflow air temperature that
+                           will shut the router down. (e.g. 58)"
+                   ::= { nmslsystem 91 }
+
+               nmsenvTestPt3MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 10%) typically +5 volt"
+                   ::= { nmslsystem 92 }
+
+               nmsenvTestPt4MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 15%) typically +12 volt"
+                   ::= { nmslsystem 93 }
+
+               nmsenvTestPt5MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 15%) typically -12 volt"
+                   ::= { nmslsystem 94 }
+
+               nmsenvTestPt6MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 10%) typically -5 volt"
+                   ::= { nmslsystem 95 }
+
+               nmsenvTestPt1last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt1 when last shutdown
+                           occurred."
+                   ::= { nmslsystem 96 }
+
+               nmsenvTestPt2last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt2 when last shutdown
+                           occurred."
+                   ::= { nmslsystem 97 }
+
+               nmsenvTestPt3last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt3 when last shutdown
+                           occurred."
+                   ::= { nmslsystem 98 }
+
+               nmsenvTestPt4last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt4 when last shutdown
+                           occurred."
+                   ::= { nmslsystem 99 }
+
+               nmsenvTestPt5last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt5 when last shutdown
+                           occurred."
+                   ::= { nmslsystem 100 }
+
+               nmsenvTestPt6last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt6 when last shutdown
+                           occurred."
+                   ::= { nmslsystem 101 }
+
+               nmsenvTestPt1warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { nmslsystem 102 }
+
+               nmsenvTestPt2warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { nmslsystem 103 }
+
+               nmsenvTestPt3warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { nmslsystem 104 }
+
+               nmsenvTestPt4warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { nmslsystem 105 }
+
+               nmsenvTestPt5warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { nmslsystem 106 }
+
+               nmsenvTestPt6warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { nmslsystem 107 }
+
+               nmsenvFirmVersion OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of Environmental Card firmware"
+                   ::= { nmslsystem 108 }
+
+               nmsenvTechnicianID OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Technician ID"
+                   ::= { nmslsystem 109 }
+
+               nmsenvType OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The type of environmental card"
+                   ::= { nmslsystem 110 }
+
+               nmsenvBurnDate OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The calibration / burn in date"
+                   ::= { nmslsystem 111 }
+
+               nmsenvSerialNumber OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial Number of environmental monitor card"
+                   ::= { nmslsystem 112 }
+
+
+	 END

@@ -1,0 +1,333 @@
+CISCOSB-HWENVIROMENT DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString           FROM SNMPv2-TC;
+
+rlEnv MODULE-IDENTITY
+        LAST-UPDATED "200309210000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for environment of CISCOSB devices."
+        REVISION "200309210000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 83 }
+
+RlEnvMonState ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.
+
+                 warning(2):        the environment is bad, such as temperature
+                                    above normal operation range but not too
+                                    high.
+
+                 critical(3):       the environment is very bad, such as
+                                    temperature much higher than normal
+                                    operation limit.
+
+                 shutdown(4):       the environment is the worst, the system
+                                    should be shutdown immediately.
+
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.
+
+                 notFunctioning(6): the environmental monitor does not
+                                    function properly, such as a temperature
+                                    sensor generates a abnormal data like
+                                    1000 C.
+                "
+        SYNTAX  INTEGER {
+                        normal(1),
+                        warning(2),
+                        critical(3),
+                        shutdown(4),
+                        notPresent(5),
+                        notFunctioning(6)
+                }
+
+RlEnvMonDirection ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the state of a device being monitored.
+                 Valid values are:
+
+                 unKnown(1):        if the board not support air flow direction.
+
+                 frontToBack(2):    the air flow direction of the fan is front to back.
+
+                 backToFront(3):    the air flow direction of the fan is back to front.
+
+                 clockwise(4):      the air flow direction of the fan is clock wise
+
+                 unClockwise(5):    the air flow direction of the fan is unclock wise
+
+                 insideOutside(6):  the air flow direction of the fan is inside outside
+
+                 outsideInside(7):  the air flow direction of the fan is outside inside
+
+                 rightToLeft(8):    the air flow direction of the fan is from right to left
+
+                 leftToRight(9):    the air flow direction of the fan is from left to right
+
+                "
+        SYNTAX  INTEGER {
+                        unKnown(1),
+                        frontToBack(2),
+                        backToFront(3),
+                        clockwise(4),
+                        unClockwise(5),
+                        insideOut(6),
+                        outsideIn(7),
+                        rightToLeft(8),
+                        leftToRight(9)
+                }
+
+rlEnvPhysicalDescription OBJECT IDENTIFIER ::= { rlEnv 1 }
+
+rlEnvMonFanStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF RlEnvMonFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of fan status maintained by the environmental
+                monitor."
+        ::= { rlEnvPhysicalDescription 1 }
+
+rlEnvMonFanStatusEntry OBJECT-TYPE
+        SYNTAX     RlEnvMonFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the fan status table, representing the status of
+                the associated fan maintained by the environmental monitor."
+        INDEX   { rlEnvMonFanStatusIndex }
+        ::= { rlEnvMonFanStatusTable 1 }
+
+RlEnvMonFanStatusEntry ::=
+        SEQUENCE {
+                rlEnvMonFanStatusIndex       INTEGER,
+                rlEnvMonFanStatusDescr       DisplayString,
+                rlEnvMonFanState             RlEnvMonState
+        }
+
+rlEnvMonFanStatusIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the fan being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { rlEnvMonFanStatusEntry 1 }
+
+rlEnvMonFanStatusDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the fan being instrumented.
+                This description is a short textual label, suitable as a
+                human-sensible identification for the rest of the
+                information in the entry."
+        ::= { rlEnvMonFanStatusEntry 2 }
+
+rlEnvMonFanState OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the fan being instrumented."
+        ::= { rlEnvMonFanStatusEntry 3 }
+
+
+
+rlEnvMonSupplyStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF RlEnvMonSupplyStatusEntry
+        MAX-ACCESS not-accessible
+
+        STATUS     current
+        DESCRIPTION
+                "The table of power supply status maintained by the
+                environmental monitor card."
+        ::= { rlEnvPhysicalDescription 2 }
+
+rlEnvMonSupplyStatusEntry OBJECT-TYPE
+        SYNTAX     RlEnvMonSupplyStatusEntry
+        MAX-ACCESS not-accessible
+
+        STATUS     current
+        DESCRIPTION
+                "An entry in the power supply status table, representing the
+                status of the associated power supply maintained by the
+                environmental monitor card."
+        INDEX   { rlEnvMonSupplyStatusIndex }
+        ::= { rlEnvMonSupplyStatusTable 1  }
+
+RlEnvMonSupplyStatusEntry ::=
+        SEQUENCE {
+                rlEnvMonSupplyStatusIndex    INTEGER ,
+                rlEnvMonSupplyStatusDescr    DisplayString,
+                rlEnvMonSupplyState          RlEnvMonState,
+                rlEnvMonSupplySource         INTEGER,
+                rlEnvMonSupplyFanDirection   RlEnvMonDirection
+        }
+
+rlEnvMonSupplyStatusIndex OBJECT-TYPE
+        SYNTAX     INTEGER (0..2147483647)
+        MAX-ACCESS not-accessible
+
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the power supply being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { rlEnvMonSupplyStatusEntry 1 }
+
+rlEnvMonSupplyStatusDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..32))
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the power supply being instrumented.
+                This description is a short textual label, suitable as a
+                human-sensible identification for the rest of the
+                information in the entry."
+        ::= { rlEnvMonSupplyStatusEntry 2 }
+
+rlEnvMonSupplyState OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the power supply being instrumented."
+        ::= { rlEnvMonSupplyStatusEntry 3 }
+
+rlEnvMonSupplySource OBJECT-TYPE
+        SYNTAX INTEGER {
+                        unknown(1),
+                        ac(2),
+                        dc(3),
+                        externalPowerSupply(4),
+                        internalRedundant(5)
+                }
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The power supply source.
+                 unknown - Power supply source unknown
+                 ac      - AC power supply
+                 dc      - DC power supply
+                 externalPowerSupply - External power supply
+                 internalRedundant - Internal redundant power supply
+                "
+        ::= { rlEnvMonSupplyStatusEntry 4 }
+
+rlEnvMonSupplyFanDirection OBJECT-TYPE
+        SYNTAX     RlEnvMonDirection
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The direction of the power supply's fan."
+        ::= { rlEnvMonSupplyStatusEntry 5 }
+        
+rlEnvFanData OBJECT IDENTIFIER ::= { rlEnv 5 }
+
+rlEnvFanDataTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlEnvFanDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each unit in a stack"
+    ::= { rlEnvFanData 1 }
+
+rlEnvFanDataEntry OBJECT-TYPE
+    SYNTAX      RlEnvFanDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies a unit"
+    INDEX  { rlEnvFanDataStackUnit }
+    ::= { rlEnvFanDataTable 1 }
+
+RlEnvFanDataEntry ::= SEQUENCE {
+    rlEnvFanDataStackUnit      INTEGER,
+    rlEnvFanDataTemp           INTEGER,
+    rlEnvFanDataSpeed          INTEGER,
+    rlEnvFanDataOperLevel      INTEGER,
+    rlEnvFanDataAdminLevel     INTEGER,
+    rlEnvFanDataDirection      RlEnvMonDirection
+}
+
+rlEnvFanDataStackUnit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the stack unit"
+    ::= { rlEnvFanDataEntry 1 }
+
+rlEnvFanDataTemp OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unit temperature"
+    ::= { rlEnvFanDataEntry 2 }
+
+rlEnvFanDataSpeed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fan speed in RPM"
+    ::= { rlEnvFanDataEntry 3 }
+
+rlEnvFanDataOperLevel OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fan speed operative level"
+    ::= { rlEnvFanDataEntry 4 }
+
+rlEnvFanDataAdminLevel OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configured fan speed level"
+    ::= { rlEnvFanDataEntry 5 }
+
+rlEnvFanDataDirection OBJECT-TYPE
+        SYNTAX     RlEnvMonDirection
+        MAX-ACCESS read-only
+
+        STATUS     current
+        DESCRIPTION
+                "The direction of the system's fan."
+        ::= { rlEnvFanDataEntry 6 }
+
+END
+

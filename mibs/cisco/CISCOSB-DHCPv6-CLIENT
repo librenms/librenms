@@ -1,0 +1,506 @@
+CISCOSB-DHCPv6-CLIENT DEFINITIONS ::= BEGIN
+
+-- Version:    7.60
+
+-- Date:       10-May-2012
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, IpAddress, Counter32                FROM SNMPv2-SMI
+    InterfaceIndex, ifIndex                         FROM IF-MIB
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    DisplayString, TruthValue                       FROM SNMPv2-TC
+    InetAddressType,InetAddress,InetAddressIPv6     FROM INET-ADDRESS-MIB -- RFC2851
+    InetAddressPrefixLength, InetAddressType, InetAddress
+                                                    FROM INET-ADDRESS-MIB
+    rlDhcpv6Client                                  FROM CISCOSB-DHCPv6;
+
+------------------------------
+-- ipv6 DHCP client mib version
+------------------------------
+
+-- rlDhcpv6ClientMibVersion --
+
+rlDhcpv6ClientMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rlDhcpv6Client 1 }
+
+
+------------------------------
+-- ipv6 DHCP client supported
+------------------------------
+
+-- rlDhcpv6ClientSupported --
+
+rlDhcpv6ClientSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rlDhcpv6Client 2 }
+
+------------------------------
+-- ipv6 DHCP client Table
+------------------------------
+
+-- rlDhcpv6ClientEntry --
+
+
+rlDhcpv6ClientTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpv6ClientEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The table saved ipv6 DHCP clients and their services."
+    ::= { rlDhcpv6Client 3 }
+
+rlDhcpv6ClientEntry OBJECT-TYPE
+    SYNTAX     RlDhcpv6ClientEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in rlDhcpv6Client."
+    INDEX      { rlDhcpv6ClientIfIndex }
+    ::= { rlDhcpv6ClientTable 1 }
+
+RlDhcpv6ClientEntry ::= SEQUENCE {
+    rlDhcpv6ClientIfIndex                   InterfaceIndex,
+    rlDhcpv6ClientPd                        INTEGER,
+    rlDhcpv6ClientStateless                 INTEGER,
+    rlDhcpv6ClientReconfigure               INTEGER,
+    rlDhcpv6ClientInfoRefreshMin            Unsigned32,
+    rlDhcpv6ClientInfoRefreshConf           Unsigned32,
+    rlDhcpv6ClientInfoRefreshReceived       Unsigned32,
+    rlDhcpv6ClientInfoRefreshRemain         Unsigned32,
+    rlDhcpv6ClientDhcpServerInetAddressType InetAddressType,
+    rlDhcpv6ClientDhcpServerInetAddress     InetAddress,
+    rlDhcpv6ClientDhcpServerDuid            OCTET STRING,
+    rlDhcpv6ClientDhcpServerPreference      Unsigned32,
+    rlDhcpv6ClientState                     INTEGER,
+    rlDhcpv6ClientTftpServerName            DisplayString,
+    rlDhcpv6ClientTftpFileName              DisplayString,
+    rlDhcpv6ClientTimeZone                  DisplayString,
+    rlDhcpv6ClientOperStatus                INTEGER,
+    rlDhcpv6ClientDisableReason             INTEGER,
+    rlDhcpv6ClientStatus                    RowStatus,
+    rlDhcpv6ClientInfoRefreshIsReceived     TruthValue,
+    rlDhcpv6ClientIndirectImageFileName     DisplayString
+}
+
+rlDhcpv6ClientIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The interface that ipv6 DHCP client is running on. "
+    ::= { rlDhcpv6ClientEntry  1 }
+
+rlDhcpv6ClientPd OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Enables Prefix Delegation service on the interface."
+    DEFVAL  { disable }
+    ::= { rlDhcpv6ClientEntry 2 }
+
+rlDhcpv6ClientStateless OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables Stateless service on the interface."
+    DEFVAL  { disable }
+    ::= { rlDhcpv6ClientEntry 3 }
+
+rlDhcpv6ClientReconfigure OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Enables reconfiguration service on the interface."
+    DEFVAL  { disable }
+    ::= { rlDhcpv6ClientEntry 4 }
+
+rlDhcpv6ClientInfoRefreshMin OBJECT-TYPE
+    SYNTAX      Unsigned32 (600..4294967295 )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Defines the minimum refresh time between information-request packets on the same interface."
+    DEFVAL  { 86400 }
+    ::= { rlDhcpv6ClientEntry 5 }
+
+rlDhcpv6ClientInfoRefreshConf OBJECT-TYPE
+    SYNTAX      Unsigned32 (86400..4294967295 )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Defines the refresh time between information-request packets on the same interface."
+    DEFVAL  { 86400 }
+    ::= { rlDhcpv6ClientEntry 6 }
+
+rlDhcpv6ClientInfoRefreshReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shows the received time from DHCP server untill next information-request packet."
+    ::= { rlDhcpv6ClientEntry 7 }
+
+rlDhcpv6ClientInfoRefreshRemain OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shows the remain time untill next information-request packet."
+    ::= { rlDhcpv6ClientEntry 8 }
+
+rlDhcpv6ClientDhcpServerInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contains Inet address Type of current DHCPv6 server."
+    ::= { rlDhcpv6ClientEntry 9 }
+
+rlDhcpv6ClientDhcpServerInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contains Inet address of current DHCPv6 server."
+    ::= { rlDhcpv6ClientEntry 10 }
+
+rlDhcpv6ClientDhcpServerDuid OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contains DUID of current DHCPv6 server."
+    ::= { rlDhcpv6ClientEntry 11 }
+
+rlDhcpv6ClientDhcpServerPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contains preference of current DHCPv6 server."
+    ::= { rlDhcpv6ClientEntry 12 }
+
+rlDhcpv6ClientState OBJECT-TYPE
+    SYNTAX INTEGER {
+       idle(1),
+       configuring(2),
+       configured(3)
+       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "shows the state machine."
+    DEFVAL  { idle }
+    ::= { rlDhcpv6ClientEntry 13 }
+
+rlDhcpv6ClientTftpServerName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Tftp server name received by DHCPv6 stateless service."
+    ::= { rlDhcpv6ClientEntry 14 }
+
+rlDhcpv6ClientTftpFileName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Name of file to use in configuration process received by DHCPv6 stateless service."
+    ::= { rlDhcpv6ClientEntry 15 }
+
+
+rlDhcpv6ClientTimeZone   OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The timezone received by DHCPv6 stateless service"
+    ::= { rlDhcpv6ClientEntry 16 }
+
+
+rlDhcpv6ClientOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+       }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The operational status of this entry. Enabled or Disabled ."
+    DEFVAL  { disable }
+    ::= { rlDhcpv6ClientEntry   17}
+
+rlDhcpv6ClientDisableReason OBJECT-TYPE
+    SYNTAX INTEGER {
+       none(1),
+       ipv6Disable(2),
+       portDown(3),
+       portDownAndIpv6Disable(4)
+       }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The disable operational status reason."
+    DEFVAL  { none }
+    ::= { rlDhcpv6ClientEntry   18}
+
+rlDhcpv6ClientStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this entry.  Creating the entry when ipv6 DHCP is enabled OR ipv6 DHCP stateless in enabled OR ipv6 DHCP pd is enabled."
+    ::= { rlDhcpv6ClientEntry   19}
+
+rlDhcpv6ClientInfoRefreshIsReceived OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shows whether information-request option is received."
+    DEFVAL  { false }
+    ::= { rlDhcpv6ClientEntry 20 }
+
+rlDhcpv6ClientIndirectImageFileName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Name of file to use in autoupdate process received by DHCPv6 stateless service."
+    ::= { rlDhcpv6ClientEntry 21 }
+
+------------------------------
+-- ipv6 DHCP client Aux DNS servers table
+------------------------------
+
+-- rlDhcpv6ClientAuxDnsServerListEntry --
+
+
+rlDhcpv6ClientAuxDnsServerListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpv6ClientAuxDnsServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The table saved the list of DNS servers received by DHCPv6 stateless service. This is an auxulary table for rlDhcpv6ClientEntry."
+    ::= { rlDhcpv6Client 4 }
+
+rlDhcpv6ClientAuxDnsServerListEntry OBJECT-TYPE
+    SYNTAX     RlDhcpv6ClientAuxDnsServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in rlDhcpv6ClientAuxDnsServerListTable."
+    INDEX      { rlDhcpv6ClientAuxDnsServerListIfIndex,
+                 rlDhcpv6ClientAuxDnsServerListPriority }
+    ::= { rlDhcpv6ClientAuxDnsServerListTable 1 }
+
+RlDhcpv6ClientAuxDnsServerListEntry ::= SEQUENCE {
+    rlDhcpv6ClientAuxDnsServerListIfIndex  InterfaceIndex,
+    rlDhcpv6ClientAuxDnsServerListPriority INTEGER,
+    rlDhcpv6ClientAuxDnsServerListAddress  InetAddressIPv6
+}
+
+rlDhcpv6ClientAuxDnsServerListIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IfIndex in rlDhcpv6ClientAuxDnsServerListEntry. "
+    ::= { rlDhcpv6ClientAuxDnsServerListEntry  1 }
+
+rlDhcpv6ClientAuxDnsServerListPriority          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The priority of the entry. "
+    ::= { rlDhcpv6ClientAuxDnsServerListEntry  2 }
+
+rlDhcpv6ClientAuxDnsServerListAddress   OBJECT-TYPE
+    SYNTAX     InetAddressIPv6
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "DNS server address received by DHCPv6 stateless service"
+    ::= { rlDhcpv6ClientAuxDnsServerListEntry 3 }
+
+
+------------------------------
+-- ipv6 DHCP client Aux SNTP servers List table
+------------------------------
+
+-- rlDhcpv6ClientAuxSntpServerListEntry --
+
+
+rlDhcpv6ClientAuxSntpServerListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpv6ClientAuxSntpServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The table saved the list of Sntp servers received by DHCPv6 stateless service. This is an auxulary table for rlDhcpv6ClientEntry."
+    ::= { rlDhcpv6Client 5 }
+
+rlDhcpv6ClientAuxSntpServerListEntry OBJECT-TYPE
+    SYNTAX     RlDhcpv6ClientAuxSntpServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in rlDhcpv6ClientAuxSntpServerListTable."
+    INDEX      { rlDhcpv6ClientAuxSntpServerListIfIndex,
+                 rlDhcpv6ClientAuxSntpServerListPriority }
+    ::= { rlDhcpv6ClientAuxSntpServerListTable 1 }
+
+RlDhcpv6ClientAuxSntpServerListEntry ::= SEQUENCE {
+    rlDhcpv6ClientAuxSntpServerListIfIndex    InterfaceIndex,
+    rlDhcpv6ClientAuxSntpServerListPriority   INTEGER,
+    rlDhcpv6ClientAuxSntpServerListAddress    InetAddressIPv6
+}
+
+rlDhcpv6ClientAuxSntpServerListIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IfIndex in rlDhcpv6ClientAuxSntpServerEntry. "
+    ::= { rlDhcpv6ClientAuxSntpServerListEntry  1 }
+
+rlDhcpv6ClientAuxSntpServerListPriority          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The priority of the entry. "
+    ::= { rlDhcpv6ClientAuxSntpServerListEntry  2 }
+
+rlDhcpv6ClientAuxSntpServerListAddress  OBJECT-TYPE
+    SYNTAX     InetAddressIPv6
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Sntp server address received by DHCPv6 stateless service"
+    ::= { rlDhcpv6ClientAuxSntpServerListEntry 3 }
+
+
+------------------------------
+-- ipv6 DHCP client Domain name search table
+------------------------------
+
+-- rlDhcpv6ClientAuxDomainNameSearchListEntry --
+
+
+rlDhcpv6ClientAuxDomainNameSearchListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpv6ClientAuxDomainNameSearchListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The table saved the list of Domain Name Search received by DHCPv6 stateless service. This is an auxulary table for rlDhcpv6ClientEntry."
+    ::= { rlDhcpv6Client 6 }
+
+rlDhcpv6ClientAuxDomainNameSearchListEntry OBJECT-TYPE
+    SYNTAX     RlDhcpv6ClientAuxDomainNameSearchListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in rlDhcpv6ClientAuxDomainNameSearchListTable."
+    INDEX      { rlDhcpv6ClientAuxDomainNameSearchListIfIndex,
+                 rlDhcpv6ClientAuxDomainNameSearchListPriority }
+    ::= { rlDhcpv6ClientAuxDomainNameSearchListTable 1 }
+
+RlDhcpv6ClientAuxDomainNameSearchListEntry ::= SEQUENCE {
+    rlDhcpv6ClientAuxDomainNameSearchListIfIndex    InterfaceIndex,
+    rlDhcpv6ClientAuxDomainNameSearchListPriority    INTEGER,
+    rlDhcpv6ClientAuxDomainNameSearchListName        DisplayString
+}
+
+rlDhcpv6ClientAuxDomainNameSearchListIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IfIndex in rlDhcpv6ClientAuxDomainNameSearchEntry. "
+    ::= { rlDhcpv6ClientAuxDomainNameSearchListEntry  1 }
+
+rlDhcpv6ClientAuxDomainNameSearchListPriority          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The priority of the entry. "
+    ::= { rlDhcpv6ClientAuxDomainNameSearchListEntry  2 }
+
+rlDhcpv6ClientAuxDomainNameSearchListName   OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Domain Name in DomainNameSearchList received by DHCPv6 stateless service"
+    ::= { rlDhcpv6ClientAuxDomainNameSearchListEntry 3 }
+
+
+-- =======================================================
+-- ipv6 DHCP Client clear command
+-- =======================================================
+
+rlDhcpv6ClientCommandTable        OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpv6ClientCommandEntry
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION     "Action MIB for DHCP v6 Renew command."
+    ::= { rlDhcpv6Client 7 }
+
+rlDhcpv6ClientCommandEntry OBJECT-TYPE
+    SYNTAX          RlDhcpv6ClientCommandEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The row definition for this table."
+    INDEX { rlDhcpv6ClientCommandIfIndex }
+::= { rlDhcpv6ClientCommandTable 1 }
+
+RlDhcpv6ClientCommandEntry::= SEQUENCE {
+    rlDhcpv6ClientCommandIfIndex InterfaceIndex,
+    rlDhcpv6ClientCommandAction  INTEGER
+}
+
+rlDhcpv6ClientCommandIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IfIndex in rlDhcpv6ClientAuxDomainNameSearchEntry. "
+    ::= { rlDhcpv6ClientCommandEntry  1 }
+
+rlDhcpv6ClientCommandAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    none(0),
+                    renew(1)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Action to apply. The default value is none."
+    ::= { rlDhcpv6ClientCommandEntry 2 }
+
+
+------------------------------
+-- rlDhcpv6ClientEnabledByDefaultRemovedIfindex --
+------------------------------
+
+rlDhcpv6ClientEnabledByDefaultRemovedIfindex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "DHCPv6 Client flag is relevant when mtsc parameter DHCPv6_client_enabled_by_default is TRUE.
+                 If the MIB has non zero value the meaning is that DHCP client has removed from configuration by the user
+                 on the interface and signs to application not to add DHCPv6 client entry. Otherwise (zero value) - the meaning is
+                 that DHCPv6 client entry must be added. "
+    DEFVAL{ 0 }
+    ::= { rlDhcpv6Client 8 }
+
+END

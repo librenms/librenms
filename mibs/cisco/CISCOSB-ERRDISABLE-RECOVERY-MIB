@@ -1,0 +1,149 @@
+CISCOSB-ERRDISABLE-RECOVERY-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB ERRDISABLE Recovery Configuration
+-- Version:    7.45.00.00
+-- Date:       24-Oct-2007
+--
+
+IMPORTS
+    TruthValue,TEXTUAL-CONVENTION,
+    RowStatus                                            FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE                         FROM SNMPv2-SMI
+    ifIndex                                              FROM IF-MIB
+    switch001                                            FROM CISCOSB-MIB;
+
+rlErrdisableRecovery  MODULE-IDENTITY
+       LAST-UPDATED "200711070000Z"
+       ORGANIZATION "Cisco Systems, Inc."
+
+       CONTACT-INFO
+       "Postal: 170 West Tasman Drive
+       San Jose , CA 95134-1706
+       USA
+
+       
+       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+       DESCRIPTION
+                "The private MIB module definition for Errdisable Recovery MIB."
+       REVISION "200711070000Z"
+       DESCRIPTION
+                "Initial version of this MIB."
+           ::= { switch001 128 }
+
+-------------------------------------------------------------------------------
+RlErrdisableRecoveryCauseType::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Errdisable Recovery Cause Type."
+    SYNTAX  INTEGER {
+        loopback-detection(1),
+        port-security(2),
+        dot1x-src-address(3),
+        acl-deny(4),
+        stp-bpdu-guard(5),
+        stp-loopback-guard(6),
+        pcb-overheat(7),
+        udld(8)
+    }
+
+
+-------------------------------------------------------------------------------
+
+rlErrdisableRecoveryInterval OBJECT-TYPE
+    SYNTAX      INTEGER(30..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout interval in seconds for automatic activation of an interface after shutdown."
+    ::= { rlErrdisableRecovery 1 }
+
+-----------------------------------------------------------------------
+rlErrdisableRecoveryCauseTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlErrdisableRecoveryCauseEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The table is used to enable or disable auto-recovery for specific
+       application causes port suspend. The table includes entries for all applications."
+    ::=  { rlErrdisableRecovery  2 }
+
+rlErrdisableRecoveryCauseEntry OBJECT-TYPE
+    SYNTAX     RlErrdisableRecoveryCauseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlErrdisableRecoveryCauseEntry."
+    INDEX  { rlErrdisableRecoveryCause }
+    ::= { rlErrdisableRecoveryCauseTable 1 }
+
+RlErrdisableRecoveryCauseEntry ::= SEQUENCE {
+    rlErrdisableRecoveryCause  RlErrdisableRecoveryCauseType,
+    rlErrdisableRecoveryEnable TruthValue
+    }
+
+rlErrdisableRecoveryCause OBJECT-TYPE
+    SYNTAX  RlErrdisableRecoveryCauseType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Type of recovery cause."
+    ::= { rlErrdisableRecoveryCauseEntry 1 }
+
+
+rlErrdisableRecoveryEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable automatic recovery."
+    ::= { rlErrdisableRecoveryCauseEntry 2 }
+
+
+-------------------------------------------------------------------------------
+
+rlErrdisableRecoveryIfTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlErrdisableRecoveryIfEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The table is used for show the reason of shutdown the port in errdisable state.
+       The table includes only suspended interfaces."
+    ::= {  rlErrdisableRecovery 3 }
+
+rlErrdisableRecoveryIfEntry OBJECT-TYPE
+    SYNTAX     RlErrdisableRecoveryIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlErrdisableRecoveryIfEntry."
+    INDEX  {     ifIndex  }
+    ::= { rlErrdisableRecoveryIfTable 1 }
+
+RlErrdisableRecoveryIfEntry::= SEQUENCE {
+    rlErrdisableRecoveryIfReason RlErrdisableRecoveryCauseType,
+    rlErrdisableRecoveryIfEnable TruthValue
+   }
+
+
+rlErrdisableRecoveryIfReason OBJECT-TYPE
+    SYNTAX      RlErrdisableRecoveryCauseType
+    MAX-ACCESS  read-only
+    STATUS   current
+    DESCRIPTION
+        " The reason of shutdown the port in errdisable state."
+    ::= { rlErrdisableRecoveryIfEntry 1 }
+
+rlErrdisableRecoveryIfEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable automatic recovery status."
+    ::= { rlErrdisableRecoveryIfEntry 2 }
+
+
+
+END
+

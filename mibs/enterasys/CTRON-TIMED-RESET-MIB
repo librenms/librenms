@@ -1,0 +1,115 @@
+CTRON-TIMED-RESET-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-timed-reset-mib.txt
+--  Revision: 01.00.00
+--  Part Number:
+--  Date: Feb 21, 2002
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides definitions for Cabletron's
+--  enterprise-specific timed reset functionality.
+--
+--  This module describes existing functionality.
+--
+--  This module will be extended, as needed.
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright Feb 2002 Enterasys Networks
+
+IMPORTS
+
+      OBJECT-TYPE
+            FROM RFC-1212
+      ctDevice
+            FROM CTRON-MIB-NAMES;
+
+ctTimedResetMIB     OBJECT IDENTIFIER ::= { ctDevice ctTimedResetMIB(2) }
+
+ctTimedResetStatus         OBJECT-TYPE 
+       SYNTAX  INTEGER { 
+          disabled(0), 
+          softEnabled(1), 
+          hardEnabled(2) 
+       } 
+       ACCESS  read-write 
+       STATUS  deprecated 
+       DESCRIPTION 
+          "softEnabled(1) - soft reset in ctTimedResetTimeEntered seconds.
+           hardEnabled(2) - hard reset in ctTimedResetTimeEntered seconds.
+
+           A zero value in ctTimedResetTimeEntered will cause an immediate
+           reset.
+
+           Setting this to disabled(0) will cause any currently enabled 
+           timed reset will be disabled." 
+       ::= { ctTimedResetMIB 1 } 
+
+ctTimedResetTimeEntered    OBJECT-TYPE 
+       SYNTAX  INTEGER 
+       ACCESS  read-write 
+       STATUS  deprecated 
+       DESCRIPTION 
+          "The time, in seconds, from the time ctTimedResetStatus 
+           is set to softEnabled(1) or hardEnabled(2), until the 
+           board will reset." 
+       ::= { ctTimedResetMIB 2 } 
+
+ctTimedResetTimeRemaining  OBJECT-TYPE 
+       SYNTAX  INTEGER 
+       ACCESS  read-only 
+       STATUS  deprecated 
+       DESCRIPTION 
+          "The time, in seconds, remaining until a reset will occur.
+           The time is not meaningful if ctTimedResetStatus is
+           disabled(0)."
+       ::= { ctTimedResetMIB 3 } 
+
+ctTimedResetOperationalMode OBJECT-TYPE 
+       SYNTAX  INTEGER { 
+          currentMode(0), 
+          ieee8021Q(1), 
+          secureFast(2) 
+       } 
+       ACCESS  read-write 
+       STATUS  deprecated 
+       DESCRIPTION 
+          "The operational mode to run in when a timed reset occurs. 
+           When set to currentMode(0), the operational mode will remain 
+           unchanged.  When set to ieee8021Q(1), the operational mode
+           will be 802.1Q Switching.  When set to secureFast(2),
+           the operational mode will be Secure Fast VLAN." 
+       ::= { ctTimedResetMIB 4 } 
+
+ctTimedResetNVRamReset  OBJECT-TYPE 
+       SYNTAX  INTEGER { 
+         dontResetNVRam(0), 
+         resetNVRam(1) 
+         } 
+       ACCESS  read-write 
+       STATUS  deprecated 
+       DESCRIPTION 
+         "dontResetNVRam(0) - NVRAM will not be cleared on timed reset.
+          resetNVRam(1)     - NVRAM will be cleared on timed reset." 
+       ::= { ctTimedResetMIB 5 } 
+
+END 

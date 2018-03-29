@@ -1,0 +1,260 @@
+       ADTRAN-AOSSNMP DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, RowStatus, TDomain, TAddress
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           adIdentity
+               FROM ADTRAN-MIB
+           adGenAOSCommon, adGenAOSConformance
+               FROM ADTRAN-AOS;
+
+
+       adGenAOSSnmpMib MODULE-IDENTITY
+        LAST-UPDATED "200409240000Z"  -- September 24, 2004
+	ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                    	"This MIB defines how the method for configuring an ADTRAN OS
+			 device for SNMP community names and configuration for TRAP
+			 manager destinations."
+
+            REVISION    "200810200000Z"  -- October 20, 2008
+            DESCRIPTION
+                    "Fixing compile errors with adAOSSNMPConfigGroup."
+
+            REVISION    "200810090000Z"  -- October 9, 2008
+            DESCRIPTION
+                    "Revised text for adAOSSNMPCommunitiesString. This Object
+                    will no longer return the configured community string when
+                    this object is read. It will return the string
+                    'NOT ACCESSIBLE' instead. This was done for security
+                    reasons."
+
+            REVISION    "200409240000Z"  -- September 24, 2004
+            DESCRIPTION
+                    "Initial version of this MIB module."
+          ::= { adIdentity 10000 53 1 2 }
+
+      adGenAOSSnmp             OBJECT IDENTIFIER ::= {  adGenAOSCommon 2 }
+
+adAOSSNMPCommunitiesTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdAOSSNMPCommunitiesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Contains a list of users who have SNMP access to this
+        unit."
+    ::= { adGenAOSSnmp  1 }
+
+adAOSSNMPCommunitiesEntry  OBJECT-TYPE
+    SYNTAX      AdAOSSNMPCommunitiesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the list defines the community string,
+        access privilege, and Manager IP address."
+    INDEX{ adAOSSNMPCommunitiesIndex }
+    ::= { adAOSSNMPCommunitiesTable  1 }
+
+AdAOSSNMPCommunitiesEntry ::= SEQUENCE {
+    adAOSSNMPCommunitiesIndex       Integer32,
+    adAOSSNMPCommunitiesString      DisplayString,
+    adAOSSNMPCommunitiesPrivilege   INTEGER,
+    adAOSSNMPCommunitiesStatus      RowStatus
+    }
+
+adAOSSNMPCommunitiesIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the table."
+    ::= { adAOSSNMPCommunitiesEntry  1 }
+
+adAOSSNMPCommunitiesString  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The community string which has the specified SNMP
+        access. Due to the secruity risk of displaying the community string,
+        reading this object will always display the string 'NOT ACCESSIBLE'."
+    ::= { adAOSSNMPCommunitiesEntry  2 }
+
+adAOSSNMPCommunitiesPrivilege  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    get(1),
+                    set(2)         -- implies get/set
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set the SNMP privileges of this user."
+    DEFVAL { get }
+    ::= { adAOSSNMPCommunitiesEntry  3 }
+
+adAOSSNMPCommunitiesStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this conceptual row.
+
+        Until instances of all corresponding columns are
+        appropriately configured, the value of the corresponding
+        instance of the adAOSSNMPCommunitiesStatus column is
+        'notReady'."
+    ::= { adAOSSNMPCommunitiesEntry  4 }
+
+--
+-- SNMP Trap Hosts
+--
+
+adAOSSNMPTrapsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdAOSSNMPTrapsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Contains a list of users that will receive SNMP traps
+        from this unit."
+    ::= { adGenAOSSnmp  2 }
+
+adAOSSNMPTrapsEntry  OBJECT-TYPE
+    SYNTAX      AdAOSSNMPTrapsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the list defines the name, privilege, and
+        Manager IP address."
+    INDEX{ adAOSSNMPTrapsIndex }
+    ::= { adAOSSNMPTrapsTable  1 }
+
+AdAOSSNMPTrapsEntry  ::= SEQUENCE {
+    adAOSSNMPTrapsIndex         Integer32,
+    adAOSSNMPTrapsString        DisplayString,
+    adAOSSNMPTrapsMngmtAddr     DisplayString,
+    adAOSSNMPTrapsStatus        RowStatus
+    }
+
+adAOSSNMPTrapsIndex  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the table. "
+    ::= { adAOSSNMPTrapsEntry  1 }
+
+adAOSSNMPTrapsString  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The community string included in the SNMP traps."
+    ::= { adAOSSNMPTrapsEntry  2 }
+
+adAOSSNMPTrapsMngmtAddr  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The hostname (or IP address) that will receive SNMP
+        traps."
+    ::= { adAOSSNMPTrapsEntry  3 }
+
+adAOSSNMPTrapsStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this conceptual row.
+
+        Until instances of all corresponding columns are
+        appropriately configured, the value of the corresponding
+        instance of the adAOSSNMPTrapsStatus column is
+        'notReady'."
+    ::= { adAOSSNMPTrapsEntry  4 }
+
+adAOSSNMPEnableTraps  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables the transmission of all Traps."
+    DEFVAL      { enabled }
+    ::= { adGenAOSSnmp  3 }
+
+adAOSSNMPAuthenticationTraps  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables the transmission of Authentication
+        Traps."
+    DEFVAL      { enabled }
+    ::= { adGenAOSSnmp  4 }
+
+
+
+         -- conformance information
+
+       adGenAOSSnmpConformance
+           OBJECT IDENTIFIER ::= { adGenAOSConformance 2 }
+
+       adAOSSnmpCompliances
+           OBJECT IDENTIFIER ::= { adGenAOSSnmpConformance 1 }
+       adAOSSnmpGroups
+           OBJECT IDENTIFIER ::= { adGenAOSSnmpConformance 2 }
+
+
+       -- compliance statements
+
+       adAOSSnmpConfigCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "SNMP Community Names."
+           MODULE
+               MANDATORY-GROUPS { adAOSSNMPConfigGroup }
+
+               ::= { adAOSSnmpCompliances 1 }
+
+
+       -- units of conformance
+    adAOSSNMPConfigGroup OBJECT-GROUP
+    OBJECTS {
+        adAOSSNMPCommunitiesString,
+        adAOSSNMPCommunitiesPrivilege,
+        adAOSSNMPCommunitiesStatus,
+        adAOSSNMPEnableTraps,
+        adAOSSNMPAuthenticationTraps,
+        adAOSSNMPTrapsString,
+        adAOSSNMPTrapsMngmtAddr,
+        adAOSSNMPTrapsStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The Unit SNMP Config Group."
+    ::= { adAOSSnmpGroups 1 }
+
+
+
+       END
+

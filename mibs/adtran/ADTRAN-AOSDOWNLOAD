@@ -1,0 +1,603 @@
+       ADTRAN-AOSDOWNLOAD DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, RowStatus, TDomain, TAddress
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           adIdentity
+               FROM ADTRAN-MIB
+           adGenAOSCommon, adGenAOSConformance
+               FROM ADTRAN-AOS;
+
+
+       adAOSDownloadMib MODULE-IDENTITY
+        LAST-UPDATED "200409212216Z"  -- September 21, 2004
+	ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "        Technical Support Dept.
+                	Postal: ADTRAN, Inc.
+                        901 Explorer Blvd.
+                        Huntsville, AL 35806
+
+                   Tel: +1 800 726-8663
+                   Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                    	"This MIB defines how the method for commanding an ADTRAN
+			OS device to initiate a download or upload of configuration
+			or firmware from a TFTP server "
+
+            REVISION    "200409212216Z"  -- September 21, 2004
+            DESCRIPTION
+                    "Initial version of this MIB module."
+          ::= { adIdentity 10000 53 1 3 }
+
+      adAOSDownload             OBJECT IDENTIFIER ::= {  adGenAOSCommon 3 }
+
+
+    adAOSDownloadTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF AdAOSDownloadEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of firmware downloads to this device.
+                   There will at any time be either 0 or 1 rows in
+                   this table, and the only valid index for this
+                   table is 1.  It is only a table so that we may
+                   take advantage of the RowStatus textual convention
+                   for configuring the download parameters."
+           ::= { adAOSDownload 1 }
+
+       adAOSDownloadEntry OBJECT-TYPE
+           SYNTAX     AdAOSDownloadEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "The row in the adAOSDownloadTable containing the
+                   download parameters."
+           INDEX      { adAOSDownloadIndex }
+           ::= { adAOSDownloadTable 1 }
+
+       AdAOSDownloadEntry ::=
+           SEQUENCE {
+               adAOSDownloadIndex              INTEGER,
+               adAOSDownloadOwnerAddress       TAddress,
+               adAOSDownloadOwnerDomain        TDomain,
+               adAOSDownloadTAddress           TAddress,
+               adAOSDownloadTDomain            TDomain,
+               adAOSDownloadFilename           DisplayString,
+               adAOSDownloadResetType          INTEGER,
+               adAOSDownloadErrorStatus        INTEGER,
+               adAOSDownloadErrorText          DisplayString,
+               adAOSDownloadStatus             RowStatus,
+               adAOSDownloadPassesLeft         Integer32,
+               adAOSDownloadOctetCount         Integer32,
+               adAOSDownloadDestination        DisplayString, --deprecated
+               adAOSDownloadDestinationType    INTEGER
+           }
+
+       adAOSDownloadIndex OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          dlInstance(1)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The index which uniquely identifies this row.
+                   The only legal value for this object is 1."
+           ::= { adAOSDownloadEntry 1 }
+
+       adAOSDownloadOwnerAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the management station
+                   that initiated this download attempt, formatted
+                   according to the value of the associated instance
+                   of adAOSDownloadOwnerDomain."
+           ::= { adAOSDownloadEntry 2 }
+
+       adAOSDownloadOwnerDomain  OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The kind of transport service used by the
+                   management station that initiated this download
+                   attempt."
+           ::= { adAOSDownloadEntry 3 }
+
+       adAOSDownloadTAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the node to download
+                   firmware from, formatted according to the value of
+                   the associated instance of adAOSDownloadTDomain.
+
+                   An attempt to modify this value will fail if the
+                   associated adAOSDownloadStatus object would be
+                   equal to 'active' both before and after the
+                   modification attempt."
+           ::= { adAOSDownloadEntry 4 }
+
+       adAOSDownloadTDomain OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The kind of transport service to be used for the
+                   download.  Currently supports snmpUDPDomain and
+                   snmpIPXDomain.
+
+                   An attempt to modify this value will fail if the
+                   associated adAOSDownloadStatus object would be
+                   equal to 'active' both before and after the
+                   modification attempt."
+           ::= { adAOSDownloadEntry 5 }
+
+       adAOSDownloadFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "Filename and path of file to download (maximum
+                   length of 63 characters + NULL).
+
+                   An attempt to modify this value will fail if the
+                   associated adAOSDownloadStatus object would be
+                   equal to 'active' both before and after the
+                   modification attempt."
+           ::= { adAOSDownloadEntry 6 }
+
+       adAOSDownloadResetType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noReset(1),
+                          warmReset(2),
+                          factoryReset(3)
+                      }
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The type of reset to perform after completion of
+                   the firmware download.  Note that not all agents
+                   will support all possible values, and there may
+                   be other agent-specific values for this object."
+           ::= { adAOSDownloadEntry 7 }
+
+       adAOSDownloadErrorStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          fileNotFound(1),
+                          accessViolation(2),
+                          diskFull(3),
+                          illegalOperation(4),
+                          unknownTID(5),
+                          fileExists(6),
+                          noSuchUser(7),
+                          notDefined(8),
+                          corruptFile(9),
+                          noServer(10),
+                          tftpTimeout(11),
+                          hardwareError(12),
+                          success(13),
+                          aborted(14),
+                          inProgress(15),
+                          idle(16),
+                          erasingEeprom(17),
+                          incompleteFirmware(18),
+                          requirePowerCycle(19),
+                          cannotUpgrade(20),
+                          cannotDowngrade(21)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "Status of download.  The first seven codes are
+                   equal to the codes defined by the TFTP protocol.
+                   'notDefined' is the same as TFTP protocol error 0.
+                   The following are the other possible values for this
+                   object:
+
+                     corruptFile        - the agent detected a problem
+                                          with the download file format.
+                     noServer           - the TFTP server at
+                                          adAOSDownloadTAddress did not
+                                          respond to the TFTP request.
+                     tftpTimeout        - the download was aborted due
+                                          to excessive timeouts.
+                     hardwareError      - there was a hardware problem
+                                          on the agent that forced an
+                                          abort of the download (see
+                                          adAOSDownloadErrorText for
+                                          more detailed information).
+                     success            - the download has completed
+                                          successfully.
+                     aborted            - the download was aborted by
+                                          setting the
+                                          adAOSDownloadStatus to
+                                          'notInService' or 'delete'.
+                     inProgress         - the TFTP transfer is currently
+                                          active.
+                     idle               - means that the download has
+                                          not yet started (i.e. the
+                                          value of adAOSDownloadStatus
+                                          has not yet been set to
+                                          'active').
+                     erasingEeprom      - the agent is currently erasing
+                                          the EEPROM device.
+                     incompleteFirmware - the agent is running an
+                                          incomplete version of firmware
+                                          and requires a download.
+                     requirePowerCycle  - the agent must be power cycled
+                                          to run the newly downloaded
+                                          firmware.
+                     cannotUpgrade      - the agent's current firmware
+                                          revision cannot be upgraded to
+                                          the revision in the download
+                                          file.
+                     cannotDowngrade    - the agent's current firmware
+                                          revision cannot be downgraded
+                                          to the revision in the
+                                          download file."
+           ::= { adAOSDownloadEntry 8 }
+
+       adAOSDownloadErrorText OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A textual description of the current error status
+                   of the firmware download."
+           ::= { adAOSDownloadEntry 9 }
+
+       adAOSDownloadStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The status of this download entry.  This object
+                   may not be set to 'active' unless the following
+                   columnar objects exist in this row:
+                   adAOSDownloadTAddress, adAOSDownloadTDomain,
+                   adAOSDownloadFilename, and
+                   adAOSDownloadResetType."
+           ::= { adAOSDownloadEntry 10 }
+
+       adAOSDownloadPassesLeft OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of passes remaining in the current
+                   download attempt.  Some agents require multiple
+                   passes through the download file in order to
+                   download a firmware image.  This object indicates
+                   the number of passes remaining, including the
+                   current pass.  The object is initialized by the
+                   agent to the number of passes required to complete
+                   the download when the corresponding instance of
+                   adAOSDownloadStatus is set to 'active'.  It is
+                   decremented by one each time a pass completes."
+           ::= { adAOSDownloadEntry 11 }
+
+       adAOSDownloadOctetCount OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of octets that have been transferred
+                   during the current pass.  This object is initialized
+                   to zero by the agent when the corresponding instance
+                   of adAOSDownloadStatus is set to 'active', and
+                   reinitialized to zero at the beginning of each pass."
+           ::= { adAOSDownloadEntry 12 }
+
+       adAOSDownloadDestination OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-create
+           STATUS      deprecated
+           DESCRIPTION
+                   "The destination of the download file.
+                   The allowable destination names depend on the type
+                   of agent being downloaded.  In all cases, a
+                   destination of '/os/primary' or '/os/secondary'
+		   indicates that this is a download of the agent's
+                   firmware image.  The agent will use '/os/primary'
+		   as the default value for this object when the row
+                   is created.
+
+                   ICF router agents also allow a download of a config
+                   file.  Currently, the name of the config file on the
+                   agent is '/config'.
+
+                   An agent should reject an attempt to set this object
+                   to a destination name that does not make sense for
+                   this type of agent."
+           DEFVAL  { "/os/primary" } -- public
+           ::= { adAOSDownloadEntry 13 }
+
+        adAOSDownloadDestinationType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                        primary(1),
+                        secondary(2),
+                        config(3),
+                        remote(4),
+                        other(5)
+                      }
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The destination of the download file.
+                   The allowable destination names depend on the type
+                   of agent being downloaded.  In all cases, a
+                   destination of  'primary(1)' or 'secondary(2)'
+                   indicates that this is a download of the agent's
+                   firmware image.  The agent will use 'primary(1)'
+                   as the default value for this object when the row
+                   is created.
+
+                   ICF router agents also allow a download of a config
+                   file.  Currently, the name of the config file on the
+                   agent is 'config(3)'.
+
+                   ICF router agents also allow a download of a
+                   file to a remote server. A destination of 'remote(4)'
+                   indicates that this is a download to a remote server.
+
+                    An agent should reject an attempt to set this object
+                   to a destination name that does not make sense for
+                   this type of agent."
+           DEFVAL  { 1 } -- public
+           ::= { adAOSDownloadEntry 14 }
+
+       adAOSDownloadLogMaxSize OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The maximum number of the download log entries
+                   supported by this agent.  Note that 0 is a
+                   legal value for this variable."
+           ::= { adAOSDownload 2 }
+
+       adAOSDownloadLogSize OBJECT-TYPE
+           SYNTAX     Gauge32 (0..65535)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of download log entries currently in
+                   the adAOSDownloadLogTable."
+           ::= { adAOSDownload 3 }
+
+       adAOSDownloadLogTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF AdAOSDownloadLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A log of the adAOSDownloadSize most recent
+                   download attempts to this device.  The first entry
+                   in the table is the oldest."
+           ::= { adAOSDownload 4 }
+
+       adAOSDownloadLogEntry OBJECT-TYPE
+           SYNTAX     AdAOSDownloadLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the adAOSDownloadLogTable containing
+                   information about a single download attempt."
+           INDEX      { adAOSDlLogIndex }
+           ::= { adAOSDownloadLogTable 1 }
+
+       AdAOSDownloadLogEntry ::=
+           SEQUENCE {
+               adAOSDlLogIndex                 Integer32,
+               adAOSDlLogOwnerAddress          TAddress,
+               adAOSDlLogOwnerDomain           TDomain,
+               adAOSDlLogTAddress              TAddress,
+               adAOSDlLogTDomain               TDomain,
+               adAOSDlLogFilename              DisplayString,
+               adAOSDlLogResetType             INTEGER,
+               adAOSDlLogErrorStatus           INTEGER,
+               adAOSDlLogErrorText             DisplayString
+           }
+
+       adAOSDlLogIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The index of this entry in the download log
+                   table.  Index 1 will always contain the oldest
+                   entry.  If the table is full when a download
+                   attempt is made, the new entry becomes the last
+                   entry (adAOSDownloadLogMaxSize), and all earlier
+                   entries are shifted down by one entry, removing
+                   the old index 1."
+           ::= { adAOSDownloadLogEntry 1 }
+
+       adAOSDlLogOwnerAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the management station
+                   that attempted to initiate a download of this
+                   device, formatted according to the value of
+                   adAOSDlLastOwnerDomain."
+           ::= { adAOSDownloadLogEntry 2 }
+
+       adAOSDlLogOwnerDomain OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The kind of transport service used by the
+                   management station that attempted to initiate a
+                   download of this device."
+           ::= { adAOSDownloadLogEntry 3 }
+
+       adAOSDlLogTAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the node from which this
+                   device attempted to download firmware, formatted
+                   according to the value of adAOSDlLastTDomain."
+           ::= { adAOSDownloadLogEntry 4 }
+
+       adAOSDlLogTDomain OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The kind of transport service which was used for
+                   the attempt to download firmware to this device."
+           ::= { adAOSDownloadLogEntry 5 }
+
+       adAOSDlLogFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The filename from which this device attempted to
+                   download firmware."
+           ::= { adAOSDownloadLogEntry 6 }
+
+       adAOSDlLogResetType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noReset(1),
+                          warmReset(2),
+                          factoryReset(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The type of reset requested to be  performed
+                   after completion of the firmware download
+                   attempt."
+           ::= { adAOSDownloadLogEntry 7 }
+
+       adAOSDlLogErrorStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          fileNotFound(1),
+                          accessViolation(2),
+                          diskFull(3),
+                          illegalOperation(4),
+                          unknownTID(5),
+                          fileExists(6),
+                          noSuchUser(7),
+                          notDefined(8),
+                          corruptFile(9),
+                          noServer(10),
+                          tftpTimeout(11),
+                          hardwareError(12),
+                          success(13),
+                          aborted(14)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The result of the attempt to download firmware to
+                   this device.  The values are the same as the
+                   corresponding values of adAOSDownloadErrorStatus."
+           ::= { adAOSDownloadLogEntry 8 }
+
+       adAOSDlLogErrorText OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A textual description of the final error status
+                   of the attempt to download firmware to this
+                   device."
+           ::= { adAOSDownloadLogEntry 9 }
+
+
+       -- conformance information
+
+       adAOSDownloadConformance
+           OBJECT IDENTIFIER ::= { adGenAOSConformance 3 }
+
+       adAOSDownloadCompliances
+           OBJECT IDENTIFIER ::= { adAOSDownloadConformance 1 }
+       adAOSDownloadGroups
+           OBJECT IDENTIFIER ::= { adAOSDownloadConformance 2 }
+
+
+       -- compliance statements
+
+       adAOSDownloadConfigCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "New version of the compliance statement for
+                   network downloadable devices that allows
+                   for monitoring in-progress downloads and for
+                   directing a download to different destinations
+                   on the device."
+           MODULE
+               MANDATORY-GROUPS { adAOSDownloadConfigGroup }
+
+               GROUP    adAOSDownloadLogGroup
+               DESCRIPTION
+                       "This group should be implemented by devices
+                       that are able to keep log of network download
+                       attempts."
+
+               ::= { adAOSDownloadCompliances 1 }
+
+
+       -- units of conformance
+
+
+       adAOSDownloadLogGroup OBJECT-GROUP
+           OBJECTS    { adAOSDlLogIndex,
+                        adAOSDlLogOwnerAddress,
+                        adAOSDlLogOwnerDomain,
+                        adAOSDlLogTAddress,
+                        adAOSDlLogTDomain,
+                        adAOSDlLogFilename,
+                        adAOSDlLogResetType,
+                        adAOSDlLogErrorStatus,
+                        adAOSDlLogErrorText
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for maintaining a log of
+                   network download attempts to ICF devices."
+           ::= { adAOSDownloadGroups 1 }
+
+       adAOSDownloadConfigGroup OBJECT-GROUP
+           OBJECTS    { adAOSDownloadIndex,
+                        adAOSDownloadOwnerAddress,
+                        adAOSDownloadOwnerDomain,
+                        adAOSDownloadTAddress,
+                        adAOSDownloadTDomain,
+                        adAOSDownloadFilename,
+                        adAOSDownloadResetType,
+                        adAOSDownloadErrorStatus,
+                        adAOSDownloadErrorText,
+                        adAOSDownloadStatus,
+                        adAOSDownloadPassesLeft,
+                        adAOSDownloadOctetCount,
+                        adAOSDownloadDestination,
+                        adAOSDownloadLogMaxSize,
+                        adAOSDownloadLogSize
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for controlling and
+                   monitoring network download of device firmware to
+                   ICF devices."
+           ::= { adAOSDownloadGroups 2 }
+
+
+       END
+

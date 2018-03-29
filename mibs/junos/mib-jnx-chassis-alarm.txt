@@ -1,0 +1,185 @@
+--
+-- Juniper Enterprise Specific MIB: Alarm MIB
+-- 
+-- Copyright (c) 2001-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32
+        FROM SNMPv2-SMI
+    TimeStamp
+        FROM SNMPv2-TC
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxAlarms MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:46 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for alarms from the router chassis box."
+    ::= { jnxMibs 4 }
+
+
+
+
+--  ::= { jnxAlarms 1 }			This OID is obsolete.
+
+
+--
+-- Craft Alarms
+--
+
+    jnxCraftAlarms 	  OBJECT IDENTIFIER ::= { jnxAlarms 2 }
+
+
+    jnxAlarmRelayMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+		other(1),	-- other or unknown
+		passOn(2),	-- alarms being passed on
+		cutOff(3)	-- alarms being cut off
+	}		
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The alarm relay mode of the craft interface
+		panel for both yellow and red alarms.
+
+		Both yellow and red alarms could be cut off 
+		by a front panel Alarm Cutoff / Lamp Test 
+		(ACO/LT) button.
+
+		In the pass-on mode, the alarm relay will be 
+		activated to pass on the yellow or red alarms.
+		In the cut-off mode, both yellow and red alarms
+		will be cut off from the alarm relays which are 
+		normally connected to audible sirens or visual 
+		flashing devices."
+
+
+	::= { jnxCraftAlarms 1 }
+
+
+    jnxYellowAlarms 	  OBJECT IDENTIFIER ::= { jnxCraftAlarms 2 }
+
+    jnxYellowAlarmState OBJECT-TYPE
+	SYNTAX		INTEGER {
+			other(1),	-- alarm state is unknown
+			off(2),		-- alarm is off
+			on(3)		-- alarm is on
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The yellow alarm state on the craft interface 
+		panel.
+
+		The yellow alarm is on when there is some 
+		system warning such as maintenance alert or 
+		significant temperature increase.
+
+		This yellow alarm state could be turned off 
+		by the ACO/LT (Alarm Cut Off / Lamp Test) button
+		on the front panel module."
+
+
+	::= { jnxYellowAlarms 1 }
+
+    jnxYellowAlarmCount OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of currently active and non-silent 
+		yellow alarms.
+
+		This object is independent of the ACO/LT (Alarm
+		Cut Off / Lamp Test) button."
+
+
+	::= { jnxYellowAlarms 2 }
+
+
+    jnxYellowAlarmLastChange OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the yellow alarm
+		last changed - either from off to on or vice
+		versa. 	Zero if unknown or never changed since
+		the agent was up."
+
+
+	::= { jnxYellowAlarms 3 }
+
+
+    jnxRedAlarms 	  OBJECT IDENTIFIER ::= { jnxCraftAlarms 3 }
+
+    jnxRedAlarmState OBJECT-TYPE
+	SYNTAX		INTEGER {
+			other(1),	-- alarm state is unknown
+			off(2),		-- alarm is off
+			on(3)		-- alarm is on
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The red alarm indication on the craft interface 
+		panel.
+
+		The red alarm is on when there is some system 
+		failure or power supply failure or the system 
+		is experiencing a hardware malfunction or some 
+		threshold is being exceeded.
+
+		This red alarm state could be turned off by the
+		ACO/LT (Alarm Cut Off / Lamp Test) button on the
+		front panel module."
+
+
+	::= { jnxRedAlarms 1 }
+
+
+    jnxRedAlarmCount OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of currently active and non-silent 
+		red alarms.
+
+		This object is independent of the ACO/LT (Alarm
+		Cut Off / Lamp Test) button."
+
+
+	::= { jnxRedAlarms 2 }
+
+
+    jnxRedAlarmLastChange OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the red alarm
+		last changed - either from off to on or vice
+		versa. 	Zero if unknown or never changed since
+		the agent was up."
+
+
+	::= { jnxRedAlarms 3 }
+
+
+END

@@ -1,0 +1,523 @@
+SFA-INFO DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE  FROM  RFC-1212
+    enterprises  FROM  RFC1155-SMI;
+
+
+datadirect  OBJECT IDENTIFIER ::= { enterprises 6894 }
+unit        OBJECT IDENTIFIER ::= { datadirect 2 }
+eventLog    OBJECT IDENTIFIER ::= { unit 10 }
+
+  -- DisplayString: comment out the next line if your MIB compiler complains
+  -- that it is already defined.
+DisplayString  ::= OCTET STRING  -- containing displayable octets (aka ASCII)
+
+-- temperature indicator
+
+tempNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "The number of temperature sensors in the system."
+    ::= { unit 1 }
+
+tempTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TempEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A list of temperature sensor entries.  The number of
+            entries is given by the value of tempNumber."
+    ::= { unit 2 }
+
+tempEntry OBJECT-TYPE
+    SYNTAX TempEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A temp entry containing temperature sensor status."
+    INDEX { tempIndex }
+    ::= { tempTable 1 }
+
+TempEntry ::=
+    SEQUENCE {
+              tempIndex  INTEGER,
+              tempEncId  OCTET STRING (SIZE(0..16)),
+              tempEncPos INTEGER,
+              tempStatus INTEGER
+             }
+
+tempIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value for each temperature sensor.  Its value 
+        ranges between 1 and the value of tempNumber."
+    ::= { tempEntry 1 }
+
+tempEncId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value displaying the enclosure ID number of the
+         temperature sensor."
+    ::= { tempEntry 2 }
+
+tempEncPos OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value displaying the position number of the
+         temperature sensor."
+    ::= { tempEntry 3 }
+
+tempStatus   OBJECT-TYPE
+    SYNTAX INTEGER {
+                    normal (1),
+                    warning (2),
+                    critical (3)
+                   }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "The current temperature status of the unit."
+    ::= { tempEntry 4 }       
+
+
+
+-- fan indicators
+
+fanNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "The number of fans in the system."
+    ::= { unit 3 }
+
+fanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FanEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A list of fan entries.  The number of
+            entries is given by the value of fanNumber."
+    ::= { unit 4 }
+
+fanEntry OBJECT-TYPE
+    SYNTAX FanEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A fan entry containing fan status."
+    INDEX { fanIndex }
+    ::= { fanTable 1 }
+
+FanEntry ::=
+    SEQUENCE {
+              fanIndex   INTEGER,
+              fanEncId   OCTET STRING (SIZE(0..16)),
+              fanEncPos  INTEGER,
+              fanStatus  INTEGER
+             }
+
+fanIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value for each fan.  Its value 
+        ranges between 1 and the value of fanNumber."
+    ::= { fanEntry 1 }
+
+fanEncId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value displaying the enclosure ID number of the
+         fan."
+    ::= { fanEntry 2 }
+
+fanEncPos OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value displaying the position number of the
+         fan."
+    ::= { fanEntry 3 }
+
+fanStatus   OBJECT-TYPE
+    SYNTAX INTEGER {
+                    healthy (1),
+                    failure (2)
+                   }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "The current fan status of the unit."
+    ::= { fanEntry 4 }       
+
+
+
+-- power indicators
+
+powerNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "The number of power supplies in the system."
+    ::= { unit 5 }
+
+powerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PowerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A list of power supply entries.  The number of
+            entries is given by the value of powerNumber."
+    ::= { unit 6 }
+
+powerEntry OBJECT-TYPE
+    SYNTAX PowerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A power entry containing power supply status."
+    INDEX { powerIndex }
+    ::= { powerTable 1 }
+
+PowerEntry ::=
+    SEQUENCE {
+              powerIndex  INTEGER,
+              powerEncId  OCTET STRING (SIZE(0..16)),
+              powerEncPos INTEGER,
+              powerStatus INTEGER
+             }
+
+powerIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value for each power supply.  Its value 
+        ranges between 1 and the value of powerNumber."
+    ::= { powerEntry 1 }
+
+powerEncId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value displaying the enclosure ID number of the
+         power supply."
+    ::= { powerEntry 2 }
+
+powerEncPos OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value displaying the position number of the
+         power supply."
+    ::= { powerEntry 3 }
+
+powerStatus   OBJECT-TYPE
+    SYNTAX INTEGER {
+                    healthy (1),
+                    failure (2)
+                   }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "The current power supply status of the unit."
+    ::= { powerEntry 4 }       
+
+
+-- pool status indicators
+
+poolNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "The number of pools in system."
+    ::= { unit 7 }
+
+poolTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PoolEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A list of pool entries.  The number of
+            entries is given by the value of poolNumber."
+    ::= { unit 8 }
+
+poolEntry OBJECT-TYPE
+    SYNTAX PoolEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+            "A pool entry containing a pool's status."
+    INDEX { poolIndex }
+    ::= { poolTable 1 }
+
+PoolEntry ::=
+    SEQUENCE {
+              poolIndex    INTEGER,
+              poolId       INTEGER,
+              poolType     INTEGER,
+              poolNumDisks INTEGER
+             }
+
+poolIndex OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value for each pool.  Its value 
+        ranges between 1 and the value of poolNumber."
+    ::= { poolEntry 1 }
+
+poolId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An integer which give the pool id as displayed in the OID."
+    ::= { poolEntry 2 }
+
+poolType OBJECT-TYPE
+    SYNTAX INTEGER {
+                    storage (1),
+                    spare (2),
+                    unassigned (3)
+                   }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "The type of pool."
+    ::= { poolEntry 3 }       
+
+poolNumDisks OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of disks in the corresponding pool."
+    ::= { poolEntry 4 }
+
+-- physical disk status indicators
+physicalDiskTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PhysicalDiskEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION    
+        "A list of disk entries.  The number of 
+         entries is given by the value of poolNumDisks."
+    ::= { unit 9 }
+
+physicalDiskEntry OBJECT-TYPE
+    SYNTAX PhysicalDiskEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION    
+         "The information related to a disk's status."
+    INDEX { physDiskIndex }
+    ::= { physicalDiskTable 1 }
+
+PhysicalDiskEntry ::=
+    SEQUENCE {
+              physDiskIndex  INTEGER,
+              physDiskPoolId INTEGER,
+              physDiskId     INTEGER,
+              physDiskWWN    OCTET STRING (SIZE(0..16)),
+              physDiskEnc    OCTET STRING (SIZE(0..16)),
+              physDiskSlot   INTEGER,
+              physDiskState  INTEGER
+             }
+
+physDiskIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique value for each physical disk within a pool."
+    ::= { physicalDiskEntry 1 }
+
+physDiskPoolId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An integer which give the pool id as displayed in the OID."
+    ::= { physicalDiskEntry 2 }
+
+physDiskId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "An integer which give the physical disk id as displayed in the OID."
+    ::= { physicalDiskEntry 3 }
+
+physDiskWWN OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "A string which gives the WWN of the physical disk."
+    ::= { physicalDiskEntry 4 }
+
+physDiskEnc OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+         "A string which gives the physical disk enclosure number."
+    ::= { physicalDiskEntry 5 }
+
+physDiskSlot OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "An integer which give the physical disk position number."
+    ::= { physicalDiskEntry 6 }
+
+physDiskState OBJECT-TYPE
+    SYNTAX INTEGER {
+                    normal (1),
+                    failed (2),
+                    predictedfailure (3),
+                    unknown (4)
+                   }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An integer which gives the state of a physical disk."
+    ::= { physicalDiskEntry 7 }
+
+-- other Information
+systemName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..31))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION    
+        "The name that has been assigned to the system." 
+    ::= { unit 30 }
+
+
+-- trap log indicators
+
+
+  -- #######################################################################
+  --
+  -- Event Group - to map the errLog
+  --
+  -- NOTE
+  -- Logically, eventLogTable is separate from the error log since it is
+  -- essentially a view of the error log within a particular time window.
+  -- The syntax chosen for the log levels is matched with the syslog
+  -- severities from RFC3164 except noting that none is zero instead of
+  -- emergency being zero.
+  --
+  -- #######################################################################
+ 
+  eventLogTrapLevel      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                 none          (0),
+                                 emergency     (1),
+                                 alert         (2),
+                                 critical      (3),
+                                 error         (4),
+                                 warning       (5),
+                                 notice        (6),
+                                 informational (7),
+                                 debug         (8)
+                                }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "This object specifies the eventLogTrap level in
+                         conjunction with an event's severity level. When an event
+                         occurs and if its severity level is at or below the value
+                         specified by this object instance, the agent will send
+                         the associated eventLogTrap to configured recipients."
+  ::= { eventLog 1 }
+  
+  eventLogNumEntries     OBJECT-TYPE
+        SYNTAX          INTEGER (0..30)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "The number of entries in the Event Table."
+  ::= { eventLog 2 }
+ 
+  eventLogTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF UnitEventEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION     "The table of event entries."
+  ::= { eventLog 3 }
+ 
+  eventLogEntry          OBJECT-TYPE
+        SYNTAX          UnitEventEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION     "An entry of the event table."
+        INDEX           { eventLogIndex }
+ 
+  ::= { eventLogTable 1 }
+ 
+  UnitEventEntry  ::= SEQUENCE {
+                              eventLogIndex       INTEGER,
+                              eventLogLevel       INTEGER,
+                              eventLogDescr       DisplayString
+                               }
+
+  eventLogIndex          OBJECT-TYPE
+        SYNTAX          INTEGER (1..30)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "This object identifies the event entry."
+  ::= { eventLogEntry 1 }
+ 
+  eventLogLevel          OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                 none          (0),
+                                 emergency     (1),
+                                 alert         (2),
+                                 critical      (3),
+                                 error         (4),
+                                 warning       (5),
+                                 notice        (6),
+                                 informational (7),
+                                 debug         (8)
+                                }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "This object identifies the severity level of this
+        event entry."
+  ::= { eventLogEntry 2 }
+ 
+  eventLogDescr          OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+         DESCRIPTION     "This object identifies the textual description of
+                          the event."
+  ::= { eventLogEntry 3 }
+ 
+  --
+  -- End of 6620 Event Group
+  --
+
+
+END
+

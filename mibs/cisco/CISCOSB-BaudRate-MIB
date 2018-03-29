@@ -1,0 +1,81 @@
+CISCOSB-BaudRate-MIB DEFINITIONS ::= BEGIN
+
+-- Title:               CISCOSB LOCALIZATION ROS
+--                      This Private MIB supports the baudrate of the local terminal of ROS products
+-- Version:             7.39
+-- Date:                14 Apr 2005
+
+
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    OBJECT-TYPE,
+    MODULE-IDENTITY                         FROM SNMPv2-SMI;
+
+rlRs232 MODULE-IDENTITY
+         LAST-UPDATED "200504140000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "The private MIB module definition for baudrate."
+         REVISION "200504140000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { switch001 104 }
+
+rlRs232MibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlRs232 1 }
+
+rlRs232AutoBaudRateStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Show the current Auto BaudRate status"
+    ::= { rlRs232 2 }
+
+rlRs232AutoBaudRateStatusAfterReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Show/Set the Auto BaudRate status after reset"
+    ::= { rlRs232 3 }
+
+rlRs232BaudRate OBJECT-TYPE
+    SYNTAX  INTEGER {
+        baud2400(1),
+        baud4800(2),
+        baud9600(3),
+        baud19200(4),
+        baud38400(5),
+        baud57600(6),
+        baud115200(7)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Show/Set the current Baud Rate status"
+    ::= { rlRs232 4 }
+
+END
+

@@ -1,0 +1,989 @@
+    --
+    -- Juniper Enterprise Specific ATM MIB. 
+    --
+    -- Copyright (c) 2001-2004, Juniper Networks, Inc.
+    -- All rights reserved.
+    --
+    -- The contents of this document are subject to change without notice.
+    --
+
+    JUNIPER-ATM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32, Counter64 
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        InetAddressIPv4, InetAddressIPv6
+            FROM INET-ADDRESS-MIB
+        ifIndex
+            FROM IF-MIB
+        atmInterfaceConfEntry, atmVclEntry, atmVplEntry 
+            FROM ATM-MIB
+        jnxMibs
+            FROM JUNIPER-SMI;
+            
+    jnxAtm MODULE-IDENTITY
+        LAST-UPDATED "200312040000Z" -- Thu Dec 4 2003 UTC
+        ORGANIZATION "Juniper Networks, Inc."
+        CONTACT-INFO
+                "Juniper Technical Assistance Center
+                      Juniper Networks, Inc.
+                      1194 N. Mathilda Avenue
+                      Sunnyvale, CA 94089
+                      E-mail: support@juniper.net"
+
+        DESCRIPTION
+                "The Juniper enterprise MIB for ATM interfaces and VCs"
+
+        REVISION    "200401060000Z"      -- Tue Jan 06 2004
+        DESCRIPTION "The following new objects were added:
+                     - jnxAtmVCOutOAMF5AISCells (jnxAtmVCTable).
+                     - jnxAtmTrunkOutOAMF4AISCells (jnxAtmTrunkTable)."
+
+        REVISION    "200312040000Z"      -- Thu Dec 4 2003 UTC
+        DESCRIPTION "New object 'jnxAtmIfL2CircuitMode' added to jnxAtmIfTable."
+
+        REVISION    "200309170000Z"      -- Wed Sept 17 2003
+        DESCRIPTION "New table 'jnxAtmTrunkTable' added."
+
+        REVISION    "200207040000Z"      -- 4th July 2002
+        DESCRIPTION "New table 'jnxAtmVpTable' added."
+
+        REVISION    "200201230000Z"      -- 23 Jan 2002
+        DESCRIPTION "Renamed atmTcc as atmTccVcMux.
+                     atmTccSnap encapsulation added."
+
+        REVISION    "200107080000Z"      -- 8 July, 2001
+        DESCRIPTION "Initial Version"
+
+        ::= { jnxMibs 10 }  
+                                                         
+
+
+    JnxAtmFlags ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "Flags related to the VC or Trunk." 
+        SYNTAX     BITS {
+                        inverseArpEnabled(0),
+                        ilmiEnabled(1),
+                        oamEnabled(2),
+                        shapingEnabled(3),
+                        passiveOam(4),
+                        multicast(5),
+                        closed(6),
+                        down(7),
+                        active(8),
+                        cosEnabled(9)
+                   }
+    
+
+    -- The ATM Physical Interface Table
+    --
+    -- This table augments atmInterfaceConfTable defined in ATM-MIB. 
+    --
+    jnxAtmIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxAtmIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains config and stats parameters, one entry per
+            physical interface (ATM port)."
+
+
+        ::= { jnxAtm 1 }
+    
+    jnxAtmIfEntry OBJECT-TYPE
+        SYNTAX      JnxAtmIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry contains additional ATM interface config and stats
+            objects, not covered in standard mibs. Each entry is an extension
+            of atmInterfaceConfEntry defined in ATM-MIB."
+        AUGMENTS { atmInterfaceConfEntry }
+        ::= { jnxAtmIfTable 1 }
+    
+    JnxAtmIfEntry ::=
+        SEQUENCE {
+            -- Config Info
+            jnxAtmIfPortType                INTEGER,
+            jnxAtmIfEncaps                  INTEGER,
+            jnxAtmIfLpBackInfo              INTEGER,
+            jnxAtmIfScrambleEnable          INTEGER,
+            
+            -- Cell Stats
+            jnxAtmIfTxCellCount             Counter64,
+            jnxAtmIfRxCellCount             Counter64,     
+            jnxAtmIfTxIdleCellCount         Counter64,
+            jnxAtmIfUncorrHCSErrs           Counter64, 
+            jnxAtmIfCorrHCSErrs             Counter64, 
+            jnxAtmIfTxCellFIFOOverRuns      Counter64,
+            jnxAtmIfRxCellFIFOOverRuns      Counter64,
+            jnxAtmIfRxCellFIFOUnderRuns     Counter64,
+            jnxAtmIfInInvalidVCCells        Counter64,
+            jnxAtmIfInNoBufferOAMCells      Counter64,
+        
+            -- AAL5 Packet stats
+            jnxAtmIfInNoBufDropPkts         Counter64,
+            jnxAtmIfOutVCQueueDrops         Counter64,
+            jnxAtmIfInBadCrcs               Counter64,
+            jnxAtmIfInLenErrPkts            Counter64,
+            jnxAtmIfInTimeoutPkts           Counter64,
+
+            -- Misc Info
+            jnxAtmIfL2CircuitMode           INTEGER
+        }
+    
+    jnxAtmIfPortType OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        other(1),
+                        oc3(2),
+                        oc12(3),
+                        t3(4),
+                        e3(5),
+                        oc48(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The physical port type." 
+        ::= { jnxAtmIfEntry 1 }
+    
+    jnxAtmIfEncaps OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        other(1),
+                        atmPvc(2),
+                        atmCccCellRelay(3) 
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ATM physical link layer encapsulation." 
+        DEFVAL { atmPvc }
+        ::= { jnxAtmIfEntry 2 }
+    
+    jnxAtmIfLpBackInfo OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        noLoopBack(1),
+                        localLoopBack(2),
+                        remoteLoopBack(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Loop back config and type." 
+        ::= { jnxAtmIfEntry 3 }
+    
+    jnxAtmIfScrambleEnable OBJECT-TYPE       
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Shows whether scrambling is enabled or disabled" 
+        DEFVAL { disabled }
+        ::= { jnxAtmIfEntry 4 }
+    
+    -- Cell Stats 
+    jnxAtmIfTxCellCount OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of ATM cells transmitted by the interface.
+             Includes Idle cells transmitted."
+        ::= { jnxAtmIfEntry 5 }
+    
+    jnxAtmIfRxCellCount OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of ATM cells received by the interface.
+             Excludes Idle cells received."
+        ::= { jnxAtmIfEntry 6 }
+    
+    jnxAtmIfTxIdleCellCount OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of idle cells sent by the port. When the ATM interface
+            has nothing to send, it sends idle cells to fill the time slot."
+        ::= { jnxAtmIfEntry 7 }
+    
+    jnxAtmIfUncorrHCSErrs OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of uncorrectable cell Header Check Sequence (HCS) Errors
+            that occurred."
+        ::= { jnxAtmIfEntry 8 }
+    
+    jnxAtmIfCorrHCSErrs OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of correctable cell Header Check Sequence (HCS) Errors
+            that occurred."
+        ::= { jnxAtmIfEntry 9 }
+    
+    jnxAtmIfTxCellFIFOOverRuns OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of overruns in the Transmit FIFO."
+        ::= { jnxAtmIfEntry 10 }
+    
+    jnxAtmIfRxCellFIFOOverRuns OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of overruns in the Receive FIFO."
+        ::= { jnxAtmIfEntry 11 }
+    
+    jnxAtmIfRxCellFIFOUnderRuns OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of underruns in the receive FIFO."
+        ::= { jnxAtmIfEntry 12 }
+    
+    jnxAtmIfInInvalidVCCells OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of Cells that arrived for non existent VC."
+        ::= { jnxAtmIfEntry 13 }
+
+    jnxAtmIfInNoBufferOAMCells OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of received OAM cells or raw cells dropped because 
+            no buffers were available to handle them."
+        ::= { jnxAtmIfEntry 14 }
+
+
+    -- AAL5 Pkt Stats
+    jnxAtmIfInNoBufDropPkts OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of AAL5 packets dropped because there was no enough
+            buffer to handle them."
+        ::= { jnxAtmIfEntry 15 }
+
+    jnxAtmIfOutVCQueueDrops OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped because of queue limits on each VC."
+        ::= { jnxAtmIfEntry 16 }
+
+    jnxAtmIfInBadCrcs OBJECT-TYPE  
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of incoming CRC errors."
+        ::= { jnxAtmIfEntry 17 }
+                
+    jnxAtmIfInLenErrPkts OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of AAL5 packets dropped because their length was incorrect."
+        ::= { jnxAtmIfEntry 18 }
+    
+    jnxAtmIfInTimeoutPkts OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of AAL5 packets dropped because of reassembly timeout."
+        ::= { jnxAtmIfEntry 19 }
+
+    jnxAtmIfL2CircuitMode OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        notApplicable(1),
+                        none(2),
+                        aal5(3),
+                        cell(4),
+                        uniTrunk(5),
+                        nniTrunk(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The layer 2 circuit mode of this Atm interface.  Note, this
+            applies only to interfaces on AtmII pics."
+        ::= { jnxAtmIfEntry 20 }
+     
+    --
+    -- Juniper ATM Virtual Circuit Table
+    --
+    -- This table augments the atmVclTable defined in ATM-MIB.
+    --
+    jnxAtmVCTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxAtmVCEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table of all p2p/p2mp/multicast VC entries."
+
+
+        ::= { jnxAtm 2 }
+    
+    jnxAtmVCEntry OBJECT-TYPE
+        SYNTAX     JnxAtmVCEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Special Cases: 
+             - No traffic Stats for multicast VCs. (0 by default).
+             - Multipoint Destination IP Address for a p2p vc is 
+               invalid (0.0.0.0 by default).
+             - When the encapsulation type for the logical interface 
+               (to which VC belongs) is 'atmCccCellRelay', only 
+               Generic VC Info is valid.
+             - If OAM is disabled (indicated in jnxAtmVCFlags),
+               then all the OAM config & F5 stats info is invalid.
+               (zeroed by default)."
+        AUGMENTS { atmVclEntry }
+        ::= { jnxAtmVCTable 1 }
+    
+    JnxAtmVCEntry ::=
+        SEQUENCE {
+            -- Generic VC Info
+            jnxAtmVCConnType           INTEGER,
+            jnxAtmVCEncapsulation      INTEGER,
+            jnxAtmVCMpDestIPv4Addr     InetAddressIPv4,
+            jnxAtmVCMpDestIPv6Addr     InetAddressIPv6,
+            jnxAtmVCFlags              JnxAtmFlags,
+            jnxAtmVCTotalDownTime      Integer32,
+
+            -- Traffic stats
+            jnxAtmVCInBytes            Counter64,
+            jnxAtmVCOutBytes           Counter64,
+            jnxAtmVCInPkts             Counter64,
+            jnxAtmVCOutPkts            Counter64,    
+            jnxAtmVCTailQueuePktDrops  Counter64,
+    
+            -- OAM Config 
+            jnxAtmVCOAMPeriod          Integer32,
+            jnxAtmVCOAMUpCellCount     Integer32,
+            jnxAtmVCOAMDownCellCount   Integer32,
+
+            -- OAM F5 Cell Stats
+            jnxAtmVCInOAMF5LoopCells   Counter32,
+            jnxAtmVCOutOAMF5LoopCells  Counter32,
+            jnxAtmVCInOAMF5RDICells    Counter32,
+            jnxAtmVCOutOAMF5RDICells   Counter32,
+            jnxAtmVCInOAMF5AISCells    Counter32,
+            jnxAtmVCOutOAMF5AISCells   Counter32
+         }
+    
+    jnxAtmVCConnType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other(1),
+                        p2p(2),        -- point-to-point
+                        p2mp(3),       -- point-to-multipoint
+                        multicast(4) 
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The type of connection.  The type 'other' means vc type is unknown
+            or is not one of the other types."
+        ::= { jnxAtmVCEntry 1 }
+    
+     jnxAtmVCEncapsulation OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other(1),
+                        atmCccCellRelay(2),
+                        atmCccVcMux(3),     
+                        atmCiscoNlpid(4),   
+                        atmNlpid(5),        
+                        atmSnap(6),        
+                        atmVcMux(7),
+                        atmTccVcMux(8),
+                        atmTccSnap(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm encapsulation type associated with the VC. 
+                atmCccCellRelay : ATM Cell Relay for CCC
+                atmCccVcMux     : ATM VC for CCC
+                atmCiscoNlpid   : Cisco-compatible ATM NLPID encapsulation
+                atmNlpid        : ATM NLPID encapsulation
+                atmSnap         : ATM LLC/SNAP encapsulation
+                atmVcMux        : ATM VC multiplexing
+                atmTccVcMux     : TCC (Translational Cross Connection)
+                                  over ATM VC MUX encapsulation 
+                atmTccSnap      : TCC (Translational Cross Connection)
+                                  over ATM LLC/SNAP encapsulation"
+        ::= { jnxAtmVCEntry 2}
+
+    jnxAtmVCMpDestIPv4Addr OBJECT-TYPE
+        SYNTAX      InetAddressIPv4    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is meaningful only if jnxAtmVCConnType value is 
+            'p2mp' (point-to-multipoint). For a p2mp VC, it's the multipoint 
+             destination IPv4 address. When the VC connection type is other
+             than p2mp OR when the multipoint destination address type is of
+             IPv6, this object returns 0.0.0.0 by default." 
+        ::= { jnxAtmVCEntry 3 }
+    
+    jnxAtmVCMpDestIPv6Addr OBJECT-TYPE
+        SYNTAX      InetAddressIPv6    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is meaningful only if jnxAtmVCConnType value is 
+            'p2mp' (point-to-multipoint). For a p2mp VC, it's the multipoint 
+             destination IPv6 address. When the VC connection type is other
+             than p2mp OR when the multipoint destination address type is of
+             IPv4, this object returns all the bytes of addr filled with 0." 
+        ::= { jnxAtmVCEntry 4 }
+
+    jnxAtmVCFlags    OBJECT-TYPE
+        SYNTAX      JnxAtmFlags
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Flags related to the VC." 
+        ::= { jnxAtmVCEntry 5 }
+    
+    jnxAtmVCTotalDownTime OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total VC down time in seconds ever since the system rebooted."
+        ::= { jnxAtmVCEntry 6 }
+        
+    -- Traffic Stats
+    jnxAtmVCInBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes received on the VC."
+        ::= { jnxAtmVCEntry 7 }
+    
+    jnxAtmVCOutBytes OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes sent out on the VC."
+        ::= { jnxAtmVCEntry 8 }
+    
+    jnxAtmVCInPkts OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets received on the VC."
+        ::= { jnxAtmVCEntry 9 }
+    
+    jnxAtmVCOutPkts OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets sent out on the VC."
+        ::= { jnxAtmVCEntry 10 }
+    
+    jnxAtmVCTailQueuePktDrops OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to bandwidth constraints. 
+            Indicates that packets were queued to send out at a rate faster 
+            than allowed."
+        ::= { jnxAtmVCEntry 11 }
+
+    -- OAM Config
+    jnxAtmVCOAMPeriod OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This time interval indicates how often the F5 cells are sent to
+            know the status of the VC."
+        ::= { jnxAtmVCEntry 12 }
+    
+    jnxAtmVCOAMUpCellCount OBJECT-TYPE
+        SYNTAX      Integer32    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minimum number of loopback cells to be received to declare 
+            that the VC is up."
+        ::= { jnxAtmVCEntry 13 }
+    
+    jnxAtmVCOAMDownCellCount OBJECT-TYPE
+        SYNTAX      Integer32            
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minimum number of loopback cells to be received to declare 
+            that the VC is down. This object would have zero value if OAM is
+            not enabled. (indicated in jnxAtmVCFlags)"
+        ::= { jnxAtmVCEntry 14 }
+
+    -- OAM F5 Stats
+    jnxAtmVCInOAMF5LoopCells OBJECT-TYPE 
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F5 loopback cells received. This object would 
+            have zero value if OAM (as indicated in jnxAtmVCFlags) is not 
+            enabled."
+        ::= { jnxAtmVCEntry 15 }
+
+    jnxAtmVCOutOAMF5LoopCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F5 loopback cells sent. This object would have
+            zero value if OAM (as indicated in jnxAtmVCFlags) is not 
+            enabled." 
+        ::= { jnxAtmVCEntry 16 }
+    
+    jnxAtmVCInOAMF5RDICells OBJECT-TYPE 
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F5 cells received, with RDI(Remote Defect 
+            Indication) bit set. This object would have zero value if OAM 
+            (as indicated in jnxAtmVCFlags) is not enabled."
+        ::= { jnxAtmVCEntry 17 }
+    
+    jnxAtmVCOutOAMF5RDICells OBJECT-TYPE 
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F5 cells transmitted, with RDI(Remote Defect
+            Indication) bit set. This object would have zero value if OAM 
+            (as indicated in jnxAtmVCFlags) is not enabled."
+        ::= { jnxAtmVCEntry 18 }
+    
+    jnxAtmVCInOAMF5AISCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F5 cells received, with AIS(Alarm Indication
+            Signal) bit set. This object would have zero value if OAM (as 
+            indicated in jnxAtmVCFlags) is not enabled."
+        ::= { jnxAtmVCEntry 19 }
+
+    jnxAtmVCOutOAMF5AISCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F5 cells transmitted, with AIS (Alarm
+            Indication Signal) bit set. This object would have zero
+            value if OAM (as indicated in jnxAtmVCFlags) is not
+            enabled."
+        ::= { jnxAtmVCEntry 20 }
+
+    --
+    -- Juniper ATM VP (Virtual Path) table 
+    --
+    -- This table augments the atmVplTable defined in ATM-MIB.
+    --
+    jnxAtmVpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxAtmVpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table of ATM VPs. This table augments atmVplTable
+            defined in standard ATM mib."
+
+
+        ::= { jnxAtm 3 }
+
+    jnxAtmVpEntry OBJECT-TYPE
+        SYNTAX      JnxAtmVpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry represents config, status and statistics info related
+            to an ATM VP configured. This entry augments the atmVplEntry
+            defined in standard ATM mib (RFC 2515). So ifIndex and VPI are the
+            indices to this table.
+
+            Caveats:
+            - Traffic stats are available per VP tunnel, only if shaping is
+              configured on the VP. Object 'jnxAtmVpFlags' can be used to
+              determine if shaping is enabled.
+
+            - When no OAM is configured, OAM config and OAM stat objects'
+              values are invalid (zero by default). Object 'jnxAtmVpFlags'
+              contains info on whether OAM is configured or not.
+            
+            - For atm-1 VPs, the only valid object is jnxAtmVpFlags." 
+        AUGMENTS { atmVplEntry }
+        ::= { jnxAtmVpTable 1 }
+
+    JnxAtmVpEntry ::= 
+        SEQUENCE {
+            -- VP Generic Info
+            jnxAtmVpFlags                 BITS,
+            jnxAtmVpTotalDownTime         Integer32,
+
+            -- VP OAM config
+            jnxAtmVpOamPeriod             Integer32,
+            jnxAtmVpOamUpCellCount        Integer32,
+            jnxAtmVpOamDownCellCount      Integer32,
+
+            -- VP Traffic Stats
+            jnxAtmVpInBytes               Counter64,
+            jnxAtmVpOutBytes              Counter64,
+            jnxAtmVpInPkts                Counter64,
+            jnxAtmVpOutPkts               Counter64,
+
+            -- VP OAM F4 Cell Stats
+            jnxAtmVpInOamF4Cells          Counter32,
+            jnxAtmVpOutOamF4Cells         Counter32,
+            jnxAtmVpInOamF4LoopCells      Counter32,
+            jnxAtmVpOutOamF4LoopCells     Counter32,
+            jnxAtmVpInOamF4RdiCells       Counter32,
+            jnxAtmVpOutOamF4RdiCells      Counter32,
+            jnxAtmVpInOamF4AisCells       Counter32
+        }
+
+    -- VP Generic Info
+    jnxAtmVpFlags OBJECT-TYPE
+        SYNTAX      BITS {
+                            active(0),
+                            down(1),
+                            oamEnabled(2),
+                            shapingEnabled(3),
+                            passiveOam(4)
+                         }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The flags associated with this VP."
+        ::= { jnxAtmVpEntry 1 }
+
+    jnxAtmVpTotalDownTime OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The total VP downtime in seconds, ever since the system rebooted."
+        ::= { jnxAtmVpEntry 2 }
+
+
+    -- VP OAM config
+    jnxAtmVpOamPeriod OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This time interval indicates how often the OAM F4 cells are sent
+           to determine the status of the VP. The value of this object is zero
+           when OAM is not enabled on the VP. Object 'jnxAtmVpFlags' can be used
+           to determine if OAM is enabled."
+        ::= { jnxAtmVpEntry 3 }
+
+    jnxAtmVpOamUpCellCount OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The minimum number of consecutive loopback cells to be received to
+           declare that the VP is up. The value of this object is zero when
+           OAM is not enabled on the VP. Object 'jnxAtmVpFlags' can be used to
+           determine if OAM is enabled."
+        ::= { jnxAtmVpEntry 4 }
+
+    jnxAtmVpOamDownCellCount OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The minimum number of consecutive loopback cells to be received to
+           declare that the VP is down. The value of this object is zero when
+           OAM is not enabled on the VP. Object 'jnxAtmVpFlags' can be used to
+           determine if OAM is enabled."
+        ::= { jnxAtmVpEntry 5 }
+
+    -- VP Traffic stats 
+    jnxAtmVpInBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of bytes received on the VP."
+        ::= { jnxAtmVpEntry 6 }
+
+    jnxAtmVpOutBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of bytes sent out on the VP."
+        ::= { jnxAtmVpEntry 7 }
+
+    jnxAtmVpInPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of packets received on the VP."
+        ::= { jnxAtmVpEntry 8 }
+
+    jnxAtmVpOutPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of packets sent out on the VP."
+        ::= { jnxAtmVpEntry 9 }
+
+    -- VP OAM F4 stats
+    jnxAtmVpInOamF4Cells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 cells received on the VP."
+        ::= { jnxAtmVpEntry 10 }
+
+    jnxAtmVpOutOamF4Cells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 cells transmitted on the VP."
+        ::= { jnxAtmVpEntry 11 }
+
+    jnxAtmVpInOamF4LoopCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 loopback cells received on the VP."
+        ::= { jnxAtmVpEntry 12 }
+
+    jnxAtmVpOutOamF4LoopCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 cells transmitted on the VP."
+        ::= { jnxAtmVpEntry 13 }
+
+    jnxAtmVpInOamF4RdiCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 RDI cells received on the VP."
+        ::= { jnxAtmVpEntry 14 }
+
+    jnxAtmVpOutOamF4RdiCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 RDI cells transmitted on the VP."
+        ::= { jnxAtmVpEntry 15 }
+
+    jnxAtmVpInOamF4AisCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of OAM F4 AIS cells received on the VP."
+        ::= { jnxAtmVpEntry 16 }
+
+
+    --
+    -- Juniper ATM Trunk Table
+    --
+    jnxAtmTrunkTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxAtmTrunkEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table of all ATM Trunk entries."
+
+
+        ::= { jnxAtm 4 }
+    
+    jnxAtmTrunkEntry OBJECT-TYPE
+        SYNTAX     JnxAtmTrunkEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Special Cases: 
+             - When the encapsulation type for the logical interface 
+               (to which Trunk belongs) is 'atmCccCellRelay', only 
+               Generic Trunk Info is valid."
+        INDEX  { ifIndex }
+
+        ::= { jnxAtmTrunkTable 1 }
+    
+    JnxAtmTrunkEntry ::=
+        SEQUENCE {
+            jnxAtmTrunkId              Integer32,
+
+            -- Generic Trunk Info
+            jnxAtmTrunkConnType           INTEGER,
+            jnxAtmTrunkEncapsulation      INTEGER,
+            jnxAtmTrunkFlags              JnxAtmFlags,
+            jnxAtmTrunkTotalDownTime      Integer32,
+
+            -- Traffic stats
+            jnxAtmTrunkInBytes            Counter64,
+            jnxAtmTrunkOutBytes           Counter64,
+            jnxAtmTrunkInPkts             Counter64,
+            jnxAtmTrunkOutPkts            Counter64,    
+            jnxAtmTrunkTailQueuePktDrops  Counter64,
+    
+            -- OAM F4 Cell Stats
+            jnxAtmTrunkInOAMF4AISCells    Counter32,
+            jnxAtmTrunkOutOAMF4AISCells   Counter32
+        }
+
+    jnxAtmTrunkId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The identifier for this ATM Trunk."
+        ::= { jnxAtmTrunkEntry 1 }
+
+    jnxAtmTrunkConnType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other(1),
+                        p2p(2)        -- point-to-point
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The type of connection.  The type 'other' means trunk type is 
+            unknown or is not one of the other types."
+        ::= { jnxAtmTrunkEntry 2 }
+    
+     jnxAtmTrunkEncapsulation OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other(1),
+                        atmCccCellRelay(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm encapsulation type associated with the VC or Trunk. 
+                atmCccCellRelay : ATM Cell Relay for CCC"
+        ::= { jnxAtmTrunkEntry 3 }
+
+    jnxAtmTrunkFlags    OBJECT-TYPE
+        SYNTAX      JnxAtmFlags
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Flags related to the Trunk." 
+        ::= { jnxAtmTrunkEntry 4 }
+    
+    jnxAtmTrunkTotalDownTime OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total Trunk down time in seconds ever since the system rebooted."
+        ::= { jnxAtmTrunkEntry 5 }
+        
+    -- Traffic Stats
+    jnxAtmTrunkInBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes received on the Trunk."
+        ::= { jnxAtmTrunkEntry 6 }
+    
+    jnxAtmTrunkOutBytes OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes sent out on the Trunk."
+        ::= { jnxAtmTrunkEntry 7 }
+    
+    jnxAtmTrunkInPkts OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets received on the Trunk."
+        ::= { jnxAtmTrunkEntry 8 }
+    
+    jnxAtmTrunkOutPkts OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets sent out on the Trunk."
+        ::= { jnxAtmTrunkEntry 9 }
+    
+    jnxAtmTrunkTailQueuePktDrops OBJECT-TYPE
+        SYNTAX      Counter64    
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to bandwidth constraints. 
+            Indicates that packets were queued to send out at a rate faster 
+            than allowed."
+        ::= { jnxAtmTrunkEntry 10 }
+
+    -- OAM F4 Stats
+    
+    jnxAtmTrunkInOAMF4AISCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F4 cells received, with AIS(Alarm Indication
+            Signal) bit set."
+        ::= { jnxAtmTrunkEntry 15 }
+
+    jnxAtmTrunkOutOAMF4AISCells OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of OAM F4 cells sent, with AIS(Alarm Indication
+            Signal) bit set."
+        ::= { jnxAtmTrunkEntry 16 }
+
+END

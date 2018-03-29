@@ -1,0 +1,1058 @@
+--
+-- Juniper Enterprise Specific MIB: Real Time Media MIB
+--
+-- Copyright (c) 2009, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-RTM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, TimeTicks, IpAddress
+        FROM SNMPv2-SMI
+    jnxVoip
+        FROM JUNIPER-JS-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+jnxRtmMIB       MODULE-IDENTITY
+    LAST-UPDATED    "200905041935Z"
+    ORGANIZATION    "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+        "This is Juniper Networks' implementation of enterprise specific
+         MIB for Real Time Media configuration."
+    ::=  {  jnxVoip  1  }
+
+jnxRtmMIBObjects      OBJECT IDENTIFIER
+    ::=  {  jnxRtmMIB  1  }
+
+-- Sip Template
+
+jnxSipTemplateTable   OBJECT-TYPE
+    SYNTAX            SEQUENCE  OF  JnxSipTemplateEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "This table contains the SIP station template objects."
+    ::=  { jnxRtmMIBObjects  1 }
+
+jnxSipTemplateEntry   OBJECT-TYPE
+    SYNTAX            JnxSipTemplateEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "A row of SIP station template objects."
+    INDEX             {  jnxSipTemplateName  }
+    ::=  { jnxSipTemplateTable 1 }
+
+JnxSipTemplateEntry  ::=  SEQUENCE {
+    jnxSipTemplateName      DisplayString,
+    jnxDtmfMethod           INTEGER,
+    jnxCallerIdTransmit     INTEGER,
+    jnxInheritExtensionsFrom DisplayString,
+    jnxInheritExtensionsTo  DisplayString,
+    jnxClassOfRestriction   DisplayString,
+    jnxCodecG711MU          INTEGER,
+    jnxCodecG711A           INTEGER,
+    jnxCodecG729AB          INTEGER
+    }
+
+
+jnxSipTemplateName  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "SIP template name"
+    ::=  {  jnxSipTemplateEntry  1  }
+
+
+jnxDtmfMethod       OBJECT-TYPE
+    SYNTAX          INTEGER  { rfc-2833 ( 1 ), sip-info (2), inband (3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "DTMF method"
+    ::=  {  jnxSipTemplateEntry  2  }
+
+jnxCallerIdTransmit OBJECT-TYPE
+    SYNTAX          INTEGER  { enable ( 1 ) , disable ( 2 ) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Caller id transmit for outgoing calls"
+    ::=  {  jnxSipTemplateEntry  3  }
+
+
+jnxInheritExtensionsFrom OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Inherit extensions in range starting from"
+    ::=  {  jnxSipTemplateEntry  4  }
+
+jnxInheritExtensionsTo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Inherit extensions in range up to"
+    ::=  {  jnxSipTemplateEntry  5  }
+    
+
+jnxClassOfRestriction OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Class of restriction policies"
+    ::=  {  jnxSipTemplateEntry  6  }
+
+
+jnxCodecG711MU      OBJECT-TYPE
+    SYNTAX          INTEGER  { on ( 1 ) , off ( 2 ) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "G711-MU - 14 bit PCM 8 kHz sample, 64 kbit/s bitstream."
+    ::=  {  jnxSipTemplateEntry  7  }
+
+
+jnxCodecG711A       OBJECT-TYPE
+    SYNTAX          INTEGER  { on ( 1 ) , off ( 2 ) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "G711-A - 13 bit PCM 8 kHz sample, 64 kbit/s bitstream."
+    ::=  {  jnxSipTemplateEntry  8  }
+    
+
+jnxCodecG729AB      OBJECT-TYPE
+    SYNTAX          INTEGER  { on ( 1 ) , off ( 2 ) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "G729AB - CS-ACELP, 8 kbit/s bitstream"
+    ::=  {  jnxSipTemplateEntry  9  }
+
+
+-- Analog Template
+
+jnxAnalogTemplateTable OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxAnalogTemplateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the analog template objects."
+    ::=  { jnxRtmMIBObjects  2 }
+
+jnxAnalogTemplateEntry OBJECT-TYPE
+    SYNTAX          JnxAnalogTemplateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of analog template objects."
+    INDEX           {  jnxAnalogTemplateName  }
+    ::=  { jnxAnalogTemplateTable 1 }
+
+JnxAnalogTemplateEntry  ::=  SEQUENCE {
+    jnxAnalogTemplateName            DisplayString,
+    jnxAanalogCallerIdTransmit       INTEGER,
+    jnxAnalogVoiceActivityDetection  INTEGER,
+    jnxAnalogComfortNoiseGeneration  INTEGER,
+    jnxAnalogClassOfRestriction      DisplayString
+    }
+
+
+jnxAnalogTemplateName   OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "Analog template name"
+    ::=  {  jnxAnalogTemplateEntry  1  }
+
+
+jnxAanalogCallerIdTransmit OBJECT-TYPE
+    SYNTAX                 INTEGER  { enable ( 1 ) , disable ( 2 ) }
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Caller id transmit for outgoing calls"
+    ::=  {  jnxAnalogTemplateEntry  2  } 
+
+
+jnxAnalogVoiceActivityDetection   OBJECT-TYPE
+    SYNTAX                        INTEGER  { enable ( 1 ) , disable ( 2 ) }
+    MAX-ACCESS                    read-only
+    STATUS                        current
+    DESCRIPTION                   "Voice activity detection"
+    ::=  {  jnxAnalogTemplateEntry  3  }
+
+
+jnxAnalogComfortNoiseGeneration   OBJECT-TYPE
+    SYNTAX                        INTEGER  { enable ( 1 ) , disable ( 2 ) }
+    MAX-ACCESS                    read-only
+    STATUS                        current
+    DESCRIPTION                   "Comfort noise generation during silence"
+    ::=  {  jnxAnalogTemplateEntry  4  }
+
+
+jnxAnalogClassOfRestriction OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Class of restriction policies"
+    ::=  {  jnxAnalogTemplateEntry  5  }
+
+-- Peer Call Server
+
+jnxPeerCallServerTable   OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxPeerCallServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the peer call server configuration objects."
+    ::=  { jnxRtmMIBObjects  7 }
+
+jnxPeerCallServerEntry OBJECT-TYPE
+    SYNTAX             JnxPeerCallServerEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION        "A row of peer call server configuration objects."
+    INDEX              {  jnxPeerCallServerName  }
+    ::=  { jnxPeerCallServerTable 1 }
+
+JnxPeerCallServerEntry  ::=  SEQUENCE {
+    jnxPeerCallServerName                   DisplayString,
+    jnxPeerCallServerDescription            DisplayString,
+    jnxPeerCallServerAddress                DisplayString,
+    jnxPeerCallServerSipProtocolPort        INTEGER,
+    jnxPeerCallServerSipProtocolTransport   INTEGER,
+    jnxPeerCallServerCodecG711MU            INTEGER,
+    jnxPeerCallServerCodecG711A             INTEGER,
+    jnxPeerCallServerCodecG729AB            INTEGER,
+    jnxPeerCallServerDtmfMethod             INTEGER,
+    jnxPeerCallServerPstnAccessNumber       DisplayString,
+    jnxPeerCallServerAuthId                 DisplayString
+    }
+
+
+jnxPeerCallServerName OBJECT-TYPE
+    SYNTAX            DisplayString
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "Peer call server name"
+    ::=  {  jnxPeerCallServerEntry  1  }
+
+
+jnxPeerCallServerDescription OBJECT-TYPE
+    SYNTAX                   DisplayString
+    MAX-ACCESS               read-only
+    STATUS                   current
+    DESCRIPTION              "Description."
+    ::=  {  jnxPeerCallServerEntry  2  }
+
+
+jnxPeerCallServerAddress OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION          "ipv4 or ipv6 address"
+    ::=  {  jnxPeerCallServerEntry  3  }
+
+
+jnxPeerCallServerSipProtocolPort OBJECT-TYPE
+    SYNTAX                       INTEGER  (1..65535)
+    MAX-ACCESS                   read-only
+    STATUS                       current
+    DESCRIPTION                  "Port number for signaling"
+    DEFVAL {5060 }
+    ::=  {  jnxPeerCallServerEntry  4  }
+
+
+jnxPeerCallServerSipProtocolTransport OBJECT-TYPE
+    SYNTAX                  INTEGER  { tcp ( 1 ) , udp ( 2 ) , tls ( 3 ) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Transport type for signaling."
+    ::=  {  jnxPeerCallServerEntry  5  }
+
+
+jnxPeerCallServerCodecG711MU OBJECT-TYPE
+    SYNTAX                  INTEGER  { on ( 1 ) , off ( 2 ) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "G711-MU - 14 bit PCM 8 kHz sample, 64 kbit/s bitstream."
+    ::=  {  jnxPeerCallServerEntry  6  }
+
+
+jnxPeerCallServerCodecG711A OBJECT-TYPE
+    SYNTAX                  INTEGER  { on ( 1 ) , off ( 2 ) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "G711-A - 13 bit PCM 8 kHz sample, 64 kbit/s bitstream."
+    ::=  {  jnxPeerCallServerEntry  7  }
+
+
+jnxPeerCallServerCodecG729AB  OBJECT-TYPE
+    SYNTAX                  INTEGER  { on ( 1 ) , off ( 2 ) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "G729AB - CS-ACELP, 8 kbit/s bitstream"
+    ::=  {  jnxPeerCallServerEntry  8  }
+
+jnxPeerCallServerDtmfMethod OBJECT-TYPE
+    SYNTAX                  INTEGER  { rfc-2833 ( 1 ), sip-info (2), inband (3) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "DTMF method."
+    ::=  {  jnxPeerCallServerEntry  9  } 
+
+jnxPeerCallServerPstnAccessNumber OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "PSTN access number for survivable call service"
+    ::=  {  jnxPeerCallServerEntry  10  }
+
+jnxPeerCallServerAuthId     OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Authentication identifier"
+    ::=  {  jnxPeerCallServerEntry  11  }
+
+-- Survivable Call Service
+
+jnxSurvivableCallServiceTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE  OF  JnxSurvivableCallServiceEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "This table contains the survivable call service
+                             configuration objects."
+    ::=  { jnxRtmMIBObjects  4 }
+
+jnxSurvivableCallServiceEntry OBJECT-TYPE
+    SYNTAX                  JnxSurvivableCallServiceEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "A row of survivable call service configuration objects."
+    INDEX                   {  jnxSurvivableCallServiceName  }
+    ::=  { jnxSurvivableCallServiceTable 1 }
+
+JnxSurvivableCallServiceEntry  ::=  SEQUENCE {
+    jnxSurvivableCallServiceName                         DisplayString,
+    jnxSurvivableCallServicePeerCallServer               DisplayString,
+    jnxSurvivableCallServiceSipProtocolPort              INTEGER,
+    jnxSurvivableCallServiceSipProtocolTransport         INTEGER,
+    jnxSurvivableCallServiceHeartbeatNormalInterval      INTEGER,
+    jnxSurvivableCallServiceRegistrationExpiryTimeout    INTEGER,
+    jnxSurvivableCallServiceSipTimeout                   INTEGER,
+    jnxSurvivableCallServiceMonitorTimeout               INTEGER,
+    jnxSurvivableCallServiceHeartbeatSurvivableInterval  INTEGER,
+    jnxSurvivableCallServiceResponseThresholdMinimum     INTEGER,
+    jnxSurvivableCallServiceServicePointZone             DisplayString,
+    jnxSurvivableCallServiceDialPlan                     DisplayString
+    }
+
+jnxSurvivableCallServiceName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "The survivable call service name."
+    ::=  {  jnxSurvivableCallServiceEntry  1  }
+
+jnxSurvivableCallServicePeerCallServer OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Peer call server for survivable call service"
+    ::=  {  jnxSurvivableCallServiceEntry  2  }
+
+jnxSurvivableCallServiceSipProtocolPort OBJECT-TYPE
+    SYNTAX                  INTEGER  (1..65535)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Port number for signaling."
+    DEFVAL {5060 }
+    ::=  {  jnxSurvivableCallServiceEntry  3  }
+
+jnxSurvivableCallServiceSipProtocolTransport OBJECT-TYPE
+    SYNTAX                  INTEGER  { tcp ( 1 ) , udp ( 2 ) , tls ( 3 ) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Transport type for signaling."
+    ::=  {  jnxSurvivableCallServiceEntry  4  }
+
+jnxSurvivableCallServiceHeartbeatNormalInterval OBJECT-TYPE
+    SYNTAX                  INTEGER  ( 2 .. 8  )
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Heartbeat interval in seconds in normal state."
+    DEFVAL { 4 }
+    ::=  {  jnxSurvivableCallServiceEntry  5  }
+
+jnxSurvivableCallServiceRegistrationExpiryTimeout OBJECT-TYPE
+    SYNTAX                  INTEGER  (1..2147483647)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Registration expiry timeout in seconds for stations registered."
+    ::=  {  jnxSurvivableCallServiceEntry  6  }
+
+jnxSurvivableCallServiceSipTimeout OBJECT-TYPE
+    SYNTAX                  INTEGER  ( 16 .. 120  )
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Timeout in seconds to declare peer call server is not reachable."
+    ::=  {  jnxSurvivableCallServiceEntry  7  }
+
+jnxSurvivableCallServiceMonitorTimeout OBJECT-TYPE
+    SYNTAX                  INTEGER  ( 5 .. 20  )
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Timeout to monitor in seconds if peer call server is reachable."
+    DEFVAL { 16 }
+    ::=  {  jnxSurvivableCallServiceEntry  8  }
+
+jnxSurvivableCallServiceHeartbeatSurvivableInterval OBJECT-TYPE
+    SYNTAX                  INTEGER  ( 100 .. 1000  )
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Heartbeat interval in miliseconds in survivable state."
+    DEFVAL { 500 }
+    ::=  {  jnxSurvivableCallServiceEntry  9  }
+
+jnxSurvivableCallServiceResponseThresholdMinimum OBJECT-TYPE
+    SYNTAX                  INTEGER  ( 0 .. 100  )
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Minimum response threshold value in percent."
+    ::=  {  jnxSurvivableCallServiceEntry  10  }
+
+jnxSurvivableCallServiceServicePointZone OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Zone for using survivable call service"
+    ::=  {  jnxSurvivableCallServiceEntry  11  }
+
+jnxSurvivableCallServiceDialPlan OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Dial plan for survivable call service"
+    ::=  {  jnxSurvivableCallServiceEntry  12  }
+
+-- Trunk Configuration
+
+jnxTrunkConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxTrunkConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the trunk configuration objects."
+    ::=  { jnxRtmMIBObjects  5 }
+
+jnxTrunkConfigEntry OBJECT-TYPE
+    SYNTAX          JnxTrunkConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of trunk configuration objects."
+    INDEX           {  jnxTrunkConfigName  }
+    ::=  { jnxTrunkConfigTable 1 }
+
+JnxTrunkConfigEntry  ::=  SEQUENCE {
+    jnxTrunkConfigName                  DisplayString,
+    jnxTrunkConfigType                  INTEGER,
+    jnxTrunkConfigTdmInterface          DisplayString,
+    jnxTrunkConfigT1CasGroupTimeSlots   DisplayString,
+    jnxTrunkConfigT1CasGroupSignaling   INTEGER
+    }
+
+jnxTrunkConfigName          OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "The trunk configuration name."
+    ::=  {  jnxTrunkConfigEntry  1  }
+
+jnxTrunkConfigType          OBJECT-TYPE
+    SYNTAX                  INTEGER  { fxs ( 1 ) , fxo ( 2 ) , t1 ( 3 ) , e1 ( 4 ) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The trunk type."
+    ::=  {  jnxTrunkConfigEntry  2  }
+
+jnxTrunkConfigTdmInterface  OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The TDM interface."
+    ::=  {  jnxTrunkConfigEntry  3  }
+
+jnxTrunkConfigT1CasGroupTimeSlots OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Channel associated signaling time slot configuration."
+    ::=  {  jnxTrunkConfigEntry  4  }
+
+jnxTrunkConfigT1CasGroupSignaling OBJECT-TYPE
+    SYNTAX                  INTEGER  {
+                                fxo-loop-start (1),
+                                fxo-ground-start (2),
+                                fxs-loop-start (3),
+                                fxs-ground-start (4),
+				em-wink-start (5)
+                                }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Channel associated signaling type."
+    ::=  {  jnxTrunkConfigEntry  5  }
+
+-- Digit Manipulation
+
+jnxDigitManipulationTable   OBJECT-TYPE
+    SYNTAX                  SEQUENCE  OF  JnxDigitManipulationEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "This table contains the digit manipulation objects."
+    ::=  { jnxRtmMIBObjects  6 }
+
+jnxDigitManipulationEntry   OBJECT-TYPE
+    SYNTAX                  JnxDigitManipulationEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "A row of digit transform rule in the table."
+    INDEX                   {  jnxDigitTransformName  }
+    ::=  { jnxDigitManipulationTable 1 }
+
+JnxDigitManipulationEntry  ::=  SEQUENCE {
+    jnxDigitTransformName                   DisplayString,
+    jnxDigitTransformRegularExpression      DisplayString
+    }
+
+jnxDigitTransformName       OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "The name of the transform rule."
+    ::=  {  jnxDigitManipulationEntry  1  }
+
+jnxDigitTransformRegularExpression OBJECT-TYPE
+    SYNTAX                         DisplayString
+    MAX-ACCESS                     read-only
+    STATUS                         current
+    DESCRIPTION                    "The digit transform regular expression."
+    ::=  {  jnxDigitManipulationEntry  2  }
+
+-- Attendant Features
+
+jnxFeatures     OBJECT IDENTIFIER
+    ::=  {  jnxRtmMIBObjects  8  }
+
+jnxFeaturesLiveAttendantExtension  OBJECT-TYPE
+    SYNTAX                         DisplayString
+    MAX-ACCESS                     read-only
+    STATUS                         current
+    DESCRIPTION                    "Live attentant's extension"
+    ::=  {  jnxFeatures  1  }
+
+jnxFeaturesLiveAttendantStartTime   OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Start time for availability."
+    ::=  {  jnxFeatures  2  }
+
+jnxFeaturesLiveAttendantEndTime     OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "End time for availability."
+    ::=  {  jnxFeatures  3  }
+
+jnxFeaturesAttendantRingCount       OBJECT-TYPE
+    SYNTAX                          INTEGER  (1..2147483647)
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Ring count wait before using auto attendant"
+    ::=  {  jnxFeatures  4  }
+
+jnxFeaturesVoicemailExtension       OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Voicemail extension"
+    ::=  {  jnxFeatures  5  }
+
+jnxFeaturesVoicemailRemoteAccessNumber OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Remote access number to reach voicemail"
+    ::=  {  jnxFeatures  6  }
+
+-- Station Configuration
+
+jnxStationTable     OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxStationEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the station configuration objects."
+    ::=  { jnxRtmMIBObjects  3 }
+
+jnxStationEntry     OBJECT-TYPE
+    SYNTAX          JnxStationEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of station configuration objects."
+    INDEX           {  jnxStationName  }
+    ::=  { jnxStationTable 1 }
+
+JnxStationEntry  ::=  SEQUENCE {
+    jnxStationName          DisplayString,
+    jnxStationExtension     DisplayString,
+    jnxStationRestriction   DisplayString,
+    jnxStationCallerId      DisplayString,
+    jnxStationDID           DisplayString,
+    jnxStationDILTdmInterface DisplayString, 
+    jnxStationDILTimeSlotNumber   Unsigned32,
+    jnxStationAuthId        DisplayString,
+    jnxStationType          INTEGER,
+    jnxStationTemplate      DisplayString,
+    jnxStationTdmInterface  DisplayString,
+    jnxStationTimeSlotNumber Unsigned32
+    }
+
+
+jnxStationName      OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The name of the station."
+    ::=  {  jnxStationEntry  1  }
+
+
+jnxStationExtension OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The station's extension"
+    ::=  {  jnxStationEntry  2  }
+
+
+jnxStationRestriction OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Class of restriction"
+    ::=  {  jnxStationEntry  3  }
+
+
+jnxStationCallerId  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The station's caller id"
+    ::=  {  jnxStationEntry  5  }
+
+jnxStationDID       OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Direct inward dialing number"
+    ::=  {  jnxStationEntry  6  }
+
+jnxStationDILTdmInterface OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Direct inward line TDM interface."
+    ::=  {  jnxStationEntry  7  }    
+    
+jnxStationDILTimeSlotNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Direct inward line time slot number."
+    ::=  {  jnxStationEntry  8  } 
+
+jnxStationAuthId    OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Authenitcation identifier"
+    ::=  {  jnxStationEntry  9  }
+
+jnxStationType      OBJECT-TYPE
+    SYNTAX          INTEGER { sip (1), analog (2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Station type"
+    ::=  {  jnxStationEntry  10  }
+
+jnxStationTemplate  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The station's template name"
+    ::=  {  jnxStationEntry  11  }
+
+jnxStationTdmInterface OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "TDM interface. If the station type is sip this
+                     object is not applicable and contains a null string."
+    ::=  {  jnxStationEntry  12  }
+
+jnxStationTimeSlotNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time Slot Number. If the station type is sip this
+                     object is not applicable."
+    ::=  {  jnxStationEntry  13  }
+    
+-- Dial Plan Configuration
+
+jnxDialPlanTable    OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxDialPlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the dial plan for survivable call
+                      service configuration objects."
+    ::=  { jnxRtmMIBObjects  9 }
+
+jnxDialPlanEntry    OBJECT-TYPE
+    SYNTAX          JnxDialPlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of dial plan."
+    INDEX           {  jnxDialPlanName, jnxDialPlanDigitPattern  }
+    ::=  { jnxDialPlanTable 1 }
+
+JnxDialPlanEntry  ::=  SEQUENCE {
+    jnxDialPlanName               DisplayString,
+    jnxDialPlanDigitPattern       DisplayString,
+    jnxDialPlanCallType           DisplayString,
+    jnxDialPlanTrunkGroupList     DisplayString
+    }
+
+jnxDialPlanName                     OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      not-accessible
+    STATUS                          current
+    DESCRIPTION                     "The name of the dial plan"
+    ::=  {  jnxDialPlanEntry  1  }
+
+jnxDialPlanDigitPattern             OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      not-accessible
+    STATUS                          current
+    DESCRIPTION                     "Digit pattern."
+    ::=  {  jnxDialPlanEntry  2  }
+
+jnxDialPlanCallType                 OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Call type."
+    ::=  {  jnxDialPlanEntry  3  }
+    
+jnxDialPlanTrunkGroupList           OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "A list of associated trunk groups."
+    ::=  {  jnxDialPlanEntry  4  }
+
+-- Class of Restriction
+
+jnxClassOfRestrictionTable  OBJECT-TYPE
+    SYNTAX                  SEQUENCE  OF  JnxClassOfRestrictionEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "This table contains the class of restriction
+                             configuration objects."
+    ::=  { jnxRtmMIBObjects  11 }
+
+jnxClassOfRestrictionEntry  OBJECT-TYPE
+    SYNTAX                  JnxClassOfRestrictionEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "A row of class of restriction configuration objects."
+    INDEX           {  jnxClassOfRestrictionName, jnxRestrictionPolicyName  }
+    ::=  { jnxClassOfRestrictionTable 1 }
+
+JnxClassOfRestrictionEntry  ::=  SEQUENCE {
+    jnxClassOfRestrictionName     DisplayString,
+    jnxRestrictionPolicyName      DisplayString,
+    jnxRestrictionCallType        DisplayString,
+    jnxRestrictionCallPermission  INTEGER
+    }
+
+jnxClassOfRestrictionName   OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "Class of restriction name."
+    ::=  {  jnxClassOfRestrictionEntry  1  }
+
+jnxRestrictionPolicyName    OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "Class of restriction policy name."
+    ::=  {  jnxClassOfRestrictionEntry  2  }
+
+jnxRestrictionCallType      OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Call type."
+    ::=  {  jnxClassOfRestrictionEntry  3  }
+
+jnxRestrictionCallPermission OBJECT-TYPE
+    SYNTAX                  INTEGER { allow (1), deny (2) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Call permission."
+    ::=  {  jnxClassOfRestrictionEntry  4  }
+
+-- Media Gateway Configuration
+
+jnxMediaGatewayTable        OBJECT-TYPE
+    SYNTAX                  SEQUENCE  OF  JnxMediaGatewayEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "This table contains the media gateway configuration objects."
+    ::=  { jnxRtmMIBObjects  12 }
+
+jnxMediaGatewayEntry        OBJECT-TYPE
+    SYNTAX                  JnxMediaGatewayEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "A row of media gateway configuration objects."
+    INDEX           {  jnxMediaGatewayName  }
+    ::=  { jnxMediaGatewayTable 1 }
+
+JnxMediaGatewayEntry  ::=  SEQUENCE {
+    jnxMediaGatewayName                     DisplayString,
+    jnxMediaGatewayPeerCallServer           DisplayString,
+    jnxMediaGatewaySipProtocolPort          INTEGER,
+    jnxMediaGatewaySipProtocolTransport     INTEGER,
+    jnxMediaGatewayDialPlan                 DisplayString
+    }
+
+jnxMediaGatewayName                 OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      not-accessible
+    STATUS                          current
+    DESCRIPTION                     "Media gateway name."
+    ::=  {  jnxMediaGatewayEntry  1  }
+
+jnxMediaGatewayPeerCallServer       OBJECT-TYPE
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Peer call server."
+    ::=  {  jnxMediaGatewayEntry  2  }
+
+jnxMediaGatewaySipProtocolPort      OBJECT-TYPE
+    SYNTAX                          INTEGER  (1..65535)
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Port number for signaling."
+    DEFVAL {5060 }
+    ::=  {  jnxMediaGatewayEntry  3  }
+
+
+jnxMediaGatewaySipProtocolTransport OBJECT-TYPE
+    SYNTAX                          INTEGER  { tcp ( 1 ) , udp ( 2 ) , tls ( 3 ) }
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Transport type for signaling."
+    ::=  {  jnxMediaGatewayEntry  4  }
+
+
+jnxMediaGatewayDialPlan             OBJECT-TYPE 
+    SYNTAX                          DisplayString
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION                     "Dial plan for survivable call service."
+    ::=  {  jnxMediaGatewayEntry  5  }
+
+-- Trunk Group Configuration
+    
+jnxTrunkGroupTable          OBJECT-TYPE
+    SYNTAX                  SEQUENCE  OF  JnxTrunkGroupEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "This table contains the trunk group configuration objects."
+    ::=  { jnxRtmMIBObjects  13 }
+    
+jnxTrunkGroupEntry          OBJECT-TYPE
+    SYNTAX                  JnxTrunkGroupEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "A row of trunk group configuration objects."
+    INDEX           { jnxTrunkGroupName }
+    ::=  { jnxTrunkGroupTable 1 }
+    
+JnxTrunkGroupEntry  ::=  SEQUENCE {
+    jnxTrunkGroupName               DisplayString,
+    jnxTrunkGroupDescription        DisplayString,
+    jnxTrunkGroupTrunkList          DisplayString
+    }
+    
+jnxTrunkGroupName           OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "Name of this trunk group."
+    ::=  {  jnxTrunkGroupEntry  1  }
+    
+jnxTrunkGroupDescription    OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Description of this trunk group."
+    ::=  {  jnxTrunkGroupEntry  2  }
+    
+jnxTrunkGroupTrunkList      OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "A list of trunks associated with this group."
+    ::=  {  jnxTrunkGroupEntry  3  }
+ 
+-- Survivable Call Service Statistics
+
+jnxSurvivableStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxSurvivableStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the survivable call service
+                     statistics objects."
+    ::=  { jnxRtmMIBObjects  14 }
+
+jnxSurvivableStatsEntry OBJECT-TYPE
+    SYNTAX          JnxSurvivableStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of survivable call service statistics."
+    INDEX   {  jnxSurvivableStatsAddress, jnxSurvivableStatsPort, jnxSurvivableStatsTransport  }
+    ::=  { jnxSurvivableStatsTable 1 }
+
+JnxSurvivableStatsEntry  ::=  SEQUENCE {
+    jnxSurvivableStatsAddress       IpAddress,
+    jnxSurvivableStatsPort          Unsigned32,
+    jnxSurvivableStatsTransport     INTEGER,
+    jnxSurvivableStatsSCSName        DisplayString,
+    jnxSurvivableStatsPeerCallServer DisplayString,
+    jnxSurvivableStatsCurrentState  INTEGER,
+    jnxSurvivableStatsPriority      INTEGER,
+    jnxSurvivableStatsLastDownTime  DisplayString,
+    jnxSurvivableStatsLastDownLen   Unsigned32,
+    jnxSurvivableStatsTotalDownTime Unsigned32,
+    jnxSurvivableStatsTimesDown     Unsigned32,
+    jnxSurvivableStatsMinResponse   Unsigned32,
+    jnxSurvivableStatsMaxResponse   Unsigned32,
+    jnxSurvivableStatsAvgResponse   Unsigned32
+    }
+
+jnxSurvivableStatsAddress   OBJECT-TYPE
+    SYNTAX                  IpAddress
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "The Ip Address of the remote SIP service."
+    ::=  {  jnxSurvivableStatsEntry  1  }
+
+jnxSurvivableStatsPort      OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "The port number."
+    ::=  {  jnxSurvivableStatsEntry  2  }
+
+jnxSurvivableStatsTransport OBJECT-TYPE
+    SYNTAX                  INTEGER { tcp ( 1 ) , udp ( 2 ) }
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION             "Transport type."
+    ::=  {  jnxSurvivableStatsEntry  3  }
+
+jnxSurvivableStatsSCSName   OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Name of the Survivable Call Service."
+    ::=  {  jnxSurvivableStatsEntry  4  }
+    
+jnxSurvivableStatsPeerCallServer    OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Peer Call Server."
+    ::=  {  jnxSurvivableStatsEntry  5  }
+
+jnxSurvivableStatsCurrentState OBJECT-TYPE
+    SYNTAX                  INTEGER  { normal (1), survivable (2), monitor (3) }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Current state."
+    ::=  {  jnxSurvivableStatsEntry  6  }
+    
+jnxSurvivableStatsPriority OBJECT-TYPE
+    SYNTAX                  INTEGER
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Priority in terms of responsiveness"
+    ::=  {  jnxSurvivableStatsEntry  7  }     
+
+jnxSurvivableStatsLastDownTime OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The last time when the survivable call service was down."
+    ::=  {  jnxSurvivableStatsEntry  8  }
+
+jnxSurvivableStatsLastDownLen  OBJECT-TYPE 
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "How long (miliseconds) it was down last time."
+    ::=  {  jnxSurvivableStatsEntry  9  }
+
+jnxSurvivableStatsTotalDownTime OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "Total down time in miliseconds."
+    ::=  {  jnxSurvivableStatsEntry  10  }
+
+jnxSurvivableStatsTimesDown OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The number of times it was down"
+    ::=  {  jnxSurvivableStatsEntry  11  }
+
+jnxSurvivableStatsMinResponse OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The minimum response time in miliseconds."
+    ::=  {  jnxSurvivableStatsEntry  12  }
+
+jnxSurvivableStatsMaxResponse OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The maximum response time in miliseconds."
+    ::=  {  jnxSurvivableStatsEntry  13  }
+
+jnxSurvivableStatsAvgResponse OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION             "The average response time in miliseconds."
+    ::=  {  jnxSurvivableStatsEntry  14  }
+
+END
+

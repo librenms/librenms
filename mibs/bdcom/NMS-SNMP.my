@@ -1,0 +1,806 @@
+-- *****************************************************************
+-- NMS-SNMP: NMS SNMP MIB
+--
+-- SEP 2011
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-SNMP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    DisplayString,MacAddress,RowStatus                     FROM SNMPv2-TC
+    nmsMgmt                                      FROM NMS-SMI
+    IpAddress                                   FROM RFC-1155-SMI
+    sysUpTime,sysObjectID                     FROM RFC1213-MIB;
+
+
+    snmp                OBJECT IDENTIFIER ::= { nmsMgmt 225 }
+               
+    snmpAgent           OBJECT IDENTIFIER   ::= { snmp 1 }
+            
+    
+    snmpCommunity	OBJECT IDENTIFIER   ::= { snmp 2 }	
+
+    snmpTrapHost	OBJECT IDENTIFIER   ::= { snmp 3 }	
+    
+    snmpView	OBJECT IDENTIFIER   ::= { snmp 4 }	
+    
+    snmpUser	OBJECT IDENTIFIER   ::= { snmp 5 }	
+
+
+    snmpGroupName	OBJECT IDENTIFIER   ::= { snmp 6 }	
+
+    snmpRegisteredMib	OBJECT IDENTIFIER   ::= { snmp 7 }	
+    
+    snmpKeepAliveMib    OBJECT IDENTIFIER   ::= { snmp 8 }	
+    
+
+
+          neCoding OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element coding."
+              ::= { snmpAgent 1 }
+
+          neSerialNo OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element serial number."
+              ::= { snmpAgent 2 }
+
+          neType OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element type."
+              ::= { snmpAgent 3 }
+
+          neSysTime OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element system time."
+              ::= { snmpAgent 4 }
+              
+           
+          neSnmpPortNo OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element snmp port number."
+              ::= { snmpAgent 5 }
+					neManufacture OBJECT-TYPE
+              SYNTAX     DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element manufacturer."
+              ::= { snmpAgent 6 }  
+              
+          neHardwareversion   OBJECT-TYPE
+              SYNTAX     DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element hardware version."
+              ::= { snmpAgent 7 }  
+          
+          neSoftwareversion   OBJECT-TYPE
+              SYNTAX     DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Network element softeware version."
+              ::= { snmpAgent 8 }  
+           
+
+          neMacAddress   OBJECT-TYPE
+              SYNTAX     MacAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "CPU MAC address."
+              ::= { snmpAgent 9 }  
+           
+
+
+
+          snmpCommunityTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpCommunityEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A list of snmp community property table entries."
+              ::= { snmpCommunity 1 }
+
+          snmpCommunityEntry OBJECT-TYPE
+              SYNTAX  SnmpCommunityEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A collection of snmp communtiy in the
+                       snmp community table."
+              INDEX { scIndex }
+          ::= { snmpCommunityTable 1 }
+
+               SnmpCommunityEntry ::=
+                   SEQUENCE {
+                       scIndex
+                           INTEGER,
+                       scCommunity
+                           DisplayString (SIZE (0..255)),
+                       scRwPermit
+                           INTEGER,
+                       scAclName
+                           DisplayString (SIZE (0..255)),
+                       scViewName
+                           DisplayString (SIZE (0..255)),
+                       scEncryptStatus
+                           INTEGER,
+                       scRowStatus
+                           RowStatus
+	     }
+	     
+               scIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Community table index, unique in table."
+                   ::= { snmpCommunityEntry 1 } 
+	     
+               scCommunity OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Community name in community table."
+                   ::= { snmpCommunityEntry 2 } 
+	     
+               scRwPermit OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 read_only(0),
+                                 read_write(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp access permission. read_only(1), read_write(2)."
+                   ::= { snmpCommunityEntry 3 } 
+	     
+               scAclName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Acl name in community table."
+                   ::= { snmpCommunityEntry 4 } 
+	     
+               scViewName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "View name in community table."
+                   ::= { snmpCommunityEntry 5 } 
+	     
+               scEncryptStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 non_encryption(0),
+                                 encryption(7)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp encryption status. non_encryption(0), encryption(7)."
+                   ::= { snmpCommunityEntry 6 } 
+	     
+               scRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Row status,that a row could be created in community table."
+                   ::= { snmpCommunityEntry 7 } 
+	     
+	  
+          snmpTrapHostTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpTrapHostEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A list of snmp trap host property table entries."
+              ::= { snmpTrapHost 1 }
+
+          snmpTrapHostEntry OBJECT-TYPE
+              SYNTAX  SnmpTrapHostEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A collection of snmp trap host in the
+                       snmp trap host table."
+              INDEX { thIndex }
+          ::= { snmpTrapHostTable 1 }
+
+               SnmpTrapHostEntry ::=
+                   SEQUENCE {
+                       thIndex
+                           INTEGER,     
+                       thIpAddr
+                           IpAddress,   
+                       thPort
+                       	   INTEGER,
+                       thVersion
+                           INTEGER,
+                       thCommUserName
+                           DisplayString (SIZE (0..255)), 
+                       thPduType
+                       	   INTEGER,
+                       thIsAuthentication
+                           INTEGER,
+                       thTrapFlag
+                           BIT STRING,
+                       thRowStatus
+                           RowStatus
+	     }
+
+               thIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host table index, unique in table."
+                   ::= { snmpTrapHostEntry 1 } 
+	     
+               thIpAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host IP address, which device sends trap to ."
+                   ::= { snmpTrapHostEntry 2 }                   
+                thPort OBJECT-TYPE
+                   SYNTAX  INTEGER                   
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host Port."
+                   ::= { snmpTrapHostEntry 3 } 
+
+	     
+               thVersion OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 v1(0),
+                                 v2c(1)             			
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host version."
+                   ::= { snmpTrapHostEntry 4 } 
+	  
+	           thPduType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 trapv1(164),
+                                 inform(166),
+                                 trapv2(167)
+                               
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host trap PDU type.inform and trapv2 must in v2c"
+                   ::= { snmpTrapHostEntry 5 } 
+    
+                thCommUserName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host community name(v1,v2c) or user name(v3)."
+                   ::= { snmpTrapHostEntry 6 } 
+                   
+               thIsAuthentication OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 authenticated(1),
+                                 non_authenticated(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host authentication configuration."
+                   ::= { snmpTrapHostEntry 7 } 
+	     
+               thTrapFlag OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Trap host flag notation. The first three bits of bit string value separately means configuration, snmp authentication. 0-configured 1-non_configured. "
+                   ::= { snmpTrapHostEntry 8 } 
+                   
+               thRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Row status,that a row could be created in trap host table."
+                   ::= { snmpTrapHostEntry 9 } 
+	     
+                   
+	     
+	  
+          snmpViewTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpViewEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A list of snmp view table entries."
+              ::= { snmpView 1 }
+
+          snmpViewEntry OBJECT-TYPE
+              SYNTAX  SnmpViewEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A collection of snmp view information in the
+                       snmp view table."
+              INDEX { svIndex }
+          ::= { snmpViewTable 1 }
+
+               SnmpViewEntry ::=
+                   SEQUENCE {
+                       svIndex
+                           INTEGER,
+                       svName
+                           DisplayString (SIZE (0..255)),
+                       svFamilyName
+                           DisplayString (SIZE (0..255)),
+                       svViewType
+                           INTEGER,
+                       svRowStatus
+                           RowStatus
+	     }
+
+               svIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp view table index, unique in table."
+                   ::= { snmpViewEntry 1 } 
+	     
+               svName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp view name."
+                   ::= { snmpViewEntry 2 } 
+	     
+               svFamilyName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp view family name."
+                   ::= { snmpViewEntry 3 } 
+	     
+               svViewType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 include(1),
+                                 exclude(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp view type."
+                   ::= { snmpViewEntry 4 } 
+	     
+               svRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Row status,that a row could be created in snmp view table."
+                   ::= { snmpViewEntry 5 } 
+	     
+
+          snmpUserTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpUserEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A list of snmp user table entries."
+              ::= { snmpUser 1 }
+
+          snmpUserEntry OBJECT-TYPE
+              SYNTAX  SnmpUserEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A collection of snmp user information in the
+                       snmp user table."
+              INDEX { suIndex }
+          ::= { snmpUserTable 1 }
+
+               SnmpUserEntry ::=
+                   SEQUENCE {
+                       suIndex
+                           INTEGER,
+                       suUserName
+                           DisplayString (SIZE (0..255)),
+                       suGroupName
+                           DisplayString (SIZE (0..255)),
+                       suVersion
+                           INTEGER,
+                       suAuthenType
+                           INTEGER,
+                       suAuthenProtocol
+                           INTEGER,
+                       suAclName
+                           DisplayString (SIZE (0..255)),
+                       suAuthenPwd
+                           DisplayString (SIZE (8..255)),
+                       suEncryptedPwd
+                           DisplayString (SIZE (8..255)),
+                       suEncryptedStatus
+                           INTEGER,
+                       suRowStatus
+                           RowStatus
+	     }
+
+               suIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp user table index, unique in table."
+                   ::= { snmpUserEntry 1 } 
+	     
+               suUserName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "User name in snmp user table."
+                   ::= { snmpUserEntry 2 } 
+	     
+               suGroupName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Group name in snmp user table."
+                   ::= { snmpUserEntry 3 } 
+	     
+               suVersion OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 v1(1),
+                                 v2c(2),
+                                 v3(3)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp version in snmp user table."
+                   ::= { snmpUserEntry 4 } 
+	     
+               suAuthenType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 encrypted(1),
+                                 authenticated(2),
+                                 null(3)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Authentication type in snmp user table."
+                   ::= { snmpUserEntry 5 } 
+	     
+               suAuthenProtocol OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 md5(1),
+                                 sha(2)                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Authentication proctocl in snmp user table."
+                   ::= { snmpUserEntry 6 } 
+	     
+               suAclName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ACL name in snmp user table."
+                   ::= { snmpUserEntry 7 } 
+	     
+               suAuthenPwd OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (8..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Auhentication password in snmp user table."
+                   ::= { snmpUserEntry 8 } 
+	     
+               suEncryptedPwd OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (8..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Encryption password in snmp user table."
+                   ::= { snmpUserEntry 9 } 
+	     
+               suEncryptedStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 non_encryption(0),
+                                 encryption(7)
+                                 }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Encryption status in snmp user table."
+                   ::= { snmpUserEntry 10 } 
+	     
+               suRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Row status,that a row could be created in snmp user table."
+                   ::= { snmpUserEntry 11 } 
+	     
+
+          snmpGroupNameTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpGroupNameEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A list of snmp Group Name table entries."
+              ::= { snmpGroupName 1 }
+
+          snmpGroupNameEntry OBJECT-TYPE
+              SYNTAX  SnmpGroupNameEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A collection of snmp Group Name in the
+                       snmp Group Name table."
+              INDEX { gnIndex }
+          ::= { snmpGroupNameTable 1 }
+
+               SnmpGroupNameEntry ::=
+                   SEQUENCE {
+                       gnIndex
+                           INTEGER,
+                       gnGroupName
+                           DisplayString (SIZE (0..255)),
+                       gnVersion
+                           INTEGER,
+                       gnAuthenType
+                           INTEGER,
+                       gnReadView
+                           DisplayString (SIZE (0..255)),
+                       gnWriteView
+                           DisplayString (SIZE (0..255)),
+                       gnNotifyView
+                           DisplayString (SIZE (0..255)),
+                       gnAclName
+                           DisplayString (SIZE (0..255)),
+                       gnRowStatus
+                           RowStatus
+	     }
+
+               gnIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp group name table index, unique in table."
+                   ::= { snmpGroupNameEntry 1 } 
+	     
+	     
+               gnGroupName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Group name in snmp group name table."
+                   ::= { snmpGroupNameEntry 2 } 
+	     
+               gnVersion OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 v1(1),
+                                 v2c(2),
+                                 v3(3)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp version in snmp group name table."
+                   ::= { snmpGroupNameEntry 3 } 
+	     
+               gnAuthenType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 private(1),
+                                 authenticated(2),
+                                 non_authenticated(3)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Authentication type in snmp group name table."
+                   ::= { snmpGroupNameEntry 4 } 
+	     
+               gnReadView OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Read view in snmp group name table."
+                   ::= { snmpGroupNameEntry 5 } 
+	     
+	     
+               gnWriteView OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write view in snmp group name table."
+                   ::= { snmpGroupNameEntry 6 } 
+	     
+	     
+               gnNotifyView OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Notify view in snmp group name table."
+                   ::= { snmpGroupNameEntry 7 } 
+	     
+	     
+               gnAclName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ACL name in snmp group name table."
+                   ::= { snmpGroupNameEntry 8 } 
+	     
+               gnRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Row status,that a row could be created in snmp group nmae table."
+                   ::= { snmpGroupNameEntry 9 } 
+	     
+
+          snmpRegisteredMibTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpRegisteredMibEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A list of snmp Registered Mib table entries."
+              ::= { snmpRegisteredMib 1 }
+
+          snmpRegisteredMibEntry OBJECT-TYPE
+              SYNTAX  SnmpRegisteredMibEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "A collection of snmp Registered Mib in the
+                       snmp Registered Mib table."
+              INDEX { rmIndex }
+          ::= { snmpRegisteredMibTable 1 }
+          
+          
+               SnmpRegisteredMibEntry ::=
+                   SEQUENCE {
+                       rmIndex
+                           INTEGER,
+                       rmMibName
+                           DisplayString (SIZE (0..255)),
+                       rmMibOid
+                           DisplayString (SIZE (0..255))
+              }
+
+               rmIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp Registered Mib table index, unique in table."
+                   ::= { snmpRegisteredMibEntry 1 } 
+	     
+               rmMibName OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp MIB name in Registered Mib table."
+                   ::= { snmpRegisteredMibEntry 2 } 
+	     
+	     
+               rmMibOid OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp MIB OID in Registered Mib table."
+                   ::= { snmpRegisteredMibEntry 3 } 
+	     
+
+--snmpKeepAliveMib
+
+
+               isKeepAlive OBJECT-TYPE
+                   SYNTAX  INTEGER{yes(1),
+                                   no(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp keepalive mib, and enable keepalive operation."
+                   ::= { snmpKeepAliveMib 1 } 
+	     
+               keepAliveCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp keepalive mib, and keepalive count."
+                   ::= { snmpKeepAliveMib 2 } 
+	     
+               keepAliveInterval OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp keepalive mib, and keepalive interval. Unit is second."
+                   ::= { snmpKeepAliveMib 3 } 
+	             isAlive OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Snmp keepalive mib, is device alive"
+                   ::= { snmpKeepAliveMib 4 } 
+
+      -- Notifications
+	keepAliveNotifications OBJECT IDENTIFIER
+                                ::= { snmpKeepAliveMib 5 }
+
+
+	keepAliveNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       sysUpTime,
+                       sysObjectID,
+                       keepAliveCount,
+                       keepAliveInterval
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when device need to synchornize keepalve information ."
+    		::= { keepAliveNotifications 1 }
+
+
+
+
+END
+
+

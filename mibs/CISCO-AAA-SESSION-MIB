@@ -1,0 +1,494 @@
+-- *****************************************************************
+-- CISCO-AAA-SESSION-MIB.my: Cisco AAA Session MIB
+--
+-- November 1999, Ed Richardson
+--
+-- Copyright (c) 1999, 2000, 2002, 2006 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+
+CISCO-AAA-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Counter32,
+        Gauge32,
+        IpAddress,
+        Unsigned32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        DisplayString,
+        TruthValue,
+        TEXTUAL-CONVENTION,
+        RowPointer
+                FROM SNMPv2-TC
+        InterfaceIndexOrZero
+                FROM IF-MIB
+        ciscoMgmt
+                FROM CISCO-SMI;
+ 
+
+ciscoAAASessionMIB MODULE-IDENTITY
+        LAST-UPDATED    "200603210000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO
+                "       Cisco Systems
+                        Customer Service
+
+                Postal: 170 W. Tasman Drive
+                        San Jose, CA  95134
+                        USA
+ 
+                   Tel: +1 800 553-NETS
+ 
+                E-mail: cs-aaa@cisco.com"
+        DESCRIPTION
+                "This MIB module provides data for accounting sessions
+                 based on Authentication, Authorization, Accounting
+                 (AAA) protocols.
+
+
+                 References:
+                     RFC 2139 RADIUS Accounting
+                     The TACACS+ Protocol Version 1.78, Internet Draft
+
+
+                "
+        REVISION        "200603210000Z"
+        DESCRIPTION
+        "Added the casnNasPort and casnVaiIfIndex objects to the
+         casnActiveTable.
+        "
+        REVISION        "200204110000Z"
+        DESCRIPTION
+        "Imported Unsigned32 from SNMPv2-SMI instead of CISCO-TC
+        "
+        REVISION        "9911160000Z"
+        DESCRIPTION
+        "Initial version
+        "
+       ::= { ciscoMgmt 150 }
+
+
+--
+-- Textual Conventions
+--
+
+--
+--  Call Identifier textual convention
+--
+CctCallId ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+        "Represents a Call Identifier.
+         The call identifier is used as an unique identifier for an
+         call within the system.
+
+         A zero value indicates no call ID.
+        "
+        SYNTAX      Unsigned32
+
+
+
+--
+--  Session Identifier textual convention
+--
+CasnSessionId ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+        "Represents an Accounting Session Identifier.
+         The session identifier is used as an unique identifier for
+         a session within the system.
+        "
+        SYNTAX      Unsigned32 (1..4294967295)
+
+
+
+-- AAA Session MIB objects definitions
+
+casnMIBObjects OBJECT IDENTIFIER ::= { ciscoAAASessionMIB 1 }
+
+
+-- The AAA Session MIB consists of the following groups
+-- [1] AAA Session Active Group (casnActive)
+-- [2] AAA Session General Group (casnGeneral)
+
+casnActive         OBJECT IDENTIFIER ::= { casnMIBObjects 1 }
+casnGeneral        OBJECT IDENTIFIER ::= { casnMIBObjects 2 }
+
+
+
+--**********************************************************************
+-- AAA Session Active Group
+--**********************************************************************
+--
+--
+
+--
+-- Active Table
+--
+
+casnActiveTableEntries OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of entries currently in casnActiveTable
+            "
+        ::= { casnActive 1 }
+
+
+casnActiveTableHighWaterMark OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum number of entries present in casnActiveTable
+             since last system re-initialization.
+
+             This corresponds to the maximum value reported by
+             casnActiveTableEntries.
+            "
+        ::= { casnActive 2 }
+
+
+casnActiveTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CasnActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains entries for active AAA accounting
+             sessions in the system.
+            "
+        ::= { casnActive 3 }
+
+casnActiveEntry OBJECT-TYPE
+        SYNTAX      CasnActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The information regarding a single accounting session.
+
+             Entries are created when a new accounting session
+             is begun.
+
+             Entries are removed when the accounting session
+             is ended.
+
+             Initiating termination of a session with the object
+             casnDisconnect will cause removal of the entry when
+             the session completes termination.
+            "
+        INDEX       { casnSessionId }
+        ::= { casnActiveTable 1 }
+
+
+CasnActiveEntry ::=
+        SEQUENCE {
+            casnSessionId                 CasnSessionId,
+            casnUserId                    DisplayString,
+            casnIpAddr                    IpAddress,
+            casnIdleTime                  Gauge32,
+            casnDisconnect                TruthValue,
+            casnCallTrackerId             CctCallId,
+            casnNasPort                   RowPointer,
+            casnVaiIfIndex                InterfaceIndexOrZero
+        }
+
+
+casnSessionId OBJECT-TYPE
+        SYNTAX      CasnSessionId 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the session identification used by the
+             accounting protocol.
+
+             This value is unique to a session within the system,
+             even if multiple accounting protocols are in use.
+
+             The value of this object corresponds to these
+             accounting protocol attributes.
+                RADIUS:  attribute 44, Acct-Session-Id
+                TACACS+: attribute 'task_id'
+            "
+        ::= { casnActiveEntry 1 }
+
+
+casnUserId OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The User login ID or zero length string if unavailable.
+
+             The value of this object corresponds to these
+             accounting protocol attributes.
+                RADIUS:  attribute 1, User-Name
+                TACACS+: attribute 'user'
+            "
+        ::= { casnActiveEntry 2 }
+
+
+casnIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of the session or 0.0.0.0 if not
+             applicable or unavailable.
+
+             RADIUS:  attribute 8, Framed-IP-Address
+             TACACS+: attribute 'addr'
+            "
+        ::= { casnActiveEntry 3 }
+
+
+casnIdleTime OBJECT-TYPE
+        SYNTAX  Gauge32
+        UNITS   "seconds"
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The elapsed time that this session has been idle.
+
+             This is the time since the last user-level data has been
+             received or transmitted. Protocol level handshaking
+             associated with the call is considered to be idle for
+             this object.
+            "
+        ::= { casnActiveEntry 4 }
+
+
+casnDisconnect OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to terminate this session.
+
+             Setting the value to true(1) will initiate termination
+             of this session.
+
+             The entry will be removed once the session has completed
+             termination.
+
+             Once this object has been set to true(1), the session
+             termination process can not be cancelled by setting the
+             value false(2).
+            "
+        ::= { casnActiveEntry 5 }
+
+
+casnCallTrackerId OBJECT-TYPE
+        SYNTAX  CctCallId 
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+             "The value of this object is the entry index in the
+              CISCO-CALL-TRACKER-MIB cctActiveTable of the call
+              corresponding to this accounting session.
+
+              Using the value of this object to query the
+              cctActiveTable will provide more detailed data regarding
+              the session represented by this casnActiveEntry.
+             "
+        ::= { casnActiveEntry 6 }
+
+
+casnNasPort OBJECT-TYPE
+        SYNTAX  RowPointer 
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+             "The value of this object identifies a particular
+              conceptual row associated with the session identified by
+              casnSessionId.  The conceptual row that this object points
+              to represents a port that is used to transport a session.
+
+              If the port transporting the session cannot be determined,
+              the value of this object will be zeroDotZero.
+
+              For example, suppose a session is established using an ATM
+              PVC.  If the ifIndex of the ATM interface is 7, and the 
+              VPI/VCI values of the PVC are 1, 100 respectively, then
+              the value of this object might be as follows:
+
+                     casnNasPort.15 = atmVclAdminStatus.7.1.100
+                                 ^                      ^ ^  ^
+                                 |                      | |  |
+                 casnSessionId --+                      | |  |
+                       ifIndex -------------------------+ |  |
+                     atmVclVpi ---------------------------+  |
+                     atmVclVci ------------------------------+
+
+              where atmVclAdminStatus is the first accessible object
+              of the atmVclTable of the ATM-MIB.
+             "
+        ::= { casnActiveEntry 7 }
+
+
+casnVaiIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndexOrZero 
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+             "The ifIndex of the Virtual Access Interface (VAI)
+              that is associated with the PPP session.
+
+              This interface may not be represented in the IF-MIB in
+              which case the value of this object will be zero.
+             "
+        ::= { casnActiveEntry 8 }
+
+
+
+--**********************************************************************
+-- AAA Session General Group
+--**********************************************************************
+--
+--
+
+casnTotalSessions OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Total number of sessions since last system
+              re-initialization.
+ 
+              This value includes all sessions currently in the
+              casnActiveTable and all previous sessions whether
+              terminated via casnDisconnect or via other
+              mechanisms.
+             "
+        ::= { casnGeneral 1 }
+
+
+casnDisconnectedSessions OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of sessions which have been disconnected using
+             casnDisconnect since last system re-initialization.
+
+             This value includes any sessions still in the
+             casnActiveTable with a casnDisconnect value of true(1) and
+             all previous sessions which terminated as a result of
+             setting casnDisconnect.
+            "
+        ::= { casnGeneral 2 }
+
+
+
+--**********************************************************************
+-- Notifications
+--**********************************************************************
+casnMIBNotificationPrefix  OBJECT IDENTIFIER ::=
+                                { ciscoAAASessionMIB 2 }
+casnMIBNotifications       OBJECT IDENTIFIER ::=
+                                { casnMIBNotificationPrefix 1 }
+
+
+
+casnMIBConformance OBJECT IDENTIFIER ::=
+                                { ciscoAAASessionMIB 3 }
+casnMIBCompliances OBJECT IDENTIFIER ::=
+                                { casnMIBConformance 1 }
+casnMIBGroups      OBJECT IDENTIFIER ::=
+                                { casnMIBConformance 2 }
+
+-- compliance statements
+
+casnMIBCompliance MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION
+            "The compliance statement for entities which
+             implement the CISCO AAA Session MIB"
+        MODULE      -- this module
+        MANDATORY-GROUPS
+            { casnActiveGroup,
+              casnGeneralGroup
+            }
+
+        OBJECT   casnDisconnect
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        ::= { casnMIBCompliances 1 }
+
+
+casnMIBComplianceRev1 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which
+             implement the CISCO AAA Session MIB"
+        MODULE      -- this module
+        MANDATORY-GROUPS
+            { casnActiveGroup,
+              casnGeneralGroup,
+              casnActiveGroupSup1
+            }
+
+        OBJECT   casnDisconnect
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        ::= { casnMIBCompliances 2 }
+
+
+
+-- units of conformance
+
+
+casnActiveGroup OBJECT-GROUP
+        OBJECTS {
+            casnActiveTableEntries,
+            casnActiveTableHighWaterMark,
+            casnUserId,
+            casnIpAddr,
+            casnIdleTime,
+            casnDisconnect,
+            casnCallTrackerId
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing the
+             AAA session information.
+            "
+        ::= { casnMIBGroups 1 }
+
+
+casnGeneralGroup OBJECT-GROUP
+        OBJECTS {
+            casnTotalSessions, 
+            casnDisconnectedSessions 
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing the
+             AAA session information.
+            "
+        ::= { casnMIBGroups 2 }
+
+
+casnActiveGroupSup1 OBJECT-GROUP
+        OBJECTS {
+            casnNasPort,
+            casnVaiIfIndex
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects that supplements
+             the casnActiveGroup.
+            "
+        ::= { casnMIBGroups 3 }
+END

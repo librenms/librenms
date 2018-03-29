@@ -1,0 +1,1656 @@
+-- *****************************************************************
+-- FORCE10-MONITORING-MIB
+--
+--
+-- Copyright (c) 2003-2004 by Force10 Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+FORCE10-MONITORING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Counter64,
+        Unsigned32
+            FROM SNMPv2-SMI
+   
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+ 
+        TruthValue,
+        TEXTUAL-CONVENTION,
+        DisplayString,
+        MacAddress
+            FROM SNMPv2-TC
+ 
+        ifIndex
+            FROM RFC1213-MIB
+    
+        f10Mgmt
+            FROM FORCE10-SMI
+            
+        F10VlanID, F10QueueID, F10PortPipeID, F10SlotID, 
+        F10CycloneVersion, F10ProcessorModuleType
+            FROM FORCE10-TC            
+        ;
+ 
+f10MonitoringMib   MODULE-IDENTITY
+        LAST-UPDATED    "200812181200Z"
+        ORGANIZATION    "Force10 Networks, Inc."
+        CONTACT-INFO
+            "Force10 Networks, Inc
+            1440 McCarthy Blvd
+            Milpitas, CA 95035
+            (408) 571-3500
+            support@force10networks.com
+            http://www.force10networks.com"
+        DESCRIPTION
+            "Force10 Monitoring MIB provides statistics and accounting for 
+            various Force10 products.
+            "
+
+-- revision history   
+       REVISION     "200812181200Z"
+       DESCRIPTION
+            "Force10 Monitoring MIB version 1.3
+             Added CPU Ingress Queue Unicast Statistics table.
+            "
+
+       REVISION     "0601200000Z"
+       DESCRIPTION
+            "Force10 Monitoring MIB version 1.2
+             Added IP and ARP statistic objects that are not available in RFC1213.
+            "
+
+       REVISION     "200011021030Z"
+       DESCRIPTION
+            "Force10 Monitoring MIB version 1.1"
+
+        ::= { f10Mgmt 3 }   
+
+
+f10MonGroup             OBJECT IDENTIFIER ::= { f10MonitoringMib 1 }
+f10MonQueue             OBJECT IDENTIFIER ::= { f10MonitoringMib 2 } 
+f10MonMac               OBJECT IDENTIFIER ::= { f10MonitoringMib 3 } 
+f10MonIfQueue           OBJECT IDENTIFIER ::= { f10MonitoringMib 4 } 
+f10NetworkStat          OBJECT IDENTIFIER ::= { f10MonitoringMib 5 } 
+f10IpStatistic          OBJECT IDENTIFIER ::= { f10NetworkStat 1 } 
+f10ArpStatistic         OBJECT IDENTIFIER ::= { f10NetworkStat 2 } 
+
+--
+--  The F10MonGroup
+--
+f10MonMibVersion  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1),
+                    version1dot1(2),
+                    version1dot2(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+            version1(1) - initial version, define QOS Queue Statistics table.
+            version1dot1(2) - support MAC Accounting (f10MonMac).
+            version1dot2(3) - support Interface Queue Statistics Tables (f10MonIfQueue).
+        "
+    ::= { f10MonGroup 1 }
+
+
+--
+--  The Force10 QOS Queue Group
+--
+f10MonQueueGroup             OBJECT IDENTIFIER ::= { f10MonQueue 1 } 
+
+f10MonMaxQueue  OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The maximum number of Force10 QOS queue supported by Force10
+        Interfaces.
+        "
+    ::= { f10MonQueueGroup 1 }
+
+
+-- 
+--  QOS Input Queue Statistics Table
+-- 
+f10InQueueStatisticsTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10InQueueStatisticsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The Force10 QOS Input Queue Statistics Table.
+        This table provides Input Queue statistics for Force10 Interfaces.
+        "
+	::= { f10MonQueue 2 }
+
+f10InQueueStatisticsEntry OBJECT-TYPE
+	SYNTAX      F10InQueueStatisticsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the Force10 QOS Input Queue table.
+        The Input Queue Statistics Table is indexed by the Interface and
+        the Queue ID. The Interface index should be an valid ifIndex as defined 
+        in the RFC1213 MIB II Interface Table and the Queue ID should be a
+        valid Force10 Queue ID.
+        "
+	INDEX		 { ifIndex, f10InQueueId }
+	::= { f10InQueueStatisticsTable 1 }
+
+F10InQueueStatisticsEntry ::= SEQUENCE {
+    f10InQueueId
+		F10QueueID,
+    f10InQueueDropPackets
+        Counter64,
+    f10InQueueBytes
+        Counter64,
+    f10InQueueMatchPackets
+        Counter64,
+    f10InQueueMatchBytes
+        Counter64,
+    f10InQueueMatchBps
+        Counter64,
+    f10InQueueCycloneVersion
+        F10CycloneVersion,
+    f10InQueueBytesCount
+        Counter64,
+    f10InQueuePktsCount
+        Counter64
+}
+
+f10InQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the second index of this table, it must be a valid 
+        Force10 QOS Queue ID.
+        "
+    ::= { f10InQueueStatisticsEntry 1 }
+
+f10InQueueDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10InQueueStatisticsEntry 2 }
+
+f10InQueueBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10InQueueStatisticsEntry 3 }
+
+f10InQueueMatchPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10InQueueStatisticsEntry 4 }
+
+f10InQueueMatchBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10InQueueStatisticsEntry 5 }
+
+f10InQueueMatchBps  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10InQueueStatisticsEntry 6 }
+
+f10InQueueCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version.
+        "
+    ::= { f10InQueueStatisticsEntry 7 }
+
+f10InQueueBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) hardware only.
+        "
+    ::= { f10InQueueStatisticsEntry 8 }
+
+f10InQueuePktsCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of packets passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) hardware only.
+        "
+    ::= { f10InQueueStatisticsEntry 9 }
+
+
+-- 
+--  QOS Output Queue Statistics Table
+-- 
+f10OutQueueStatisticsTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10OutQueueStatisticsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The Force10 QOS Output Queue Statistics Table.
+        This table provides Output Queue statistics for Force10 Interfaces.
+        "
+	::= { f10MonQueue 3 }
+
+f10OutQueueStatisticsEntry OBJECT-TYPE
+	SYNTAX      F10OutQueueStatisticsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the Output Queue table.
+        The Output Queue Statistics Table is indexed by the Interface and
+        the Queue ID. The Interface index should be an valid ifIndex as defined 
+        in the RFC1213 MIB II Interface Table and the the Queue ID should be a
+        valid Force10 Queue ID.
+        "
+	INDEX		 { ifIndex, f10OutQueueId }
+	::= { f10OutQueueStatisticsTable 1 }
+
+F10OutQueueStatisticsEntry ::= SEQUENCE {
+    f10OutQueueId
+		F10QueueID,
+    f10OutQueuePackets
+        Counter64,
+    f10OutQueueBytes
+        Counter64,
+    f10OutQueueBps
+        Counter64,
+    f10OutQueueCycloneVersion
+        F10CycloneVersion,
+    f10OutQueueBytesCount
+        Counter64
+}
+
+f10OutQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the second index of this table, it must be a valid 
+        Force10 QOS Queue ID.
+        "
+    ::= { f10OutQueueStatisticsEntry 1 }
+
+f10OutQueuePackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10OutQueueStatisticsEntry 2 }
+
+f10OutQueueBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of bytes in the queue.
+        This object is available on Cyclone version 1.5 (CjTj) hardware only.
+        "
+    ::= { f10OutQueueStatisticsEntry 3 }
+
+f10OutQueueBps  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10OutQueueStatisticsEntry 4 }
+
+f10OutQueueCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version.
+        "
+    ::= { f10OutQueueStatisticsEntry 5 }
+
+f10OutQueueBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) hardware only.
+        "
+    ::= { f10OutQueueStatisticsEntry 6 }
+
+-- 
+--  QOS WRED Statistics Table
+-- 
+f10WredStatisticsTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10WredStatisticsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "QOS WRED Statistics Table
+        This table provides QOS WRED statistics for the Force10 Interfaces.
+        "
+	::= { f10MonQueue 4 }
+
+f10WredStatisticsEntry OBJECT-TYPE
+	SYNTAX      F10WredStatisticsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the WRED Statistics table.
+        The WRED Statistics Table is indexed by the Interface and
+        the Queue ID. The Interface index should be an valid ifIndex as defined 
+        in the RFC1213 MIB II Interface Table and the Queue ID should be a
+        valid Force10 Queue ID.
+        "
+	INDEX		 { ifIndex, f10WredQueueId }
+	::= { f10WredStatisticsTable 1 }
+
+F10WredStatisticsEntry ::= SEQUENCE {
+    f10WredQueueId
+		F10QueueID,
+    f10WredGreenName
+        DisplayString,
+    f10WredGreenThresholdLow
+        Unsigned32,
+    f10WredGreenThresholdHigh
+        Unsigned32,
+    f10WredGreenDropPackets
+        Counter64,
+    f10WredGreenReserve1
+        Counter64,
+    f10WredGreenReserve2
+        Counter64,
+    f10WredYellowName
+        DisplayString,
+    f10WredYellowThresholdLow
+        Unsigned32,
+    f10WredYellowThresholdHigh
+        Unsigned32,
+    f10WredYellowDropPackets
+        Counter64,
+    f10WredYellowReserve1
+        Counter64,
+    f10WredYellowReserve2
+        Counter64,
+    f10WredRedName
+        DisplayString,
+    f10WredRedThresholdLow
+        Unsigned32,
+    f10WredRedThresholdHigh
+        Unsigned32,
+    f10WredRedDropPackets
+        Counter64,
+    f10WredRedReserve1
+        Counter64,
+    f10WredRedReserve2
+        Counter64
+}
+
+f10WredQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the second index of this table, it must be a valid 
+        Force10 QOS Queue ID.
+        "
+    ::= { f10WredStatisticsEntry 1 }
+
+f10WredGreenName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 2 }
+
+f10WredGreenThresholdLow  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 3 }
+
+f10WredGreenThresholdHigh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 4 }
+
+f10WredGreenDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 5 }
+
+f10WredGreenReserve1  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 6 }
+
+f10WredGreenReserve2  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 7 }
+
+f10WredYellowName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 8 }
+
+f10WredYellowThresholdLow  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 9 }
+
+f10WredYellowThresholdHigh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 10 }
+
+f10WredYellowDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 11 }
+
+f10WredYellowReserve1  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 12 }
+
+f10WredYellowReserve2  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 13 }
+
+f10WredRedName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 14 }
+
+f10WredRedThresholdLow  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 15 }
+
+f10WredRedThresholdHigh  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 16 }
+
+f10WredRedDropPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 17 }
+
+f10WredRedReserve1  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 18 }
+
+f10WredRedReserve2  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "
+        "
+    ::= { f10WredStatisticsEntry 19 }
+
+
+--
+--  The MAC Group
+--
+f10MacGroup                  OBJECT IDENTIFIER ::= { f10MonMac 1 } 
+
+
+--
+--  The MAC Accounting Group
+--
+f10MacAccounting             OBJECT IDENTIFIER ::= { f10MonMac 2 } 
+
+
+-- 
+--  The MAC Accounting Destination Table
+-- 
+f10MacAccountingDestTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10MacAccountingDestEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The MAC Accounting Destination Table.
+        Each entry in the table provides the MAC accounting statistics from a
+        specific Interface, VLAN ID, and the desired destination MAC Address.
+        "
+	::= { f10MacAccounting 1 }
+
+f10MacAccountingDestEntry OBJECT-TYPE
+	SYNTAX      F10MacAccountingDestEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the MAC Accounting Destination Table.
+        The MAC Accounting Destination table is indexed by the input Interface,
+        VLAN ID, and the destination MAC Address.
+        "
+	INDEX		 { f10MacAccInIfIndex, f10MacAccVlan, f10MacAccMacAddr }
+	::= { f10MacAccountingDestTable 1 }
+
+F10MacAccountingDestEntry ::= SEQUENCE {
+    f10MacAccInIfIndex
+        INTEGER,
+    f10MacAccMacAddr
+        MacAddress,
+    f10MacAccVlan
+        F10VlanID,
+    f10MacAccOutIfIndex
+        INTEGER,
+    f10MacAccPackets
+        Counter64,
+    f10MacAccBytes
+        Counter64                            
+}
+
+
+f10MacAccInIfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The input Interface of this entry of the table.
+        The value should be a valid ifIndex in the MIB II Interface Table.
+        "
+    ::= { f10MacAccountingDestEntry 1 }
+
+f10MacAccVlan  OBJECT-TYPE
+    SYNTAX      F10VlanID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The VLAN ID.
+        "
+    ::= { f10MacAccountingDestEntry 2 }
+
+f10MacAccMacAddr  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The MAC Address that identifies this entry of the table.
+        This is the destination MAC Address of the packets that's going through
+        the Interface identified by f10MacAccInIfIndex.
+        "
+    ::= { f10MacAccountingDestEntry 3 }
+
+f10MacAccOutIfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The output Interface of this entry of the table.
+        The value should be a valid ifIndex in the MIB II Interface Table.
+        "
+    ::= { f10MacAccountingDestEntry 4 }
+
+f10MacAccPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of packets going through this entry of the
+        the table, identified by the Interface/MAC/VLAN.
+        "
+    ::= { f10MacAccountingDestEntry 5 }
+
+f10MacAccBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of bytes traffic going through this entry of
+        the table, identified by the Interface/MAC/VLAN.
+        "
+    ::= { f10MacAccountingDestEntry 6 }
+
+
+--
+--  The Force10 Interface Queue Group
+--
+--  The Interface Queue Statistics Tables shows Queue Statistics of all Force10 
+--  linecard/interfaces. Please note this is different from the QOS Queue 
+--  Statistics Table which shows the Egress Unicast Statistics and hit counters
+--  only when a QOS profile is created for the interface.
+
+f10MonIfQueueGroup             OBJECT IDENTIFIER ::= { f10MonIfQueue 1 } 
+
+-- 
+--  Ingress Queue Unicast Statistics Table
+-- 
+f10IngQueueUnicastStatTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10IngQueueUnicastStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The Ingress Queue Unicast Statistics Table.
+        This table provides Queue statistics for Ingress Unicast packets
+        between Force10 linecards.
+        "
+	::= { f10MonIfQueue 2 }
+
+f10IngQueueUnicastStatEntry OBJECT-TYPE
+	SYNTAX      F10IngQueueUnicastStatEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the Ingress Queue Unicast Statistics table.
+        The Ingress Queue Unicast Statistics Table is indexed by the source
+        and destination linecard/portpipe and Queue ID.
+        "
+	INDEX { f10IngUnicastSrcCard, 
+            f10IngUnicastDestCard,
+            f10IngUnicastSrcPortPipe, 
+            f10IngUnicastDestPortPipe, 
+            f10IngUnicastQueueId }
+            
+	::= { f10IngQueueUnicastStatTable 1 }
+
+F10IngQueueUnicastStatEntry ::= SEQUENCE {
+    f10IngUnicastSrcCard
+        F10SlotID,
+    f10IngUnicastDestCard
+        F10SlotID,
+    f10IngUnicastSrcPortPipe
+        F10PortPipeID,        
+    f10IngUnicastDestPortPipe
+        F10PortPipeID,        
+    f10IngUnicastQueueId
+		F10QueueID,
+    f10IngUnicastCycloneVersion
+        F10CycloneVersion,
+    f10IngUnicastBytes
+        Counter64,
+    f10IngUnicastBytesCount
+        Counter64,
+    f10IngUnicastPacketCount
+        Counter64,
+    f10IngUnicastGreenMin
+        Unsigned32,
+    f10IngUnicastGreenMax
+        Unsigned32,
+    f10IngUnicastGreenDrop
+        Counter64,
+    f10IngUnicastYellowMin
+        Unsigned32,
+    f10IngUnicastYellowMax
+        Unsigned32,
+    f10IngUnicastYellowDrop
+        Counter64,
+    f10IngUnicastRedDrop
+        Counter64
+}
+
+f10IngUnicastSrcCard  OBJECT-TYPE
+    SYNTAX      F10SlotID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the source linecard number.
+        This is the first index of this table entry.
+        "
+    ::= { f10IngQueueUnicastStatEntry 1 }
+
+f10IngUnicastDestCard  OBJECT-TYPE
+    SYNTAX      F10SlotID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the destination linecard number.
+        This is the 3rd index of this table entry.
+        "
+    ::= { f10IngQueueUnicastStatEntry 2 }
+
+f10IngUnicastSrcPortPipe  OBJECT-TYPE
+    SYNTAX      F10PortPipeID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Force10 Cyclone PortPipe number of the source
+        linecard.
+        This is the 2nd index of this table entry.
+        "
+    ::= { f10IngQueueUnicastStatEntry 3 }
+
+f10IngUnicastDestPortPipe  OBJECT-TYPE
+    SYNTAX      F10PortPipeID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Force10 Cyclone PortPipe number of the destination
+        linecard.
+        This is the 4th index of this table entry.
+        "
+    ::= { f10IngQueueUnicastStatEntry 4 }
+
+f10IngUnicastQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Queue ID of this entry.
+        This is the 5th index of this table entry.
+        "
+    ::= { f10IngQueueUnicastStatEntry 5 }
+
+f10IngUnicastCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version.
+        "
+    ::= { f10IngQueueUnicastStatEntry 6 }
+
+f10IngUnicastBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of bytes in the queue.
+        This object is available on Cyclone version 1.5 (CjTj) hardware only.
+        "
+    ::= { f10IngQueueUnicastStatEntry 7 }
+
+f10IngUnicastBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10IngQueueUnicastStatEntry 8 }
+
+f10IngUnicastPacketCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of packets passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10IngQueueUnicastStatEntry 9 }
+
+f10IngUnicastGreenMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Green packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10IngQueueUnicastStatEntry 10 }
+
+f10IngUnicastGreenMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Green packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10IngQueueUnicastStatEntry 11 }
+
+f10IngUnicastGreenDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Green packets being dropped in this queue.
+        "
+    ::= { f10IngQueueUnicastStatEntry 12 }
+
+f10IngUnicastYellowMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Yellow packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10IngQueueUnicastStatEntry 13 }
+
+f10IngUnicastYellowMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Yellow packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10IngQueueUnicastStatEntry 14 }
+
+f10IngUnicastYellowDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Yellow packets being dropped in this queue.
+        "
+    ::= { f10IngQueueUnicastStatEntry 15 }
+
+f10IngUnicastRedDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Red packets being dropped in this queue.
+        "
+    ::= { f10IngQueueUnicastStatEntry 16 }
+
+
+
+-- 
+--  Ingress Queue Multicast Statistics Table
+-- 
+f10IngQueueMulticastStatTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10IngQueueMulticastStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The Ingress Queue Multicast Statistics Table.
+        This table provides Queue statistics for Ingress Multicast packets
+        at Force10 linecards.
+        "
+	::= { f10MonIfQueue 3 }
+
+f10IngQueueMulticastStatEntry OBJECT-TYPE
+	SYNTAX      F10IngQueueMulticastStatEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the Ingress Queue Multicast Statistics table.
+        The Ingress Queue Multicast Statistics Table is indexed by the source
+        linecard/portpipe and Queue ID.
+        "
+	INDEX { f10IngMulticastSrcCard, 
+            f10IngMulticastSrcPortPipe, 
+            f10IngMulticastQueueId }
+            
+	::= { f10IngQueueMulticastStatTable 1 }
+
+F10IngQueueMulticastStatEntry ::= SEQUENCE {
+    f10IngMulticastSrcCard
+        F10SlotID,
+    f10IngMulticastSrcPortPipe
+        F10PortPipeID,        
+    f10IngMulticastQueueId
+		F10QueueID,
+    f10IngMulticastCycloneVersion
+        F10CycloneVersion,
+    f10IngMulticastBytes 
+        Counter64,
+    f10IngMulticastBytesCount
+        Counter64,
+    f10IngMulticastPacketCount
+        Counter64,
+    f10IngMulticastGreenMin
+        Unsigned32,
+    f10IngMulticastGreenMax
+        Unsigned32,
+    f10IngMulticastGreenDrop
+        Counter64,
+    f10IngMulticastYellowMin
+        Unsigned32,
+    f10IngMulticastYellowMax
+        Unsigned32,
+    f10IngMulticastYellowDrop
+        Counter64,
+    f10IngMulticastRedDrop
+        Counter64
+}
+
+f10IngMulticastSrcCard  OBJECT-TYPE
+    SYNTAX      F10SlotID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the source linecard number.
+        This is the first index of this table entry.
+        "
+    ::= { f10IngQueueMulticastStatEntry 1 }
+
+f10IngMulticastSrcPortPipe  OBJECT-TYPE
+    SYNTAX      F10PortPipeID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Force10 Cyclone PortPipe number of the source
+        linecard.
+        This is the 2nd index of this table entry.
+        "
+    ::= { f10IngQueueMulticastStatEntry 2 }
+
+f10IngMulticastQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Queue ID of this entry.
+        This is the 3rd index of this table entry.
+        "
+    ::= { f10IngQueueMulticastStatEntry 3 }
+
+f10IngMulticastCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version.
+        "
+    ::= { f10IngQueueMulticastStatEntry 4 }
+
+f10IngMulticastBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of bytes in the queue.
+        This object is available on Cyclone version 1.5 (CjTj) hardware only.
+        "
+    ::= { f10IngQueueMulticastStatEntry 5 }
+
+f10IngMulticastBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10IngQueueMulticastStatEntry 6 }
+
+f10IngMulticastPacketCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of packets passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10IngQueueMulticastStatEntry 7 }
+
+f10IngMulticastGreenMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Green packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10IngQueueMulticastStatEntry 8 }
+
+f10IngMulticastGreenMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Green packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10IngQueueMulticastStatEntry 9 }
+
+f10IngMulticastGreenDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Green packets being dropped in this queue.
+        "
+    ::= { f10IngQueueMulticastStatEntry 10 }
+
+f10IngMulticastYellowMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Yellow packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10IngQueueMulticastStatEntry 11 }
+
+f10IngMulticastYellowMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Yellow packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10IngQueueMulticastStatEntry 12 }
+
+f10IngMulticastYellowDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Yellow packets being dropped in this queue.
+        "
+    ::= { f10IngQueueMulticastStatEntry 13 }
+
+f10IngMulticastRedDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Red packets being dropped in this queue.
+        "
+    ::= { f10IngQueueMulticastStatEntry 14 }
+
+
+-- 
+--  Egress Queue Unicast Statistics Table
+-- 
+f10EgQueueUnicastStatTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10EgQueueUnicastStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The Egress Queue Unicast Statistics Table.
+        This table provides Queue statistics for Egress Unicast packets
+        at Force10 Interface.
+        "
+	::= { f10MonIfQueue 4 }
+
+f10EgQueueUnicastStatEntry OBJECT-TYPE
+	SYNTAX      F10EgQueueUnicastStatEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the Egress Queue Unicast Statistics table.
+        The Egress Queue Unicast Statistics Table is indexed by the ifIndex
+        and Queue ID.
+        The IfIndex should be an valid Interface Index as defined in the 
+        RFC1213 MIB II Interface Table.
+        "
+	INDEX { ifIndex, 
+            f10EgUnicastQueueId }
+            
+	::= { f10EgQueueUnicastStatTable 1 }
+
+F10EgQueueUnicastStatEntry ::= SEQUENCE {
+    f10EgUnicastQueueId
+		F10QueueID,
+    f10EgUnicastCycloneVersion
+        F10CycloneVersion,
+    f10EgUnicastBytes
+        Counter64,
+    f10EgUnicastBytesCount
+        Counter64,
+    f10EgUnicastPacketCount
+        Counter64,
+    f10EgUnicastGreenMin
+        Unsigned32,
+    f10EgUnicastGreenMax
+        Unsigned32,
+    f10EgUnicastGreenDrop
+        Counter64,
+    f10EgUnicastYellowMin
+        Unsigned32,
+    f10EgUnicastYellowMax
+        Unsigned32,
+    f10EgUnicastYellowDrop
+        Counter64,
+    f10EgUnicastRedDrop
+        Counter64
+}
+
+f10EgUnicastQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Queue ID of this entry.
+        This is the 2nd index of this table entry.
+        "
+    ::= { f10EgQueueUnicastStatEntry 1 }
+
+f10EgUnicastCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version.
+        "
+    ::= { f10EgQueueUnicastStatEntry 2 }
+
+f10EgUnicastBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of bytes in the queue.
+        This object is available on Cyclone version 1.5 (CjTj) hardware only.
+        "
+    ::= { f10EgQueueUnicastStatEntry 3 }
+
+f10EgUnicastBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10EgQueueUnicastStatEntry 4 }
+
+f10EgUnicastPacketCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of packets passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10EgQueueUnicastStatEntry 5 }
+
+f10EgUnicastGreenMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Green packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10EgQueueUnicastStatEntry 6 }
+
+f10EgUnicastGreenMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Green packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10EgQueueUnicastStatEntry 7 }
+
+f10EgUnicastGreenDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Green packets being dropped in this queue.
+        "
+    ::= { f10EgQueueUnicastStatEntry 8 }
+
+f10EgUnicastYellowMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Yellow packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10EgQueueUnicastStatEntry 9 }
+
+f10EgUnicastYellowMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Yellow packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10EgQueueUnicastStatEntry 10 }
+
+f10EgUnicastYellowDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Yellow packets being dropped in this queue.
+        "
+    ::= { f10EgQueueUnicastStatEntry 11 }
+
+f10EgUnicastRedDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Red packets being dropped in this queue.
+        "
+    ::= { f10EgQueueUnicastStatEntry 12 }
+
+-- 
+--  Egress Queue Multicast Statistics Table
+-- 
+f10EgQueueMulticastStatTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF F10EgQueueMulticastStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "The Egress Queue Multicast Statistics Table.
+        This table provides Queue statistics for Egress Multicast packets
+        at Force10 Interface.
+        "
+	::= { f10MonIfQueue 5 }
+
+f10EgQueueMulticastStatEntry OBJECT-TYPE
+	SYNTAX      F10EgQueueMulticastStatEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "An entry in the Egress Queue Multicast Statistics table.
+        The Egress Queue Multicast Statistics Table is indexed by the ifIndex
+        and Queue ID.
+        The IfIndex should be an valid Interface Index as defined in the 
+        RFC1213 MIB II Interface Table.
+        "
+	INDEX { ifIndex, 
+            f10EgMulticastQueueId }
+
+	::= { f10EgQueueMulticastStatTable 1 }
+
+F10EgQueueMulticastStatEntry ::= SEQUENCE {
+    f10EgMulticastQueueId
+		F10QueueID,
+    f10EgMulticastCycloneVersion
+        F10CycloneVersion,
+    f10EgMulticastBytes 
+        Counter64,
+    f10EgMulticastBytesCount
+        Counter64,
+    f10EgMulticastPacketCount
+        Counter64,
+    f10EgMulticastGreenMin
+        Unsigned32,
+    f10EgMulticastGreenMax
+        Unsigned32,
+    f10EgMulticastGreenDrop
+        Counter64,
+    f10EgMulticastYellowMin
+        Unsigned32,
+    f10EgMulticastYellowMax
+        Unsigned32,
+    f10EgMulticastYellowDrop
+        Counter64,
+    f10EgMulticastRedDrop
+        Counter64
+}
+
+f10EgMulticastQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the Queue ID of this entry.
+        This is the 2nd index of this table entry.
+        "
+    ::= { f10EgQueueMulticastStatEntry 1 }
+
+f10EgMulticastCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version.
+        "
+    ::= { f10EgQueueMulticastStatEntry 2 }
+
+f10EgMulticastBytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of bytes in the queue.
+        This object is available on Cyclone version 1.5 (CjTj) hardware only.
+        "
+    ::= { f10EgQueueMulticastStatEntry 3 }
+
+f10EgMulticastBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10EgQueueMulticastStatEntry 4 }
+
+f10EgMulticastPacketCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of packets passing through this queue.
+        This object is available on Cyclone version 2.0 (C2T2) and Cyclone version 3.0 (X3) hardwares only.
+        "
+    ::= { f10EgQueueMulticastStatEntry 5 }
+
+f10EgMulticastGreenMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Green packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10EgQueueMulticastStatEntry 6 }
+
+f10EgMulticastGreenMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Green packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10EgQueueMulticastStatEntry 7 }
+
+f10EgMulticastGreenDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Green packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10EgQueueMulticastStatEntry 8 }
+
+f10EgMulticastYellowMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Yellow packets. The min threshold 
+        identifies the queue size percentage at which the WRED dropping starts
+        to be applied with a given configured probability.
+        "
+    ::= { f10EgQueueMulticastStatEntry 9 }
+
+f10EgMulticastYellowMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Yellow packets. The max threshold 
+        identifies the queue size level at which tail drops occurs.
+        "
+    ::= { f10EgQueueMulticastStatEntry 10 }
+
+f10EgMulticastYellowDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Yellow packets being dropped in this queue.
+        "
+    ::= { f10EgQueueMulticastStatEntry 11 }
+
+f10EgMulticastRedDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Red packets being dropped in this queue.
+        "
+    ::= { f10EgQueueMulticastStatEntry 12 }
+
+
+-- 
+--  CPU Ingress Queue Unicast Statistics Table - Applicable only for Cyclone version 3.0 and above
+-- 
+f10CpuIngQueueUnicastStatTable  OBJECT-TYPE
+   SYNTAX       SEQUENCE OF F10CpuIngQueueUnicastStatEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION  "The CPU Ingress Queue Unicast Statistics Table.
+                This table provides Queue statistics for Ingress Unicast packets
+                destined for CPU."
+                
+   ::= { f10MonIfQueue 6 }           
+
+f10CpuIngQueueUnicastStatEntry  OBJECT-TYPE
+   SYNTAX       F10CpuIngQueueUnicastStatEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION  "An entry in the CPU Ingress Queue Unicast Statistics Table.
+                The CPU Ingress Queue Unicast Statistics Table is indexed by the 
+                source linecard/portpipe, cpu port and Queue ID."
+   INDEX        { f10CpuIngUnicastSrcCard,
+                  f10CpuIngUnicastSrcPortPipe,
+                  f10CpuIngUnicastDestCpu,
+                  f10CpuIngUnicastQueueId }
+                  
+   ::= { f10CpuIngQueueUnicastStatTable 1 }
+
+   F10CpuIngQueueUnicastStatEntry ::= SEQUENCE {
+       f10CpuIngUnicastSrcCard
+           F10SlotID,
+       f10CpuIngUnicastSrcPortPipe
+           F10PortPipeID,
+       f10CpuIngUnicastDestCpu
+           F10ProcessorModuleType,
+       f10CpuIngUnicastQueueId
+           F10QueueID,
+       f10CpuIngUnicastCycloneVersion
+           F10CycloneVersion,
+       f10CpuIngUnicastBytesCount
+           Counter64,
+       f10CpuIngUnicastPacketCount
+           Counter64,
+       f10CpuIngUnicastGreenMin
+           Unsigned32,
+       f10CpuIngUnicastGreenMax
+           Unsigned32,
+       f10CpuIngUnicastGreenDrop
+           Counter64,
+       f10CpuIngUnicastYellowMin
+           Unsigned32,
+       f10CpuIngUnicastYellowMax
+           Unsigned32,
+       f10CpuIngUnicastYellowDrop
+           Counter64,
+       f10CpuIngUnicastRedDrop
+           Counter64
+}
+
+f10CpuIngUnicastSrcCard  OBJECT-TYPE
+    SYNTAX      F10SlotID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is the source linecard number.
+                This is the first index of this table entry."
+                 
+    ::= { f10CpuIngQueueUnicastStatEntry 1 }
+
+f10CpuIngUnicastSrcPortPipe  OBJECT-TYPE
+    SYNTAX      F10PortPipeID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is the Force10 Cyclone PortPipe number of the source
+                linecard.This is the 2nd index of this table entry."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 2 }
+
+f10CpuIngUnicastDestCpu  OBJECT-TYPE
+    SYNTAX      F10ProcessorModuleType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is the destination CPU port of this entry. 
+                This is the 3rd index of this table entry."
+                 
+    ::= { f10CpuIngQueueUnicastStatEntry 3 }
+
+f10CpuIngUnicastQueueId  OBJECT-TYPE
+    SYNTAX      F10QueueID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is the Queue ID of this entry. 
+                This is the 4th index of this table entry."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 4 }
+
+f10CpuIngUnicastCycloneVersion  OBJECT-TYPE
+    SYNTAX      F10CycloneVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The linecard Cyclone hardware version."
+    
+    ::= { f10CpuIngQueueUnicastStatEntry 5 }
+
+f10CpuIngUnicastBytesCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of bytes data passing through this queue.  
+                This object is available on Cyclone version 3.0 (X3) hardware only." 
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 6 }
+
+f10CpuIngUnicastPacketCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The cumulative number of packets passing through this queue.
+                This object is available on Cyclone version 3.0 (X3) hardware only."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 7 }
+
+f10CpuIngUnicastGreenMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Green packets. The min threshold
+                identifies the queue size percentage at which the WRED
+                dropping starts to be applied with a given configured
+                probability."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 8 }
+
+f10CpuIngUnicastGreenMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Green packets. The max threshold
+                identifies the queue size level at which tail drops occurs."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 9 }
+
+f10CpuIngUnicastGreenDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Green packets being dropped in this queue."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 10 }
+
+f10CpuIngUnicastYellowMin  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The min threshold for Yellow packets. The min threshold
+                identifies the queue size percentage at which the WRED 
+                dropping starts to be applied with a given configured 
+                probability."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 11 }
+
+f10CpuIngUnicastYellowMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The max threshold for Yellow packets. The max threshold 
+                identifies the queue size level at which tail drops occurs."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 12 }
+
+f10CpuIngUnicastYellowDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Yellow packets being dropped in this queue."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 13 }
+
+f10CpuIngUnicastRedDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of Red packets being dropped in this queue."
+        
+    ::= { f10CpuIngQueueUnicastStatEntry 14 }
+
+--             
+--  Force10 IP Statistic 
+--
+f10BcastPktRecv  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total broadcast packet received.
+       "
+    ::= { f10IpStatistic 1 }
+
+f10BcastPktSent  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total broadcast packet sent.
+       "
+    ::= { f10IpStatistic 2 }
+
+f10McastPktRecv  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total multicast packet received.
+       "
+    ::= { f10IpStatistic 3 }
+
+f10McastPktSent  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total multicast packet sent.
+       "
+    ::= { f10IpStatistic 4 }
+
+--
+--  Force10 ARP Statistic 
+--
+f10ArpReqRecv  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total ARP request received.
+       "
+    ::= { f10ArpStatistic 1 }
+
+f10ArpReqSent  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total ARP request sent.
+       "
+    ::= { f10ArpStatistic 2 }
+
+f10ArpReplyRecv  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total ARP reply received.
+       "
+    ::= { f10ArpStatistic 3 }
+
+f10ArpReplySent  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total ARP reply sent.
+       "
+    ::= { f10ArpStatistic 4 }
+
+f10ArpProxySent  OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The total ARP proxy sent.
+       "
+    ::= { f10ArpStatistic 5 }
+
+
+END

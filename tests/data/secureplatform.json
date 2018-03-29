@@ -1,0 +1,58 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux hostname #1 2.6.18-92cp SMP Thu Apr 12 03:28:54 IDT 2012 i686",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "secureplatform",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "checkpoint.png"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux hostname #1 2.6.18-92cp SMP Thu Apr 12 03:28:54 IDT 2012 i686",
+                    "sysContact": "<private>",
+                    "version": "R75.40",
+                    "hardware": "",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "secureplatform",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "checkpoint.png"
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.2620.1.6.7.2.4.0",
+                    "processor_index": "0",
+                    "processor_type": "splat-cpu",
+                    "processor_usage": "64",
+                    "processor_descr": "Processor",
+                    "processor_precision": "1",
+                    "processor_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

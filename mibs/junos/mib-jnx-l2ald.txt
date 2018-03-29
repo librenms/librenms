@@ -1,0 +1,568 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2002-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, 
+      NOTIFICATION-TYPE, Unsigned32, Counter64, TimeTicks, Integer32
+        FROM SNMPv2-SMI
+      DisplayString, TruthValue
+        FROM SNMPv2-TC
+      ifIndex, ifDescr
+        FROM IF-MIB 
+      jnxl2aldMibRoot
+        FROM JUNIPER-SMI
+    ;
+    
+    jnxl2aldMib MODULE-IDENTITY
+       LAST-UPDATED "201208081000Z" -- Wednesday August 08 10:00:00 2012 UTC
+       ORGANIZATION "Juniper Networks, Inc."
+       CONTACT-INFO
+              "        Juniper Technical Assistance Center
+                       Juniper Networks, Inc.
+                       1194 N. Mathilda Avenue
+                       Sunnyvale, CA 94089
+                       E-mail: support@juniper.net"
+       DESCRIPTION
+              "The MIB modules for L2ALD traps"
+
+    -- Revision history
+    REVISION "201501221000Z" -- Thursday January 22 10:00:00 2015 UTC
+    DESCRIPTION
+             "Added a new field jnxL2aldVlanFdbId to the table jnxL2aldVlanTable"
+
+    REVISION "201501141000Z" -- Wednesday January 14 10:00:00 2015 UTC
+    DESCRIPTION
+             "Added new table jnxL2aldVlanTable"
+
+    REVISION "201208081000Z" -- Wednesday August 08 10:00:00 2012 UTC
+    DESCRIPTION
+            "Added new notification jnxl2aldMacMoveThreshold"
+
+    REVISION "200702151000Z" -- Thursday February 15 10:00:00 2007 UTC
+    DESCRIPTION
+            "Initial Version"
+    ::= { jnxl2aldMibRoot 1 }
+
+    jnxl2aldNotification OBJECT IDENTIFIER ::= { jnxl2aldMib 0 }
+
+    jnxl2aldObjects OBJECT IDENTIFIER ::= { jnxl2aldMib 1 }
+    
+    jnxl2aldInterfaceTable  OBJECT-TYPE
+        SYNTAX             SEQUENCE OF Jnxl2aldEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION 
+              "L2ALD objects for interface MAC limit."  
+    ::= { jnxl2aldObjects 1 }
+    
+    jnxl2aldEntry    OBJECT-TYPE
+        SYNTAX       Jnxl2aldEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  
+              "An entry in l2aldInterfaceTable."
+    INDEX { ifIndex }          
+    ::= { jnxl2aldInterfaceTable 1 }          
+
+    Jnxl2aldEntry ::= 
+       SEQUENCE {
+          jnxl2aldIntfLogicalRouter  DisplayString,
+          jnxl2aldIntfRoutingInst    DisplayString,
+          jnxl2aldIntfBridgeDomain   DisplayString,
+          jnxl2aldIntfMacLimit       Unsigned32,
+          jnxl2aldIntfMacPinningIntf DisplayString,
+          jnxl2aldIntfDiscardIntf    DisplayString
+    }   
+ 
+-- Entry definitions for the table above
+ 
+    jnxl2aldIntfLogicalRouter OBJECT-TYPE
+        SYNTAX                DisplayString
+        MAX-ACCESS            accessible-for-notify
+        STATUS                current
+        DESCRIPTION
+              "The logical router string for interface table."
+    ::= { jnxl2aldEntry 1 }
+
+    jnxl2aldIntfRoutingInst OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          accessible-for-notify
+        STATUS              current
+        DESCRIPTION  
+             "The routing instance string for interface table."
+    ::= { jnxl2aldEntry 2 }
+    
+    jnxl2aldIntfBridgeDomain OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           accessible-for-notify
+        STATUS               current
+        DESCRIPTION
+              "The bridge domain string for interface table."
+    ::= { jnxl2aldEntry 3 } 
+
+    jnxl2aldIntfMacLimit OBJECT-TYPE
+        SYNTAX           Unsigned32
+        MAX-ACCESS       accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+             "The MAC limit count for the interface table."
+    ::= { jnxl2aldEntry 4 }
+
+    jnxl2aldIntfMacPinningIntf OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           accessible-for-notify
+        STATUS               current
+        DESCRIPTION
+              "The interface on which MAC Pinning is enabled."
+    ::= { jnxl2aldEntry 5 }
+
+    jnxl2aldIntfDiscardIntf OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           accessible-for-notify
+        STATUS               current
+        DESCRIPTION
+              "The interface on which MAC is discarded due to MAC Pinning."
+    ::= { jnxl2aldEntry 6 }
+
+
+-- Objects defined below are scalar and for a different trap 
+-- they are different then the table definitions above
+
+    jnxl2aldRoutingInst OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     
+              "The Routing instance string for routing mac limit trap." 
+    ::= { jnxl2aldObjects 2 }
+
+    jnxl2aldBridgeDomain OBJECT-TYPE
+        SYNTAX           DisplayString
+        MAX-ACCESS       accessible-for-notify
+        STATUS           current
+        DESCRIPTION      
+              "The bridge domain string for routing mac limit trap."
+    ::= { jnxl2aldObjects 3 }
+
+    jnxl2aldLogicalRouter OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION 
+             "The logical router string for routing mac limit trap."
+    ::= { jnxl2aldObjects 4 }
+
+    jnxl2aldMacLimit     OBJECT-TYPE
+       SYNTAX            Unsigned32
+       MAX-ACCESS        accessible-for-notify
+       STATUS            current
+       DESCRIPTION
+              "The mac limit count for routing instance."
+    ::= { jnxl2aldObjects 5 }          
+
+    jnxl2aldGbMacLimit OBJECT-TYPE
+       SYNTAX              Unsigned32
+       MAX-ACCESS          accessible-for-notify
+       STATUS              current
+       DESCRIPTION
+              "The mac limit count for the system."
+    ::= { jnxl2aldObjects 6 }
+
+     jnxl2aldMacAdress OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION
+             "The offending mac causing mac move threshold trap."
+    ::= { jnxl2aldObjects 7 }
+
+----------------------------------------------------------------------------
+-- Juniper MAC Notification MIB object definitions
+----------------------------------------------------------------------------
+
+    jnxL2aldMacNotificationMIBObjects OBJECT IDENTIFIER
+    ::= {jnxl2aldMib 2 }
+
+    jnxL2aldMacNotificationMIBGlobalObjects     OBJECT IDENTIFIER
+    ::= {jnxL2aldMacNotificationMIBObjects 1 }
+
+-- Juniper Mac Notification Global Group
+
+jnxL2aldMacGlobalFeatureEnabled  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether the MAC notification feature is currently
+        running in the device.
+
+        Setting this object to false(2) disables the MAC notification
+        feature globally.
+
+        Setting this object to true(1) will start the MAC notification
+        feature running in the device. If the feature is already
+        running, setting to true(1) has no effect."
+	::= { jnxL2aldMacNotificationMIBGlobalObjects 1 }
+
+jnxL2aldMacNotificationInterval  OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "seconds"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object specifies the maximum interval of time between
+        jnxL2aldMacChangedNotifications being generated by the device.
+        If the value of jnxNotificationsEnabled is true(1), the
+        device will send out the generated jnxL2aldMacChangedNotifications
+        and archive the MAC change notification events in the
+        jnxMacHistoryTable. If the value of jnxNotificationEnabled is
+        false(2), the device will not send out the generated
+        jnxL2aldMacChangedNotifications but it will archive these events
+        in the jnxMacHistoryTable.
+
+        If the value of this object is equal to 0, the device will
+        generate jnxL2aldMacChangedNotifications and archive the MAC
+        change notification events in the jnxMacHistoryTable as soon as
+        there is MAC address learnt or removed by the device.
+
+        If the value of this object is greater than 0, the device will
+        wait for a period of time equal to the value of this object
+        before generate the jnxL2aldMacChangedNotifications and archive
+        the MAC change notification events in the jnxMacHistoryTable."
+    DEFVAL { 30 }
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 2 }
+
+jnxL2aldMacAddressesLearnt OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of MAC addresses learnt by the
+        device."
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 3 }
+
+jnxL2aldMacAddressesRemoved OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of MAC addresses removed from the
+        forwarding database."
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 4 }
+
+jnxL2aldMacNotificationsEnabled OBJECT-TYPE
+     SYNTAX          TruthValue
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "Indicates whether jnxL2aldMacChangedNotification notifications
+          will or will not be sent when there are MAC addresses
+          learnt or removed from the device's forwarding database.
+          Disabling notifications does not prevent the MAC address
+          info from being added to the jnxMacHistoryTable."
+     DEFVAL { false }
+     ::= { jnxL2aldMacNotificationMIBGlobalObjects 5 }
+
+jnxL2aldMacNotificationsSent OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Indicates the number of jnxl2aldMacChangedNotifications sent out
+        by the device."
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 6 }
+
+jnxL2aldMacHistTableMaxLength OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..500)
+    UNITS           "entries"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The upper limit on the number of entries that the
+        jnxMacHistoryTable may contain.  A value of 0 will
+        prevent any history from being retained. When this
+        table is full, the oldest entry will be deleted and
+        a new one will be created."
+    DEFVAL  { 256 }
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 7 }
+
+jnxL2aldMacHistoryTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxL2aldMacHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table will archive the MAC change notification events
+        generated by this device. The MAC change notification
+        events are archived here even if jnxMacChangesNotifications
+        are not actually sent."
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 8 }
+
+jnxL2aldMacHistoryEntry OBJECT-TYPE
+    SYNTAX     JnxL2aldMacHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A MAC change notification message that was previously
+        generated by this device.  Each entry is indexed by a message
+        index."
+    INDEX   { jnxL2aldHistIndex }
+    ::= { jnxL2aldMacHistoryTable 1 }
+
+JnxL2aldMacHistoryEntry ::=
+    SEQUENCE {
+        jnxL2aldHistIndex
+                Unsigned32,
+        jnxL2aldHistMacChangedMsg
+                OCTET STRING,
+        jnxL2aldHistTimestamp
+                TimeTicks
+    }
+
+jnxL2aldHistIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An index that uniquely identifies a MAC change notification
+        event previously generated by the device. This index starts at
+        1 and increases by one when a MAC change notification is
+        generated.  When it reaches the maximum value, the agent wraps
+        the value back to 1."
+    ::= { jnxL2aldMacHistoryEntry 1 }
+
+jnxL2aldHistMacChangedMsg OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..512))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object contains the information of a MAC change
+        notification event. It consists of several tuples packed
+        together in the format of '<tuple1><tuple2>...'.
+
+        Each tuple consist of 13 octets in the format of
+        '<operation><VLAN INDEX><MAC><dot1dBasePort><VLAN TAG>' where
+
+        <operation> is of size 1 octet and supports the following values
+          0 - End of MIB object.
+          1 - MAC learnt.
+          2 - MAC removed.
+          3 - MAC updated.
+
+        <VLAN INDEX> is the index of the VLAN which the MAC address is
+        belonged to and has size of 2 octet.
+        
+        <MAC> is the Layer2 Mac Address and has size of 6 octets.
+
+        <dot1dBasePort> is the value of dot1dBasePort for the
+        interface from which the MAC address is learnt and has size
+        of 2 octets.
+
+        <VLAN TAG> is the tag of the VLAN which the MAC address is
+        belonged to and has size of 2 octet."
+        
+    ::= { jnxL2aldMacHistoryEntry 2 }
+
+jnxL2aldHistTimestamp  OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime when the jnxL2aldMacChangedNotification
+        containing the information denoted by the jnxHistMacChangedMsg
+        object in this entry was generated."
+    ::= { jnxL2aldMacHistoryEntry 3 }
+
+jnxL2aldMacAddressesUpdated OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of MAC addresses updated by the
+        device."
+    ::= { jnxL2aldMacNotificationMIBGlobalObjects 9 }
+
+------------------------------------------------------------------------------------------
+-- Juniper Vlan MIB Definitions
+------------------------------------------------------------------------------------------
+
+    jnxL2aldVlanMIBObjects OBJECT IDENTIFIER
+    ::= {jnxl2aldMib 3 }
+
+-- VLAN Configuration
+
+jnxL2aldVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxL2aldVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of VLAN names and characteristics."
+    ::= { jnxL2aldVlanMIBObjects 1 }
+
+jnxL2aldVlanEntry OBJECT-TYPE
+    SYNTAX      JnxL2aldVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing VLAN names and characteristics."
+    INDEX   { jnxL2aldVlanID }
+    ::= { jnxL2aldVlanTable 1 }
+
+JnxL2aldVlanEntry ::=
+    SEQUENCE {
+        jnxL2aldVlanID                 Unsigned32,
+        jnxL2aldVlanName               DisplayString,
+        jnxL2aldVlanTag                Integer32,
+        jnxL2aldVlanType               INTEGER,
+        jnxL2aldVlanFdbId              Unsigned32
+    }
+
+jnxL2aldVlanID OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the locally significant ID that is used internally by this
+         device to reference this VLAN."
+    ::= { jnxL2aldVlanEntry 1 }
+
+jnxL2aldVlanName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Vlan name is the textual name and this is the identifier
+        that the user of a configuration utility will use."
+    ::= {  jnxL2aldVlanEntry 2 }
+
+jnxL2aldVlanTag OBJECT-TYPE
+    SYNTAX      Integer32(1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This is the locally significant ID that is used internally by this
+        device to reference this VLAN."
+    ::= { jnxL2aldVlanEntry 3 }
+
+jnxL2aldVlanType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        static (1),
+        dynamic(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The vlan type can be
+            Static (1)
+            Dynamic(2)"
+    DEFVAL { 1 }
+    ::= { jnxL2aldVlanEntry 4 }
+
+jnxL2aldVlanFdbId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The identity of the Filtering Database dot1qFdbTable (A table that
+        contains configuration and control information for each Filtering
+        Database currently operating on this device)"
+    ::= { jnxL2aldVlanEntry 5 }
+
+------------------------------------------------------------------------------------------
+-- Trap definitions
+------------------------------------------------------------------------------------------
+
+    jnxl2aldRoutingInstMacLimit NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldLogicalRouter,
+                     jnxl2aldRoutingInst,
+                     jnxl2aldBridgeDomain,
+                     jnxl2aldMacLimit
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated when the MAC limit for
+                  given routing instance (jnxl2aldRoutingInst) is reached. 
+                  This trap is send only once we exceed the limit value."
+    ::= { jnxl2aldNotification 1 }          
+                  
+    jnxl2aldInterfaceMacLimit NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldIntfLogicalRouter, 
+                     jnxl2aldIntfRoutingInst,
+                     jnxl2aldIntfBridgeDomain,
+                     ifDescr,
+                     jnxl2aldIntfMacLimit
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated when the MAC limit for 
+                  the given physical interface (jnxl2aldInterfaceMacLimit) is reached.
+                  This trap is send only once we exceed the limit value."
+    ::= { jnxl2aldNotification 2 }
+
+    jnxl2aldGlobalMacLimit NOTIFICATION-TYPE
+         OBJECTS   {  jnxl2aldGbMacLimit 
+         }
+         STATUS   current
+         DESCRIPTION
+                 "This notification is generated when the MAC limit for
+                  the entire system is reached.
+                  This trap is send only once we exceed the limit value."
+     ::= { jnxl2aldNotification 3 }
+
+    jnxl2aldMacMoveThreshold NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldIntfLogicalRouter,
+                     jnxl2aldIntfRoutingInst,
+                     jnxl2aldIntfBridgeDomain,
+                     ifDescr,
+                     jnxl2aldMacAdress
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated when a mac move reaches threshold.
+                  The given interface (ifDescr) will be blocked for the Bridge
+                  Domain(jnxl2aldIntfBridgeDomain). This trap is send only once when
+                  mac move count exceeds the threshold for the Mac(jnxl2aldMacAdress)."
+    ::= { jnxl2aldNotification 4 }
+
+    jnxL2aldMacChangedNotification NOTIFICATION-TYPE
+	OBJECTS { jnxL2aldHistMacChangedMsg, jnxL2aldHistTimestamp }
+    STATUS  current
+    DESCRIPTION
+        "This notification is generated when there is enough MAC
+        address information to fully occupy a maximum size SNMP trap
+        message. This notification is also generated when there
+        is at least one MAC address changed or removed and the amount
+        of time elapsed from the previous notification is greater
+        than the maximum wait time denoted by
+        jnxNotificationInterval object.
+
+        If there are more MAC addresses information than can fit into
+        one cmmHistTrapContent object, then multiple notifications
+        will be generated."
+    ::= { jnxl2aldNotification 5 }
+
+    jnxl2aldMacPinningdiscard NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldIntfLogicalRouter,
+                     jnxl2aldIntfRoutingInst,
+                     jnxl2aldIntfBridgeDomain,
+                     jnxl2aldMacAdress,
+                     jnxl2aldIntfMacPinningIntf,
+                     jnxl2aldIntfDiscardIntf
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated for discarding packets in a bridge domain over an
+                  IFL for MACs when learned over MAC pinning enabled interface and same MACs are
+                  also seen over any other interfaces in the same bridge domain.
+                  This trap is generated in configured interval of time when packets are discarded
+                  over an IFL continuously."
+    ::= { jnxl2aldNotification 6 }
+
+END

@@ -1,0 +1,356 @@
+-- *****************************************************************
+-- switch MIB -  The MIB for switch Product
+--
+-- Jan 2009 nie
+
+-- Copyright (c) 2009 by  Co., Ltd. 
+-- All rights reserved.
+-- *****************************************************************
+   
+-- ********************************************************************************
+--  Log for switch MIB.
+--
+--  Jan 13 2009
+--  1. Add UserMacAddress            
+--
+
+-- ********************************************************************************   
+ 
+NMS-SWITCH-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+            FROM SNMPv2-SMI
+        
+     	Gauge,TimeTicks
+      		FROM RFC1155-SMI
+                  
+        DisplayString
+			FROM RFC1213-MIB
+        nmsMgmt
+            FROM NMS-SMI 
+        PhysAddress,
+        RowStatus,
+        MacAddress, 
+ 		TruthValue 
+            FROM SNMPv2-TC   
+       ifIndex             
+       		FROM IF-MIB
+       InetAddressType, InetAddress
+			FROM INET-ADDRESS-MIB;  			
+                       
+switchMIB  MODULE-IDENTITY
+        LAST-UPDATED    "20090113"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+                      "The MIB module to describe switch product."
+        ::= { nmsMgmt 1 }
+
+switchMIBObjects  OBJECT IDENTIFIER ::= { switchMIB 1 }
+
+switchSystem           OBJECT IDENTIFIER ::= { switchMIBObjects 1 }
+switchModules          OBJECT IDENTIFIER ::= { switchMIBObjects 2 }
+
+-- Port Security   Table 
+portSecurityTable	OBJECT-TYPE
+			SYNTAX		SEQUENCE OF portSecurityEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"Port-based Security information,including security mode and max host setting."
+			::= { switchModules 1 }
+
+			portSecurityEntry	OBJECT-TYPE
+					SYNTAX		portSecurityEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION	"An entry containing port security information."
+      				INDEX   {portSecurityModuleIndex,portSecurityPortIndex }
+					::= { portSecurityTable 1 }
+
+			portSecurityEntry	::= SEQUENCE { 
+           					portSecurityModuleIndex         INTEGER,
+           					portSecurityPortIndex         INTEGER,
+							portSecurityMode		  INTEGER, 
+							portSecurityMaxHostCapability		  INTEGER,
+							portSecurityMaxHost		  INTEGER
+						}  
+		
+			portSecurityModuleIndex OBJECT-TYPE
+	       SYNTAX      INTEGER
+	       MAX-ACCESS  read-only
+	       STATUS      current
+	       DESCRIPTION
+	               "A unique value, greater than zero, for each
+	               module.  It is recommended that values are assigned
+	               contiguously starting from 1.  The value for each
+	               interface sub-layer must remain constant at least from
+	               one re-initialization of the entity's network
+	               management system to the next re-initialization."
+	       ::= { portSecurityEntry 1 }
+			
+		   portSecurityPortIndex OBJECT-TYPE
+		       SYNTAX      INTEGER
+		       MAX-ACCESS  read-only
+		       STATUS      current
+		       DESCRIPTION
+		               "A unique value, greater than zero, for each
+		               port.  It is recommended that values are assigned
+		               contiguously starting from 1.  The value for each
+		               interface sub-layer must remain constant at least from
+		               one re-initialization of the entity's network
+		               management system to the next re-initialization."
+		       ::= { portSecurityEntry 2 }
+			
+      		portSecurityMode	OBJECT-TYPE
+						SYNTAX		INTEGER { 
+										none                (1)
+										dynamic				(2),
+										static_accept		(3),
+										static_reject		(4)
+									}
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The port security mode."
+						::= { portSecurityEntry 3 }
+
+			portSecurityMaxHostCapability	OBJECT-TYPE
+						SYNTAX		INTEGER
+						MAX-ACCESS	read-only
+						STATUS		current
+						DESCRIPTION	"The maximum number hosts which can be allowed to be used."
+						::= { portSecurityEntry 4 } 
+			portSecurityMaxHost	OBJECT-TYPE
+						SYNTAX		INTEGER
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"The maximum number hosts which can be allowed to be used.
+ 									a value bigger than  portSecurityMaxHostCapability means  
+ 									unlimited max-host value."
+						::= { portSecurityEntry 5 } 
+        
+-- Port Security mac address  Table      
+portSecurityMacAddressTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF portSecurityMacAddressEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of portSecurityMacAddressEntry entries. 
+				 The port-based security mac address information."
+					::= { switchModules 2 }		
+	                       
+		portSecurityMacAddressEntry	OBJECT-TYPE
+				SYNTAX		portSecurityMacAddressEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	"An entry containing security mac address information.Useing the format
+				(port + space + mac address)to add a new mac address to a port.For example,'20 0013469905a9'
+				will add the mac address '0013.4699.05a9' to port 20.The switch will return a error symbol
+				to indicate a unsuccessful operation."
+				INDEX		{ portSecurityMacAddressPortIndex , portSecurityMacAddress}
+				::= { portSecurityMacAddressTable 1 }
+       
+		portSecurityMacAddressEntry	::= SEQUENCE { 
+		          			portSecurityMacAddressPortIndex     INTEGER,
+							portSecurityMacAddress				MacAddress, 
+							portSecurityMacAddressDel        TruthValue
+							--portSecurityMacAddressMaxNum		INTEGER
+  				}
+            
+		  portSecurityMacAddressPortIndex		OBJECT-TYPE
+		       SYNTAX      INTEGER
+		       MAX-ACCESS  read-only
+		       STATUS      current
+		       DESCRIPTION
+		               "A unique value, greater than zero, for each
+		               port."
+		       ::= { portSecurityMacAddressEntry 1 }
+
+			portSecurityMacAddress		OBJECT-TYPE
+						SYNTAX		MacAddress
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"A unique string for mac address. Useing the format(port + space + mac address)
+						to add a new mac address to a port.For example,'20 0013469905a9'will add the mac address
+						'0013.4699.05a9' to port 20.The switch will return a error symbol to indicate a unsuccessful
+						operation."
+						::= { portSecurityMacAddressEntry 2}  
+			portSecurityMacAddressDel		OBJECT-TYPE
+						SYNTAX		TruthValue
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"mac address cancel flag. True (1) delete the 
+						mac address from a port."
+						::= { portSecurityMacAddressEntry 3 }  
+			--portSecurityMacAddressMaxNum		OBJECT-TYPE
+			--			SYNTAX		INTEGER
+			--			MAX-ACCESS	read-only
+			--			STATUS		current
+			--			DESCRIPTION	"The max number of security mac address can be applied to a port."
+			--			::= { portSecurityMacAddressEntry 4 }  
+       
+--
+-- Lastest user MAC table
+--                                                        
+                                                         
+   switchUserMacTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF switchUserMacEntry
+       MAX-ACCESS  not-accessible
+       STATUS      mandatory
+       DESCRIPTION
+               "A list of switchUserMacEntry entries."
+       ::= { switchModules 11 }
+
+   switchUserMacEntry OBJECT-TYPE
+       SYNTAX      switchUserMacEntry
+       MAX-ACCESS  not-accessible
+       STATUS      mandatory
+       DESCRIPTION
+               "An entry containing management information applicable
+               to a particular switch User mac address."
+       INDEX   { UserMacModuleIndex , UserMacPortIndex }
+       ::= { switchUserMacTable 1 }
+                              
+   switchUserMacEntry ::=
+       SEQUENCE {
+           userMacModuleIndex                 INTEGER,
+           userMacPortIndex                   INTEGER,
+           userMacAddress1    	   		      PhysAddress,           
+           userMacAddress2			   		  PhysAddress,           
+           userMacAddress3			   		  PhysAddress,
+           userMacAddress4			   		  PhysAddress,
+           userMacAddress5					  PhysAddress,
+           userMacAddress6					  PhysAddress,
+           userMacAddress7					  PhysAddress,
+           userMacAddress8					  PhysAddress
+       }                      
+              
+   userMacModuleIndex OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "A unique value, greater than zero, for each
+               module(Node).  It is recommended that values are assigned
+               contiguously starting from 1."
+       ::= { switchUserMacEntry 1 }
+
+   userMacPortIndex OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "A unique value, greater than zero, for each
+               port.  It is recommended that values are assigned
+               contiguously starting from 1."
+       ::= { switchUserMacEntry 2 }                   
+                                             
+   userMacAddress1 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The first entry of lastest user mac address."
+       ::= { switchUserMacEntry 3 }      
+                               
+   userMacAddress2 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The second entry of lastest user mac address."
+       ::= { switchUserMacEntry 4 }      
+   
+   userMacAddress3 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The third entry of lastest user mac address."
+       ::= { switchUserMacEntry 5 }      
+                                   
+   userMacAddress4 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The fourth entry of lastest user mac address."
+       ::= { switchUserMacEntry 6 }  
+       
+   userMacAddress5 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The fifth entry of lastest user mac address."
+       ::= { switchUserMacEntry 7 }   
+       
+       
+   userMacAddress6 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The sixth entry of lastest user mac address."
+       ::= { switchUserMacEntry 8 }   
+       
+   userMacAddress7 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The seventh entry of lastest user mac address."
+       ::= { switchUserMacEntry 9 }   
+       
+       
+   userMacAddress8 OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION       
+               "The eighth entry of lastest user mac address."
+       ::= { switchUserMacEntry 10 }   
+       
+   cpuBandwidthTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF cpuBandwidthEntry
+       ACCESS  not-accessible
+       STATUS  mandatory
+       DESCRIPTION
+               "A list of cpu bandwidth table entries."
+       ::= { switchSystem 2 }
+
+   cpuBandwidthEntry OBJECT-TYPE
+       SYNTAX cpuBandwidthEntry
+       ACCESS  not-accessible
+       STATUS  mandatory
+       DESCRIPTION
+               "A collection of additional objects in the cpu bandwidth table."
+       INDEX { cpuBandwidthQueueIndex }
+       ::= { cpuBandwidthTable 1 }
+
+   cpuBandwidthEntry ::=
+       SEQUENCE {
+           cpuBandwidthQueueIndex                INTEGER,
+           cpuBandwidthQueueBW                   INTEGER
+       }
+
+   cpuBandwidthQueueIndex OBJECT-TYPE
+       SYNTAX  INTEGER(1..8)
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+               "Queue id. The range is 1-8."
+       ::= { cpuBandwidthEntry 1 } 
+        
+   cpuBandwidthQueueBW OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+               "The rate limitation of cpu queue. Unit is 64kbps. The range is 1-1562. 0 means disable. Default is 0."
+       ::= { cpuBandwidthEntry 2 }               	       
+END
+
+

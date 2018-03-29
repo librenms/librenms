@@ -1,0 +1,45 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-MAT-MIB.my:  NMS-EPON-OLT-MAT-MIB MIB file
+-- JULY 2010
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-MAT-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    IpAddress
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+		    nmsEPONGroup
+			FROM NMS-SMI;
+          
+               nmsEponOltMat         OBJECT IDENTIFIER ::= { nmsEPONGroup 200 }
+
+
+          oltFtpServerIpAddr OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "FTP server IP address for HS update. Use only for BSTAR 85 series."
+              ::= { nmsEponOltMat 1 }
+
+          oltFtpServerPort OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "FTP server port for HS update. Use only for BSTAR 85 series."
+              ::= { nmsEponOltMat 2 }
+
+               
+          oltMatInsideIpAddr OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Mat inside interface IP address. Use only for BSTAR 85 series."
+              ::= { nmsEponOltMat 3 }
+               
+END

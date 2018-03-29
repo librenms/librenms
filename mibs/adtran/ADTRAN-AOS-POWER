@@ -1,0 +1,306 @@
+ADTRAN-AOS-POWER   DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+    TruthValue, TEXTUAL-CONVENTION
+           FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+           FROM SNMPv2-CONF
+    adGenAOSPower, adGenAOSConformance
+           FROM ADTRAN-AOS;
+
+
+adGenAOSPowerMonitor MODULE-IDENTITY
+       	LAST-UPDATED "201009100000Z"
+       	ORGANIZATION "ADTRAN, Inc."
+       	CONTACT-INFO
+                "Technical Support Dept.
+                 Postal: ADTRAN, Inc.
+                         901 Explorer Blvd.
+                         Huntsville, AL 35806
+
+                         Tel: +1 800 726-8663
+                         Fax: +1 256 963 6217
+                         E-mail: support@adtran.com"
+       	DESCRIPTION
+                    "The MIB module for general configuration of power
+                    monitoring options for devices with battery backup."
+
+	 	REVISION	"201009100000Z"		-- September 10, 2010 
+	 	DESCRIPTION
+					"Initial version of this MIB module"
+
+	 	REVISION	"201302100000Z"		-- February 7, 2013
+       	DESCRIPTION
+                    "Added EPS and RPS connection and delivery traps to the existing adGenAOSPowerTraps.  
+                     Also, added the RO adGenAOSPowerEpsRpsTable to allow OID support for the changes in 
+                     EPS/RPS state changes."
+		::= { adGenAOSPower 1 }
+
+        adGenAOSPowerTraps        	OBJECT IDENTIFIER ::= { adGenAOSPower 0 }
+        adGenAOSPowerRollOverCtl  	OBJECT IDENTIFIER ::= { adGenAOSPowerMonitor 1 }
+        adGenAOSPowerEpsRps 		OBJECT IDENTIFIER ::= { adGenAOSPowerMonitor 2 }
+
+
+AdEpsPowerDeliveryStateTC  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates Failure State of a power supply "
+    SYNTAX      INTEGER {
+        delivering(1),
+	 notDelivering(2),
+        failed(3),
+        unknown(4)
+    }
+
+AdRpsPowerDeliveryStateTC  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates Failure State of a power supply "
+    SYNTAX      INTEGER {
+        failed(1),
+        busy(2),
+        delivering(3),
+        available(4),
+        unknown(5)
+   }
+
+AdPowerConnectionStateTC  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates Failure State of a power supply "
+    SYNTAX      INTEGER {
+        connected(1),
+        notConnected(2),
+        notApplicable(3),
+        unknown(4)
+    }
+
+--
+-- Power Rollover Control
+--
+adGenAOSPowerRolloverOnAC  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Integer value specifying whether or not unit is on AC power."
+    ::= { adGenAOSPowerRollOverCtl 1 }
+
+adGenAOSPwrRollOvrEvntSecSinceEpoch  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time (seconds since epoch) that a power rollover trap was
+        generated."
+    ::= { adGenAOSPowerRollOverCtl  2 }
+
+     --
+
+     -- EPS/RPS Table
+
+     --   
+
+     adGenAOSPowerEpsRpsTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF AdGenAOSPowerEpsRpsEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "EPS/RPS Power Table."
+         ::= { adGenAOSPowerEpsRps 1 }
+
+
+	adGenAOSPowerEpsRpsEntry OBJECT-TYPE
+         SYNTAX   AdGenAOSPowerEpsRpsEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "EPS/RPS entry for a particular VCID."
+         INDEX { adGenAOSPowerEpsRpsInstanceId }
+         ::= {adGenAOSPowerEpsRpsTable 1 }
+
+     AdGenAOSPowerEpsRpsEntry ::=
+         SEQUENCE {
+             adGenAOSPowerEpsRpsInstanceId				     Unsigned32,
+             adGenAOSPowerEpsConnectionState                 AdPowerConnectionStateTC,
+             adGenAOSPowerEpsDeliveryState                 	 AdEpsPowerDeliveryStateTC,
+             adGenAOSPowerRpsConnectionState                 AdPowerConnectionStateTC,
+             adGenAOSPowerRpsDeliveryState                 	 AdRpsPowerDeliveryStateTC
+     }
+
+
+     adGenAOSPowerEpsRpsInstanceId OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+                "Uniquely identifies a row in the adGenAOSEpsRpsTable."
+         ::= { adGenAOSPowerEpsRpsEntry 1 }
+
+adGenAOSPowerEpsConnectionState  OBJECT-TYPE
+    SYNTAX     AdPowerConnectionStateTC
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Text value specifying if an EPS is connected or not."
+    ::= { adGenAOSPowerEpsRpsEntry 2 }
+
+adGenAOSPowerEpsDeliveryState  OBJECT-TYPE
+    SYNTAX     AdEpsPowerDeliveryStateTC
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Text value specifying the delivery state of the EPS power."
+    ::= { adGenAOSPowerEpsRpsEntry 3 }
+
+adGenAOSPowerRpsConnectionState  OBJECT-TYPE
+    SYNTAX     AdPowerConnectionStateTC
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Text value specifying if an RPS is connected or not."
+    ::= { adGenAOSPowerEpsRpsEntry  4 }
+
+adGenAOSPowerRpsDeliveryState  OBJECT-TYPE
+    SYNTAX     AdRpsPowerDeliveryStateTC
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Text value specifying the delivery state of the RPS power."
+    ::= { adGenAOSPowerEpsRpsEntry  5 }
+
+--
+-- Notifications
+--
+adGenAOSPowerRollover NOTIFICATION-TYPE
+    OBJECTS { adGenAOSPowerRolloverOnAC,
+                adGenAOSPwrRollOvrEvntSecSinceEpoch  }
+    STATUS  current
+    DESCRIPTION
+    	"This trap indicates the unit has had a change in power source, either from AC to DC or back again.  The SecSinceEpoch represents the time (seconds since epoch) that the rollover occured."
+	::= { adGenAOSPowerTraps 1 }
+
+adGenAOSEpsConnectionChange NOTIFICATION-TYPE
+    OBJECTS { adGenAOSPowerEpsRpsInstanceId, adGenAOSPowerEpsConnectionState  }
+    STATUS  current
+    DESCRIPTION
+    	"This trap indicates the unit has had a change in the EPS connection state."
+	::= { adGenAOSPowerTraps 2 }
+
+adGenAOSEpsDeliveryChange NOTIFICATION-TYPE
+    OBJECTS { adGenAOSPowerEpsRpsInstanceId, adGenAOSPowerEpsDeliveryState  }
+    STATUS  current
+    DESCRIPTION
+    	"This trap indicates the unit has had a change in the EPS delivery state."
+	::= { adGenAOSPowerTraps 3 }
+
+adGenAOSRpsConnectionChange NOTIFICATION-TYPE
+    OBJECTS { adGenAOSPowerEpsRpsInstanceId, adGenAOSPowerRpsConnectionState  }
+    STATUS  current
+    DESCRIPTION
+    	"This trap indicates the unit has had a change in the RPS connection state."
+	::= { adGenAOSPowerTraps 4 }
+
+adGenAOSRpsDeliveryChange NOTIFICATION-TYPE
+    OBJECTS { adGenAOSPowerEpsRpsInstanceId, adGenAOSPowerRpsDeliveryState  }
+    STATUS  current
+    DESCRIPTION
+    	"This trap indicates the unit has had a change in the RPS delivery state."
+	::= { adGenAOSPowerTraps 5 }
+
+-- conformance information
+
+     adGenAOSPowerConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 11 }
+     adGenAOSPowerGroups      OBJECT IDENTIFIER ::= { adGenAOSPowerConformance 1 }
+     adGenAOSPowerCompliances OBJECT IDENTIFIER ::= { adGenAOSPowerConformance 2 }
+
+--
+-- MIB Compliance statements.
+--
+
+-- Full compliance statement
+     adGenAOSPowerFullCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        version 2 of the adGenAOSPower MIB. When this MIB is fully
+        implemented, then such an implementation can claim
+        full compliance."
+
+         MODULE  -- this module
+
+         GROUP adGenAOSPowerRollOverCtlGroup
+         DESCRIPTION
+            "A collection of objects providing read/write configuration
+            information for the management of power rollovers."
+
+           GROUP adGenAOSPowerNotificationGroup
+         DESCRIPTION
+            "This mandatory group is used for the management of
+            power rollover notifications."
+      
+         GROUP adGenAOSEpsRpsConfigurationGroup
+         DESCRIPTION
+            "A collection of objects providing read-only configuration
+            information for the management of EPS and RPS."
+
+         GROUP adGenAOSEpsNotificationGroup
+         DESCRIPTION
+            "This mandatory group is used for the management of
+            EPS notifications."
+
+         GROUP adGenAOSRpsNotificationGroup
+         DESCRIPTION
+            "This mandatory group is used for the management of
+            RPS notifications."
+        ::= { adGenAOSPowerCompliances 1 }
+
+
+     adGenAOSPowerNotificationGroup NOTIFICATION-GROUP
+         NOTIFICATIONS { adGenAOSPowerRollover }
+         STATUS  current
+         DESCRIPTION
+            "Trap which may be used to enhance power event driven
+            management of the Unit."
+         ::= { adGenAOSPowerGroups 1 }
+
+        adGenAOSPowerRollOverCtlGroup OBJECT-GROUP
+          	OBJECTS {
+                    	adGenAOSPwrRollOvrEvntSecSinceEpoch,
+                    	adGenAOSPowerRolloverOnAC
+                    }
+  			STATUS  current
+        	DESCRIPTION
+                "The Unit SNMP Config Group."
+        ::= { adGenAOSPowerGroups 2 }
+
+     adGenAOSEpsNotificationGroup NOTIFICATION-GROUP
+         NOTIFICATIONS { adGenAOSEpsConnectionChange, adGenAOSEpsDeliveryChange }
+         STATUS  current
+         DESCRIPTION
+            "Trap used to indicate state changes of EPS."
+         ::= { adGenAOSPowerGroups 3 }
+
+     adGenAOSRpsNotificationGroup NOTIFICATION-GROUP
+         NOTIFICATIONS { adGenAOSRpsConnectionChange, adGenAOSRpsDeliveryChange }
+         STATUS  current
+         DESCRIPTION
+            "Trap used to indicate state changes of RPS."
+         ::= { adGenAOSPowerGroups 4 }
+
+
+        adGenAOSEpsRpsConfigurationGroup OBJECT-GROUP
+            OBJECTS {
+	    				adGenAOSPowerEpsRpsInstanceId,
+                      	adGenAOSPowerRpsConnectionState,
+                      	adGenAOSPowerRpsDeliveryState,
+                      	adGenAOSPowerEpsConnectionState,
+                      	adGenAOSPowerEpsDeliveryState
+                    }
+            STATUS  current
+        	DESCRIPTION
+                "The Unit SNMP Config Group."
+        ::= { adGenAOSPowerGroups 5 }
+END

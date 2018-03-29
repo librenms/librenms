@@ -1,0 +1,171 @@
+-- *******************************************************************
+-- Juniper Networks Security IPSEC VPN object mibs 
+-- This Mib provides extension to JUNIPER-IPSEC-FLOW-MON_MIB.
+--
+-- Copyright (c) 2001-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-JS-IPSEC-VPN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE  
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString 
+            FROM SNMPv2-TC
+        jnxJsIPSecVpn 
+            FROM JUNIPER-JS-SMI
+        jnxIpSecTunnelMonEntry
+            FROM JUNIPER-IPSEC-FLOW-MON-MIB;
+
+    jnxJsIpSecVpnMib  MODULE-IDENTITY
+        LAST-UPDATED "200705112153Z" --  May 11, 2007 
+        ORGANIZATION "Juniper Networks, Inc."
+        CONTACT-INFO
+                "Juniper Technical Assistance Center
+                      Juniper Networks, Inc.
+                      1194 N. Mathilda Avenue
+                      Sunnyvale, CA 94089
+                      E-mail: support@juniper.net"
+        DESCRIPTION
+            "This module defines the object used to monitor the
+             entries pertaining to IPSec objects and the management
+             of the IPSEC VPN functionalities for Juniper security 
+             product lines.  
+
+             This mib module extend Juniper's common IPSEC flow monitoring
+             MIB, building on the existing common infrastruature, the  
+	     security implementation integrates the value-added 
+	     features for the security products"
+        REVISION "200704270000Z"
+	DESCRIPTION 
+            "Create the jnxJsIpSecTunnelTable as an augmented table 
+             to the jnxIpSecTunnelMonTable in JUNIPER-IPSEC-FLOW-MON-MIB."
+        ::= { jnxJsIPSecVpn 1 } 
+
+
+    jnxJsIpSecVpnNotifications OBJECT IDENTIFIER ::= { jnxJsIpSecVpnMib 0 }
+    jnxJsIpSecVpnPhaseOne      OBJECT IDENTIFIER ::= { jnxJsIpSecVpnMib 1 }
+    jnxJsIpSecVpnPhaseTwo      OBJECT IDENTIFIER ::= { jnxJsIpSecVpnMib 2 }
+   
+
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- TEXTURE CONVENTION 
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    JnxJsIpSecVpnType  ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+             "The type of the remote peer gateway (endpoint). It can be one
+             of the following two types:
+               - policyBased : tunnels requires a policy with action 
+                 'tunnel' to trigger IPSEC VPN.  The device receives traffic
+                 and matches it with policy that has action 'tunnel', it 
+                 performs the encryption/decryption and authentication options
+                 negotiated for this VPN phase 2 negotiation.  
+               - routeBased : requires a tunnel interface a route directing
+                 traffic to protected networks to exit the system using that 
+                 tunnel interface.  The tunnel interface is bound to a Phase 2
+                 VPN configuration that specifies all the tunnel parameters.
+             "
+         SYNTAX INTEGER {
+                   policyBased (1),
+                   routeBased  (2)
+         }  
+
+   -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IPsec Phase-2 Tunnel Table
+   -- 
+   -- During this phase, IKE negotiates IPSEC SA parameters and setup 
+   -- matching IPSEC SA in the peers.
+   -- 
+   -- Phase 2 VPN: tunnel peer connection, associated with a specific policy
+   -- or a tunnel interface.  Phase 2 security association components include
+   -- encryption and authentication algorithms, proxy-IDs and optional DH 
+   -- group values.
+   -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+     jnxJsIpSecTunnelTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF JnxJsIpSecTunnelEntry
+         MAX-ACCESS 	not-accessible
+         STATUS         current
+         DESCRIPTION
+            "The IPsec Phase-2 Tunnel Table.
+             There is one entry in this table for each active IPsec Phase-2 
+             Tunnel.  If the tunnel is terminated, then the entry is no longer 
+             available after the table has been refreshed. "
+         ::= { jnxJsIpSecVpnPhaseTwo 1 }
+
+     jnxJsIpSecTunnelEntry OBJECT-TYPE
+         SYNTAX     JnxJsIpSecTunnelEntry
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+            "Each entry contains the attributes
+             associated with an active IPsec Phase-2 Tunnel."
+	 AUGMENTS   { jnxIpSecTunnelMonEntry }  -- This table augments the
+                                                -- jnxIpSecTunnelMonTable
+         ::= { jnxJsIpSecTunnelTable 1 }
+
+      JnxJsIpSecTunnelEntry ::= SEQUENCE {
+         jnxJsIpSecTunPolicyName           DisplayString,
+         jnxJsIpSecVpnTunType              JnxJsIpSecVpnType, 
+	 jnxJsIpSecTunCfgMonState          INTEGER, 
+	 jnxJsIpSecTunState                INTEGER 
+      }											
+
+      jnxJsIpSecTunPolicyName   OBJECT-TYPE
+         SYNTAX 	DisplayString(SIZE(0..80)) 
+         MAX-ACCESS     read-only 
+         STATUS         current 
+         DESCRIPTION
+            "The policy name assoicated with this tunnel if the 
+             this IPSEC VPN is policy based.  Otherwise, this attribute
+             is not applicable."
+         ::= { jnxJsIpSecTunnelEntry 1 }
+	
+
+      jnxJsIpSecVpnTunType OBJECT-TYPE
+         SYNTAX     JnxJsIpSecVpnType
+         MAX-ACCESS read-only               
+         STATUS     current
+         DESCRIPTION
+            "This attribute indicates the IPSEC VPN tunnel is policy
+             based or route based."
+         ::= { jnxJsIpSecTunnelEntry 2 }
+
+
+      jnxJsIpSecTunCfgMonState OBJECT-TYPE
+         SYNTAX     INTEGER {
+                           disable     (1),
+                           enable      (2)
+		    }
+         MAX-ACCESS 	read-only 
+         STATUS         current 
+         DESCRIPTION
+            "The user configuration states whether to monitor the  
+	     IPSec tunnel to be alive or not. " 
+         ::= { jnxJsIpSecTunnelEntry 3 }
+
+
+	jnxJsIpSecTunState OBJECT-TYPE
+         SYNTAX     INTEGER {
+                         up 	(1),
+                         down	(2),
+                         vpnMonitoringDisabled (3)
+		    }
+         MAX-ACCESS 	read-only 
+         STATUS		current 
+         DESCRIPTION
+            "This attribute indicates whether the IPSec Tunnel is up or
+	         down, determined by icmp ping if the jnxJsIpSecTunCfgMonState
+             is enable.  
+
+             Down: VPN monitor detects the tunnel is down
+             Up:   VPN monitor detects the tunnel is up.
+             vpnMonitoringDisabled: user has disabled VPN tunnel monitoring." 
+         ::= { jnxJsIpSecTunnelEntry 4 }
+
+END
+

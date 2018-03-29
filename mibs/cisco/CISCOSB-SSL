@@ -1,0 +1,565 @@
+CISCOSB-SSL DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Ssl Private Extension
+-- Version:    7.35
+-- Date:       20 Jan 2004
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    Unsigned32, IpAddress,
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    TruthValue, RowStatus, DisplayString,
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
+
+rlSsl MODULE-IDENTITY
+        LAST-UPDATED "200309210000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for SSL."
+        REVISION "200309210000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 100 }
+
+rlSslCertificateGenerationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSslCertificateGenerationEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for :
+    1. generating keys and self signed certificate - saved in flash and RAM
+    (not in configuration file)
+    2. generating certificate requests - saved in RAM, can be read by
+    rlSslCertificateExportTable
+    3. generating self signed certificate - saved in flash and RAM (not in
+    configuraion file)
+    By setting rlSslCertificateGenerationAction to the appropriate
+    value this action takes place. The other fields of this table are used for
+    each of this actions"
+    ::= { rlSsl 1 }
+
+rlSslCertificateGenerationEntry  OBJECT-TYPE
+   SYNTAX RlSslCertificateGenerationEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX {  rlSslCertificateGenerationIndex }
+   ::= { rlSslCertificateGenerationTable 1 }
+
+RlSslCertificateGenerationEntry ::= SEQUENCE {
+  rlSslCertificateGenerationIndex                   INTEGER,
+  rlSslCertificateGenerationId                      INTEGER,
+  rlSslCertificateGenerationCountryName             DisplayString,
+  rlSslCertificateGenerationStateOrProvinceName     DisplayString,
+  rlSslCertificateGenerationLocalityName            DisplayString,
+  rlSslCertificateGenerationOrganizationName        DisplayString,
+  rlSslCertificateGenerationOrganizationUnitName    DisplayString,
+  rlSslCertificateGenerationCommonName              DisplayString,
+  rlSslCertificateGenerationValidDays               INTEGER,
+  rlSslCertificateGenerationRsaKeyLength            INTEGER,
+  rlSslCertificateGenerationPassphrase              DisplayString,
+  rlSslCertificateGenerationAction                  INTEGER
+}
+
+rlSslCertificateGenerationIndex   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "This index is always set to 1 no matter for which certificate or
+    certificate request the action refers to."
+     ::=  { rlSslCertificateGenerationEntry  1 }
+
+rlSslCertificateGenerationId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "The device can hold a number of keys/certificates/certificate requests.
+    These certificates are always numbered from 1 to N (maximum number of
+    certificates in device). This field decides to which
+    keys/certificates/certificate requests the action refers."
+     ::=  { rlSslCertificateGenerationEntry  2 }
+
+
+rlSslCertificateGenerationCountryName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(2))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of country name field that will appear when a new certificate
+        request or self signed certificate is generated."
+    ::= { rlSslCertificateGenerationEntry   3 }
+
+rlSslCertificateGenerationStateOrProvinceName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of state or province name field that will appear when a new
+        certificate or self signed certificate is generated."
+    ::= { rlSslCertificateGenerationEntry   4 }
+
+
+rlSslCertificateGenerationLocalityName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of locality field that will appear when a new certificate or
+        self signed certificate is generated."
+    ::= { rlSslCertificateGenerationEntry   5 }
+
+
+rlSslCertificateGenerationOrganizationName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of organization field that will appear when a new certificate or
+        self signed certificate is generated."
+    ::= { rlSslCertificateGenerationEntry   6 }
+
+rlSslCertificateGenerationOrganizationUnitName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of organization field that will appear when a new certificate or
+        self signed certificate is generated."
+    ::= { rlSslCertificateGenerationEntry   7 }
+
+rlSslCertificateGenerationCommonName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Value of common name field that will appear when a new certificate or
+        self signed certificate is generated."
+    ::= { rlSslCertificateGenerationEntry   8 }
+
+rlSslCertificateGenerationValidDays OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "When generating self signed certificate this field sets the valid fields.
+        'Valid from' is current GMT and 'valid to' current GMT + the value of
+        this field."
+    ::= { rlSslCertificateGenerationEntry   9 }
+
+rlSslCertificateGenerationRsaKeyLength OBJECT-TYPE
+    SYNTAX  INTEGER (512..2048)
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting the RSA key size that will be created when a new key is generated -
+         generateRsaKeyAndSelfSignedCertificate"
+    ::= { rlSslCertificateGenerationEntry   10 }
+
+rlSslCertificateGenerationPassphrase OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When a RSA key is generated (generateRsaKeyAndSelfSignedCertificate)
+        this passphrase is saved in flash and when the time comes and the
+        certificate and the key are exported in PKCS12 format this passphrase
+        is used to encrypt it. If the passphrase is empty the key and
+        certificate can not be exported. There is no method of obtaining this
+        passphrase once a key was generated."
+    ::= { rlSslCertificateGenerationEntry   11 }
+
+
+rlSslCertificateGenerationAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+       generateRsaKeyAndSelfSignedCertificate(1),
+       generateSelfSignedCertificate(2),
+       generatePkcs12(3),
+       generateCertificateRequest(4)
+     }
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting to a regenerateCertificate causes a new certificate to be
+        generated and to be used for all new sessions."
+    ::= { rlSslCertificateGenerationEntry   12 }
+
+
+
+
+rlSslCertificateExportTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSslCertificateExportEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for viewing saved data from RAM and flash."
+    ::= { rlSsl 2 }
+
+rlSslCertificateExportEntry  OBJECT-TYPE
+   SYNTAX RlSslCertificateExportEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX {     rlSslCertificateExportId,
+               rlSslCertificateExportType,
+               rlSslCertificateExportFragmentId }
+   ::= { rlSslCertificateExportTable 1 }
+
+RlSslCertificateExportEntry ::= SEQUENCE {
+  rlSslCertificateExportId              INTEGER,
+  rlSslCertificateExportType            INTEGER,
+  rlSslCertificateExportFragmentId      INTEGER,
+  rlSslCertificateExportFragmentText    OCTET STRING
+}
+
+rlSslCertificateExportId     OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this certficate / certificate request the table holds."
+     ::=  { rlSslCertificateExportEntry  1 }
+
+rlSslCertificateExportType        OBJECT-TYPE
+   SYNTAX INTEGER {
+           certificateRequestPemFormat (1),
+           certificatePemFormat(2),
+           certificateOpenSslFormat(3),
+           certificateAndKeyPkcs12(4)
+     }
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "Identifies the type of data the current entry shows."
+     ::=  { rlSslCertificateExportEntry  2 }
+
+rlSslCertificateExportFragmentId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this fragment in the certificate request."
+     ::=  { rlSslCertificateExportEntry  3 }
+
+rlSslCertificateExportFragmentText    OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "A part of the readable text entry for the certificate request."
+     ::=  { rlSslCertificateExportEntry  4 }
+
+
+
+rlSslCertificateSave OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Saves data from rlSslCertificateImportTable to RAM and CDB. When
+        an external certificate should be copied to the device first we copy
+        it to rlSslCertificateImportTable and then this scalar is set to the
+        certificate id that we want to save -
+        1. All entries in rlSslCertificateImportTable that have this id and
+        their format is equal to the current value of rlSslCertificateSaveFormat
+        are concatenated.
+        2. If the imported certificate format is .. - section 1 result
+        is validated against the key with the same index. If validation fails
+        for any reason - the certificate is not saved and the setting this
+        scalar fails.]
+        This scalar is for certificate 1 only... for certificate 2 use
+        rlSslCertificateSave2 "
+    ::= { rlSsl  3 }
+
+rlSslCertificateSaveFormat OBJECT-TYPE
+    SYNTAX  INTEGER{
+            x509 (1),
+            pkcs12(2)
+        }
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { rlSsl  4 }
+
+rlSslImportedPKCS12CertificatePassphrase OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(8..96))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { rlSsl  5 }
+
+
+rlSslCertificateImportTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSslCertificateImportEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for copying an external certificate to the device -
+    see rlSslCertificateSave"
+    ::= { rlSsl 6 }
+
+rlSslCertificateImportEntry  OBJECT-TYPE
+   SYNTAX RlSslCertificateImportEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSslCertificateImportId,
+           rlSslCertificateImportFormat,
+           rlSslCertificateImportFragmentId}
+   ::= { rlSslCertificateImportTable 1 }
+
+RlSslCertificateImportEntry ::= SEQUENCE {
+  rlSslCertificateImportId              INTEGER,
+  rlSslCertificateImportFormat          INTEGER,
+  rlSslCertificateImportFragmentId      INTEGER,
+  rlSslCertificateImportFragmentText    OCTET STRING,
+  rlSslCertificateImportFragmentStatus  RowStatus
+}
+
+rlSslCertificateImportId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "The certificate ID."
+     ::=  { rlSslCertificateImportEntry  1 }
+
+rlSslCertificateImportFormat   OBJECT-TYPE
+   SYNTAX INTEGER {
+            x509 (1),
+            pkcs12(2)
+           }
+
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "."
+     ::=  { rlSslCertificateImportEntry  2 }
+
+
+rlSslCertificateImportFragmentId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this fragment in the certificate."
+     ::=  { rlSslCertificateImportEntry  3 }
+
+
+rlSslCertificateImportFragmentText    OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "A part of the readable text entry for the certificate."
+     ::=  { rlSslCertificateImportEntry  4 }
+
+rlSslCertificateImportFragmentStatus    OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    ""
+     ::=  { rlSslCertificateImportEntry  5 }
+
+
+ rlSslSSLv2Enable OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if enabled then SSLv2 will be supported , if disabled SSLv2 won't be supported.
+         only SSLV3 and TSL1.
+         Note: disabling SSLv2 is more secure."
+     ::= { rlSsl 7 }
+
+RlSslPublicKeyAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention describes the various possible public key
+         algorithms.  The key algorithm is used to select the PK to be generated
+         and is also used when viewing the public keys."
+
+    SYNTAX  INTEGER {
+        rsa(1),
+        dsa(2)
+    }
+
+
+rlSslImportExportSelfKeyTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSslImportExportSelfKeyEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table can be used for 2 purposes:
+     1) Importing public/private key pair to serve as the device key when acting
+     as SSL server. This is done by setting entries to this table, according to
+     the specified format. When the last entry (footer) is set, the whole key
+     pair is checked and if valid, stored in CDB.
+     2) Exporting the device SSL server public/private key. This can be done by
+     performing GetNext operations on this table."
+    ::= { rlSsl 8 }
+
+rlSslImportExportSelfKeyEntry  OBJECT-TYPE
+   SYNTAX RlSslImportExportSelfKeyEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSslImportExportSelfKeyFormat,
+           rlSslImportExportSelfKeyIndex,
+           rlSslImportExportSelfKeyFragmentId}
+   ::= { rlSslImportExportSelfKeyTable 1 }
+
+RlSslImportExportSelfKeyEntry ::= SEQUENCE {
+  rlSslImportExportSelfKeyFormat          INTEGER,
+  rlSslImportExportSelfKeyIndex           INTEGER,
+  rlSslImportExportSelfKeyFragmentId      INTEGER,
+  rlSslImportExportSelfKeyAlgorithm       RlSslPublicKeyAlgorithm,
+  rlSslImportExportSelfKeyFragmentText    OCTET STRING
+}
+
+
+rlSslImportExportSelfKeyFormat   OBJECT-TYPE
+   SYNTAX INTEGER {
+            uuencoded-format(1)
+           }
+
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Specifies the format of public/key pair. The following formats are
+    supported for import/export:
+    1) uuencoded_format - in this format both private and public key are in
+    uu-encoded format, and are seperated from one another by header and footer.
+    An example of the concateneation of all fragments in this format is:
+    -----BEGIN RSA PRIVATE KEY-----
+    tDaNkZZoCxXfkLLsLDlZ6T9H8U4Gz637eRV7BYBpapkidAxY1UG0/qgfKLPkbId4wzht6ArV9bE4fMtX
+    wSMOxL3q31pOmUdVhjbWYcgZQBDy1DjFSbuIEdP85c96B9bBE2nPv90mSvb/6j8R2NItT/KJeiYMtLtI
+    N3m6/zESKJGIrX0jP1RFDjVZSS5chSAFgB0egsLZEyOQn7jAqpX/x/easD2J6F/OjPXlJ9Hff2tMb3NU
+    QYyBoWH2J9IxhWB6Vo66R9Y04JGR18uL/rV2sMCtpg5ppkVTEpNTp9qE1yXocR2NmzUfNFap+GJ4IHj8
+    CzkVfmJM/kEWaJsYgHbAgLyRg4QVyelfobv1B71aQ+u1z9KGu/QajkWdR04OQfsGOL1CvU2LGYDcRjfH
+    jv+jl/UkDRRjoD9kt2WvouT+OL6esvKl0OJBqWbGNXg9TWv/VLtJIwgUno+MLaJuOM4Fh44+wpnqUXwQ
+    TFtBFc8pzt5BoOwbv9gXpicTkq4/+GhwXWXxSVFebKhnHAvKSLT+Ba7K7ZeR8EIIxbXdDNFOiS45R2KI
+    jxxXLXK44u6KGl5MygCKXUOFlJ+Zhgrq6ZH17z/RVJQ2CWqb5Ekn9GY3kH9QZ3mb4MDPfriWi2lHGXHY
+    JmJd4SLQhpBdnOS5tu84QmyU3dNbAdzghDsR+dEY/6g7Cn0kcVkeHNZ0H+mCZik5f6XBD8eplkk43bdR
+    FrkwTeAjwurGcKwdiKkR4DlfSq3DKssVBucTqUpqsKqPXLwTIL44rWKhEPXgGPB2XDG0VLvIRKkAgEGI
+    LNTwOm091Ro=
+    -----END RSA PRIVATE KEY-----
+
+    -----BEGIN RSA PUBLIC KEY-----
+    MIGHAoGBAOeIC9gRg3YaEGGMp3C00qNwLINAEDZV/J4BWM5WnWwCWZyHXDs2XiEmFu0ZONAD4gcT2f2f
+    NNfCBPye39VVuOkKQuSV0MLLX5800LZ4y1BNcPzPZHpnGaCzl7iAjhfj9MolzAh5VRjeiYt0t1um4dm+
+    q9A4BtfpJqDYxCW9uxd/AgEj
+    -----END RSA PUBLIC KEY-----
+    "
+     ::=  { rlSslImportExportSelfKeyEntry  1 }
+
+rlSslImportExportSelfKeyIndex   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Identifies the SSL server key index (there can be more than one key)."
+     ::=  { rlSslImportExportSelfKeyEntry  2 }
+
+rlSslImportExportSelfKeyFragmentId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this fragment in the key pair input/output."
+     ::=  { rlSslImportExportSelfKeyEntry  3 }
+
+rlSslImportExportSelfKeyAlgorithm   OBJECT-TYPE
+   SYNTAX RlSslPublicKeyAlgorithm
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "Identifies the type of key pair."
+     ::=  { rlSslImportExportSelfKeyEntry  4 }
+
+rlSslImportExportSelfKeyFragmentText    OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "A part of the readable text entry for the key pair input/output."
+     ::=  { rlSslImportExportSelfKeyEntry  5 }
+
+
+--
+--rlSslImportExportSelfKeyStatus    OBJECT-TYPE
+--   SYNTAX RowStatus
+--   MAX-ACCESS   read-write
+--   STATUS current
+--   DESCRIPTION
+--   ""
+--     ::=  { rlSslImportExportSelfKeyEntry  6 }
+--
+
+
+rlSslCertificateSave2 OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Saves data from rlSslCertificateImportTable to RAM and CDB. When
+        an external certificate should be copied to the device first we copy
+        it to rlSslCertificateImportTable and then this scalar is set to the
+        certificate id that we want to save -
+        1. All entries in rlSslCertificateImportTable that have this id and
+        their format is equal to the current value of rlSslCertificateSaveFormat
+        are concatenated.
+        2. If the imported certificate format is .. - section 1 result
+        is validated against the key with the same index. If validation fails
+        for any reason - the certificate is not saved and the setting this
+        scalar fails.]
+        This scalar is for certificate 2 only... for certificate 1 use
+        rlSslCertificateSave  "
+    ::= { rlSsl  9 }
+
+rlSslisCertificate1Default OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to true then this is the default key , will be configured
+         when auto generation is done , will set to try , all other cases will
+         be set to false.
+          "
+    ::= { rlSsl  10 }
+
+rlSslisCertificate2Default OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to true then this is the default key , will be configured
+         when auto generation is done , will set to try , all other cases will
+         be set to false.
+          "
+    ::= { rlSsl  11 }
+
+
+
+
+END
+
+
+

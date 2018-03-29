@@ -1,0 +1,52 @@
+	-- SmartOptics Enterprise Specific MIB.
+--
+-- Copyright (c) 2011, SmartOptics
+-- All rights reserved
+--
+
+MSERIES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI;
+
+smartoptics     MODULE-IDENTITY
+                LAST-UPDATED    "201402121327Z"
+                ORGANIZATION    "SmartOptics"
+                CONTACT-INFO    "http://www.smartoptics.com"
+                DESCRIPTION
+                                "This is the enterprise specific MIB for SmartOptics M-Series.
+
+                                 The root of the OID sub-tree assigned to SmartOptics."
+                REVISION        "201402121327Z"
+                DESCRIPTION
+                                "The initial revision."
+
+                ::=  { enterprises  30826 }
+
+        mseries   OBJECT-IDENTITY
+                  STATUS      current
+                  DESCRIPTION
+                      "The M-Series product root."
+                ::=  { smartoptics  1}
+
+
+
+-- MIB overview
+
+-- MSERIES-SYSTEM           smartSystemMIB
+--                          tbd
+
+-- MSERIES-ALARM            smartAlarmMIB
+--                          Active Alarm List and Log.
+
+-- MSERIES-TC               smartTcMIB
+--                          Textual coneventions
+
+-- MSERIES-PORT             smartPortMIB
+--                          Line and Client Port Description.
+
+-- MSERIES-ENVMON           smartEnvMonMIB
+--                          Temperature sensor reading from the M-Series.
+
+END

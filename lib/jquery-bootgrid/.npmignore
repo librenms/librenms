@@ -1,0 +1,14 @@
+build
+demo
+dist/*.nupkg
+dist/*.zip
+docs
+lib
+*.nuspec
+test
+.gitattributes
+.gitignore
+.travis.yml
+bootgrid.jquery.json
+bower.json
+Gruntfile.js

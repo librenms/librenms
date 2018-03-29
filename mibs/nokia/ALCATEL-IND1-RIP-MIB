@@ -1,0 +1,1157 @@
+ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress, TimeTicks, Integer32
+            FROM SNMPv2-SMI
+      	rip2IfConfEntry
+			FROM RIPv2-MIB
+        DisplayString, RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+	    routingIND1Rip
+		    FROM ALCATEL-IND1-BASE;
+
+
+    alcatelIND1RIPMIB MODULE-IDENTITY
+        LAST-UPDATED "200704030000Z"
+        ORGANIZATION "Alcatel-Lucent"
+        CONTACT-INFO
+                " Please consult with Customer Service to ensure the most appropriate
+                  version of this document is used with the products in question:
+
+                            Alcatel-Lucent, Enterprise Solutions Division
+                           (Formerly Alcatel Internetworking, Incorporated)
+                                   26801 West Agoura Road
+                                Agoura Hills, CA  91301-5122
+                                  United States Of America
+
+                Telephone:               North America  +1 800 995 2696
+                                         Latin America  +1 877 919 9526
+                                         Europe         +31 23 556 0100
+                                         Asia           +65 394 7933
+                                         All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+                "This module describes an authoritative enterprise-specific Simple
+                 Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                     For the Birds Of Prey Product Line
+                     Configuration Of Global RIP Configuration Parameters.
+
+                 The right to make changes in specification and other information
+                 contained in this document without prior notice is reserved.
+
+                 No liability shall be assumed for any incidental, indirect, special, or
+                 consequential damages whatsoever arising from or related to this
+                 document or the information contained herein.
+
+                 Vendors, end-users, and other interested parties are granted
+                 non-exclusive license to use this specification in connection with
+                 management of the products for which it is intended to be used.
+
+                             Copyright (C) 1995-2007 Alcatel-Lucent
+                                 ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION         "200704030000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+
+        ::= { routingIND1Rip 1 }
+
+    alcatelIND1RIPMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for Routing Information Protocol (RIP)
+             Subsystem Managed Objects."
+        ::= { alcatelIND1RIPMIB 1 }
+
+
+    alcatelIND1RIPMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for Routing Information Protocol (RIP)
+             Subsystem Conformance Information."
+        ::= { alcatelIND1RIPMIB 2 }
+
+
+    alcatelIND1RIPMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for Routing Information Protocol (RIP)
+             Subsystem Units Of Conformance."
+        ::= { alcatelIND1RIPMIBConformance 1 }
+
+
+    alcatelIND1RIPMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for Routing Information Protocol (RIP)
+             Subsystem Compliance Statements."
+        ::= { alcatelIND1RIPMIBConformance 2 }
+
+
+--********************************************************************
+--************************ Textual Conventions ***********************
+--********************************************************************
+	AlaAuthenticationEncryptKey ::= TEXTUAL-CONVENTION
+		STATUS         current
+		DESCRIPTION
+			"The authentication encryption key that is used to decypher
+			RIP simple passwords."
+		SYNTAX	OCTET STRING (SIZE(16))
+
+
+
+-- ************************************************************************
+--  RIP Global Protocol configuration
+-- ************************************************************************
+
+    alaProtocolRip	OBJECT IDENTIFIER ::= { alcatelIND1RIPMIBObjects 1 }
+
+    alaRipProtoStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Global administration status of RIP."
+        DEFVAL { disable }
+        ::= { alaProtocolRip 1 }
+
+    alaRipHostRouteSupport OBJECT-TYPE
+        SYNTAX  INTEGER {
+                            enable(1),
+                            disable(2)
+                        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Enable or disable support for host routes."
+        DEFVAL { enable }
+        ::= { alaProtocolRip 2 }
+
+    alaRipRedistAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+            "Enable or disable redistribution of routes into RIP.
+             This object has been obsoleted. Use the alaRouteMapRedistProtoEntry 
+             objects of AlcatelIND1RouteMap.mib."
+        DEFVAL { 2 }
+    ::= { alaProtocolRip 3 }
+
+    alaRipRedistRouteTag OBJECT-TYPE
+        SYNTAX  INTEGER ( 0 .. 2147483647 )
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "A 32-bit value tagged to each RIP internal route while
+        it is redistributed in to other routing protocol domains. The
+        lower 16-bits typically indicate the autonomous system number."
+        DEFVAL { 0 }
+    ::= { alaProtocolRip 4 }
+
+    alaRipForceHolddownTimer OBJECT-TYPE
+        SYNTAX INTEGER ( 0 .. 120 )
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interval in seconds during which routing information regarding
+        better paths is suppressed. A route enters into a forced holddown
+        state when an update packet is received that indicates the route is
+        unreachable and when this timer value is nonzero. After this timer
+        has expired, if the value is less that 120 - the route enters a
+        holddown state for the rest of the period until 120. During this time
+        advertisements for better paths are accepted if any."
+        ::= { alaProtocolRip 5 }
+
+    alaRipRouteNumber OBJECT-TYPE
+        SYNTAX  INTEGER ( 0 .. 2147483647 )
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of network routes in RIP routing table."
+        ::= { alaProtocolRip 6 }
+
+    alaRipUpdateInterval OBJECT-TYPE
+        SYNTAX  Integer32 (1 .. 120)
+        UNITS "seconds"
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Interval (in seconds) that RIP routing updates will
+            be sent out.  The value must be less than or equal to
+            one-third the value of the invalid timer."
+        DEFVAL { 30 }
+    ::= { alaProtocolRip 13 }
+
+    alaRipInvalidTimer OBJECT-TYPE
+        SYNTAX  Integer32 (3 .. 360)
+        UNITS "seconds"
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Time in seconds that a route will remain active
+            in RIB before being moved to the invalid state.
+            The value must be at least three times the
+            update interval."
+        DEFVAL { 180 }
+    ::= { alaProtocolRip 14 }
+
+    alaRipHolddownTimer OBJECT-TYPE
+        SYNTAX  Integer32 (0 .. 120)
+        UNITS "seconds"
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Time to keep a route in the holddown state."
+        DEFVAL { 0 }
+    ::= { alaProtocolRip 15 }
+
+    alaRipGarbageTimer OBJECT-TYPE
+        SYNTAX Integer32 (0 .. 180)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Time to keep a route before garbage collection."
+        DEFVAL { 120 }
+    ::= { alaProtocolRip 16 }
+
+
+-- ************************************************************************
+--  RIP Redistribution Protocol configuration
+-- ************************************************************************
+
+	alaRipRedistProtoTable  OBJECT-TYPE
+		SYNTAX    SEQUENCE OF AlaRipRedistProtoEntry
+		MAX-ACCESS    not-accessible
+		STATUS    obsolete
+		DESCRIPTION
+			"Protocol based configuration for route redistribution using RIP.
+             This table has been obsoleted. Use alaRouteMapRedistProtoTable
+             of AlcatelIND1RouteMap.mib."
+            
+		::= { alaProtocolRip 7 }
+
+    alaRipRedistProtoEntry OBJECT-TYPE
+        SYNTAX    AlaRipRedistProtoEntry
+        MAX-ACCESS    not-accessible
+        STATUS    obsolete
+        DESCRIPTION
+            "A range of routes from a protocol to be redistributed using RIP.
+             This entry has been obsoleted. Use alaRouteMapRedistProtoEntry
+             of AlcatelIND1RouteMap.mib."
+            
+        INDEX   { alaRipRedistProtoId }
+    ::= { alaRipRedistProtoTable 1 }
+
+    AlaRipRedistProtoEntry ::=
+        SEQUENCE {
+            alaRipRedistProtoId          INTEGER,
+            alaRipRedistProtoMetric      INTEGER,
+            alaRipRedistProtoStatus      RowStatus
+        }
+
+    alaRipRedistProtoId   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                   other(1),      -- not specified
+                   local(2),      -- local interfaces on which OSPF is not enabled
+                   directHost(3), -- hosts on a directly connected network
+                   netmgmt(4),    -- static routes
+                   rip(5),        -- Routing Information Protocol
+                   ospf(6),       -- Open Shortest Path First
+                   isis(7),       -- IS-IS
+                   bgp(8)         -- Border Gateway Protocol
+                 }
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+            "The routing mechanism via which the routes, to be redistributed 
+             using RIP, are learned. This object has been obsoleted. 
+             Use alaRouteMapRedistProtoEntry objects of AlcatelIND1RouteMap.mib."
+        ::= { alaRipRedistProtoEntry 1 }
+
+    alaRipRedistProtoMetric   OBJECT-TYPE
+         SYNTAX   INTEGER (0 .. 15 )
+         MAX-ACCESS   read-write
+         STATUS   obsolete
+         DESCRIPTION
+             "Default metric to be used for redistributing routes. This object has been
+              obsoleted. Use alaRouteMapRedistProtoEntry objects of AlcatelIND1RouteMap.mib."
+         DEFVAL    { 0 }
+         ::= { alaRipRedistProtoEntry 2 }
+
+    alaRipRedistProtoStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+             "Add or Delete entries. This object has been obsoleted. Use 
+              alaRouteMapRedistProtoEntry objects of AlcatelIND1RouteMap.mib."
+        DEFVAL  { notInService }
+        ::= { alaRipRedistProtoEntry 3 }
+
+
+-- ************************************************************************
+--  RIP Debug Configuration
+-- ************************************************************************
+
+     alaRipDebug OBJECT IDENTIFIER ::= { alcatelIND1RIPMIBObjects 2 }
+
+     alaRipDebugLevel OBJECT-TYPE
+         SYNTAX  INTEGER (0..255)
+         MAX-ACCESS  read-write
+         STATUS  deprecated
+         DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebug
+			Configuration"
+         DEFVAL { 0 }
+         ::= { alaRipDebug 1 }
+
+	 alaRipDebugError OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugError
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 2}
+
+	 alaRipDebugWarn OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugWarning
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 3}
+
+	 alaRipDebugRecv OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugRecv
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 4}
+
+	 alaRipDebugSend OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugSend
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 5}
+
+	 alaRipDebugRdb OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugRdb
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 6}
+
+	 alaRipDebugAge OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugAge
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 7}
+
+	 alaRipDebugConfig OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugConfig
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 8}
+
+	 alaRipDebugRedist OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugRedist
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 9}
+
+	 alaRipDebugInfo OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugInfo
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 10}
+
+	 alaRipDebugSetup OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugSetup
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 11}
+
+	 alaRipDebugTime OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugTime
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 12}
+
+	 alaRipDebugAll OBJECT-TYPE
+		SYNTAX  INTEGER
+					{
+						enable(1),
+						disable(2)
+			   		}
+		MAX-ACCESS read-write
+		STATUS     deprecated
+		DESCRIPTION
+			"This Object is deprecated in favour of alaDrcTmRipDebugAll
+			MIB Object of alaDrcTmRipDebug Configuration"
+		DEFVAL     { disable }
+			::= { alaRipDebug 13}
+
+
+-- ************************************************************************
+--  RIP route table statistics
+-- ************************************************************************
+
+     alaRipRouteTable OBJECT-TYPE
+         SYNTAX    SEQUENCE OF AlaRipRouteEntry
+         MAX-ACCESS    not-accessible
+         STATUS    deprecated
+         DESCRIPTION
+             "RIP routing table which contains the network routes.
+              This Object is deprecated in favour of alaRipEcmpRouteTable."
+         ::= { alaProtocolRip 9 }
+
+     alaRipRouteEntry OBJECT-TYPE
+         SYNTAX   AlaRipRouteEntry
+         MAX-ACCESS   not-accessible
+         STATUS   deprecated
+         DESCRIPTION
+             "RIP routing table which contains the network routes.
+              This Object is deprecated in favour of alaRipEcmpRouteEntry.
+              This deprecated object is indexed by Destination/Mask.
+              With the addition of ECMP support, routes can now have
+              more than one nexthop, which requires routing entries to be
+              identified/indexed by Destination/Mask/NextHop.  As a result
+              of this change, GET/GETNEXT operations on this deprecated
+              object (which provide only Destination/Mask) will fail to
+              uniquely identify a routing table entry.  In response,
+              the router will return only the first nexthop in its list of
+              nexthops for the given routing destination. The order of the
+              router's internal nexthop list is not specified or guaranteed,
+              so there's no assurance that the returned nexthop will be active,
+              installed, or otherwise in service.  To retrieve information
+              on all nexthops for a given destination, use
+              alaRipEcmpRouteTable instead."
+         INDEX {
+                 alaRipRouteDest,
+                 alaRipRouteMask
+               }
+         ::= { alaRipRouteTable 1 }
+
+     AlaRipRouteEntry ::=
+         SEQUENCE {
+             alaRipRouteDest
+                 IpAddress,
+             alaRipRouteMask
+                 IpAddress,
+             alaRipRouteNextHop
+                 IpAddress,
+             alaRipRouteType
+                 INTEGER,
+             alaRipRouteAge
+                 TimeTicks,
+             alaRipRouteTag
+                 INTEGER,
+             alaRipRouteMetric
+                 INTEGER,
+             alaRipRouteStatus
+                 RowStatus
+         }
+
+     alaRipRouteDest OBJECT-TYPE
+         SYNTAX   IpAddress
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The destination IP address of this route.
+             This Object is deprecated in favour of alaRipEcmpRouteDest."
+         ::= { alaRipRouteEntry 1 }
+
+     alaRipRouteMask OBJECT-TYPE
+         SYNTAX   IpAddress
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The network mask for this route.
+             This Object is deprecated in favour of alaRipEcmpRouteMask."
+         ::= { alaRipRouteEntry 2 }
+
+     alaRipRouteNextHop OBJECT-TYPE
+         SYNTAX   IpAddress
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The address of the next hop to reach this route.
+             This Object is deprecated in favour of alaRipEcmpRouteNextHop."
+         ::= { alaRipRouteEntry 3 }
+
+     alaRipRouteType OBJECT-TYPE
+         SYNTAX   INTEGER
+                  {
+                     local  (1), -- local route
+                     remote (2), -- remote route
+                     redistribute (3)  -- redistributed route
+                  }
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The type of route.
+             This Object is deprecated in favour of alaRipEcmpRouteType."
+         ::= { alaRipRouteEntry 4 }
+
+     alaRipRouteAge OBJECT-TYPE
+         SYNTAX   TimeTicks
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The number of seconds  since  this  route  was last
+            updated  or  otherwise  determined  to be correct.
+            This Object is deprecated in favour of alaRipEcmpRouteAge."
+         ::= { alaRipRouteEntry 5 }
+
+     alaRipRouteTag OBJECT-TYPE
+         SYNTAX   INTEGER ( 0 .. 2147483647 )
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The associated route tag.
+             This Object is deprecated in favour of alaRipEcmpRouteTag."
+         DEFVAL { 0 }
+         ::= { alaRipRouteEntry 6 }
+
+     alaRipRouteMetric OBJECT-TYPE
+         SYNTAX   INTEGER ( 0 .. 15 )
+         MAX-ACCESS   read-only
+         STATUS   deprecated
+         DESCRIPTION
+            "The routing  metric  for  this  route.
+             This Object is deprecated in favour of alaRipEcmpRouteMetric."
+         ::= { alaRipRouteEntry 7 }
+
+     alaRipRouteStatus OBJECT-TYPE
+         SYNTAX   RowStatus
+         MAX-ACCESS read-only
+         STATUS    deprecated
+         DESCRIPTION
+            "The row status variable, used according to
+            row installation and removal conventions.
+            This Object is deprecated in favour of alaRipEcmpRouteStatus."
+         ::= { alaRipRouteEntry 8 }
+
+
+-- ************************************************************************
+--  RIP Redistribution filter configuration
+-- ************************************************************************
+
+    alaRipRedistRouteTable OBJECT-TYPE
+        SYNTAX    SEQUENCE OF AlaRipRedistRouteEntry
+        MAX-ACCESS    not-accessible
+        STATUS    obsolete
+        DESCRIPTION
+            "A configuration table which controls the routes to be
+             redistributed by RIP from other routing protocols. This table has been
+             obsoleted. Use alaRouteMapRedistProtoTable of AlcatelIND1RouteMap.mib."
+        ::= { alaProtocolRip 10 }
+
+    alaRipRedistRouteEntry OBJECT-TYPE
+        SYNTAX   AlaRipRedistRouteEntry
+        MAX-ACCESS   not-accessible
+        STATUS   obsolete
+        DESCRIPTION
+            "An entry of alaRipRedistRouteTable which specifies a route or 
+             set of routes to be redistributed by RIP from another routing protocol.
+             This entry has been obsoleted. Use alaRouteMapRedistProtoEntry of
+             AlcatelIND1RouteMap.mib."
+        INDEX {
+                alaRipRedistRouteProto,
+                alaRipRedistRouteDest,
+                alaRipRedistRouteMask
+              }
+        ::= { alaRipRedistRouteTable 1 }
+
+    AlaRipRedistRouteEntry ::=
+        SEQUENCE {
+            alaRipRedistRouteProto
+                INTEGER,
+            alaRipRedistRouteDest
+                IpAddress,
+            alaRipRedistRouteMask
+                IpAddress,
+            alaRipRedistRouteMetric
+                INTEGER,
+            alaRipRedistRouteControl
+                INTEGER,
+            alaRipRedistRouteTagMatch
+                INTEGER,
+            alaRipRedistRouteEffect
+                INTEGER,
+            alaRipRedistRouteStatus
+                RowStatus
+        }
+
+    alaRipRedistRouteProto OBJECT-TYPE
+        SYNTAX   INTEGER
+                 {
+                     other(1),   -- not specified
+                     local(2),   -- local routes
+                     directHost(3), -- hosts on a directly connected network
+                     netmgmt(4), -- static routes
+                     ospf(6),    -- Open Shortest Path First
+                     isis(7),    -- IS-IS
+                     bgp(8)      -- Border Gateway Protocol
+                 }
+        MAX-ACCESS   read-only
+        STATUS   obsolete
+        DESCRIPTION
+           "Protocol from which this route is to be imported into RIP. This object
+            has been obsoleted. Use alaRouteMapRedistProtoEntry objects 
+            of AlcatelIND1RouteMap.mib."
+        ::= { alaRipRedistRouteEntry 1 }
+
+    alaRipRedistRouteDest OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   obsolete
+        DESCRIPTION
+           "The destination IP address of this route. This object
+            has been obsoleted. Use alaRouteMapRedistProtoEntry objects
+            of AlcatelIND1RouteMap.mib."
+        ::= { alaRipRedistRouteEntry 2 }
+
+    alaRipRedistRouteMask OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   obsolete
+        DESCRIPTION
+           "The network mask for this route. This object
+            has been obsoleted. Use alaRouteMapRedistProtoEntry objects
+            of AlcatelIND1RouteMap.mib."
+        ::= { alaRipRedistRouteEntry 3 }
+
+    alaRipRedistRouteMetric OBJECT-TYPE
+        SYNTAX   INTEGER ( 0 .. 15 )
+        MAX-ACCESS   read-write
+        STATUS   obsolete
+        DESCRIPTION
+           "The metric to be used for the redistributed route. A value 
+            of 0 means that the metric used should be the value configured 
+            in alaRipRedistProtoMetric for this protocol. This object
+            has been obsoleted. Use alaRouteMapRedistProtoEntry objects
+            of AlcatelIND1RouteMap.mib."
+        DEFVAL { 0 }
+        ::= { alaRipRedistRouteEntry 4 }
+
+    alaRipRedistRouteControl OBJECT-TYPE
+        SYNTAX   INTEGER
+                 {
+                     redistributeAllSubnets(1),
+                     redistributeAsAggregate(2),
+                     redistributeExactMatch(3)
+                 }
+        MAX-ACCESS   read-write
+        STATUS   obsolete
+        DESCRIPTION
+           "Specifies how routes matching this entry are to be redistributed 
+            into RIP. The different mechanisms possible are to redistribute all 
+            the subnet routes, redistribute an aggregated route if there are 
+            one or more actual routes which match this entry or redistribute 
+            only an exactly matching route. This object has been obsoleted. 
+            Use alaRouteMapRedistProtoEntry objects of AlcatelIND1RouteMap.mib."
+        DEFVAL { redistributeAllSubnets }
+        ::= { alaRipRedistRouteEntry 5 }
+
+    alaRipRedistRouteTagMatch OBJECT-TYPE
+        SYNTAX   INTEGER ( -2147483648 .. 2147483647 )
+        MAX-ACCESS   read-write
+        STATUS   obsolete
+        DESCRIPTION
+           "Redistribute the route only when the route tag matches with this 
+            value. It defaults to -1 which matches all route tags. This object
+            has been obsoleted. Use alaRouteMapRedistProtoEntry objects
+            of AlcatelIND1RouteMap.mib."
+        DEFVAL { -1 }
+        ::= { alaRipRedistRouteEntry 6 }
+
+    alaRipRedistRouteEffect  OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                    redistribute(1),
+                    doNotRedistribute(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+           "Specifies whether the redistribution of routes in this range 
+            is allowed or denied. This object has been obsoleted. Use 
+            alaRouteMapRedistProtoEntry objects of AlcatelIND1RouteMap.mib."
+        DEFVAL { redistribute }
+        ::= { alaRipRedistRouteEntry 7 }
+
+    alaRipRedistRouteStatus OBJECT-TYPE
+        SYNTAX    RowStatus
+        MAX-ACCESS    read-write
+        STATUS    obsolete
+        DESCRIPTION
+           "The row status variable, used according to row installation and 
+            removal conventions. This object has been obsoleted. Use 
+            alaRouteMapRedistProtoEntry objects of AlcatelIND1RouteMap.mib."
+        ::= { alaRipRedistRouteEntry 8 }
+
+-- ************************************************************************
+-- Expansion of rip2IfCOnf
+-- ************************************************************************
+	alaRip2IfConfAugTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlaRip2IfConfAugEntry
+		MAX-ACCESS not-accessible
+   		STATUS current
+		DESCRIPTION
+			"Expansion for rip2ifconftable"
+        ::= { alaProtocolRip 11 }
+
+	alaRip2IfConfAugEntry OBJECT-TYPE
+        SYNTAX   AlaRip2IfConfAugEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "An entry of alaRip2IfConfAugTable"
+      	AUGMENTS { rip2IfConfEntry }
+        ::= { alaRip2IfConfAugTable 1 }
+
+    AlaRip2IfConfAugEntry ::=
+        SEQUENCE {
+        	alaRip2IfConfEncryptKey AlaAuthenticationEncryptKey,
+    		alaRip2IfIpConfStatus 	INTEGER,
+    		alaRip2IfRecvPkts 	Integer32,
+        	alaRip2IfConfName       DisplayString,
+        	alaRip2IfConfType	INTEGER,
+		alaRip2IfConfPtoPPeer   IpAddress
+    	}
+
+    alaRip2IfConfEncryptKey OBJECT-TYPE
+        SYNTAX  	AlaAuthenticationEncryptKey
+        MAX-ACCESS   	read-write
+        STATUS   	current
+        DESCRIPTION
+			"The authentication encryption key that is used to decypher
+			RIP passwords."
+       ::= { alaRip2IfConfAugEntry 1 }
+
+    alaRip2IfIpConfStatus OBJECT-TYPE
+        SYNTAX  	INTEGER { enable(1), disable(2), none(3) }
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+			"The status of the associated IP interface"
+       ::= { alaRip2IfConfAugEntry 2 }
+
+    alaRip2IfRecvPkts OBJECT-TYPE
+        SYNTAX  	Integer32
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+			"Number of packets received on this interface"
+       ::= { alaRip2IfConfAugEntry 3 }
+
+    alaRip2IfConfName OBJECT-TYPE
+        SYNTAX  	DisplayString
+        MAX-ACCESS   	read-only
+        STATUS   	current
+        DESCRIPTION
+            "The user defined name used to identify the IP interface"
+       ::= { alaRip2IfConfAugEntry 4 }
+
+    alaRip2IfConfType OBJECT-TYPE
+        SYNTAX  	INTEGER
+			{ broadcast (1), point2point(2) }
+        MAX-ACCESS   	read-write
+        STATUS   	current
+        DESCRIPTION
+            "The type of the rip interface"
+       ::= { alaRip2IfConfAugEntry 5 }
+
+    alaRip2IfConfPtoPPeer OBJECT-TYPE
+        SYNTAX  	IpAddress
+        MAX-ACCESS   	read-write
+        STATUS   	current
+        DESCRIPTION
+            "The address of the peer for a point-to-point rip interface"
+       ::= { alaRip2IfConfAugEntry 6 }
+
+-- ************************************************************************
+-- ************************************************************************
+
+     alaRipEcmpRouteTable OBJECT-TYPE
+         SYNTAX    SEQUENCE OF AlaRipEcmpRouteEntry
+         MAX-ACCESS    not-accessible
+         STATUS    current
+         DESCRIPTION
+             "ECMP-enabled RIP routing table which contains the network routes."
+         ::= { alaProtocolRip 12 }
+
+     alaRipEcmpRouteEntry OBJECT-TYPE
+         SYNTAX   AlaRipEcmpRouteEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+             "ECMP-enabled RIP routing table which contains the network routes."
+         INDEX {
+                 alaRipEcmpRouteDest,
+                 alaRipEcmpRouteMask,
+		 alaRipEcmpRouteNextHop
+               }
+         ::= { alaRipEcmpRouteTable 1 }
+
+     AlaRipEcmpRouteEntry ::=
+         SEQUENCE {
+             alaRipEcmpRouteDest
+                 IpAddress,
+             alaRipEcmpRouteMask
+                 IpAddress,
+             alaRipEcmpRouteNextHop
+                 IpAddress,
+             alaRipEcmpRouteType
+                 INTEGER,
+             alaRipEcmpRouteAge
+                 TimeTicks,
+             alaRipEcmpRouteTag
+                 INTEGER,
+             alaRipEcmpRouteMetric
+                 INTEGER,
+             alaRipEcmpRouteStatus
+                 RowStatus,
+             alaRipEcmpRouteState
+                 INTEGER
+         }
+
+     alaRipEcmpRouteDest OBJECT-TYPE
+         SYNTAX   IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "The destination IP address of this route."
+         ::= { alaRipEcmpRouteEntry 1 }
+
+     alaRipEcmpRouteMask OBJECT-TYPE
+         SYNTAX   IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "The network mask for this route."
+         ::= { alaRipEcmpRouteEntry 2 }
+
+     alaRipEcmpRouteNextHop OBJECT-TYPE
+         SYNTAX   IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+            "The address of the next hop to reach this route."
+         ::= { alaRipEcmpRouteEntry 3 }
+
+     alaRipEcmpRouteType OBJECT-TYPE
+         SYNTAX   INTEGER
+                  {
+                     local  (1), -- local route
+                     remote (2), -- remote route
+                     redistribute (3)  -- redistributed route
+                  }
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+            "The type of route."
+         ::= { alaRipEcmpRouteEntry 4 }
+
+     alaRipEcmpRouteAge OBJECT-TYPE
+         SYNTAX   TimeTicks
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+            "The number of seconds since this route  was last
+            updated or otherwise determined to be correct."
+         ::= { alaRipEcmpRouteEntry 5 }
+
+     alaRipEcmpRouteTag OBJECT-TYPE
+         SYNTAX   INTEGER ( 0 .. 2147483647 )
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+            "The associated route tag."
+         DEFVAL { 0 }
+         ::= { alaRipEcmpRouteEntry 6 }
+
+     alaRipEcmpRouteMetric OBJECT-TYPE
+         SYNTAX   INTEGER ( 0 .. 15 )
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+            "The routing  metric  for  this  route."
+         ::= { alaRipEcmpRouteEntry 7 }
+
+     alaRipEcmpRouteStatus OBJECT-TYPE
+         SYNTAX   RowStatus
+         MAX-ACCESS read-only
+         STATUS    current
+         DESCRIPTION
+            "The row status variable, used according to
+            row installation and removal conventions."
+         ::= { alaRipEcmpRouteEntry 8 }
+
+     alaRipEcmpRouteState OBJECT-TYPE
+         SYNTAX   INTEGER
+                  {
+                     active   (1),
+                     garbage  (2),
+                     holddown (3),
+                     unknown  (4)
+                  }
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+            "The associated state for this route."
+         ::= { alaRipEcmpRouteEntry 9 }
+
+
+-- ************************************************************************
+-- ************************************************************************
+
+--
+-- Compliance Statements
+--
+
+     alcatelIND1RIPMIBCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "Compliance statement for
+             Routing Information Protocol (RIP) Subsystem."
+        MODULE -- this module
+
+            MANDATORY-GROUPS
+            {
+               alaRipMiscellaneousGroup,
+               alaRipRedistProtoGroup,
+               alaRipDebugGroup,
+               alaRipEcmpRouteGroup,
+               alaRipRedistRouteGroup
+            }
+
+        ::= { alcatelIND1RIPMIBCompliances 1 }
+
+
+--
+-- Units of Conformance
+--
+
+     alaRipMiscellaneousGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaRipRedistAdminStatus,
+           alaRipRedistRouteTag,
+           alaRipForceHolddownTimer,
+           alaRipRouteNumber
+        }
+        STATUS current
+        DESCRIPTION
+            "Collection of Miscellaneous objects for management of RIP."
+        ::= { alcatelIND1RIPMIBGroups 1 }
+
+
+     alaRipRedistProtoGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaRipRedistProtoId,           -- Route Redistribution Protocol table
+           alaRipRedistProtoMetric,
+           alaRipRedistProtoStatus
+        }
+        STATUS obsolete
+        DESCRIPTION
+            "Collection of objects for management of Route Redistribution Protocol. These objects
+             have been obsoleted, and this group is no longer mandatory."
+        ::= { alcatelIND1RIPMIBGroups 2 }
+
+     alaRipDebugGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaRipDebugLevel,
+	        alaRipDebugError,
+	        alaRipDebugWarn,
+	        alaRipDebugRecv,
+	        alaRipDebugSend,
+	        alaRipDebugRdb,
+	        alaRipDebugAge,
+	        alaRipDebugConfig,
+	        alaRipDebugRedist,
+	        alaRipDebugInfo,
+	        alaRipDebugSetup,
+	        alaRipDebugTime,
+	        alaRipDebugAll
+        }
+        STATUS deprecated
+        DESCRIPTION
+            "Collection of objects for management of
+             Debug Information. These objects have been deprecated, and this group
+             is no longer mandatory."
+        ::= { alcatelIND1RIPMIBGroups 3 }
+
+     alaRipRouteGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaRipRouteNumber,
+           alaRipRouteDest,
+           alaRipRouteMask,
+           alaRipRouteNextHop,
+           alaRipRouteType,
+           alaRipRouteAge,
+           alaRipRouteTag,
+           alaRipRouteMetric,
+           alaRipRouteStatus
+        }
+        STATUS deprecated
+        DESCRIPTION
+            "Collection of objects for management of Network Route configuration.
+             This Object is deprecated in favour of alaRipEcmpRouteGroup."
+        ::= { alcatelIND1RIPMIBGroups 4 }
+
+     alaRipRedistRouteGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaRipRedistRouteTag,
+           alaRipRedistRouteProto,
+           alaRipRedistRouteDest,
+           alaRipRedistRouteMask,
+           alaRipRedistRouteMetric,
+           alaRipRedistRouteControl,
+           alaRipRedistRouteTagMatch,
+           alaRipRedistRouteEffect,
+           alaRipRedistRouteStatus
+        }
+        STATUS obsolete
+        DESCRIPTION
+            "Collection of objects for management of
+             Route Redistribution configuration. These objects have been obsoleted, and this
+             group is no longer mandatory."
+        ::= { alcatelIND1RIPMIBGroups 5 }
+
+     alaRipEcmpRouteGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaRipRouteNumber,
+           alaRipEcmpRouteType,
+           alaRipEcmpRouteAge,
+           alaRipEcmpRouteTag,
+           alaRipEcmpRouteMetric,
+           alaRipEcmpRouteStatus,
+           alaRipEcmpRouteState
+        }
+        STATUS current
+        DESCRIPTION
+            "Collection of objects for management of Network Route configuration."
+        ::= { alcatelIND1RIPMIBGroups 6 }
+
+--
+-- Trap definitions
+--
+
+alcatelIND1RIPTraps                OBJECT IDENTIFIER ::= { alcatelIND1RIPMIB 3}
+alcatelIND1RIPTrapsRoot            OBJECT IDENTIFIER ::= { alcatelIND1RIPTraps 0}
+
+ripRouteMaxLimitReached NOTIFICATION-TYPE
+     STATUS             current
+     DESCRIPTION
+           " This notification is generated as RIP database reached supported
+             Maximum entries. RIP will discard any new updates."
+::= {alcatelIND1RIPTrapsRoot 1}
+
+
+END
+

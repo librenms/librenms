@@ -1,0 +1,896 @@
+--
+-- Juniper Enterprise Specific MIB: TWAMP MIB
+-- 
+-- Copyright (c) 2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-TWAMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI              -- RFC2578
+    NOTIFICATION-TYPE, OBJECT-IDENTITY,IpAddress
+	FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex
+        FROM DISMAN-PING-MIB
+    jnxTwampMibRoot, jnxTwampNotificationPrefix
+        FROM JUNIPER-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+jnxTwampMib MODULE-IDENTITY
+    LAST-UPDATED "201403010000Z" 
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This mib provides data associated with the TWAMP feature" 
+    -- revision history
+    REVISION "201403010000Z" 
+    DESCRIPTION
+            "Initial definition."
+    ::= { jnxTwampMibRoot 1 }
+
+
+JnxTwampClientCollectionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Each TWAMP entry can maintain several collections of probes and
+         provide separate calculations over each collection.  The types of
+         collections include:
+
+             currentTest       -- the test currently being executed
+             lastCompletedTest -- the most recently completed test
+             movingAverage     -- the 'n' most recent probes (n is configurable)
+             allTests          -- all the probes (since the entry was last
+                                  reset).
+         
+         Objects with this type identify a specific collection."
+    SYNTAX INTEGER {  
+               currentTest       (1),
+               lastCompletedTest (2),
+               movingAverage     (3),
+               allTests          (4)
+           }
+
+JnxTwampClientMeasurementType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "For each individual probe, several different measurements can be
+         made.  These include the following (all measurements are provided
+         in units of microseconds):
+
+             roundTripTime -- this is the delay between the the transmission of
+                 a probe and the arrival of its response.
+
+             rttJitter -- this is the difference between the current round trip
+                 time measurement and the previous one.
+
+             rttInterarrivalJitter -- An estimate of the statistical variance
+                 of a packet's interarrival time.  Defined in rfc1889 as:
+
+                   J=J+(|D(i-1,i)|-J)/16
+
+                 where J is the interarrival jitter and D(i-1, i) is the current
+                 round trip jitter measurement.
+
+             egress -- this is the delay beween the transmission of a probe and
+                 its arrival at its destination.
+
+             egressJitter -- this is the difference between the current egress
+                 delay the previous measurement.
+
+             egressInterarrivalJitter -- similar to rttInterarrivalJitter, but
+                 applied to egress jitter measurements.
+
+             ingress -- this is the delay between the transmission of a probe
+                 response and its arrival at its destination.
+
+             ingressJitter -- this is the difference between the current ingress
+                 delay and the previous measurement.
+
+             ingressInterarrivalJitter -- similar to rttInterarrivalJitter, but
+                 applied to ingress jitter measurements.
+       Note, due to clock synchronization artifacts, many one-way
+         jitter measurements & calculations may include signifacant variations,
+         in some cases orders of magnitude greater than the round trip times.
+         Because of this, one-way jitter measurements will only be performed
+         on samples which are less than 10 seconds apart."
+    SYNTAX     INTEGER {
+                   roundTripTime             (1),
+                   rttJitter                 (2),
+                   rttInterarrivalJitter     (3),
+                   egress                    (4),
+                   egressJitter              (5),
+                   egressInterarrivalJitter  (6),
+                   ingress                   (7),
+                   ingressJitter             (8),
+                   ingressInterarrivalJitter (9)
+               }
+
+JnxTwampClientMeasurementSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Over each collection of probes, TWAMP calculates statistics for several
+         sets of measurements.  These sets include the following:
+
+             roundTripTime    -- the set of round trip delays
+             posRttJitter     -- the set of positive round trip jitter
+                                 measurements
+             negRttJitter     -- the set of negative round trip jitter
+                                 measurements
+             egress           -- the set of outgoing (source to destination)
+                                 one-way delays
+             posEgressJitter  -- the set of positive egress jitter measurements
+             negEgressJitter  -- the set of negative egress jitter measurements
+             ingress          -- the set of incoming (destination to source)
+                                 one-way delays
+             posIngressJitter -- the set of positive ingress jitter measurements
+             negIngressJitter -- the set of negative ingress jitter measurements
+
+        Objects with this type identify a specific set of measurements."
+    SYNTAX INTEGER {
+               roundTripTime    (1),
+               posRttJitter     (2),
+               negRttJitter     (3),
+               egress           (4),
+               posEgressJitter  (5),
+               negEgressJitter  (6),
+               ingress          (7),
+               posIngressJitter (8),
+               negIngressJitter (9)
+           }
+
+
+jnxTwampClientNode	OBJECT-IDENTITY
+    STATUS			current
+    DESCRIPTION	
+			  "The node contains all the TWAMP client related tables."
+::= {jnxTwampMib 1}
+
+jnxTwampRpmIdentity	OBJECT-TYPE
+    SYNTAX		INTEGER {
+				rpm(1),
+				twamp(2)
+				}
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		
+	      "This object is added to be binded to the traps. This object simply identifies if 
+		its an RPM type of test or a TWAMP type of test."
+::= {jnxTwampMib 2}
+
+--
+-- Sample Results Table
+--
+    jnxTwampClientResultsSampleTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxTwampClientResultsSampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides measurements from the latest individual TWAMP
+             probe samples.  Within each sample, the specific measurement type
+             is identified by jnxTwampClientResSampleType.  Note, if the latest
+             probe was unsuccessful, no measurement types will be available.
+
+             See the definition of JnxTwampClientMeasurementType for details on
+             the types of measurements available."
+        ::= { jnxTwampClientNode 1 }
+
+    jnxTwampClientResultsSampleEntry OBJECT-TYPE
+        SYNTAX      JnxTwampClientResultsSampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry provides a specific measurement type for a single
+             probe."
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, jnxTwampResSampleType }
+        ::= { jnxTwampClientResultsSampleTable 1 }
+
+    JnxTwampClientResultsSampleEntry ::=
+        SEQUENCE {
+            jnxTwampResSampleType          JnxTwampClientMeasurementType,
+            jnxTwampResSampleValue         Integer32,
+            jnxTwampResSampleDate          DateAndTime
+        }
+
+    jnxTwampResSampleType OBJECT-TYPE
+        SYNTAX     JnxTwampClientMeasurementType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This object identifies the specific measurement type returned
+            by jnxTwampResSampleValue."
+       ::= { jnxTwampClientResultsSampleEntry 1 }
+
+    jnxTwampResSampleValue OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "This object returns the measurement identified by the corresponding
+            jnxTwampResSampleType."
+       ::= { jnxTwampClientResultsSampleEntry 2 }
+
+    jnxTwampResSampleDate OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the date and time of when this measurement
+             was obtained."
+        ::= { jnxTwampClientResultsSampleEntry 3 }
+
+
+--
+-- Summary Results Table
+--
+    jnxTwampClientResultsSummaryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxTwampClientResultsSummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides a summary of the results for a specific
+             TWAMP entry (identified by pingCtlOwnerIndex/pingCtlTestName).
+             The scope of the summary is identified by jnxTwampClientResSumCollection."
+        ::= { jnxTwampClientNode 2 }
+
+    jnxTwampClientResultsSummaryEntry OBJECT-TYPE
+        SYNTAX      JnxTwampClientResultsSummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry in the table provides a summary of the TWAMP results
+             over a single collection of probes(test session).  For each TWAMP entry, there
+             are several collections maintained: the current test, the
+             most recently completed test, a configurable number of the most
+             recent probes (aka 'moving average'), and a global collection
+             representing all the probes.  Each entry in this table summarizes
+             the results for one of these collections."
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, jnxTwampResSumCollection }
+        ::= { jnxTwampClientResultsSummaryTable 1 }
+
+    JnxTwampClientResultsSummaryEntry ::=
+        SEQUENCE {
+            jnxTwampResSumCollection               JnxTwampClientCollectionType,
+            jnxTwampResSumSent                     Unsigned32,
+            jnxTwampResSumReceived                 Unsigned32,
+            jnxTwampResSumPercentLost              Unsigned32,
+            jnxTwampResSumDate                     DateAndTime
+        }
+
+    jnxTwampResSumCollection OBJECT-TYPE
+        SYNTAX      JnxTwampClientCollectionType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifes the collection of probes over which the
+             summary data represented by the other objects in this table
+             applies.  Note, if a collection type is not supported or not
+             configured, it will not be instantiated in this table."
+        ::= { jnxTwampClientResultsSummaryEntry 1 }
+
+    jnxTwampResSumSent OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes sent within the
+             collection identified by jnxTwampResSumCollection."
+        ::= { jnxTwampClientResultsSummaryEntry 2 }
+
+    jnxTwampResSumReceived OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes received within the
+             collection identified by jnxTwampResSumCollection."
+        ::= { jnxTwampClientResultsSummaryEntry 3 }
+
+    jnxTwampResSumPercentLost OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the percentage of probes lost within the
+             collection identified by jnxTwampResSumCollection."
+        ::= { jnxTwampClientResultsSummaryEntry 4 }
+
+    jnxTwampResSumDate OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the date and time of when the most recent
+             probe within the collection identified by jnxTwampResSumCollection
+             was completed."
+        ::= { jnxTwampClientResultsSummaryEntry 5 }
+---
+--Calculated Results Table
+--
+    jnxTwampClientResultsCalculatedTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxTwampClientResultsCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides a set of calculated values for each
+             TWAMP entry, for each collection of probes maintained within that
+             entry, and for each supported measurement set within that
+             collection of probes.
+
+             This table will skip over any measurement set for which
+             there are 0 samples."
+        ::= { jnxTwampClientNode 3 }
+
+    jnxTwampClientResultsCalculatedEntry OBJECT-TYPE
+        SYNTAX      JnxTwampClientResultsCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, jnxTwampResSumCollection,
+                jnxTwampResCalcSet }
+        ::= { jnxTwampClientResultsCalculatedTable 1 }
+
+    JnxTwampClientResultsCalculatedEntry ::=
+        SEQUENCE {
+            jnxTwampResCalcSet       JnxTwampClientMeasurementSet,
+            jnxTwampResCalcSamples   Unsigned32,
+            jnxTwampResCalcMin       Unsigned32,
+            jnxTwampResCalcMax       Unsigned32,
+            jnxTwampResCalcAverage   Unsigned32,
+            jnxTwampResCalcPkToPk    Unsigned32,
+            jnxTwampResCalcStdDev    Unsigned32,
+            jnxTwampResCalcSum       CounterBasedGauge64
+        }
+
+    jnxTwampResCalcSet OBJECT-TYPE
+        SYNTAX      JnxTwampClientMeasurementSet
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the measurement set upon which the
+             calculations returned by the other objects in this table are
+             based."
+        ::= { jnxTwampClientResultsCalculatedEntry 1 }
+
+    jnxTwampResCalcSamples OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of samples used in this calculations."
+        ::= { jnxTwampClientResultsCalculatedEntry 2 }
+
+    jnxTwampResCalcMin OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The minimum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxTwampClientResultsCalculatedEntry 3 }
+
+    jnxTwampResCalcMax OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The maximum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxTwampClientResultsCalculatedEntry 4 }
+    jnxTwampResCalcAverage OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The average of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxTwampClientResultsCalculatedEntry 5 }
+
+    jnxTwampResCalcPkToPk OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The difference between the minimum and maximum of all the samples
+             in the collection and measurement set associated with this row.
+             Values are provided in units of microseconds."
+        ::= { jnxTwampClientResultsCalculatedEntry 6 }
+
+    jnxTwampResCalcStdDev OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The standard deviation calculated over all the samples
+             in the collection and measurement set associated with this row.
+             Values are provided in units of microseconds."
+        ::= { jnxTwampClientResultsCalculatedEntry 7 }
+
+    jnxTwampResCalcSum OBJECT-TYPE
+        SYNTAX     CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The sum of all the samples in the collection and measurement set
+             associated with this row.  Values are provided in units of
+             microseconds."
+        ::= { jnxTwampClientResultsCalculatedEntry 8 }
+
+
+--
+-- History Sample Table
+--
+    jnxTwampClientHistorySampleTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxTwampClientHistorySampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides measurements for individual TWAMP probe samples(test sessions).
+             In addition to the last completed sample, a configurable number of
+             the most recent samples are available as well.  Within each sample,
+             the specific measurement type is identified by
+             jnxTwampHistSampleType.  Note, if probe was unsuccessful, no
+             measurement types will be available for that history entry.
+
+             See the definition of JnxTwampClientMeasurementType for details on
+             of measurements available."
+        ::= { jnxTwampClientNode 4 }
+
+    jnxTwampClientHistorySampleEntry OBJECT-TYPE
+        SYNTAX      JnxTwampClientHistorySampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex,
+                jnxTwampHistSampleType }
+        ::= { jnxTwampClientHistorySampleTable 1 }
+
+    JnxTwampClientHistorySampleEntry ::=
+        SEQUENCE {
+            jnxTwampHistSampleType          JnxTwampClientMeasurementType,
+            jnxTwampHistSampleValue         Integer32
+        }
+
+    jnxTwampHistSampleType OBJECT-TYPE
+        SYNTAX     JnxTwampClientMeasurementType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This object identifies the specific measurement type returned
+            by jnxTwampHistSampleValue."
+       ::= { jnxTwampClientHistorySampleEntry 1 }
+
+    jnxTwampHistSampleValue OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "This object returns the measurement identified by the corresponding
+            jnxTwampHistSampleType."
+       ::= { jnxTwampClientHistorySampleEntry 2 }
+
+--
+-- History Summary Table
+--
+    jnxTwampClientHistorySummaryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxTwampClientHistorySummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides historical summary data for each collection
+             of probes(test session) within each TWAMP Control Entry, similar to the
+             jnxTwampClientResultsSummaryTable.
+
+             In addition to the current summary, this table provides the same
+             number of historical entries as the jnxTwampClientHistorySampleTable."
+        ::= { jnxTwampClientNode 5 }
+
+    jnxTwampClientHistorySummaryEntry OBJECT-TYPE
+        SYNTAX      JnxTwampClientHistorySummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex,
+                jnxTwampHistSumCollection }
+        ::= { jnxTwampClientHistorySummaryTable 1 }
+
+    JnxTwampClientHistorySummaryEntry ::=
+        SEQUENCE {
+            jnxTwampHistSumCollection  JnxTwampClientCollectionType,
+            jnxTwampHistSumSent        Unsigned32,
+            jnxTwampHistSumReceived    Unsigned32,
+            jnxTwampHistSumPercentLost Unsigned32
+        }
+
+    jnxTwampHistSumCollection OBJECT-TYPE
+        SYNTAX      JnxTwampClientCollectionType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Identifies the collection of probes whose results are summarized by
+             this row.
+
+             At this time, historical summaries are available only for the
+             current test (currentTest(1))."
+        ::= { jnxTwampClientHistorySummaryEntry 1 }
+
+    jnxTwampHistSumSent OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes sent within the
+             collection identified by jnxTwampHistSumCollection."
+        ::= { jnxTwampClientHistorySummaryEntry 2 }
+
+    jnxTwampHistSumReceived OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes received within the
+             collection identified by jnxTwampHistSumCollection."
+        ::= { jnxTwampClientHistorySummaryEntry 3 }
+
+    jnxTwampHistSumPercentLost OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the percentage of probes lost within the
+             collection identified by jnxTwampHistSumCollection."
+        ::= { jnxTwampClientHistorySummaryEntry 4 }
+
+
+
+--
+-- History Calculated Table
+--
+    jnxTwampClientHistoryCalculatedTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxTwampClientHistoryCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides a set of calculated values for each
+             TWAMP control entry, for each test session maintained within that
+             entry, and for each supported calculated type within that
+             collection of probes, similar to the jnxTwampClientResultsCalculatedTable.
+
+             In addition to the current summary, this table provides the same
+             number of historical entries as the jnxTwampClientHistorySampleTable."
+        ::= { jnxTwampClientNode 6 }
+
+    jnxTwampClientHistoryCalculatedEntry OBJECT-TYPE
+        SYNTAX      JnxTwampClientHistoryCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex,
+                jnxTwampHistSumCollection, jnxTwampHistCalcSet }
+        ::= { jnxTwampClientHistoryCalculatedTable 1 }
+    JnxTwampClientHistoryCalculatedEntry ::=
+        SEQUENCE {
+            jnxTwampHistCalcSet       JnxTwampClientMeasurementSet,
+            jnxTwampHistCalcSamples   Unsigned32,
+            jnxTwampHistCalcMin       Unsigned32,
+            jnxTwampHistCalcMax       Unsigned32,
+            jnxTwampHistCalcAverage   Unsigned32,
+            jnxTwampHistCalcPkToPk    Unsigned32,
+            jnxTwampHistCalcStdDev    Unsigned32,
+            jnxTwampHistCalcSum       CounterBasedGauge64
+        }
+
+    jnxTwampHistCalcSet OBJECT-TYPE
+       SYNTAX     JnxTwampClientMeasurementSet
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "This object identifies the measurement set upon which the
+             calculations returned by the other objects in this table are
+             based."
+       ::= { jnxTwampClientHistoryCalculatedEntry 1 }
+
+    jnxTwampHistCalcSamples OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of samples used in this calculations."
+        ::= { jnxTwampClientHistoryCalculatedEntry 2 }
+
+    jnxTwampHistCalcMin OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The minimum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxTwampClientHistoryCalculatedEntry 3 }
+    jnxTwampHistCalcMax OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The maximum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxTwampClientHistoryCalculatedEntry 4 }
+
+    jnxTwampHistCalcAverage OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The average of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxTwampClientHistoryCalculatedEntry 5 }
+
+    jnxTwampHistCalcPkToPk OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The difference between the minimum and maximum of all the samples
+             in the collection and measurement set associated with this row.
+             Values are provided in units of microseconds."
+        ::= { jnxTwampClientHistoryCalculatedEntry 6 }
+
+    jnxTwampHistCalcStdDev OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The standard deviation calculated over all the samples
+             in the collection and measurement set associated with this row.
+             Values are provided in units of microseconds."
+        ::= { jnxTwampClientHistoryCalculatedEntry 7 }
+
+    jnxTwampHistCalcSum OBJECT-TYPE
+        SYNTAX     CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The sum of all the samples in the collection and measurement set
+             associated with this row.  Values are provided in units of
+             microseconds."
+        ::= { jnxTwampClientHistoryCalculatedEntry 8 }
+
+-- Control Sessions Table --
+    jnxTwampClientControlConnectionTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxTwampClientCCEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "Table of Client Sessions."
+        ::= { jnxTwampClientNode 7 }
+
+    jnxTwampClientCCEntry OBJECT-TYPE
+        SYNTAX       JnxTwampClientCCEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "TWAMP Client Session characteristics."
+        INDEX { jnxTwampClientControlConnectionID }
+        ::= { jnxTwampClientControlConnectionTable 1 }
+
+
+    JnxTwampClientCCEntry ::= 
+        SEQUENCE {
+            jnxTwampClientControlConnectionID  SnmpAdminString,
+            jnxTwampClientCCName      DisplayString,
+            jnxTwampClientCCStatus    INTEGER(0..65535),
+            jnxTwampClientServerAddress    IpAddress,
+            jnxTwampClientServerPort  INTEGER(0..65535),
+            jnxTwampClientTSConfiguredCount INTEGER(0..65535),
+            jnxTwampClientTSActiveCount        INTEGER(0..65535),
+            jnxTwampClientAuthMode     INTEGER(0..65535)
+        } 
+
+    jnxTwampClientControlConnectionID OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "TWAMP Client control session ID."
+            ::= { jnxTwampClientCCEntry 1 }
+
+    jnxTwampClientCCName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Text string containing the session's unique name."
+            ::= { jnxTwampClientCCEntry 2 }
+
+    jnxTwampClientCCStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                        active(1),
+                        stopped(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "If the control session is active, this would return 1.
+                 If the control session does not have any currently
+                 running test sessions and is not active, this would return 2."
+            ::= { jnxTwampClientCCEntry 3 }
+
+    jnxTwampClientServerAddress OBJECT-TYPE
+        SYNTAX             IpAddress
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "Server IP address for TWAMP TCP control session."
+            ::= { jnxTwampClientCCEntry 4 }
+    jnxTwampClientServerPort     OBJECT-TYPE
+        SYNTAX             INTEGER (0..65535)
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "Destination port for TWAMP TCP control connection."
+            ::= { jnxTwampClientCCEntry 5 }
+
+    jnxTwampClientTSConfiguredCount OBJECT-TYPE
+        SYNTAX             INTEGER (0..65535)
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+               "Number test sessions configured."
+            ::= { jnxTwampClientCCEntry 6 }
+
+    jnxTwampClientTSActiveCount     OBJECT-TYPE
+        SYNTAX             INTEGER(0..65535)
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+                "Number of test sessions currently running."
+            ::= { jnxTwampClientCCEntry 7 }
+
+    jnxTwampClientAuthMode    OBJECT-TYPE
+        SYNTAX             INTEGER {
+                            none(1),
+                            authenticated(2),
+                            encrypted(3),
+                            controlOnlyEncrypted(4)
+                         }
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+                " Authenticated mode for the control session."
+            ::= {jnxTwampClientCCEntry 8 }
+
+--- Table containing entries for all test sessions 
+ jnxTwampClientTestSessionsTable        OBJECT-TYPE
+    SYNTAX              SEQUENCE OF JnxTwampClientTSEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+              "Table of Test Sessions."
+     ::= {jnxTwampClientNode 8}
+
+ jnxTwampClientTSEntry          OBJECT-TYPE
+    SYNTAX              JnxTwampClientTSEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+              "TWAMP Test Session characteristics."
+    INDEX {pingCtlOwnerIndex, jnxTwampClientTestSessionID }
+    ::= { jnxTwampClientTestSessionsTable 1 }
+
+ JnxTwampClientTSEntry ::= SEQUENCE {
+        jnxTwampClientTestSessionID     SnmpAdminString,
+        jnxTwampClientTSName            DisplayString,
+        jnxTwampClientTSStatus          INTEGER,
+        jnxTwampClientTSSenderAddress   IpAddress,
+        jnxTwampClientTSSenderPort      INTEGER,
+        jnxTwampClientTSReflectorAddress IpAddress,
+        jnxTwampClientTSReflectorPort   INTEGER
+  }
+
+ jnxTwampClientTestSessionID    OBJECT-TYPE
+    SYNTAX              SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+              "Test Session ID."
+        ::= { jnxTwampClientTSEntry 1 }
+
+
+ jnxTwampClientTSName           OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+              "TWAMP Test Session Name."
+        ::= {jnxTwampClientTSEntry 2 }
+
+ jnxTwampClientTSStatus         OBJECT-TYPE
+    SYNTAX              INTEGER {
+                                active (1),
+                                stopped (2)
+                        }
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+              "TWAMP Test Session status."
+        ::= {jnxTwampClientTSEntry 3 }
+ jnxTwampClientTSSenderAddress  OBJECT-TYPE
+    SYNTAX              IpAddress
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+              "Twamp Test Sender Address."
+        ::= {jnxTwampClientTSEntry 4 }
+
+ jnxTwampClientTSSenderPort     OBJECT-TYPE
+    SYNTAX              INTEGER (0..65535)
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+              "TWAMP Test Session Sender Port."
+        ::= {jnxTwampClientTSEntry 5 }
+
+ jnxTwampClientTSReflectorAddress OBJECT-TYPE
+    SYNTAX              IpAddress
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+              "TWAMP Test Session Reflector Address."
+        ::= {jnxTwampClientTSEntry 6}
+
+ jnxTwampClientTSReflectorPort  OBJECT-TYPE
+    SYNTAX              INTEGER (0..65535)
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+              "TWAMP Test Session Reflector Port. "
+        ::= {jnxTwampClientTSEntry 7 }
+
+
+twampNotifications      OBJECT IDENTIFIER ::= {jnxTwampNotificationPrefix 1 }
+
+ jnxTwampClientControlConnectionClosed  NOTIFICATION-TYPE
+    OBJECTS {
+                jnxTwampClientCCName
+        }
+    STATUS              current
+    DESCRIPTION
+              "This trap is generated when all the test iterations configured under the control
+                connection finish running and control connection is closed."
+
+        ::= {twampNotifications 1 }
+ jnxTwampClientTestIterationFinished    NOTIFICATION-TYPE
+    OBJECTS {
+                jnxTwampClientCCName
+        }
+    STATUS              current
+    DESCRIPTION
+              "This trap is generated when one test iteration is finished for all the
+                test sessions configured under the control connection."
+        ::= {twampNotifications 2 }
+
+
+END

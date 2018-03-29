@@ -1,0 +1,641 @@
+CTRON-SSR-CAPACITY-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Enterasys's
+--  enterprise-specific Smart Switch Router specific mib branches.
+--
+--  This module will be extended, as required.
+ 
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys products.
+ 
+--  Copyright June 1998-2000 Enterasys Networks
+ 
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Counter32
+       FROM SNMPv2-SMI
+   MODULE-COMPLIANCE, OBJECT-GROUP
+   FROM SNMPv2-CONF
+   TEXTUAL-CONVENTION, TruthValue
+       FROM SNMPv2-TC
+   ssrMibs
+       FROM CTRON-SSR-SMI-MIB;
+
+capacityMIB MODULE-IDENTITY
+   LAST-UPDATED "200007150000Z"  -- July 15, 2000
+   ORGANIZATION
+     "Enterasys Networks, Inc."
+   CONTACT-INFO
+    "Enterasys Networks
+     35 Industrial Way, P.O. Box 5005
+     Rochester, NH 03867-0505
+     (603) 332-9400
+     support@enterasys.com
+     http://www.enterasys.com"
+ 
+   DESCRIPTION
+     "This module defines a schema to access RS system resource 
+      capacity statistics."
+    REVISION     "200007150000Z"
+    DESCRIPTION
+        "Update contact information, Change object name chassis
+         to chassisCap due to collsion with chassis in ctron-mib-names.txt.
+         SSR enterprise mibs apply to the Riverstone RS product line and
+         Enterasys SSR." 
+
+    REVISION     "9811050000Z"
+    DESCRIPTION
+         "Revision 1.0 Initial MIB revision."
+      ::= { ssrMibs 270 }   
+
+-- Describes the types of memory devices supported in the SSR
+   SSRMemoryType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+        "A unique value, greater than zero, for each non-volatile memory
+        device supported by the SSR series of products."
+       SYNTAX   INTEGER {
+                cpu(1),           -- Main CPU Memory
+                intFlash(2),    -- Internal Flash
+                pcmcia(3),      -- PCMCIA 
+                         rmon(4),                 -- RMON
+                l2Hardware(5),  -- L2 Hardware Entries
+                l3Hardware(6)   -- L3 Hardware Entries
+                }
+
+-- Describes the different capability types of the SSR chassis
+   SSRCapabilityType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+        "A unique value, greater than zero, for the different 
+         capabilities of the SSR chassis."
+       SYNTAX   INTEGER {
+                noSupport(1),          -- feature not supported
+                available(2),          -- feature available but not used
+                enabled(3),            -- feature available and enabled
+                disabled(4)            -- feature available and disabled
+                }
+                
+-- Describes the different SSR firmware task states
+   SSRStatusType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+        "A unique value, greater than zero, for each possible state
+        a task on the SSR can be in."
+       SYNTAX   INTEGER {
+                ready(0),          -- task sheduled and ready
+                suspPure(1),       -- task suspended by scheduler
+                suspSleep(2),      -- task suspended for idle time
+                suspMbox(3),       -- task waiting for mbox
+                suspQue(4),        -- task waiting for queue
+                suspPipe(5),       -- task suspended
+                suspSema4(6),      -- task waiting for sema4
+                suspEvent(7),      -- task waiting for event
+                suspPart(8),       -- task suspended
+                suspMem(9),        -- task waiting for memory
+                suspDrvr(10),      -- task waiting for driver
+                finished(11),      -- task finished
+                terminated(12)     -- task terminated
+                }
+
+-- Capacity metrics are broken down by these functional areas 
+   chassisCap OBJECT IDENTIFIER ::= { capacityMIB 1 }
+   cpu       OBJECT IDENTIFIER ::= { capacityMIB 2 }
+   tasks     OBJECT IDENTIFIER ::= { capacityMIB 3 }
+   memory    OBJECT IDENTIFIER ::= { capacityMIB 4 }
+
+-- chassisCap group: reports stats on the chassis capacity
+
+   capChassisSlotCount OBJECT-TYPE
+       SYNTAX      INTEGER (2..32)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The maximum number of slots in the chassis, including the
+                slot for the CPU module."
+       ::= { chassisCap 1 }
+
+   capChassisSlotsUsed OBJECT-TYPE
+       SYNTAX      INTEGER (0..32)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of slots used in the chassis.  This number 
+                includes the slot used for the CPU module, if any."
+       ::= { chassisCap 2 }
+
+   capChassisSlotsFree OBJECT-TYPE
+       SYNTAX      INTEGER (0..32)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of free slots in the chassis.  This includes
+                all of the available slots not used by the CPU or redundant
+                CPU card."
+       ::= { chassisCap 3 }
+
+   capChassisCPURedundancy OBJECT-TYPE
+       SYNTAX      SSRCapabilityType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The chassis CPU redundancy capability of the SSR.  This
+                will be one of the following values:
+                  noSupport(1)   -- feature not supported
+                  available(2)   -- feature not in use
+                  enabled(3)     -- feature in use and enabled
+                  disabled(4)    -- feature in use and disabled
+               "
+       ::= { chassisCap 4 }
+
+   capChassisPSRedundancy OBJECT-TYPE
+       SYNTAX      SSRCapabilityType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The chassis Power Supply redundancy capability of the SSR.  
+                This will be one of the following values:
+                  noSupport(1)   -- feature not supported
+                  available(2)   -- feature not in use
+                  enabled(3)     -- feature in use and enabled
+                  disabled(4)    -- feature in use and disabled
+               "
+       ::= { chassisCap 5 }
+
+   capChassisSFRedundancy OBJECT-TYPE
+       SYNTAX      SSRCapabilityType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The chassis Switching Fabric redundancy capability of the SSR. 
+                This will be one of the following values:
+                  noSupport(1)   -- feature not supported
+                  available(2)   -- feature not in use
+                  enabled(3)     -- feature in use and enabled
+                  disabled(4)    -- feature in use and disabled
+               "
+       ::= { chassisCap 6 }
+
+-- cpu group : capacity stats for CPU main memory
+
+   capCPUTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CapCPUEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "Summary of CPU statistics.  It is assumed that there is only 
+         one CPU per line card."
+       ::= { cpu 1 }
+ 
+   capCPUEntry OBJECT-TYPE
+       SYNTAX      CapCPUEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "An entry containing CPU statistics information."
+       INDEX   { capCPUModuleIndex }
+       ::= { capCPUTable 1 }
+ 
+   CapCPUEntry ::=
+       SEQUENCE {
+           capCPUModuleIndex           INTEGER,
+           capCPUCurrentUtilization    INTEGER,
+           capCPUL3Learned             Counter32,
+           capCPUL3Aged                Counter32,
+           capCPUL2Learned             Counter32,
+           capCPUL2Aged                Counter32,
+           capCPUNIAReceived           Counter32,
+           capCPUNIATransmitted        Counter32,
+           capCPUMinThreshold          INTEGER,
+           capCPUMaxThreshold          INTEGER
+       }
+ 
+
+   capCPUModuleIndex OBJECT-TYPE
+       SYNTAX      INTEGER (0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The Slot index in which the current CPU is residing."
+       ::= { capCPUEntry 1 }
+
+   capCPUCurrentUtilization OBJECT-TYPE
+       SYNTAX      INTEGER (0..100)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The CPU utilization expressed as an integer percentage.
+                This is calculated over the last 5 seconds at a 0.1 second
+                interval as a simple average."
+
+       ::= { capCPUEntry 2 }
+
+   capCPUL3Learned OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of new layer 3 flows the CPU has processed and
+                programmed into the Layer 3 hardware flow tables. 
+
+                Layer 3 flows are packets for IP or IPX protocols that will
+                be routed from one subnet to another. Bridged flows or IP and
+                IPX flows that originate and terminate in the same subnet
+                are accounted for by capCPUL2Learned object."
+       ::= { capCPUEntry 3 }
+
+   capCPUL3Aged OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of Layer 3flows that have been
+                removed from the layer 3 hardware flow tables across 
+                all modules by the Layer 3 aging task. This number may
+                increase quickly if routing protocols are not stable. Removal
+                or insertion of routes into the forwarding table will cause
+                premature aging of flows. Flows are normally aged/removed 
+                from the hardware when there are no more packets being sent
+                for a defined time period.  
+                This counter is cumulative from the time the system started."
+       ::= { capCPUEntry 4 }
+
+   capCPUL2Learned OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of L2 flows or addresses learned. 
+                The intended result here is to see how many stations 
+                attempt to establish switched communication through the SSR."
+       ::= { capCPUEntry 5 }
+
+   capCPUL2Aged OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of L2 addresses or flows aged out.  Hosts
+                that end switched communication through the SSR are aged out
+                every 15 seconds."
+       ::= { capCPUEntry 6 }
+
+   capCPUNIAReceived OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets received by the NIA chip.
+                This is useful in gauging how many packets are forwarded
+                to the CPU for processing."
+       ::= { capCPUEntry 7 }
+
+   capCPUNIATransmitted OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets transmitted by the NIA chip. 
+                This is useful in seeing how much the CPU is communicating
+                directory with management stations and other routers."
+       ::= { capCPUEntry 8 }
+
+   capCPUMinThreshold OBJECT-TYPE
+       SYNTAX      INTEGER (0..99)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The CPU utilization expressed as an integer percentage.
+                This value represents the threshold minimum value for
+                capCPUCurrentUtilization that is used to reset the
+                threshold testing for generation of the
+                envCPUThresholdTrap. This value is equal to 0 by
+                default. When this value or the value of
+                capCPUMaxThreshold is equal to 0, no envCPUThresholdTrap
+                will be generated."
+       ::= { capCPUEntry 9 }
+
+   capCPUMaxThreshold OBJECT-TYPE
+       SYNTAX      INTEGER (0..99)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The CPU utilization expressed as an integer percentage.
+                This value represents the threshold maximum for
+                capCPUCurrentUtilization which causes generation of the
+                envCPUThresholdTrap. Another trap is not generated until
+                the capCPUCurrentUtilization value has dropped below
+                capCPUMinThreshold. When this value or the value of
+                capCPUMinThreshold is equal to 0, no envCPUThresholdTrap
+                will be generated."
+       ::= { capCPUEntry 10 }
+
+
+-- tasks group : stats for tasks running on a CPU enabled module in the chassis
+
+   capTaskTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CapTaskEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "A summary of the tasks running on a CPU enabled module in 
+         the chassis."
+       ::= { tasks 1 }
+
+   capTaskEntry OBJECT-TYPE
+       SYNTAX      CapTaskEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "An entry containing information on a task running on a CPU enabled
+         module in the chassis including the memory consumption and current
+         status."
+       INDEX   { capTaskModuleIndex, capTaskIndex }
+       ::= { capTaskTable 1 }
+ 
+   CapTaskEntry ::=
+       SEQUENCE {
+           capTaskModuleIndex   INTEGER,
+           capTaskIndex         INTEGER,
+           capTaskName          OCTET STRING,
+           capTaskShed          Counter32,
+           capTaskStatus        SSRStatusType,
+           capTaskUsed          INTEGER
+       }
+
+   capTaskModuleIndex OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The module index on which the task is running."
+       ::= { capTaskEntry 1 }
+
+   capTaskIndex OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A unique index assigned to a task instance.  This index is
+                unique to the task for the time SSR is booted.  If the task
+                is terminated, the index will not be reused for another task
+                that might become active in the system."
+       ::= { capTaskEntry 2 }
+
+   capTaskName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..8))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The encrypted name assigned to this task.  This is unique 
+                for each different type of task, but there may be multiple 
+                instances of the same task running in the system."
+       ::= { capTaskEntry 3 }
+
+   capTaskShed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of times this task has been scheduled to run.  
+                This is a cumulative count from the time the SSR was started."
+       ::= { capTaskEntry 4 }
+
+   capTaskStatus OBJECT-TYPE
+       SYNTAX      SSRStatusType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The current status of this task."
+       ::= { capTaskEntry 5 }
+
+   capTaskUsed OBJECT-TYPE
+       SYNTAX      INTEGER (0..4294967295)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The size of the memory consumed by this task.  This can be 
+                used to monitor any excess memory use by a particular task 
+                and is expressed in bytes."
+       ::= { capTaskEntry 6 }
+
+-- memory group : capacity stats for Memory pools 
+
+   capMemoryTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CapMemoryEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "A summary of the non-volatile storage devices in the SSR."
+       ::= { memory 1 }
+ 
+   capMemoryEntry OBJECT-TYPE
+       SYNTAX      CapMemoryEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "An entry containing information on a non-volatile memory device
+         in the SSR."
+       INDEX   { capMemoryType, capMemoryIndex }
+       ::= { capMemoryTable 1 }
+
+   CapMemoryEntry ::=
+       SEQUENCE {
+           capMemoryType          SSRMemoryType,
+           capMemoryIndex         INTEGER,
+           capMemoryDescr         OCTET STRING,
+           capMemorySize          INTEGER,
+           capMemoryFree          INTEGER,
+           capMemoryUsed          INTEGER,
+           capMemoryBlockSize     INTEGER,
+           capMemoryFailures      Counter32,
+           capMemoryRemovable     TruthValue
+       }
+
+   capMemoryType OBJECT-TYPE
+       SYNTAX      SSRMemoryType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A type of storage device from the enumerated memory types."
+       ::= { capMemoryEntry 1 }
+
+   capMemoryIndex OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An index or enumeration for the entries of a particular 
+                memory type.  This index corresponds to:
+                   -- Interface index for L2Hardware Type
+                   -- Module index for L3Hardware Type
+                   -- Enumeration for everything else."
+       ::= { capMemoryEntry 2 }
+
+   capMemoryDescr OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..256))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "The description of the memory device."
+       ::= { capMemoryEntry 3 }
+
+   capMemorySize OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "Memory device total memory capacity expressed in blocks."
+       ::= { capMemoryEntry 4 }
+ 
+   capMemoryFree OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "Memory device free memory in blocks.  This will include any
+         unused memory between used memory blocks and is calculated by
+         subtracting the memory used from the size of the memory device."
+       ::= { capMemoryEntry 5 }
+ 
+   capMemoryUsed OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "Size of used memory on the memory device.  This includes the blocks
+         of memory that are only partially used and is expressed in blocks."
+       ::= { capMemoryEntry 6 }
+
+   capMemoryBlockSize OBJECT-TYPE
+       SYNTAX      INTEGER (1..4294967295)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "Size of the memory blocks on the memory device.  This is the 
+         minimum block size of memory returned when memory is requested 
+         and is expressed in bytes."
+       ::= { capMemoryEntry 7 }
+
+   capMemoryFailures OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "The number of times a memory allocation in this memory device has
+         failed.  In the case of L2Hardware and L3Hardware types it expresses
+         the number of times a Full Hash Bucket condition has been met."
+       ::= { capMemoryEntry 8 }
+
+   capMemoryRemovable OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "Indicates if the memory type is removable."
+       ::= { capMemoryEntry 9 }
+
+ 
+-- ### Compliance ###
+
+capConformance OBJECT IDENTIFIER ::= { capacityMIB 6 }
+capCompliances OBJECT IDENTIFIER ::= { capConformance 1 }
+capGroups OBJECT IDENTIFIER ::= { capConformance 2 }
+ 
+capComplianceV10 MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+            "The compliance statement for the SSR-CAPACITY-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { capConfGroupV10 }
+    ::= { capConfGroupV10 1 }
+
+capComplianceV20 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the SSR-CAPACITY-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { capConfGroupV20 }
+    ::= { capConfGroupV20 1 }
+
+
+capConfGroupV10  OBJECT-GROUP 
+   OBJECTS {
+    capChassisSlotCount,
+    capChassisSlotsUsed,
+    capChassisSlotsFree,
+    capChassisCPURedundancy,
+    capChassisPSRedundancy,
+    capChassisSFRedundancy,
+    capCPUCurrentUtilization,
+    capCPUL3Learned,
+    capCPUL3Aged,
+    capCPUL2Learned,
+    capCPUL2Aged,
+    capCPUNIAReceived,
+    capCPUNIATransmitted,
+    capTaskName,
+    capTaskShed,
+    capTaskStatus,
+    capTaskUsed,
+    capMemoryDescr,
+    capMemorySize,
+    capMemoryFree,
+    capMemoryUsed,
+    capMemoryBlockSize,
+    capMemoryFailures,
+    capMemoryRemovable
+}
+  STATUS deprecated
+  DESCRIPTION
+  "A set of managed objects that make up version 1.0 of the SSR capacity mib."
+   ::= { capGroups 1 } 
+ 
+capConfGroupV20  OBJECT-GROUP 
+   OBJECTS {
+    capChassisSlotCount,
+    capChassisSlotsUsed,
+    capChassisSlotsFree,
+    capChassisCPURedundancy,
+    capChassisPSRedundancy,
+    capChassisSFRedundancy,
+    capCPUCurrentUtilization,
+    capCPUL3Learned,
+    capCPUL3Aged,
+    capCPUL2Learned,
+    capCPUL2Aged,
+    capCPUNIAReceived,
+    capCPUNIATransmitted,
+    capCPUMinThreshold,
+    capCPUMaxThreshold,
+    capTaskName,
+    capTaskShed,
+    capTaskStatus,
+    capTaskUsed,
+    capMemoryDescr,
+    capMemorySize,
+    capMemoryFree,
+    capMemoryUsed,
+    capMemoryBlockSize,
+    capMemoryFailures,
+    capMemoryRemovable
+}
+  STATUS current
+  DESCRIPTION
+  "A set of managed objects that make up version 2.0 of the SSR capacity mib."
+   ::= { capGroups 2 } 
+
+END

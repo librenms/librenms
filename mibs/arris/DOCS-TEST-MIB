@@ -1,0 +1,182 @@
+DOCS-TEST-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+  -- do not import        BITS,
+        Integer32,
+        enterprises
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        TruthValue
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE
+                FROM SNMPv2-CONF;
+
+
+-- These are the defined Cablelabs OID paths. Not all are needed for the Test MIB,
+-- but included here for sake of completeness.
+cableLabs           OBJECT IDENTIFIER ::= { enterprises 4491 }
+clabFunction        OBJECT IDENTIFIER ::= { cableLabs 1 }
+clabFuncMib2        OBJECT IDENTIFIER ::= { clabFunction 1 }
+clabFuncProprietary OBJECT IDENTIFIER ::= { clabFunction 2 }
+clabProject         OBJECT IDENTIFIER ::= { cableLabs 2 }
+clabProjDocsis      OBJECT IDENTIFIER ::= { clabProject 1 }
+clabProjPacketCable OBJECT IDENTIFIER ::= { clabProject 2 }
+clabProjOpenCable   OBJECT IDENTIFIER ::= { clabProject 3 }
+clabProjCableHome   OBJECT IDENTIFIER ::= { clabProject 4 }
+
+
+docsTestMIB MODULE-IDENTITY
+        LAST-UPDATED    "0203150000Z" -- March 15, 2002
+        ORGANIZATION    "DOCSIS 2.0 ATP Working Group"
+        CONTACT-INFO
+            "        David Raftus
+             Postal: Imedia Semiconductor       
+                     340 Terry Fox Drive, Suite 202
+                     Ottawa Ontario
+                     Canada
+             Phone:  +1 613 592 1052
+             E-mail: david.raftus@imedia.com           
+
+             DOCSIS 2.0 ATP Working Group
+             General Discussion: docsis-20@cablelabs.com,
+                                 docsis-20-atp@cablelabs.com"
+        DESCRIPTION
+            "This is the MIB Module supporting programmable test features
+             for DOCSIS 2.0 compliant Cable Modems (CM) and Cable Modem 
+             Termination Systems (CMTS)."
+        -- 4491 is the IANA Cablelabs enterprise number
+        ::= { clabProjDocsis 12 }
+             
+
+
+-- Textual Conventions
+-- none required yet - dave - leave as a placeholder
+
+
+-- Mapping path to the test mib.
+--
+docsTestMibObjects   OBJECT IDENTIFIER ::= { docsTestMIB 1 }
+docsTestBaseObjects  OBJECT IDENTIFIER ::= { docsTestMibObjects 1 }
+docsTestSetupObjects OBJECT IDENTIFIER ::= { docsTestMibObjects 2 }
+
+--
+-- docsTestBaseObjects
+--
+-- These objects indicate the capability and current status of the
+-- programmable test features on the CM/CMTS.
+--
+
+docsTestCapability OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the ability of this device to support the 
+             programmable features identified by the TYPE field from
+             the CM/CMTS TLV table in [17] and section 3.1.2.
+             Each octet within this octet string represents eight tests.
+             For example, the first octet represents tests one through eight
+             as identified by the TYPE field."
+        ::= { docsTestBaseObjects 1 }
+
+docsTestStatus OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the current operating status of tests initiated 
+             through the docsTestSetupObjects. The octet representation is
+             identical to that used by docsTestCapability. A bit representation
+             of one indicates that a test is currently active, while zero 
+             indicates the test is inactive or has completed."
+        ::= { docsTestBaseObjects 2 }
+
+
+--
+-- docsTestSetupObjects
+--
+-- These objects setup the test parameters ands initiate the test.
+--
+
+docsTestType OBJECT-TYPE
+        SYNTAX      Integer32 (0..1023)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Corresponds to the TYPE field from the CM/CMTS TLV Table
+             in [17] and section 3.1.2. The default value of zero indicates
+             no test has yet been initiated.
+             A WrongValueError should be returned in response to a write
+             request for a test not supported by the device. A read request
+             will return the docsTestType value last successfully written, 
+             whether that test is active or inactive."
+        DEFVAL { 0 }
+        ::= { docsTestSetupObjects 1 }
+
+docsTestData OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Corresponds to the LENGTH and VALUE fields from the CM/CMTS TLV
+             Table in [17] and section 3.1.2. A read request will return the 
+             docsTestData value last successfully written, whether that test 
+             is active or inactive."
+        ::= { docsTestSetupObjects 2 }
+
+docsTestEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Used to initiate or stop the tests setup through the docsTestType
+             and docsTestData objects. 
+             A CommitFailedError should be returned in response to a TRUE
+             Write request if the values in docsTestType and docsTestData are
+             incompatible, or a test could not be initiated for any other
+             reason."
+        ::= { docsTestSetupObjects 3 }
+
+
+
+
+-- Compliance statements
+
+docsTestConformance  OBJECT IDENTIFIER     ::= { docsTestMIB 2 }
+docsTestCompliances  OBJECT IDENTIFIER     ::= { docsTestConformance 1 }
+docsTestGroups       OBJECT IDENTIFIER     ::= { docsTestConformance 2 }
+
+
+docsTestBasicCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for devices that implement
+             the DOCSIS compliant programmable test features."
+
+MODULE  -- docsTestMib
+
+-- unconditionally mandatory groups
+MANDATORY-GROUPS {
+        docsTestGroup
+        } ::= { docsTestCompliances 1 }
+
+
+docsTestGroup OBJECT-GROUP
+        OBJECTS {
+            docsTestCapability,
+            docsTestStatus,
+            docsTestType,
+            docsTestData,
+            docsTestEnable
+        }
+        STATUS      current
+        DESCRIPTION
+            "Group of objects implemented in both Cable Modems and
+             Cable Modem Termination Systems."
+        ::= { docsTestGroups 1 }
+
+
+END

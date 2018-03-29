@@ -1,0 +1,233 @@
+--
+-- Copyright (c) 2004-2009, Infoblox, Inc
+-- All rights reserved.
+
+IB-DHCPONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION FROM SNMPv2-TC
+   Counter64, Unsigned32 FROM SNMPv2-SMI
+   Counter FROM RFC1155-SMI
+   ibDHCPOne, IbString, IbIpAddr FROM IB-SMI-MIB;
+
+ibDhcpModule MODULE-IDENTITY
+    LAST-UPDATED "201003230000Z"  --  Mar 23, 2010
+    ORGANIZATION "Infoblox"
+    CONTACT-INFO "See IB-SMI-MIB for information."
+    DESCRIPTION "This file defines the Infoblox DHCP One MIB."
+
+    REVISION  "201003230000Z"  --  Mar 23, 2010
+    DESCRIPTION   "Fixed smilint errors"
+
+    REVISION  "200802140000Z"  --  Feb 14, 2008
+    DESCRIPTION   "change ibDHCPSubnetPercentUsed syntax"
+
+    REVISION  "200501100000Z"  --  Jan 10, 2005
+    DESCRIPTION   "Added copyright"
+                                                                                                
+    REVISION  "200405210000Z"  --  May 21, 2004
+    DESCRIPTION   "Creation of the MIB file"
+
+    ::= { ibDHCPOne 1 }
+
+-- DNSOne DHCP Subnet Definition
+
+ibDHCPSubnetTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbDHCPSubnetEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of DHCP Subnet statistics."
+   ::= { ibDhcpModule 1 }
+
+ibDHCPSubnetEntry OBJECT-TYPE
+   SYNTAX        IbDHCPSubnetEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row of the ibDHCPSubnetEntry containing 
+                  info about a particular network using DHCP."
+   INDEX         {ibDHCPSubnetNetworkAddress }
+   ::= { ibDHCPSubnetTable 1 }
+
+IbDHCPSubnetEntry ::=
+   SEQUENCE {
+     ibDHCPSubnetNetworkAddress     IbIpAddr,
+     ibDHCPSubnetNetworkMask        IbIpAddr,
+     ibDHCPSubnetPercentUsed        INTEGER
+   }
+
+ibDHCPSubnetNetworkAddress OBJECT-TYPE
+   SYNTAX        IbIpAddr
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "DHCP Subnet in IpAddress format. A subnetwork may have many 
+                  ranges for lease."
+   ::= { ibDHCPSubnetEntry 1 }
+
+ibDHCPSubnetNetworkMask OBJECT-TYPE
+   SYNTAX        IbIpAddr
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "DHCP Subnet mask in IpAddress format." 
+   ::= { ibDHCPSubnetEntry 2 }
+
+ibDHCPSubnetPercentUsed OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Percentage of dynamic DHCP address for subnet leased out at this 
+                  time. Fixed addresses are always counted as leased for this
+                  calcuation if the fixed addresses are within ranges of leases."
+   ::= { ibDHCPSubnetEntry 3 }
+
+ibDHCPStatistics OBJECT IDENTIFIER
+   ::= { ibDhcpModule 3 }
+
+ibDhcpTotalNoOfDiscovers OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 discovery messages received"
+   ::= { ibDHCPStatistics 1 }
+
+ibDhcpTotalNoOfRequests OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 requests received"
+   ::= { ibDHCPStatistics 2 }
+
+ibDhcpTotalNoOfReleases OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 releases received"
+   ::= { ibDHCPStatistics 3 }
+
+ibDhcpTotalNoOfOffers OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 offers sent"
+   ::= { ibDHCPStatistics 4 }
+
+ibDhcpTotalNoOfAcks OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 acks sent"
+   ::= { ibDHCPStatistics 5 }
+
+ibDhcpTotalNoOfNacks OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 nacks sent"
+   ::= { ibDHCPStatistics 6 }
+
+ibDhcpTotalNoOfDeclines OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 declines received"
+   ::= { ibDHCPStatistics 7 }
+
+ibDhcpTotalNoOfInforms OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 informs received"
+   ::= { ibDHCPStatistics 8 }
+
+ibDhcpTotalNoOfOthers OBJECT-TYPE
+   SYNTAX  Counter
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "This variable indicates the number of
+		 other messages received"
+   ::= { ibDHCPStatistics 9 }
+
+ibDhcpDeferredQueueSize OBJECT-TYPE
+   SYNTAX  INTEGER
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION "The size of deferred dynamic DNS update queue"
+   ::= { ibDhcpModule 4 }
+
+ibDHCPDDNSStats OBJECT IDENTIFIER
+   ::= { ibDhcpModule 5 }
+
+ibDHCPDDNSAvgLatency5 OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Average Latencies (in microseconds) for DHCPD
+                  dynamic DNS updates during the last 5 minutes"
+   ::= { ibDHCPDDNSStats 1 }
+
+ibDHCPDDNSAvgLatency15 OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Average Latencies (in microseconds) for DHCPD
+                  dynamic DNS updates during the last 15 minutes"
+   ::= { ibDHCPDDNSStats 2 }
+
+ibDHCPDDNSAvgLatency60 OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Average Latencies (in microseconds) for DHCPD
+                  dynamic DNS updates during the last 60 minutes"
+   ::= { ibDHCPDDNSStats 3 }
+
+ibDHCPDDNSAvgLatency1440 OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Average Latencies (in microseconds) for DHCPD
+                  dynamic DNS updates during the last 1 day"
+   ::= { ibDHCPDDNSStats 4 }
+
+ibDHCPDDNSTimeoutCount5 OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "The number of timeout DHCPD dynamic DDNS
+                  updates during the last 5 minutes"
+   ::= { ibDHCPDDNSStats 5 }
+
+ibDHCPDDNSTimeoutCount15 OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "The number of timeout DHCPD dynamic DDNS
+                  updates during the last 15 minutes"
+   ::= { ibDHCPDDNSStats 6 }
+
+ibDHCPDDNSTimeoutCount60 OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "The number of timeout DHCPD dynamic DDNS
+                  updates during the last 60 minutes"
+   ::= { ibDHCPDDNSStats 7 }
+
+ibDHCPDDNSTimeoutCount1440 OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "The number of timeout DHCPD dynamic DDNS
+                  updates during the last 1 day"
+   ::= { ibDHCPDDNSStats 8 }
+
+END

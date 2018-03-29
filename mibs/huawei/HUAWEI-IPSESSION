@@ -1,0 +1,321 @@
+-- =================================================================
+-- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-IPSESSION-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--       
+-- =================================================================
+
+        HUAWEI-IPSESSION-MIB DEFINITIONS ::= BEGIN
+ 
+                IMPORTS
+                        hwDatacomm            
+                                FROM HUAWEI-MIB
+                        InterfaceIndex                  
+                                FROM IF-MIB                     
+                        IpAddress, Integer32, OBJECT-TYPE                       
+                                FROM SNMPv2-SMI                 
+                        RowStatus, MacAddress, TruthValue, DisplayString                       
+                                FROM SNMPv2-TC
+                        EnabledStatus
+        												FROM P-BRIDGE-MIB;
+                 
+                hwIpSessionMIB MODULE-IDENTITY 
+                        LAST-UPDATED "200403041608Z"
+                        ORGANIZATION 
+                                "Huawei Technologies Co., Ltd.
+                                "
+                CONTACT-INFO 
+                        "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                         
+                        Http://www.huawei.com                                       
+                        E-mail:support@huawei.com "
+            
+                DESCRIPTION 
+                        "The MIB contains objects of module IP-Session interface."
+                ::= { hwDatacomm 184 }
+        
+                hwIpSessionMibObjects OBJECT IDENTIFIER ::= { hwIpSessionMIB 1 }
+                
+                hwIpSessIfCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwIPSessIfCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The IP-Session interface configuration table."
+                        ::= { hwIpSessionMibObjects 1 }
+                
+                hwIpSessIfCfgEntry OBJECT-TYPE
+                        SYNTAX HwIPSessIfCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The IP-Session interface configuration table entry."
+                        INDEX { hwIpSessIfCfgIfIndex }
+                        ::= { hwIpSessIfCfgTable 1 }
+
+                HwIPSessIfCfgEntry ::=
+                        SEQUENCE { 
+	                        hwIpSessIfCfgIfIndex
+	                                InterfaceIndex,
+	                        hwIpSessIfCfgAuthDomain
+	                                DisplayString,
+	                        hwIpSessIfCfgNasPortType
+	                                Integer32,
+	                        hwIpSessIfCfgArpInterval
+	                                Integer32,
+	                        hwIpSessIfCfgArpFailTimes  
+	                                Integer32,
+	                        hwIpSessIfCfgOption82Policy
+	                                INTEGER,
+	                        hwIpSessIfCfgServicePolicy
+	                                INTEGER,
+	                        hwIpSessIfCfgVpn
+	                                DisplayString,            
+	                        hwIpSessIfCfgIpSessionEnable
+	                                EnabledStatus,	                                
+	                        hwIpSessIfCfgRowStatus
+	                                RowStatus
+                        }
+
+                hwIpSessIfCfgIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                        "The interface index.
+                        "
+                    ::= { hwIpSessIfCfgEntry 1 }
+
+                hwIpSessIfCfgAuthDomain OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE(1..64))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "The default domain when authenticating.
+                        "
+                    ::= { hwIpSessIfCfgEntry 11 }
+                              
+                hwIpSessIfCfgNasPortType OBJECT-TYPE
+                    SYNTAX Integer32(0..20)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "Kind of access port, reference to attribute of NAS-PORT-TYPE in RFC2865. 20 indicates that the access port is restored to the default value.  
+                        "
+                    ::= { hwIpSessIfCfgEntry 12 }   
+                    
+                hwIpSessIfCfgArpInterval OBJECT-TYPE
+                    SYNTAX Integer32(0..121)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "ARP detection interval, 121 indicates that the detection interval is restored to the default value.  
+                        "
+                    DEFVAL { 30 }
+                    ::= { hwIpSessIfCfgEntry 13 }
+
+                hwIpSessIfCfgArpFailTimes OBJECT-TYPE
+                    SYNTAX Integer32(2..11)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "The number that ARP detection is allowed to fail, 121 indicates that the number is restored to the default value.
+                        "
+                    DEFVAL { 5 }
+                    ::= { hwIpSessIfCfgEntry 14 }
+                                                
+                hwIpSessIfCfgOption82Policy OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	    	none(1),
+        	   		insert(2),
+        	    	replace(3)
+    		    	}
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "Policy of DHCP option82.
+                        "
+                    DEFVAL { replace }
+                    ::= { hwIpSessIfCfgEntry 15 }  
+                                       
+                hwIpSessIfCfgServicePolicy OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	        default(1),
+        	        option60(2)
+    		        }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "Policy to select service scheme .
+                        "
+                    DEFVAL { default }
+                    ::= { hwIpSessIfCfgEntry 16 }   
+                     
+                hwIpSessIfCfgVpn OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE (1..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "VPN instance name.             
+                         "
+                    ::= { hwIpSessIfCfgEntry 17 }   
+                                       
+                hwIpSessIfCfgIpSessionEnable OBJECT-TYPE
+                    SYNTAX EnabledStatus               
+    		    				MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "Enable IP-Session, 
+                        1:disable(default);  2:enable.
+                        "
+                    DEFVAL { disable }
+                    ::= { hwIpSessIfCfgEntry 18 }                    
+                    
+                hwIpSessIfCfgRowStatus OBJECT-TYPE
+                    SYNTAX RowStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The row administration status, only supporting add or delete.
+                        "
+                    ::= { hwIpSessIfCfgEntry 51 }
+                    
+                                        
+                hwIpSessUserCfgTable OBJECT IDENTIFIER ::= { hwIpSessionMibObjects 2 }
+               
+		        hwIpSessUserPasswordType OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	        simple(1),
+        	        cipher(2)
+    		        }			              
+    		        MAX-ACCESS read-write
+			        STATUS current
+			        DESCRIPTION
+			        "IP session user's password type.
+			        "
+                    DEFVAL { simple }         
+			              ::= { hwIpSessUserCfgTable 11 }		
+			              
+				hwIpSessUserPassword OBJECT-TYPE
+			        SYNTAX DisplayString(SIZE (0..128))
+			        MAX-ACCESS read-write
+			        STATUS current
+			        DESCRIPTION
+			        "IP session user's password.            
+			        "         
+			        ::= { hwIpSessUserCfgTable 12 }
+			              
+				hwIpSessUserNameOption82 OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	        none(1),
+        	        first(2),
+        	        second(3),
+        	        third(4),
+        	        fourth(5)
+    		        }			              
+    		        MAX-ACCESS read-write
+			        STATUS current
+			        DESCRIPTION
+			        "IP session user's name option82 include.
+			        "
+                    DEFVAL { none }         
+			        ::= { hwIpSessUserCfgTable 13 }			              
+			              
+				hwIpSessUserNameIP OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	        none(1),
+        	        first(2),
+        	        second(3),
+        	        third(4),
+        	        fourth(5)
+    		        }			              
+    		        MAX-ACCESS read-write
+			        STATUS current
+			        DESCRIPTION
+			        "IP session user's name IP address include.
+			        "
+                    DEFVAL { none }         
+			        ::= { hwIpSessUserCfgTable 14 }	
+
+				hwIpSessUserNameSysName OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	        none(1),
+        	        first(2),
+        	        second(3),
+        	        third(4),
+        	        fourth(5)
+    		        }			              
+    		        MAX-ACCESS read-write
+			        STATUS current
+			        DESCRIPTION
+			        "IP session user's name system name include.
+			        "
+                    DEFVAL { none }         
+			        ::= { hwIpSessUserCfgTable 15 }	
+			              
+			    hwIpSessUserNameMac OBJECT-TYPE
+                    SYNTAX INTEGER
+                    {
+        	        none(1),
+        	        first(2),
+        	        second(3),
+        	        third(4),
+        	        fourth(5)
+    		        }			              
+    		        MAX-ACCESS read-write
+			        STATUS current
+			        DESCRIPTION
+			        "IP session user's name MAC address include.
+			        "
+                    DEFVAL { none }         
+			        ::= { hwIpSessUserCfgTable 16 }			                    
+                    
+         hwIpSessionConformance OBJECT IDENTIFIER ::= { hwIpSessionMIB 3 }
+          
+         hwIpSessionCompliances OBJECT IDENTIFIER ::= { hwIpSessionConformance 1 } 
+         
+         hwIpSessionCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The configure of IP session's group."
+            MODULE
+                MANDATORY-GROUPS { hwIpSessIfCfgGroup, hwIpSessUserCfgGroup }
+            ::= { hwIpSessionCompliances 1 }  
+            
+         hwIpSessionGroups OBJECT IDENTIFIER ::= { hwIpSessionConformance 2 }                          
+         
+         hwIpSessIfCfgGroup OBJECT-GROUP
+            OBJECTS {hwIpSessIfCfgAuthDomain, hwIpSessIfCfgNasPortType,
+	                  hwIpSessIfCfgArpInterval, hwIpSessIfCfgArpFailTimes, hwIpSessIfCfgOption82Policy,
+	                  hwIpSessIfCfgServicePolicy, hwIpSessIfCfgVpn, hwIpSessIfCfgIpSessionEnable,	                                
+	                  hwIpSessIfCfgRowStatus
+                     }
+            STATUS current
+            DESCRIPTION 
+                "The interface configure of IP session's group."
+            ::= { hwIpSessionGroups 1 }
+        
+        hwIpSessUserCfgGroup OBJECT-GROUP
+            OBJECTS { hwIpSessUserPasswordType, hwIpSessUserPassword, hwIpSessUserNameOption82,
+	                  hwIpSessUserNameIP, hwIpSessUserNameSysName,hwIpSessUserNameMac	                  
+                     }
+            STATUS current
+            DESCRIPTION 
+                "The global configure of IP session's group."
+            ::= { hwIpSessionGroups 2 }
+         
+                                                                                                        
+        END

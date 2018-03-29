@@ -1,0 +1,594 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+--FROM SNMP-FRAMEWORK-MIB; 
+-- RFC 2571  
+  
+--  These are from draft-ietf-ops-rfc2851-update-00.txt  
+--  You will have to work out the details with your own  
+--  compiler being because they are so new. 
+     
+--equalLogic   OBJECT IDENTIFIER ::= { enterprises 12740 } 
+-- assigned by IANA to EqualLogic.  
+EQLSTORAGECONTAINER-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, Counter32, enterprises, Counter64
+            FROM SNMPv2-SMI  
+    DateAndTime, RowPointer       
+            FROM SNMPv2-TC
+    TruthValue, RowStatus, DisplayString    
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    UTFString
+            FROM EQLGROUP-MIB
+    eqliscsiLocalMemberId, EQL2PartRowPointerStr
+            FROM EQLVOLUME-MIB
+    eqlStoragePoolIndex
+            FROM EQLSTORAGEPOOL-MIB;
+
+eqlStorageContainerModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Storage Array Storage Container information 
+
+        Copyright (c) 2012 by Dell, Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell, Inc. 
+        "
+
+    -- Revision history, in reverse chronological order
+    REVISION   "201206200000Z"      -- 12-Jun-20
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 25 }     
+
+
+eqlStorageContainerObjects OBJECT IDENTIFIER ::=  { eqlStorageContainerModule 1 }   
+eqlStorageContainerNotifications OBJECT IDENTIFIER ::= { eqlStorageContainerModule 2 }   
+eqlStorageContainerConformance OBJECT IDENTIFIER ::=  { eqlStorageContainerModule 3 } 
+     
+--***********************************************************************************
+-- Textual conventions
+--
+-- If adding entries here, also update the file mibconv.c !!!
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+           "A non-negative 64-bit bit integer, without counter
+            semantics."
+       SYNTAX Counter64
+
+
+--***********************************************************************************
+
+eqlStorageContainerTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStorageContainerEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent StorageContainerTable.
+                     This table contains a list of Storage Containers in a group and their attributes.
+                     TimeoutCreate:60 TimeoutDelete:60"  
+    ::=    { eqlStorageContainerObjects 1 } 
+
+
+eqlStorageContainerEntry OBJECT-TYPE      
+    SYNTAX          EqlStorageContainerEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Storage Container info."
+    INDEX           { eqliscsiLocalMemberId, eqlStorageContainerIndex }
+
+    ::=   { eqlStorageContainerTable 1}     
+
+EqlStorageContainerEntry ::= 
+    SEQUENCE { 
+        eqlStorageContainerIndex                   Unsigned32,   
+        eqlStorageContainerRowStatus               RowStatus,
+        eqlStorageContainerUuid                    OCTET STRING,
+        eqlStorageContainerName                    UTFString,
+        eqlStorageContainerLookupName              UTFString,
+        eqlStorageContainerDescription             UTFString,  
+        eqlStorageContainerLogicalLimit            Unsigned64
+    }
+
+eqlStorageContainerIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      not-accessible     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifying a Storage Container."  
+    ::=   { eqlStorageContainerEntry 1}     
+
+eqlStorageContainerRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used to indicate the status of the entry i.e. whether the entry is active or not."  
+    ::= { eqlStorageContainerEntry 2 }  
+
+eqlStorageContainerUuid OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field is for internal use only.It stores the UUID for the storage container. 
+                     The UUID is generated by the system."  
+    ::=  { eqlStorageContainerEntry 3 }
+
+eqlStorageContainerName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a user friendly name for a Storage Container.
+                     The name must be unique within a group.
+                     The name must not contain spaces or special characters.
+                     The name can be up to 64 characters in length. There is no default."
+    ::=  {  eqlStorageContainerEntry 4 }  
+
+eqlStorageContainerLookupName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies a string-prepped version of the Storage Container name, used for lookups.
+                     The name must be unique within a group.
+                     The name must not contain spaces or special characters.
+                     The name can be up to 64 characters in length. There is no default."
+    ::=  {  eqlStorageContainerEntry 5 }  
+
+eqlStorageContainerDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides details about the storage container.
+                     The description can be up to 128 characters. There is no default value."  
+    ::=  {  eqlStorageContainerEntry 6 } 
+          
+eqlStorageContainerLogicalLimit OBJECT-TYPE      
+    SYNTAX          Unsigned64  
+    UNITS           "MB" 
+    MAX-ACCESS      read-create      
+    STATUS          current    
+    DESCRIPTION     "This field specifies the Storage Container *logical* limit in MB. There is no default.
+                     It should be larger than the physical size, as configured for this Storage Container."
+    DEFVAL          {8589934592}  
+    ::=   { eqlStorageContainerEntry 7 }   
+
+--***********************************************************************************
+    
+eqlStorageContainerStatisticsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStorageContainerStatisticsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic StorageContainerStatisticsTable.
+                     This table contains the statistics of the storage containers within an EQL group." 
+    ::=    { eqlStorageContainerObjects 2 }     
+
+
+eqlStorageContainerStatisticsEntry OBJECT-TYPE      
+    SYNTAX          EqlStorageContainerStatisticsEntry 
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Storage Container statistics."
+    AUGMENTS        { eqlStorageContainerEntry }
+
+    ::=   { eqlStorageContainerStatisticsTable 1}     
+
+EqlStorageContainerStatisticsEntry ::= 
+    SEQUENCE { 
+        eqlStorageContainerStatisticsLogicalUsed        Unsigned64,      
+        eqlStorageContainerStatisticsLogicalFree        Unsigned64,
+        eqlStorageContainerStatisticsPhysicalUsed       Unsigned64,
+        eqlStorageContainerStatisticsPhysicalFree       Unsigned64,
+        eqlStorageContainerStatisticsThinProvFree       Unsigned64,
+        eqlStorageContainerStatisticsVvolsBound         Counter32,
+        eqlStorageContainerStatisticsSVCount            Counter32,
+        eqlStorageContainerStatisticsSVSCount           Counter32,
+        eqlStorageContainerStatisticsThinProvisioned    TruthValue,
+        eqlStorageContainerStatisticsVvolsOnline        Counter32
+    }
+
+eqlStorageContainerStatisticsLogicalUsed OBJECT-TYPE      
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of Logical Space is 
+                     is allocated from this Storage Container.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=  { eqlStorageContainerStatisticsEntry 1 }
+
+
+eqlStorageContainerStatisticsLogicalFree OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of Logical Space 
+                     is free within this Storage Container.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=   { eqlStorageContainerStatisticsEntry 2}  
+
+
+eqlStorageContainerStatisticsPhysicalUsed OBJECT-TYPE      
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of Physical Space 
+                     is allocated from this Storage Container.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=  { eqlStorageContainerStatisticsEntry 3 }
+
+
+eqlStorageContainerStatisticsPhysicalFree OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of Physical Space 
+                     is free within this Storage Container.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=   { eqlStorageContainerStatisticsEntry 4 }  
+
+eqlStorageContainerStatisticsThinProvFree  OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies how many MB of the Thin Provision Reserved 
+                     Physical Space is free within this Storage Container.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=   { eqlStorageContainerStatisticsEntry 5 } 
+
+eqlStorageContainerStatisticsVvolsBound OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of vvols within
+                     the storage container that are bound."
+    ::= {   eqlStorageContainerStatisticsEntry 6 }
+
+eqlStorageContainerStatisticsSVCount OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of shared 
+                     volumes for this storage container."
+    ::= {   eqlStorageContainerStatisticsEntry 7 }
+
+eqlStorageContainerStatisticsSVSCount OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of shared
+                     volume sets for this storage container."
+    ::= {   eqlStorageContainerStatisticsEntry 8 }
+
+eqlStorageContainerStatisticsThinProvisioned OBJECT-TYPE      
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Are the buckets in this Storage Container thin-provisioned."
+    ::= {   eqlStorageContainerStatisticsEntry 9 }
+
+eqlStorageContainerStatisticsVvolsOnline OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of vvols within
+                     the storage container that are online."
+    ::= {   eqlStorageContainerStatisticsEntry 10 }
+
+
+--***********************************************************************************
+
+
+eqlStorageBucketTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStorageBucketEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent StorageBucket Table.
+                     This table contains a list of Storage Buckets in a group and their attributes.
+                     TimeoutCreate:60 TimeoutDelete:60"  
+    ::=    { eqlStorageContainerObjects 3 } 
+
+eqlStorageBucketEntry OBJECT-TYPE      
+    SYNTAX          EqlStorageBucketEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Storage Bucket info."
+    INDEX           { eqliscsiLocalMemberId, eqlStorageBucketIndex }
+
+    ::=   { eqlStorageBucketTable 1}     
+
+EqlStorageBucketEntry ::= 
+    SEQUENCE { 
+        eqlStorageBucketIndex                   Unsigned32,   
+        eqlStorageBucketRowStatus               RowStatus,
+        eqlStorageBucketName                    UTFString,
+        eqlStorageBucketLookupName              UTFString,
+        eqlStorageBucketUuid                    OCTET STRING,
+        eqlStorageBucketPhysicalSize            Unsigned64,  
+        eqlStorageBucketThinProvision           TruthValue,
+        eqlStorageBucketThinMinReserve          Unsigned32,
+        eqlStorageBucketThinMaxGrow             Unsigned32,
+        eqlStorageBucketFreeWarnPercentage      Unsigned32,
+        eqlParentStorageContainerPointer        EQL2PartRowPointerStr,
+        eqlParentStoragePoolIndex               Unsigned32   
+   }
+
+eqlStorageBucketIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      not-accessible     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifying a Storage Bucket."  
+    ::=   { eqlStorageBucketEntry 1}     
+
+eqlStorageBucketRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used to indicate the status of this entry i.e. whether the entry is active or not."  
+    ::= { eqlStorageBucketEntry 2 }  
+
+eqlStorageBucketName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a user friendly name for a Storage Bucket.
+                     The name must be unique within a group.
+                     The name must not contain spaces or special characters.
+                     The name can be up to 64 characters in length. There is no default."
+    ::=  {  eqlStorageBucketEntry 3 }  
+
+eqlStorageBucketLookupName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies a string-prepped version of the Storage Bucket name, used for lookups.
+                     The name must be unique within a group.
+                     The name must not contain spaces or special characters.
+                     The name can be up to 64 characters in length. There is no default."
+    ::=  {  eqlStorageBucketEntry 4 }  
+
+eqlStorageBucketUuid OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This is the unique identifier for the Storage Bucket, used in interacting with IOM."  
+    ::=  { eqlStorageBucketEntry 5 }
+
+eqlStorageBucketPhysicalSize OBJECT-TYPE      
+    SYNTAX          Unsigned64
+    UNITS           "MB" 
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the Storage Bucket *physical* size in MB. There is no default.
+                     It will be rounded up to the nearest increment of one page (15MB).  
+                     It should be smaller than the logical size, as configured for this Storage Bucket."
+    ::=   { eqlStorageBucketEntry 6 }   
+
+eqlStorageBucketThinProvision  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies if the StorageBucket is enabled for Thin Provisioning."
+    DEFVAL            {false}
+    ::=   { eqlStorageBucketEntry 7 }
+    
+eqlStorageBucketThinMinReserve  OBJECT-TYPE
+    SYNTAX          Unsigned32(0..100)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the amount of pool free space that is currently reserved 
+                     for this Thin Provisioned StorageBucket configured as a percentage of eqlStorageBucketPhysicalSize."
+    DEFVAL          {10}
+    ::=   { eqlStorageBucketEntry 8 }
+
+eqlStorageBucketThinMaxGrow  OBJECT-TYPE
+    SYNTAX          Unsigned32(1..100)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the amount of pool space that the storage bucket can grow to within the pool.  
+                     This field is configured as a percentage of eqlStorageBucketPhysicalSize."
+    DEFVAL          {100}
+    ::=   { eqlStorageBucketEntry 9 }
+    
+eqlStorageBucketFreeWarnPercentage  OBJECT-TYPE
+    SYNTAX          Unsigned32(1..100)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is configured as a percentage of the eqlStorageBucketPhysicalSize for thick 
+                     provisioned volumes, but as a percentage of eqlStorageBucketThinMaxGrow for thin provisioned
+                     volumes.  It is expected that IOM will raise a warning when the bucket's free space reaches this
+                     value.  For thin provisioned volumes, it is expected that if the bucket's containing pool 
+                     reaches this threshold (in terms of free pages) the warning will also be issued."
+    DEFVAL          {10}
+    ::=   { eqlStorageBucketEntry 10 }
+    
+eqlParentStorageContainerPointer OBJECT-TYPE
+    SYNTAX          EQL2PartRowPointerStr
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the row in the Storage Container table of the parent
+                     Storage Container for this Storage Bucket.  If this value is null then the 
+                     Storage Bucket is unassigned."
+    ::=   { eqlStorageBucketEntry 11 }
+
+eqlParentStoragePoolIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the index of the Storage Pool in which the bucket is placed."
+    ::=   { eqlStorageBucketEntry 12 }
+
+
+--***********************************************************************************
+
+
+eqlStorageBucketDynamicConfigTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStorageBucketDynamicConfigEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Table for storing in database the Storage Bucket attributes that can 
+                     independently change.  This table is owned by MgmtExec, and is read/written upon request of IOM."
+    ::=    { eqlStorageContainerObjects 4 }     
+
+eqlStorageBucketDynamicConfigEntry OBJECT-TYPE      
+    SYNTAX          EqlStorageBucketDynamicConfigEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing status for Storage Bucket dynamic config. The values in this 
+                    table are not user configurable."
+    INDEX           { eqliscsiLocalMemberId, eqlStorageBucketIndex }
+
+    ::=   { eqlStorageBucketDynamicConfigTable 1}     
+
+EqlStorageBucketDynamicConfigEntry ::= 
+    SEQUENCE { 
+        eqlStorageBucketDynamicReservePages                 Counter64,
+        eqlStorageBucketFreeWarnInUsePageCount              Counter64,
+        eqlStorageBucketMaxResvInUsePageCount               Counter64,
+        eqlStorageBucketFreeWarnThresholdPageCount          Counter64
+    }
+
+eqlStorageBucketDynamicReservePages  OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "pages"
+    MAX-ACCESS      read-only       
+    STATUS          current
+    DESCRIPTION     "This field specifies the amount of pool space that is currently reserved 
+                     for this Storage Bucket. It is valid for both thick and thin provisioned buckets."
+    ::=   { eqlStorageBucketDynamicConfigEntry 1}
+
+eqlStorageBucketFreeWarnInUsePageCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "pages"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the number of Storage Bucket pages that were in use when the
+                     last free-warn event for the bucket was received from IOM. It is valid for both thick 
+                     and thin provisioned buckets."
+    ::=   { eqlStorageBucketDynamicConfigEntry 2}
+
+eqlStorageBucketMaxResvInUsePageCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "pages"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the number of Storage Bucket pages that were in use when the
+                     last max-resv event for the bucket was received from IOM. It is valid for both thick 
+                     and thin provisioned buckets."
+    ::=   { eqlStorageBucketDynamicConfigEntry 3}
+
+eqlStorageBucketFreeWarnThresholdPageCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "pages"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field holds the value of the free-warn-threshold page count as it was set when
+                     the last free-warn event for the bucket was received from IOM. It is valid for both thick 
+                     and thin provisioned buckets."
+    ::=   { eqlStorageBucketDynamicConfigEntry 4}
+
+
+--***********************************************************************************
+
+
+eqlStorageBucketStatisticsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStorageBucketStatisticsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Storage StorageBucketStatisticsTable.
+                     This table contains the statistics of the storage buckets within a group." 
+    ::=    { eqlStorageContainerObjects 5 }     
+
+eqlStorageBucketStatisticsEntry OBJECT-TYPE      
+    SYNTAX          EqlStorageBucketStatisticsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Storage Bucket statistics."
+    AUGMENTS        { eqlStorageBucketEntry }
+
+    ::=   { eqlStorageBucketStatisticsTable 1}     
+
+EqlStorageBucketStatisticsEntry ::= 
+    SEQUENCE { 
+        eqlStorageBucketStatisticsPhysicalUsed        Unsigned64,
+        eqlStorageBucketStatisticsPhysicalFree        Unsigned64,
+        eqlStorageBucketStatisticsThinProvFree        Unsigned64,
+        eqlStorageBucketStatisticsVvolsBound          Counter32,
+        eqlStorageBucketStatisticsSVCount             Counter32,
+        eqlStorageBucketStatisticsSVSCount            Counter32,
+        eqlStorageBucketStatisticsVvolsOnline         Counter32
+    }
+
+eqlStorageBucketStatisticsPhysicalUsed OBJECT-TYPE      
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of Physical Space 
+                     is allocated from this Storage Bucket.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=  { eqlStorageBucketStatisticsEntry 1 }
+
+
+eqlStorageBucketStatisticsPhysicalFree OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of Physical Space 
+                     is free within this Storage Bucket.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=   { eqlStorageBucketStatisticsEntry 2 }  
+
+eqlStorageBucketStatisticsThinProvFree  OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies how many MB of the Thin Provision Minimum Reserve 
+                     Physical Space is free within this Storage Bucket.
+                     This is a dynamic value, it is not Administrator settable."
+    ::=   { eqlStorageBucketStatisticsEntry 3 } 
+
+eqlStorageBucketStatisticsVvolsBound OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of vvols within
+                     the storage container that are bound."
+    ::= {   eqlStorageBucketStatisticsEntry 4 }
+
+eqlStorageBucketStatisticsSVCount OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of shared 
+                     volumes for this storage bucket."
+    ::= {   eqlStorageBucketStatisticsEntry 5 }
+
+eqlStorageBucketStatisticsSVSCount OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of shared
+                     volume sets for this storage bucket."
+    ::= {   eqlStorageBucketStatisticsEntry 6 }
+
+eqlStorageBucketStatisticsVvolsOnline OBJECT-TYPE      
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents number of vvols within
+                     the storage container that are online."
+    ::= {   eqlStorageBucketStatisticsEntry 7 }
+
+END

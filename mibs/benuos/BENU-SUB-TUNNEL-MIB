@@ -1,0 +1,205 @@
+BENU-SUB-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Unsigned32, MODULE-IDENTITY, OBJECT-TYPE,
+   OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuWagSubTunMIB  MODULE-IDENTITY
+            LAST-UPDATED "201511130000Z" -- Nov 13, 2015
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "The MIB module defines subscriber and tunnel
+                information
+
+                Copyright (C)  2012 by Benu Networks, Inc.
+                All rights reserved."
+            
+            REVISION "201511130000Z" -- Nov 13, 2015
+            DESCRIPTION "Moved bWagTunMaxNumOfTunnels and bWagSubMaxNumOfSubscribers
+                         to scalars. Also, removed some imports which are not required"
+            REVISION "201501020000Z" -- Jan 02, 2015
+            DESCRIPTION "updated MIB file by adding Subscriber and Tunnel MIB Notifications"
+            REVISION "201212120000Z" -- Dec 12, 2012
+            DESCRIPTION "Initial Version"
+    ::= { benuWAG 2 }
+
+-- declare top-level MIB objects
+
+bWagSubTunnelMIBNotifications  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Subscriber and Tunnel MIB Notifications are defined in this branch."
+   ::= { benuWagSubTunMIB  0 }
+
+bWagSubMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Subscriber MIB objects are defined in this branch."
+   ::= { benuWagSubTunMIB 1 }
+
+bWagSubMIBNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Subscriber MIB Notification objects are defined
+       in this branch."
+   ::= { benuWagSubTunMIB 2 }
+
+bWagTunnelMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Subscriber MIB objects are defined in this branch."
+   ::= { benuWagSubTunMIB 3 }
+
+bWagTunnelMIBNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Subscriber MIB Notification objects are defined
+       in this branch."
+   ::= { benuWagSubTunMIB 4 }
+
+-- subscriber and tunnel scalars
+
+bWagSubMaxNumOfSubscribers  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Max Number of subscribers that can exist
+        at a given time. Any new subscribers beyond this
+        number will be rejected"
+   ::= { bWagSubMIBObjects 1 }
+
+bWagTunMaxNumOfTunnels  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Max Number of tunnels that can exist
+        at a given time. Any new tunnel request beyond this
+        number will be rejected"
+   ::= { bWagTunnelMIBObjects 1 }
+
+-- subscriber notifications
+
+bWagSubHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The high threshold for number of subscribers .
+        If a bWagSubLowThresholdReached event has
+        been generated , and the value number of subscribers
+        has exceeded the value of bWagSubHighThreshold, then a
+        bWagSubHighThresholdReached event will be generated.  No more
+        bWagSubHighThresholdReached events will be generated
+        until the  value for number of subscribers becomes equal to or less
+        than the value of bWagSubLowThreshold."
+   ::= { bWagSubMIBNotifObjects 1 }
+
+bWagSubLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The Lower threshold for number of subscribers .
+        If a bWagSubHighThresholdReached event has
+        been generated , and the value number of subscribers
+        falls below the value of bWagSubLowThreshold, then a
+        bWagSubLowThresholdReached event will be generated.  No more
+        bWagSubLowThresholdReached events will be generated
+        until the  value for number of subscribers becomes equal to or greater
+        than the value of bWagSubHighThreshold."
+   ::= { bWagSubMIBNotifObjects 2 }
+
+bWagSubHighThresholdReached  NOTIFICATION-TYPE
+   OBJECTS        {
+                      bWagSubMaxNumOfSubscribers,
+                      bWagSubHighThreshold
+                  }
+   STATUS      current
+   DESCRIPTION
+        "This notification signifies that the current number of
+        subscribers has risen above the  value of
+        bWagSubHighThreshold."
+   ::= { bWagSubTunnelMIBNotifications 1 }
+
+bWagSubLowThresholdReached  NOTIFICATION-TYPE
+   OBJECTS        {
+                      bWagSubMaxNumOfSubscribers,
+                      bWagSubLowThreshold
+                  }
+   STATUS      current
+   DESCRIPTION
+        "This notification signifies that the current number of
+        subscribers has fallen below the  value of
+        bWagSubLowThreshold."
+   ::= { bWagSubTunnelMIBNotifications 2 }
+
+-- tunnel notifications
+
+bWagTunHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The high threshold for number of tunnels.
+        If a bWagTunLowThresholdReached event has
+        been generated , and the value number of tunnels in use
+        has exceeded the value of bWagTunHighThreshold, then a
+        bWagTunHighThresholdReached event will be generated.  No more
+        bWagTunHighThresholdReached events will be generated
+        until the  value for number of tunnels in use becomes equal to or less
+        than the value of bWagTunLowThreshold."
+   ::= { bWagTunnelMIBNotifObjects 1 }
+
+bWagTunLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The Lower threshold for number of tunnels .
+        If a bWagTunHighThresholdReached event has
+        been generated , and the value number of tunnels in use
+        falls below the value of bWagTunLowThreshold, then a
+        bWagTunLowThresholdReached event will be generated.  No more
+        bWagTunLowThresholdReached events will be generated
+        until the  value for number of tunnels in use becomes equal to
+        or greater than the value of bWagTunHighThreshold."
+   ::= { bWagTunnelMIBNotifObjects 2 }
+
+bWagTunHighThresholdReached  NOTIFICATION-TYPE
+   OBJECTS        {
+                      bWagTunMaxNumOfTunnels,
+                      bWagTunHighThreshold
+                  }
+   STATUS      current
+   DESCRIPTION
+        "This notification signifies that the current number of
+        tunnels has risen above the  value of
+        bWagTunHighThreshold."
+   ::= { bWagSubTunnelMIBNotifications 3 }
+
+
+bWagTunLowThresholdReached  NOTIFICATION-TYPE
+   OBJECTS        {
+                      bWagTunMaxNumOfTunnels,
+                      bWagTunLowThreshold
+                  }
+   STATUS      current
+   DESCRIPTION
+        "This notification signifies that the current number of
+        tunnels has fallen below the  value of
+        bWagTunLowThreshold."
+   ::= { bWagSubTunnelMIBNotifications 4 }
+
+END

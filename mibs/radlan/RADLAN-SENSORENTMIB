@@ -1,0 +1,87 @@
+RADLAN-SENSORENTMIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        rlEnv
+                FROM RADLAN-HWENVIROMENT
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32, mib-2
+                FROM SNMPv2-SMI
+        entPhySensorEntry
+                FROM ENTITY-SENSOR-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, TimeStamp
+                FROM SNMPv2-TC
+        entPhysicalIndex, entityPhysicalGroup
+                FROM ENTITY-MIB
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        EntitySensorValue
+                FROM ENTITY-SENSOR-MIB;
+
+rlSensor MODULE-IDENTITY
+        LAST-UPDATED "200309210000Z"
+        ORGANIZATION "Radlan Computer Communications Ltd."
+        CONTACT-INFO
+                "radlan.com"
+        DESCRIPTION
+                "The private MIB module definition for sensors in Radlan devices."
+        REVISION "200309210000Z"
+        DESCRIPTION
+                "ADDED this MODULE-IDENTITY clause."
+        ::= { rlEnv 4 }
+
+
+
+rlEntPhySensorTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF RlEntPhySensorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The addition to the table of sensors maintained by the environmental
+                monitor."
+        ::= { rlEnv 3 }
+
+rlEntPhySensorEntry OBJECT-TYPE
+        SYNTAX     RlEntPhySensorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An additon to the entry in the sensor table, representing the
+                maximum/minimum values for the sensor associated."
+        AUGMENTS     {entPhySensorEntry}
+        ::= { rlEntPhySensorTable 1 }
+
+RlEntPhySensorEntry ::=
+        SEQUENCE {
+                rlEnvPhySensorMinValue       EntitySensorValue,
+                rlEnvPhySensorMaxValue       EntitySensorValue,
+                rlEnvPhySensorTestValue      EntitySensorValue
+        }
+
+rlEnvPhySensorMinValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Minimum value for the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 1 }
+
+rlEnvPhySensorMaxValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Maximum value for the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 2 }
+
+rlEnvPhySensorTestValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Test/reference value for the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 3 }
+
+END
+

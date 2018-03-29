@@ -1,0 +1,4649 @@
+
+MBG-SNMP-LTNG-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE , Integer32, Unsigned32, Counter64, NOTIFICATION-TYPE
+                                                                FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                                                                FROM SNMPv2-CONF
+    DisplayString
+								FROM SNMPv2-TC
+
+   mbgSnmpRoot, MeinbergSwitch
+                FROM MBG-SNMP-ROOT-MIB;
+
+mbgLantimeNG MODULE-IDENTITY
+    LAST-UPDATED "201605180517Z"
+    ORGANIZATION "Meinberg Radio Clocks GmbH & Co. KG"
+    CONTACT-INFO
+         "postal:   Meinberg Funkuhren
+                    Lange Wand 9
+                    31812 Bad Pyrmont
+                    Germany
+
+          email:    info@meinberg.de
+            web:    http://www.meinberg.de
+            tel:    +49 (0) 52 81 / 93 09 - 0
+            fax:    +49 (0) 52 81 / 93 09 - 30"
+    DESCRIPTION
+        " Meinberg LANTIME SNMP Management Information Base "
+
+    REVISION	"201605180517Z"
+    DESCRIPTION
+        " Rev 6.20.001  18 Mai 2015 05:17 UTC Philipp Rahns
+          Added traps mbgLtNgTrapFDMOk, mbgLtNgTrapNTPOffsetLimitExceeded and
+          mbgLtNgTrapNTPOffsetLimitOk"
+
+    REVISION	"201508270844Z"
+    DESCRIPTION
+        " Rev 6.18.005  27 August 2015 08:44 UTC Philipp Rahns
+          Added mbgLtNgCpuSerialNumber object."
+
+    REVISION	"201504170632Z"
+    DESCRIPTION
+        " Rev 6.17.xxx  17 April 2015 06:32 UTC Philipp Rahns
+          Added / updated new PTP configuration objects.
+          Added trap mbgLtNgTrapSHSTimeLimitOk.
+          Added object mbgLtNgCmdSetTime.
+          Added trap mbgLtNgTrapIMSError.
+          Added trap mbgLtNgTrapIMSOk.
+          Added sendTestNotification command."
+
+    REVISION	"201411250724Z"
+    DESCRIPTION
+        " Rev 6.16.006  25 November 2014 07:24 UTC Philipp Rahns
+          Added mbgLtNgTrapSufficientSystemResources trap."
+
+    REVISION	"201408290810Z"
+    DESCRIPTION
+        " Rev 6.16.001  29 August 2014 08:10 UTC Philipp Rahns
+          Added support for MRS input references.
+          Fixed power supply detection and state."
+
+    REVISION	"201401300919Z"
+    DESCRIPTION
+        " Rev 6.15.016  30 January 2014 09:19 UTC Philipp Rahns
+          Fixed datatypes in MbgLtNgCfgPtpTableEntry."
+
+    REVISION	"201311010939Z"
+    DESCRIPTION
+        " Rev 6.15.011  01 November 2013 09:39 UTC Philipp Rahns
+          Added cluster traps."
+
+    REVISION	"201310091150Z"
+    DESCRIPTION
+        " Rev 6.15.010  09 October 2013 11:50 UTC Philipp Rahns
+          Added NTP client counter objects concerning statistics.
+          Added external NTP server and its offset when MRS.
+          Additional GPS related information.
+          Added traps.
+          Redesigned PTP port state table."
+
+    REVISION    "201310010810Z"
+    DESCRIPTION
+        " Rev 6.14.020  07 October 2013 08:10 UTC Philipp Rahns
+          Added GRC180 refclock support.
+          Added object mbgLtNgRefclockTimeDiff.
+          Added object mbgLtNgRefclockGpsPos."
+
+    REVISION    "201309181216Z"
+    DESCRIPTION
+        " Rev 6.14.019  18 September 2013 12:16 UTC Philipp Rahns
+          Fixed PTP port states"
+
+    REVISION    "201302200700Z"
+    DESCRIPTION
+        " Rev 6.14.012  20 February 2013 07:00 UTC Philipp Rahns
+          Added objects for physical ethernet port link state"
+
+    REVISION	"201211071420Z"
+    DESCRIPTION
+        " Rev 6.14.009  07 November 2012 14:20 UTC Philipp Rahns
+          Changed FDM frequency units"
+
+    REVISION	"201203300713Z"
+    DESCRIPTION
+        " Rev 6.14.001  30 March 2012 07:13 UTC Philipp Rahns
+		  Added object mbgLtNgRefclockLeapSecondDate"
+
+    REVISION	"201201250745Z"
+    DESCRIPTION
+        " Rev 6.14.001  25 January 2012 07:45 UTC Philipp Rahns
+          Added trap object mbgLtNgTrapCertificateExpired.
+          Split MIB in root-mib-header and sub-mibs. Changed MIB module name."
+
+    REVISION	"201109120818Z"
+    DESCRIPTION
+        " Rev 6.12.002  12 September 2011 08:18 UTC Philipp Rahns
+          Added object mbgLtNgSubagentTimeticks"
+
+    REVISION	"201109021110Z"
+    DESCRIPTION
+        " Rev 6.10.012  01 September 2011 11:10 UTC Philipp Rahns
+          Changed mbgLtNgNtp objects"
+
+    REVISION	"201106210930Z"
+    DESCRIPTION
+        " Rev 6.10.009  21 June 2011 09:30 UTC Philipp Rahns
+          Added cluster support."
+
+    REVISION	"201105201000Z"
+    DESCRIPTION
+        " Rev 6.10.006  20 May 2011 10:00 UTC Philipp Rahns
+          Changed default value of 'mbgLtNgSysNumberOfPowerSupplies'
+          from '0' to '1'."
+
+    REVISION	"201105161330Z"
+    DESCRIPTION
+        " Rev 6.10.005  16 May 2011 13:30 UTC Philipp Rahns
+          Initial MIB version for LANTIME V6."
+
+    ::= { mbgSnmpRoot 30 }
+
+mbgLantimeNGStatus              OBJECT IDENTIFIER    ::= { mbgLantimeNG 0 }
+--- General LANTIME information objects
+
+mbgLtNgInfo               OBJECT IDENTIFIER ::= { mbgLantimeNGStatus 0 }
+
+mbgLtNgSnmpSubagentVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "version of this SNMP subagent"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgInfo  1 }
+
+mbgLtNgFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "installed LANTIME firmware version"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgInfo  2 }
+
+mbgLtNgSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LANTIME serial number"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgInfo  3 }
+
+mbgLtNgSubagentTimeticks OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "sec"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Subdaemons' time alive in seconds"
+    DEFVAL { 0 }
+    ::= { mbgLtNgInfo  4 }
+
+mbgLtNgCpuSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU's serial number"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgInfo  5 }
+
+--
+-- Lantime Refclock information
+--
+
+mbgLtNgRefclock   OBJECT IDENTIFIER  ::= { mbgLantimeNGStatus 1 }
+
+--- Refclock information table start
+
+mbgLtNgNumberOfRefclocks OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "currently installed number of refclocks"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclock 1 }
+
+
+mbgLtNgRefclockTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgRefclockTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of refclock related variables"
+    ::= { mbgLtNgRefclock 2 }
+
+
+mbgLtNgRefclockTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgRefclockTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to a refclock"
+    INDEX { mbgLtNgRefclockIndex }
+    ::= { mbgLtNgRefclockTable 1 }
+
+
+MbgLtNgRefclockTableEntry ::=
+    SEQUENCE {
+	      mbgLtNgRefclockIndex            Unsigned32,
+        mbgLtNgRefclockType             INTEGER,
+        mbgLtNgRefclockUsage            INTEGER,
+        mbgLtNgRefclockState            INTEGER,
+        mbgLtNgRefclockSubstate         INTEGER,
+        mbgLtNgRefclockStatusA          Unsigned32,
+        mbgLtNgRefclockMaxStatusA       Unsigned32,
+        mbgLtNgRefclockStatusB          Unsigned32,
+        mbgLtNgRefclockMaxStatusB       Unsigned32,
+        mbgLtNgRefclockAdditionalInfo   INTEGER,
+        mbgLtNgRefclockLeapSecondDate   DisplayString
+      }
+
+
+mbgLtNgRefclockIndex OBJECT-TYPE
+    SYNTAX Unsigned32(1..2)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index for refclock"
+    ::= { mbgLtNgRefclockTableEntry 1 }
+
+
+mbgLtNgRefclockType OBJECT-TYPE
+    SYNTAX INTEGER {
+      unknown(0),
+      gps166(1),
+      gps167(2),
+      gps167SV(3),
+      gps167PC(4),
+      gps167PCI(5),
+      gps163(6),
+      gps168PCI(7),
+      gps161(8),
+      gps169PCI(9),
+      tcr167PCI(10),
+      gps164(11),
+      gps170PCI(12),
+      pzf511(13),
+      gps170(14),
+      tcr511(15),
+      am511(16),
+      msf511(17),
+      grc170(18),
+      gps170PEX(19),
+      gps162(20),
+      ptp270PEX(21),
+      frc511PEX(22),
+      gen170(23),
+      tcr170PEX(24),
+      wwvb511(25),
+      mgr170(26),
+      jjy511(27),
+      pzf600(28),
+      tcr600(29),
+      gps180(30),
+      gln170(31),
+      gps180PEX(32),
+      tcr180PEX(33),
+      pzf180PEX(34),
+      mgr180(35),
+      msf600(36),
+      wwvb600(37),
+      jjy600(38),
+      gps180HS(39),
+      gps180AMC(40),
+      esi180(41),
+      cpe180(42),
+      lno180(43),
+      grc180(44),
+      liu(45),
+      dcf600HS(46),
+      dcf600RS(47),
+      mri(48),
+      bpe(49),
+      gln180Pex(50),
+      n2x(51),
+      rsc180(52),
+      lneGb(53),
+      lnePpg180(54),
+      scg(55),
+      mdu300(56),
+      sdi(57),
+      fdm180(58),
+      spt(59),
+      pzf180(60),
+      rel1000(61)
+    }                
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "type of refclock"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 2 }
+
+
+mbgLtNgRefclockUsage OBJECT-TYPE
+    SYNTAX INTEGER {
+      notAvailable(0),
+      secondary(1),
+      compare(2),
+      primary(3)
+    }                
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "what this refclock is used for"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 3 }
+
+
+mbgLtNgRefclockState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                notAvailable(0),
+                synchronized(1),
+                notSynchronized(2)
+                }
+                
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "state of GPS refclock conneted to NTP time server as value
+          0: not available
+          1: synchronized
+          2: not synchronized"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 4 }
+
+
+mbgLtNgRefclockSubstate OBJECT-TYPE
+    SYNTAX INTEGER{
+      mrsRefNone(-1),
+      notAvailable(0),
+      gpsSync(1),
+      gpsTracking(2),
+      gpsAntennaDisconnected(3),
+      gpsWarmBoot(4),
+      gpsColdBoot(5),
+      gpsAntennaShortCircuit(6),
+      lwNeverSync(50),
+      lwNotSync(51),
+      lwSync(52),
+      tcrNotSync(100),
+      tcrSync(101),
+      mrsGpsSync(150),
+      mrs10MhzSync(151),
+      mrsPpsInSync(152),
+      mrs10MhzPpsInSync(153),
+      mrsIrigSync(154),
+      mrsNtpSync(155),
+      mrsPtpIeee1588Sync(156),
+      mrsPtpOverE1Sync(157),
+      mrsFixedFreqInSync(158),
+      mrsPpsStringSync(159),
+      mrsVarFreqGpioSync(160),
+      mrsReserved(161),
+      mrsDcf77PzfSync(162),
+      mrsLongwaveSync(163),
+      mrsGlonassGpsSync(164),
+      mrsHavequickSync(165),
+      mrsExtOscSync(166),
+      mrsIntOscSync(167)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "more detailed state depending on refclock type
+          0: no substate available
+          gps: 1-4
+          long waves (PZF,WWVB,MSF,...): 50-52 (not supported by all types)
+          irig: 100-101"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 5 }
+
+
+mbgLtNgRefclockStatusA OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "status A depending on reflcock
+          gps         : indicates number of good satellites in view
+          long wave
+            - pzf     : correlation
+            - other   : not supported
+          irig        : not supported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 6 }
+
+
+mbgLtNgRefclockMaxStatusA OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "maximum status A depending on reflcock
+          gps         : indicates number of satellites in view
+          long wave
+            - pzf     : 100
+            - other   : not supported
+          irig        : not supported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 7 }
+
+
+mbgLtNgRefclockStatusB OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "maximum status B depending on reflcock
+          gps         : not supported
+          long wave
+            - all     : field strength
+          irig        : not supported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 8 }
+
+
+mbgLtNgRefclockMaxStatusB OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "maximum status B depending on reflcock
+          gps         : not supported
+          long wave
+            - all     : 100
+          irig        : not supported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 9 }
+
+
+mbgLtNgRefclockAdditionalInfo OBJECT-TYPE
+    SYNTAX INTEGER{
+      notAvailable(0),
+      leapSecondAnnounced(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "any kind of additional information concerning a refclock"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclockTableEntry 10 }
+
+
+mbgLtNgRefclockLeapSecondDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Date for next leap second"
+  DEFVAL { "n/a" }
+    ::= { mbgLtNgRefclockTableEntry 11 }
+
+
+--- GPS refclock only information start
+
+mbgLtNgRefclockGpsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgRefclockGpsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of gps only related variables"
+    ::= { mbgLtNgRefclock 3 }
+
+
+mbgLtNgRefclockGpsTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgRefclockGpsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to a GPS refclock"
+    INDEX { mbgLtNgRefclockGpsIndex }
+    ::= { mbgLtNgRefclockGpsTable 1 }
+
+
+MbgLtNgRefclockGpsTableEntry ::=
+    SEQUENCE {
+        mbgLtNgRefclockGpsIndex                 Unsigned32,
+        mbgLtNgRefclockGpsLatitude              DisplayString,
+        mbgLtNgRefclockGpsLongitude             DisplayString,
+        mbgLtNgRefclockGpsAltitude              Integer32,
+        mbgLtNgRefclockGpsTdop                  DisplayString,
+        mbgLtNgRefclockGpsPdop                  DisplayString,
+        mbgLtNgRefclockGpsUtcOffset             Integer32
+      }
+
+mbgLtNgRefclockGpsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index for GPS"
+    ::= { mbgLtNgRefclockGpsTableEntry 1 }
+
+mbgLtNgRefclockGpsLatitude OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "GPS' latitude"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgRefclockGpsTableEntry 2 }
+
+mbgLtNgRefclockGpsLongitude OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "GPS' longitude"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgRefclockGpsTableEntry 3 }
+
+mbgLtNgRefclockGpsAltitude OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "m"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "GPS' altitude"
+    DEFVAL { -1 }
+    ::= { mbgLtNgRefclockGpsTableEntry 4 }
+
+mbgLtNgRefclockGpsTdop OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "GPS' timing dillution of precision"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgRefclockGpsTableEntry 5 }
+
+mbgLtNgRefclockGpsPdop OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "GPS' positional dillution of precision"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgRefclockGpsTableEntry 6 }
+
+mbgLtNgRefclockGpsUtcOffset OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "sec"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "GPS' offset to UTC in seconds"
+    DEFVAL { -1 }
+    ::= { mbgLtNgRefclockGpsTableEntry 7 }
+
+mbgLtNgRefclockTimeDiff OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "when there is more than one refclock
+         this object shows the internal time
+         difference in milliseconds"
+    DEFVAL { 0 }
+    ::= { mbgLtNgRefclock 4 }
+
+mbgLtNgRefclockGpsPos OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "shows current GPS receiver position"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgRefclock 5 }
+
+--- GPS end
+
+--- Refclock information table end
+
+
+--
+-- Lantime NTP states
+--
+mbgLtNgNtp        OBJECT IDENTIFIER  ::= { mbgLantimeNGStatus 2 }
+
+mbgLtNgNtpCurrentState OBJECT-TYPE
+    SYNTAX INTEGER {
+      notAvailable(0),
+      notSynchronized(1),
+      synchronized(2)
+   }    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current NTP's synchronization status"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtp 1 }
+
+mbgLtNgNtpStratum OBJECT-TYPE
+    SYNTAX      Integer32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stratum value of the NTP"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtp 2 }
+
+mbgLtNgNtpRefclockName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the current refclock selected by the NTP"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgNtp 3 }
+
+mbgLtNgNtpRefclockOffset OBJECT-TYPE
+    SYNTAX      DisplayString
+    UNITS "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time offset between the current selected refclock and time of NTP as string in milliseconds"
+  DEFVAL { "n/a" }
+    ::= { mbgLtNgNtp 4 }
+
+mbgLtNgNtpVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "integrated NTP version"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgNtp 5 }
+
+--- ntp client counter
+
+mbgLtNgNtpClientCounter        OBJECT IDENTIFIER  ::= { mbgLtNgNtp 8 }
+
+mbgLtNgNtpCCStartedAt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "start time of current NTP client counter session as timestamp"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 1 }
+
+mbgLtNgNtpCCDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS "sec"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "total duration of NTP client counter in seconds"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 2 }
+
+mbgLtNgNtpCCNumberOfClients OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "total number of different clients requesting time"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 3 }
+
+mbgLtNgNtpCCTotalRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "total requests since starting the daemon"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 4 }
+
+mbgLtNgNtpCCTotalRequestsCurrentDay OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "today's total requests"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 5 }
+
+mbgLtNgNtpCCTotalRequestsLastHour OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "today's requests within the last completed hour"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 6 }
+
+mbgLtNgNtpCCTotalRequestsLastMinute OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "today's requests within the last completed minute"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 7 }
+
+mbgLtNgNtpCCTodaysClients OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "today's number of different clients requesting time"
+    DEFVAL { 0 }
+    ::= { mbgLtNgNtpClientCounter 8 }
+
+
+mbgLtNgNtpMrs        OBJECT IDENTIFIER  ::= { mbgLtNgNtp 9 }
+
+mbgLtNgNtpMrsServer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "external NTP server being used for synchronization"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgNtpMrs 1 }
+
+mbgLtNgNtpMrsOffset OBJECT-TYPE
+    SYNTAX      DisplayString
+    UNITS "sec"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "external NTP server's offset"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgNtpMrs 2 }
+
+--
+-- Lantime PTP status
+--
+
+mbgLtNgPtp			OBJECT IDENTIFIER    ::= { mbgLantimeNGStatus 3 }
+
+mbgLtNgPtpNumberOfModules	OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "number of available PTPv2 modules"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtp 1 }
+
+mbgLtNgPtpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgPtpTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of PTPv2 related variables"
+    ::= { mbgLtNgPtp 2 }
+
+mbgLtNgPtpTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgPtpTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to a PTPv2 module"
+    INDEX { mbgLtNgPtpIndex }
+    ::= { mbgLtNgPtpTable 1 }
+
+MbgLtNgPtpTableEntry ::=
+    SEQUENCE {
+	mbgLtNgPtpIndex               Unsigned32,
+        mbgLtNgPtpMode            INTEGER,
+        mbgLtNgPtpPortState       INTEGER,
+        mbgLtNgPtpGrandmasterMac  DisplayString,
+        mbgLtNgPtpClockAccuracy   INTEGER,
+        mbgLtNgPtpClockClass      Unsigned32,
+        mbgLtNgPtpTimeSource      INTEGER,
+        mbgLtNgPtpUtcOffset       Unsigned32,
+        mbgLtNgPtpTimeSeconds     Counter64,
+        mbgLtNgPtpTsuTime         DisplayString,
+        mbgLtNgPtpSysTime         DisplayString,
+        mbgLtNgPtpPortLinkup      MeinbergSwitch,
+        mbgLtNgPtpOffsetFromGM    DisplayString,
+        mbgLtNgPtpPathDelay       DisplayString,
+        mbgLtNgPtpDelayMec        INTEGER,
+	    mbgLtNgPtpDomain          Unsigned32,
+        mbgLtNgPtpGrandmasterUuid DisplayString,
+        mbgLtNgPtpLocalMac        DisplayString,
+        mbgLtNgPtpDelayAsymmetry  DisplayString,
+        mbgLtNgPtpAvail           INTEGER
+      }
+
+mbgLtNgPtpIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index for PTPv2 module"
+    ::= { mbgLtNgPtpTableEntry 1 }
+
+mbgLtNgPtpMode	OBJECT-TYPE
+    SYNTAX INTEGER {
+        notAvailable(0),  
+        stopped		(1),
+        master		(2),
+        slave		(3),
+	    ordinary	(4)
+      }
+    MAX-ACCESS read-only
+    STATUS     obsolete
+    DESCRIPTION
+        "PTPv2 modus as integer. This object is obsolete and
+         always returns '0'. Please see alternates
+         mbgLtNgPtpPortState and mbgLtNgPtpRole."
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 2 }
+
+mbgLtNgPtpPortState OBJECT-TYPE
+    SYNTAX INTEGER {
+        uninitialized   (0),
+        initializing    (1),
+      	faulty          (2), 
+        disabled   	    (3),
+        listening	    (4),
+        preMaster       (5),
+        master          (6),
+      	passive	        (7),
+	    uncalibrated    (8),
+	    slave           (9)
+      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "port state as integer"
+    DEFVAL { 3 }
+    ::= { mbgLtNgPtpTableEntry 3 }
+
+mbgLtNgPtpGrandmasterMac OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "MAC address of current grandmaster"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 4 }
+
+mbgLtNgPtpClockAccuracy OBJECT-TYPE
+    SYNTAX  INTEGER {
+      notAvailable(0),
+      timeAccurateTo25ns(32),
+      timeAccurateTo100ns(33),
+      timeAccurateTo250ns(34),
+      timeAccurateTo1us(35),
+      timeAccurateTo2Point5us(36),
+      timeAccurateTo10us(37),
+      timeAccurateTo25us(38),
+      timeAccurateTo100us(39),
+      timeAccurateTo250us(40),
+      timeAccurateTo1ms(41),
+      timeAccurateTo2to5ms(42),
+      timeAccurateTo10ms(43),
+      timeAccurateTo25ms(44),
+      timeAccurateTo100ms(45),
+      timeAccurateTo250ms(46),
+      timeAccurateTo1s(47),
+      timeAccurateTo10s(48),
+      timeAccurateToGT10s(49),
+      timeAccurateToUnknown(254)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "indicates the source of time"
+    REFERENCE    "IEEE Std. 1588-2008"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 5 }
+
+mbgLtNgPtpClockClass  OBJECT-TYPE	
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "denotes the traceability of the time or frequency"
+    REFERENCE    "IEEE Std. 1588-2008"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 6 }
+
+mbgLtNgPtpTimeSource  OBJECT-TYPE	
+    SYNTAX INTEGER {
+        notAvailable(0),
+        atomicClock(16),
+        gps(32),
+        terrestrialRadio(48),
+        ptp(64),
+        ntp(80),
+        handSet(96),
+        other(144),
+        internalOscillator(160)
+        }
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "source of time being used"
+    REFERENCE    "IEEE Std. 1588-2008"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 7 }
+
+mbgLtNgPtpUtcOffset  OBJECT-TYPE	
+    SYNTAX Unsigned32
+    UNITS "seconds"
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "offset from PTP's TAI time to UTC time"
+    REFERENCE    "IEEE Std. 1588-2008"
+    DEFVAL { 35 }
+    ::= { mbgLtNgPtpTableEntry 8 }
+
+mbgLtNgPtpTimeSeconds  OBJECT-TYPE	
+    SYNTAX Counter64
+    UNITS "seconds"
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "PTP seconds"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 9 }
+
+mbgLtNgPtpTsuTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "current time on PTP TSU"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 10 }
+
+mbgLtNgPtpSysTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "current system time"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 11 }
+
+mbgLtNgPtpPortLinkup  OBJECT-TYPE	
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "PTP port's physical link-up"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 12 }
+
+mbgLtNgPtpOffsetFromGM OBJECT-TYPE
+    SYNTAX DisplayString
+    UNITS "ns"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+         "offset from grandmaster in nanoseconds"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 13 }
+
+mbgLtNgPtpPathDelay OBJECT-TYPE
+    SYNTAX DisplayString
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "network delay in nanoseconds"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 14 }
+
+mbgLtNgPtpDelayMec  OBJECT-TYPE	
+    SYNTAX INTEGER {
+        end2End(0),
+        peer2Peer(1)
+    }
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "delay mechanism"
+    REFERENCE    "IEEE Std. 1588-2008"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 15 }
+
+mbgLtNgPtpDomain  OBJECT-TYPE	
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "domain number"
+    REFERENCE    "IEEE Std. 1588-2008"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 16 }
+
+mbgLtNgPtpGrandmasterUuid OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "grandmaster uuid"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 17 }
+
+mbgLtNgPtpLocalMac OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "local MAC address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 18 }
+
+mbgLtNgPtpDelayAsymmetry OBJECT-TYPE
+    SYNTAX DisplayString
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "asymmetric network delay in nanoseconds"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgPtpTableEntry 19 }
+
+mbgLtNgPtpAvail  OBJECT-TYPE	
+    SYNTAX INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS read-only
+    STATUS       current
+    DESCRIPTION
+        "Signals whether PTP instance is avail or not"
+    DEFVAL { 0 }
+    ::= { mbgLtNgPtpTableEntry 20 }
+
+-- 
+-- FDM Powerline Frequency Deviation Monitor Module
+-- 
+
+mbgLtNgFdm			OBJECT IDENTIFIER    ::= { mbgLantimeNGStatus 4 }
+
+mbgLtNgFdmFreq OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|45000..65000)
+    UNITS "mHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "powerline frequency in mHz; 0 indicates that no data is available"
+    DEFVAL { 0 }
+    ::= { mbgLtNgFdm 1 }
+
+mbgLtNgFdmFreqDev OBJECT-TYPE
+    SYNTAX      Integer32 (-15000..15000)
+    UNITS "mHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "frequency deviation in mHz depending on the configured nominal frequency; check 'mbgLtNgFdmFreq' for error"
+    DEFVAL { 0 }
+    ::= { mbgLtNgFdm 2 }
+
+mbgLtNgFdmNomFreq OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|50000|60000)
+    UNITS "mHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "nominal frequency in mHz; can be 50000 (50Hz) or 60000 (60Hz); 0 indicates that no value is configured"
+    DEFVAL { 0 }
+    ::= { mbgLtNgFdm 3 }
+
+
+--
+-- System hardware ( fan, power supply, ... )
+--
+
+mbgLtNgSystemHardware			OBJECT IDENTIFIER    ::= { mbgLantimeNGStatus 5 }
+
+-- power supplies
+
+mbgLtNgSysPowerSupply 		OBJECT IDENTIFIER    ::= { mbgLtNgSystemHardware 0 }
+
+mbgLtNgSysNumberOfPowerSupplies	OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "number of available power supplies"
+    DEFVAL { 1 }
+    ::= { mbgLtNgSysPowerSupply 1 }
+
+mbgLtNgSysPsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgSysPsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of power supply stati"
+    ::= { mbgLtNgSysPowerSupply 2 }
+
+mbgLtNgSysPsTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgSysPsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to power supplies"
+    INDEX { mbgLtNgSysPsIndex }
+    ::= { mbgLtNgSysPsTable 1 }
+
+MbgLtNgSysPsTableEntry ::=
+    SEQUENCE {
+	    mbgLtNgSysPsIndex          Unsigned32,
+        mbgLtNgSysPsStatus         INTEGER
+      }
+
+mbgLtNgSysPsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index of power supply"
+    ::= { mbgLtNgSysPsTableEntry 1 }
+
+mbgLtNgSysPsStatus	OBJECT-TYPE
+    SYNTAX INTEGER {
+        notAvailable(0),  
+        down(1),
+        up(2)
+      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of power supply"
+    DEFVAL { 0 }
+    ::= { mbgLtNgSysPsTableEntry 2 }
+
+-- fans
+
+mbgLtNgSysFan 		OBJECT IDENTIFIER    ::= { mbgLtNgSystemHardware 1 }
+
+mbgLtNgSysNumberOfFans	OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "number of available fans"
+    DEFVAL { 0 }
+    ::= { mbgLtNgSysFan 1 }
+
+mbgLtNgSysFanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgSysFanTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of power supply stati"
+    ::= { mbgLtNgSysFan 2 }
+
+mbgLtNgSysFanTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgSysFanTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to fans"
+    INDEX { mbgLtNgSysFanIndex }
+    ::= { mbgLtNgSysFanTable 1 }
+
+MbgLtNgSysFanTableEntry ::=
+    SEQUENCE {
+	    mbgLtNgSysFanIndex          Unsigned32,
+        mbgLtNgSysFanStatus         INTEGER,
+        mbgLtNgSysFanError          INTEGER
+      }
+
+mbgLtNgSysFanIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index of fan"
+    ::= { mbgLtNgSysFanTableEntry 1 }
+
+mbgLtNgSysFanStatus	OBJECT-TYPE
+    SYNTAX INTEGER {
+        notAvailable(0),  
+        off(1),
+        on(2)
+      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of fan"
+    DEFVAL { 0 }
+    ::= { mbgLtNgSysFanTableEntry 2 }
+
+mbgLtNgSysFanError	OBJECT-TYPE
+    SYNTAX INTEGER {
+        notAvailable(0),
+        no(1),
+        yes(2)
+      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "fan's error field"
+    DEFVAL { 0 }
+    ::= { mbgLtNgSysFanTableEntry 3 }
+
+
+-- temperature
+
+mbgLtNgSysTemperature 		OBJECT IDENTIFIER    ::= { mbgLtNgSystemHardware 2 }
+
+mbgLtNgSysTempCelsius	OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "C"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "temperature in degree Celsius"
+    DEFVAL { 0 }
+    ::= { mbgLtNgSysTemperature 1 }
+
+
+--
+-- Cluster status information
+--
+
+mbgLtNgCluster			OBJECT IDENTIFIER    ::= { mbgLantimeNGStatus 6 }
+
+mbgLtNgNumberOfClusters OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "number of active running clusters"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCluster 1 }
+
+mbgLtNgClusterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgClusterTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of cluster status information"
+    ::= { mbgLtNgCluster 2 }
+
+mbgLtNgClusterTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgClusterTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to running and active clusters"
+    INDEX { mbgLtNgClusterIndex }
+    ::= { mbgLtNgClusterTable 1 }
+
+MbgLtNgClusterTableEntry ::=
+    SEQUENCE {
+	    mbgLtNgClusterIndex                 Unsigned32,
+        mbgLtNgClusterCommunicationIp       DisplayString,
+        mbgLtNgClusterPortState             INTEGER,
+        mbgLtNgClusterMasterSerial          DisplayString,
+        mbgLtNgClusterMasterIp              DisplayString,
+        mbgLtNgClusterMasterPriority        Unsigned32,
+        mbgLtNgClusterClockClass            INTEGER,
+        mbgLtNgClusterClockStatus           INTEGER,
+        mbgLtNgClusterReconfigurationState  INTEGER,
+        mbgLtNgClusterIsFalseticker         INTEGER
+      }
+
+mbgLtNgClusterIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index of power supply"
+    ::= { mbgLtNgClusterTableEntry 1 }
+
+mbgLtNgClusterCommunicationIp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "ip of cluster interface"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgClusterTableEntry 2 }
+
+mbgLtNgClusterPortState OBJECT-TYPE
+    SYNTAX INTEGER{
+      notAvailable(0),
+      master(1),
+      slave(2),
+      listening(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "state of cluster"
+    DEFVAL { 0 }
+    ::= { mbgLtNgClusterTableEntry 3 }
+
+mbgLtNgClusterMasterSerial OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "serial number of cluster's master"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgClusterTableEntry 4 }
+
+mbgLtNgClusterMasterIp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "ip address of cluster's master"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgClusterTableEntry 5 }
+
+mbgLtNgClusterMasterPriority OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "priority of cluster master"
+    DEFVAL { 0 }
+    ::= { mbgLtNgClusterTableEntry 6 }
+
+mbgLtNgClusterClockClass OBJECT-TYPE
+    SYNTAX INTEGER{
+      notAvailable(0),
+      gps(3),
+      pzf(4),
+      am(5),
+      irig(6),
+      pps(7),
+      ptp(8),
+      ntp(9),
+      e1(10),
+      rdt(11)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "reference's clock class"
+    DEFVAL { 0 }
+    ::= { mbgLtNgClusterTableEntry 7 }
+
+mbgLtNgClusterClockStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+      notAvailable(0),
+      normalOperation(1),
+      freeRunningOrTracking(2),
+      antennaFailure(3),
+      invalid(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "reference's clock status"
+    DEFVAL { 0 }
+    ::= { mbgLtNgClusterTableEntry 8 }
+
+mbgLtNgClusterReconfigurationState OBJECT-TYPE
+    SYNTAX INTEGER{
+      notAvailable(0),
+      normal(1),
+      masterToSlave(2),
+      slaveToMaster(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "current reconfiguration state"
+    DEFVAL { 0 }
+    ::= { mbgLtNgClusterTableEntry 9 }
+
+mbgLtNgClusterIsFalseticker OBJECT-TYPE
+    SYNTAX INTEGER{
+      notAvailable(0),
+      no(1),
+      yes(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "am I a falseticker?"
+    DEFVAL { 0 }
+    ::= { mbgLtNgClusterTableEntry 10 }
+
+--
+-- Misc objects
+--
+
+mbgLtNgMisc                  OBJECT IDENTIFIER    ::= { mbgLantimeNGStatus 7 }
+
+mbgLtNgEthPortLinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgEthPortLinkTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of physical ethernet interface port link states"
+    ::= { mbgLtNgMisc 1 }
+
+mbgLtNgEthPortLinkTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgEthPortLinkTableEntry
+    MAX-ACCESS not-accessible
+      STATUS current
+    DESCRIPTION
+         "port link states for each physical ethernet interface"
+    INDEX { mbgLtNgEthPortLinkIndex }
+    ::= { mbgLtNgEthPortLinkTable 1 }
+
+MbgLtNgEthPortLinkTableEntry ::=
+    SEQUENCE {
+        mbgLtNgEthPortLinkIndex  Unsigned32,
+        mbgLtNgEthPortLinkState  INTEGER
+      }
+
+mbgLtNgEthPortLinkIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "interface index"
+    ::= { mbgLtNgEthPortLinkTableEntry 1 }
+
+mbgLtNgEthPortLinkState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        down(0),
+        up(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "link state"
+    DEFVAL { 0 }
+    ::= { mbgLtNgEthPortLinkTableEntry 2 }
+
+
+--
+-- Meinberg Lantime CFG MIB objects for agent module--
+--
+
+mbgLtNgConfig        OBJECT IDENTIFIER  ::= { mbgLantimeNG 1 }
+
+--
+-- Ethernet page
+--
+mbgLtNgCfgEthernet        OBJECT IDENTIFIER ::= { mbgLtNgConfig 0 }
+
+mbgLtNgCfgEthernetHostname OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "devices' hostname"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEthernet 1 }
+
+mbgLtNgCfgEthernetDomain OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "devices' domain membership"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEthernet 2 }
+
+mbgLtNgCfgEthernetNameserver1 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "first nameserver's ip address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEthernet 3 }
+
+mbgLtNgCfgEthernetNameserver2 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "second nameserver's ip address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEthernet 4 }
+
+mbgLtNgCfgEthernetIpv4Gateway OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "device's ethernet ipv4 gateway"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEthernet 5 }
+
+mbgLtNgCfgEthernetIpv6Gateway OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "device's ethernet ipv6 gateway"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEthernet 6 }
+
+
+--- start interface specific table oids
+
+
+mbgLtNgCfgNumberOfPhysicalIf OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "number of virtual interfaces interfaces"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgEthernet 7 }
+
+mbgLtNgCfgNumberOfVirtualIf OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "number of virtual interfaces interfaces"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgEthernet 8 }
+
+
+-- physical interface table/configuration
+
+
+mbgLtNgCfgPhysicalIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgCfgPhysicalIfTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of service stati for the ethernet interfaces"
+    ::= { mbgLtNgCfgEthernet 9 }
+
+mbgLtNgCfgPhysicalIfTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgCfgPhysicalIfTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to a mrs input reference"
+    INDEX { mbgLtNgCfgPhysicalIfIndex }
+    ::= { mbgLtNgCfgPhysicalIfTable 1 }
+
+MbgLtNgCfgPhysicalIfTableEntry ::=
+    SEQUENCE {
+	    mbgLtNgCfgPhysicalIfIndex Unsigned32,
+	    mbgLtNgCfgPhysicalIfMac DisplayString,
+	    mbgLtNgCfgPhysicalIfNetLinkMode INTEGER,
+	    mbgLtNgCfgPhysicalIfIndicateLink MeinbergSwitch,
+	    mbgLtNgCfgPhysicalIfBondingGroup Unsigned32,
+	    mbgLtNgCfgPhysicalIfIpv6Mode INTEGER
+    }
+
+mbgLtNgCfgPhysicalIfIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "specifies the physical interface index"
+    ::= { mbgLtNgCfgPhysicalIfTableEntry 1 }
+
+mbgLtNgCfgPhysicalIfMac OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interface's physical MAC address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPhysicalIfTableEntry 2 }
+
+mbgLtNgCfgPhysicalIfNetLinkMode OBJECT-TYPE
+    SYNTAX INTEGER{
+      auto(0),
+      hd10Mbit(1),
+      fd10Mbit(2),
+      hd100Mbit(3),
+      fd100Mbit(4),
+      hd1000Mbit(5),
+      fd1000Mbit(6)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "interface's net link mode; hd = half-duplex; fd = full-duplex"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPhysicalIfTableEntry 3 }
+
+mbgLtNgCfgPhysicalIfIndicateLink OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "indicate link via front panel LED"
+    DEFVAL { 1 }
+    ::= { mbgLtNgCfgPhysicalIfTableEntry 4 }
+
+mbgLtNgCfgPhysicalIfBondingGroup OBJECT-TYPE
+    SYNTAX Unsigned32(0..5)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "assign interface to bonding group; '0' means not assigned"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPhysicalIfTableEntry 5 }
+
+mbgLtNgCfgPhysicalIfIpv6Mode OBJECT-TYPE
+    SYNTAX INTEGER{
+      deactivated(0),
+      activated(1),
+      activatedWithAutoconf(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "enable IPv6 mode"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPhysicalIfTableEntry 6 }
+
+-- virtual interface table/configuration
+
+
+mbgLtNgCfgVirtualIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgCfgVirtualIfTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of service stati for the ethernet interfaces"
+    ::= { mbgLtNgCfgEthernet 10 }
+
+mbgLtNgCfgVirtualIfTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgCfgVirtualIfTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to a mrs input reference"
+    INDEX { mbgLtNgCfgVirtualIfIndex }
+    ::= { mbgLtNgCfgVirtualIfTable 1 }
+
+MbgLtNgCfgVirtualIfTableEntry ::=
+    SEQUENCE {
+	    mbgLtNgCfgVirtualIfIndex Unsigned32,
+	    mbgLtNgCfgVirtualIfIpv4Addr DisplayString,
+	    mbgLtNgCfgVirtualIfIpv4Netmask DisplayString,
+	    mbgLtNgCfgVirtualIfIpv4Dhcp MeinbergSwitch,
+      mbgLtNgCfgVirtualIfIpv4AddrFromDhcp DisplayString,
+      mbgLtNgCfgVirtualIfIpv4NetmaskFromDhcp DisplayString,
+      mbgLtNgCfgVirtualIfIpv4BroadcastFromDhcp DisplayString,
+      mbgLtNgCfgVirtualIfIpv4GatewayFromDhcp DisplayString,
+      mbgLtNgCfgVirtualIfIpv4DnsFromDhcp DisplayString,
+      mbgLtNgCfgVirtualIfIpv4DomainFromDhcp DisplayString,
+	    mbgLtNgCfgVirtualIfIpv6Addr DisplayString,
+	    mbgLtNgCfgVirtualIfIpv6Dhcp MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfIpv6RoutAdd DisplayString,
+	    mbgLtNgCfgVirtualIfIpv6LinkLocal DisplayString,
+      mbgLtNgCfgVirtualIfAssigned Unsigned32,
+      mbgLtNgCfgVirtualIfMac DisplayString,
+      mbgLtNgCfgVirtualIfLabel DisplayString,
+	    mbgLtNgCfgVirtualIfVlan MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfVlanTag Unsigned32,
+	    mbgLtNgCfgVirtualIfVlanPrio Unsigned32,
+	    mbgLtNgCfgVirtualIfCluster MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfClusterIpv4Addr DisplayString,
+	    mbgLtNgCfgVirtualIfClusterIpv4Netmask DisplayString,
+	    mbgLtNgCfgVirtualIfClusterPrio Unsigned32,
+	    mbgLtNgCfgVirtualIfServiceNtp MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceHttp MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceHttps MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceTelnet MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceSsh MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceSnmp MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceFtp MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceTime MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceDaytime MeinbergSwitch,
+	    mbgLtNgCfgVirtualIfServiceFpc MeinbergSwitch
+      }
+
+mbgLtNgCfgVirtualIfIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "specifies the virtual interface index"
+    ::= { mbgLtNgCfgVirtualIfTableEntry 1 }
+
+mbgLtNgCfgVirtualIfIpv4Addr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 2 }
+
+mbgLtNgCfgVirtualIfIpv4Netmask OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 netmask"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 3 }
+
+mbgLtNgCfgVirtualIfIpv4Dhcp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "interface uses ipv4 dhcp?"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 4 }
+
+-- ipv4 dhcp related stuff
+
+mbgLtNgCfgVirtualIfIpv4AddrFromDhcp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 address received from dhcp"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 5 }
+
+mbgLtNgCfgVirtualIfIpv4NetmaskFromDhcp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 netmask received from dhcp"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 6 }
+
+mbgLtNgCfgVirtualIfIpv4BroadcastFromDhcp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 broadcast received from dhcp"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 7 }
+
+mbgLtNgCfgVirtualIfIpv4GatewayFromDhcp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 gateway received from dhcp"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 8 }
+
+mbgLtNgCfgVirtualIfIpv4DnsFromDhcp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 dns server received from dhcp"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 9 }
+
+mbgLtNgCfgVirtualIfIpv4DomainFromDhcp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv4 dns server received from dhcp"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 10 }
+
+--- ipv6
+
+mbgLtNgCfgVirtualIfIpv6Addr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv6 address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 11 }
+
+mbgLtNgCfgVirtualIfIpv6Dhcp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "interfaces uses ipv6 dhcp"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 12 }
+
+mbgLtNgCfgVirtualIfIpv6RoutAdd OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' router advertisement ipv6 address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 13 }
+
+mbgLtNgCfgVirtualIfIpv6LinkLocal OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "interfaces' ipv6 link local address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 14 }
+
+--- misc stuff
+
+mbgLtNgCfgVirtualIfAssigned OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "mapping to the physical interface this virtual one is assigned to"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 15 }
+
+mbgLtNgCfgVirtualIfMac OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "MAC-address of this virtual interface"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 16 }
+
+mbgLtNgCfgVirtualIfLabel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "user description for this label (like an alias)"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 17 }
+
+--- vlan
+
+mbgLtNgCfgVirtualIfVlan OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is vlan enabled"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 18 }
+
+mbgLtNgCfgVirtualIfVlanTag OBJECT-TYPE
+    SYNTAX Unsigned32(0..4094)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "vlan tag"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 19 }
+
+mbgLtNgCfgVirtualIfVlanPrio OBJECT-TYPE
+    SYNTAX Unsigned32(0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "vlan priority"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 20 }
+
+--- cluster
+
+mbgLtNgCfgVirtualIfCluster OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is cluster mode enabled"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 21 }
+
+mbgLtNgCfgVirtualIfClusterIpv4Addr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "ipv4 cluster address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 22 }
+
+mbgLtNgCfgVirtualIfClusterIpv4Netmask OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "cluster ipv4 netmask"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 23 }
+
+mbgLtNgCfgVirtualIfClusterPrio OBJECT-TYPE
+    SYNTAX Unsigned32(0..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "cluster priority"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 24 }
+
+--- service
+
+mbgLtNgCfgVirtualIfServiceNtp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is ntp active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 25 }
+
+mbgLtNgCfgVirtualIfServiceHttp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is http active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 26 }
+
+mbgLtNgCfgVirtualIfServiceHttps OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is https active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 27 }
+
+mbgLtNgCfgVirtualIfServiceTelnet OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is telnet active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 28 }
+
+mbgLtNgCfgVirtualIfServiceSsh OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is ssh active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 29 }
+
+mbgLtNgCfgVirtualIfServiceSnmp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is snmp active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 30 }
+
+mbgLtNgCfgVirtualIfServiceFtp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is ftp active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 31 }
+
+mbgLtNgCfgVirtualIfServiceTime OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is time active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 32 }
+
+mbgLtNgCfgVirtualIfServiceDaytime OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is daytime active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 33 }
+
+mbgLtNgCfgVirtualIfServiceFpc OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "is fpc active on this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgVirtualIfTableEntry 34 }
+
+--- table interfaces end
+
+
+mbgLtNgCfgEthernetGenClusterPort OBJECT-TYPE
+    SYNTAX Unsigned32(0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "general cluster port"
+    ::= { mbgLtNgCfgEthernet 11 }
+
+mbgLtNgCfgEthernetGenClusterIp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "general multicast cluster address"
+    ::= { mbgLtNgCfgEthernet 12 }
+
+
+--
+-- Notification page
+--
+
+mbgLtNgCfgNotifications   OBJECT IDENTIFIER ::= { mbgLtNgConfig 1 }
+
+--- syslog
+
+mbgLtNgCfgSyslog   OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 0 }
+
+mbgLtNgCfgSyslogServerAddr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "comma separated string of all configured syslog servers;
+         use such a list to set syslog servers"
+    DEFVAL{ "n/a" }
+    ::= { mbgLtNgCfgSyslog 1 }
+
+mbgLtNgCfgSyslogLoglevel OBJECT-TYPE
+    SYNTAX INTEGER{
+      emergency(0),
+      alert(1),
+      critical(2),
+      error(3),
+      warning(4),
+      notice(5),
+      info(6)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "loglevel for syslog server"
+    DEFVAL{ 0 }
+    ::= { mbgLtNgCfgSyslog 2 }
+
+--- email
+
+mbgLtNgCfgEmail   OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 1 }
+
+mbgLtNgCfgEmailTo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "email address to send alerts etc. to (receiving address)"
+    DEFVAL{ "n/a" }
+    ::= { mbgLtNgCfgEmail 1 }
+
+mbgLtNgCfgEmailFrom OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "email address to send alerts etc. from (sending address)"
+    DEFVAL{ "n/a" }
+    ::= { mbgLtNgCfgEmail 2 }
+
+mbgLtNgCfgEmailSmarthostAddr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SMTP smarthost used to send mail (ip or hostname)"
+    DEFVAL{ "n/a" }
+    ::= { mbgLtNgCfgEmail 3 }
+
+mbgLtNgCfgEmailSmarthostPort OBJECT-TYPE
+    SYNTAX      Unsigned32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SMTP smarthost listenning port"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgEmail 4 }
+
+mbgLtNgCfgEmailSmarthostAuth OBJECT-TYPE
+    SYNTAX      MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "use authentication for smarthost"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgEmail 5 }
+
+mbgLtNgCfgEmailSmarthostAuthUser OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "user to authenticate at smarthost"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEmail 6 }
+  
+mbgLtNgCfgEmailSmarthostAuthPw OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "password to authenticate user at smarthost"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgEmail 7 }
+
+-- winpopup
+
+mbgLtNgCfgWinpopup        OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 2 }
+
+mbgLtNgCfgWmailAddress1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "first windows popup alert receiver (ip or hostname)"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgWinpopup 1 }
+
+mbgLtNgCfgWmailAddress2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "second windows popup alert receiver (ip or hostname)"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgWinpopup 2 }
+
+-- snmp
+
+mbgLtNgCfgSNMP    OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 3 }
+
+mbgLtNgCfgSnmpTrapRecTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgCfgSnmpTrapRecTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of SNMP trap receiver information"
+    ::= { mbgLtNgCfgSNMP 1 }
+
+mbgLtNgCfgSnmpTrapRecTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgCfgSnmpTrapRecTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to an interface and concerning broad-, multi- and manycast"
+    INDEX { mbgLtNgCfgSnmpTrapRecIndex }
+    ::= { mbgLtNgCfgSnmpTrapRecTable 1 }
+
+
+MbgLtNgCfgSnmpTrapRecTableEntry ::=
+    SEQUENCE {
+        mbgLtNgCfgSnmpTrapRecIndex     	Unsigned32,
+	      mbgLtNgCfgSnmpTrapRecAddr	      DisplayString,
+	      mbgLtNgCfgSnmpTrapRecCommunity 	DisplayString,
+	      mbgLtNgCfgSnmpTrapRecVersion	  INTEGER
+      }
+
+mbgLtNgCfgSnmpTrapRecIndex OBJECT-TYPE
+    SYNTAX Unsigned32(0..4)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index of different SNMP trap receivers"
+    ::= { mbgLtNgCfgSnmpTrapRecTableEntry 1 }
+
+mbgLtNgCfgSnmpTrapRecAddr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMP trap receiver address (ip or hostname)"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgSnmpTrapRecTableEntry 2 }
+
+mbgLtNgCfgSnmpTrapRecCommunity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMP trap receiver community"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgSnmpTrapRecTableEntry 3 }
+
+mbgLtNgCfgSnmpTrapRecVersion OBJECT-TYPE
+    SYNTAX      INTEGER{ v1(1), v2c(2), v3(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMP trap receiver version"
+    DEFVAL { 1 }
+    ::= { mbgLtNgCfgSnmpTrapRecTableEntry 4 }
+
+mbgLtNgCfgSnmpReadCommunity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "read community for SNMPv1 and SNMPv2c"
+    DEFVAL { "****" }
+    ::= { mbgLtNgCfgSNMP 2 }
+
+mbgLtNgCfgSnmpWriteCommunity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "read community for SNMPv1 and SNMPv2c"
+    DEFVAL { "****" }
+    ::= { mbgLtNgCfgSNMP 3 }
+
+mbgLtNgCfgSnmpContact OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMP contact string for Lantime"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgSNMP 4 }
+
+mbgLtNgCfgSnmpLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMP location string for Lantime"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgSNMP 5 }
+
+mbgLtNgCfgSnmpV3UserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "username for SNMPv3"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgSNMP 6 }
+
+mbgLtNgCfgSnmpV3UserRights OBJECT-TYPE
+    SYNTAX      INTEGER{
+      readonly(0),
+      readwrite(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "privacy protocol for SNMPv3"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgSNMP 7 }
+
+mbgLtNgCfgSnmpV3Context OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "context string for SNMPv3"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgSNMP 8 }
+
+mbgLtNgCfgSnmpV3SecurityLevel OBJECT-TYPE
+    SYNTAX      INTEGER{
+      noAuthNoPriv(0),
+      authNoPriv(1),
+      authPriv(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "authentication level for SNMPv3"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgSNMP 9 }
+
+mbgLtNgCfgSnmpV3AuthProtocol OBJECT-TYPE
+    SYNTAX      INTEGER{
+      md5(0),
+      sha(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "authentication protocol for SNMPv3"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgSNMP 10 }
+
+mbgLtNgCfgSnmpV3AuthPassphrase OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "authentication passphrase for SNMPv3"
+    DEFVAL { "****" }
+    ::= { mbgLtNgCfgSNMP 11 }
+
+mbgLtNgCfgSnmpV3PrivProtocol OBJECT-TYPE
+    SYNTAX      INTEGER{
+      des(0),
+      aes(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "privacy protocol for SNMPv3"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgSNMP 12 }
+
+mbgLtNgCfgSnmpV3PrivPassphrase OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "privacy passphrase for SNMPv3"
+    DEFVAL { "****" }
+    ::= { mbgLtNgCfgSNMP 13 }
+
+mbgLtNgCfgSnmpRetries OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "number of retries for sending traps"
+    DEFVAL { 3 }
+    ::= { mbgLtNgCfgSNMP 14 }
+
+mbgLtNgCfgSnmpTimeout OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "sec"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "timeout for sending traps (in seconds)"
+    DEFVAL { 3 }
+    ::= { mbgLtNgCfgSNMP 15 }
+
+mbgLtNgCfgSnmpEnabledVersion OBJECT-TYPE
+    SYNTAX INTEGER{
+      v1ANDv2c(0),
+      v3only(1),
+      v1ANDv2cANDv3(2)
+    }  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "currently enabled SNMP version"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgSNMP 16 }
+
+
+-- Wallmount display
+
+
+mbgLtNgCfgWalldisplay     OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 4 }
+
+mbgLtNgCfgVP100Display1Addr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "address of wall display (ip or hostname)"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgWalldisplay 1 }
+
+mbgLtNgCfgVP100Display1SN OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "serial number of first VP100 wall display"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgWalldisplay 2 }
+
+mbgLtNgCfgVP100Display2Addr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "address of wall display (ip or hostname)"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgWalldisplay 3 }
+
+mbgLtNgCfgVP100Display2SN OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "serial number of second VP100 wall display"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgWalldisplay 4 }
+
+
+-- ntp client monitoring 
+
+
+mbgLtNgCfgNtpClientMonitoring     OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 5 }
+
+mbgLtNgCfgNtpMaxClientOffset OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "ms"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "max NTP client offset limit in milliseconds"
+    DEFVAL { 10 }
+    ::= { mbgLtNgCfgNtpClientMonitoring 1 }
+
+mbgLtNgCfgNtpMaxClientStratum OBJECT-TYPE
+    SYNTAX Unsigned32(1..16)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "max NTP client stratum level"
+    DEFVAL { 10 }
+    ::= { mbgLtNgCfgNtpClientMonitoring 2 }
+
+-- trap trigger
+
+mbgLtNgCfgTrapTrigger     OBJECT IDENTIFIER ::= { mbgLtNgCfgNotifications 6 }
+
+mbgLtNgCfgTrapNormalOperation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "string containing signaling information ( comma-separated ); use the following aliases to set params:
+        Email	-> email
+        Wmail	-> wmail
+        Snmp	-> snmp
+        VP100	-> disp
+        User	-> own
+        Alarm	-> led
+        Relay	-> relais
+        Following string is perfectly valid to enable signaling for SNMP and Email: 'snmp,email'.
+        Please note that some objects do not suppurt relay and led but this is announced at each MIB object itself.
+        This object, for example, does not support them."
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 1 }
+
+mbgLtNgCfgTrapNtpNotSync OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 2 }
+
+mbgLtNgCfgTrapNtpSync OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 3 }
+
+mbgLtNgCfgTrapNtpStopped OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 4 }
+
+mbgLtNgCfgTrapServerBoot OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 5 }
+
+mbgLtNgCfgTrapRefclockNotResponding OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 6 }
+
+mbgLtNgCfgTrapRefclockSynchronized OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 7 }
+
+mbgLtNgCfgTrapRefclockNotSynchronized OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 8 }
+
+mbgLtNgCfgTrapSecRefclockNotResponding OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 9 }
+
+mbgLtNgCfgTrapSecRefclockSynchronized OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 10 }
+
+mbgLtNgCfgTrapSecRefclockNotSynchronized OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 11 }
+
+mbgLtNgCfgTrapAntennaFaulty OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 12 }
+
+mbgLtNgCfgTrapAntennaReconnect OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 13 }
+
+mbgLtNgCfgTrapAntennaShortCircuit OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 14 }
+
+mbgLtNgCfgTrapConfigChanged OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 15 }
+
+mbgLtNgCfgTrapLeapSecAnnounced OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 16 }
+
+mbgLtNgCfgTrapNtpClientLimitExceeded OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 17 }
+
+mbgLtNgCfgTrapRefSrcLimitExceeded OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 18 }
+
+mbgLtNgCfgTrapRefSrcDisconnected OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 19 }
+
+mbgLtNgCfgTrapRefSrcReconnected OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 20 }
+
+mbgLtNgCfgTrapShsTimeLimitError OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 21 }
+
+mbgLtNgCfgTrapShsTimeLimitWarning OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 22 }
+
+mbgLtNgCfgTrapNetworkDown OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 23 }
+
+mbgLtNgCfgTrapNetworkUp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 24 }
+
+mbgLtNgCfgTrapPowerSupplyUp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 25 }
+
+mbgLtNgCfgTrapPowerSupplyDown OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 26 }
+
+mbgLtNgCfgTrapFdmError OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 27 }
+
+mbgLtNgCfgTrapLowSystemResources OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 28 }
+
+mbgLtNgCfgTrapPtpNetworkDown OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 29 }
+
+mbgLtNgCfgTrapPtpNetworkUp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 30 }
+
+mbgLtNgCfgTrapPtpStateChanged OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 31 }
+
+mbgLtNgCfgTrapPtpError OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 32 }
+
+mbgLtNgCfgTrapFanDown OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 33 }
+
+mbgLtNgCfgTrapFanUp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 34 }
+
+mbgLtNgCfgRepeatEvent OBJECT-TYPE
+    SYNTAX INTEGER{ never(0), everyMinute(1), everyHour(2), everyDay(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "when to send last error trap message again"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgTrapTrigger 35 }
+
+mbgLtNgCfgRepetitions OBJECT-TYPE
+    SYNTAX Unsigned32(0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "how often do you want to resend an error trap"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgTrapTrigger 36 }
+
+mbgLtNgCfgTrapWarmedUp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 37 }
+
+mbgLtNgCfgTrapNotWarmedUp OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "see 'mbgLtNgCfgTrapNormalOperation' for a detailed explanation"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgTrapTrigger 38 }
+
+--
+-- security
+--
+
+mbgLtNgCfgSecurity        OBJECT IDENTIFIER ::= { mbgLtNgConfig 2 }
+
+-- login and access
+
+mbgLtNgCfgLoginAccess        OBJECT IDENTIFIER ::= { mbgLtNgCfgSecurity 0 }
+
+mbgLtNgCfgDisableRootLogin OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "do not allow user 'root' to login"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgLoginAccess 1 }
+
+mbgLtNgCfgAllowNetworkDiscovery OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "allow LANTIME to be discovered via network mdns"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgLoginAccess 2 }
+
+-- front panel
+
+mbgLtNgCfgFrontPanel        OBJECT IDENTIFIER ::= { mbgLtNgCfgSecurity 1 }
+
+mbgLtNgCfgLockFrontPanel OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "do not allow usage of the front panel"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgFrontPanel 1 }
+
+mbgLtNgCfgDisableUsbPort OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "do not allow usage of front USB port"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgFrontPanel 2 }
+
+-- ssh
+
+mbgLtNgCfgSsh        OBJECT IDENTIFIER ::= { mbgLtNgCfgSecurity 2 }
+
+mbgLtNgCfgSshKeyLength OBJECT-TYPE
+    SYNTAX Unsigned32(768|1024|2048|4096|8192|16384|32768)
+    UNITS "bits"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "ssh key length in bits"
+    DEFVAL { 1024 }
+    ::= { mbgLtNgCfgSsh 1 }
+
+mbgLtNgCfgSshShellTimeout OBJECT-TYPE
+    SYNTAX Unsigned32(0|60|120|300|600|3600|10800|18000|86400)
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "ssh shell timeout in seconds"
+    DEFVAL { 300 }
+    ::= { mbgLtNgCfgSsh 2 }
+
+
+--
+-- NTP page
+--
+mbgLtNgCfgNtp        OBJECT IDENTIFIER  ::= { mbgLtNgConfig 3 }
+
+-- Phil start
+mbgLtNgCfgNtpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgCfgNtpTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of configured, external NTP servers"
+    ::= { mbgLtNgCfgNtp 1 }
+
+
+mbgLtNgCfgNtpTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgCfgNtpTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to a configured,external NTP server"
+    INDEX { mbgLtNgCfgNtpIndex }
+    ::= { mbgLtNgCfgNtpTable 1 }
+
+
+MbgLtNgCfgNtpTableEntry ::=
+    SEQUENCE {
+        mbgLtNgCfgNtpIndex     Unsigned32,
+        mbgLtNgCfgNtpServerIP DisplayString,
+        mbgLtNgCfgNtpServerKey Unsigned32,
+        mbgLtNgCfgNtpServerAutokey MeinbergSwitch,
+        mbgLtNgCfgNtpServerMinpoll Unsigned32,
+        mbgLtNgCfgNtpServerMaxpoll Unsigned32,
+        mbgLtNgCfgNtpServerIburst MeinbergSwitch
+      }
+
+mbgLtNgCfgNtpIndex OBJECT-TYPE
+    SYNTAX Unsigned32(1..7)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index (and no.) of external NTP server"
+    ::= { mbgLtNgCfgNtpTableEntry 1 }
+
+mbgLtNgCfgNtpServerIP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ip address for external NTP server"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgNtpTableEntry 2 }
+
+mbgLtNgCfgNtpServerKey OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "key for external NTP server"
+    ::= { mbgLtNgCfgNtpTableEntry 3 }
+
+mbgLtNgCfgNtpServerAutokey OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "is autokey enabled for the external NTP server"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtpTableEntry 4 }
+
+mbgLtNgCfgNtpServerMinpoll OBJECT-TYPE
+    SYNTAX Unsigned32(4..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "is autokey enabled for the external NTP server"  
+    DEFVAL { 6 }
+    ::= { mbgLtNgCfgNtpTableEntry 5 }
+
+mbgLtNgCfgNtpServerMaxpoll OBJECT-TYPE
+    SYNTAX Unsigned32(4..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "is autokey enabled for the external NTP server"
+    DEFVAL { 6 }
+    ::= { mbgLtNgCfgNtpTableEntry 6 }
+
+mbgLtNgCfgNtpServerIburst OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "is autokey enabled for the external NTP server"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtpTableEntry 7 }
+
+--- broad- and manycast mode
+mbgLtNgCfgNtpBMTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgCfgNtpBMTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of configured, external NTP servers"
+    ::= { mbgLtNgCfgNtp 2 }
+
+mbgLtNgCfgNtpBMTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgCfgNtpBMTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of objects pertaining to an interface and concerning broad-, multi- and manycast"
+    INDEX { mbgLtNgCfgNtpBMIndex }
+    ::= { mbgLtNgCfgNtpBMTable 1 }
+
+
+MbgLtNgCfgNtpBMTableEntry ::=
+    SEQUENCE {
+        mbgLtNgCfgNtpBMIndex     Unsigned32,
+        mbgLtNgCfgNtpBroadAddr  DisplayString,
+        mbgLtNgCfgNtpBroadSymKey Unsigned32,
+        mbgLtNgCfgNtpBroadInterval Unsigned32,
+        mbgLtNgCfgNtpBroadUseAutokey MeinbergSwitch
+      }
+
+mbgLtNgCfgNtpBMIndex OBJECT-TYPE
+    SYNTAX Unsigned32(0..16)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index of interface concerning different NTP modes"
+    ::= { mbgLtNgCfgNtpBMTableEntry 1 }
+
+--- broadcast
+
+mbgLtNgCfgNtpBroadAddr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "address for NTP broadcast mode"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgNtpBMTableEntry 2 }
+
+mbgLtNgCfgNtpBroadSymKey OBJECT-TYPE
+    SYNTAX Unsigned32(0..10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "symmetric key number for broadcast"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtpBMTableEntry 3 }
+
+mbgLtNgCfgNtpBroadInterval OBJECT-TYPE
+    SYNTAX Unsigned32(0..10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "NTP broadcast interval on specific interval"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtpBMTableEntry 4 }
+
+mbgLtNgCfgNtpBroadUseAutokey OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "use autokey for broadcast"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtpBMTableEntry 5 }
+
+---multicast
+
+mbgLtNgCfgNtpEnableMulticast OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "enable or disable multicast mode"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 3 }
+
+mbgLtNgCfgNtpMultiAddr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "address for NTP multicast mode"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgNtp 4 }
+
+mbgLtNgCfgNtpMultiInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP multicast interval on specific interval"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 5 }
+
+mbgLtNgCfgNtpMultiSymKey OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "symmetric key number for multicast"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 6 }
+
+mbgLtNgCfgNtpMultiUseAutokey OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "use autokey for multicast"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 7 }
+
+-- manycast
+
+mbgLtNgCfgNtpEnableManycast OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "enable or disable manycast mode for this interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 8 }
+
+mbgLtNgCfgNtpManyAddr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "address for NTP manycast mode"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgNtp 9 }
+
+mbgLtNgCfgNtpManySymKey OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "symmetric key number for manycast"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 11 }
+
+mbgLtNgCfgNtpManyUseAutokey OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "use autokey for manycast"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 12 }
+
+-- general
+
+mbgLtNgCfgNtpLocalClkStratum OBJECT-TYPE
+    SYNTAX Unsigned32(1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "stratum of local clock"
+    DEFVAL { 12 }
+    ::= { mbgLtNgCfgNtp 13 }
+
+mbgLtNgCfgNtpDisableLocalClk OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "disable local clock"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 14 }
+
+mbgLtNgCfgNtpSpoofLocalTime OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+         "NTP outputs local time instead of UTC; see mbgLtNgCfgNtpTimeScale"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 15 }
+
+mbgLtNgCfgNtpLocalTrustedKeys OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "local trusted key"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgNtp 16 }
+
+mbgLtNgCfgNtpTrusttime OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "accept async reference clock for this amount of time in seconds"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 17 }
+
+mbgLtNgCfgNtpTimeScale OBJECT-TYPE
+    SYNTAX INTEGER
+            {
+              utc(0),
+              local(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "timescale"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 18 }
+
+mbgLtNgCfgNtpEnableClientCounter OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "enable NTP request client counting"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 19 }
+
+mbgLtNgCfgNtpEnableClientCounterDuration OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    UNITS "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "NTP client counter duration in seconds; 0 means continuously"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgNtp 20 }
+
+--
+-- PTP page
+--
+mbgLtNgCfgPtp        OBJECT IDENTIFIER ::= { mbgLtNgConfig 4 }
+
+mbgLtNgCfgPtpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgLtNgCfgPtpTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a table of PTPv2 related configurtion variables"
+    ::= { mbgLtNgCfgPtp 1 }
+
+mbgLtNgCfgPtpTableEntry OBJECT-TYPE
+    SYNTAX MbgLtNgCfgPtpTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "a list of configuration objects pertaining to a PTPv2 module"
+    INDEX { mbgLtNgCfgPtpIndex }
+    ::= { mbgLtNgCfgPtpTable 1 }
+
+MbgLtNgCfgPtpTableEntry ::=
+    SEQUENCE {
+	      mbgLtNgCfgPtpIndex            Unsigned32,
+	      mbgLtNgCfgPtpHostname         DisplayString,
+	      mbgLtNgCfgPtpDomainname       DisplayString,
+	      mbgLtNgCfgPtpNameserver1      DisplayString,
+	      mbgLtNgCfgPtpNameserver2      DisplayString,
+	      mbgLtNgCfgPtpIpv4             DisplayString,
+	      mbgLtNgCfgPtpNetmask          DisplayString,
+	      mbgLtNgCfgPtpGateway          DisplayString,
+	      mbgLtNgCfgPtpEnableVlan       MeinbergSwitch,
+	      mbgLtNgCfgPtpVlanId           Unsigned32,
+	      mbgLtNgCfgPtpVlanPriority     Unsigned32,
+	      mbgLtNgCfgPtpEnableDhcp       MeinbergSwitch,
+	      mbgLtNgCfgPtpMode             INTEGER,
+	      mbgLtNgCfgPtpDelayMechanism   INTEGER,
+	      mbgLtNgCfgPtpNetworkProtocol  INTEGER,
+	      mbgLtNgCfgPtpDomainNumber     Unsigned32,
+	      mbgLtNgCfgPtpPriority1        Unsigned32,
+	      mbgLtNgCfgPtpPriority2        Unsigned32,
+	      mbgLtNgCfgPtpSyncInterval     Integer32,
+	      mbgLtNgCfgPtpAnnounceInterval Integer32,
+	      mbgLtNgCfgPtpDelayReqInterval Integer32,
+	      mbgLtNgCfgPtpTimescale        INTEGER,
+          mbgLtNgCfgPtpIpv6Avail        INTEGER,
+          mbgLtNgCfgPtpIpv6Mode         INTEGER,
+          mbgLtNgCfgPtpIpv6Address      DisplayString,
+          mbgLtNgCfgPtpIpv6McastScope   INTEGER,
+          mbgLtNgCfgPtpDisableSsh       INTEGER,
+          mbgLtNgCfgPtpDscpClass        Unsigned32,
+          mbgLtNgCfgPtpMcastTtl         Unsigned32,
+          mbgLtNgCfgPtpOpMode           INTEGER,
+          mbgLtNgCfgPtpProfile          INTEGER,
+          mbgLtNgCfgPtpHybridMode       MeinbergSwitch,
+          mbgLtNgCfgPtpUcastMstAddr     DisplayString,
+          mbgLtNgCfgPtpAnnRcptTmout     Unsigned32,
+          mbgLtNgCfgPtpMessageDuration  Unsigned32,
+          mbgLtNgCfgPtpSyncEAvail       INTEGER,
+          mbgLtNgCfgPtpSyncEEnabled     INTEGER,
+          mbgLtNgCfgPtpSyncEQltLvlSelEnable INTEGER,
+          mbgLtNgCfgPtpSyncESdhNwOption INTEGER,
+          mbgLtNgCfgPtpSyncEInputSsm    INTEGER,
+          mbgLtNgCfgPtpSyncEOutputSsm   INTEGER,
+          mbgLtNgCfgPtpSyncEGbitCopperMode INTEGER,
+          mbgLtNgCfgPtpMiscEnable1Step  INTEGER,
+          mbgLtNgCfgPtpDisableMgmtMsgs  INTEGER,
+          mbgLtNgCfgPtpOutput1          INTEGER,
+          mbgLtNgCfgPtpOutput2          INTEGER
+      }
+
+mbgLtNgCfgPtpIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "index for PTPv2 module"
+    ::= { mbgLtNgCfgPtpTableEntry 1 }
+
+
+-- network section
+
+
+mbgLtNgCfgPtpHostname OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "network hostname"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 2 }
+
+mbgLtNgCfgPtpDomainname OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "network domain"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 3 }
+
+mbgLtNgCfgPtpNameserver1 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ethernet nameserver for hostname resolving"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 4 }
+
+mbgLtNgCfgPtpNameserver2 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ethernet nameserver for hostname resolving"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 5 }
+
+mbgLtNgCfgPtpIpv4 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ip address"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 6 }
+
+mbgLtNgCfgPtpNetmask OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "netmask"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 7 }
+
+mbgLtNgCfgPtpGateway OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "default gateway"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 8 }
+
+mbgLtNgCfgPtpEnableVlan OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Enable VLAN if it is supported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 9 }
+
+mbgLtNgCfgPtpVlanId OBJECT-TYPE
+    SYNTAX Unsigned32(0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "VLAN id ranges from 0-4096"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 10 }
+
+mbgLtNgCfgPtpVlanPriority OBJECT-TYPE
+    SYNTAX Unsigned32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "VLAN priority ranges from 0-7"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 11 }
+
+mbgLtNgCfgPtpEnableDhcp OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Enable DCHP for PTPv2 module"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 12 }
+
+mbgLtNgCfgPtpIpv6Avail OBJECT-TYPE
+    SYNTAX INTEGER{
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Is IPv6 supported?"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 23 }
+
+mbgLtNgCfgPtpIpv6Mode OBJECT-TYPE
+    SYNTAX INTEGER{
+        static(0),
+        ra(1),
+        dhcp(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "IPv6 addressing mode"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 24 }
+
+mbgLtNgCfgPtpIpv6Address OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "IPv6 address if supported, else n/a"
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 25 }
+
+mbgLtNgCfgPtpIpv6McastScope OBJECT-TYPE
+    SYNTAX INTEGER{
+        intfLocal(1),
+        linkLocal(2),
+        realmLocal(3),
+        adminLocal(4),
+        siteLocal(5),
+        orgaLocal(8),
+        globalScope(14)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Multicast scope. See RFC 7346 and RFC 4291"
+    DEFVAL { 1 }
+    ::= { mbgLtNgCfgPtpTableEntry 26 }
+
+mbgLtNgCfgPtpDisableSsh OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Disable SSH for PTP port"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 27 }
+
+mbgLtNgCfgPtpDscpClass OBJECT-TYPE
+    SYNTAX Unsigned32(0..64)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "DSCP classification value ranges from 0-64"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 28 }
+
+mbgLtNgCfgPtpMcastTtl OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Multicast TTL value ranges from 0-255"
+    DEFVAL { 5 }
+    ::= { mbgLtNgCfgPtpTableEntry 29 }
+
+
+-- global section
+
+
+mbgLtNgCfgPtpMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      multicastSlave(0),
+      unicastSlave(1),
+      multicastMaster(2),
+      unicastMaster(3),
+      multicastAuto(4),
+      bothMaster(5),
+      ntpServer(6),
+      ntpClient(7)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "PTP mode"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 13 }
+
+mbgLtNgCfgPtpDelayMechanism OBJECT-TYPE
+    SYNTAX INTEGER{
+      e2e(0),
+      p2p(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "how to calculate delay mechanism"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 14 }
+
+mbgLtNgCfgPtpNetworkProtocol OBJECT-TYPE
+    SYNTAX INTEGER{
+      reserved(0),
+      udpIpv4(1),
+      udpIpv6(2),
+      ieee8023(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "how to calculate delay mechanism"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 15 }
+
+mbgLtNgCfgPtpDomainNumber OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ptp domain membership"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 16 }
+
+mbgLtNgCfgPtpPriority1 OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ptp user defined major priority"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 17 }
+
+mbgLtNgCfgPtpPriority2 OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ptp user defined minor priority"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 18 }
+
+mbgLtNgCfgPtpSyncInterval OBJECT-TYPE
+    SYNTAX Integer32(-7..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "value is defined as power of 2;
+          for example:
+             2 = one message every 4 seconds,
+            -2 = 4 messages every second"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 19 }
+
+mbgLtNgCfgPtpAnnounceInterval OBJECT-TYPE
+    SYNTAX Integer32(-7..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "see 'mbgLtNgCfPtpSyncInterval' for explanation"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 20 }
+
+mbgLtNgCfgPtpDelayReqInterval OBJECT-TYPE
+    SYNTAX Integer32(-7..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "see 'mbgLtNgCfPtpSyncInterval' for explanation"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 21 }
+
+mbgLtNgCfgPtpTimescale OBJECT-TYPE
+    SYNTAX INTEGER{
+      arbitrary(0),
+      ptp(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "see 'mbgLtNgCfPtpSyncInterval' for explanation"
+    DEFVAL { 1 }
+    ::= { mbgLtNgCfgPtpTableEntry 22 }
+
+mbgLtNgCfgPtpOpMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        ptp(0),
+        ntp(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "General PTP operation mode"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 30 }
+
+mbgLtNgCfgPtpProfile OBJECT-TYPE
+    SYNTAX INTEGER {
+        custom(0),
+        defE2eIeee15882008(1),
+        defP2pIeee15882008(2),
+        powIeeeC37238(3),
+        telItuTG82651(4),
+        telItuTG82751(5),
+        smpteSt20592(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "PTP profile"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 31 }
+
+mbgLtNgCfgPtpHybridMode OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Run card in hybrid mode"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 32 }
+
+mbgLtNgCfgPtpUcastMstAddr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "IP address of unicast master
+         when in slave mode. Only 1!!!
+         is shown and can be set."
+    DEFVAL { "n/a" }
+    ::= { mbgLtNgCfgPtpTableEntry 33 }
+
+mbgLtNgCfgPtpAnnRcptTmout OBJECT-TYPE
+    SYNTAX Unsigned32(2..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Timeout for announce messages"
+    DEFVAL { 3 }
+    ::= { mbgLtNgCfgPtpTableEntry 34 }
+
+mbgLtNgCfgPtpMessageDuration OBJECT-TYPE
+    SYNTAX Unsigned32(10..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Time period until master stops
+          sending messages [s]"
+    DEFVAL { 60 }
+    ::= { mbgLtNgCfgPtpTableEntry 35 }
+
+
+--- Sync E section
+
+
+mbgLtNgCfgPtpSyncEAvail OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Is SyncE supported?"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 36 }
+
+mbgLtNgCfgPtpSyncEEnabled OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Is Sync-E enabled if supported?"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 37 }
+
+mbgLtNgCfgPtpSyncEQltLvlSelEnable OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Enable quality selection?"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 38 }
+
+mbgLtNgCfgPtpSyncESdhNwOption OBJECT-TYPE
+    SYNTAX INTEGER {
+        opt1(0),
+        opt2(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Sdh network option"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 39 }
+
+mbgLtNgCfgPtpSyncEInputSsm OBJECT-TYPE
+    SYNTAX INTEGER {
+        stuUkn(0),
+        prs(1),
+        prc(2),
+        inv3(3),
+        ssuATnc(4),
+        inv5(5),
+        inv6(6),
+        st2(7),
+        ssuB(8),
+        inv9(9),
+        eec2St3(10),
+        eec1Sec(11),
+        smc(12),
+        st3e(13),
+        prov(14),
+        dnuDus(15)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Input SSMs combied for both options.
+          You should be aware of using which code when."
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 40 }
+
+mbgLtNgCfgPtpSyncEOutputSsm OBJECT-TYPE
+    SYNTAX INTEGER {
+        stuUkn(0),
+        prs(1),
+        prc(2),
+        inv3(3),
+        ssuATnc(4),
+        inv5(5),
+        inv6(6),
+        st2(7),
+        ssuB(8),
+        inv9(9),
+        eec2St3(10),
+        eec1Sec(11),
+        smc(12),
+        st3e(13),
+        prov(14),
+        dnuDus(15)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Input SSMs combined for both options.
+          You should be aware of using which code when."
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 41 }
+
+
+mbgLtNgCfgPtpSyncEGbitCopperMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        auto(0),
+        forceSyncEAuto(1),
+        forceOrIsMaster(2),
+        forceOrIsSlave(3),
+        preferMaster(4),
+        preferSlave(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Gigabit copper modes"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 42 }
+
+
+--- Misc
+
+
+mbgLtNgCfgPtpMiscEnable1Step OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Enable PTP 1 step if supported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 43 }
+
+mbgLtNgCfgPtpDisableMgmtMsgs OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Disable management messages if suppported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 44 }
+
+
+--- Outputs
+
+
+mbgLtNgCfgPtpOutput1 OBJECT-TYPE
+    SYNTAX INTEGER {
+        off(0),
+        pps(1),
+        mhz10(2),
+        khzGPS2048(3),
+        mhzGPS10(4),
+        ppsGPS(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Additional I/O output if suppported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 45 }
+
+mbgLtNgCfgPtpOutput2 OBJECT-TYPE
+    SYNTAX INTEGER {
+        off(0),
+        pps(1),
+        mhz10(2),
+        khzGPS2048(3),
+        mhzGPS10(4),
+        ppsGPS(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Additional I/O output if suppported"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtpTableEntry 46 }
+
+mbgLtNgCfgPtpCmd OBJECT-TYPE
+    SYNTAX INTEGER{
+        none(0),
+        configure(1),
+        reset(2),
+        apply(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "Configuration commands"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgPtp 2 }
+
+--
+-- System page
+--
+mbgLtNgCfgSystem        OBJECT IDENTIFIER ::= { mbgLtNgConfig 5 }
+
+-- general
+mbgLtNgCfgGeneral        OBJECT IDENTIFIER ::= { mbgLtNgCfgSystem 0 }
+
+mbgLtNgCfgWebLanguage OBJECT-TYPE
+    SYNTAX INTEGER{ notAvailable(0), englisch(1), german(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "set language for web interface"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgGeneral 1 }
+
+mbgLtNgCfgActivateChangesAsStartup OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "activate changes automatically as startup configuration"
+    DEFVAL { 1 }
+    ::= { mbgLtNgCfgGeneral 2 }
+
+-- front display
+
+mbgLtNgCfgDisplay        OBJECT IDENTIFIER ::= { mbgLtNgCfgSystem 1 }
+
+mbgLtNgCfgEnableFrontPanelLight OBJECT-TYPE
+    SYNTAX MeinbergSwitch
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "active light at front panel"
+    DEFVAL { 0 }
+    ::= { mbgLtNgCfgDisplay 1 }
+
+
+--
+-- Lantime system modus 
+--
+-- mbgLtNgCfgReceiver        OBJECT IDENTIFIER ::= { mbgLtNgConfig 8 }
+-- MRS settings etc....
+
+
+
+--
+-- Lantime SNMP commands
+--
+
+mbgLtNgCommands        OBJECT IDENTIFIER  ::= { mbgLantimeNG 2 }
+
+mbgLtNgCmdExecute OBJECT-TYPE
+    SYNTAX  INTEGER {
+      none(0),
+      applyChanges(1),
+      saveChanges(2),
+      saveAndApplyChanges(3),
+      startFirmwareUpdate(4),
+      reboot(5),
+      resendErrorConditions(6),
+      sendTestNotifications(7)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Send a command to the timeserver to be executed;
+         Attention: Command should be executed with a timeout of 120 seconds and 0 retries"
+    DEFVAL { 0 }
+    ::={ mbgLtNgCommands 1 }
+
+mbgLtNgCmdSetTime OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "Reference time can be set via a date-time string in format:
+             yyyy-mm-dd hh:mm:ss
+             Time is interpreted as configured via web interface at menu:
+             'Receiver'->'Time Zone'
+             It is mandatory to unplug the receiver's antenna to make this work.
+             and strongly advised to execute a SNMPSET WITHOUT retries
+             and a timeout value greater than 60 seconds. Otherwise
+             there might come up unforeseen issues.
+             SNMPGET always returns default value."
+    DEFVAL { "n/a" }
+    ::={ mbgLtNgCommands 2 }
+
+
+--
+-- Lantime SNMP trap definitions
+--
+mbgLtNgTrapNotifications      OBJECT IDENTIFIER  ::= { mbgLantimeNG 3 }
+
+mbgLtNgTraps      OBJECT IDENTIFIER  ::= { mbgLtNgTrapNotifications 0 }
+
+mbgLtNgTrapNTPNotSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when NTP is not synchronised "
+    ::= { mbgLtNgTraps 1 }
+
+mbgLtNgTrapNTPStopped NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when NTP is stopped "
+    ::= { mbgLtNgTraps 2 }
+
+mbgLtNgTrapServerBoot NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when time server has finished boot sequence "
+    ::= { mbgLtNgTraps 3 }
+
+mbgLtNgTrapReceiverNotResponding NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when receiver is not responding "
+    ::= { mbgLtNgTraps 4 }
+
+mbgLtNgTrapReceiverNotSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when receiver is not synchronised "
+    ::= { mbgLtNgTraps 5 }
+
+mbgLtNgTrapAntennaFaulty NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when connection to antenna is broken "
+    ::= { mbgLtNgTraps 6 }
+
+mbgLtNgTrapAntennaReconnect NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when antenna has been reconnected "
+    ::= { mbgLtNgTraps 7 }
+
+mbgLtNgTrapConfigChanged NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when timeserver reloaded its configuration "
+    ::= { mbgLtNgTraps 8 }
+
+mbgLtNgTrapLeapSecondAnnounced NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a leap second has been announced "
+    ::= { mbgLtNgTraps 9 }
+
+mbgLtNgTrapSHSTimeLimitError NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when SHS timelimit exceeded "
+    ::= { mbgLtNgTraps 10 }
+
+mbgLtNgTrapSecondaryRecNotSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when secondary receiver in SHS system is not synchronised "
+    ::= { mbgLtNgTraps 11 }
+
+mbgLtNgTrapPowerSupplyFailure NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when one of the redundant power supplies fails"
+    ::= { mbgLtNgTraps 12 }
+
+mbgLtNgTrapAntennaShortCircuit NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a connected antenna fails due to a short circuit"
+    ::= { mbgLtNgTraps 13 }
+
+mbgLtNgTrapReceiverSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when receiver is synchronised "
+    ::= { mbgLtNgTraps 14 }
+
+mbgLtNgTrapNTPClientAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when an NTP Client Monitoring alarm occurs, e.g. when a monitored client is not reachable. "
+    ::= { mbgLtNgTraps 15 }
+
+mbgLtNgTrapPowerSupplyUp NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a power supply returned to a healthy state. "
+    ::= { mbgLtNgTraps 16 }
+
+mbgLtNgTrapNetworkDown NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a monitored network port is down. "
+    ::= { mbgLtNgTraps 17 }
+
+mbgLtNgTrapNetworkUp NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a monitored network port is up. "
+    ::= { mbgLtNgTraps 18 }
+
+mbgLtNgTrapSecondaryRecNotResp NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when secondary receiver is not responding "
+    ::= { mbgLtNgTraps 19 }
+
+
+mbgLtNgTrapXmrLimitExceeded NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a reference offset exceeds the configured limit"
+    ::= { mbgLtNgTraps 30 }
+
+mbgLtNgTrapXmrRefDisconnect NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a reference signal has been lost"
+    ::= { mbgLtNgTraps 31 }
+
+
+mbgLtNgTrapXmrRefReconnect NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a reference signal recovered"
+    ::= { mbgLtNgTraps 32 }
+
+mbgLtNgTrapFdmError NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the Fdm module generates an alarm "
+    ::= { mbgLtNgTraps 33 }
+
+mbgLtNgTrapSHSTimeLimitWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when SHS warning limit exceeded "
+    ::= { mbgLtNgTraps 34 }
+
+mbgLtNgTrapSecondaryRecSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when secondary receiver is synchronised "
+    ::= { mbgLtNgTraps 35 }
+
+mbgLtNgTrapNTPSync NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when NTP is synchronised "
+    ::= { mbgLtNgTraps 36 }
+
+mbgLtNgTrapPtpPortDisconnected NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when PTP network port got disconnected"
+    ::= { mbgLtNgTraps 37 }
+
+mbgLtNgTrapPtpPortConnected NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when PTP network port got connected"
+    ::= { mbgLtNgTraps 38 }
+
+mbgLtNgTrapPtpStateChanged NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when PTP state changed (e.g. from 'passive' to 'master')"
+    ::= { mbgLtNgTraps 39 }
+
+mbgLtNgTrapPtpError NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when PTP raised an error"
+    ::= { mbgLtNgTraps 40 }
+
+mbgLtNgTrapLowSystemResources NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when system is running on low resources"
+    ::= { mbgLtNgTraps 41 }
+
+mbgLtNgTrapFanDown NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when fan goes down"
+    ::= { mbgLtNgTraps 45 }
+
+mbgLtNgTrapFanUp NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when fan comes up"
+    ::= { mbgLtNgTraps 46 }
+
+mbgLtNgTrapCertificateExpired NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when certificate expired or will expire"
+    ::= { mbgLtNgTraps 47 }
+
+mbgLtNgTrapSufficientSystemResources NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when system has regained sufficient resources"
+    ::= { mbgLtNgTraps 48 }
+
+mbgLtNgTrapOscillatorWarmedUp NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when oscillator is not warmed up"
+    ::= { mbgLtNgTraps 49 }
+
+mbgLtNgTrapOscillatorNotWarmedUp NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when oscillator is warmed up"
+    ::= { mbgLtNgTraps 50 }
+
+mbgLtNgTrapXmrRefChanged NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when XMR reference source changed"
+    ::= { mbgLtNgTraps 51 }
+
+mbgLtNgTrapClusterMasterChanged NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when cluster mode is active and cluster changed"
+    ::= { mbgLtNgTraps 52 }
+
+mbgLtNgTrapClusterFalsetickerDetected NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when cluster mode is active and
+         a cluster member is dectected as falseticker"
+    ::= { mbgLtNgTraps 53 }
+
+mbgLtNgTrapClusterFalsetickerCleared NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when cluster mode is active and
+         a cluster member is no longer a falseticker"
+    ::= { mbgLtNgTraps 54 }
+
+mbgLtNgTrapSHSTimeLimitOk NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when SHS timelimit error has
+         been acknowledged or time difference drops
+         below warning limit."
+    ::= { mbgLtNgTraps 55 }
+
+mbgLtNgTrapIMSError NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when an IMS module is not
+         responsive anymore, has got temperature issues,
+         etc. ..."
+    ::= { mbgLtNgTraps 56 }
+
+mbgLtNgTrapIMSOk NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when an IMS module returns
+         to healthy state."
+    ::= { mbgLtNgTraps 57 }
+
+mbgLtNgTrapFDMOk NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when an FDM module returns
+         to healthy state."
+    ::= { mbgLtNgTraps 58 }
+
+mbgLtNgTrapNTPOffsetLimitExceeded NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when monitoring an NTP client and its
+         offset limit is exceeded"
+    ::= { mbgLtNgTraps 59 }
+
+mbgLtNgTrapNTPOffsetLimitOk NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when monitoring an NTP client and its
+         offset limit is back again in a valid range"
+    ::= { mbgLtNgTraps 60 }
+
+mbgLtNgTrapNormalOperation NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the system returned to a healthy state "
+    ::= { mbgLtNgTraps 77 }
+
+mbgLtNgTrapHeartbeat NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent periodically to indicate that time server is still alive "
+    ::= { mbgLtNgTraps 88 }
+
+mbgLtNgTrapTestNotification NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a test notification has been requested "
+    ::= { mbgLtNgTraps 99 }
+
+mbgLtNgTrapMessage  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "used as a payload object for all traps, holds a clear text event message"
+        DEFVAL { "no event" }
+        ::= { mbgLtNgTraps 100 }
+
+-- conformance and other stuff
+
+mbgLtNgConformance        OBJECT IDENTIFIER ::= { mbgLantimeNG 90 }
+mbgLtNgCompliances                OBJECT IDENTIFIER ::= { mbgLtNgConformance 1 }
+mbgLtNgGroups                     OBJECT IDENTIFIER ::= { mbgLtNgConformance 2 }
+
+mbgLtNgCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION 
+                        "The compliance statement for SNMP entities which implement version 2
+                        of the LANTIME MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS {
+                        mbgLtNgObjectsGroup,
+                        mbgLtNgTrapsGroup
+                }
+        ::= { mbgLtNgCompliances 1 }
+                
+
+mbgLtNgObjectsGroup       OBJECT-GROUP 
+        OBJECTS {
+    mbgLtNgSnmpSubagentVersion,
+    mbgLtNgFirmwareVersion,
+    mbgLtNgSerialNumber,
+    mbgLtNgSubagentTimeticks,
+    mbgLtNgCpuSerialNumber,
+    mbgLtNgNtpCurrentState,
+    mbgLtNgNtpStratum,
+    mbgLtNgNtpRefclockName,
+    mbgLtNgNtpRefclockOffset,
+    mbgLtNgNtpVersion,
+    mbgLtNgNtpCCStartedAt,
+    mbgLtNgNtpCCDuration,
+    mbgLtNgNtpCCNumberOfClients,
+    mbgLtNgNtpCCTotalRequests,
+    mbgLtNgNtpCCTotalRequestsLastHour,
+    mbgLtNgNtpCCTotalRequestsLastMinute,
+    mbgLtNgNtpCCTotalRequestsCurrentDay,
+    mbgLtNgNtpCCTodaysClients,
+    mbgLtNgNtpMrsServer,
+    mbgLtNgNtpMrsOffset,
+    mbgLtNgNumberOfRefclocks,
+    mbgLtNgRefclockType,
+    mbgLtNgRefclockUsage,
+    mbgLtNgRefclockState,
+    mbgLtNgRefclockSubstate,
+    mbgLtNgRefclockStatusA,
+    mbgLtNgRefclockMaxStatusA,
+    mbgLtNgRefclockStatusB,
+    mbgLtNgRefclockMaxStatusB,
+    mbgLtNgRefclockAdditionalInfo,
+    mbgLtNgRefclockLeapSecondDate,
+    mbgLtNgRefclockGpsLatitude,
+    mbgLtNgRefclockGpsLongitude,
+    mbgLtNgRefclockGpsTdop,
+    mbgLtNgRefclockGpsPdop,
+    mbgLtNgRefclockGpsUtcOffset,
+    mbgLtNgRefclockGpsAltitude,
+    mbgLtNgRefclockTimeDiff,
+    mbgLtNgRefclockGpsPos,
+	mbgLtNgTrapMessage,
+    mbgLtNgNumberOfClusters,
+    mbgLtNgClusterCommunicationIp,
+    mbgLtNgClusterPortState,
+    mbgLtNgClusterMasterSerial,
+    mbgLtNgClusterMasterIp,
+    mbgLtNgClusterMasterPriority,
+    mbgLtNgClusterClockStatus,
+    mbgLtNgClusterClockClass,
+    mbgLtNgClusterReconfigurationState,
+    mbgLtNgClusterIsFalseticker,
+    mbgLtNgCfgNtpServerIP,
+    mbgLtNgCfgNtpServerKey,
+    mbgLtNgCfgNtpServerAutokey,
+    mbgLtNgCfgNtpServerMinpoll,
+    mbgLtNgCfgNtpServerMaxpoll,
+    mbgLtNgCfgNtpServerIburst,
+    mbgLtNgCfgNtpBroadAddr,
+    mbgLtNgCfgNtpBroadInterval,
+    mbgLtNgCfgNtpBroadSymKey,
+    mbgLtNgCfgNtpBroadUseAutokey,
+    mbgLtNgCfgNtpEnableMulticast,
+    mbgLtNgCfgNtpMultiAddr,
+    mbgLtNgCfgNtpMultiInterval,
+    mbgLtNgCfgNtpMultiSymKey,
+    mbgLtNgCfgNtpMultiUseAutokey,
+    mbgLtNgCfgNtpEnableManycast,
+    mbgLtNgCfgNtpManyAddr,
+    mbgLtNgCfgNtpManySymKey,
+    mbgLtNgCfgNtpManyUseAutokey,
+    mbgLtNgCfgNtpLocalTrustedKeys,
+    mbgLtNgCfgNtpTrusttime,
+    mbgLtNgCfgNtpTimeScale,
+    mbgLtNgCfgNtpLocalClkStratum,
+    mbgLtNgCfgNtpDisableLocalClk,
+    mbgLtNgCfgNtpSpoofLocalTime,
+    mbgLtNgCfgNtpEnableClientCounter,
+    mbgLtNgCfgNtpEnableClientCounterDuration,
+    mbgLtNgCfgPtpHostname,
+    mbgLtNgCfgPtpDomainname,
+    mbgLtNgCfgPtpNameserver1,
+    mbgLtNgCfgPtpNameserver2,
+    mbgLtNgCfgPtpIpv4,
+    mbgLtNgCfgPtpNetmask,
+    mbgLtNgCfgPtpGateway,
+    mbgLtNgCfgPtpEnableVlan,
+    mbgLtNgCfgPtpVlanId,
+    mbgLtNgCfgPtpVlanPriority,
+    mbgLtNgCfgPtpEnableDhcp,
+    mbgLtNgCfgPtpIpv6Avail,
+    mbgLtNgCfgPtpIpv6Mode,
+    mbgLtNgCfgPtpIpv6Address,
+    mbgLtNgCfgPtpIpv6McastScope,
+    mbgLtNgCfgPtpDisableSsh,
+    mbgLtNgCfgPtpDscpClass,
+    mbgLtNgCfgPtpMcastTtl,
+    mbgLtNgCfgPtpOpMode,
+    mbgLtNgCfgPtpMode,
+    mbgLtNgCfgPtpHybridMode,
+    mbgLtNgCfgPtpUcastMstAddr,
+    mbgLtNgCfgPtpProfile,
+    mbgLtNgCfgPtpDelayMechanism,
+    mbgLtNgCfgPtpNetworkProtocol,
+    mbgLtNgCfgPtpDomainNumber,
+    mbgLtNgCfgPtpPriority1,
+    mbgLtNgCfgPtpPriority2,
+    mbgLtNgCfgPtpSyncInterval,
+    mbgLtNgCfgPtpAnnounceInterval,
+    mbgLtNgCfgPtpDelayReqInterval,
+    mbgLtNgCfgPtpTimescale,
+    mbgLtNgCfgPtpAnnRcptTmout,
+    mbgLtNgCfgPtpMessageDuration,
+    mbgLtNgCfgPtpCmd,
+    mbgLtNgCfgPtpSyncEAvail,
+    mbgLtNgCfgPtpSyncEEnabled,
+    mbgLtNgCfgPtpSyncEQltLvlSelEnable,
+    mbgLtNgCfgPtpSyncESdhNwOption,
+    mbgLtNgCfgPtpSyncEInputSsm,
+    mbgLtNgCfgPtpSyncEOutputSsm,
+    mbgLtNgCfgPtpSyncEGbitCopperMode,
+    mbgLtNgCfgPtpMiscEnable1Step,
+    mbgLtNgCfgPtpDisableMgmtMsgs,
+    mbgLtNgCfgPtpOutput1,
+    mbgLtNgCfgPtpOutput2,
+    mbgLtNgCfgEmailTo,
+    mbgLtNgEthPortLinkState,
+    mbgLtNgCfgEmailFrom,
+    mbgLtNgCfgEmailSmarthostAddr,
+    mbgLtNgCfgEmailSmarthostPort,
+    mbgLtNgCfgEmailSmarthostAuth,
+    mbgLtNgCfgEmailSmarthostAuthUser,
+    mbgLtNgCfgEmailSmarthostAuthPw,
+    mbgLtNgCfgSnmpContact,
+    mbgLtNgCfgSnmpLocation,
+    mbgLtNgCfgVP100Display1Addr,
+    mbgLtNgCfgVP100Display1SN,
+    mbgLtNgCfgVP100Display2Addr,
+    mbgLtNgCfgVP100Display2SN,
+    mbgLtNgCfgEthernetHostname,
+    mbgLtNgCfgEthernetDomain,
+    mbgLtNgCfgEthernetNameserver1,
+    mbgLtNgCfgEthernetNameserver2,
+    mbgLtNgCfgEthernetIpv4Gateway,
+    mbgLtNgCfgEthernetIpv6Gateway,
+    mbgLtNgCfgNumberOfPhysicalIf,
+    mbgLtNgCfgNumberOfVirtualIf,
+    mbgLtNgCfgPhysicalIfMac,
+    mbgLtNgCfgPhysicalIfNetLinkMode,
+    mbgLtNgCfgPhysicalIfIndicateLink,
+    mbgLtNgCfgPhysicalIfBondingGroup,
+    mbgLtNgCfgPhysicalIfIpv6Mode,
+    mbgLtNgCfgVirtualIfIpv4AddrFromDhcp,
+    mbgLtNgCfgVirtualIfIpv4NetmaskFromDhcp,
+    mbgLtNgCfgVirtualIfIpv4BroadcastFromDhcp,
+    mbgLtNgCfgVirtualIfIpv4GatewayFromDhcp,
+    mbgLtNgCfgVirtualIfIpv4DnsFromDhcp,
+    mbgLtNgCfgVirtualIfIpv4DomainFromDhcp,
+    mbgLtNgCfgVirtualIfAssigned,
+    mbgLtNgCfgVirtualIfMac,
+    mbgLtNgCfgVirtualIfLabel,
+    mbgLtNgCfgVirtualIfServiceNtp,
+    mbgLtNgCfgVirtualIfServiceHttp,
+    mbgLtNgCfgVirtualIfServiceHttps,
+    mbgLtNgCfgVirtualIfServiceTelnet,
+    mbgLtNgCfgVirtualIfServiceSsh,
+    mbgLtNgCfgVirtualIfServiceSnmp,
+    mbgLtNgCfgVirtualIfServiceFtp,
+    mbgLtNgCfgVirtualIfServiceTime,
+    mbgLtNgCfgVirtualIfServiceDaytime,
+    mbgLtNgCfgVirtualIfServiceFpc,
+    mbgLtNgCfgVirtualIfIpv4Addr,
+    mbgLtNgCfgVirtualIfIpv4Netmask,
+    mbgLtNgCfgVirtualIfIpv4Dhcp,
+    mbgLtNgCfgVirtualIfIpv6Addr,
+    mbgLtNgCfgVirtualIfIpv6Dhcp,
+    mbgLtNgCfgVirtualIfIpv6RoutAdd,
+    mbgLtNgCfgVirtualIfIpv6LinkLocal,
+    mbgLtNgCfgVirtualIfVlan,
+    mbgLtNgCfgVirtualIfVlanTag,
+    mbgLtNgCfgVirtualIfVlanPrio,
+    mbgLtNgCfgVirtualIfCluster,
+    mbgLtNgCfgVirtualIfClusterIpv4Addr,
+    mbgLtNgCfgVirtualIfClusterIpv4Netmask,
+    mbgLtNgCfgVirtualIfClusterPrio,
+    mbgLtNgCfgEthernetGenClusterIp,
+    mbgLtNgCfgEthernetGenClusterPort,
+    mbgLtNgCfgSyslogServerAddr,
+    mbgLtNgCfgSyslogLoglevel,
+    mbgLtNgCfgWmailAddress1,
+    mbgLtNgCfgWmailAddress2,
+    mbgLtNgCfgSnmpTrapRecAddr,
+    mbgLtNgCfgSnmpTrapRecCommunity,
+    mbgLtNgCfgSnmpTrapRecVersion,
+    mbgLtNgCfgSnmpReadCommunity,
+    mbgLtNgCfgSnmpWriteCommunity,
+    mbgLtNgCfgSnmpV3UserName,
+    mbgLtNgCfgSnmpV3UserRights,
+    mbgLtNgCfgSnmpV3Context,
+    mbgLtNgCfgSnmpV3SecurityLevel,
+    mbgLtNgCfgSnmpV3AuthProtocol,
+    mbgLtNgCfgSnmpV3AuthPassphrase,
+    mbgLtNgCfgSnmpV3PrivProtocol,
+    mbgLtNgCfgSnmpV3PrivPassphrase,
+    mbgLtNgCfgSnmpRetries,
+    mbgLtNgCfgSnmpTimeout,
+    mbgLtNgCfgSnmpEnabledVersion,
+    mbgLtNgCfgNtpMaxClientOffset,
+    mbgLtNgCfgNtpMaxClientStratum,
+    mbgLtNgCfgTrapNormalOperation,
+    mbgLtNgCfgTrapNtpNotSync,
+    mbgLtNgCfgTrapNtpSync,
+    mbgLtNgCfgTrapNtpStopped,
+    mbgLtNgCfgTrapServerBoot,
+    mbgLtNgCfgTrapRefclockNotResponding,
+    mbgLtNgCfgTrapRefclockSynchronized,
+    mbgLtNgCfgTrapRefclockNotSynchronized,
+    mbgLtNgCfgTrapSecRefclockNotResponding,
+    mbgLtNgCfgTrapSecRefclockSynchronized,
+    mbgLtNgCfgTrapSecRefclockNotSynchronized,
+    mbgLtNgCfgTrapAntennaFaulty,
+    mbgLtNgCfgTrapAntennaReconnect,
+    mbgLtNgCfgTrapAntennaShortCircuit,
+    mbgLtNgCfgTrapConfigChanged,
+    mbgLtNgCfgTrapLeapSecAnnounced,
+    mbgLtNgCfgTrapNtpClientLimitExceeded,
+    mbgLtNgCfgTrapRefSrcDisconnected,
+    mbgLtNgCfgTrapRefSrcReconnected,
+    mbgLtNgCfgTrapShsTimeLimitError,
+    mbgLtNgCfgTrapShsTimeLimitWarning,
+    mbgLtNgCfgTrapNetworkDown,
+    mbgLtNgCfgTrapNetworkUp,
+    mbgLtNgCfgTrapPowerSupplyUp,
+    mbgLtNgCfgTrapPowerSupplyDown,
+    mbgLtNgCfgTrapFdmError,
+    mbgLtNgCfgTrapLowSystemResources,
+    mbgLtNgCfgTrapPtpNetworkDown,
+    mbgLtNgCfgTrapPtpNetworkUp,
+    mbgLtNgCfgTrapPtpStateChanged,
+    mbgLtNgCfgTrapPtpError,
+    mbgLtNgCfgTrapRefSrcLimitExceeded,
+    mbgLtNgCfgTrapFanDown,
+    mbgLtNgCfgTrapFanUp,
+    mbgLtNgCfgRepeatEvent,
+    mbgLtNgCfgRepetitions,
+    mbgLtNgCfgTrapWarmedUp,
+    mbgLtNgCfgTrapNotWarmedUp,
+    mbgLtNgCfgDisableRootLogin,
+    mbgLtNgCfgDisableUsbPort,
+    mbgLtNgCfgAllowNetworkDiscovery,
+    mbgLtNgCfgLockFrontPanel,
+    mbgLtNgCfgSshKeyLength,
+    mbgLtNgCfgSshShellTimeout,
+    mbgLtNgCfgWebLanguage,
+    mbgLtNgCfgActivateChangesAsStartup,
+    mbgLtNgCfgEnableFrontPanelLight,
+    mbgLtNgCmdExecute,
+    mbgLtNgCmdSetTime,
+    mbgLtNgFdmFreq,
+    mbgLtNgFdmFreqDev,
+    mbgLtNgFdmNomFreq,
+    mbgLtNgPtpNumberOfModules,
+    mbgLtNgPtpMode,
+    mbgLtNgPtpPortState,
+    mbgLtNgPtpLocalMac,
+    mbgLtNgPtpGrandmasterMac,
+    mbgLtNgPtpGrandmasterUuid,
+    mbgLtNgPtpClockAccuracy,
+    mbgLtNgPtpClockClass,
+    mbgLtNgPtpTimeSource,
+    mbgLtNgPtpUtcOffset,
+    mbgLtNgPtpTimeSeconds,
+    mbgLtNgPtpTsuTime,
+    mbgLtNgPtpSysTime,
+    mbgLtNgPtpPortLinkup,
+    mbgLtNgPtpOffsetFromGM,
+    mbgLtNgPtpPathDelay,
+    mbgLtNgPtpDelayMec,
+    mbgLtNgPtpDomain,
+    mbgLtNgPtpDelayAsymmetry,
+    mbgLtNgPtpAvail,
+    mbgLtNgSysNumberOfPowerSupplies,
+    mbgLtNgSysPsStatus,
+    mbgLtNgSysNumberOfFans,
+    mbgLtNgSysFanStatus,
+    mbgLtNgSysFanError,
+    mbgLtNgSysTempCelsius
+	}
+        STATUS  current
+        DESCRIPTION
+                        "The collection of objects for the LANTIME MIB"
+        ::= { mbgLtNgGroups 1 }
+        
+mbgLtNgTrapsGroup NOTIFICATION-GROUP 
+        NOTIFICATIONS {
+            mbgLtNgTrapNTPNotSync,
+            mbgLtNgTrapNTPStopped,
+            mbgLtNgTrapServerBoot,
+            mbgLtNgTrapReceiverNotResponding,
+            mbgLtNgTrapReceiverNotSync,
+            mbgLtNgTrapAntennaFaulty,
+            mbgLtNgTrapAntennaReconnect,
+            mbgLtNgTrapConfigChanged,
+            mbgLtNgTrapLeapSecondAnnounced,
+            mbgLtNgTrapSHSTimeLimitError,
+            mbgLtNgTrapSecondaryRecNotSync,
+            mbgLtNgTrapPowerSupplyFailure,
+            mbgLtNgTrapAntennaShortCircuit,
+            mbgLtNgTrapReceiverSync,
+            mbgLtNgTrapNTPClientAlarm,
+            mbgLtNgTrapPowerSupplyUp,
+            mbgLtNgTrapNetworkDown,
+            mbgLtNgTrapNetworkUp,
+            mbgLtNgTrapSecondaryRecNotResp,
+            mbgLtNgTrapXmrLimitExceeded,
+            mbgLtNgTrapXmrRefDisconnect,
+            mbgLtNgTrapXmrRefReconnect,
+            mbgLtNgTrapFdmError,
+            mbgLtNgTrapSHSTimeLimitWarning,
+            mbgLtNgTrapSecondaryRecSync,
+            mbgLtNgTrapNTPSync,
+            mbgLtNgTrapNormalOperation,
+            mbgLtNgTrapHeartbeat,
+            mbgLtNgTrapTestNotification,
+            mbgLtNgTrapPtpPortDisconnected,
+            mbgLtNgTrapPtpPortConnected,
+            mbgLtNgTrapPtpStateChanged,
+            mbgLtNgTrapPtpError,
+            mbgLtNgTrapLowSystemResources,
+            mbgLtNgTrapSufficientSystemResources,
+            mbgLtNgTrapFanDown,
+            mbgLtNgTrapFanUp,
+            mbgLtNgTrapCertificateExpired,
+            mbgLtNgTrapOscillatorWarmedUp,
+            mbgLtNgTrapOscillatorNotWarmedUp,
+            mbgLtNgTrapXmrRefChanged,
+            mbgLtNgTrapClusterMasterChanged,
+            mbgLtNgTrapClusterFalsetickerDetected,
+            mbgLtNgTrapClusterFalsetickerCleared,
+            mbgLtNgTrapSHSTimeLimitOk,
+            mbgLtNgTrapIMSError,
+            mbgLtNgTrapIMSOk,
+            mbgLtNgTrapFDMOk,
+            mbgLtNgTrapNTPOffsetLimitExceeded,
+            mbgLtNgTrapNTPOffsetLimitOk
+        }
+        STATUS  current
+        DESCRIPTION
+                        "The collection of traps for the LANTIME MIB"
+        ::= { mbgLtNgGroups 2 }
+        
+END

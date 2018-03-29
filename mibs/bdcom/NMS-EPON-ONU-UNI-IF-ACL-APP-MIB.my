@@ -1,0 +1,111 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-UNI-IF-ACL-APP-MIB.my:  NMS EPON-ONU-UNI-IF-ACL-APP MIB file
+-- MAR 2010
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-UNI-IF-ACL-APP-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+               	    llidIfIndex
+			FROM NMS-EPON-LLID
+		    RowStatus
+		    	FROM SNMPv2-TC;
+		    
+          
+               nmsEponOnuUniIfAppPolicy         OBJECT IDENTIFIER ::= { nmsEPONGroup 105 }
+
+               nmsEponOnuUniIfAppPolicyTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuUniIfAppPolicyEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon onu uni interface application policy table entries."
+                   ::= { nmsEponOnuUniIfAppPolicy 1 }
+
+               nmsEponOnuUniIfAppPolicyEntry OBJECT-TYPE
+                   SYNTAX  NMSEponOnuUniIfAppPolicyEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon onu uni interface property table."
+                   INDEX { llidIfIndex,nmsOnuUniIfIndex }
+               ::= { nmsEponOnuUniIfAppPolicyTable 1 }
+               
+
+               NMSEponOnuUniIfAppPolicyEntry ::=
+                   SEQUENCE {
+                       llidIfIndex
+                           INTEGER,                         
+                       nmsOnuUniIfIndex
+                           INTEGER,
+                       nmsOnuUniIfInMacACL
+                           DisplayString,
+                       nmsOnuUniIfOutMacACL
+                           DisplayString,
+                       nmsOnuUniIfInIpACL
+                           DisplayString,
+                       nmsOnuUniIfOutIpACL
+                           DisplayString
+,                      
+                   }
+          llidIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "LLID interface id, unique in system."
+              ::= { nmsEponOnuUniIfAppPolicyEntry 1 } 
+ 
+
+          nmsOnuUniIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each onu uni interface."
+              ::= { nmsEponOnuUniIfAppPolicyEntry 2 }
+               
+          nmsOnuUniIfInMacACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface input MAC address ACL."
+              ::= { nmsEponOnuUniIfAppPolicyEntry 3 } 
+
+          nmsOnuUniIfOutMacACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface output MAC address ACL."
+              ::= { nmsEponOnuUniIfAppPolicyEntry 4 } 
+
+          nmsOnuUniIfInIpACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface input IP address ACL."
+              ::= { nmsEponOnuUniIfAppPolicyEntry 5 } 
+
+          nmsOnuUniIfOutIpACL OBJECT-TYPE
+              SYNTAX  DisplayString 
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface output IP address ACL."
+              ::= { nmsEponOnuUniIfAppPolicyEntry 6 } 
+
+               
+END

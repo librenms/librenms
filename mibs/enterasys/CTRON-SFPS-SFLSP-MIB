@@ -1,0 +1,1508 @@
+CTRON-SFPS-SFLSP-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-sflsp-mib.txt
+--  Revision: 0.0.06
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+--      DisplayString
+--                FROM RFC1213-MIB
+--      enterprises,
+        TimeTicks, 
+        IpAddress,
+        Counter,
+        Gauge
+                FROM RFC1155-SMI
+ 
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.1
+        vlanSflspGeneralVariables, vlanSflspLsdb, vlanSflspInterfaces,
+        vlanSflspIfMetric, vlanSflspNeighbors, vlanSflspArea,
+        vlanSflsp1stHop, vlanSflspTracePathAPI, vlanSflspTracePathInternal,
+        vlanSflspLSDBFlood, vlanSflspLSPStats
+                FROM CTRON-SFPS-INCLUDE-MIB; 
+ 
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+
+-- SFLSP
+
+
+vlanSflspGeneralSwitchID    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A 10 byte octet string uniquely identifying the switch in the Switch Fabric.
+                 By convention, to ensure uniqueness the first six bytes should default
+                 to the base mac address and the last four bytes should default to zeroes."
+        ::= { vlanSflspGeneralVariables 1 }
+
+
+vlanSflspGeneralAdminStatus    OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        enabled(1),
+                        disabled(2)
+                          }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The administrative status of the SFLSP in the switch.  The value 'enabled' 
+                 denotes that the SFLSP Process is active on at least one interface; 'disabled'
+                 disables it on all interfaces. " 
+        ::= { vlanSflspGeneralVariables 2 }
+
+vlanSflspGeneralVersion      OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The current version number of the SFLSP protocol is 2 "
+        ::= { vlanSflspGeneralVariables 3 }
+
+vlanSflspGeneralAreaBRStatus     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                          true(1),
+                          false(2)
+                                 }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "A flag to note whether this switch is an area border switch "
+        ::= { vlanSflspGeneralVariables 4 }
+
+vlanSflspGeneralASBRStatus     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                true(1),
+                                false(2)
+                                  }
+
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "A flag to note whether this switch is an Autonomous System border switch. "
+        ::= { vlanSflspGeneralVariables 5 }
+
+vlanSflspGeneralTOSSupport     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                        true(1),
+                                        false(2)
+                                 }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The switch's support for type-of-service switching.  Currently, this
+                 is set to false, indicating no type-of-service switching."
+        ::= { vlanSflspGeneralVariables 6 }
+
+vlanSflspGeneralOrgNewLSAs     OBJECT-TYPE
+        SYNTAX          Counter 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Number of new link-state advertisements that have been originated.
+                 This number is incremented each time the switch originates a new LSA."
+        ::= { vlanSflspGeneralVariables 7 }
+
+vlanSflspGeneralRcvNewLSAs     OBJECT-TYPE
+        SYNTAX          Counter 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link-state advertisements received determined to be new.
+                 instantiations.  This number does not include newer instantiations of
+                 self-originated link-state advertisements."
+        ::= { vlanSflspGeneralVariables 8 }
+
+vlanSflspGeneralMaxOnQueue     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Maximum number of events on the queue"
+        ::= { vlanSflspGeneralVariables 9 }
+
+vlanSflspGeneralCurOnQueue     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Current number of events on the queue"
+        ::= { vlanSflspGeneralVariables 10 }
+
+vlanSflspGeneralMaxTimeUs     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Maximum length of time to process events on the queue"
+        ::= { vlanSflspGeneralVariables 11 }
+
+vlanSflspGeneralCurTimeUs     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Current length of time to process events on the queue"
+        ::= { vlanSflspGeneralVariables 12 }
+
+vlanSflspGeneralMaxEvents     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Maximum number of events processed at once"
+        ::= { vlanSflspGeneralVariables 13 }
+
+vlanSflspGeneralMaxTimeOccurred     OBJECT-TYPE
+        SYNTAX          TimeTicks 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Maximum length of time occurred at this time"
+        ::= { vlanSflspGeneralVariables 14 }
+
+vlanSflspGeneralMaxOnQOccurred     OBJECT-TYPE
+        SYNTAX          TimeTicks 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Maximum number of events on the queue occurred at this time"
+        ::= { vlanSflspGeneralVariables 15 }
+
+vlanSflspGeneralTotalSwLinks     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Total number of switch links in our database"
+        ::= { vlanSflspGeneralVariables 16 }
+
+vlanSflspGeneralLastChangeDet     OBJECT-TYPE
+        SYNTAX          TimeTicks 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Timestamp of last run of spf due to change detected in topology "
+        ::= { vlanSflspGeneralVariables 17 }
+
+vlanSflspGeneralFloodMask    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { vlanSflspGeneralVariables 18 }
+
+
+vlanSflspGeneralLowestMac    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { vlanSflspGeneralVariables 19 }
+
+
+vlanSflspGeneralRootId    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { vlanSflspGeneralVariables 20 }
+
+
+vlanSflspGeneralFloodAdminStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { vlanSflspGeneralVariables 21 }
+
+
+--LSDB
+
+vlanSflspLsdbTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspLsdbEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The SFLSP Process's Links State Database. "
+        ::= { vlanSflspLsdb 1 }
+
+vlanSflspLsdbEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspLsdbEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " A single Link State Advertisement" 
+        INDEX   { vlanSflspLsdbAreaID, vlanSflspLsdbType,
+                  vlanSflspLsdbLSID, vlanSflspLsdbSwitchID  }
+        ::= { vlanSflspLsdbTable 1 }
+
+VlanSflspLsdbEntry ::=
+        SEQUENCE {
+                vlanSflspLsdbAreaID            INTEGER,
+                vlanSflspLsdbType              INTEGER,
+                vlanSflspLsdbLSID              OCTET STRING,
+                vlanSflspLsdbSwitchID          OCTET STRING,
+                vlanSflspLsdbSequence          INTEGER,
+                vlanSflspLsdbAge               INTEGER,
+                vlanSflspLsdbChecksum          INTEGER,
+                vlanSflspLsdbAdvertisement     OCTET STRING,    
+                vlanSflspLsdbUsedInSPF         INTEGER  
+        }
+
+ 
+vlanSflspLsdbAreaID     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The 32-bit identifier of the Area from which the LSA was received. "
+        ::= { vlanSflspLsdbEntry 1 }
+
+vlanSflspLsdbType     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                switch-link(1),
+                                connection-link(2)
+                                  }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The type of the link state advertisement.  Each link state type has a 
+                 seperate advertisement format. "
+        ::= { vlanSflspLsdbEntry 2 }
+
+vlanSflspLsdbLSID     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The Link State ID is an LS Type Specific field containing either
+                 a switch ID or a switch port name; it identifies the piece of the
+                 routing domain that is being described by the advertisement. "
+        ::= { vlanSflspLsdbEntry 3 }
+
+vlanSflspLsdbSwitchID     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A 10 byte octet string uniquely identifying the orignating switch in the Switch
+                 Fabric.  By convention, to ensure uniqueness the first six bytes should default
+                 to the base mac address and the last four bytes should default to zeroes."
+        ::= { vlanSflspLsdbEntry 4 }
+
+vlanSflspLsdbSequence     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The sequence number field is a signed 32-bit integer.
+                 It is used to detect old and duplicate link state advertisements.
+                 The space of sequence numbers is linearly ordered.  The larger the 
+                 sequence numbers the more recent the advertisement. "
+        ::= { vlanSflspLsdbEntry 5 }
+
+vlanSflspLsdbAge     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This field is the age of the link state advertisement in seconds ."
+        ::= { vlanSflspLsdbEntry 6 }
+
+vlanSflspLsdbChecksum     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This field is the checksum of the complete contents of the advertisement,
+                 excepting the age field.  The age field is excepted so that an advertisement's
+                 age can be incremented without updating th checksum.  The checksum used is the 
+                 same that is used for ISO connectionless datagrams;  it is commonly referred to
+                 as the Fletcher checksum. "
+        ::= { vlanSflspLsdbEntry 7 }
+
+vlanSflspLsdbAdvertisement     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The entire Link State Advertisement, including its header. "
+        ::= { vlanSflspLsdbEntry 8 }
+
+vlanSflspLsdbUsedInSPF     OBJECT-TYPE
+        SYNTAX          INTEGER {
+--              false(0),
+                true(1)
+        } 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                " "
+        ::= { vlanSflspLsdbEntry 9 }
+
+-- interfaces
+
+vlanSflspInterfacesTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspInterfacesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The SFLSP Interface Table describes the interfaces from the
+                 viewpoint of SFLSP. "
+        ::= { vlanSflspInterfaces 1 }
+
+vlanSflspInterfacesEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspInterfacesEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The SFLSP Interfaces Entry describes one interface from the 
+                 viewpoint of SFLSP " 
+        INDEX   { vlanSflspInterfacesIFAddress, vlanSflspInterfacesSwAddressLess  }
+        ::= { vlanSflspInterfacesTable 1 }
+
+VlanSflspInterfacesEntry ::=
+        SEQUENCE {
+                vlanSflspInterfacesIFAddress               SfpsAddress,
+                vlanSflspInterfacesSwAddressLess              INTEGER,
+                vlanSflspInterfacesAreaID                     IpAddress,
+                vlanSflspInterfacesIfType                     INTEGER,
+                vlanSflspInterfacesAdminStatus                INTEGER,
+                vlanSflspInterfacesSwPriority                INTEGER,
+                vlanSflspInterfacesTransDelay                 INTEGER,
+                vlanSflspInterfacesReTransInterval            INTEGER,
+                vlanSflspInterfacesHelloInterval              INTEGER,
+                vlanSflspInterfacesDeadInterval               INTEGER,
+                vlanSflspInterfacesPollInterval               INTEGER,
+                vlanSflspInterfacesState                      INTEGER,
+                vlanSflspInterfacesDS                         SfpsAddress,
+                vlanSflspInterfacesBDS                        SfpsAddress,
+                vlanSflspInterfacesEvents                     Counter,
+                vlanSflspInterfacesAuthKey                    SfpsAddress       
+        }
+
+vlanSflspInterfacesIFAddress     OBJECT-TYPE
+        SYNTAX          SfpsAddress 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A 10 byte octet string uniquely identifying the port address.
+                 By convention, to ensure uniqueness the first six bytes should default
+                 to the base mac address and the last four bytes should default to the
+                 port number of the interface."
+        ::= { vlanSflspInterfacesEntry 1 }
+
+vlanSflspInterfacesSwAddressLess     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "For the purpose of easing the instancing of addressed and
+                 addressless interfaces;  This variable takes the value 0 on
+                 interfaces with IP Addresses, and the corresponding value of
+                 ifIndex for interfaces having no IP Address. "
+        ::= { vlanSflspInterfacesEntry 2 }
+
+vlanSflspInterfacesAreaID     OBJECT-TYPE
+        SYNTAX          IpAddress 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "A 32-bit integer uniquely identifying the area to which the
+                 interface connects.  Area ID 0.0.0.0 is used for the SFLSP backbone. "
+        ::= { vlanSflspInterfacesEntry 3 }
+
+vlanSflspInterfacesIfType     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                brodcast(1),
+                                nbma(2),
+                                point-to-point(3)
+                                 }
+         
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The SFLSP interface type.  Currently all interfaces are handled as
+                 broadcast type. "
+        ::= { vlanSflspInterfacesEntry 4 }
+
+vlanSflspInterfacesAdminStatus     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                enabled(1),
+                                disabled(2)
+                                 }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The SFLSP interface's administrative status.  The value 'enabled'
+                 denotes that neighbor relationships may be formed on the interface, and the
+                 interface will be advertised as an internal route to some area.
+                 The value 'disabled' denotes that the interface is external to SFLSP. "
+        ::= { vlanSflspInterfacesEntry 5 }
+
+vlanSflspInterfacesSwPriority     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The priority of this interface.  Used in multi-access networks, this field
+                 is used in the designated switch election algorithm.  By default all switches
+                 are eligible with a priority of 1. "
+        ::= { vlanSflspInterfacesEntry 6 }
+
+vlanSflspInterfacesTransDelay     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The estimated number of seconds it takes to transmit a link-state update packet 
+                 over this interface. "
+        ::= { vlanSflspInterfacesEntry 7 }
+
+vlanSflspInterfacesReTransInterval     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of seconds between link-state advertisement retransmissions, for
+                 adjacencies belonging to this interface.  This value is also used when re-
+                 transmitting database description and link-state request packets. "
+        ::= { vlanSflspInterfacesEntry 8 }
+
+vlanSflspInterfacesHelloInterval     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The lenght of time, in seconds, between the Hello packets that the switch sends
+                 on the interface.  This value must be the same for all switches attached to a 
+                 common network. "
+        ::= { vlanSflspInterfacesEntry 9 }
+
+vlanSflspInterfacesDeadInterval     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of seconds that a switch's Hello packets have not been seen
+                 before it's neighbors declare the switch down.  This should be some multiple of the
+                 Hello interval.  This value must be the same for all switches attached to a common network. "
+        ::= { vlanSflspInterfacesEntry 10 }
+
+vlanSflspInterfacesPollInterval     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The larger time interval, in seconds, between the Hello packets sent to an
+                 inactive non-broadcast multi-access neighbor. "
+        ::= { vlanSflspInterfacesEntry 11 }
+
+vlanSflspInterfacesState     OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                        down(1),
+                                        loopback(2),
+                                        waiting(3),
+                                        point-to-point(4),
+                                        dr(5),
+                                        bdr(6),
+                                        dr-other(7)
+                                }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The SFLSP Interface State. "
+        ::= { vlanSflspInterfacesEntry 12 }
+
+vlanSflspInterfacesDS     OBJECT-TYPE
+        SYNTAX          SfpsAddress 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "An octet string uniquely identifying the designated switch in the Switch Fabric.
+                 By convention, to ensure uniqueness this should default to the base mac address."
+        ::= { vlanSflspInterfacesEntry 13 }
+
+vlanSflspInterfacesBDS     OBJECT-TYPE
+        SYNTAX          SfpsAddress 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "An octet string uniquely identifying the backup designated switch in the Switch Fabric.
+                 By convention, to ensure uniqueness this should default to the base mac address."
+        ::= { vlanSflspInterfacesEntry 14 }
+
+vlanSflspInterfacesEvents     OBJECT-TYPE
+        SYNTAX          Counter 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of times this SFLSP interface has changed its
+                 state, or an error has occured. "
+        ::= { vlanSflspInterfacesEntry 15 }
+
+vlanSflspInterfacesAuthKey     OBJECT-TYPE
+        SYNTAX          SfpsAddress 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "THe Authentification Key.  If the Area's Authorization Type is
+                 simplePassword, and the key length is shorter than 8 octets, the agent will
+                 left adjust and zero fill to 8 octets. "
+        ::= { vlanSflspInterfacesEntry 16 }
+
+
+
+-- IfMetric
+
+vlanSflspIfMetricTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspIfMetricEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " The TOS metrics for a non-virtual interface indentified by the 
+                 interface index."
+        ::= { vlanSflspIfMetric 1 }
+
+vlanSflspIfMetricEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspIfMetricEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " A particular TOS metric for a non-virtual interface identified by
+                 the interface index." 
+        INDEX   { vlanSflspIfMetricIfAddress, vlanSflspIfMetricIfTOSType  }
+        ::= { vlanSflspIfMetricTable 1 }
+
+VlanSflspIfMetricEntry ::=
+        SEQUENCE {
+                vlanSflspIfMetricIfAddress                    OCTET STRING,
+                vlanSflspIfMetricIfTOSType                    INTEGER,
+                vlanSflspIfMetricIfMetric                     INTEGER,
+                vlanSflspIfMetricIfStatus                     INTEGER
+                
+        }
+
+vlanSflspIfMetricIfAddress     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A 10 byte octet string uniquely identifying the port address.
+                 By convention, to ensure uniqueness the first six bytes should default
+                 to the base mac address and the last four bytes should default to the
+                 port number of the interface."
+        ::= { vlanSflspIfMetricEntry 1 }
+
+vlanSflspIfMetricIfTOSType     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The type of service metric being referenced.  On row creation, this can be 
+                 derived from the instance.."
+        ::= { vlanSflspIfMetricEntry 2 }
+
+vlanSflspIfMetricIfMetric     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The metric of using this type of service on this interface.  The default value of the
+                 TOS 0 Metric is 10^8 / ifSpeed.
+                 The value FFFF is distinguished to mean 'no route via this TOS'. "
+        ::= { vlanSflspIfMetricEntry 3 }
+
+vlanSflspIfMetricIfStatus     OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                        valid(1),
+                                        invalid(2)
+                                }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This variable displays the validity or invalidity of the entry.
+                 Setting it to 'invalid' has the effect of rendering it inoperative.
+                 The internal effect (row removal) is implementation dependent "
+        ::= { vlanSflspIfMetricEntry 4 }
+
+-- Neighbors
+
+vlanSflspNeighborsTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspNeighborsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of non-virtual neighbor information ."
+        ::= { vlanSflspNeighbors 1 }
+
+vlanSflspNeighborsEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspNeighborsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The information regarding a single neighbor. " 
+        INDEX   { vlanSflspNeighborsPortName }
+        ::= { vlanSflspNeighborsTable 1 }
+
+VlanSflspNeighborsEntry ::=
+        SEQUENCE {
+                vlanSflspNeighborsPortName                      OCTET STRING,
+                vlanSflspNeighborsSwitchID                      OCTET STRING,
+                vlanSflspNeighborsOptions                       INTEGER,
+                vlanSflspNeighborsPriority                      INTEGER,
+                vlanSflspNeighborsState                         INTEGER,
+                vlanSflspNeighborsEvents                        Counter,
+                vlanSflspNeighborsLSRetransQLen                 Gauge,
+                vlanSflspNeighborsHELLOsRcvd                    INTEGER,
+                vlanSflspNeighborsDBDsRcvd                              INTEGER,
+                vlanSflspNeighborsLSUsRcvd                              INTEGER,
+                vlanSflspNeighborsLSRsRcvd                              INTEGER,
+                vlanSflspNeighborsLSACKsRcvd                    INTEGER,
+                vlanSflspNeighborsHELLOsSent                    INTEGER,
+                vlanSflspNeighborsDBDsSent                              INTEGER,
+                vlanSflspNeighborsLSUsSent                              INTEGER,
+                vlanSflspNeighborsLSRsSent                              INTEGER,
+                vlanSflspNeighborsLSACKsSent                    INTEGER,
+                vlanSflspNeighborsNBMAStatus                    INTEGER,                
+                vlanSflspNeighborsFULLTimeSec                   TimeTicks               
+        }
+
+vlanSflspNeighborsPortName     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A 10 byte octet string uniquely identifying the neighbor's port address.
+                 By convention, to ensure uniqueness the first six bytes should default
+                 to the base mac address and the last four bytes should default to the
+                 port number of the neighbor's interface."
+        ::= { vlanSflspNeighborsEntry 1 }
+
+vlanSflspNeighborsSwitchID     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "An octet string uniquely identifying the neighboring switch in the Switch Fabric.
+                 By convention, to ensure uniqueness this should default to the base mac address."
+      ::= { vlanSflspNeighborsEntry 2 }
+
+vlanSflspNeighborsOptions     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A bit Mask corresponding to the neighbor's options field.
+                 Bit 0, if set, indicates that the area accepts and operates
+                 on external information;  if zero, it is a stub area.
+                
+                 Bit 1, if set, indicates that the system will operate on Type 
+                 of Service metrics other than TOS 0.  If zero, the neighbor
+                 will ignore all metrics except the TOS 0 metric ."
+        ::= { vlanSflspNeighborsEntry 3 }
+
+vlanSflspNeighborsPriority     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                " The priority of this neighbor in the designated switch election
+                 algorithm.  The value 0 signifies that the neighbor is not eligible 
+                 to become the designated switch on this particular network."
+        ::= { vlanSflspNeighborsEntry 4 }
+
+vlanSflspNeighborsState     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                down(1),
+                                attempt(2),
+                                init(3),
+                                two-way(4),
+                                exchange(5),
+                                exchange-start(6),
+                                loading(7),
+                                full(8)
+                                  } 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                " The State of the relationship with this Neighbor."
+        ::= { vlanSflspNeighborsEntry 5 }
+
+vlanSflspNeighborsEvents     OBJECT-TYPE
+        SYNTAX          Counter 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of times this neighbor relationship has
+                 changed state, or an error has occurred. "
+        ::= { vlanSflspNeighborsEntry 6 }
+
+vlanSflspNeighborsLSRetransQLen     OBJECT-TYPE
+        SYNTAX          Gauge 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                " The current length of the retransmission queue."
+        ::= { vlanSflspNeighborsEntry 7 }
+
+vlanSflspNeighborsHELLOsRcvd    OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of hello packets received from this neighbor"
+        ::= { vlanSflspNeighborsEntry 8 }
+
+vlanSflspNeighborsDBDsRcvd     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of database description packets received from this neighbor"
+        ::= { vlanSflspNeighborsEntry 9 }
+
+vlanSflspNeighborsLSUsRcvd     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link state update packets received from this neighbor"
+        ::= { vlanSflspNeighborsEntry 10 }
+
+vlanSflspNeighborsLSRsRcvd     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link state request packets received from this neighbor"
+        ::= { vlanSflspNeighborsEntry 11 }
+
+vlanSflspNeighborsLSACKsRcvd    OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link state acknowledgement packets received from this neighbor"
+        ::= { vlanSflspNeighborsEntry 12 }
+
+vlanSflspNeighborsHELLOsSent     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of hello packets sent to this neighbor"
+        ::= { vlanSflspNeighborsEntry 13 }
+
+vlanSflspNeighborsDBDsSent     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of database description packets sent to this neighbor"
+        ::= { vlanSflspNeighborsEntry 14 }
+
+vlanSflspNeighborsLSUsSent     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link state update packets sent to this neighbor"
+        ::= { vlanSflspNeighborsEntry 15 }
+
+vlanSflspNeighborsLSRsSent     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link state request packets sent to this neighbor"
+        ::= { vlanSflspNeighborsEntry 16 }
+
+vlanSflspNeighborsLSACKsSent     OBJECT-TYPE
+    SYNTAX  INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link state acknowledgement packets sent to this neighbor"
+        ::= { vlanSflspNeighborsEntry 17 }
+
+vlanSflspNeighborsNBMAStatus     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                                        valid(1),
+                                        invalid(2)
+                                  } 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                " The variable displays the validity or invalidity of the
+                  entry.  Setting it to 'invalid' has the effect of rendering
+                 it inoperative.  The internal effect (row removal) is implementation
+                 dependant."
+        ::= { vlanSflspNeighborsEntry 18 }
+
+vlanSflspNeighborsFULLTimeSec     OBJECT-TYPE
+    SYNTAX  TimeTicks 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Neighbor went to FULL state at this time "
+        ::= { vlanSflspNeighborsEntry 19 }
+
+-- Area
+
+vlanSflspAreaTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspAreaEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Information describing the configured parameters and
+                 cumulative statistics of the switches attached areas."
+        ::= { vlanSflspArea 1 }
+
+vlanSflspAreaEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspAreaEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Information describing the configured parameters and
+                 cumulative statistics of one of the switches attached
+                 areas." 
+        INDEX   { vlanSflspAreaAreaID  }
+        ::= { vlanSflspAreaTable 1 }
+
+VlanSflspAreaEntry ::=
+        SEQUENCE {
+                vlanSflspAreaAreaID                IpAddress,
+                vlanSflspAreaAuthType              INTEGER,
+                vlanSflspAreaSPFRuns               Counter,
+                vlanSflspAreaABRCount              Gauge,
+                vlanSflspAreaASBRCount             Gauge,
+                vlanSflspAreaAreaLSACnt            Gauge,
+                vlanSflspAreaAreaCheckSum          INTEGER,
+                vlanSflspAreaLastSpfRun            TimeTicks
+                  }
+
+vlanSflspAreaAreaID     OBJECT-TYPE
+        SYNTAX          IpAddress
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A 10 byte octet string uniquely identifying an area."
+        ::= { vlanSflspAreaEntry 1 }
+
+vlanSflspAreaAuthType   OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "The authentication type specified for an area.
+                 Additional authentication types may be assigned locally
+                 on a per Area basis."
+        ::= { vlanSflspAreaEntry 2 }
+
+vlanSflspAreaSPFRuns    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of times that the intra-area route table
+                 has been calculated using this area's link-state
+                 database.  This is typically done using Dijkstra's
+                 algorithm."
+        ::= { vlanSflspAreaEntry 3 }
+
+vlanSflspAreaABRCount   OBJECT-TYPE
+        SYNTAX          Gauge
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The total number of area border switches reachable
+                 within this area.  This is initially zero, and is
+                 calculated in each SPF Pass."
+        ::= { vlanSflspAreaEntry 4 }
+
+vlanSflspAreaASBRCount   OBJECT-TYPE
+        SYNTAX          Gauge
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The total number of Autonomous System border switches
+                 reachable within this area.  This is initially zero,
+                 and is calculated in each LSP Pass."
+        ::= { vlanSflspAreaEntry 5 }
+
+vlanSflspAreaAreaLSACnt   OBJECT-TYPE
+        SYNTAX          Gauge
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The total number of link-state advertisements in this
+                 area's link-state database, excluding AS External LSA's"
+        ::= { vlanSflspAreaEntry 6 }
+
+vlanSflspAreaAreaCheckSum   OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The 32-bit unsigned sum of the link-state
+                 advertisements' LS checksums contained in this area's
+                 link-state database.  This sum excludes external (LS
+                 type 5) link-state advertisements.  The sum can be used
+                 to determine if there has been a change in a switches
+                 link state database, and to compare the link-state
+                 database of two switches."
+        ::= { vlanSflspAreaEntry 7 }
+
+vlanSflspAreaLastSpfRun   OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Timestamp of last run of spf"
+        ::= { vlanSflspAreaEntry 8 }
+
+
+-- 1stHop
+
+vlanSflsp1stHopTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflsp1stHopEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the SecureFast path next-hop table.  It
+                 reports various information about the next switch port
+                 address on the path to a particular destination switch
+                 port address."
+        ::= { vlanSflsp1stHop 1 }
+
+vlanSflsp1stHopEntry      OBJECT-TYPE
+        SYNTAX  VlanSflsp1stHopEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry describes the next hop switch port addresses for
+                 each destination switch port address." 
+        INDEX   { vlanSflsp1stHopDestSwitch  }
+        ::= { vlanSflsp1stHopTable 1 }
+
+VlanSflsp1stHopEntry ::=
+        SEQUENCE {
+                vlanSflsp1stHopDestSwitch               OCTET STRING,
+                vlanSflsp1stHopPath11stHop              OCTET STRING,
+                vlanSflsp1stHopPath21stHop              OCTET STRING,
+                vlanSflsp1stHopPath31stHop              OCTET STRING
+                  }
+
+vlanSflsp1stHopDestSwitch     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This is the index to the table, representing destination
+                 switch port addresses for each port address within
+                 the switch fabric."
+        ::= { vlanSflsp1stHopEntry 1 }
+
+vlanSflsp1stHopPath11stHop     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The 1st hop of the 1st path to the destination switch"
+        ::= { vlanSflsp1stHopEntry 2 }
+
+vlanSflsp1stHopPath21stHop     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The 1st host of the 2nd path to the destination switch"
+        ::= { vlanSflsp1stHopEntry 3 }
+
+vlanSflsp1stHopPath31stHop     OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The 1st hop of the 3rd path to the destination switch"
+        ::= { vlanSflsp1stHopEntry 4 }
+
+-- Trace Path
+
+vlanSflspTracePathAPIDest   OBJECT-TYPE
+    SYNTAX    OCTET STRING
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+           "This is the switch address for which a path list will be
+            requested in the sfTracePathTable."
+    ::= { vlanSflspTracePathAPI 1 }
+ 
+vlanSflspTracePathAPIID    OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "This is an ID to uniquely identify the path list request
+            in the sfTracePathTable."
+    ::= { vlanSflspTracePathAPI 2 }
+
+vlanSflspTracePathAPIType    OBJECT-TYPE
+    SYNTAX           INTEGER {
+                                 other(1),
+                                 invalid(2)
+                              }
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "The administrative control of the trace path request entry in
+            the sfTracePathTable.  It is used to create or delete a trace
+            path request entry."
+    ::= { vlanSflspTracePathAPI 3 }
+
+vlanSflspTracePathAPIAction    OBJECT-TYPE
+    SYNTAX           INTEGER {
+                                 other(1),
+                                 activate(2),
+                                 suspend(3)
+                             }
+    ACCESS           read-write
+    STATUS           mandatory
+    DESCRIPTION
+           "The action to be performed by the trace path request entry
+            in the sfTracePathTable."
+    ::= { vlanSflspTracePathAPI 4 }
+
+
+-- Trace Path
+
+vlanSflspTracePathTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspTracePathEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "This table allows the determination of paths to known
+             destinations using the same internal methods used by the
+             switch to program these paths.  It is indexed by
+             destination switch address and a request identifier.
+             If successful, the resulting path, which consists of a
+             list of switch port addresses, is reported in the
+             sfTracePathReqHopTable."
+        ::= { vlanSflspTracePathInternal 1 }
+
+vlanSflspTracePathEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspTracePathEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "An SF Trace Path Table entry containing objects for a
+             particular destination switch." 
+        INDEX  { vlanSflspTracePathDest, vlanSflspTracePathID }
+        ::= { vlanSflspTracePathTable 1 }
+
+VlanSflspTracePathEntry ::=
+        SEQUENCE {
+                vlanSflspTracePathDest             OCTET STRING,
+                vlanSflspTracePathID               INTEGER,
+                vlanSflspTracePathAction           INTEGER,
+                vlanSflspTracePathStatus           INTEGER
+                 }
+
+vlanSflspTracePathDest  OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "The switch address of the requested destination."
+        ::= { vlanSflspTracePathEntry 1 }
+
+vlanSflspTracePathID    OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "A unique identifier for this path request."
+        ::= { vlanSflspTracePathEntry 2 }
+
+vlanSflspTracePathAction    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                 other(1),
+                                 activate(2),
+                                 suspend(3)
+                                 }                             
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "The action to be performed by this trace path entry."
+        ::= { vlanSflspTracePathEntry 3 }
+
+vlanSflspTracePathStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                 other(1),
+                                 success(2),
+                                 failed(3)
+                                 }                             
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "The results of a trace path request.  A result of success(4)
+             means the device has determined at least one path to the
+             destination."
+        ::= { vlanSflspTracePathEntry 4 }
+
+
+-- Trace Path List
+
+vlanSflspTracePathListTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspTracePathListEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "This table contains the SecureFast Trace Path List table."
+        ::= { vlanSflspTracePathInternal 2 }
+
+vlanSflspTracePathListEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspTracePathListEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "This table contains the switch port addresses of each hop
+             of each path traversed for a particular destination switch.
+             These paths correspond to trace path requests in the
+             sfTracePathReqTable." 
+        INDEX  { vlanSflspTracePathListDest, vlanSflspTracePathListID, vlanSflspTracePathListPathNum, vlanSflspTracePathListHopNum }
+        ::= { vlanSflspTracePathListTable 1 }
+
+VlanSflspTracePathListEntry ::=
+        SEQUENCE {
+                vlanSflspTracePathListDest         OCTET STRING,
+                vlanSflspTracePathListID           INTEGER,
+                vlanSflspTracePathListPathNum      INTEGER,
+                vlanSflspTracePathListHopNum       INTEGER,
+                vlanSflspTracePathListHopAddr      OCTET STRING
+                 }
+
+vlanSflspTracePathListDest  OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "The switch address of the destination for this trace path
+             entry, corresponding to a requested destination in the
+             sfTracePathReqTable."
+        ::= { vlanSflspTracePathListEntry 1 }
+
+vlanSflspTracePathListID  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "A unique identifier corresponding to the identifier in a
+             trace path request in the sfTracePathReqTable."
+        ::= { vlanSflspTracePathListEntry 2 }
+
+vlanSflspTracePathListPathNum  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "The number of this path in the table of networks traversed.
+             This value represents a unique path id when there are multiple
+             paths to a single destination."
+        ::= { vlanSflspTracePathListEntry 3 }
+
+vlanSflspTracePathListHopNum  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "The hop number in this path."
+        ::= { vlanSflspTracePathListEntry 4 }
+
+vlanSflspTracePathListHopAddr  OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "The switch port address of this hop on the path."
+        ::= { vlanSflspTracePathListEntry 5 }
+
+-- 
+
+vlanSflspLSDBFloodTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanSflspLSDBFloodEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFlood 1 }
+
+vlanSflspLSDBFloodEntry      OBJECT-TYPE
+        SYNTAX  VlanSflspLSDBFloodEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "" 
+        INDEX  { vlanSflspLSDBFloodAreaID, vlanSflspLSDBFloodType, vlanSflspLSDBFloodLSID, vlanSflspLSDBFloodAdvSwitchID }
+        ::= { vlanSflspLSDBFloodTable 1 }
+
+VlanSflspLSDBFloodEntry ::=
+        SEQUENCE {
+                vlanSflspLSDBFloodAreaID           INTEGER,
+                vlanSflspLSDBFloodType             INTEGER,
+                vlanSflspLSDBFloodLSID             SfpsAddress,
+                vlanSflspLSDBFloodAdvSwitchID      SfpsAddress,
+                vlanSflspLSDBFloodSequence         INTEGER,
+                vlanSflspLSDBFloodAge              INTEGER,
+                vlanSflspLSDBFloodChecksum         INTEGER,
+                vlanSflspLSDBFloodAdvertisement    SfpsAddress,
+                vlanSflspLSDBFloodUsedInSPF        INTEGER,
+                vlanSflspLSDBFloodEverUsed         INTEGER
+                 }
+
+vlanSflspLSDBFloodAreaID  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 1 }
+
+vlanSflspLSDBFloodType  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                switchLink(1),
+                connectionLink(2)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 2 }
+
+vlanSflspLSDBFloodLSID  OBJECT-TYPE
+        SYNTAX          SfpsAddress
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 3 }
+
+vlanSflspLSDBFloodAdvSwitchID  OBJECT-TYPE
+        SYNTAX          SfpsAddress
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 4 }
+
+vlanSflspLSDBFloodSequence  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 5 }
+
+vlanSflspLSDBFloodAge  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 6 }
+
+vlanSflspLSDBFloodChecksum  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 7 }
+
+vlanSflspLSDBFloodAdvertisement  OBJECT-TYPE
+        SYNTAX          SfpsAddress
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 8 }
+
+vlanSflspLSDBFloodUsedInSPF  OBJECT-TYPE
+        SYNTAX          INTEGER {
+--              false(0),
+                true(1)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 9 }
+
+vlanSflspLSDBFloodEverUsed  OBJECT-TYPE
+        SYNTAX          INTEGER {
+--              false(0),
+                true(1)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSDBFloodEntry 10 }
+
+
+--SFLSP Statistics
+
+vlanSflspLSPStatsMaxOnQueue  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 1 }
+
+vlanSflspLSPStatsCurOnQueue  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 2 }
+
+vlanSflspLSPStatsMaxTimeUs  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 3 }
+
+vlanSflspLSPStatsCurTimeUs  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 4 }
+
+vlanSflspLSPStatsMaxTimeOccurred  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 5 }
+
+vlanSflspLSPStatsMaxOnQOccurred  OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 6 }
+
+vlanSflspLSPStatsTotalSwLinks  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 7 }
+
+vlanSflspLSPStatsLastChangeDet  OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 8 }
+
+vlanSflspLSPStatsNumSPFRuns  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 9 }
+
+vlanSflspLSPStatsNumFULLNbrs  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 10 }
+
+vlanSflspLSPStatsNumIntfs  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 11 }
+
+vlanSflspLSPStatsNum1stHops  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 12 }
+
+vlanSflspLSPStatsNumUpdates  OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 13 }
+
+vlanSflspLSPStatsLastUpdateRecvd  OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            ""
+        ::= { vlanSflspLSPStats 14 }
+
+END 

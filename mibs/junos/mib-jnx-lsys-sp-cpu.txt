@@ -1,0 +1,280 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-CPU-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpCPU                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpCPUMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- October 1, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the CPU-specific MIB for Juniper Enterprise 
+             Logical-System (LSYS) security profiles.  Juniper documentation 
+             is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security CPU resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpCPU 1 }
+
+    jnxLsysSpCPUObjects        OBJECT IDENTIFIER ::= { jnxLsysSpCPUMIB 1 }
+    jnxLsysSpCPUSummary        OBJECT IDENTIFIER ::= { jnxLsysSpCPUMIB 2 }
+    jnxLsysSpCPSummary         OBJECT IDENTIFIER ::= { jnxLsysSpCPUSummary 1 }
+    jnxLsysSpSPUSummary        OBJECT IDENTIFIER ::= { jnxLsysSpCPUSummary 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular CPU resource information objects per LSYS:
+--   Below are CPU resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- CPU resource table per LSYS
+
+    jnxLsysSpCPUTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpCPUEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE CPU objects for CPU resource consumption per LSYS."  
+    ::= { jnxLsysSpCPUObjects 1 }
+    
+    jnxLsysSpCPUEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpCPUEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in CPU resource table."
+    INDEX { IMPLIED jnxLsysSpCPULsysName }          
+    ::= { jnxLsysSpCPUTable 1 }          
+
+    JnxLsysSpCPUEntry ::= 
+       SEQUENCE {
+          jnxLsysSpCPULsysName    DisplayString,
+          jnxLsysSpCPUProfileName DisplayString,
+          jnxLsysSpCPUsage        Unsigned32,
+          jnxLsysSpSPUUsage       Unsigned32,
+          jnxLsysSpCPUReserved    Unsigned32,
+          jnxLsysSpCPUMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the CPU resource table
+ 
+    jnxLsysSpCPULsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which CPU resource information is retrieved. "
+        ::= { jnxLsysSpCPUEntry 1 }
+
+    jnxLsysSpCPUProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpCPUEntry 2 }
+
+    jnxLsysSpCPUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        UNITS               "0.01 percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current CP resource usage count for the LSYS."
+    ::= { jnxLsysSpCPUEntry 3 }
+    
+    jnxLsysSpSPUUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        UNITS               "0.01 percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current SPU resource usage count for the LSYS."
+    ::= { jnxLsysSpCPUEntry 4 }
+    
+    jnxLsysSpCPUReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        UNITS               "0.01 percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpCPUEntry 5 } 
+
+    jnxLsysSpCPUMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        UNITS               "0.01 percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpCPUEntry 6 }
+
+
+-- **********************************************************************
+-- CP resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpCPUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The CP resource consumption over all LSYS."
+    ::= { jnxLsysSpCPSummary 1 }          
+
+    jnxLsysSpCPMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The CP resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpCPSummary 2 }
+    
+    jnxLsysSpCPAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The CP resource available in the whole device."
+    ::= { jnxLsysSpCPSummary 3 }
+    
+    jnxLsysSpCPHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of CP resource consumed of a LSYS."
+    ::= { jnxLsysSpCPSummary 4 }
+    
+    jnxLsysSpCPHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most CP resource."
+    ::= { jnxLsysSpCPSummary 5 }
+    
+    jnxLsysSpCPLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of CP resource consumed of a LSYS."
+    ::= { jnxLsysSpCPSummary 6 }
+    
+    jnxLsysSpCPLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least CP resource."
+    ::= { jnxLsysSpCPSummary 7 }
+    
+
+-- **********************************************************************
+-- SPU resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpSPUUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The SPU resource consumption over all LSYS."
+    ::= { jnxLsysSpSPUSummary 1 }          
+
+    jnxLsysSpSPUMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The SPU resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpSPUSummary 2 }
+    
+    jnxLsysSpSPUAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The SPU resource available in the whole device."
+    ::= { jnxLsysSpSPUSummary 3 }
+    
+    jnxLsysSpSPUHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of SPU resource consumed of a LSYS."
+    ::= { jnxLsysSpSPUSummary 4 }
+    
+    jnxLsysSpSPUHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most SPU resource."
+    ::= { jnxLsysSpSPUSummary 5 }
+    
+    jnxLsysSpSPULightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        UNITS                   "0.01 percent"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of SPU resource consumed of a LSYS."
+    ::= { jnxLsysSpSPUSummary 6 }
+    
+    jnxLsysSpSPULightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least SPU resource."
+    ::= { jnxLsysSpSPUSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of CPU resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

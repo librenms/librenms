@@ -1,0 +1,1176 @@
+CT-CMMPHYS-MIB DEFINITIONS ::= BEGIN
+
+   --  ct-cmmphys-mib.txt
+   --  Revision: 01.00.00
+   --  Part Number:
+   --  Date: December 16, 1998
+
+   --  Cabletron Systems, Inc.
+   --  35 Industrial Way, P.O. Box 5005
+   --  Rochester, NH 03867-0505
+   --  (603) 332-9400
+   --  support@ctron.com
+
+   --  This module provides an enterprise-specific CMM container MIB.
+   --
+   --  This module will be extended, as needed.
+   --
+
+   --  Goals and Philosophy
+   --
+   --  The purpose of this MIB is to provide a central repository of all
+   --  information pertaining to the configuration, operation, status,
+   --  and health of a CMM board and its CMM modules.  The goal of these
+   --  values is to facilitate troubleshooting problems at the level of
+   --  a CMM board or CMM module.  The intended audience for this
+   --  information includes customers, field engineers, and developers.
+
+   --  Cabletron Systems reserves the right to make changes in
+   --  specification and other information contained in this document
+   --  without prior notice.  The reader should consult Cabletron Systems
+   --  to determine whether any such changes have been made.
+   --
+   --  In no event shall Cabletron Systems be liable for any incidental,
+   --  indirect, special, or consequential damages whatsoever (including
+   --  but not limited to lost profits) arising out of or related to this
+   --  document or the information contained in it, even if Cabletron
+   --  Systems has been advised of, known, or should have known, the
+   --  possibility of such damages.
+   --
+   --  Cabletron grants vendors, end-users, and other interested parties
+   --  a non-exclusive license to use this Specification in connection
+   --  with the management of Cabletron products.
+
+   --  Copyright December 98 Cabletron Systems
+
+   IMPORTS
+      OBJECT-TYPE
+         FROM RFC-1212
+      DisplayString,ifIndex
+         FROM RFC1213-MIB
+      IpAddress,Counter,Gauge
+         FROM RFC1155-SMI
+      ctCMM
+         FROM CTRON-MIB-NAMES
+      mBusBoardID
+         FROM CT-HSIMPHYS-MIB;
+
+   --===============   Group Definitions          ===================
+
+-- This is just a dummy value to get this to compile correctly for now.
+
+   cmmModemInfo   OBJECT IDENTIFIER  ::=  { ctCMM 1 }
+
+   --================================================================
+
+   --  This MIB module uses the extended OBJECT-TYPE macro as defined
+   --  RFC 1212
+
+   --================= CMM Board-Level Info ===================
+   cmmBoardTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CmmBoardEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "A list of CMM boards present in this unit."
+      ::= { cmmModemInfo 1 }
+
+   cmmBoardEntry  OBJECT-TYPE
+         SYNTAX  CmmBoardEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "A CMM board present in this unit."
+         INDEX   { mBusBoardID }
+      ::= { cmmBoardTable 1 }
+
+
+   CmmBoardEntry  ::=
+         SEQUENCE {
+                  cmmBoardType                  OBJECT IDENTIFIER,
+                  cmmNumModules                 INTEGER,
+                  cmmModuleNumModems            INTEGER,
+                  cmmTFTPServer                 IpAddress,
+                  cmmUpgradePath                DisplayString,
+                  cmmUpgradeFlag                INTEGER,
+                  cmmCommitFlag                 INTEGER,
+                  cmmModemResetLimit            INTEGER,
+                  cmmModemResetTime             INTEGER,
+                  cmmOutgoingInactivityTimeout  INTEGER,
+                  cmmIncomingInactivityTimeout  INTEGER,
+                  cmmAsyncBaseOrigATCmdStr      DisplayString,
+                  cmmAsyncBaseAnswerATCmdStr    DisplayString,
+                  cmmAsyncOrigStrModifier       DisplayString,
+                  cmmAsyncAnswerStrModifier     DisplayString,
+                  cmmAsyncOperOrigATCmdStr      DisplayString,
+                  cmmAsyncOperAnswerATCmdStr    DisplayString,
+                  cmmHdlcBaseOrigATCmdStr       DisplayString,
+                  cmmHdlcBaseAnswerATCmdStr     DisplayString,
+                  cmmHdlcOrigStrModifier        DisplayString,
+                  cmmHdlcAnswerStrModifier      DisplayString,
+                  cmmHdlcOperOrigATCmdStr       DisplayString,
+                  cmmHdlcOperAnswerATCmdStr     DisplayString,
+                  cmmBoardAdminStatus           INTEGER,
+                  cmmBoardOperStatus            INTEGER
+                  }
+
+   cmmBoardType  OBJECT-TYPE
+         SYNTAX  OBJECT IDENTIFIER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object uniquely defines the CMM
+         board type - a vendor's authoritative identification
+         for a module. By convention, this value is allocated
+         within the SMI enterprises subtree(1.3.6.1.4.1), and
+         provides an easy and unambiguous means for determining
+         the type of board."
+      ::= { cmmBoardEntry 1 }
+
+   cmmNumModules  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the number of CMM modules
+         contained on this physical CMM circuit board."
+      ::= { cmmBoardEntry 2 }
+
+   cmmModuleNumModems  OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+        "Number of modems per CMM module."
+      ::= { cmmBoardEntry 3 }
+
+   cmmTFTPServer  OBJECT-TYPE
+         SYNTAX  IpAddress
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the IP address of the TFTP
+         server where the object code for CMM modules resides.
+         This object is persistent."
+      ::= { cmmBoardEntry 4 }
+
+   cmmUpgradePath  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the path to the object code
+         for CMM modules on the TFTP server.  This object is
+         persistent."
+      ::= { cmmBoardEntry 5 }
+
+   cmmUpgradeFlag  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         true(1),
+                         false(2)
+                         }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a flag that indicates whether
+         or not to upgrade the software for the CMM modules on the
+         board.  This object is persistent."
+      ::= { cmmBoardEntry 6 }
+
+   cmmCommitFlag  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         true(1),
+                         false(2)
+                         }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a flag that indicates whether
+         or not to commit the software for the CMM modules on the
+         board.  This object is persistent."
+      ::= { cmmBoardEntry 7 }
+
+   cmmModemResetLimit  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the number of times that a
+         modem can be reset within a given time span before it is
+         declared to be faulty.  If the value is 0 then the modem
+         will never be declared faulty.  This object is persistent."
+      ::= { cmmBoardEntry 8 }
+
+   cmmModemResetTime  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the time span (in minutes)
+         during which the given number of resets must occur before
+         the modem is declared to be faulty.  This object is
+         persistent."
+      ::= { cmmBoardEntry 9 }
+
+   cmmOutgoingInactivityTimeout  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the duration (in seconds) of a
+         period of inactivity before an outgoing call is terminated.
+         This object is persistent."
+      ::= { cmmBoardEntry 10 }
+
+   cmmIncomingInactivityTimeout  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the duration (in seconds) of a
+         period of inactivity before an incoming call is terminated.
+         This object is persistent."
+      ::= { cmmBoardEntry 11 }
+
+   cmmAsyncBaseOrigATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the default or base set of AT
+         commands to be used when originating an async call."
+      ::= { cmmBoardEntry 12 }
+
+   cmmAsyncBaseAnswerATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the default or base set of AT
+         commands to be used when answering an async call."
+      ::= { cmmBoardEntry 13 }
+
+   cmmAsyncOrigStrModifier  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a set of additional AT commands
+         to be used when originating an async call.  This object is
+         persistent."
+      ::= { cmmBoardEntry 14 }
+
+   cmmAsyncAnswerStrModifier  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a set of additional AT commands
+         to be used when answering an async call.  This object is
+         persistent."
+      ::= { cmmBoardEntry 15 }
+
+   cmmAsyncOperOrigATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the operative set of AT commands
+         to be used when originating an async call.  It includes the
+         base string, the modifier string, and the call timeout value."
+      ::= { cmmBoardEntry 16 }
+
+   cmmAsyncOperAnswerATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the operative set of AT commands
+         to be used when answering an async call.  It includes the
+         base string, the modifier string, and the call timeout value."
+      ::= { cmmBoardEntry 17 }
+
+   cmmHdlcBaseOrigATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the default or base set of AT
+         commands to be used when originating an HDLC call."
+      ::= { cmmBoardEntry 18 }
+
+   cmmHdlcBaseAnswerATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the default or base set of AT
+         commands to be used when answering an HDLC call."
+      ::= { cmmBoardEntry 19 }
+
+   cmmHdlcOrigStrModifier  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a set of additional AT commands
+         to be used when originating an HDLC call.  This object is
+         persistent."
+      ::= { cmmBoardEntry 20 }
+
+   cmmHdlcAnswerStrModifier  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a set of additional AT commands
+         to be used when answering an HDLC call.  This object is
+         persistent."
+      ::= { cmmBoardEntry 21 }
+
+   cmmHdlcOperOrigATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the operative set of AT commands
+         to be used when originating an HDLC call.  It includes the
+         base string, the modifier string, and the call timeout value."
+      ::= { cmmBoardEntry 22 }
+
+   cmmHdlcOperAnswerATCmdStr  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the operative set of AT commands
+         to be used when answering an HDLC call.  It includes the
+         base string, the modifier string, and the call timeout value."
+      ::= { cmmBoardEntry 23 }
+
+   cmmBoardAdminStatus  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         down(1),
+                         leave-service(2),
+                         up(3),
+                         upgrade(4)
+                         }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the administrative status
+         of the CMM board.
+         
+         down(1) -- all modems that belong to this board are to be
+                    removed from service immediately
+         leave-service(2) -- each modem that belongs to this board is
+                             to be removed from service at the completion
+                             of its current call, if any
+         up(3) -- each modem that belongs to this module is to become
+                  available for accepting calls
+         upgrade(4) -- all modules that belong to this board are to be
+                       reloaded with new software and restarted"
+      ::= { cmmBoardEntry 24 }
+
+   cmmBoardOperStatus  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         initializing(1),
+                         active(2),
+                         leaving-service(3),
+                         out-of-service(4),
+                         faulty(5),
+                         impaired(6)
+                         }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the operational status of
+         the CMM board.
+         
+         initializing(1) -- all modules that belong to this board are booting
+                            up or in the process of a software upgrade
+         active(2) -- all modules that belong to this board are available
+                      for accepting calls
+         leaving-service(3) -- all modules that belong to this board are
+                               functional but are no longer available for
+                               accepting calls  (Existing calls are allowed
+                               to terminate normally.)
+         out-of-service(4) -- none of the modules that belong to this board
+                              are available for accepting calls nor do they
+                              have any existing calls
+         faulty(5) -- all modules that belong to this board are unusable
+         impaired(6) -- the board is otherwise active but one or more
+                        modules are in the out-of-service, initializing,
+                        testing, faulty, or impaired states"
+      ::= { cmmBoardEntry 25 }
+
+   --================= CMM Module-Level Info ===================
+   cmmModuleTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CmmModuleEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "A list of CMM modules present on each CMM board in this unit"
+      ::= { cmmModemInfo 2 }
+
+   cmmModuleEntry  OBJECT-TYPE
+         SYNTAX  CmmModuleEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a CMM module that is
+         present in this unit"
+         INDEX   { mBusBoardID, cmmModuleID }
+      ::= { cmmModuleTable 1 }
+
+   CmmModuleEntry  ::=
+         SEQUENCE {
+                  cmmModuleID           INTEGER,
+                  cmmDpramSize          INTEGER,
+                  cmmSdramSize          INTEGER,
+                  cmmCpuType            INTEGER,
+                  cmmCpuSpeed           INTEGER,
+                  cmmCpuFwRev           DisplayString,
+                  cmmEpldId             DisplayString,
+                  cmmEpldRev            DisplayString,
+                  cmmNumBadModems       INTEGER,
+                  cmmModuleOperStatus   INTEGER,
+                  cmmModuleAdminStatus  INTEGER
+                  }
+
+   cmmModuleID  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is an index that uniquely identifies
+         the CMM module within the physical CMM board."
+      ::= { cmmModuleEntry 1 }
+
+   cmmDpramSize  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Size of the DPRAM (in bytes) on the CMM module."
+      ::= { cmmModuleEntry 2 }
+
+   cmmSdramSize  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Size of the SDRAM (in bytes) on the CMM module."
+      ::= { cmmModuleEntry 3 }
+
+   cmmCpuType  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         unknown(1),
+                         hitachish3(2),
+                         hitachish4(3)
+                         }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "CPU type on the CMM module."
+      ::= { cmmModuleEntry 4 }
+
+   cmmCpuSpeed OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The speed of the CPU (in Megahertz) on the CMM module."
+      ::= { cmmModuleEntry 5 }
+
+   cmmCpuFwRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Revision of the CPU firmware on the CMM module.  This code
+         is a product of RSA."
+      ::= { cmmModuleEntry 6 }
+
+   cmmEpldId  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "EPLD ID on the CMM module.  (Read from the Altera chip.)"
+      ::= { cmmModuleEntry 7 }
+
+   cmmEpldRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Revision of the EPLD firmware on the CMM module.  This
+         code is produced by Cabletron."
+      ::= { cmmModuleEntry 8 }
+
+   cmmNumBadModems OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the number of bad modems
+         on the CMM module."
+      ::= { cmmModuleEntry 9 }
+
+   cmmModuleAdminStatus  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         down(1),
+                         leave-service(2),
+                         up(3),
+                         run-diagnostics(4),
+                         reset(5),
+                         faulty(6)
+                         }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the administrative status
+         of the CMM module.
+         
+         down(1) -- all modems that belong to this module are to be
+                    removed from service immediately
+         leave-service(2) -- each modem that belongs to this module is
+                             to be removed from service at the completion
+                             of its current call, if any
+         up(3) -- each modem that belongs to this module is to become
+                  available for accepting calls
+         run-diagnostics(4) -- all modems that belong to this module are
+                               to run a series of comprehensive on-line
+                               diagnostic tests
+         reset(5) -- the entire module is to be physically reset
+         faulty(6) -- the entire module is to be immediately removed from
+                      service and considered unusable"
+      ::= { cmmModuleEntry 10 }
+      
+   cmmModuleOperStatus  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         initializing(1),
+                         active(2),
+                         leaving-service(3),
+                         out-of-service(4),
+                         faulty(5),
+                         impaired(6)
+                         }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the operational status of
+         the CMM module.
+         
+         initializing(1) -- the module is booting up or in the process of
+                            a software upgrade
+         active(2) -- all modems that belong to this module are available
+                      for accepting calls
+         leaving-service(3) -- all modems that belong to this module are
+                               functional but are no longer available for
+                               accepting calls  (Existing calls are allowed
+                               to terminate normally.)
+         out-of-service(4) -- none of the modems that belong to this module
+                              are available for accepting calls nor do they
+                              have any existing calls
+         faulty(5) -- the module has been removed from service by an NMS and
+                      is considered to be unusable
+         impaired(6) -- the module is otherwise active but one or more
+                        modems are in the out-of-service, initializing,
+                        testing, or faulty states"
+      ::= { cmmModuleEntry 11 }
+
+
+   --================= CMM Modem-Level Info ===================
+   cmmModemTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CmmModemEntry
+         ACCESS  not-accessible
+         STATUS      mandatory
+         DESCRIPTION
+        "A list of modems present on each CMM module on each CMM board
+         in this unit"
+      ::= { cmmModemInfo 3 }
+
+   cmmModemEntry OBJECT-TYPE
+         SYNTAX      CmmModemEntry
+         ACCESS  not-accessible
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains data for a single CMM modem."
+         INDEX   { ifIndex }
+      ::= { cmmModemTable 1 }
+
+   CmmModemEntry ::=
+         SEQUENCE {
+                  cmmBoardID            INTEGER,
+                  cmmModemID            INTEGER,
+                  cmmIFNum              INTEGER,
+                  cmmSessionNum         INTEGER,
+                  cmmDdpPartNum         DisplayString,
+                  cmmDdpRevLevel        DisplayString,
+                  cmmDdpFwRev           DisplayString,
+                  cmmDDPInterrupts      Counter,
+                  cmmRxFlowCtlEvts      Counter,
+                  cmmTxFlowCtlEvts      Counter,
+                  cmmCallStatus         INTEGER,
+                  cmmCallOrigin         INTEGER,
+                  cmmRobbedBitDetected  DisplayString,
+                  cmmCorrectionType     INTEGER,
+                  cmmCompressionType    INTEGER,
+                  cmmRxRate             INTEGER,
+                  cmmTxRate             INTEGER,
+                  cmmEncoding           INTEGER,
+                  cmmFraming            INTEGER,
+                  cmmInitialConnectRate INTEGER,
+                  cmmMaxHostWindows     INTEGER,
+                  cmmMaxCmmWindows      INTEGER,
+                  cmmNumOutHostAcks     Gauge,
+                  cmmNumOutCmmAcks      Gauge,
+                  cmmToNetworkOctets    Counter,
+                  cmmFromNetworkOctets  Counter,
+                  cmmToHostOctets       Counter,
+                  cmmFromHostOctets     Counter,
+                  cmmToNetworkFrames    Counter,
+                  cmmFromNetworkFrames  Counter,
+                  cmmOversizeFrames     Counter,
+                  cmmOverrunErrors      Counter,
+                  cmmCRCErrors          Counter,
+                  cmmAbortedFrames      Counter,
+                  cmmRetrainEvents      Counter,
+                  cmmARAEvents          Counter,
+                  cmmARAFlag            INTEGER,
+                  cmmCarrierLossEvents  Counter,
+                  cmmCarrierLossFlag    INTEGER,
+                  cmmRcvSignalLevel     INTEGER,
+                  cmmRcvSignalEQM       INTEGER,
+                  cmmTDMSlot            INTEGER,
+                  cmmResetModemStats    INTEGER,
+                  cmmModemAdminStatus   INTEGER,
+                  cmmModemOperStatus    INTEGER 
+                  }
+
+   cmmBoardID  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "This object contains the logical number of the CMM board to which
+         the modem belongs."
+      ::= { cmmModemEntry 1 }
+
+   cmmModemID  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "This object contains the logical number of the modem on the CMM
+         module to which the modem belongs."
+      ::= { cmmModemEntry 2 }
+
+   cmmIFNum  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "This object contains the number of the instance of the Interface
+         MIB that is associated with this modem."
+      ::= { cmmModemEntry 3 }
+
+   cmmSessionNum  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "This object contains the session number that is associated with
+         this modem.  Session numbers are assigned, starting with 1, from
+         the first modem on the first module of the first CMM board and
+         continuing through the last modem of the last module of the last
+         CMM board."
+      ::= { cmmModemEntry 4 }
+
+   cmmDdpPartNum  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Part number of the DDP controller on the CMM module.
+         (Read from the DDP chip.)"
+      ::= { cmmModemEntry 5 }
+
+   cmmDdpRevLevel  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Revision level of the DDP controller on the CMM module.
+         (Read from the DDP chip.)"
+      ::= { cmmModemEntry 6 }
+
+   cmmDdpFwRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "Revison of the DDP controller firmware on the CMM module.
+         This code is produced by Rockwell."
+      ::= { cmmModemEntry 7 }
+
+   cmmDDPInterrupts OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of interrupts received by the CMM
+         transfer manager since initialization."
+      ::= { cmmModemEntry 8 }
+
+   cmmRxFlowCtlEvts OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of received flow control events."
+      ::= { cmmModemEntry 9 }
+
+   cmmTxFlowCtlEvts OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of transmitted flow control events."
+      ::= { cmmModemEntry 10 }
+
+   cmmCallStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             idle(1),
+                             connected(2),
+                             retraining(3),
+                             dropping(4),
+                             local-test(5),
+                             remote-test(6)
+                             }
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the current call status."
+      ::= { cmmModemEntry 11 }
+
+   cmmCallOrigin OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             answer(1),
+                             originate(2)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains an enumerated value that indicates whether
+         the call originated locally or remotely."
+      ::= { cmmModemEntry 12 }
+
+   cmmRobbedBitDetected OBJECT-TYPE
+         SYNTAX      DisplayString
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the robbed bit signalling pattern that was
+         detected by the modem or 0 if none."
+      ::= { cmmModemEntry 13 }
+
+   cmmCorrectionType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             no-ec(1),
+                             detection(2),
+                             mnp(3),
+                             hanging-up(4),
+                             speed-matching(5),
+                             lapm(6),
+                             mnp10(7)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains an enumerated value that indicates the type
+         of error correction that was negotiated."
+      ::= { cmmModemEntry 14 }
+   
+   cmmCompressionType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             none(1),
+                             mnp-class-5(2),
+                             v42bis-tx-only(3),
+                             v42bis-rx-only(4),
+                             v42bis(5)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains an enumerated value that indicates the type
+         of data compression that was negotiated."
+      ::= { cmmModemEntry 15 }
+
+   cmmRxRate OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the current receive rate."
+      ::= { cmmModemEntry 16 }
+
+   cmmTxRate OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the current transmit rate."
+      ::= { cmmModemEntry 17 }
+
+   cmmEncoding OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             u-law(1),
+                             a-law(2)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the current PCM encoding type."
+      ::= { cmmModemEntry 18 }
+
+   cmmFraming OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             pseudo-framing(1),
+                             hdlc-framing(2),
+                             ppp-async(3)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the current framing type."
+      ::= { cmmModemEntry 19 }
+
+   cmmInitialConnectRate OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the initial connect rate (in BPS) or the session."
+      ::= { cmmModemEntry 20 }
+
+   cmmMaxHostWindows OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the maximum number of host windows."
+      ::= { cmmModemEntry 21 }
+
+   cmmMaxCmmWindows OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the maximum number of CMM windows."
+      ::= { cmmModemEntry 22 }
+
+   cmmNumOutHostAcks OBJECT-TYPE
+         SYNTAX     Gauge 
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of host window acks that
+         have not been processed by the CMM side."
+      ::= { cmmModemEntry 23 }
+
+   cmmNumOutCmmAcks OBJECT-TYPE
+         SYNTAX     Gauge 
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of CMM window acks that
+         have not been processed by the host side."
+      ::= { cmmModemEntry 24 }
+
+   cmmToNetworkOctets OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of data bytes transmitted
+         (modem -> central office switch)."
+      ::= { cmmModemEntry 25 }
+
+   cmmFromNetworkOctets OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of data bytes received
+         (central office switch -> modem)."
+      ::= { cmmModemEntry 26 }
+
+   cmmToHostOctets OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of data bytes transmitted
+         (modem -> m-bus host)."
+      ::= { cmmModemEntry 27 }
+
+   cmmFromHostOctets OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of data bytes received
+         (m-bus host -> modem)."
+      ::= { cmmModemEntry 28 }
+
+   cmmToNetworkFrames OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of frames transmitted
+         (modem -> central office switch)."
+      ::= { cmmModemEntry 29 }
+
+   cmmFromNetworkFrames OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of frames received
+         (central office switch -> modem)."
+      ::= { cmmModemEntry 30 }
+
+   cmmOversizeFrames OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of HDLC frames received that were
+         greater than the maximum permissible size."
+      ::= { cmmModemEntry 31 }
+
+   cmmOverrunErrors OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of HDLC overrun errors."
+      ::= { cmmModemEntry 32 }
+
+   cmmCRCErrors OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of HDLC CRC errors."
+      ::= { cmmModemEntry 33 }
+
+   cmmAbortedFrames OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of HDLC frames that were aborted
+         while they were being received."
+      ::= { cmmModemEntry 34 }
+
+   cmmRetrainEvents OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of times that retrain and
+         renegotiation events have occurred since initialization."
+      ::= { cmmModemEntry 35 }
+
+   cmmARAEvents OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of times that automatic
+         rate adaption events have occurred."
+      ::= { cmmModemEntry 36 }
+
+   cmmARAFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             true(1),
+                             false(2)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains a flag that indicates whether or not
+         an ARA event has occurred during the current session."
+      ::= { cmmModemEntry 37 }
+
+   cmmCarrierLossEvents OBJECT-TYPE
+         SYNTAX      Counter
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of times that carrier loss
+         events have occurred."
+      ::= { cmmModemEntry 38 }
+
+   cmmCarrierLossFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             true(1),
+                             false(2)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains a flag that indicates whether or not a
+         carrier loss event has occurred during the current session."
+      ::= { cmmModemEntry 39 }
+
+   cmmRcvSignalLevel OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the receive signal level."
+      ::= { cmmModemEntry 40 }
+
+   cmmRcvSignalEQM OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the receive signal EQM."
+      ::= { cmmModemEntry 41 }
+
+   cmmTDMSlot OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the number of the TDM slot used by this
+         session."
+      ::= { cmmModemEntry 42 }
+
+   cmmResetModemStats OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             true(1),
+                             false(2)
+                             }
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object is used to reset the statistics pertaining to
+         the selected modem.  If written with the value 'true', the
+         statistics will be reset.  If written with the value 'false',
+         no action will be taken.  Its value will always be read as
+         'false'."
+      ::= { cmmModemEntry 43 }
+
+   cmmModemAdminStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             down(1),
+                             leave-service(2),
+                             up(3),
+                             run-diagnostics(4),
+                             reset(5),
+                             faulty(6)
+                             }
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the administrative status of a modem.
+         
+         down(1) -- the modem is to be removed from service immediately
+         leave-service(2) -- the modem is to be removed from service at
+                             the completion of its current call, if any
+         up(3) -- the modem is to become available for accepting calls
+         run-diagnostics(4) -- the modem is to run a series of 
+                               comprehensive on-line diagnostic tests
+         reset(5) -- the modem is to be physically reset
+         faulty(6) -- the modem is to be immediately removed from
+                      service and considered unusable"
+      ::= { cmmModemEntry 44 }
+
+   cmmModemOperStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             initializing(1),
+                             idle(2),
+                             active(3),
+                             leaving-service(4),
+                             out-of-service(5),
+                             testing(6),
+                             faulty(7),
+                             resetting(8)
+                             }
+         ACCESS  read-only
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the operational status of a modem.
+        
+         initializing(1) -- the module to which the modem belongs is booting
+                            up or in the process of a software upgrade
+         idle(2) -- the modem is available for accepting calls but has no
+                    call in place
+         active(3) -- the modem is not available for accepting calls because
+                      it already has one in place
+         leaving-service(4) -- the modem is functional but is no longer
+                               available for accepting calls  (Existing calls
+                               are allowed to terminate normally.)
+         out-of-service(5) -- the modem is neither available for accepting
+                              calls nor does it have a call in place
+         testing(6) -- the modem is running a series of comprehensive on-line
+                       diagnostic tests
+         faulty(7) -- the modem has been removed from service by an NMS or
+                      due to a hardware or software failure and is considered
+                      to be unusable
+         resetting(8) -- the modem is executing a reset sequence"
+      ::= { cmmModemEntry 45 }
+
+   --================= Free-Form AT Command Group ===================
+
+   cmmFreeFormAtCmdGroup OBJECT IDENTIFIER ::= { cmmModemInfo 5 }
+
+   cmmATCommand  OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "This object contains the user-defined AT command string.  It
+         can contain up to 256 characters, including a carriage return
+         that will automatically be inserted and a NULL terminator."
+      ::= { cmmFreeFormAtCmdGroup 1 }
+
+   cmmSelectedModem OBJECT-TYPE
+         SYNTAX      INTEGER
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object contains the ID of the modem to which the free-form
+         AT command string should be sent."
+      ::= { cmmFreeFormAtCmdGroup 2 }
+
+   cmmATCmdStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                             sending(1),
+                             not-sending(2)
+                             }
+         ACCESS  read-write
+         STATUS      mandatory
+         DESCRIPTION
+        "This object allows the free-form AT command string to be sent
+         and allows the status of the command string to be examined."
+      ::= { cmmFreeFormAtCmdGroup 3 }
+
+   cmmATCmdResult  OBJECT-TYPE
+         SYNTAX  DisplayString (SIZE (0..255))
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "This object contains the result string from issuing the
+         free-form AT command ."
+      ::= { cmmFreeFormAtCmdGroup 4 }
+
+END

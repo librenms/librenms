@@ -1,0 +1,438 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-SRVCFG-STATICUSER-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--       
+-- =================================================================
+
+        HUAWEI-BRAS-SRVCFG-STATICUSER-MIB DEFINITIONS ::= BEGIN
+ 
+                IMPORTS
+                        hwBRASMib                     
+                                FROM HUAWEI-MIB
+                        InterfaceIndex                  
+                                FROM IF-MIB                     
+                        IpAddress, Integer32, OBJECT-TYPE                       
+                                FROM SNMPv2-SMI                 
+                        RowStatus, MacAddress, TruthValue, DisplayString                        
+                                FROM SNMPv2-TC  
+                        mplsVpnVrfName
+                                FROM MPLS-VPN-MIB;
+        
+                hwBRASSrvcfgStaticUser MODULE-IDENTITY 
+                        LAST-UPDATED "200403041608Z"
+                        ORGANIZATION 
+                                "Huawei Technologies Co., Ltd.
+                                "
+                CONTACT-INFO 
+                        "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                         
+                        Http://www.huawei.com                                       
+                        E-mail:support@huawei.com "
+            
+                DESCRIPTION 
+                        "The MIB contains objects of module SRVCFG."
+                ::= { hwBRASMib 5 }
+       --
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ==================================================================  
+                hwSrvcfgStaticUserMibObjects OBJECT IDENTIFIER ::= { hwBRASSrvcfgStaticUser 1 }
+      --  ============== hwStaticUserTable  define beginning ==============
+                
+                hwStaticUserTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwStaticUserEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of static user."
+                        ::= { hwSrvcfgStaticUserMibObjects 1 }
+            --  ============== hwStaticUserEntry  define beginning ==============    
+                hwStaticUserEntry OBJECT-TYPE
+                        SYNTAX HwStaticUserEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "Description."
+                        INDEX { mplsVpnVrfName , hwStaticUserStartIpAddr }
+                        ::= { hwStaticUserTable 1 }
+                
+                HwStaticUserEntry ::=
+                        SEQUENCE { 
+                                hwStaticUserStartIpAddr
+                                        IpAddress,
+                                hwStaticUserEndIpAddr
+                                        IpAddress,                                        
+                                hwStaticUserIfIndex
+                                        InterfaceIndex,
+                                hwStaticUserVlan
+                                        Integer32,
+                                hwStaticUserVpi
+                                        Integer32,
+                                hwStaticUserVci
+                                        Integer32,
+                                hwStaticUserMac
+                                        MacAddress,
+                                hwStaticUserDomain
+                                        DisplayString,
+                                hwStaticUserDetect
+                                        TruthValue,
+                                hwStaticUserRowStatus
+                                        RowStatus,
+                                hwStaticUserStatus
+                                        INTEGER,
+                                hwStaticUserQinQVlan
+                                        Integer32,
+                                hwStaticUserDescription
+                                    DisplayString
+                         }
+                hwStaticUserStartIpAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The start ip address of static user."
+                        ::= { hwStaticUserEntry 1 }
+                        
+                hwStaticUserEndIpAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end ip address of static user."
+                        ::= { hwStaticUserEntry 2 }                        
+                
+                hwStaticUserIfIndex OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The interface of static user logining."
+                    ::= { hwStaticUserEntry 3 }
+                    
+                hwStaticUserVlan OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vlan of static user."
+                        ::= { hwStaticUserEntry 4 }
+                
+                hwStaticUserVpi OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vpi of static user."
+                        ::= { hwStaticUserEntry 5}
+                
+                hwStaticUserVci OBJECT-TYPE
+                        SYNTAX Integer32 (0..65534)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vci of static user."
+                        ::= { hwStaticUserEntry 6}
+                        
+                hwStaticUserMac OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The MAC address of static user."
+                        ::= { hwStaticUserEntry 7 }
+
+                hwStaticUserDomain OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..200))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The domain of static user belong to."
+                        ::= { hwStaticUserEntry 8 }
+
+                hwStaticUserDetect OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Whether or not detect static user."
+                    DEFVAL { false }
+                    ::= { hwStaticUserEntry 9 }
+                
+                hwStaticUserRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The status of row."
+                        ::= { hwStaticUserEntry 10 }
+                        
+                hwStaticUserStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                ready(0),
+                detecting(1),
+                deleting(2),
+                online(3)
+                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The status of static user."
+                        ::= { hwStaticUserEntry 11}
+                                               
+                hwStaticUserQinQVlan OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The QinQ vlan of static user."
+                        ::= { hwStaticUserEntry 12 }  
+              
+              hwStaticUserDescription OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..32))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The description of static user."
+                        ::= { hwStaticUserEntry 13 }     
+             --  ============== hwStaticUserEntry  define end ==============      
+       --  ============== hwStaticUserTable  define end ============== 
+                       
+              --  ============== hwStaticUserTableV2  define beginning ==============
+                hwStaticUserTableV2 OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwStaticUserEntryV2
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of static user.(V2)"
+                        ::= { hwSrvcfgStaticUserMibObjects 2 }
+            --  ============== hwStaticUserEntryV2  define beginning ==============    
+                hwStaticUserEntryV2 OBJECT-TYPE
+                        SYNTAX HwStaticUserEntryV2
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "Description.(V2)"
+                        INDEX { hwStaticUserVrfNameV2 , hwStaticUserStartIpAddrV2 }
+                        ::= { hwStaticUserTableV2 1 }
+                
+                HwStaticUserEntryV2 ::=
+                        SEQUENCE { 
+                                hwStaticUserStartIpAddrV2
+                                        IpAddress,
+                                hwStaticUserEndIpAddrV2
+                                        IpAddress,                                        
+                                hwStaticUserIfIndexV2
+                                        InterfaceIndex,
+                                hwStaticUserVlanV2
+                                        Integer32,
+                                hwStaticUserVpiV2
+                                        Integer32,
+                                hwStaticUserVciV2
+                                        Integer32,
+                                hwStaticUserMacV2
+                                        MacAddress,
+                                hwStaticUserDomainV2
+                                        DisplayString,
+                                hwStaticUserDetectV2
+                                        TruthValue,
+                                hwStaticUserRowStatusV2
+                                        RowStatus,
+                                hwStaticUserStatusV2
+                                        INTEGER,
+                                hwStaticUserQinQVlanV2
+                                        Integer32,
+                                hwStaticUserVrfNameV2
+                                        DisplayString
+                         }
+
+                hwStaticUserStartIpAddrV2 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The start ip address of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 1 }
+                        
+                hwStaticUserEndIpAddrV2 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end ip address of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 2 }                        
+                
+                hwStaticUserIfIndexV2 OBJECT-TYPE
+                    SYNTAX InterfaceIndex
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The interface of static user logining.(V2)"
+                    ::= { hwStaticUserEntryV2 3 }
+                    
+                hwStaticUserVlanV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vlan of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 4 }
+                
+                hwStaticUserVpiV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vpi of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 5}
+                
+                hwStaticUserVciV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..65534)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The vci of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 6}
+                        
+                hwStaticUserMacV2 OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The MAC address of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 7 }
+
+                hwStaticUserDomainV2 OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..64))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The domain of static user belong to.(V2)"
+                        ::= { hwStaticUserEntryV2 8 }
+
+                hwStaticUserDetectV2 OBJECT-TYPE
+                    SYNTAX TruthValue
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Whether or not detect static user.(V2)"
+                    DEFVAL { false }
+                    ::= { hwStaticUserEntryV2 9 }
+                
+                hwStaticUserRowStatusV2 OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The status of row.(V2)"
+                        ::= { hwStaticUserEntryV2 10 }
+                        
+                hwStaticUserStatusV2 OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                ready(0),
+                detecting(1),
+                deleting(2),
+                online(3)
+                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The status of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 11}
+                                               
+                hwStaticUserQinQVlanV2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The QinQ vlan of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 12 }  
+                                        
+                hwStaticUserVrfNameV2 OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..31))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The vpn instance of static user.(V2)"
+                        ::= { hwStaticUserEntryV2 13 }
+                        
+
+                        
+             --  ============== hwStaticUserEntryV2  define end ==============      
+       --  ============== hwStaticUserTableV2  define end ============== 
+
+   
+       --  ============== conformance information ==============
+        hwStaticUserConformance OBJECT IDENTIFIER ::= { hwBRASSrvcfgStaticUser 2 }
+        
+        
+        hwStaticUserCompliances OBJECT IDENTIFIER ::= { hwStaticUserConformance 1 }
+        hwStaticUserCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwStaticUserTableGroup,
+                                hwStaticUserTableV2Group}  
+                                               
+              ::= { hwStaticUserCompliances 1 }
+              
+    --  ============== groups ==============  
+        hwStaticUserObjectGroups OBJECT IDENTIFIER ::= { hwStaticUserCompliances 2 } 
+        
+        hwStaticUserTableGroup OBJECT-GROUP
+            OBJECTS { hwStaticUserStartIpAddr, 
+                      hwStaticUserEndIpAddr, 
+                      hwStaticUserIfIndex,
+                      hwStaticUserVlan, 
+                      hwStaticUserVpi, 
+                      hwStaticUserVci ,
+                      hwStaticUserMac, 
+                      hwStaticUserDomain, 
+                      hwStaticUserDetect,
+                      hwStaticUserRowStatus,
+                      hwStaticUserStatus,
+                      hwStaticUserQinQVlan,
+                      hwStaticUserDescription}
+            STATUS current
+            DESCRIPTION 
+                "Static user configuraion table."
+            ::= { hwStaticUserObjectGroups 1 }    
+            
+        hwStaticUserTableV2Group OBJECT-GROUP
+            OBJECTS { hwStaticUserStartIpAddrV2, 
+                      hwStaticUserEndIpAddrV2, 
+                      hwStaticUserIfIndexV2,
+                      hwStaticUserVlanV2, 
+                      hwStaticUserVpiV2, 
+                      hwStaticUserVciV2 ,
+                      hwStaticUserMacV2, 
+                      hwStaticUserDomainV2, 
+                      hwStaticUserDetectV2,
+                      hwStaticUserRowStatusV2,
+                      hwStaticUserStatusV2,
+                      hwStaticUserQinQVlanV2,
+                      hwStaticUserVrfNameV2}
+            STATUS current
+            DESCRIPTION 
+                "Static user configuraion table.(V2)"
+            ::= { hwStaticUserObjectGroups 2 }    
+    --  ============== conformance information define end ==============       
+    
+        END

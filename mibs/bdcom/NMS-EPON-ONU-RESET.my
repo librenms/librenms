@@ -1,0 +1,70 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-RESET.MIB:  NMS LLID ONU RESET MIB file
+-- MAY 2010
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-RESET DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+	            PortList
+	                FROM Q-BRIDGE-MIB;
+
+               nmsEponOnuReset         OBJECT IDENTIFIER ::= { nmsEPONGroup 25 }
+               
+               nmsEponOnuResetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuResetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of the ONU reset table entries. The corresponding onu id will input and corresponding onu will reset."
+                   ::= { nmsEponOnuReset 1 }
+
+               nmsEponOnuResetEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuResetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of certain ONU reset operation table entry. The ONU id can be reset through this table."
+                   INDEX { onuLlid }
+               ::= { nmsEponOnuResetTable 1 }
+
+               NMSEponOnuResetEntry ::=
+                   SEQUENCE {
+                       onuLlid
+                           INTEGER,
+                       onuReset
+                           INTEGER
+                   }
+                   
+               onuLlid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU LLID."
+                   ::= { nmsEponOnuResetEntry 1 } 
+                   
+               onuReset OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no_action(0),
+                                   reset(1)
+				   }                                  
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU reset operation.1-reset,0-no action."
+                   ::= { nmsEponOnuResetEntry 2 } 
+                   
+               
+      END         
+               
+               

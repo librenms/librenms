@@ -1,0 +1,491 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-OSPF-MIB.my
+ --
+ --
+
+ CIENA-CES-OSPF-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32, Unsigned32, IpAddress
+      FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, TruthValue, RowStatus
+      FROM SNMPv2-TC
+   AreaID
+      FROM OSPF-MIB
+   cienaCesConfig 		
+	FROM CIENA-SMI;
+
+	
+ cienaCesOspfMIB MODULE-IDENTITY
+	    LAST-UPDATED "201304180000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  	115 North Sullivan Road
+			Spokane Valley, WA 99037
+		        USA		 		
+		        Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+	    DESCRIPTION
+		    "This MIB module is for the Extension of the OSPF MIB for CIENA Products"
+
+	    REVISION
+	    	"201304180000Z"
+	    DESCRIPTION
+		"Fixed miscellaneous typos and descriptions."
+
+	    REVISION
+	    	"201102020000Z"
+	    DESCRIPTION
+		"Initial version."
+
+	    ::= { cienaCesConfig 19 }
+
+ --
+ -- Textual conventions
+ --
+
+ OspfOperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The current operational state of an OSPF Protocol Manager entity."
+    SYNTAX      INTEGER {
+                  operStatusUp(1),       -- active
+                  operStatusDown(2),     -- inactive
+                  operStatusGoingUp(3),  -- activating
+                  operStatusGoingDown(4),-- deactivating
+                  operStatusActFailed(5) -- activation failed
+                }
+
+ --
+ -- Node definitions
+ --
+
+ cienaCesOspfMIBObjects          OBJECT IDENTIFIER ::= { cienaCesOspfMIB 1 }
+ cienaCesOspfGeneralGroup        OBJECT IDENTIFIER ::= { cienaCesOspfMIBObjects 1 }
+ cienaCesOspf                    OBJECT IDENTIFIER ::= { cienaCesOspfMIBObjects 2 }
+ 
+ cienaCesOspfRFC1583Comp  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "Indicates metrics used to choose among multiple
+       AS-external-LSAs. When RFC1583Compatibility is set to
+       TRUE, only cost is used when choosing among
+       multiple AS-external-LSAs advertising the same
+       destination. When RFC1583Compatibility is set to
+       FALSE, preference is driven first by type of
+       path using cost only to break ties.
+
+       In order to minimize the chance of routing loops, all OSPF
+       routers in an OSPF routing domain should have
+       RFC1583Compatibility set identically. When there are routers
+       present that have not been updated with the functionality
+       specified in RFC2328 Section 16.4.1, all routers should
+       have RFC1583Compatibility set to TRUE. Otherwise, all
+       routers should have RFC1583Compatibility set to FALSE,
+       preventing all routing loops."
+    REFERENCE
+       "OSPF Version 2, Section 16.4.1 External path preferences"
+    DEFVAL { false }
+    ::= { cienaCesOspfGeneralGroup 1 }
+
+  cienaCesOspfOperStatus OBJECT-TYPE
+       SYNTAX       OspfOperStatus
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The current operational state of OSPF."
+       ::= { cienaCesOspfGeneralGroup 2 }
+       
+
+  cienaCesOspfOpaqueLsaSupport  OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The router's support for Opaque LSA types. This value cannot be
+           changed when OSPF is active and operStatus is up."
+       REFERENCE
+          "The OSPF Opaque LSA Option"
+       DEFVAL { true }
+       ::= { cienaCesOspfGeneralGroup 3 }
+
+  cienaCesOspfTrafficEngSupport OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The router's support for OSPF traffic engineering."
+       DEFVAL { true }
+       ::= { cienaCesOspfGeneralGroup 4 }
+
+  cienaCesOspfExtOpLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of type-11 LSAs in the external database."
+       ::= { cienaCesOspfGeneralGroup 5 }
+
+  cienaCesOspfExtOpLsaCksumSum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32 bit sum of LS checksums of all type-11 LSAs in the
+          external Link State Database."
+       ::= { cienaCesOspfGeneralGroup 6 }
+
+  cienaCesOspfNumUpdPending OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of pending updates to the Link State Database."
+       ::= { cienaCesOspfGeneralGroup 7 }
+
+  cienaCesOspfNumUpdMerged OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of updates that have been merged into the Link State
+          Database since the last routing calculation."
+       ::= { cienaCesOspfGeneralGroup 8 }
+
+  cienaCesOspfNumCksumsPending OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of LSAs in the Link State Database which are now due to
+          have their checksum checked."
+       ::= { cienaCesOspfGeneralGroup 9 }
+
+  cienaCesOspfCalcMaxDelay OBJECT-TYPE
+       SYNTAX       Unsigned32
+       UNITS        "milliseconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The maximum delay before the routing table is
+          recalculated following a change to the Link State
+          Database. (Recalculation is delayed to reduce the
+          frequency of recalculations of the routing table).
+
+          This parameter has units of milliseconds. A value of
+          0 indicates that a routing calculation will
+          immediately follow an update to the database."
+       DEFVAL { 5000 }
+       ::= { cienaCesOspfGeneralGroup 10 }
+
+    cienaCesOspfRouterId OBJECT-TYPE
+       SYNTAX       IpAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Ospf router ID."
+       ::= { cienaCesOspfGeneralGroup 11 } 
+
+--      The OSPF Area Data Structure contains information
+--      regarding the various areas. The interfaces and
+--      virtual links are configured as part of these areas.
+--      Area 0.0.0.0, by definition, is the Backbone Area
+
+
+ cienaCesOspfAreaTable OBJECT-TYPE
+     SYNTAX   SEQUENCE OF CienaCesOspfAreaEntry
+     MAX-ACCESS   not-accessible
+     STATUS   current
+     DESCRIPTION
+        "Information describing the configured parameters 
+        and cumulative statistics of the router's attached 
+        areas."
+    REFERENCE
+       "OSPF Version 2, Section 6  The Area Data Struc-
+       ture"
+   ::= { cienaCesOspf 1 }
+
+
+ cienaCesOspfAreaEntry OBJECT-TYPE
+     SYNTAX   CienaCesOspfAreaEntry
+     MAX-ACCESS   not-accessible
+     STATUS   current
+     DESCRIPTION
+        "Information describing the configured parameters  
+        and cumulative statistics of one of the router's 
+        attached areas."
+    INDEX { cienaCesOspfAreaId }
+    ::= { cienaCesOspfAreaTable 1 }
+
+ CienaCesOspfAreaEntry ::=
+   SEQUENCE {
+       cienaCesOspfAreaId                   AreaID,
+       cienaCesOspfAreaTransitCapability    TruthValue,
+       cienaCesOspfAreaRtrLsaCount          Gauge32,
+       cienaCesOspfAreaRtrLsaCksumSum       Integer32,
+       cienaCesOspfAreaNetLsaCount	   Gauge32,
+       cienaCesOspfAreaNetLsaCksumSum	   Integer32,
+       cienaCesOspfAreaSummLsaCount         Gauge32,
+       cienaCesOspfAreaSummLsaCksumSum	   Integer32,
+       cienaCesOspfAreaSummAsLsaCount	   Gauge32,
+       cienaCesOspfAreaSummAsLsaCksumSum    Integer32,
+       cienaCesOspfAreaNssaLsaCount	   Gauge32,
+       cienaCesOspfAreaNssaLsaCksumSum      Integer32,
+       cienaCesOspfAreaOpLsaCount	   Gauge32,
+       cienaCesOspfAreaOpLsaCksumSum	   Integer32
+             }
+
+  cienaCesOspfAreaId OBJECT-TYPE
+      SYNTAX   AreaID
+      MAX-ACCESS   not-accessible
+      STATUS   current
+      DESCRIPTION
+         "A 32-bit integer uniquely identifying an area.
+         Area ID 0.0.0.0 is used for the OSPF backbone."
+     REFERENCE
+        "OSPF Version 2, Appendix C.2 Area parameters"
+    ::= { cienaCesOspfAreaEntry 1 }
+
+
+ cienaCesOspfAreaTransitCapability OBJECT-TYPE
+      SYNTAX       TruthValue
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "This parameter indicates whether the area can carry data
+         traffic that neither originates nor terminates in the area
+         itself. This parameter is calculated when the area's shortest-path
+         tree is built."
+      DEFVAL { false }
+      ::= { cienaCesOspfAreaEntry 2 }
+
+ cienaCesOspfAreaRtrLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The number of LSAs with LS type-1 in this area's Link State
+         Database."
+      ::= { cienaCesOspfAreaEntry 3 }
+
+ cienaCesOspfAreaRtrLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32 bit sum of LS checksums of all LSAs with LS type-1 in this
+         area's Link State Database."
+      ::= { cienaCesOspfAreaEntry 4 }
+
+ cienaCesOspfAreaNetLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The number of LSAs with LS type-2 in this area's Link State
+         Database."
+      ::= { cienaCesOspfAreaEntry 5 }
+
+ cienaCesOspfAreaNetLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32 bit sum of LS checksums of all LSAs with LS type-2 in this
+         area's Link State Database."
+      ::= { cienaCesOspfAreaEntry 6 }
+
+ cienaCesOspfAreaSummLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The number of LSAs with LS type-3 in this area's Link State
+         Database."
+      ::= { cienaCesOspfAreaEntry 7 }
+
+ cienaCesOspfAreaSummLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32 bit sum of LS checksums of all LSAs with LS type-3 in this
+         area's Link State Database."
+      ::= { cienaCesOspfAreaEntry 8 }
+
+ cienaCesOspfAreaSummAsLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The number of LSAs with LS type-4 in this area's Link State
+         Database."
+      ::= { cienaCesOspfAreaEntry 9 }
+
+ cienaCesOspfAreaSummAsLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32 bit sum of LS checksums of all LSAs with LS type-4 in this
+         area's Link State Database."
+      ::= { cienaCesOspfAreaEntry 10 }
+
+ cienaCesOspfAreaNssaLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The number of LSAs with LS type-7 in this area's Link State
+          Database."
+      ::= { cienaCesOspfAreaEntry 11 }
+
+ cienaCesOspfAreaNssaLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32 bit sum of LS checksums of all LSAs with LS type-7 in this
+         area's Link State Database."
+      ::= { cienaCesOspfAreaEntry 12 }
+
+ cienaCesOspfAreaOpLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The number of LSAs with LS type-10 in this area's Link State
+         Database."
+      ::= { cienaCesOspfAreaEntry 13 }
+
+ cienaCesOspfAreaOpLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32 bit sum of LS checksums of all LSAs with LS type-10 in this
+         area's Link State Database."
+       ::= { cienaCesOspfAreaEntry 14 }
+
+--  CIENA OSPF Interface Table
+
+--  The CIENA OSPF Interface Table augments the OSPF Interface Table
+
+ cienaCesOspfIfTable OBJECT-TYPE
+     SYNTAX   SEQUENCE OF CienaCesOspfIfEntry
+     MAX-ACCESS   not-accessible
+     STATUS   current
+     DESCRIPTION
+        "The OSPF interface table describes the interfaces from the viewpoint 
+        of OSPF."
+    REFERENCE
+       "OSPF Version 2, Appendix C.3  Router  interface
+       parameters"
+   ::= { cienaCesOspf 2 }
+
+
+ cienaCesOspfIfEntry OBJECT-TYPE
+     SYNTAX   CienaCesOspfIfEntry
+     MAX-ACCESS   not-accessible
+     STATUS   current
+     DESCRIPTION
+        "The OSPF interface entry describes one interface from the viewpoint 
+        of OSPF."
+    INDEX { cienaCesOspfIfIpAddress, cienaCesOspfAddressLessIf }
+    ::= { cienaCesOspfIfTable 1 }
+
+ CienaCesOspfIfEntry ::=
+     SEQUENCE {
+         cienaCesOspfIfIpAddress                 IpAddress,
+         cienaCesOspfAddressLessIf               Integer32,
+         cienaCesOspfIfLsaCount                  Gauge32,
+         cienaCesOspfIfLsaCksumSum               Integer32,
+         cienaCesOspfIfOperStatus                OspfOperStatus,
+         cienaCesOspfIfNetMask                   IpAddress,
+         cienaCesOspfIfTransmitTimerDelay        INTEGER
+         }
+
+ cienaCesOspfIfIpAddress OBJECT-TYPE
+      SYNTAX   IpAddress
+      MAX-ACCESS   not-accessible
+      STATUS   current
+      DESCRIPTION
+         "The IP address of this OSPF interface."
+     ::= { cienaCesOspfIfEntry 1 }
+
+ cienaCesOspfAddressLessIf OBJECT-TYPE
+      SYNTAX   Integer32 (0..2147483647)
+      MAX-ACCESS   not-accessible
+      STATUS   current
+      DESCRIPTION
+         "For the purpose of easing the instancing of
+         addressed and addressless interfaces, this
+         variable takes the value 0 on interfaces with
+         IP addresses, and the corresponding value of
+         ifIndex for interfaces having no IP address."
+     ::= { cienaCesOspfIfEntry 2 }
+
+ cienaCesOspfIfLsaCount OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The total number of link-local link state advertisements
+         in this interface's link-local Link State Database."
+      ::= { cienaCesOspfIfEntry 3 }
+
+ cienaCesOspfIfLsaCksumSum OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The 32-bit unsigned sum of the link-state
+         advertisements' LS checksums contained in this
+         interface's link-local Link State Database.
+         The sum can be used to determine if there has
+         been a change in the interface's Link State Database,
+         and to compare the interface Link State Database of
+         routers attached to the same subnet."
+      ::= { cienaCesOspfIfEntry 4 }
+
+ cienaCesOspfIfOperStatus OBJECT-TYPE
+      SYNTAX       OspfOperStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The current operational state of this interface."
+      ::= { cienaCesOspfIfEntry 5 }
+
+ cienaCesOspfIfNetMask OBJECT-TYPE
+      SYNTAX       IpAddress
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "The subnet mask associated with the IP address of this entry. The
+        value of the mask is an IP address with all the network bits set to 1
+        and all the hosts bits set to 0."
+      ::= { cienaCesOspfIfEntry 6 }
+
+  cienaCesOspfIfTransmitTimerDelay OBJECT-TYPE
+       SYNTAX       INTEGER (1..429496799) 
+       UNITS        "milliseconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The time this interface delays a LSU packet, in order to
+          add more LSAs to the packet before sending. Setting this
+          correctly can reduce the network traffic. This is configurable
+          on a per-interface basis."
+       DEFVAL { 100 }
+       ::= { cienaCesOspfIfEntry 7 }
+
+ END
+ 
+ --
+ -- CIENA-CES-OSPF-MIB
+ --
+ 

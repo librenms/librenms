@@ -1,0 +1,9 @@
+os: unifi
+text: 'Ubiquiti UniFi'
+type: wireless
+icon: ubiquiti
+group: ubnt
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_wireless_clients, text: 'Connected Clients' }
+    - { graph: device_wireless_ccq, text: 'Connection Quality' }

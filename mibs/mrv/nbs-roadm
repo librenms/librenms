@@ -1,0 +1,867 @@
+NBS-ROADM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    InterfaceIndex, ifAlias
+        FROM IF-MIB
+
+    nbs, NbsTcMilliDb, NbsTcMHz, NbsTcStagingCommit
+        FROM NBS-MIB
+
+    DisplayString, RowStatus
+        FROM SNMPv2-TC;
+
+nbsRoadmMib  MODULE-IDENTITY
+    LAST-UPDATED "201504300000Z"  -- April 30, 2015
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Reconfigurable Optical Add/Drop Multiplexing"
+    ::= { nbs 235 }
+
+-- *******************************************************************
+-- NBS-ROADM-MIB local defines
+-- *******************************************************************
+
+nbsRoadmCommonGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Channels per Common port"
+    ::= { nbsRoadmMib 10 }
+
+nbsRoadmFlexgridGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Describes Flexgrid centerline and bandwidth capabilities "
+    ::= { nbsRoadmMib 20 }
+
+nbsRoadmStagingGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Scratchpad for users to configure channels and WSS setup"
+    ::= { nbsRoadmMib 30 }
+
+nbsRoadmCommittedGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Administratively active channel and WSS setup."
+    ::= { nbsRoadmMib 31 }
+
+nbsRoadmRedundantGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Current active port."
+    ::= { nbsRoadmMib 32 }
+
+nbsRoadmTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "SNMP Traps or Notifications"
+    ::= { nbsRoadmMib 100 }
+
+nbsRoadmEvent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Event Notification Definitions"
+    ::= { nbsRoadmTraps 0 }
+
+
+-- *******************************************************************
+--
+-- the nbsRoadmCommonGrp
+--
+-- *******************************************************************
+
+nbsRoadmCommonTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRoadmCommonTable"
+    ::= { nbsRoadmCommonGrp 1 }
+
+nbsRoadmCommonTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRoadmCommonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "WSS Switch Configuration"
+    ::= { nbsRoadmCommonGrp 2 }
+
+NbsRoadmCommonEntry ::= SEQUENCE {
+    nbsRoadmCommonIfIndex            InterfaceIndex,
+    nbsRoadmCommonStagingQuickCfg    INTEGER,
+    nbsRoadmCommonStagingCommit      NbsTcStagingCommit,
+    nbsRoadmCommonStagingAddCaps     INTEGER,
+    nbsRoadmCommonStagingDropCaps    INTEGER,
+    nbsRoadmCommonCommittedGridType  INTEGER,
+    nbsRoadmCommonCommittedChannels  INTEGER
+}
+
+nbsRoadmCommonEntry      OBJECT-TYPE
+    SYNTAX      NbsRoadmCommonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    INDEX { nbsRoadmCommonIfIndex }
+    ::= { nbsRoadmCommonTable 1 }
+
+nbsRoadmCommonIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's trunk port."
+    ::= { nbsRoadmCommonEntry 1 }
+
+nbsRoadmCommonStagingQuickCfg   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported      (1),
+        supported         (2),
+        std100Ghz         (3),
+        std50Ghz          (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Impulse object used to replace this port's current
+        nbsRoadmStagingTable entries with a known configuration.
+
+        Users may create the nbsRoadmStagingTable manually, a row at a
+        time.  Often it would save the users much work if they could
+        initially populate this table with a standard or known
+        configuration and then customize it to their own requirements.
+
+        When read, this object will indicate whether this feature is
+        available by reporting either notSupported(1) or supported(2).
+
+        The value std100Ghz(3) overwrites this port's
+        nbsRoadmStagingTable with all the standard 100 GHz ITU grid
+        channels which are supported by this port.
+
+        The value std50Ghz(4) overwrites this port's
+        nbsRoadmStagingTable with all the standard 50 GHz ITU grid
+        channels which are supported by this port.
+
+        Overwriting the nbsRoadmStagingTable entries has no effect
+        on the live configuration until committed using
+        nbsRoadmCommonStagingCommit"
+    ::= { nbsRoadmCommonEntry 10 }
+
+nbsRoadmCommonStagingAddCaps  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported     (1),
+        capable          (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This object indicates if this port is capable of Add"
+   ::= { nbsRoadmCommonEntry 13 }
+
+nbsRoadmCommonStagingDropCaps  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported     (1),
+        capable          (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This object indicates if this port is capable of Drop"
+   ::= { nbsRoadmCommonEntry 14 }
+
+nbsRoadmCommonStagingCommit  OBJECT-TYPE
+    SYNTAX      NbsTcStagingCommit
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Impulse object used to rewrite the entire WSS configuration.
+
+        In order to protect users against accidentally dropping traffic
+        streams, a two-step process is used.
+
+        In the first step, users 'stage' a WSS configuration.  The
+        nbsRoadmStagingTable is like a scratchpad where users can
+        build and modify the entire WSS configuration without affecting
+        the live network.  Here users assign channels to WSS ports, and
+        for flex-grids, define the channels.
+
+        The second step is to replace the existing WSS configuration
+        (which can be read from the nbsRoadmCommittedTable). To replace
+        the existing setup with the configuration specified in the
+        nbsRoadmStagingTable, users set this object to apply(4).
+
+        To discard all changes done to nbsRoadmStagingTable, users
+        set this object to revertToCommitted(3), which will synchronize
+        the Staging table to the Staged configuation.
+
+        When read, this object will report the action last requested
+        until that action is completed, after which it will report
+        supported(2)."
+    ::= { nbsRoadmCommonEntry 20 }
+
+nbsRoadmCommonCommittedGridType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported     (1),
+        reserved         (2),
+        customized       (3),
+        std100Ghz        (4),
+        std50Ghz         (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This object is automatically updated in association with writes
+       to nbsRoadmCommonStagingApply.  It indicates whether or not this
+       port's updated nbsRoadmCommittedTable is equivalent to a
+       standard ITU grid such as would come from
+       nbsRoadmCommonStagingQuickCfg.
+
+       If the nbsRoadmCommittedTable matches the results from a
+       nbsRoadmCommonStagingQuickCfg of std100Ghz(4), then this object
+       will report std100Ghz(4).
+
+       If the nbsRoadmCommittedTable matches the results from a
+       nbsRoadmCommonStagingQuickCfg of std50Ghz(5), then this object
+       will report std50Ghz(5).
+
+       If the nbsRoadmCommittedTable matches neither the results from a
+       nbsRoadmCommonStagingQuickCfg of std100Ghz(4) or std50Ghz(5),
+       then this object will report customized(3)."
+   ::= { nbsRoadmCommonEntry 30 }
+
+nbsRoadmCommonCommittedChannels OBJECT-TYPE
+   SYNTAX      INTEGER (0..100000)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of channels for this wdm port in the
+       nbsRoadmCommittedTable."
+   ::= { nbsRoadmCommonEntry 40 }
+
+
+-- *******************************************************************
+--
+-- the nbsRoadmFlexgridGrp
+--
+-- *******************************************************************
+
+nbsRoadmFlexgridTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRoadmFlexgridTable."
+    ::= { nbsRoadmFlexgridGrp 1 }
+
+nbsRoadmFlexgridTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRoadmFlexgridEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Flexgrid channel creation parameters"
+    ::= { nbsRoadmFlexgridGrp 2 }
+
+NbsRoadmFlexgridEntry ::= SEQUENCE {
+    nbsRoadmFlexgridIfIndex             InterfaceIndex,
+    nbsRoadmFlexgridCenterlineMin       NbsTcMHz,
+    nbsRoadmFlexgridCenterlineMax       NbsTcMHz,
+    nbsRoadmFlexgridCenterlineIncr      NbsTcMHz,
+    nbsRoadmFlexgridBandwidthMin        NbsTcMHz,
+    nbsRoadmFlexgridBandwidthMax        NbsTcMHz,
+    nbsRoadmFlexgridBandwidthIncr       NbsTcMHz
+}
+
+nbsRoadmFlexgridEntry      OBJECT-TYPE
+   SYNTAX      NbsRoadmFlexgridEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      ""
+   INDEX { nbsRoadmFlexgridIfIndex }
+   ::= { nbsRoadmFlexgridTable 1 }
+
+nbsRoadmFlexgridIfIndex   OBJECT-TYPE
+   SYNTAX      InterfaceIndex
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The Mib2 ifIndex of the Common port."
+   ::= { nbsRoadmFlexgridEntry 1 }
+
+nbsRoadmFlexgridCenterlineMin OBJECT-TYPE
+   SYNTAX      NbsTcMHz
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The frequency of the lowest centerline possible."
+   DEFVAL { 190100000 }
+   ::= { nbsRoadmFlexgridEntry 21 }
+
+nbsRoadmFlexgridCenterlineMax OBJECT-TYPE
+   SYNTAX      NbsTcMHz
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The frequency of the highest centerline possible."
+   DEFVAL { 197250000 }
+   ::= { nbsRoadmFlexgridEntry 22 }
+
+nbsRoadmFlexgridCenterlineIncr OBJECT-TYPE
+   SYNTAX      NbsTcMHz
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Centerline increment - the minimum possible difference, in MHz,
+       between adjacent channels' centerlines."
+   DEFVAL { 12500 }
+   ::= { nbsRoadmFlexgridEntry 23 }
+
+nbsRoadmFlexgridBandwidthMin OBJECT-TYPE
+   SYNTAX      NbsTcMHz
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The minimum bandwidth possible.  Each channel must be at least
+       this wide."
+   DEFVAL { 25000 }
+   ::= { nbsRoadmFlexgridEntry 31 }
+
+nbsRoadmFlexgridBandwidthMax OBJECT-TYPE
+   SYNTAX      NbsTcMHz
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The maximum bandwidth possible.  Each channel must be at most
+       this wide."
+   DEFVAL { 25000 }
+   ::= { nbsRoadmFlexgridEntry 32 }
+
+nbsRoadmFlexgridBandwidthIncr OBJECT-TYPE
+   SYNTAX      NbsTcMHz
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The granularity of bandwidths possible.  Each channel's
+       bandwidth must be a multiple of this number."
+   DEFVAL { 25000 }
+   ::= { nbsRoadmFlexgridEntry 33 }
+
+
+
+-- *******************************************************************
+--
+-- the nbsRoadmStagingGrp
+--
+-- *******************************************************************
+
+
+nbsRoadmStagingTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRoadmStagingTable"
+    ::= { nbsRoadmStagingGrp 1 }
+
+nbsRoadmStagingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRoadmStagingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Scratchpad where users can specify a new WSS configuration.
+        Changes to this table have no effect on the system until they
+        are committed using nbsRoadmCommonStagingApply."
+    ::= { nbsRoadmStagingGrp 2 }
+
+nbsRoadmStagingEntry      OBJECT-TYPE
+    SYNTAX      NbsRoadmStagingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    INDEX { nbsRoadmStagingIfIndex, nbsRoadmStagingCenterline }
+    ::= { nbsRoadmStagingTable 1 }
+
+NbsRoadmStagingEntry ::= SEQUENCE {
+    nbsRoadmStagingIfIndex        InterfaceIndex,
+    nbsRoadmStagingCenterline     NbsTcMHz,
+    nbsRoadmStagingBandwidth      NbsTcMHz,
+    nbsRoadmStagingChannelName    DisplayString,
+    nbsRoadmStagingAddPort        InterfaceIndex,
+    nbsRoadmStagingDropPort       InterfaceIndex,
+    nbsRoadmStagingSecondaryPort  InterfaceIndex,
+    nbsRoadmStagingSecondAttenu   NbsTcMilliDb,
+    nbsRoadmStagingAddAttenu      NbsTcMilliDb,
+    nbsRoadmStagingDropAttenu     NbsTcMilliDb,
+    nbsRoadmStagingItuName        DisplayString,
+    nbsRoadmStagingRowStatus      RowStatus
+}
+
+nbsRoadmStagingIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Common port."
+    ::= { nbsRoadmStagingEntry 1 }
+
+nbsRoadmStagingCenterline   OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The center frequency of this channel, in MHz"
+    ::= { nbsRoadmStagingEntry 2 }
+
+nbsRoadmStagingBandwidth  OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The amount of spectrum allocated for this channel, in MHz"
+    DEFVAL { 100000 }
+    ::= { nbsRoadmStagingEntry 10 }
+
+nbsRoadmStagingChannelName  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "User-assigned name for this channel.  The assigned name must be
+        unique within this agent system."
+    ::= { nbsRoadmStagingEntry 30 }
+
+nbsRoadmStagingAddPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Add port.
+
+        This channel will be blocked from all Add ports except the port
+        specified here.  Setting this object to 0 blocks the channel on
+        all Add ports.
+
+        Not supported value : -1"
+    ::= { nbsRoadmStagingEntry 41 }
+
+nbsRoadmStagingDropPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Drop port.
+
+        This channel will be blocked on all Drop ports except the port
+        specified here.  Setting this object to 0 blocks the channel on
+        all Drop ports.
+
+        Not supported value : -1"
+
+    ::= { nbsRoadmStagingEntry 42 }
+
+nbsRoadmStagingSecondaryPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Secondary port.
+
+        This channel will be blocked from all Add ports except the port
+        specified here.  Setting this object to 0 removes the secondary."
+    ::= { nbsRoadmStagingEntry 43 }
+
+nbsRoadmStagingSecondAttenu OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Attenuation actually being applied to the secondary port, in
+        millidecibels (mdB)."
+    DEFVAL { -1000000 }
+    ::= { nbsRoadmStagingEntry 44 }
+
+nbsRoadmStagingAddAttenu OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Attenuation to be applied to Add channel, expressed in
+        millidecibels (mdB). Default is the blocked value as defined
+        in NbsTcMilliDb"
+    DEFVAL { -1000000 }
+    ::= { nbsRoadmStagingEntry 51 }
+
+nbsRoadmStagingDropAttenu OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Attenuation to be applied to Drop channel, expressed in
+        millidecibels (mdB). Default is the blocked value as defined
+        in NbsTcMilliDb"
+    DEFVAL { -1000000 }
+    ::= { nbsRoadmStagingEntry 52 }
+
+nbsRoadmStagingItuName  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "If this channel's centerline and bandwidth match a channel
+        specified in the ITU grid DWDM standard, the name of that ITU
+        channel will be shown here.  The naming convention for 100GHz
+        channels will be the two digit ITU channel number.  For 50GHz
+        channels, the convention will be to specify either the C or H
+        band, followed by the two digit ITU channel number.
+
+        For user-defined channels that don't match an ITU channel, this
+        object will report 'N/A'."
+    ::= { nbsRoadmStagingEntry 53 }
+
+nbsRoadmStagingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Used to create and delete channels in staging area"
+    DEFVAL { active }
+    ::= { nbsRoadmStagingEntry 99 }
+
+
+
+-- *******************************************************************
+--
+-- the nbsRoadmCommittedGrp
+--
+-- *******************************************************************
+
+nbsRoadmCommittedTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRoadmCommittedTable"
+    ::= { nbsRoadmCommittedGrp 1 }
+
+nbsRoadmCommittedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRoadmCommittedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Current wss configuration"
+    ::= { nbsRoadmCommittedGrp 2 }
+
+nbsRoadmCommittedEntry      OBJECT-TYPE
+    SYNTAX      NbsRoadmCommittedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    INDEX { nbsRoadmCommittedIfIndex, nbsRoadmCommittedCenterline }
+    ::= { nbsRoadmCommittedTable 1 }
+
+NbsRoadmCommittedEntry ::= SEQUENCE {
+    nbsRoadmCommittedIfIndex          InterfaceIndex,
+    nbsRoadmCommittedCenterline       NbsTcMHz,
+    nbsRoadmCommittedBandwidth        NbsTcMHz,
+    nbsRoadmCommittedChannelName      DisplayString,
+    nbsRoadmCommittedAddPort          InterfaceIndex,
+    nbsRoadmCommittedDropPort         InterfaceIndex,
+    nbsRoadmCommittedSecondaryPort    InterfaceIndex,
+    nbsRoadmCommittedSecondAttenu     NbsTcMilliDb,
+    nbsRoadmCommittedAddAttenu        NbsTcMilliDb,
+    nbsRoadmCommittedDropAttenu       NbsTcMilliDb,
+    nbsRoadmCommittedItuName          DisplayString
+}
+
+nbsRoadmCommittedIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of the channel's Common port."
+    ::= { nbsRoadmCommittedEntry 1 }
+
+nbsRoadmCommittedCenterline   OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The center frequency of this channel, in MHz"
+    ::= { nbsRoadmCommittedEntry 2 }
+
+nbsRoadmCommittedBandwidth  OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The amount of spectrum allocated for this channel, in MHz"
+    DEFVAL { 100000 }
+    ::= { nbsRoadmCommittedEntry 10 }
+
+nbsRoadmCommittedChannelName  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "User-assigned name for this channel.  The assigned name must be
+        unique within this agent system.
+
+        This object is equivalent to nbsWdmChannelCustomName."
+    ::= { nbsRoadmCommittedEntry 30 }
+
+nbsRoadmCommittedAddPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Add port.
+
+        This channel will be blocked from all Add ports except the port
+        specified here.  Setting this object to 0 blocks the channel on
+        all ports.
+
+        Not supported value : -1"
+    ::= { nbsRoadmCommittedEntry 41 }
+
+nbsRoadmCommittedDropPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Drop port.
+
+        This channel will be blocked on all Drop ports except the port
+        specified here.  Setting this object to 0 blocks the channel on
+        all ports.
+
+        Not supported value : -1"
+    ::= { nbsRoadmCommittedEntry 42 }
+
+nbsRoadmCommittedSecondaryPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Secondary Add port.
+
+        This channel will be blocked from all Add ports except the port
+        specified here.  Setting this object to 0 removes the secondary."
+    ::= { nbsRoadmCommittedEntry 43 }
+
+nbsRoadmCommittedSecondAttenu OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Attenuation actually being applied to the secondary port, in
+        millidecibels (mdB)."
+    ::= { nbsRoadmCommittedEntry 44 }
+
+nbsRoadmCommittedAddAttenu OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Attenuation actually being applied to Add channel, in
+        millidecibels (mdB)."
+    ::= { nbsRoadmCommittedEntry 51 }
+
+nbsRoadmCommittedDropAttenu OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Attenuation actually being applied to Drop channel, in
+        millidecibels (mdB)."
+    ::= { nbsRoadmCommittedEntry 52 }
+
+nbsRoadmCommittedItuName  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "If this channel's centerline and bandwidth match a channel
+        specified in the ITU grid DWDM standard, the name of that ITU
+        channel will be shown here.  The naming convention for 100GHz
+        channels will be the two digit ITU channel number.  For 50GHz
+        channels, the convention will be to specify either the C or H
+        band, followed by the two digit ITU channel number.
+
+        For user-defined channels that don't match an ITU channel, this
+        object will report 'N/A'."
+    ::= { nbsRoadmCommittedEntry 60 }
+
+
+
+
+-- *******************************************************************
+--
+-- the nbsRoadmRedundantGrp
+--
+-- *******************************************************************
+
+nbsRoadmRedundantTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRoadmRedundantTable"
+    ::= { nbsRoadmRedundantGrp 1 }
+
+nbsRoadmRedundantTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRoadmRedundantEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Current wss redundancy configuration"
+    ::= { nbsRoadmRedundantGrp 2 }
+
+nbsRoadmRedundantEntry      OBJECT-TYPE
+    SYNTAX      NbsRoadmRedundantEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    INDEX { nbsRoadmRedundantIfIndex, nbsRoadmRedundantCenterline }
+    ::= { nbsRoadmRedundantTable 1 }
+
+NbsRoadmRedundantEntry ::= SEQUENCE {
+    nbsRoadmRedundantIfIndex      InterfaceIndex,
+    nbsRoadmRedundantCenterline   NbsTcMHz,
+    nbsRoadmRedundantItuName      DisplayString,
+    nbsRoadmRedundantChannelName  DisplayString,
+    nbsRoadmRedundantMapPort      InterfaceIndex,
+    nbsRoadmRedundantSecondaryPort InterfaceIndex,
+    nbsRoadmRedundantCurPort      InterfaceIndex,
+    nbsRoadmRedundantCurAttenu    NbsTcMilliDb,
+    nbsRoadmRedundantCurState     INTEGER
+}
+
+nbsRoadmRedundantIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of the channel's Common port."
+    ::= { nbsRoadmRedundantEntry 1 }
+
+nbsRoadmRedundantCenterline   OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The center frequency of this channel, in MHz"
+    ::= { nbsRoadmRedundantEntry 2 }
+
+nbsRoadmRedundantItuName  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "If this channel's centerline and bandwidth match a channel
+        specified in the ITU grid DWDM standard, the name of that ITU
+        channel will be shown here.  The naming convention for 100GHz
+        channels will be the two digit ITU channel number.  For 50GHz
+        channels, the convention will be to specify either the C or H
+        band, followed by the two digit ITU channel number.
+
+        For user-defined channels that don't match an ITU channel, this
+        object will report 'N/A'."
+    ::= { nbsRoadmRedundantEntry 10 }
+
+nbsRoadmRedundantChannelName  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "User-assigned name for this channel.  The assigned name must be
+        unique within this agent system.
+
+        This object is equivalent to nbsWdmChannelCustomName."
+    ::= { nbsRoadmRedundantEntry 20 }
+
+nbsRoadmRedundantMapPort  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of the current channel's map port."
+    ::= { nbsRoadmRedundantEntry 29 }
+
+nbsRoadmRedundantSecondaryPort  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of the current channel's Secondary port."
+    ::= { nbsRoadmRedundantEntry 30 }
+
+nbsRoadmRedundantCurPort  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of the current channel's Secondary port."
+    ::= { nbsRoadmRedundantEntry 40 }
+
+nbsRoadmRedundantCurAttenu  OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Attenuation actually being applied to the redundant channel, in
+        millidecibels (mdB)."
+    ::= { nbsRoadmRedundantEntry 41 }
+
+nbsRoadmRedundantCurState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        switching (1),
+        active    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The state of the current redundant port."
+    ::= { nbsRoadmRedundantEntry 50 }
+
+
+-- *******************************************************************
+--
+-- the nbsRoadmEvent group
+--
+-- *******************************************************************
+
+nbsRoadmEventStageAreaCommitted  NOTIFICATION-TYPE
+    OBJECTS  { nbsRoadmCommonIfIndex, ifAlias, nbsRoadmCommonCommittedGridType,
+        nbsRoadmCommonCommittedChannels  }
+    STATUS      current
+    DESCRIPTION
+       "Sent after an nbsRoadmCommonStagingCommit request is fulfilled.
+
+        This Notification is of severity ERROR, which means it should
+        be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
+        to a severity worse than error(3)."
+    ::= { nbsRoadmEvent 10 }
+
+nbsRoadmEventRedundancyTriggered  NOTIFICATION-TYPE
+    OBJECTS  { nbsRoadmRedundantIfIndex, nbsRoadmRedundantCenterline  }
+    STATUS      current
+    DESCRIPTION
+       "Sent after an channel redundancy takes effect.
+
+        This Notification is of severity ERROR, which means it should
+        be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
+        to a severity worse than error(3)."
+    ::= { nbsRoadmEvent 20 }
+
+END

@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- NMS-OPTICAL-PORT-MIB:  NMS OPTICAL-POWER MIB file
+-- AUG 2010
+-- *****************************************************************
+--
+
+               NMS-OPTICAL-PORT-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    NOTIFICATION-TYPE,INTEGER
+                        FROM SNMPv2-SMI
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+                    nmsMgmt
+                        FROM NMS-SMI
+		    nmsEPONGroup
+			FROM NMS-SMI;
+
+--definition of NMS device optical port receive/send related power parameters
+
+               opticalPortPower         OBJECT IDENTIFIER ::= { nmsMgmt 183 }
+
+          opticalPortPowerTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF OpticalPortPowerEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of optical interface entries."
+              ::= { opticalPortPower 1 }
+
+          opticalPortPowerEntry OBJECT-TYPE
+              SYNTAX  OpticalPortPowerEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An optical interface entry containing objects at the
+                      subnetwork layer and below for a particular
+                      interface."
+              INDEX   { opIfIndex }
+              ::= { opticalPortPowerTable 1 }
+
+          OpticalPortPowerEntry ::=
+              SEQUENCE {
+                  opIfIndex
+                      INTEGER,
+                  opIfDescr
+                      DisplayString,
+                  opIfAdminStatus
+                      INTEGER,
+                  opIfOperStatus
+                      INTEGER,
+                  opIfRxPowerCurr
+                      INTEGER,    
+		  opIfRxPowerULimit
+                      INTEGER,		     
+		  opIfRxPowerLLimit
+                      INTEGER,	
+                  opIfTxPowerCurr
+                      INTEGER,    	     
+		  opIfTxPowerULimit
+                      INTEGER,		     
+		  opIfTxPowerLLimit
+                      INTEGER,
+                  opIfUploadBERLimit
+                      INTEGER,
+                  opIfPowerTrapStatus
+                      INTEGER,
+                  opIfTemperature
+                      INTEGER,
+                  opIfVolt
+                      INTEGER,
+                  opIfCurrent
+                      INTEGER
+                                    
+                     
+              }
+              
+          opIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface. The same value as ifIndex of ifTable in RFC1213."
+              ::= { opticalPortPowerEntry 1 }
+
+          opIfDescr OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A textual string containing information about the optical interface. The same value as ifDesc of ifTable in RFC1213. "
+              ::= { opticalPortPowerEntry 2 }
+              
+          opIfAdminStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          up(1),       -- ready to pass packets
+                          down(2),
+                          testing(3)   -- in some test mode
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The desired state of the interface. The same value as ifAdminStatus of ifTable in RFC1213."
+              ::= { opticalPortPowerEntry 3 }
+
+          opIfOperStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          up(1),       -- ready to pass packets
+                          down(2),
+                          testing(3)   -- in some test mode
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current operational state of the optical interface. The same value as ifOperStatus of ifTable in RFC1213."
+              ::= { opticalPortPowerEntry 4 }
+
+          opIfRxPowerCurr OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical current receive power value."
+              ::= { opticalPortPowerEntry 5 }
+              
+          opIfRxPowerULimit OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical receive upper limit."
+              ::= { opticalPortPowerEntry 6 }
+              
+          opIfRxPowerLLimit OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical receiving lower limit."
+              ::= { opticalPortPowerEntry 7 }
+              
+          opIfTxPowerCurr OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical current sending power value."
+              ::= { opticalPortPowerEntry 8 }
+
+          opIfTxPowerULimit OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical sending upper limit."
+              ::= { opticalPortPowerEntry 9 }
+              
+          opIfTxPowerLLimit OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical sending lower limit."
+              ::= { opticalPortPowerEntry 10 }
+
+          opIfUploadBERLimit OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical port BER threshold."
+              ::= { opticalPortPowerEntry 11 }
+
+          opIfPowerTrapStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                                 on(0),
+                                 off(1)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical R/X power limit trap sending status. 0-on, 1-off."
+              ::= { opticalPortPowerEntry 12 }
+
+          opIfTemperature OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical module temperature. Unit is 1/256 Celsius."
+              ::= { opticalPortPowerEntry 13 }
+
+          opIfVolt OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical module volt. Unit is 100uV."
+              ::= { opticalPortPowerEntry 14 }
+
+          opIfCurrent OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each optical interface, that means optical module current. Unit is 2uA."
+              ::= { opticalPortPowerEntry 15 }
+
+
+          opIfTransMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              upload(1),
+                              download(2)
+              }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A value for optical interface trasporting mode, 1-upload, 2-download."
+              ::= { opticalPortPower 2 }
+
+          opIfTransPowerAlarm OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              over(1),
+                              below(2),
+                              normal(3)
+              }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A value for optical interface trasporting power alarm, 1-over than upper limit, 2-lower than lower limit."
+              ::= { opticalPortPower 3 }
+              
+              
+
+          opIfBERStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              exception(1),
+                              normal(2)
+              }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A value for optical interface BER status, 1-exception, 2-recover to normal status."
+              ::= { opticalPortPower 4 }
+              
+              
+
+-- Notifications
+	nmsOpIfPowerThresNotifications OBJECT IDENTIFIER
+                                ::= { opticalPortPower 5 }
+
+
+	nmsOpIfPowerThresNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       opIfIndex,
+                       opIfDescr,
+                       opIfTransMode,
+                       opIfTransPowerAlarm
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when optical interface upload/download power exceed the threshold ruled in opticalPortPowerTable."
+    		::= { nmsOpIfPowerThresNotifications 1 }
+
+-- Notifications
+	opIfUploadBERNotifications OBJECT IDENTIFIER
+                                ::= { opticalPortPower 6 }
+
+
+	opIfUploadBERNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       opIfIndex,
+                       opIfDescr,
+                       opIfBERStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when optical interface upload BER exceed the threshold ruled in opticalPortPowerTable."
+    		::= { opIfUploadBERNotifications 1 }
+
+              
+	
+
+
+              
+              		     
+END

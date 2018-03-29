@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <title>Demo &raquo; sticky position widgets &raquo; gridster.js</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/demo.css">
+    <link rel="stylesheet" type="text/css" href="../dist/jquery.gridster.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="../dist/jquery.gridster.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+
+<h1>Sticky position widgets</h1>
+
+<p>Widgets can be moved to an exact postion on the grid and the grid will not attempt to collapse it down to a smaller size.  Also widgets will not move out of the way automatically, but will move only on mouse up</p>
+
+
+<div class="gridster">
+    <ul>
+    <ul class="task-card-list">
+        <li data-row="1" data-col="1" data-sizex="1" data-sizey="1" class="task-card">0</li>
+        <li data-row="1" data-col="2" data-sizex="1" data-sizey="1" class="task-card">1</li>
+        <li data-row="1" data-col="3" data-sizex="1" data-sizey="1" class="task-card">2</li>
+        <li data-row="1" data-col="4" data-sizex="1" data-sizey="1" class="task-card">3</li>
+        <li data-row="2" data-col="1" data-sizex="1" data-sizey="1" class="task-card">4</li>
+        <li data-row="2" data-col="3" data-sizex="1" data-sizey="2" class="task-card">5</li>
+        <li data-row="2" data-col="4" data-sizex="1" data-sizey="1" class="task-card">6</li>
+        <li data-row="3" data-col="1" data-sizex="1" data-sizey="1" class="task-card">7</li>
+        <li data-row="3" data-col="2" data-sizex="1" data-sizey="1" class="task-card">8</li>
+        <li data-row="3" data-col="4" data-sizex="1" data-sizey="1" class="task-card">9</li>
+		</ul>
+</div>
+
+
+<script type="text/javascript">
+    var gridster;
+
+        gridster = $(".gridster ul").gridster({
+            widget_base_dimensions: [100, 100],
+            widget_margins: [5, 5],
+            shift_widgets_up: false,
+            shift_larger_widgets_down: false,
+            collision: {
+                wait_for_mouseup: true
+            }
+        }).data('gridster');
+
+</script>
+</body>
+</html>

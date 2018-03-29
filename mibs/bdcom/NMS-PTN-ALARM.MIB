@@ -1,0 +1,455 @@
+
+NMS-PTN-ALARM DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsPTNGroup                                 FROM NMS-SMI
+    DateAndTime, TruthValue						FROM SNMPv2-TC;
+
+  
+  
+    nmsPtnAlarm         OBJECT IDENTIFIER ::= { nmsPTNGroup 1 }
+   	ptnNotifications OBJECT IDENTIFIER ::= { nmsPtnAlarm 1 }
+	ptnAlarmNotification NOTIFICATION-TYPE
+	OBJECTS { 
+		ptnTrapCode,
+		prnTrapType,
+		ptnTrapInstance,
+		ptnTrapSeverity, 
+		ptnTrapAdditionalText, 
+		ptnTrapOccurTime, 
+		ptnTrapSequenceNumber
+	}
+	STATUS current
+	DESCRIPTION
+	"Alarm TRAP definition"
+	::= { ptnNotifications 1 }    
+	
+	ptnEventNotification NOTIFICATION-TYPE
+	OBJECTS {    
+		ptnTrapCode,   
+		prnTrapType,
+		ptnTrapInstance,		
+		ptnTrapAdditionalText,
+		ptnTrapOccurTime,       
+		ptnTrapSequenceNumber
+	}
+	STATUS current
+	DESCRIPTION
+	"Event TRAP definition"
+	::= { ptnNotifications 2 }    
+	
+	ptnTrapObjects OBJECT IDENTIFIER ::= { nmsPtnAlarm 2 }     
+	                        
+	ptnTrapCode OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	""
+	::= { ptnTrapObjects 1 }     
+	
+	ptnTrapType OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	""
+	::= { ptnTrapObjects 2 }
+
+                        
+	ptnTrapInstance OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	"Alarm instance, indicates the detailed managed object, which
+	detects faults.	"
+	::= { ptnTrapObjects 3 }    
+	                            
+	ptnTrapSeverity OBJECT-TYPE
+	SYNTAX Unsigned32  
+	{
+		critical(1),
+		major(2),
+		minor(3),
+		warning(4),
+		info(5),
+		clear(6)
+	}
+
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	"
+	告警严重程度。"
+	::= { ptnTrapObjects 4 }
+                           
+	ptnTrapAdditionalText OBJECT-TYPE
+	SYNTAX OCTET STRING ( SIZE (0..256) )
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	"Additional info to the alarm, for further desciption of the
+	alarm. The format of it shall be related to each kind alarm
+	defined in alarm reference table"
+
+	::= { ptnTrapObjects 5 }  
+	
+	ptnTrapOccurTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	"
+	告警产生时间。"
+	::= { ptnTrapObjects 6 }   
+	
+	ptnTrapSequenceNumber OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	""
+	::= { ptnTrapObjects 7 }             
+	
+	activeAlarmTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ActiveAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Active alarm table"
+	::= { nmsPtnAlarm 3 }   
+	
+	activeAlarmEntry OBJECT-TYPE
+	SYNTAX ActiveAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { activeAlarmSeqNum, activeAlarmRaisingNumber }
+	::= { activeAlarmTable 1 }   
+	
+	ActiveAlarmEntry ::=
+	SEQUENCE {
+		activeAlarmSeqNum 	Unsigned32,
+		activeAlarmCode	 	Unsigned32,
+		activeAlarmInstance	Unsigned32,
+		activeAlarmSeverity Unsigned32,
+		activeAlarmRaisingNumber	Unsigned32,
+		activeAlarmFirstOccurTime	DateAndTime,
+		activeAlarmLastOccurTime	DateAndTime,
+		activeAlarmRepeats			Counter32,
+		activeAlarmConfirm			TruthValue,
+		activeAlarmAdditionalText	OCTET STRING
+	}
+	activeAlarmSeqNum OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Alarm sequence number
+	The definition refered to the description of activeAlarmTable"
+	::= { activeAlarmEntry 1 }  
+	
+	activeAlarmCode OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	告警代码，见附录B
+	"
+	::= { activeAlarmEntry 2 }  
+	
+	activeAlarmInstance OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Alarm instance, indicates the detailed managed object"
+	::= { activeAlarmEntry 3 }
+	activeAlarmSeverity OBJECT-TYPE
+
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	告警严重程度。"
+	::= { activeAlarmEntry 4 }    
+	
+	activeAlarmRaisingNumber OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Alarm raising number.
+	The definition refered to the description of activeAlarmTable"
+	::= { activeAlarmEntry 5 }       
+	
+	activeAlarmFirstOccurTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	告警初始发生的时间
+	The time stamp when alarm occurs, which triggered to create the
+	active alarm entry."
+	::= { activeAlarmEntry 6 }       
+	
+	activeAlarmLastOccurTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	The time stamp when alarm occurs, where the alarm is duplicated
+	with existed active alarm entry, and it was the latest one. "
+	::= { activeAlarmEntry 7 }    
+	
+	activeAlarmRepeats OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	
+	"Number of repeated alarms for this active alarm entry"
+	::= { activeAlarmEntry 8 }     
+	
+	activeAlarmConfirm OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"
+	告警确认
+	Node shall not clear an active alarm, upon the confirmation
+	of the active alarm, but just mark an acknowledged status.
+	An alarm will only be cleared once the clear condition hits."
+	::= { activeAlarmEntry 9 }     
+	
+	activeAlarmAdditionalText OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..256))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Additional info to the alarm, for further desciption of the
+	alarm. The format of it shall be related to each kind alarm
+	defined in alarm reference table"
+	::= { activeAlarmEntry 10 }
+                              
+	historyAlarmTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HistoryAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	::= { nmsPtnAlarm 4 }
+                          
+	historyAlarmEntry OBJECT-TYPE
+	SYNTAX HistoryAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { historyAlarmSeqNum, historyAlarmRaisingNumber }
+	::= { historyAlarmTable 1 }   
+	
+	HistoryAlarmEntry ::=
+	SEQUENCE {
+		historyAlarmSeqNum		Unsigned32,
+		historyAlarmCode		Unsigned32,
+		historyAlarmInstance		Unsigned32,
+		historyAlarmSeverity		Unsigned32,
+		historyAlarmRaisingNumber		Unsigned32,
+		historyAlarmFirstOccurTime		DateAndTime,
+		historyAlarmLastOccurTime		DateAndTime,
+		historyAlarmRepeats		Counter32,
+		historyAlarmCorrelationId		Unsigned32,
+		historyAlarmAdditionalText		OCTET STRING,
+		historyAlarmClearTime		DateAndTime
+	}       
+	
+	historyAlarmSeqNum OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Alarm sequence number
+	
+	The definition refered to the description of historyAlarmTable"
+	::= { historyAlarmEntry 1 }        
+		
+	historyAlarmCode OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	告警代码，见附录B
+	"
+	::= { historyAlarmEntry 2 }    
+	
+	historyAlarmInstance OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Alarm instance, indicates the detailed managed object"
+	::= { historyAlarmEntry 3 }   
+		
+	historyAlarmSeverity OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	告警严重程度。"
+	::= { historyAlarmEntry 4 }   
+	
+	historyAlarmRaisingNumber OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Alarm raising number.
+	The definition refered to the description of historyAlarmTable"
+	::= { historyAlarmEntry 5 }    
+	
+	historyAlarmFirstOccurTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	告警初始发生的时间
+	The time stamp when alarm occurs, which triggered to create the
+	history alarm entry."
+	::= { historyAlarmEntry 6 }      
+	
+	historyAlarmLastOccurTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	The time stamp when alarm occurs, where the alarm is duplicated
+	with existed history alarm entry, and it was the latest one. "
+	::= { historyAlarmEntry 7 }      
+	
+	historyAlarmRepeats OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Number of repeated alarms for this history alarm entry"
+	::= { historyAlarmEntry 8 }     
+	
+	historyAlarmCorrelationId OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"It is the corresponding sequence ID of the alarm that to
+	be cleared. "
+	::= { historyAlarmEntry 9 }     
+	
+	historyAlarmAdditionalText OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..256))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Additional info to the alarm, for further desciption of the
+	alarm. The format of it shall be related to each kind alarm
+	defined in alarm reference table"
+	::= { historyAlarmEntry 10 }
+
+	historyAlarmClearTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Define when the alarm was cleared"
+	::= { historyAlarmEntry 11 }    
+	
+	eventLogTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	::= { nmsPtnAlarm 5 }        
+	
+	eventLogEntry OBJECT-TYPE
+	SYNTAX EventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	INDEX { eventSeqNum }
+	::= { eventLogTable 1 }   
+		
+	EventLogEntry ::=
+	SEQUENCE {
+		eventSeqNum		Unsigned32,
+		eventCode		Unsigned32,
+	    eventInstance		Unsigned32,
+		eventOccurTime		DateAndTime,
+		eventAdditionalText		OCTET STRING,
+	}        
+	
+	eventSeqNum OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Event sequence number
+	The definition refered to the description of eponTrapSequenceNumber"
+	::= { eventLogEntry 1 }   
+	
+	eventCode OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	事件代码，见附录B
+	"
+	::= { eventLogEntry 2 }  
+	
+	eventInstance OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Event instance, indicates the detailed managed object"
+	::= { eventLogEntry 3 }     
+	
+	eventOccurTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"
+	The time stamp when event occurs"
+	
+	::= { eventLogEntry 4 }       
+	
+	eventAdditionalText OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..256))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Additional info to the event, for further desciption of the
+	event. The format of it shall be related to each kind event
+	defined in event reference table"
+	::= { eventLogEntry 5 }
+
+	
+	
+END    
+

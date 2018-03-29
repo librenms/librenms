@@ -1,0 +1,125 @@
+-- =================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: The HUAWEI-IPV6-MIB provides information about IPv6.
+--              
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              wangshuangxu,2007.5.24,publish 
+-- =================================================================
+HUAWEI-IPV6-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm
+            FROM HUAWEI-MIB
+        ifIndex
+            FROM IF-MIB
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC 
+        DisplayString
+            FROM SNMPv2-TC
+        ipv6IfIndex
+            FROM IPV6-MIB           
+        EnabledStatus                                   
+            FROM P-BRIDGE-MIB;
+
+    hwIpv6Mib MODULE-IDENTITY
+        LAST-UPDATED "200705241610Z"
+        ORGANIZATION "IPv6-Team of Huawei Technologies"
+        CONTACT-INFO
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Showchuang Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:winstan@huawei.com"
+        DESCRIPTION
+            "The MIB module for entities implementing the IPv6
+             protocol."
+        ::= { hwDatacomm 153 }
+        
+    hwIpv6MibObjects OBJECT IDENTIFIER ::= { hwIpv6Mib 1 }
+        
+    -- ==============================    
+    -- the ipv6 Interfaces table
+    -- ==============================        
+  
+    hwIpv6IfTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwIpv6IfEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The IPv6 interfaces table contains information
+            on the entity's internetwork-layer interfaces."
+        ::= { hwIpv6MibObjects 1 }
+    
+    hwIpv6IfEntry OBJECT-TYPE
+        SYNTAX     HwIpv6IfEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An interface entry containing objects
+             about a particular IPv6 interface."
+        INDEX   { ipv6IfIndex }
+        ::= { hwIpv6IfTable 1 }
+        
+    
+    HwIpv6IfEntry ::= SEQUENCE {
+        hwIpv6IfDescr             DisplayString,
+        hwIpv6IfEnableFlag        EnabledStatus
+        }
+    
+    
+    hwIpv6IfDescr OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object identifies interface name."
+        ::= { hwIpv6IfEntry 1 }
+        
+    hwIpv6IfEnableFlag OBJECT-TYPE
+        SYNTAX    EnabledStatus  
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object identifies whether IPv6 is enabled on interface 
+            or not. If IPv6 is enabled on interface, the value of 
+            this object refers to 1,else refers to 2."
+        ::= { hwIpv6IfEntry 2 }
+        
+    hwIpv6MibConformance OBJECT IDENTIFIER ::= { hwIpv6Mib 2 }
+    
+    hwIpv6Compliances  OBJECT IDENTIFIER ::= { hwIpv6MibConformance 1 }
+    hwIpv6Compliance  MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for systems supporting 
+             the HUAWEI-IPV6-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS {
+            hwIpv6Group
+            }
+        ::= { hwIpv6Compliances 1 }
+    
+    hwIpv6Groups OBJECT IDENTIFIER ::= { hwIpv6MibConformance 2 }
+    hwIpv6Group OBJECT-GROUP
+        OBJECTS { 
+            hwIpv6IfDescr, 
+            hwIpv6IfEnableFlag}
+        STATUS current
+        DESCRIPTION 
+            "The IPv6 table member."
+        ::= { hwIpv6Groups 1 }
+
+END
+    
+                  
+                                                                           
+                                                                           

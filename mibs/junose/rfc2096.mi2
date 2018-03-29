@@ -1,0 +1,805 @@
+IP-FORWARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    ip
+          FROM IP-MIB
+--        FROM RFC1213-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+ipForward MODULE-IDENTITY
+    LAST-UPDATED "9609190000Z"     -- Thu Sep 26 16:34:47 PDT 1996
+    ORGANIZATION "IETF OSPF Working Group"
+    CONTACT-INFO
+     "        Fred Baker
+      Postal: Cisco Systems
+              519 Lado Drive
+              Santa Barbara, California 93111
+
+      Phone:  +1 805 681 0115
+      Email:  fred@cisco.com
+      "
+    DESCRIPTION
+            "The MIB module for the display of CIDR multipath IP Routes."
+    REVISION      "9609190000Z"
+    DESCRIPTION
+            "Revisions made by the OSPF WG."
+    ::= { ip 24 }
+
+ipCidrRouteNumber OBJECT-TYPE
+    SYNTAX   Gauge32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The number of current ipCidrRouteTable entries
+       that are not invalid."
+    ::= { ipForward 3 }
+
+--  IP CIDR Route Table
+
+--  The IP CIDR Route Table obsoletes and replaces the ipRoute
+--  Table current in MIB-I and MIB-II and the IP Forwarding Table.
+--  It adds knowledge of the autonomous system of the next hop,
+--  multiple next hops, and policy routing, and Classless
+
+
+--  Inter-Domain Routing.
+
+ipCidrRouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF IpCidrRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "This entity's IP Routing table."
+    REFERENCE
+       "RFC 1213 Section 6.6, The IP Group"
+    ::= { ipForward 4 }
+
+ipCidrRouteEntry OBJECT-TYPE
+    SYNTAX   IpCidrRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A particular route to  a  particular  destina-
+       tion, under a particular policy."
+    INDEX {
+        ipCidrRouteDest,
+        ipCidrRouteMask,
+        ipCidrRouteTos,
+        ipCidrRouteNextHop
+        }
+    ::= { ipCidrRouteTable 1 }
+
+IpCidrRouteEntry ::=
+    SEQUENCE {
+        ipCidrRouteDest
+            IpAddress,
+        ipCidrRouteMask
+            IpAddress,
+        ipCidrRouteTos
+             Integer32,
+        ipCidrRouteNextHop
+            IpAddress,
+        ipCidrRouteIfIndex
+            Integer32,
+        ipCidrRouteType
+            INTEGER,
+        ipCidrRouteProto
+            INTEGER,
+        ipCidrRouteAge
+            Integer32,
+        ipCidrRouteInfo
+            OBJECT IDENTIFIER,
+        ipCidrRouteNextHopAS
+            Integer32,
+        ipCidrRouteMetric1
+            Integer32,
+        ipCidrRouteMetric2
+            Integer32,
+        ipCidrRouteMetric3
+            Integer32,
+        ipCidrRouteMetric4
+            Integer32,
+        ipCidrRouteMetric5
+            Integer32,
+        ipCidrRouteStatus
+            RowStatus
+    }
+
+ipCidrRouteDest OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The destination IP address of this route.
+
+       This object may not take a Multicast (Class  D)
+       address value.
+
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       ipCidrRouteMask object is not equal to x."
+    ::= { ipCidrRouteEntry 1 }
+
+ipCidrRouteMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "Indicate the mask to be logical-ANDed with the
+       destination  address  before  being compared to
+       the value  in  the  ipCidrRouteDest  field.   For
+       those  systems  that  do  not support arbitrary
+       subnet masks, an agent constructs the value  of
+       the  ipCidrRouteMask  by  reference to the IP Ad-
+       dress Class.
+
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       ipCidrRouteDest object is not equal to ipCidrRoute-
+       Dest."
+    ::= { ipCidrRouteEntry 2 }
+
+-- The following convention is included for specification
+-- of TOS Field contents.  At this time, the Host Requirements
+-- and the Router Requirements documents disagree on the width
+-- of the TOS field.  This mapping describes the Router
+-- Requirements mapping, and leaves room to widen the TOS field
+-- without impact to fielded systems.
+
+ipCidrRouteTos OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The policy specifier is the IP TOS Field.  The encoding
+       of IP TOS is as specified  by  the  following convention.
+       Zero indicates the default path if no more  specific
+       policy applies.
+
+       +-----+-----+-----+-----+-----+-----+-----+-----+
+       |                 |                       |     |
+       |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |
+       |                 |                       |     |
+       +-----+-----+-----+-----+-----+-----+-----+-----+
+
+                IP TOS                IP TOS
+           Field     Policy      Field     Policy
+           Contents    Code      Contents    Code
+           0 0 0 0  ==>   0      0 0 0 1  ==>   2
+           0 0 1 0  ==>   4      0 0 1 1  ==>   6
+           0 1 0 0  ==>   8      0 1 0 1  ==>  10
+           0 1 1 0  ==>  12      0 1 1 1  ==>  14
+           1 0 0 0  ==>  16      1 0 0 1  ==>  18
+           1 0 1 0  ==>  20      1 0 1 1  ==>  22
+           1 1 0 0  ==>  24      1 1 0 1  ==>  26
+           1 1 1 0  ==>  28      1 1 1 1  ==>  30"
+    ::= { ipCidrRouteEntry 3 }
+
+ipCidrRouteNextHop OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "On remote routes, the address of the next sys-
+       tem en route; Otherwise, 0.0.0.0."
+    ::= { ipCidrRouteEntry 4 }
+
+ipCidrRouteIfIndex OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The ifIndex value which identifies  the  local
+       interface  through  which  the next hop of this
+       route should be reached."
+    DEFVAL { 0 }
+    ::= { ipCidrRouteEntry 5 }
+
+ipCidrRouteType OBJECT-TYPE
+    SYNTAX   INTEGER {
+                other    (1), -- not specified by this MIB
+                reject   (2), -- route which discards traffic
+                local    (3), -- local interface
+                remote   (4)  -- remote destination
+             }
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The type of route.  Note that local(3)  refers
+       to  a route for which the next hop is the final
+       destination; remote(4) refers to  a  route  for
+       which  the  next  hop is not the final destina-
+       tion.
+
+       Routes which do not result in traffic forwarding or
+       rejection should not be displayed even if the
+       implementation keeps them stored internally.
+
+
+       reject (2) refers to a route which, if matched, discards
+       the message as unreachable. This is used in some
+       protocols as a means of correctly aggregating routes."
+    ::= { ipCidrRouteEntry 6 }
+
+ipCidrRouteProto OBJECT-TYPE
+    SYNTAX   INTEGER {
+                other     (1),  -- not specified
+                local     (2),  -- local interface
+                netmgmt   (3),  -- static route
+                icmp      (4),  -- result of ICMP Redirect
+
+                        -- the following are all dynamic
+                        -- routing protocols
+
+                egp        (5),  -- Exterior Gateway Protocol
+                ggp        (6),  -- Gateway-Gateway Protocol
+                hello      (7),  -- FuzzBall HelloSpeak
+                rip        (8),  -- Berkeley RIP or RIP-II
+                isIs       (9),  -- Dual IS-IS
+                esIs       (10), -- ISO 9542
+                ciscoIgrp  (11), -- Cisco IGRP
+                bbnSpfIgp  (12), -- BBN SPF IGP
+                ospf       (13), -- Open Shortest Path First
+                bgp        (14), -- Border Gateway Protocol
+                idpr       (15), -- InterDomain Policy Routing
+                ciscoEigrp (16)  -- Cisco EIGRP
+             }
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The routing mechanism via which this route was
+       learned.  Inclusion of values for gateway rout-
+       ing protocols is not  intended  to  imply  that
+       hosts should support those protocols."
+    ::= { ipCidrRouteEntry 7 }
+
+ipCidrRouteAge OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The number of seconds  since  this  route  was
+       last  updated  or  otherwise  determined  to be
+       correct.  Note that no semantics of  `too  old'
+       can  be implied except through knowledge of the
+       routing  protocol  by  which  the   route   was
+       learned."
+    DEFVAL  { 0 }
+    ::= { ipCidrRouteEntry 8 }
+
+ipCidrRouteInfo OBJECT-TYPE
+    SYNTAX   OBJECT IDENTIFIER
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "A reference to MIB definitions specific to the
+       particular  routing protocol which is responsi-
+       ble for this route, as determined by the  value
+       specified  in the route's ipCidrRouteProto value.
+       If this information is not present,  its  value
+       should be set to the OBJECT IDENTIFIER { 0 0 },
+       which is a syntactically valid object  identif-
+       ier, and any implementation conforming to ASN.1
+       and the Basic Encoding Rules must  be  able  to
+       generate and recognize this value."
+    ::= { ipCidrRouteEntry 9 }
+
+ipCidrRouteNextHopAS OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The Autonomous System Number of the Next  Hop.
+       The  semantics of this object are determined by
+       the routing-protocol specified in  the  route's
+       ipCidrRouteProto  value. When  this object is
+       unknown or not relevant its value should be set
+       to zero."
+    DEFVAL { 0 }
+    ::= { ipCidrRouteEntry 10 }
+
+ipCidrRouteMetric1 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The primary routing  metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipCidrRouteProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipCidrRouteEntry 11 }
+
+ipCidrRouteMetric2 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipCidrRouteProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipCidrRouteEntry 12 }
+
+ipCidrRouteMetric3 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipCidrRouteProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipCidrRouteEntry 13 }
+
+ipCidrRouteMetric4 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipCidrRouteProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipCidrRouteEntry 14 }
+
+ipCidrRouteMetric5 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipCidrRouteProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipCidrRouteEntry 15 }
+
+ipCidrRouteStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { ipCidrRouteEntry 16 }
+
+-- conformance information
+
+ipForwardConformance OBJECT IDENTIFIER ::= { ipForward 5 }
+ipForwardGroups      OBJECT IDENTIFIER ::= { ipForwardConformance 1 }
+ipForwardCompliances OBJECT IDENTIFIER ::= { ipForwardConformance 2 }
+
+-- compliance statements
+
+ipForwardCompliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+       "The compliance statement for SNMPv2 entities
+       which implement the ipForward MIB."
+
+   MODULE  -- this module
+   MANDATORY-GROUPS { ipForwardCidrRouteGroup }
+
+   ::= { ipForwardCompliances 1 }
+
+-- units of conformance
+
+ipForwardCidrRouteGroup OBJECT-GROUP
+    OBJECTS { ipCidrRouteNumber,
+              ipCidrRouteDest, ipCidrRouteMask, ipCidrRouteTos,
+              ipCidrRouteNextHop, ipCidrRouteIfIndex, ipCidrRouteType,
+              ipCidrRouteProto, ipCidrRouteAge, ipCidrRouteInfo,
+              ipCidrRouteNextHopAS, ipCidrRouteMetric1,
+              ipCidrRouteMetric2, ipCidrRouteMetric3,
+              ipCidrRouteMetric4, ipCidrRouteMetric5, ipCidrRouteStatus
+        }
+    STATUS  current
+    DESCRIPTION
+       "The CIDR Route Table."
+    ::= { ipForwardGroups 3 }
+
+-- Obsoleted Definitions - Objects
+
+ipForwardNumber OBJECT-TYPE
+    SYNTAX   Gauge32
+    MAX-ACCESS read-only
+    STATUS   obsolete
+    DESCRIPTION
+       "The number of current  ipForwardTable  entries
+       that are not invalid."
+    ::= { ipForward 1 }
+
+--  IP Forwarding Table
+
+--  The IP Forwarding Table obsoletes and replaces the ipRoute
+--  Table current in MIB-I and MIB-II.  It adds knowledge of
+--  the autonomous system of the next hop, multiple next hop
+--  support, and policy routing support.
+
+ipForwardTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF IpForwardEntry
+    MAX-ACCESS not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+       "This entity's IP Routing table."
+    REFERENCE
+       "RFC 1213 Section 6.6, The IP Group"
+    ::= { ipForward 2 }
+
+ipForwardEntry OBJECT-TYPE
+    SYNTAX   IpForwardEntry
+    MAX-ACCESS not-accessible
+    STATUS   obsolete
+    DESCRIPTION
+       "A particular route to  a  particular  destina-
+       tion, under a particular policy."
+    INDEX {
+        ipForwardDest,
+        ipForwardProto,
+        ipForwardPolicy,
+        ipForwardNextHop
+        }
+    ::= { ipForwardTable 1 }
+
+IpForwardEntry ::=
+    SEQUENCE {
+        ipForwardDest
+            IpAddress,
+        ipForwardMask
+            IpAddress,
+        ipForwardPolicy
+             Integer32,
+        ipForwardNextHop
+            IpAddress,
+        ipForwardIfIndex
+            Integer32,
+        ipForwardType
+            INTEGER,
+        ipForwardProto
+            INTEGER,
+        ipForwardAge
+            Integer32,
+        ipForwardInfo
+            OBJECT IDENTIFIER,
+        ipForwardNextHopAS
+            Integer32,
+        ipForwardMetric1
+            Integer32,
+        ipForwardMetric2
+            Integer32,
+        ipForwardMetric3
+            Integer32,
+        ipForwardMetric4
+            Integer32,
+        ipForwardMetric5
+            Integer32
+    }
+
+ipForwardDest OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   obsolete
+    DESCRIPTION
+       "The destination IP address of this route.   An
+       entry  with  a value of 0.0.0.0 is considered a
+       default route.
+
+       This object may not take a Multicast (Class  D)
+       address value.
+
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       ipForwardMask object is not equal to x."
+    ::= { ipForwardEntry 1 }
+
+ipForwardMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "Indicate the mask to be logical-ANDed with the
+       destination  address  before  being compared to
+       the value  in  the  ipForwardDest  field.   For
+       those  systems  that  do  not support arbitrary
+       subnet masks, an agent constructs the value  of
+       the  ipForwardMask  by  reference to the IP Ad-
+       dress Class.
+
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       ipForwardDest object is not equal to ipForward-
+       Dest."
+    DEFVAL { '00000000'h }      -- 0.0.0.0
+    ::= { ipForwardEntry 2 }
+
+-- The following convention is included for specification
+-- of TOS Field contents.  At this time, the Host Requirements
+-- and the Router Requirements documents disagree on the width
+-- of the TOS field.  This mapping describes the Router
+-- Requirements mapping, and leaves room to widen the TOS field
+-- without impact to fielded systems.
+
+ipForwardPolicy OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS   obsolete
+    DESCRIPTION
+       "The general set of conditions that would cause
+       the  selection  of  one multipath route (set of
+       next hops for a given destination) is  referred
+       to as 'policy'.
+
+       Unless the mechanism indicated by ipForwardPro-
+       to specifies otherwise, the policy specifier is
+       the IP TOS Field.  The encoding of IP TOS is as
+        specified  by  the  following convention.  Zero
+       indicates the default path if no more  specific
+       policy applies.
+
+       +-----+-----+-----+-----+-----+-----+-----+-----+
+       |                 |                       |     |
+       |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |
+       |                 |                       |     |
+       +-----+-----+-----+-----+-----+-----+-----+-----+
+
+                IP TOS                IP TOS
+           Field     Policy      Field     Policy
+           Contents    Code      Contents    Code
+           0 0 0 0  ==>   0      0 0 0 1  ==>   2
+           0 0 1 0  ==>   4      0 0 1 1  ==>   6
+           0 1 0 0  ==>   8      0 1 0 1  ==>  10
+           0 1 1 0  ==>  12      0 1 1 1  ==>  14
+           1 0 0 0  ==>  16      1 0 0 1  ==>  18
+           1 0 1 0  ==>  20      1 0 1 1  ==>  22
+           1 1 0 0  ==>  24      1 1 0 1  ==>  26
+           1 1 1 0  ==>  28      1 1 1 1  ==>  30
+
+       Protocols defining 'policy' otherwise must  ei-
+       ther define a set of values which are valid for
+       this  object  or  must  implement  an  integer-
+       instanced  policy table for which this object's
+       value acts as an index."
+    ::= { ipForwardEntry 3 }
+
+ipForwardNextHop OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   obsolete
+    DESCRIPTION
+       "On remote routes, the address of the next sys-
+       tem en route; Otherwise, 0.0.0.0."
+    ::= { ipForwardEntry 4 }
+
+ipForwardIfIndex OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "The ifIndex value which identifies  the  local
+       interface  through  which  the next hop of this
+       route should be reached."
+    DEFVAL { 0 }
+    ::= { ipForwardEntry 5 }
+
+ipForwardType OBJECT-TYPE
+    SYNTAX   INTEGER {
+                other    (1), -- not specified by this MIB
+                invalid  (2), -- logically deleted
+                local    (3), -- local interface
+                remote   (4)  -- remote destination
+             }
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "The type of route.  Note that local(3)  refers
+       to  a route for which the next hop is the final
+       destination; remote(4) refers to  a  route  for
+       which  the  next  hop is not the final destina-
+       tion.
+
+       Setting this object to the value invalid(2) has
+       the  effect  of  invalidating the corresponding
+       entry in the ipForwardTable object.   That  is,
+       it  effectively  disassociates  the destination
+       identified with said entry from the route iden-
+       tified    with    said   entry.    It   is   an
+       implementation-specific matter  as  to  whether
+       the agent removes an invalidated entry from the
+       table.  Accordingly, management  stations  must
+       be prepared to receive tabular information from
+       agents that corresponds to entries not current-
+       ly  in  use.  Proper interpretation of such en-
+       tries requires examination of the relevant  ip-
+       ForwardType object."
+    DEFVAL { invalid }
+    ::= { ipForwardEntry 6 }
+
+ipForwardProto OBJECT-TYPE
+    SYNTAX   INTEGER {
+                other     (1),  -- not specified
+                local     (2),  -- local interface
+                netmgmt   (3),  -- static route
+                icmp      (4),  -- result of ICMP Redirect
+
+                        -- the following are all dynamic
+                        -- routing protocols
+                egp       (5),  -- Exterior Gateway Protocol
+                ggp       (6),  -- Gateway-Gateway Protocol
+                hello     (7),  -- FuzzBall HelloSpeak
+                rip       (8),  -- Berkeley RIP or RIP-II
+                is-is     (9),  -- Dual IS-IS
+                es-is     (10), -- ISO 9542
+                ciscoIgrp (11), -- Cisco IGRP
+                bbnSpfIgp (12), -- BBN SPF IGP
+                ospf      (13), -- Open Shortest Path First
+                bgp       (14), -- Border Gateway Protocol
+                idpr      (15)  -- InterDomain Policy Routing
+             }
+    MAX-ACCESS read-only
+    STATUS   obsolete
+    DESCRIPTION
+       "The routing mechanism via which this route was
+       learned.  Inclusion of values for gateway rout-
+       ing protocols is not  intended  to  imply  that
+       hosts should support those protocols."
+    ::= { ipForwardEntry 7 }
+
+ipForwardAge OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS   obsolete
+    DESCRIPTION
+       "The number of seconds  since  this  route  was
+       last  updated  or  otherwise  determined  to be
+       correct.  Note that no semantics of  `too  old'
+       can  be implied except through knowledge of the
+       routing  protocol  by  which  the   route   was
+       learned."
+    DEFVAL  { 0 }
+    ::= { ipForwardEntry 8 }
+
+ipForwardInfo OBJECT-TYPE
+    SYNTAX   OBJECT IDENTIFIER
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "A reference to MIB definitions specific to the
+       particular  routing protocol which is responsi-
+       ble for this route, as determined by the  value
+       specified  in the route's ipForwardProto value.
+       If this information is not present,  its  value
+       should be set to the OBJECT IDENTIFIER { 0 0 },
+       which is a syntactically valid object  identif-
+       ier, and any implementation conforming to ASN.1
+       and the Basic Encoding Rules must  be  able  to
+       generate and recognize this value."
+    ::= { ipForwardEntry 9 }
+
+ipForwardNextHopAS OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "The Autonomous System Number of the Next  Hop.
+       When  this  is  unknown  or not relevant to the
+       protocol indicated by ipForwardProto, zero."
+    DEFVAL { 0 }
+    ::= { ipForwardEntry 10 }
+
+ipForwardMetric1 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "The primary routing  metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipForwardProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipForwardEntry 11 }
+
+ipForwardMetric2 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipForwardProto  value.   If  this metric is not
+       used, its value should be set to -1."
+
+    DEFVAL { -1 }
+    ::= { ipForwardEntry 12 }
+
+ipForwardMetric3 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipForwardProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipForwardEntry 13 }
+
+ipForwardMetric4 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipForwardProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipForwardEntry 14 }
+
+ipForwardMetric5 OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-create
+    STATUS   obsolete
+    DESCRIPTION
+       "An alternate routing metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       ipForwardProto  value.   If  this metric is not
+       used, its value should be set to -1."
+    DEFVAL { -1 }
+    ::= { ipForwardEntry 15 }
+
+-- Obsoleted Definitions - Groups
+-- compliance statements
+
+ipForwardOldCompliance MODULE-COMPLIANCE
+   STATUS  obsolete
+   DESCRIPTION
+       "The compliance statement for SNMP entities
+       which implement the ipForward MIB."
+
+   MODULE  -- this module
+   MANDATORY-GROUPS { ipForwardMultiPathGroup }
+
+   ::= { ipForwardCompliances 2 }
+
+ipForwardMultiPathGroup OBJECT-GROUP
+    OBJECTS { ipForwardNumber,
+              ipForwardDest, ipForwardMask, ipForwardPolicy,
+              ipForwardNextHop, ipForwardIfIndex, ipForwardType,
+              ipForwardProto, ipForwardAge, ipForwardInfo,
+              ipForwardNextHopAS,
+              ipForwardMetric1, ipForwardMetric2, ipForwardMetric3,
+              ipForwardMetric4, ipForwardMetric5
+        }
+    STATUS  obsolete
+    DESCRIPTION
+       "IP Multipath Route Table."
+    ::= { ipForwardGroups 2 }
+
+END

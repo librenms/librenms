@@ -1,0 +1,1168 @@
+
+-- *****************************************************************************
+-- Juniper-IPsec-Tunnel-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for IPsec Tunnel management
+--
+-- Copyright (c) 2003 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IPsec-Tunnel-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Counter64, Unsigned32
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    TEXTUAL-CONVENTION, RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    JuniNextIfIndex, JuniName
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniIpsecTunnelMIB  MODULE-IDENTITY
+    LAST-UPDATED "200404062226Z"  -- 06-Apr-04 06:26 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IPsec Tunnel MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200404062226Z"  -- 06-Apr-04 06:26 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 70 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniIpsecIdentityType  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The type of IPsec Phase-1 identity.  The Phase-1 identity may be
+        identified by one of the ID types defined in IPSEC DOI."
+    SYNTAX      INTEGER {
+                    reserved(0),
+                    idIpv4Addr(1),
+                    idFqdn(2),
+                    idUserFqdn(3),
+                    idIpv4AddrSubnet(4),
+                    idIpv6Addr(5),
+                    idIpv6AddrSubnet(6),
+                    idIpv4AddrRange(7),
+                    idIpv6AddrRange(8),
+                    idDn(9),
+                    idDerAsn1Gn(10),
+                    idKeyId(11) }
+
+JuniIpsecTransformType  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The transform algorithm for the IPsec tunnel."
+    SYNTAX      INTEGER {
+                    reserved(0),
+                    ahMd5(1),
+                    ahSha(2),
+                    espDesMd5(3),
+                    esp3DesMd5(4),
+                    espDesSha(5),
+                    esp3DesSha(6),
+                    espNullMd5(7),
+                    espNullSha(8),
+                    espDesNullAuth(9),
+                    esp3DesNullAuth(10) }
+
+JuniIpsecPfsGroup  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The perfect forward secrecy group.
+         Group1 -  768-bit DH prime modulus group.
+         Group2 - 1024-bit DH prime modulus group.
+         Group5 - 1536-bit DH prime modulus group."
+    SYNTAX      INTEGER {
+                    noGroup(0),
+                    group1(1),
+                    group2(2),
+                    group5(5) }
+
+JuniIpsecTunnelType  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The ipsec tunnel type."
+    SYNTAX      INTEGER {
+                    signaledTunnel(0),
+                    manualTunnel(1) }
+
+Spi  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS      current
+    DESCRIPTION
+        "The type of the SPI associated with IPsec Phase-2 security
+        associations."
+    SYNTAX      Unsigned32 (0..4294967295)
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpsecObjects           OBJECT IDENTIFIER ::= { juniIpsecTunnelMIB 1 }
+
+--
+-- Major subtrees
+--
+juniIpsecTunnel            OBJECT IDENTIFIER ::= { juniIpsecObjects 1 }
+juniIpsecSystem            OBJECT IDENTIFIER ::= { juniIpsecObjects 2 } 
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IPSEC tunnel group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--juniIpsecTunnelNextIfIndex   OBJECT IDENTIFIER   ::= { juniIpsecTunnel 1 }
+--juniIpsecTunnelConfig        OBJECT IDENTIFIER   ::= { juniIpsecTunnel 2 }
+--juniIpsecTunnelStatistics    OBJECT IDENTIFIER   ::= { juniIpsecTunnel 3 }
+--juniIpsecTransformSet        OBJECT IDENTIFIER   ::= { juniIpsecTunnel 4 }
+--juniIpsecGlobalLocalEndpoint OBJECT IDENTIFIER   ::= { juniIpsecTunnel 5 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IPsec Tunnel Interface Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IfIndex selection for creating IPsec tunnel interfaces
+--
+juniIpsecTunnelNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in the
+        juniIpsecTunnelIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniIpsecTunnel 1 }
+
+--
+-- The IPsec Tunnel Configuration
+--
+juniIpsecTunnelInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpsecTunnelInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries of IPsec Tunnel interfaces."
+    ::= { juniIpsecTunnel 2 }
+
+juniIpsecTunnelInterfaceEntry OBJECT-TYPE
+    SYNTAX      JuniIpsecTunnelInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a single IPsec Tunnel
+        interface.
+
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniIpsecTunnelIfIndex }
+    ::= { juniIpsecTunnelInterfaceTable 1 }
+
+JuniIpsecTunnelInterfaceEntry ::= SEQUENCE {
+    juniIpsecTunnelIfIndex                        InterfaceIndex,
+    juniIpsecTunnelName                           DisplayString,
+    juniIpsecTunnelType                           JuniIpsecTunnelType,
+    juniIpsecTunnelTransportVirtualRouter         JuniName,
+    juniIpsecTunnelLocalEndPt                     IpAddress,
+    juniIpsecTunnelRemoteEndPt                    IpAddress,
+    juniIpsecTunnelTransformSet                   DisplayString,
+    juniIpsecTunnelSrcType                        JuniIpsecIdentityType,
+    juniIpsecTunnelSrcAddr                        IpAddress,
+    juniIpsecTunnelSrcName                        DisplayString,
+    juniIpsecTunnelDstType                        JuniIpsecIdentityType,
+    juniIpsecTunnelDstAddr                        IpAddress,
+    juniIpsecTunnelDstName                        DisplayString,
+    juniIpsecTunnelBackupDstType                  JuniIpsecIdentityType,
+    juniIpsecTunnelBackupDstAddr                  IpAddress,
+    juniIpsecTunnelBackupDstName                  DisplayString,
+    juniIpsecTunnelLocalIdType                    JuniIpsecIdentityType,
+    juniIpsecTunnelLocalIdAddr1                   IpAddress,
+    juniIpsecTunnelLocalIdAddr2                   IpAddress,
+    juniIpsecTunnelRemoteIdType                   JuniIpsecIdentityType,
+    juniIpsecTunnelRemoteIdAddr1                  IpAddress,
+    juniIpsecTunnelRemoteIdAddr2                  IpAddress,
+    juniIpsecTunnelLifeTimeSecs                   Unsigned32,
+    juniIpsecTunnelLifeTimeKBs                    Unsigned32,
+    juniIpsecTunnelPfsGroup                       JuniIpsecPfsGroup,
+    juniIpsecTunnelMtu                            Unsigned32,
+    juniIpsecTunnelInboundSpi1                    Spi,
+    juniIpsecTunnelInboundTransform1              JuniIpsecTransformType,
+    juniIpsecTunnelInboundSpi2                    Spi,
+    juniIpsecTunnelInboundTransform2              JuniIpsecTransformType,
+    juniIpsecTunnelInboundSpi3                    Spi,
+    juniIpsecTunnelInboundTransform3              JuniIpsecTransformType,
+    juniIpsecTunnelInboundSpi4                    Spi,
+    juniIpsecTunnelInboundTransform4              JuniIpsecTransformType,
+    juniIpsecTunnelOutboundSpi                    Spi,
+    juniIpsecTunnelOutboundTransform              JuniIpsecTransformType,
+    juniIpsecTunnelRowStatus                      RowStatus }
+
+juniIpsecTunnelIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the IPsec tunnel interface.  When creating entries in
+        this table, suitable values for this object are determined by reading
+        juniIpsecTunnelNextIfIndex."
+    ::= { juniIpsecTunnelInterfaceEntry 1 }
+
+juniIpsecTunnelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name for this IPsec Tunnel interface.
+        Before configuring other tunnel attributes, IPsec tunnel has to be
+        created with minimum attributes (tunnel name and rowStatus)."
+    ::= { juniIpsecTunnelInterfaceEntry 2 }
+
+juniIpsecTunnelType OBJECT-TYPE
+    SYNTAX      JuniIpsecTunnelType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured mode for this IPsec Tunnel interface."
+    DEFVAL    { signaledTunnel }
+    ::= { juniIpsecTunnelInterfaceEntry 3 }
+
+juniIpsecTunnelTransportVirtualRouter OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The transport virtual router associated with this IPsec tunnel
+        interface.  This object need not be set when creating row entries.  Note
+        that the default when this object is not specified is the router
+        associated with the agent acting on the management request."
+    DEFVAL    { "default" }
+    ::= { juniIpsecTunnelInterfaceEntry 4 }
+
+juniIpsecTunnelLocalEndPt OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel local endpoint."
+    ::= { juniIpsecTunnelInterfaceEntry 5 }
+
+juniIpsecTunnelRemoteEndPt OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel remote endpoint."
+    ::= { juniIpsecTunnelInterfaceEntry 6 }
+
+juniIpsecTunnelTransformSet OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The transform set. It refers to a transform set that is defined in
+        the transform set table."
+    ::= { juniIpsecTunnelInterfaceEntry 7 }
+
+juniIpsecTunnelSrcType OBJECT-TYPE
+    SYNTAX      JuniIpsecIdentityType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel source type.  The tunnel source may be identified by:
+            1. an IP(V4) address, or
+            2. a fully qualified domain name string, or
+            3. a user fully qualified domain name string."
+    DEFVAL    { idIpv4Addr }
+    ::= { juniIpsecTunnelInterfaceEntry 8 }
+
+juniIpsecTunnelSrcAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel source IP(V4) address."
+    ::= { juniIpsecTunnelInterfaceEntry 9 }
+
+juniIpsecTunnelSrcName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel source Name."
+    ::= { juniIpsecTunnelInterfaceEntry 10 }
+
+juniIpsecTunnelDstType OBJECT-TYPE
+    SYNTAX      JuniIpsecIdentityType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel destination type.  The tunnel destination may be identified
+        by:
+            1. an IP(V4) address, or
+            2. a fully qualified domain name string, or
+            3. a user fully qualified domain name string."
+    DEFVAL    { idIpv4Addr }
+    ::= { juniIpsecTunnelInterfaceEntry 11 }
+
+juniIpsecTunnelDstAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel destination IP(V4) address."
+    ::= { juniIpsecTunnelInterfaceEntry 12 }
+
+juniIpsecTunnelDstName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel destination Name."
+    ::= { juniIpsecTunnelInterfaceEntry 13 }
+
+juniIpsecTunnelBackupDstType OBJECT-TYPE
+    SYNTAX      JuniIpsecIdentityType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel backup destination type.  The tunnel backup destination
+         type has to be the same as the tunnel destination type    
+         The tunnel destination may be identified by:  
+            1. an IP(V4) address, or
+            2. a fully qualified domain name string,
+            3. a user fully qualified domain name string."
+    DEFVAL    { idIpv4Addr }
+    ::= { juniIpsecTunnelInterfaceEntry 14 }
+
+juniIpsecTunnelBackupDstAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel backup destination IP(V4) address."
+    ::= { juniIpsecTunnelInterfaceEntry 15 }
+
+juniIpsecTunnelBackupDstName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel backup destination Name."
+    ::= { juniIpsecTunnelInterfaceEntry 16 }
+
+juniIpsecTunnelLocalIdType OBJECT-TYPE
+    SYNTAX      JuniIpsecIdentityType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel phase-2 local identity type.  The tunnel local identity type
+        may be identified by:
+            1. an IP address, or
+            2. an IP address subnet, or
+            3. an IP address range."
+    DEFVAL    { idIpv4Addr }
+    ::= { juniIpsecTunnelInterfaceEntry 17 }
+
+juniIpsecTunnelLocalIdAddr1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel local phase-2 identity IP address 1."
+    ::= { juniIpsecTunnelInterfaceEntry 18 }
+
+juniIpsecTunnelLocalIdAddr2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel local phase-2 identity IP address 2 in the
+         case the identity type is an IP address range.
+         The tunnel local phase-2 identity netmask in the
+         case the identity type is an IP address subnet."
+    ::= { juniIpsecTunnelInterfaceEntry 19 }
+
+juniIpsecTunnelRemoteIdType OBJECT-TYPE
+    SYNTAX      JuniIpsecIdentityType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The tunnel phase-2 remote identity type.  The tunnel remote identity
+        type may be identified by:
+            1. an IP address, or
+            2. an IP address subnet, or
+            3. an IP address range."
+    DEFVAL    { idIpv4Addr }
+    ::= { juniIpsecTunnelInterfaceEntry 20 }
+
+juniIpsecTunnelRemoteIdAddr1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel remote phase-2 identity IP address 1."
+    ::= { juniIpsecTunnelInterfaceEntry 21 }
+
+juniIpsecTunnelRemoteIdAddr2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel remote phase-2 identity IP address 2 in the
+         case the identity type is an IP address range.
+         The tunnel remote phase-2 identity netmask in the
+         case the identity type is an IP address subnet."
+    ::= { juniIpsecTunnelInterfaceEntry 22 }
+
+juniIpsecTunnelLifeTimeSecs OBJECT-TYPE
+    SYNTAX      Unsigned32 (1800..864000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel lifetime in seconds."
+    ::= { juniIpsecTunnelInterfaceEntry 23 }
+
+juniIpsecTunnelLifeTimeKBs OBJECT-TYPE
+    SYNTAX      Unsigned32 (102400..4294967295)
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel lifetime in kilobytes."
+    ::= { juniIpsecTunnelInterfaceEntry 24 }
+
+juniIpsecTunnelPfsGroup OBJECT-TYPE
+    SYNTAX      JuniIpsecPfsGroup
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel perfect forward secrecty group."
+    ::= { juniIpsecTunnelInterfaceEntry 25 }
+
+juniIpsecTunnelMtu OBJECT-TYPE
+    SYNTAX      Unsigned32 (160..9000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel MTU."
+    ::= { juniIpsecTunnelInterfaceEntry 26 }
+
+juniIpsecTunnelInboundSpi1 OBJECT-TYPE
+    SYNTAX      Spi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound SPI 1."
+    ::= { juniIpsecTunnelInterfaceEntry 27 }
+
+juniIpsecTunnelInboundTransform1 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound transform 1."
+    ::= { juniIpsecTunnelInterfaceEntry 28 }
+
+juniIpsecTunnelInboundSpi2 OBJECT-TYPE
+    SYNTAX      Spi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound SPI 2."
+    ::= { juniIpsecTunnelInterfaceEntry 29 }
+
+juniIpsecTunnelInboundTransform2 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound transform 2."
+    ::= { juniIpsecTunnelInterfaceEntry 30 }
+
+juniIpsecTunnelInboundSpi3 OBJECT-TYPE
+    SYNTAX      Spi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound SPI 3."
+    ::= { juniIpsecTunnelInterfaceEntry 31 }
+
+juniIpsecTunnelInboundTransform3 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound transform 3."
+    ::= { juniIpsecTunnelInterfaceEntry 32 }
+
+juniIpsecTunnelInboundSpi4 OBJECT-TYPE
+    SYNTAX      Spi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound SPI 4."
+    ::= { juniIpsecTunnelInterfaceEntry 33 }
+
+juniIpsecTunnelInboundTransform4 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel inbound transform 4."
+    ::= { juniIpsecTunnelInterfaceEntry 34 }
+
+juniIpsecTunnelOutboundSpi OBJECT-TYPE
+    SYNTAX      Spi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel outbound SPI."
+    ::= { juniIpsecTunnelInterfaceEntry 35 }
+
+juniIpsecTunnelOutboundTransform OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel outbound transform."
+    ::= { juniIpsecTunnelInterfaceEntry 36 }
+
+juniIpsecTunnelRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpsecTunnelIfRowStatus
+            juniIpsecTunnelName
+
+        In addition, when creating an entry the following condition must hold:
+            A value for juniIpsecTunnelIfIndex must have been determined
+            previously, typically by reading juniIpsecTunnelNextIfIndex.
+
+        Once created, the following objects may not be modified:
+            juniIpsecTunnelName
+            juniIpsecTunnelVirtualRouter
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniIpsecTunnelInterfaceEntry 37 }
+
+
+--
+-- Ipsec tunnel interface statistics
+--
+juniIpsecTunnelStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpsecTunnelStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IPsec tunnel interface statistics table.  Describes the IPsec
+        tunnel inbound/outbound statistics on IPsec de/encapsulation,
+        de/encryption, and related error statistics."
+    ::= { juniIpsecTunnel 3 }
+
+juniIpsecTunnelStatEntry  OBJECT-TYPE
+    SYNTAX      JuniIpsecTunnelStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the ipsec traffic statistics of the ipsec tunnel interface."
+    INDEX     { juniIpsecTunnelStatIfIndex }
+    ::= { juniIpsecTunnelStatTable 1 }
+
+JuniIpsecTunnelStatEntry ::= SEQUENCE {
+    juniIpsecTunnelStatIfIndex                    InterfaceIndex,
+    juniIpsecTunnelStatInbUserRecvPkts            Counter64,
+    juniIpsecTunnelStatInbUserRecvOctets          Counter64,
+    juniIpsecTunnelStatInbAccRecvPkts             Counter64,
+    juniIpsecTunnelStatInbAccRecvOctets           Counter64,
+    juniIpsecTunnelStatInbAuthErrs                Counter32,
+    juniIpsecTunnelStatInbReplayErrs              Counter32,
+    juniIpsecTunnelStatInbPolicyErrs              Counter32,
+    juniIpsecTunnelStatInbOtherRecvErrs           Counter32,
+    juniIpsecTunnelStatInbDecryptErrs             Counter32,
+    juniIpsecTunnelStatInbPadErrs                 Counter32,
+    juniIpsecTunnelStatOutbUserRecvPkts           Counter64,
+    juniIpsecTunnelStatOutbUserRecvOctets         Counter64,
+    juniIpsecTunnelStatOutbAccRecvPkts            Counter64,
+    juniIpsecTunnelStatOutbAccRecvOctets          Counter64,
+    juniIpsecTunnelOutbOtherTxErrs                Counter32,
+    juniIpsecTunnelOutbPolicyErrs                 Counter32 }
+
+juniIpsecTunnelStatIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces
+         MIB ifTable."
+    ::= { juniIpsecTunnelStatEntry 1 }
+
+juniIpsecTunnelStatInbUserRecvPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound user packets (non-error) received
+         for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 2 }
+
+juniIpsecTunnelStatInbUserRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound user octets (non-error) received 
+         for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 3 }
+
+juniIpsecTunnelStatInbAccRecvPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound encapsulated packets received for
+        this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 4 }
+
+juniIpsecTunnelStatInbAccRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound encapsulated octets received for
+        this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 5 }
+
+juniIpsecTunnelStatInbAuthErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound packets with authentication errors
+         received for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 6 }
+
+juniIpsecTunnelStatInbReplayErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound packets with replay errors received
+         for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 7 }
+
+juniIpsecTunnelStatInbPolicyErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound packets with inbound policy errors
+         received for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 8 }
+
+juniIpsecTunnelStatInbOtherRecvErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound packets with other Rx errors
+         received for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 9 }
+
+juniIpsecTunnelStatInbDecryptErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound packets with decryption errors
+         received for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 10 }
+
+juniIpsecTunnelStatInbPadErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of inbound packets with pad errors
+         received for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 11 }
+
+juniIpsecTunnelStatOutbUserRecvPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of outbound user packets received
+         for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 12 }
+
+juniIpsecTunnelStatOutbUserRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of outbound user octets received
+         for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 13 }
+
+juniIpsecTunnelStatOutbAccRecvPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of encapsulated outbound packets received for
+         this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 14 }
+
+juniIpsecTunnelStatOutbAccRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of encapsulated outbound octets received for
+        this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 15 }
+
+juniIpsecTunnelOutbOtherTxErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of outbound packets with other TX errors
+         for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 16 }
+
+juniIpsecTunnelOutbPolicyErrs  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of outbound packets with outbound policy 
+         errors for this IPsec tunnel."
+    ::= { juniIpsecTunnelStatEntry 17 }
+
+--
+-- IPsec Transform Set
+--
+juniIpsecTunnelTransformSetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpsecTunnelTransformSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries of IPsec transform sets defined
+         for this router."
+    ::= { juniIpsecTunnel 4 }
+
+juniIpsecTunnelTransformSetEntry OBJECT-TYPE
+    SYNTAX      JuniIpsecTunnelTransformSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes a transform set that contains up to 6 IPsec
+        transforms.  The transform set name is referenced by the IPsec tunnel
+        as its local IPsec policy."
+    INDEX     { juniIpsecTunnelTransformSetName }
+    ::= { juniIpsecTunnelTransformSetTable 1 }
+
+JuniIpsecTunnelTransformSetEntry ::= SEQUENCE {
+    juniIpsecTunnelTransformSetName               DisplayString,
+    juniIpsecTunnelTransform1                     JuniIpsecTransformType,
+    juniIpsecTunnelTransform2                     JuniIpsecTransformType,
+    juniIpsecTunnelTransform3                     JuniIpsecTransformType,
+    juniIpsecTunnelTransform4                     JuniIpsecTransformType,
+    juniIpsecTunnelTransform5                     JuniIpsecTransformType,
+    juniIpsecTunnelTransform6                     JuniIpsecTransformType,
+    juniIpsecTunnelTransformSetRowStatus          RowStatus }
+
+juniIpsecTunnelTransformSetName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the IPsec tunnel transform set."
+    ::= { juniIpsecTunnelTransformSetEntry 1 }
+
+juniIpsecTunnelTransform1 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The first IPsec transform in the transform set."
+    DEFVAL    { reserved }
+    ::= { juniIpsecTunnelTransformSetEntry 2 }
+
+juniIpsecTunnelTransform2 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The second IPsec transform in the transform set."
+    DEFVAL    { reserved }
+    ::= { juniIpsecTunnelTransformSetEntry 3 }
+
+juniIpsecTunnelTransform3 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The third IPsec transform in the transform set."
+    DEFVAL    { reserved }
+    ::= { juniIpsecTunnelTransformSetEntry 4 }
+
+juniIpsecTunnelTransform4 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The fourth IPsec transform in the transform set."
+    ::= { juniIpsecTunnelTransformSetEntry 5 }
+
+juniIpsecTunnelTransform5 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The fifth IPsec transform in the transform set."
+    DEFVAL    { reserved }
+    ::= { juniIpsecTunnelTransformSetEntry 6 }
+
+juniIpsecTunnelTransform6 OBJECT-TYPE
+    SYNTAX      JuniIpsecTransformType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The sixth IPsec transform in the transform set."
+    DEFVAL    { reserved }
+    ::= { juniIpsecTunnelTransformSetEntry 7 }
+
+juniIpsecTunnelTransformSetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpsecTunnelTransformSetRowStatus
+            juniIpsecTunnelTransformSetName
+            juniIpsecTunnelTransform1."
+    ::= { juniIpsecTunnelTransformSetEntry 8 }
+
+
+--
+-- IPsec Global Local Endpoint
+--
+juniIpsecTunnelGlobalLocalEndpointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpsecTunnelGlobalLocalEndpointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries of global local endpoint for the IPsec
+        tunnel.  There is one global local endpoint for each transport virtual
+        router if configured."
+    ::= { juniIpsecTunnel 5 }
+
+juniIpsecTunnelGlobalLocalEndpointEntry OBJECT-TYPE
+    SYNTAX      JuniIpsecTunnelGlobalLocalEndpointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines the global local endpoint for the transport virtual
+        router."
+    INDEX     { juniIpsecTunnelTransportVrRouterIdx }
+    ::= { juniIpsecTunnelGlobalLocalEndpointTable 1 }
+
+JuniIpsecTunnelGlobalLocalEndpointEntry ::= SEQUENCE {
+    juniIpsecTunnelTransportVrRouterIdx           Unsigned32,
+    juniIpsecTunnelGlobalLocalEndpoint            IpAddress,
+    juniIpsecTunnelGlobalLocalEndpointRowStatus   RowStatus }
+
+juniIpsecTunnelTransportVrRouterIdx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The transport virtual router for the global local endpoint."
+    ::= { juniIpsecTunnelGlobalLocalEndpointEntry  1 }
+
+juniIpsecTunnelGlobalLocalEndpoint OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The global local endpoint for the transport virtual router."
+    ::= { juniIpsecTunnelGlobalLocalEndpointEntry  2 }
+
+juniIpsecTunnelGlobalLocalEndpointRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpsecTunnelGlobalLocalEndpoint
+            juniIpsecTunnelTransportVrRouterIdx
+        
+        Once created, the global local endpoint can not be changed unless there
+        is no IPsec tunnel references to the local endpoint."
+    ::= { juniIpsecTunnelGlobalLocalEndpointEntry  3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IPsec System Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpsecTunnelSystemStats      OBJECT IDENTIFIER   ::= { juniIpsecSystem 1 }
+
+--
+-- IPsec System-level Status
+--
+juniIpsecSummaryStatsTotalTunnels  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of tunnels"
+    ::= { juniIpsecTunnelSystemStats 1 }
+
+juniIpsecSummaryStatsAdminStatusEnabled  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of tunnels with administrative status enabled"
+    ::= { juniIpsecTunnelSystemStats 2 }
+
+juniIpsecSummaryStatsAdminStatusDisabled  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of tunnels with administrative status disabled"
+    ::= { juniIpsecTunnelSystemStats 3 }
+
+juniIpsecSummaryStatsOperStatusUp  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of tunnels with operational status up"
+    ::= { juniIpsecTunnelSystemStats 4 }
+
+juniIpsecSummaryStatsOperStatusDown  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of tunnels with operational status down"
+    ::= { juniIpsecTunnelSystemStats 5 }
+
+juniIpsecSummaryStatsOperStatusNotPresent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of tunnels with operational status not-present"
+    ::= { juniIpsecTunnelSystemStats 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpsecTunnelMIBConformance  OBJECT IDENTIFIER
+    ::= { juniIpsecTunnelMIB 2 }
+juniIpsecTunnelMIBCompliances  OBJECT IDENTIFIER
+    ::= { juniIpsecTunnelMIBConformance 1 }
+juniIpsecTunnelMIBGroups  OBJECT IDENTIFIER
+    ::= { juniIpsecTunnelMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniIpsecTunnelCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which implement the IPsec
+        Tunnel MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpsecTunnelConfigGroup,
+            juniIpsecTunnelStatsGroup,
+            juniIpsecTransformSetGroup,
+            juniIpsecGlobalLocalEndpointGroup }
+    ::= { juniIpsecTunnelMIBCompliances 1 }
+
+juniIpsecTunnelCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which implement the IPsec
+        Tunnel MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpsecTunnelConfigGroup,
+            juniIpsecTunnelStatsGroup,
+            juniIpsecTransformSetGroup,
+            juniIpsecGlobalLocalEndpointGroup,
+            juniIpsecTunnelSystemStatsGroup }
+    ::= { juniIpsecTunnelMIBCompliances 2 }
+
+--
+-- units of conformance
+--
+juniIpsecTunnelConfigGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpsecTunnelNextIfIndex,
+        juniIpsecTunnelName,
+        juniIpsecTunnelType,
+        juniIpsecTunnelTransportVirtualRouter,
+        juniIpsecTunnelLocalEndPt,
+        juniIpsecTunnelRemoteEndPt,
+        juniIpsecTunnelTransformSet,
+        juniIpsecTunnelSrcType,
+        juniIpsecTunnelSrcAddr,
+        juniIpsecTunnelSrcName,
+        juniIpsecTunnelDstType,
+        juniIpsecTunnelDstAddr,
+        juniIpsecTunnelDstName,
+        juniIpsecTunnelBackupDstType,
+        juniIpsecTunnelBackupDstAddr,
+        juniIpsecTunnelBackupDstName,
+        juniIpsecTunnelLocalIdType,
+        juniIpsecTunnelLocalIdAddr1,
+        juniIpsecTunnelLocalIdAddr2,
+        juniIpsecTunnelRemoteIdType,
+        juniIpsecTunnelRemoteIdAddr1,
+        juniIpsecTunnelRemoteIdAddr2,
+        juniIpsecTunnelLifeTimeSecs,
+        juniIpsecTunnelLifeTimeKBs,
+        juniIpsecTunnelPfsGroup,
+        juniIpsecTunnelMtu,
+        juniIpsecTunnelInboundSpi1,
+        juniIpsecTunnelInboundTransform1,
+        juniIpsecTunnelInboundSpi2,
+        juniIpsecTunnelInboundTransform2,
+        juniIpsecTunnelInboundSpi3,
+        juniIpsecTunnelInboundTransform3,
+        juniIpsecTunnelInboundSpi4,
+        juniIpsecTunnelInboundTransform4,
+        juniIpsecTunnelOutboundSpi,
+        juniIpsecTunnelOutboundTransform,
+        juniIpsecTunnelRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing configuration information of the
+        IPsec tunnel."
+    ::= { juniIpsecTunnelMIBGroups 1 }
+
+juniIpsecTunnelStatsGroup OBJECT-GROUP
+    OBJECTS {
+        juniIpsecTunnelStatInbUserRecvPkts,
+        juniIpsecTunnelStatInbUserRecvOctets,
+        juniIpsecTunnelStatInbAccRecvPkts,
+        juniIpsecTunnelStatInbAccRecvOctets,
+        juniIpsecTunnelStatInbAuthErrs,
+        juniIpsecTunnelStatInbReplayErrs,
+        juniIpsecTunnelStatInbPolicyErrs,
+        juniIpsecTunnelStatInbOtherRecvErrs,
+        juniIpsecTunnelStatInbDecryptErrs,
+        juniIpsecTunnelStatInbPadErrs,
+        juniIpsecTunnelStatOutbUserRecvPkts,
+        juniIpsecTunnelStatOutbUserRecvOctets,
+        juniIpsecTunnelStatOutbAccRecvPkts,
+        juniIpsecTunnelStatOutbAccRecvOctets,
+        juniIpsecTunnelOutbOtherTxErrs,
+        juniIpsecTunnelOutbPolicyErrs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing satistics information of the IPsec
+        tunnel."
+    ::= { juniIpsecTunnelMIBGroups 2 }
+
+juniIpsecTransformSetGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpsecTunnelTransform1,
+        juniIpsecTunnelTransform2,
+        juniIpsecTunnelTransform3,
+        juniIpsecTunnelTransform4,
+        juniIpsecTunnelTransform5,
+        juniIpsecTunnelTransform6,
+        juniIpsecTunnelTransformSetRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing transform set information of the
+        IPsec tunnel."
+    ::= { juniIpsecTunnelMIBGroups 3 }
+
+juniIpsecGlobalLocalEndpointGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpsecTunnelGlobalLocalEndpoint,
+        juniIpsecTunnelGlobalLocalEndpointRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing the global local endpoint for the
+        IPsec tunnel."
+    ::= { juniIpsecTunnelMIBGroups 4 }
+
+juniIpsecTunnelSystemStatsGroup OBJECT-GROUP
+    OBJECTS {
+        juniIpsecSummaryStatsTotalTunnels,
+        juniIpsecSummaryStatsAdminStatusEnabled,
+        juniIpsecSummaryStatsAdminStatusDisabled,
+        juniIpsecSummaryStatsOperStatusUp,
+        juniIpsecSummaryStatsOperStatusDown,
+        juniIpsecSummaryStatsOperStatusNotPresent }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing summary statistics information
+        for IPsec tunnels in one system."
+    ::= { juniIpsecTunnelMIBGroups 5 }
+
+END

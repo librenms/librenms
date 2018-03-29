@@ -1,0 +1,80 @@
+-- *******************************************************************
+-- Brocade-REG-MIB.my: Brocade Products MIB.
+--
+-- Feb 2012, Sanjeev C Joshi, Yasar Khan
+--
+-- Copyright (c) 1996-2002, 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+--
+-- *******************************************************************
+Brocade-REG-MIB DEFINITIONS ::= BEGIN
+IMPORTS        
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,                        
+    enterprises                     FROM SNMPv2-SMI;
+
+bcsi MODULE-IDENTITY
+        LAST-UPDATED        "201202030000Z"
+        ORGANIZATION        " Brocade Communications Systems, Inc."
+        CONTACT-INFO
+                "Brocade Communications Systems, Inc.
+                 Postal: 130 Holger Way
+                 San Jose, CA 95134
+                 U.S.A
+                 Tel: +1-408-333-8000
+                 E-mail: support@Brocade.com 
+                 web: www.brocade.com."
+        DESCRIPTION
+                "This MIB module defines Structure of Management 
+                Information for the Brocade enterprise and serves as 
+                central repository of all the OIDs under Brocade 
+                enterprise OID tree."
+
+        REVISION        "201202030000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { enterprises 1588 }	-- assigned by IANA
+
+commDev OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Communication devices of Brocade."
+    ::= { bcsi 2 }
+    
+fibrechannel   OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Fibre Channel Devices of Brocade."
+    ::= { commDev 1 }
+
+nos OBJECT-IDENTITY 
+    STATUS  current
+	DESCRIPTION  
+		"The root OID sub-tree for Brocade's NOS products."
+	::= { commDev 2 }
+    
+fcSwitch OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Fibre Channel Switches of Brocade."
+    ::= { fibrechannel 1 }
+    
+bcsiReg OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Brocade Global Registry."
+    ::= { bcsi 3 }
+
+bcsiModules OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for all the Brocade management MIBs."
+    ::= { bcsiReg 1 }
+    
+brocadeAgentCapability OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"This provides a root object identifier from which 
+        AGENT-CAPABILITIES values may be assigned."
+	::= { bcsiReg 2 }
+END

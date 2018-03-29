@@ -1,0 +1,151 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-VLAN.MIB:  NMS LLID ONU VLAN MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-VLAN DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOnuVlan         OBJECT IDENTIFIER ::= { nmsEPONGroup 13 }
+               
+               nmsepononuvlanTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU port vlan table entries."
+                   ::= { nmsEponOnuVlan 1 }
+
+               nmsEponOnuVlanEntry OBJECT-TYPE
+                   SYNTAX  NMSEponOnuVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU port vlan property table."
+                   INDEX { onuLlidDiid,onuIfSequenceNo,onuOldVlan }
+               ::= { nmsepononuvlanTable 1 }
+
+               NMSEponOnuVlanEntry ::=
+                   SEQUENCE {
+                       onuLlidDiid
+                           INTEGER,
+                       onuIfSequenceNo
+                           INTEGER,
+                       onuOldVlan
+                           INTEGER,
+                       onuNewVlan
+                           INTEGER
+			}
+			
+               onuLlidDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID port DIID, as one of the index together with onuIfSequenceNo and onuOldVlan."
+                   ::= { nmsEponOnuVlanEntry 1 } 
+
+               onuIfSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface sequence number, as one of the index together with onuLlidDiid and onuOldVlan."
+                   ::= { nmsEponOnuVlanEntry 2 } 
+		
+               onuOldVlan OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface old vlan id. This configuration can be set only as vlan mode is translation mode."
+                   ::= { nmsEponOnuVlanEntry 3 } 
+		
+               onuNewVlan OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface new vlan id. This configuration can be set only as vlan mode is translation mode."
+                   ::= { nmsEponOnuVlanEntry 4 } 
+                   
+                   
+                   
+               nmsepononuvlanaggTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuVlanAggEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU port vlan aggregation table entries."
+                   ::= { nmsEponOnuVlan 2 }
+
+               nmsEponOnuVlanAggEntry OBJECT-TYPE
+                   SYNTAX  NMSEponOnuVlanAggEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU port vlan aggregation property table."
+                   INDEX { onuAggLlidDiid,onuAggIfSequenceNo,onuAggDstVlan }
+               ::= { nmsepononuvlanaggTable 1 }
+
+               NMSEponOnuVlanAggEntry ::=
+                   SEQUENCE {
+                       onuAggLlidDiid
+                           INTEGER,
+                       onuAggIfSequenceNo
+                           INTEGER,
+                       onuAggSrcVlans
+                           BIT STRING,
+                       onuAggDstVlan
+                           INTEGER
+			}
+                   
+               onuAggLlidDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID port DIID, as one of the index together with onuAggIfSequenceNo and onuAggDstVlan."
+                   ::= { nmsEponOnuVlanAggEntry 1 } 
+
+               onuAggIfSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface sequence number, as one of the index together with onuAggLlidDiid and onuAggDstVlan."
+                   ::= { nmsEponOnuVlanAggEntry 2 } 
+                   
+               onuAggSrcVlans OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface aggregation source VLANs. There is totally 4094 bit. Each bit means ONU aggregation vlan allowed or not. 0- not allowed, 1- allowed. "
+                   ::= { nmsEponOnuVlanAggEntry 3 } 
+                   
+               onuAggDstVlan OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface aggregation source VLAN ID, as one of the index together with onuAggLlidDiid and onuAggIfSequenceNo. "
+                   ::= { nmsEponOnuVlanAggEntry 4 } 
+                   
+
+			
+END			

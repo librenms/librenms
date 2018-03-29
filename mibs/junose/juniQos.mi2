@@ -1,0 +1,2823 @@
+
+-- *****************************************************************************
+-- Juniper-QoS-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Quality of Service (QoS) MIB
+--
+-- Copyright (c) 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002 - 2005 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+
+Juniper-QoS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Counter64, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniQosMIB  MODULE-IDENTITY
+    LAST-UPDATED "200507061418Z"  -- 06-Jul-05 10:18 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Quality of Service (QoS) MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200507061418Z"  -- 06-Jul-05 10:18 AM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added support for QoS SVlans."
+    REVISION    "200504011900Z"  -- 1-Apr-05 03:00 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added support for QoS Parameters."
+    REVISION    "200412101916Z"  -- 10-Dec-04 03:16 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+        "o Added support for compound shared shaping.  Scheduler-profile
+           list reved.
+         o Added/Corrected DEFVALs for QosProfileElementEntry."
+    REVISION    "200401261419Z"  -- 26-Jan-04 09:19 AM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Added support for multiple traffic class groups."
+    REVISION    "200311042010Z"  -- 04-Nov-03 03:10 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added support for Hierarchical Assured Rate."
+    REVISION    "200305081705Z"  -- 08-May-03 01:05 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added support for ATM VP UID, statistics profile list, scheduler
+        profile assured rate, and QoS mode port."
+    REVISION    "200303131817Z"  -- 13-Mar-03 01:17 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added drop profile list support."
+    REVISION    "200303121830Z"  -- 12-Mar-03 01:30 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 57 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+JuniQosLogicalInterfaceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A logical interface type supported by QoS."
+    SYNTAX      BITS {
+                    atmInterface(0),
+                    hdlcInterface(1),
+                    ethernetInterface(2),
+                    atm1483Interface(3),
+                    atmVirtualPath(4),
+                    ipInterface(5),
+                    ipv6Interface(6),
+                    vlanSubInterface(7),
+                    frameRelaySubInterface(8),
+                    cbfInterface(9),
+                    serverPortInterface(10),
+                    l2tpFromTunnelQueue(11),
+                    ipTunnelFromTunnelQueue(12),
+                    mplsMinorInterface(13),
+                    bridgeInterface(14),
+                    l2tpSessionInterface(15),
+                    stackedVlan(16),
+                    lagInterface(17) }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosObjects                           OBJECT IDENTIFIER ::= { juniQosMIB 1 }
+juniQosCapability                        OBJECT IDENTIFIER ::= { juniQosObjects 1 }
+juniQos                                  OBJECT IDENTIFIER ::= { juniQosObjects 2 }
+juniQosTrafficClassList                  OBJECT IDENTIFIER ::= { juniQosObjects 3 }
+juniQosTrafficClassGroupList             OBJECT IDENTIFIER ::= { juniQosObjects 4 }
+juniQosTrafficClassGroupEntryList        OBJECT IDENTIFIER ::= { juniQosObjects 5 }
+juniQosSchedulerProfileList              OBJECT IDENTIFIER ::= { juniQosObjects 6 }
+juniQosQueueProfileList                  OBJECT IDENTIFIER ::= { juniQosObjects 7 }
+juniQosProfile                           OBJECT IDENTIFIER ::= { juniQosObjects 8 }
+juniQosProfileElement                    OBJECT IDENTIFIER ::= { juniQosObjects 9 }
+juniQosIfAttach                          OBJECT IDENTIFIER ::= { juniQosObjects 10 }
+juniQosQosPortTypeProfile                OBJECT IDENTIFIER ::= { juniQosObjects 11 }
+juniQosQueueStatistics                   OBJECT IDENTIFIER ::= { juniQosObjects 12 }
+juniQosDropProfileList                   OBJECT IDENTIFIER ::= { juniQosObjects 13 }
+juniQosAtmVpUidSupport                   OBJECT IDENTIFIER ::= { juniQosObjects 14 }
+juniQosStatisticsProfileList             OBJECT IDENTIFIER ::= { juniQosObjects 15 }
+juniQosQosModePortList                   OBJECT IDENTIFIER ::= { juniQosObjects 16 }
+juniQosQosShapingModeList                OBJECT IDENTIFIER ::= { juniQosObjects 17 }
+juniQosSVlanUidSupport                   OBJECT IDENTIFIER ::= { juniQosObjects 18 }
+juniQosSVlanIdSupport                    OBJECT IDENTIFIER ::= { juniQosObjects 19 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Capability Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosMaxTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the maximum number of traffic classes supported."
+    ::= { juniQosCapability 1 }
+
+juniQosMaxQueueLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the maximum supported queue length in bytes."
+    ::= { juniQosCapability 2 }
+
+juniQosMinSchedulerBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the minimum supported scheduler burst size in
+        bytes."
+    ::= { juniQosCapability 3 }
+
+juniQosMaxSchedulerBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the maximum supported scheduler burst size in
+        bytes."
+    ::= { juniQosCapability 4 }
+
+juniQosMaxQosProfileRules OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the maximum number of rules per qos-profile
+        supported."
+    ::= { juniQosCapability 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Scalar Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosTrafficClassCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured traffic classes."
+    ::= { juniQos 1 }
+
+juniQosQueueProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured queue profiles."
+    ::= { juniQos 2 }
+
+juniQosSchedulerProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured scheduler profiles."
+    ::= { juniQos 3 }
+
+juniQosProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured QoS profiles."
+    ::= { juniQos 4 }
+
+juniQosInterfaceCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured interface QoS
+        attachments."
+    ::= { juniQos 5 }
+
+juniQosQosPortTypeProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured default port profiles."
+    ::= { juniQos 6 }
+
+juniQosDropProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured drop profiles."
+    ::= { juniQos 7 }
+
+juniQosStatisticsProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of configured statistics profiles."
+    ::= { juniQos 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Traffic Class List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosTrafficClassNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosTrafficClassTable."
+    ::= { juniQosTrafficClassList 1 }
+
+juniQosTrafficClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of Traffic Class definitions."
+    ::= { juniQosTrafficClassList 2 }
+
+juniQosTrafficClassEntry OBJECT-TYPE
+    SYNTAX      JuniQosTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a traffic class element."
+    INDEX     { juniQosTrafficClassIndex }
+    ::= { juniQosTrafficClassTable 1 }
+
+JuniQosTrafficClassEntry ::= SEQUENCE {
+    juniQosTrafficClassIndex                     Unsigned32,
+    juniQosTrafficClassRowStatus                 RowStatus,
+    juniQosTrafficClassName                      DisplayString,
+    juniQosTrafficClassWeight                    Unsigned32,
+    juniQosTrafficClassStrictPriority            TruthValue,
+    juniQosTrafficClassUpdatePending             TruthValue,
+    juniQosTrafficClassUpdateNow                 TruthValue,
+    juniQosTrafficClassIsReferencedByGroup       TruthValue,
+    juniQosTrafficClassIsReferencedByQosProfile  TruthValue }
+
+juniQosTrafficClassIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the traffic class entry which is defined by this row."
+    ::= { juniQosTrafficClassEntry 1 }
+
+juniQosTrafficClassRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosTrafficClassRowStatus
+             juniQosTrafficClassName "
+    ::= { juniQosTrafficClassEntry 2 }
+
+juniQosTrafficClassName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the traffic class defined by this row."
+    ::= { juniQosTrafficClassEntry 3 }
+
+juniQosTrafficClassWeight OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The relative weight for queues in this traffic class."
+    DEFVAL    { 8 }
+    ::= { juniQosTrafficClassEntry 4 }
+
+juniQosTrafficClassStrictPriority OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The traffic to be dequeued before all other classes."
+    DEFVAL    { false }
+    ::= { juniQosTrafficClassEntry 5 }
+
+juniQosTrafficClassUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the traffic class object which
+        have not been committed to the line cards."
+    ::= { juniQosTrafficClassEntry 6  }
+
+juniQosTrafficClassUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the traffic class object will
+        be committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosTrafficClassEntry 7 }
+
+juniQosTrafficClassIsReferencedByGroup OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the traffic class is referenced by a traffic class group."
+    ::= { juniQosTrafficClassEntry 8 }
+
+juniQosTrafficClassIsReferencedByQosProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the traffic class is referenced by a QoS profile."
+    ::= { juniQosTrafficClassEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Traffic Class Group List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosTrafficClassGroupNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosTrafficClassGroupTable."
+    ::= { juniQosTrafficClassGroupList 1 }
+
+juniQosTrafficClassGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosTrafficClassGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of Traffic Class group
+        definitions."
+    ::= { juniQosTrafficClassGroupList 2 }
+
+juniQosTrafficClassGroupEntry OBJECT-TYPE
+    SYNTAX      JuniQosTrafficClassGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a traffic class group
+        element."
+    INDEX     { juniQosTrafficClassGroupIndex }
+    ::= { juniQosTrafficClassGroupTable 1 }
+
+JuniQosTrafficClassGroupEntry ::= SEQUENCE {
+    juniQosTrafficClassGroupIndex                    Unsigned32,
+    juniQosTrafficClassGroupRowStatus                RowStatus,
+    juniQosTrafficClassGroupName                     DisplayString,
+    juniQosTrafficClassGroupUpdatePending            TruthValue,
+    juniQosTrafficClassGroupUpdateNow                TruthValue,
+    juniQosTrafficClassGroupIsReferencedByQosProfile TruthValue,
+    juniQosTrafficClassGroupSlotNumber               Integer32,
+    juniQosTrafficClassGroupExtendedGroup            TruthValue }
+
+juniQosTrafficClassGroupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the traffic class entry which is defined by this row."
+    ::= { juniQosTrafficClassGroupEntry 1 }
+
+juniQosTrafficClassGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosTrafficClassGroupRowStatus
+             juniQosTrafficClassGroupName "
+    ::= { juniQosTrafficClassGroupEntry 2 }
+
+juniQosTrafficClassGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the traffic class group defined by this row."
+    ::= { juniQosTrafficClassGroupEntry 3 }
+
+juniQosTrafficClassGroupUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the traffic class group object
+        which have not been committed to the line cards."
+    ::= { juniQosTrafficClassGroupEntry 4  }
+
+juniQosTrafficClassGroupUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the traffic class group object
+        will be committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosTrafficClassGroupEntry 5 }
+
+juniQosTrafficClassGroupIsReferencedByQosProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the traffic class group is referenced by a QoS profile."
+    ::= { juniQosTrafficClassGroupEntry 6 }
+
+juniQosTrafficClassGroupSlotNumber OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot on which this traffic class group is applied.
+        Traffic class groups may be global or local.  Global groups indicate
+        that the traffic class group is to be applied to each line card in the
+        chassis.  The value of this object is -1 for global traffic class
+        groups.  Local traffic class groups override global traffic class groups
+        and are applied to the slot indicated by the value of this object."
+    DEFVAL    { -1 }
+    ::= { juniQosTrafficClassGroupEntry 7 }
+
+juniQosTrafficClassGroupExtendedGroup OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When true, the traffic class group is an extended group.  False
+        indicates the traffic class group is an auto-strict-priority group."
+    DEFVAL    { false }
+    ::= { juniQosTrafficClassGroupEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Traffic Class Group Entry List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosTrafficClassGroupEntryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosTrafficClassGroupEntryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table identifies which traffic classes are in each traffic class
+        group."
+    ::= { juniQosTrafficClassGroupEntryList 1 }
+
+juniQosTrafficClassGroupEntryEntry OBJECT-TYPE
+    SYNTAX      JuniQosTrafficClassGroupEntryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry ties a traffic class table entry to a traffic class group."
+    INDEX     { juniQosTrafficClassGroupIndex,
+                juniQosTrafficClassIndex }
+    ::= { juniQosTrafficClassGroupEntryTable 1 }
+
+JuniQosTrafficClassGroupEntryEntry ::= SEQUENCE {
+    juniQosTrafficClassGroupEntryRowStatus   RowStatus }
+
+juniQosTrafficClassGroupEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry object MUST be
+        explicitly configured:
+             juniQosTrafficClassGroupEntryRowStatus "
+    ::= { juniQosTrafficClassGroupEntryEntry 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Queue Profile List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosQueueProfileNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosQueueProfileTable."
+    ::= { juniQosQueueProfileList 1 }
+
+juniQosQueueProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosQueueProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of queue profile definitions."
+    ::= { juniQosQueueProfileList 2 }
+
+juniQosQueueProfileEntry OBJECT-TYPE
+    SYNTAX      JuniQosQueueProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a queue profile element."
+    INDEX     { juniQosQueueProfileIndex }
+    ::= { juniQosQueueProfileTable 1 }
+
+JuniQosQueueProfileEntry ::= SEQUENCE {
+    juniQosQueueProfileIndex                     Unsigned32,
+    juniQosQueueProfileRowStatus                 RowStatus,
+    juniQosQueueProfileName                      DisplayString,
+    juniQosQueueProfileCommittedMinLength        Unsigned32,
+    juniQosQueueProfileCommittedMaxLength        Unsigned32,
+    juniQosQueueProfileConformedMinLength        Unsigned32,
+    juniQosQueueProfileConformedMaxLength        Unsigned32,
+    juniQosQueueProfileExceededMinLength         Unsigned32,
+    juniQosQueueProfileExceededMaxLength         Unsigned32,
+    juniQosQueueProfileConformedFraction         Unsigned32,
+    juniQosQueueProfileExceededFraction          Unsigned32,
+    juniQosQueueProfileCommittedDropThreshold    Unsigned32,
+    juniQosQueueProfileCommittedDropRate         Unsigned32,
+    juniQosQueueProfileConformedDropThreshold    Unsigned32,
+    juniQosQueueProfileConformedDropRate         Unsigned32,
+    juniQosQueueProfileExceededDropThreshold     Unsigned32,
+    juniQosQueueProfileExceededDropRate          Unsigned32,
+    juniQosQueueProfileBufferWeight              Unsigned32,
+    juniQosQueueProfileUpdatePending             TruthValue,
+    juniQosQueueProfileUpdateNow                 TruthValue,
+    juniQosQueueProfileIsReferencedByQosProfile  TruthValue }
+
+juniQosQueueProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the queue profile entry which is defined by this row."
+    ::= { juniQosQueueProfileEntry 1 }
+
+juniQosQueueProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosQueueProfileRowStatus
+             juniQosQueueProfileName "
+    ::= { juniQosQueueProfileEntry 2 }
+
+juniQosQueueProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the queue profile defined by this row."
+    ::= { juniQosQueueProfileEntry 3 }
+
+juniQosQueueProfileCommittedMinLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum queue length in bytes for committed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 4 }
+
+juniQosQueueProfileCommittedMaxLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum queue length in bytes for committed traffic."
+    DEFVAL    { 1073741824 }
+    ::= { juniQosQueueProfileEntry 5 }
+
+juniQosQueueProfileConformedMinLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum queue length in bytes for conformed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 6 }
+
+juniQosQueueProfileConformedMaxLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum queue length in bytes for conformed traffic."
+    DEFVAL    { 1073741824 }
+    ::= { juniQosQueueProfileEntry 7 }
+
+juniQosQueueProfileExceededMinLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum queue length in bytes for exceeded traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 8 }
+
+juniQosQueueProfileExceededMaxLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum queue length in bytes for exceeded traffic."
+    DEFVAL    { 1073741824 }
+    ::= { juniQosQueueProfileEntry 9 }
+
+juniQosQueueProfileConformedFraction OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum percentage of queue occupied by conformed
+        traffic."
+    DEFVAL    { 50 }
+    ::= { juniQosQueueProfileEntry 10 }
+
+juniQosQueueProfileExceededFraction OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum percentage of queue occupied by exceeded
+        traffic."
+    DEFVAL    { 25 }
+    ::= { juniQosQueueProfileEntry 11 }
+
+juniQosQueueProfileCommittedDropThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop threshold (percent of queue) for committed traffic."
+    DEFVAL    { 100 }
+    ::= { juniQosQueueProfileEntry 12 }
+
+juniQosQueueProfileCommittedDropRate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop rate (percent of traffic) for committed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 13 }
+
+juniQosQueueProfileConformedDropThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop threshold (percent of queue) for comformed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 14 }
+
+juniQosQueueProfileConformedDropRate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop rate (percent of traffic) for comformed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 15 }
+
+juniQosQueueProfileExceededDropThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop threshold (percent of queue) for exceeded traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 16 }
+
+juniQosQueueProfileExceededDropRate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop rate (percent of traffic) for exceeded traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosQueueProfileEntry 17 }
+
+juniQosQueueProfileBufferWeight OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The relative weight for queues in this traffic class."
+    DEFVAL    { 8 }
+    ::= { juniQosQueueProfileEntry 18 }
+
+juniQosQueueProfileUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the queue profile object which
+        have not been committed to the line cards."
+    ::= { juniQosQueueProfileEntry 19  }
+
+juniQosQueueProfileUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the queue profile object will
+        be committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosQueueProfileEntry 20 }
+
+juniQosQueueProfileIsReferencedByQosProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the queue profile is referenced by a QoS profile."
+    ::= { juniQosQueueProfileEntry 21 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Scheduler Profile List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosSchedulerProfileNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosSchedulerProfileTable."
+    ::= { juniQosSchedulerProfileList 1 }
+
+juniQosSchedulerProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosSchedulerProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of Scheduler Profile
+        definitions."
+    ::= { juniQosSchedulerProfileList 2 }
+
+juniQosSchedulerProfileEntry OBJECT-TYPE
+    SYNTAX      JuniQosSchedulerProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a scheduler profile
+        element."
+    INDEX     { juniQosSchedulerProfileIndex }
+    ::= { juniQosSchedulerProfileTable 1 }
+
+JuniQosSchedulerProfileEntry ::= SEQUENCE {
+    juniQosSchedulerProfileIndex                     Unsigned32,
+    juniQosSchedulerProfileRowStatus                 RowStatus,
+    juniQosSchedulerProfileName                      DisplayString,
+    juniQosSchedulerProfileShapingRate               Unsigned32,
+    juniQosSchedulerProfileBurst                     Unsigned32,
+    juniQosSchedulerProfileWeight                    Unsigned32,
+    juniQosSchedulerProfileStrictPriority            TruthValue,
+    juniQosSchedulerProfileUpdatePending             TruthValue,
+    juniQosSchedulerProfileUpdateNow                 TruthValue,
+    juniQosSchedulerProfileIsReferencedByQosProfile  TruthValue,
+    juniQosSchedulerProfileAssuredRate               Unsigned32,
+    juniQosSchedulerProfileSharedShapingRate         Unsigned32,
+    juniQosSchedulerProfileSharedShapingBurstSize    Unsigned32,
+    juniQosSchedulerProfileSharedShapingType         INTEGER,
+    juniQosSchedulerProfileSharedShapingExplicitConstituents TruthValue,
+    juniQosSchedulerProfileSharedShapingPriority     Integer32,
+    juniQosSchedulerProfileSharedShapingWeight       Integer32 }
+
+juniQosSchedulerProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the scheduler profile entry which is defined by this
+        row."
+    ::= { juniQosSchedulerProfileEntry 1 }
+
+juniQosSchedulerProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosSchedulerProfileRowStatus
+             juniQosSchedulerProfileName "
+    ::= { juniQosSchedulerProfileEntry 2 }
+
+juniQosSchedulerProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the scheduler profile defined by this row."
+    ::= { juniQosSchedulerProfileEntry 3 }
+
+juniQosSchedulerProfileShapingRate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000000)
+    UNITS       "bps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the shaping rate in bits per second (bps).
+         Values between 1 and 63999 are not supported."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 4 }
+
+juniQosSchedulerProfileBurst OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..522240)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the catch-up burst size in bytes.
+         Burst value of 0 indicates the largest burst size the
+         system will allow without losing accuracy."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 5 }
+
+juniQosSchedulerProfileWeight OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4080)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The relative weight of the scheduler.  When an assured rate is
+        specified, this object is ignored."
+    DEFVAL    { 8 }
+    ::= { juniQosSchedulerProfileEntry 6 }
+
+juniQosSchedulerProfileStrictPriority OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the traffic to be dequeued before all other scheduler nodes."
+    DEFVAL    { false }
+    ::= { juniQosSchedulerProfileEntry 7 }
+
+juniQosSchedulerProfileUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the scheduler profile object
+        which have not been committed to the line cards."
+    ::= { juniQosSchedulerProfileEntry 8  }
+
+juniQosSchedulerProfileUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the scheduler profile object
+        will be committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosSchedulerProfileEntry 9 }
+
+juniQosSchedulerProfileIsReferencedByQosProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the scheduler profile is referenced by a QoS profile."
+    ::= { juniQosSchedulerProfileEntry 10 }
+
+juniQosSchedulerProfileAssuredRate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 25000..1000000000 | 4294967295)
+    UNITS       "bps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the assured rate in bits per second (bps).
+        When this object has a non-default value, the scheduler 
+        weight (juniQosSchedulerProfileWeight) is ignored.
+
+        A value of '4294967295' configures Hierarchical Assured Rate."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 11 }
+
+juniQosSchedulerProfileSharedShapingRate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000000)
+    UNITS       "bps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the shared shaping rate in bits per second (bps).
+        The range of 1 to 63999 is not supported."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 12 }
+
+juniQosSchedulerProfileSharedShapingBurstSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..522240)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the catch-up burst size for a shared shaping,
+        in bytes.
+
+        A value of zero indicates that the system should choose
+        an appropriate default value."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 13 }
+
+juniQosSchedulerProfileSharedShapingType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    simple(1),
+                    compound(2),
+                    auto(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object specifies the type
+        of shared shaping that is to be performed when
+        shared shaping is enabled.  Shared shaper types 
+        are defined as follows:
+
+        'simple' indicates that Simple Shared Shaping is 
+        performed regardless of the line cards capabilities.
+
+        'compound' indicates that Compound Shared Shaping is 
+        to be performed.  When compound is specified for a line 
+        card that does not support Compound Shared Shaping, a 
+        warning message is logged, and Simple Shared Shaping 
+        is configured instead.
+
+        'auto' indicates that selection of the shared shaper 
+        should be automatic such that compound shared shaping 
+        is performed on line cards which support it and simple 
+        shared shaping is performed on line cards that do not
+        support it."
+    DEFVAL    { auto }
+    ::= { juniQosSchedulerProfileEntry 14 }
+
+juniQosSchedulerProfileSharedShapingExplicitConstituents OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This option allows automatic shared shaper constituent 
+        selecting and bandwidth allocation to be overridden.  
+        By default, constituents are configured implicitly."
+    DEFVAL    { false }
+    ::= { juniQosSchedulerProfileEntry 15 }
+
+juniQosSchedulerProfileSharedShapingPriority OBJECT-TYPE
+    SYNTAX      Integer32 (-1..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The priority of a strict shared shaper constituent.
+
+        When the value of juniQosSchedulerProfileSharedShaper-
+        ConstituentType is 'strict' the value of this object
+        determines the order in which the strict constituent
+        can claim bandwidth.  Priority values range from 1 to 8, 
+        with priority 1 getting first claim amongst strict 
+        constituents on available shared bandwidth, and 
+        priority 8 getting final claim amongst strict 
+        constituents on available bandwidth.  When two or 
+        more strict constituents have the same priority 
+        value, the rules used for implicit bandwidth 
+        allocation are applied to determine their order.
+
+        A value of zero indicates 'not a constituent' 
+        of a shared shaper.
+
+        A value of -1 indicates 'is a constituent' of a shared 
+        shaper, but the system is free to choose whether the 
+        constituent is 'strict-priority' of 'weighted'
+
+        This object takes precedence over the
+        juniQosSchedulerProfileSharedShapingWeight object.
+        When set to a value from 1 to 8 the system sets
+        the value of juniQosSchedulerProfileSharedShaping-
+        Weight to zero."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 16 }
+
+juniQosSchedulerProfileSharedShapingWeight OBJECT-TYPE
+    SYNTAX      Integer32 (-1..31)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The weight of a weighted shared shaper constituent.
+
+        When the value of juniQosSchedulerProfileSharedShaper-
+        ConstituentType is 'weighted' the value of this object
+        determines the proportion of the weighted constituent's
+        bandwidth
+
+        Non-zero values specify the weight of a weighted 
+        shared shaping constituent.  A value of zero 
+        indicates 'not a constituent' of a shared shaper.
+
+        A value of -1 indicates 'is a constituent' of a 
+        shared shaper, but the system is free to choose 
+        whether the constituent is 'strict-priority' of 
+        'weighted'
+
+        The juniQosSchedulerProfileSharedShapingPriority
+        has precedence over the this object."
+    DEFVAL    { 0 }
+    ::= { juniQosSchedulerProfileEntry 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Profile Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosProfileNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosProfileTable."
+    ::= { juniQosProfile 1 }
+
+juniQosProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of QoS Profile definitions."
+    ::= { juniQosProfile 2 }
+
+juniQosProfileEntry OBJECT-TYPE
+    SYNTAX      JuniQosProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a QoS profile element."
+    INDEX     { juniQosProfileIndex }
+    ::= { juniQosProfileTable 1 }
+
+JuniQosProfileEntry ::= SEQUENCE {
+    juniQosProfileIndex                                  Unsigned32,
+    juniQosProfileRowStatus                              RowStatus,
+    juniQosProfileName                                   DisplayString,
+    juniQosProfileUpdatePending                          TruthValue,
+    juniQosProfileUpdateNow                              TruthValue,
+    juniQosProfileIsReferencedByInterfaceQosAttachment   TruthValue,
+    juniQosProfileIsReferencedByQosPortTypeProfile       TruthValue }
+
+juniQosProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number identifies this QoS profile."
+    ::= { juniQosProfileEntry 1 }
+
+juniQosProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create a QoS profile in this table, the following entry objects MUST
+        be explicitly configured:
+             juniQosProfileRowStatus
+             juniQosProfileName "
+    ::= { juniQosProfileEntry 2 }
+
+juniQosProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the QoS profile defined by this row."
+    ::= { juniQosProfileEntry 3 }
+
+juniQosProfileUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the QoS profile object which
+        have not been committed to the line cards."
+    ::= { juniQosProfileEntry 4  }
+
+juniQosProfileUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the QoS profile object will be
+        committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosProfileEntry 5 }
+
+juniQosProfileIsReferencedByInterfaceQosAttachment OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the QoS profile is referenced by an interface QoS
+        attachment."
+    ::= { juniQosProfileEntry 6 }
+
+juniQosProfileIsReferencedByQosPortTypeProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, the QoS profile is referenced by a QoS port type profile."
+    ::= { juniQosProfileEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Profile Element Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosProfileElementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosProfileElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of QoS profile definitions."
+    ::= { juniQosProfileElement 1 }
+
+juniQosProfileElementEntry OBJECT-TYPE
+    SYNTAX      JuniQosProfileElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a QoS profile element."
+    INDEX     { juniQosProfileIndex,
+                juniQosInterfaceType,
+                juniQosProfileEntryType,
+                juniQosTrafficClassIndex,
+                juniQosTrafficClassGroupIndex }
+    ::= { juniQosProfileElementTable 1 }
+
+JuniQosProfileElementEntry ::= SEQUENCE {
+    juniQosProfileElementEntryRowStatus          RowStatus,
+    juniQosProfileElementEntryQueueProfile       Unsigned32,
+    juniQosProfileElementEntrySchedulerProfile   Unsigned32,
+    juniQosInterfaceType                         INTEGER,
+    juniQosProfileEntryType                      INTEGER,
+    juniQosProfileElementEntryDropProfile        Unsigned32,
+    juniQosProfileElementEntryStatisticsProfile  Unsigned32 }
+
+juniQosProfileElementEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry object MUST be
+        explicitly configured:
+             juniQosProfileRowStatus "
+    ::= { juniQosProfileElementEntry 1 }
+
+juniQosProfileElementEntryQueueProfile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the queue profile assigned to the QoS entry."
+    DEFVAL    { 1 }
+    ::= { juniQosProfileElementEntry 2 }
+
+juniQosProfileElementEntrySchedulerProfile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the scheduler profile assigned to the QoS entry."
+    DEFVAL    { 1 }
+    ::= { juniQosProfileElementEntry 3 }
+
+juniQosInterfaceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ip(0),
+                    ethernet(6),
+                    atm(9),
+                    atmVc(11),
+                    serial(13),
+                    frVc(16),
+                    l2tpSession(21),
+                    serverPort(31),
+                    vlan(35),
+                    cbf(36),
+                    ipv6(50),
+                    l2tpTunnel(150),
+                    ipTunnel(151),
+                    atmVp(163),
+                    svlan(174) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The QoS interface type ID, part of the index for
+        juniQosProfileElementTable.
+
+        Please note that if the juniQpsProfileEntryType is trafficClassGroup,
+        then only ethernet, atm, serial, and serverPort are valid interface
+        types."
+    ::= { juniQosProfileElementEntry 4 }
+
+juniQosProfileEntryType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    trafficClass(1),
+                    schedulerProfile(2),
+                    trafficClassGroup(3),
+                    shadowNode(4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The QoS profile type, part of the index for
+        juniQosProfileElementTable."
+    ::= { juniQosProfileElementEntry 5 }
+
+juniQosProfileElementEntryDropProfile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the drop profile assigned to the QoS entry."
+    DEFVAL    { 1 }
+    ::= { juniQosProfileElementEntry 6 }
+
+juniQosProfileElementEntryStatisticsProfile OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the statistics profile assigned to the QoS entry."
+    DEFVAL    { 1 }
+    ::= { juniQosProfileElementEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Interface Attached Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosIfAttachTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosIfAttachEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries which represent attachment of QoS to
+        interfaces."
+    ::= { juniQosIfAttach 1 }
+
+juniQosIfAttachEntry OBJECT-TYPE
+    SYNTAX      JuniQosIfAttachEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the attachment of QoS to an interface."
+    INDEX     { juniQosIfAttachIndex }
+    ::= { juniQosIfAttachTable 1 }
+
+JuniQosIfAttachEntry ::= SEQUENCE {
+    juniQosIfAttachIndex             Unsigned32,
+    juniQosIfAttachRowStatus         RowStatus,
+    juniQosIfAttachQosProfileIndex   Unsigned32 }
+
+juniQosIfAttachIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface number representing the interface to which QoS has been
+        attached."
+    ::= { juniQosIfAttachEntry 1 }
+
+juniQosIfAttachRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        juniQosIfAttachQosProfileIndex must be specified when creating the row.
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list.
+            destroy         Destroy the specified list and all of its
+                            constituent elements. "
+    ::= { juniQosIfAttachEntry 2 }
+
+juniQosIfAttachQosProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The QoS profile attached to this interface."
+    ::= { juniQosIfAttachEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Port Type Profile Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosQosPortTypeProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosQosPortTypeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries which represent attachment of QoS to
+        interface types with which they are associated."
+    ::= { juniQosQosPortTypeProfile 1 }
+
+juniQosQosPortTypeProfileEntry OBJECT-TYPE
+    SYNTAX      JuniQosQosPortTypeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the attachment of QoS to an interface."
+    INDEX     { juniQosQosPortTypeProfileIndex }
+    ::= { juniQosQosPortTypeProfileTable 1 }
+
+JuniQosQosPortTypeProfileEntry ::= SEQUENCE {
+    juniQosQosPortTypeProfileIndex           INTEGER,
+    juniQosQosPortTypeProfileRowStatus       RowStatus,
+    juniQosQosPortTypeProfileQosProfileIndex Unsigned32 }
+
+juniQosQosPortTypeProfileIndex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ethernet(6),
+                    atm(9),
+                    serial(13),
+                    serverPort(31),
+                    lag(54) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface number representing the types of interface to which QoS
+        has been attached."
+    ::= { juniQosQosPortTypeProfileEntry 1 }
+
+juniQosQosPortTypeProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        juniQosQosPortTypeProfileQosProfileIndex must be specified when creating
+        the row.
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list.
+
+            destroy         Destroy the specified list and all of its
+                            constituent elements. "
+     ::= { juniQosQosPortTypeProfileEntry 2 }
+
+juniQosQosPortTypeProfileQosProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The QoS profile assigned to this port type."
+    ::= { juniQosQosPortTypeProfileEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Queue Statistics
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosQueueStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosQueueStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry within this table contains queue statistics for an
+        interface/traffic class combination."
+    ::= { juniQosQueueStatistics 1 }
+
+juniQosQueueStatisticsEntry OBJECT-TYPE
+    SYNTAX      JuniQosQueueStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a single queue statistics entry."
+    INDEX     { ifIndex,
+                juniQosTrafficClassIndex }
+    ::= { juniQosQueueStatisticsTable 1 }
+
+JuniQosQueueStatisticsEntry ::= SEQUENCE {
+    juniQosOutPacketForwarded                Counter64,
+    juniQosOutBytesForwarded                 Counter64,
+    juniQosOutGreenPacketsSchedulerDrops     Counter64,
+    juniQosOutYellowPacketsSchedulerDrops    Counter64,
+    juniQosOutRedPacketsSchedulerDrops       Counter64,
+    juniQosOutGreenBytesSchedulerDrops       Counter64,
+    juniQosOutYellowBytesSchedulerDrops      Counter64,
+    juniQosOutRedBytesSchedulerDrops         Counter64 }
+
+juniQosOutPacketForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets queued on this interface."
+    ::= { juniQosQueueStatisticsEntry 1 }
+
+juniQosOutBytesForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes queued on this interface."
+    ::= { juniQosQueueStatisticsEntry 2 }
+
+juniQosOutGreenPacketsSchedulerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of green packets dropped on this interface."
+    ::= { juniQosQueueStatisticsEntry 3 }
+
+juniQosOutYellowPacketsSchedulerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of yellow packets dropped on this interface."
+    ::= { juniQosQueueStatisticsEntry 4 }
+
+juniQosOutRedPacketsSchedulerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of red packets dropped on this interface."
+    ::= { juniQosQueueStatisticsEntry 5 }
+
+juniQosOutGreenBytesSchedulerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of green bytes dropped on this interface."
+    ::= { juniQosQueueStatisticsEntry 6 }
+
+juniQosOutYellowBytesSchedulerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of yellow bytes dropped on this interface."
+    ::= { juniQosQueueStatisticsEntry 7 }
+
+juniQosOutRedBytesSchedulerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of red bytes dropped on this interface."
+    ::= { juniQosQueueStatisticsEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS ATM VP UID support Scalar Attributes
+--
+-- To translate an ATM port interface and VP into an ATM VP UID, write the port
+-- interface and path objects, and read the VP UID object.
+--
+-- To translate an ATM VP UID into an ATM port interface and path, write the
+-- ATM VP UID object and read the ATM port interface and path objects.
+--
+-- The validity of the objects is represented by the ATM VP UID valid object.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniQosAtmVpUidValid OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(0),
+                    badPortInterfaceUid(1),
+                    badPath(2),
+                    badAtmVpUid(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the status of the ATM VP UID translation objects."
+    ::= { juniQosAtmVpUidSupport 1 }
+
+juniQosAtmVpAtmPortInterfaceUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is the ATM port interface UID which correlates to the ATM
+        VP UID object."
+    ::= { juniQosAtmVpUidSupport 2 }
+
+juniQosAtmVpAtmPath OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is the ATM VP which correlates to the ATM VP UID object."
+    ::= { juniQosAtmVpUidSupport 3 }
+
+juniQosAtmVpUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is the ATM VP UID which correlates to the ATM port
+        interface and path objects."
+    ::= { juniQosAtmVpUidSupport 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Drop Profile List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosDropProfileNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosDropProfileTable."
+    ::= { juniQosDropProfileList 1 }
+
+juniQosDropProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosDropProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of drop profile definitions."
+    ::= { juniQosDropProfileList 2 }
+
+juniQosDropProfileEntry OBJECT-TYPE
+    SYNTAX      JuniQosDropProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a drop profile element."
+    INDEX     { juniQosDropProfileIndex }
+    ::= { juniQosDropProfileTable 1 }
+
+JuniQosDropProfileEntry ::= SEQUENCE {
+    juniQosDropProfileIndex                                 Unsigned32,
+    juniQosDropProfileRowStatus                             RowStatus,
+    juniQosDropProfileName                                  DisplayString,
+    juniQosDropProfileAverageLengthExponent                 Unsigned32,
+    juniQosDropProfileCommittedThresholdUnits               INTEGER,
+    juniQosDropProfileCommittedThresholdMinThreshold        Unsigned32,
+    juniQosDropProfileCommittedThresholdMaxThreshold        Unsigned32,
+    juniQosDropProfileCommittedThresholdMaxDropProbability  Unsigned32,
+    juniQosDropProfileConformedThresholdUnits               INTEGER,
+    juniQosDropProfileConformedThresholdMinThreshold        Unsigned32,
+    juniQosDropProfileConformedThresholdMaxThreshold        Unsigned32,
+    juniQosDropProfileConformedThresholdMaxDropProbability  Unsigned32,
+    juniQosDropProfileExceededThresholdUnits                INTEGER,
+    juniQosDropProfileExceededThresholdMinThreshold         Unsigned32,
+    juniQosDropProfileExceededThresholdMaxThreshold         Unsigned32,
+    juniQosDropProfileExceededThresholdMaxDropProbability   Unsigned32,
+    juniQosDropProfileUpdatePending                         TruthValue,
+    juniQosDropProfileUpdateNow                             TruthValue,
+    juniQosDropProfileIsReferencedByQosProfile              TruthValue }
+
+juniQosDropProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the drop profile entry which is defined by this row."
+    ::= { juniQosDropProfileEntry 1 }
+
+juniQosDropProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosDropProfileRowStatus
+             juniQosDropProfileName "
+    ::= { juniQosDropProfileEntry 2 }
+
+juniQosDropProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the drop profile defined by this row."
+    ::= { juniQosDropProfileEntry 3 }
+
+juniQosDropProfileAverageLengthExponent OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..20)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the exponent used to weight the average queue length over
+        time, controlling RED responsiveness.  A non-default value enables
+        the average queue length calculation."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 4 }
+
+juniQosDropProfileCommittedThresholdUnits OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    bytes(1),
+                    percent(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the units for the committed minimum and maximum thresholds."
+    DEFVAL    { bytes }
+    ::= { juniQosDropProfileEntry 5 }
+
+juniQosDropProfileCommittedThresholdMinThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum drop threshold for committed traffic.  The units
+        are defined by juniQosDropProfileCommittedThresholdUnits.
+
+        If units are bytes, the value must be in the range of 0..1073741824.
+        If units are percent, the value must be in the range of 1..100."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 6 }
+
+juniQosDropProfileCommittedThresholdMaxThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum drop threshold for committed traffic.  The units
+        are defined by juniQosDropProfileCommittedThresholdUnits.
+
+        If units are bytes, the value must be in the range of 0..1073741824.
+        If units are percent, the value must be in the range of 1..100.
+        Setting the minimum and maximum thresholds to 0 disables the threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 7 }
+
+juniQosDropProfileCommittedThresholdMaxDropProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum drop probability for committed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 8 }
+
+juniQosDropProfileConformedThresholdUnits OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    bytes(1),
+                    percent(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the units for the conformed minimum and maximum thresholds."
+    DEFVAL    { bytes }
+    ::= { juniQosDropProfileEntry 9 }
+
+juniQosDropProfileConformedThresholdMinThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum drop threshold for conformed traffic.  The units
+        are defined by juniQosDropProfileConformedThresholdUnits.
+
+        If units are bytes, the value must be in the range of 0..1073741824.
+        If units are percent, the value must be in the range of 1..100."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 10 }
+
+juniQosDropProfileConformedThresholdMaxThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum drop threshold for conformed traffic.  The units
+        are defined by juniQosDropProfileConformedThresholdUnits.
+
+        If units are bytes, the value must be in the range of 0..1073741824.
+        If units are percent, the value must be in the range of 1..100.
+        Setting the minimum and maximum thresholds to 0 disables the threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 11 }
+
+juniQosDropProfileConformedThresholdMaxDropProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum drop probability for conformed traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 12 }
+
+juniQosDropProfileExceededThresholdUnits OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    bytes(1),
+                    percent(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the units for the exceeded minimum and maximum thresholds."
+    DEFVAL    { bytes }
+    ::= { juniQosDropProfileEntry 13 }
+
+juniQosDropProfileExceededThresholdMinThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum drop threshold for exceeded traffic.  The units
+        are defined by juniQosDropProfileExceededThresholdUnits.
+
+        If units are bytes, the value must be in the range of 0..1073741824.
+        If units are percent, the value must be in the range of 1..100."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 14 }
+
+juniQosDropProfileExceededThresholdMaxThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum drop threshold for exceeded traffic.  The units
+        are defined by juniQosDropProfileExceededThresholdUnits.
+
+        If units are bytes, the value must be in the range of 0..1073741824.
+        If units are percent, the value must be in the range of 1..100.
+        Setting the minimum and maximum thresholds to 0 disables the threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 15 }
+
+juniQosDropProfileExceededThresholdMaxDropProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum drop probability for exceeded traffic."
+    DEFVAL    { 0 }
+    ::= { juniQosDropProfileEntry 16 }
+
+juniQosDropProfileUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the drop profile object which
+        have not been committed to the line cards."
+    ::= { juniQosDropProfileEntry 17 }
+
+juniQosDropProfileUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the drop profile object will be
+        committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosDropProfileEntry 18 }
+
+juniQosDropProfileIsReferencedByQosProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the drop profile is referenced by QoS profile(s)."
+    ::= { juniQosDropProfileEntry 19 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Statistics Profile List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosStatisticsProfileNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniQosStatsProfileTable."
+    ::= { juniQosStatisticsProfileList 1 }
+
+juniQosStatisticsProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosStatisticsProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of Statistics Profile
+        definitions."
+    ::= { juniQosStatisticsProfileList 2 }
+
+juniQosStatisticsProfileEntry OBJECT-TYPE
+    SYNTAX      JuniQosStatisticsProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a statstics profile
+        element."
+    INDEX     { juniQosStatisticsProfileIndex }
+    ::= { juniQosStatisticsProfileTable 1 }
+
+JuniQosStatisticsProfileEntry ::= SEQUENCE {
+    juniQosStatisticsProfileIndex                       Unsigned32,
+    juniQosStatisticsProfileName                        DisplayString,
+    juniQosStatisticsProfileRowStatus                   RowStatus,
+    juniQosStatisticsProfileForwardingRateThreshold     Unsigned32,
+    juniQosStatisticsProfileCommittedDropThreshold      Unsigned32,
+    juniQosStatisticsProfileConformedDropThreshold      Unsigned32,
+    juniQosStatisticsProfileExceededDropThreshold       Unsigned32,
+    juniQosStatisticsProfileRatePeriod                  Unsigned32,
+    juniQosStatisticsProfileUpdatePending               TruthValue,
+    juniQosStatisticsProfileUpdateNow                   TruthValue,
+    juniQosStatisticsProfileIsReferencedByQosProfile    TruthValue }
+
+juniQosStatisticsProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the statistics profile entry which is defined by this
+        row."
+    ::= { juniQosStatisticsProfileEntry 1 }
+
+juniQosStatisticsProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosStatisticsProfileRowStatus
+             juniQosStatisticsProfileName "
+    ::= { juniQosStatisticsProfileEntry 2 }
+
+juniQosStatisticsProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the statistics profile defined by this row."
+    ::= { juniQosStatisticsProfileEntry 3 }
+
+juniQosStatisticsProfileForwardingRateThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the forwarding rate threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosStatisticsProfileEntry 4 }
+
+juniQosStatisticsProfileCommittedDropThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the committed drop threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosStatisticsProfileEntry 5 }
+
+juniQosStatisticsProfileConformedDropThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the conformed drop threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosStatisticsProfileEntry 6 }
+
+juniQosStatisticsProfileExceededDropThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the exceeded drop threshold."
+    DEFVAL    { 0 }
+    ::= { juniQosStatisticsProfileEntry 7 }
+
+juniQosStatisticsProfileRatePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the rate period over which forwarding and drop thresholds are
+        calculated "
+    DEFVAL    { 0 }
+    ::= { juniQosStatisticsProfileEntry 8 }
+
+juniQosStatisticsProfileUpdatePending OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if modifications have been made to the statistics profile object
+        which have not been committed to the line cards."
+    ::= { juniQosStatisticsProfileEntry 9 }
+
+juniQosStatisticsProfileUpdateNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to true, modifications made to the statistics profile object
+        will be committed to the line cards."
+    DEFVAL    { false }
+    ::= { juniQosStatisticsProfileEntry 10 }
+
+juniQosStatisticsProfileIsReferencedByQosProfile OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the statistics profile is referenced by QoS profile(s)."
+    ::= { juniQosStatisticsProfileEntry 11 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Mode Port List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosQosModePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosQosModePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of QoS mode port definitions."
+    ::= { juniQosQosModePortList 1 }
+
+juniQosQosModePortEntry OBJECT-TYPE
+    SYNTAX      JuniQosQosModePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a QoS mode port element."
+    INDEX     { juniQosQosModePortIndex }
+    ::= { juniQosQosModePortTable 1 }
+
+JuniQosQosModePortEntry ::= SEQUENCE {
+    juniQosQosModePortIndex         Unsigned32,
+    juniQosQosModePortRowStatus     RowStatus,
+    juniQosQosModePortFrameMode     INTEGER }
+
+juniQosQosModePortIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ATM port interface for which this row defines QoS mode port
+        settings."
+    ::= { juniQosQosModePortEntry 1 }
+
+juniQosQosModePortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosQosModePortRowStatus
+             juniQosQosModePortFrameMode "
+    ::= { juniQosQosModePortEntry 2 }
+
+juniQosQosModePortFrameMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    lowCdv(0),
+                    lowLatency(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the frame mode for this ATM port interface.
+
+        lowCdv mode can not be configured unless
+        juniQosQosShapingModeShapingMode for the ATM port interface is
+        configured as 'cell'."
+    ::= { juniQosQosModePortEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Shaping Mode List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosQosShapingModeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosQosShapingModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of QoS shaping mode
+        definitions."
+    ::= { juniQosQosShapingModeList 1 }
+
+juniQosQosShapingModeEntry OBJECT-TYPE
+    SYNTAX      JuniQosQosShapingModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a QoS shaping mode
+        element."
+    INDEX     { juniQosQosShapingModeIndex }
+    ::= { juniQosQosShapingModeTable 1 }
+
+JuniQosQosShapingModeEntry ::= SEQUENCE {
+    juniQosQosShapingModeIndex         Unsigned32,
+    juniQosQosShapingModeRowStatus     RowStatus,
+    juniQosQosShapingModeShapingMode   INTEGER }
+
+juniQosQosShapingModeIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ATM port interface for which this row defines QoS shaping mode port
+        settings."
+    ::= { juniQosQosShapingModeEntry 1 }
+
+juniQosQosShapingModeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniQosQosShapingModeRowStatus
+             juniQosQosShapingModeShapingMode "
+    ::= { juniQosQosShapingModeEntry 2 }
+
+juniQosQosShapingModeShapingMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    frame(0),
+                    cell(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the QoS shaping mode for this ATM port interface.  'frame'
+        indicates shaping is to be based on frames, not including cell
+        encapsulation and padding.  'cell' indicates shaping is to be based on
+        cells, with cell encapsulation and padding included.
+
+        'frame' mode can not be configured unless juniQosQosModePortFrameMode
+        for the ATM port interface is configured as 'lowLatency'."
+    DEFVAL    { frame }
+    ::= { juniQosQosShapingModeEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Stacked Vlan Uid Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosSVlanUidTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosSVlanUidTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains an entry for each possible stacked vlan UID."
+    ::= { juniQosSVlanUidSupport 1 }
+
+juniQosSVlanUidTableEntry OBJECT-TYPE
+    SYNTAX      JuniQosSVlanUidTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry is a stacked vlan UID."
+    INDEX       { juniQosSVlanUidTablePortUid,
+                  juniQosSVlanUidTableSVlanId }
+    ::= { juniQosSVlanUidTable 1 }
+
+JuniQosSVlanUidTableEntry ::= SEQUENCE {
+    juniQosSVlanUidTablePortUid   Unsigned32,
+    juniQosSVlanUidTableSVlanId   Unsigned32,
+    juniQosSVlanUidTableSVlanUid  Unsigned32 }
+
+juniQosSVlanUidTablePortUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The UID of the Ethernet port on which the stacked vlan 
+         is defined"
+     ::= { juniQosSVlanUidTableEntry 1 }
+
+juniQosSVlanUidTableSVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The stacked vlan ID"
+     ::= { juniQosSVlanUidTableEntry 2 }
+
+juniQosSVlanUidTableSVlanUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The stacked vlan UID"
+     ::= { juniQosSVlanUidTableEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- QoS Stacked Vlan Id Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosSVlanIdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniQosSVlanIdTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains an entry for each possible Ethernet port/stacked vlan id."
+    ::= { juniQosSVlanIdSupport 1 }
+
+juniQosSVlanIdTableEntry OBJECT-TYPE
+    SYNTAX      JuniQosSVlanIdTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry is a stacked vlan Ethernet port/stacked vlan ID."
+    INDEX       { juniQosSVlanIdTableSVlanUid }
+    ::= { juniQosSVlanIdTable 1 }
+
+JuniQosSVlanIdTableEntry ::= SEQUENCE {
+    juniQosSVlanIdTableSVlanUid  Unsigned32,
+    juniQosSVlanIdTablePortUid   Unsigned32,
+    juniQosSVlanIdTableSVlanId   Unsigned32 }
+
+juniQosSVlanIdTableSVlanUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The stacked vlan UID"
+     ::= { juniQosSVlanIdTableEntry 1 }
+
+juniQosSVlanIdTablePortUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UID of the Ethernet port on which the stacked vlan 
+         is defined"
+     ::= { juniQosSVlanIdTableEntry 2 }
+
+juniQosSVlanIdTableSVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The stacked vlan ID"
+     ::= { juniQosSVlanIdTableEntry 3 }
+
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniQosConformance OBJECT IDENTIFIER ::= { juniQosMIB 2 }
+juniQosCompliances OBJECT IDENTIFIER ::= { juniQosConformance 1 }
+juniQosGroups      OBJECT IDENTIFIER ::= { juniQosConformance 2 }
+
+--
+-- Compliance statements.
+--
+juniQosCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        QoS management MIB.  This statement became obsolete when drop profile
+        list support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup }
+    ::= { juniQosCompliances 1 }                                   -- JUNOSe 4.0
+
+juniQosCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        QoS management MIB.  This statement became obsolete when ATM VP UID,
+        statistics profile list and QoS mode port support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup2,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup2,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup }
+    ::= { juniQosCompliances 2 }                                   -- JUNOSe 5.0
+
+juniQosCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        QoS management MIB.  This statement became obsolete when multiple
+        traffic class group support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup3,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup2,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup3,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup,
+            juniQosAtmVpUidSupportGroup,
+            juniQosStatisticsProfileListGroup,
+            juniQosQosModePortGroup,
+            juniQosQosShapingModeGroup }
+    ::= { juniQosCompliances 3 }                                   -- JUNOSe 5.1
+
+juniQosCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper QoS
+        management MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup3,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup2,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup2,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup3,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup,
+            juniQosAtmVpUidSupportGroup,
+            juniQosStatisticsProfileListGroup,
+            juniQosQosModePortGroup,
+            juniQosQosShapingModeGroup }
+    ::= { juniQosCompliances 4 }                                   -- JUNOSe 6.0
+
+juniQosCompliance5  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper QoS
+        management MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup3,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup2,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup3,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup3,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup,
+            juniQosAtmVpUidSupportGroup,
+            juniQosStatisticsProfileListGroup,
+            juniQosQosModePortGroup,
+            juniQosQosShapingModeGroup }
+    ::= { juniQosCompliances 5 }                                   -- JUNOSe 7.0
+
+juniQosCompliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper QoS
+        management MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup3,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup2,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup4,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup3,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup,
+            juniQosAtmVpUidSupportGroup,
+            juniQosStatisticsProfileListGroup,
+            juniQosQosModePortGroup,
+            juniQosQosShapingModeGroup,
+            juniQosSVlanUidSupportGroup,
+            juniQosSVlanIdSupportGroup }
+    ::= { juniQosCompliances 6 }                                   -- Kyoto FIXME:smg  Change to a number.
+
+--
+-- Units of conformance.
+--
+juniQosCapabilityGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosMaxTrafficClass,
+        juniQosMaxQueueLength,
+        juniQosMinSchedulerBurst,
+        juniQosMaxSchedulerBurst,
+        juniQosMaxQosProfileRules }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS application-wide capabilities management."
+    ::= { juniQosGroups 1 }                                        -- JUNOSe 4.0
+
+juniQosScalarGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosTrafficClassCount,
+        juniQosQueueProfileCount,
+        juniQosSchedulerProfileCount,
+        juniQosProfileCount,
+        juniQosInterfaceCount,
+        juniQosQosPortTypeProfileCount }
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete group defines QoS application-wide counters.  This group
+        became obsolete when drop profile list support was added."
+    ::= { juniQosGroups 2 }                                        -- JUNOSe 4.0
+
+juniQosTrafficClassListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosTrafficClassNextIndex,
+
+        juniQosTrafficClassRowStatus,
+        juniQosTrafficClassName,
+        juniQosTrafficClassWeight,
+        juniQosTrafficClassStrictPriority,
+        juniQosTrafficClassUpdatePending,
+        juniQosTrafficClassUpdateNow,
+        juniQosTrafficClassIsReferencedByGroup,
+        juniQosTrafficClassIsReferencedByQosProfile }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS traffic class management."
+    ::= { juniQosGroups 3 }                                        -- JUNOSe 4.0
+
+juniQosTrafficClassGroupListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosTrafficClassGroupNextIndex,
+
+        juniQosTrafficClassGroupRowStatus,
+        juniQosTrafficClassGroupName,
+        juniQosTrafficClassGroupUpdatePending,
+        juniQosTrafficClassGroupUpdateNow,
+        juniQosTrafficClassGroupIsReferencedByQosProfile,
+
+        juniQosTrafficClassGroupEntryRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete group defines QoS traffic class group management.  This
+        group became obsolete when multiple traffic class group support was
+        added."
+    ::= { juniQosGroups 4 }                                        -- JUNOSe 4.0
+
+juniQosQueueProfileListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosQueueProfileNextIndex,
+
+        juniQosQueueProfileRowStatus,
+        juniQosQueueProfileName,
+        juniQosQueueProfileCommittedMinLength,
+        juniQosQueueProfileCommittedMaxLength,
+        juniQosQueueProfileConformedMinLength,
+        juniQosQueueProfileConformedMaxLength,
+        juniQosQueueProfileExceededMinLength,
+        juniQosQueueProfileExceededMaxLength,
+        juniQosQueueProfileConformedFraction,
+        juniQosQueueProfileExceededFraction,
+        juniQosQueueProfileCommittedDropThreshold,
+        juniQosQueueProfileCommittedDropRate,
+        juniQosQueueProfileConformedDropThreshold,
+        juniQosQueueProfileConformedDropRate,
+        juniQosQueueProfileExceededDropThreshold,
+        juniQosQueueProfileExceededDropRate,
+        juniQosQueueProfileBufferWeight,
+        juniQosQueueProfileUpdatePending,
+        juniQosQueueProfileUpdateNow,
+        juniQosQueueProfileIsReferencedByQosProfile }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS queue profile management."
+    ::= { juniQosGroups 5 }                                        -- JUNOSe 4.0
+
+juniQosSchedulerProfileListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosSchedulerProfileNextIndex,
+
+        juniQosSchedulerProfileRowStatus,
+        juniQosSchedulerProfileName,
+        juniQosSchedulerProfileShapingRate,
+        juniQosSchedulerProfileBurst,
+        juniQosSchedulerProfileWeight,
+        juniQosSchedulerProfileStrictPriority,
+        juniQosSchedulerProfileUpdatePending,
+        juniQosSchedulerProfileUpdateNow,
+        juniQosSchedulerProfileIsReferencedByQosProfile }
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete group defines QoS scheduler profile management.  This
+        group became obsolete when assured rate support was added."
+    ::= { juniQosGroups 6 }                                        -- JUNOSe 4.0
+
+juniQosProfileListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosProfileNextIndex,
+
+        juniQosProfileRowStatus,
+        juniQosProfileName,
+        juniQosProfileUpdatePending,
+        juniQosProfileUpdateNow,
+        juniQosProfileIsReferencedByInterfaceQosAttachment,
+        juniQosProfileIsReferencedByQosPortTypeProfile }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS profile management."
+    ::= { juniQosGroups 7 }                                        -- JUNOSe 4.0
+
+juniQosProfileElementGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosProfileElementEntryRowStatus,
+        juniQosProfileElementEntryQueueProfile,
+        juniQosProfileElementEntrySchedulerProfile }
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete group defines QoS profile element entry management.  This
+        group became obsolete when drop profile list support was added."
+    ::= { juniQosGroups 8 }                                        -- JUNOSe 4.0
+
+juniQosIfAttachGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosIfAttachRowStatus,
+        juniQosIfAttachQosProfileIndex }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS interface attachment management."
+    ::= { juniQosGroups 9 }                                        -- JUNOSe 4.0
+
+juniQosQosPortTypeProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosQosPortTypeProfileRowStatus,
+        juniQosQosPortTypeProfileQosProfileIndex }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS default port profile management."
+    ::= { juniQosGroups 10 }                                       -- JUNOSe 4.0
+
+juniQosQueueStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosOutPacketForwarded,
+        juniQosOutBytesForwarded,
+        juniQosOutGreenPacketsSchedulerDrops,
+        juniQosOutYellowPacketsSchedulerDrops,
+        juniQosOutRedPacketsSchedulerDrops,
+        juniQosOutGreenBytesSchedulerDrops,
+        juniQosOutYellowBytesSchedulerDrops,
+        juniQosOutRedBytesSchedulerDrops }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS queue statistics reporting."
+    ::= { juniQosGroups 11 }                                       -- JUNOSe 4.0
+
+juniQosScalarGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniQosTrafficClassCount,
+        juniQosQueueProfileCount,
+        juniQosSchedulerProfileCount,
+        juniQosProfileCount,
+        juniQosInterfaceCount,
+        juniQosQosPortTypeProfileCount,
+        juniQosDropProfileCount }
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete group defines QoS application-wide counters.  This group
+        became obsolete when statistics profile list support was added."
+    ::= { juniQosGroups 12 }                                       -- JUNOSe 5.0
+
+juniQosProfileElementGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniQosProfileElementEntryRowStatus,
+        juniQosProfileElementEntryQueueProfile,
+        juniQosProfileElementEntrySchedulerProfile,
+        juniQosProfileElementEntryDropProfile }
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete group defines QoS profile element entry management.  This
+        group became obsolete when statistics profile list support was added."
+    ::= { juniQosGroups 13 }                                       -- JUNOSe 5.0
+
+juniQosDropProfileListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosDropProfileNextIndex,
+
+        juniQosDropProfileRowStatus,
+        juniQosDropProfileName,
+        juniQosDropProfileAverageLengthExponent,
+        juniQosDropProfileCommittedThresholdUnits,
+        juniQosDropProfileCommittedThresholdMinThreshold,
+        juniQosDropProfileCommittedThresholdMaxThreshold,
+        juniQosDropProfileCommittedThresholdMaxDropProbability,
+        juniQosDropProfileConformedThresholdUnits,
+        juniQosDropProfileConformedThresholdMinThreshold,
+        juniQosDropProfileConformedThresholdMaxThreshold,
+        juniQosDropProfileConformedThresholdMaxDropProbability,
+        juniQosDropProfileExceededThresholdUnits,
+        juniQosDropProfileExceededThresholdMinThreshold,
+        juniQosDropProfileExceededThresholdMaxThreshold,
+        juniQosDropProfileExceededThresholdMaxDropProbability,
+        juniQosDropProfileUpdatePending,
+        juniQosDropProfileUpdateNow,
+        juniQosDropProfileIsReferencedByQosProfile }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS drop profile management."
+    ::= { juniQosGroups 14 }                                       -- JUNOSe 5.0
+
+juniQosAtmVpUidSupportGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosAtmVpUidValid,
+        juniQosAtmVpAtmPortInterfaceUid,
+        juniQosAtmVpAtmPath,
+        juniQosAtmVpUid }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS ATM VP UID support."
+    ::= { juniQosGroups 15 }                                       -- JUNOSe 5.1
+
+juniQosScalarGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniQosTrafficClassCount,
+        juniQosQueueProfileCount,
+        juniQosSchedulerProfileCount,
+        juniQosProfileCount,
+        juniQosInterfaceCount,
+        juniQosQosPortTypeProfileCount,
+        juniQosDropProfileCount,
+        juniQosStatisticsProfileCount }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS application-wide counters."
+    ::= { juniQosGroups 16 }                                       -- JUNOSe 5.1
+
+juniQosProfileElementGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniQosProfileElementEntryRowStatus,
+        juniQosProfileElementEntryQueueProfile,
+        juniQosProfileElementEntrySchedulerProfile,
+        juniQosProfileElementEntryDropProfile,
+        juniQosProfileElementEntryStatisticsProfile }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS profile element entry management."
+    ::= { juniQosGroups 17 }                                       -- JUNOSe 5.1
+
+juniQosStatisticsProfileListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosStatisticsProfileNextIndex,
+
+        juniQosStatisticsProfileRowStatus,
+        juniQosStatisticsProfileName,
+        juniQosStatisticsProfileForwardingRateThreshold,
+        juniQosStatisticsProfileCommittedDropThreshold,
+        juniQosStatisticsProfileConformedDropThreshold,
+        juniQosStatisticsProfileExceededDropThreshold,
+        juniQosStatisticsProfileRatePeriod,
+        juniQosStatisticsProfileUpdatePending,
+        juniQosStatisticsProfileUpdateNow,
+        juniQosStatisticsProfileIsReferencedByQosProfile }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS statistics profile management."
+    ::= { juniQosGroups 18 }                                       -- JUNOSe 5.1
+
+juniQosSchedulerProfileListGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniQosSchedulerProfileNextIndex,
+
+        juniQosSchedulerProfileRowStatus,
+        juniQosSchedulerProfileName,
+        juniQosSchedulerProfileShapingRate,
+        juniQosSchedulerProfileBurst,
+        juniQosSchedulerProfileWeight,
+        juniQosSchedulerProfileStrictPriority,
+        juniQosSchedulerProfileUpdatePending,
+        juniQosSchedulerProfileUpdateNow,
+        juniQosSchedulerProfileIsReferencedByQosProfile,
+        juniQosSchedulerProfileAssuredRate,
+        juniQosSchedulerProfileSharedShapingRate,
+        juniQosSchedulerProfileSharedShapingBurstSize }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS scheduler profile management."
+    ::= { juniQosGroups 19 }                                       -- JUNOSe 5.1
+
+juniQosQosModePortGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosQosModePortRowStatus,
+        juniQosQosModePortFrameMode }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS mode port management."
+    ::= { juniQosGroups 20 }                                       -- JUNOSe 5.1
+
+juniQosQosShapingModeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniQosQosShapingModeRowStatus,
+        juniQosQosShapingModeShapingMode }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS shaping mode management."
+    ::= { juniQosGroups 21 }                                       -- JUNOSe 5.1
+
+juniQosTrafficClassGroupListGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniQosTrafficClassGroupNextIndex,
+
+        juniQosTrafficClassGroupRowStatus,
+        juniQosTrafficClassGroupName,
+        juniQosTrafficClassGroupUpdatePending,
+        juniQosTrafficClassGroupUpdateNow,
+        juniQosTrafficClassGroupIsReferencedByQosProfile,
+        juniQosTrafficClassGroupSlotNumber,
+        juniQosTrafficClassGroupExtendedGroup,
+
+        juniQosTrafficClassGroupEntryRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS traffic class group management."
+    ::= { juniQosGroups 22 }                                       -- JUNOSe 6.0
+
+juniQosSchedulerProfileListGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniQosSchedulerProfileNextIndex,
+
+        juniQosSchedulerProfileRowStatus,
+        juniQosSchedulerProfileName,
+        juniQosSchedulerProfileShapingRate,
+        juniQosSchedulerProfileBurst,
+        juniQosSchedulerProfileWeight,
+        juniQosSchedulerProfileStrictPriority,
+        juniQosSchedulerProfileUpdatePending,
+        juniQosSchedulerProfileUpdateNow,
+        juniQosSchedulerProfileIsReferencedByQosProfile,
+        juniQosSchedulerProfileAssuredRate,
+        juniQosSchedulerProfileSharedShapingRate,
+        juniQosSchedulerProfileSharedShapingBurstSize,
+        juniQosSchedulerProfileSharedShapingType,
+        juniQosSchedulerProfileSharedShapingExplicitConstituents,
+        juniQosSchedulerProfileSharedShapingPriority,
+        juniQosSchedulerProfileSharedShapingWeight }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS scheduler profile management."
+    ::= { juniQosGroups 23 }                                       -- JUNOS/e 7.0
+
+juniQosSchedulerProfileListGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniQosSchedulerProfileNextIndex,
+
+        juniQosSchedulerProfileRowStatus,
+        juniQosSchedulerProfileName,
+        juniQosSchedulerProfileShapingRate,
+        juniQosSchedulerProfileBurst,
+        juniQosSchedulerProfileWeight,
+        juniQosSchedulerProfileStrictPriority,
+        juniQosSchedulerProfileUpdatePending,
+        juniQosSchedulerProfileUpdateNow,
+        juniQosSchedulerProfileIsReferencedByQosProfile,
+        juniQosSchedulerProfileAssuredRate,
+        juniQosSchedulerProfileSharedShapingRate,
+        juniQosSchedulerProfileSharedShapingBurstSize,
+        juniQosSchedulerProfileSharedShapingType,
+        juniQosSchedulerProfileSharedShapingExplicitConstituents,
+        juniQosSchedulerProfileSharedShapingPriority,
+        juniQosSchedulerProfileSharedShapingWeight }
+    STATUS      current
+    DESCRIPTION
+        "This group defines QoS scheduler profile management."
+    ::= { juniQosGroups 24 }                                       -- JUNOS/e Kyoto FIXME:smg
+
+juniQosSVlanUidSupportGroup OBJECT-GROUP
+    OBJECTS {
+        juniQosSVlanUidTableSVlanUid }
+    STATUS  current
+    DESCRIPTION
+        "This group defines QoS stacked vlan UID listing support."
+    ::= { juniQosGroups 25 }
+
+juniQosSVlanIdSupportGroup OBJECT-GROUP
+    OBJECTS {
+        juniQosSVlanIdTablePortUid,
+        juniQosSVlanIdTableSVlanId }
+    STATUS  current
+    DESCRIPTION
+        "This group defines QoS stacked vlan port/id listing support."
+    ::= { juniQosGroups 26 }
+
+END
+

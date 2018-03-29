@@ -1,0 +1,291 @@
+
+    ADTRAN-MIB  DEFINITIONS ::= BEGIN
+
+    -- TITLE:       ADTRAN MIB Definitions (SMIv2)
+    -- FILENAME:    ADTRAN.MIB
+    -- AUTHOR:      Jeff Wells
+    -- DATE:        97/06/13
+    --
+    -- MODIFICATIONS:
+    --   98/04/10 SLS added adShared node for shared function mibs
+    --   98/05/05 SLS correct adShared & add adPerform shared function mibs
+    --   98/09/17 SLS added adProductID & adProdTransType (both optional)
+    --   98/09/24 BED revised description of adProdPhysAddress
+    --   01/07/19 pnb Added adIdentity nodes for SMIv2 modules
+    --   02/04/02 sls Converted to SMIv2
+    --   02/08/09 pnb/sls add nodes for module identity, module compliance,
+    --                and agent capabilities advances using SMIv2
+
+    -- *** ENSURE ANY UPDATES TO THIS FILE ARE ALSO REFLECTED IN ADTRAN.MIB ***
+
+    -- {iso org(3) dod(6) internet(1) private(4) enterprises(1) adtran(664) }
+    -- The ADTRAN-MIB defines the "adtran" enterprise tree node.  This MIB
+    -- provides the basis for the definition of all other ADTRAN MIBs.
+    -- The "adProducts" sub-node under "adtran" lists all SNMP manageable
+    -- products.  Product specific MIBs are defined under "adMgmt".
+    -- Management information common to all ADTRAN products appears under
+    -- the "adAdmin" sub-node.
+
+    IMPORTS
+    enterprises, OBJECT-TYPE, MODULE-IDENTITY
+           FROM SNMPv2-SMI
+    DisplayString,PhysAddress
+           FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF;
+
+adtran MODULE-IDENTITY
+        LAST-UPDATED "0208090000Z"
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "        Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                        901 Explorer Blvd.
+                        Huntsville, AL 35806
+
+                   Tel: +1 800 726-8663
+                   Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+        DESCRIPTION
+               "The MIB module that describes the base organization
+               for all enterprises MIBs developed by ADTRAN, Inc."
+       ::= { enterprises 664 }
+
+
+
+    --
+    -- OBJECT-IDENTIFIERS
+    --
+
+    adProducts         OBJECT IDENTIFIER ::= { adtran 1 }
+    adMgmt             OBJECT IDENTIFIER ::= { adtran 2 }
+    adAdmin            OBJECT IDENTIFIER ::= { adtran 3 }
+    adPerform          OBJECT IDENTIFIER ::= { adtran 4 }
+    adShared           OBJECT IDENTIFIER ::= { adtran 5 }
+    adIdentity         OBJECT IDENTIFIER ::= { adtran 6 }
+        adIdentityShared   OBJECT IDENTIFIER ::= { adIdentity 10000 }
+    adAgentCapModule   OBJECT IDENTIFIER ::= { adtran 7 }
+        adAgentCapProduct  OBJECT IDENTIFIER ::= { adAgentCapModule 1 }
+        adAgentCapShared   OBJECT IDENTIFIER ::= { adAgentCapModule 2 }
+    adConformance      OBJECT IDENTIFIER ::= { adtran 99 }
+        adComplianceShared OBJECT IDENTIFIER ::= { adConformance 10000 }
+
+    --
+    -- PRODUCT-IDENTITY SECTION - adProducts
+    --
+    -- The name identifiers for Adtran products that support SNMP
+    -- management appear in a list under the "adProducts" node.
+    -- The location of the name within this list defines the MIB-II
+    -- system group "sysObjectID" value for the product.  For example,
+    -- the T1 channel bank line interface unit, ACTDAXL3, will respond
+    -- to a request for system object ID with the identifier sequence
+    -- iso.org.dos.internet.private.enterprises.adtran.adProducts.
+    -- adACTDAXL3 - 1.3.6.1.4.1.664.1.9
+    --
+
+    --
+    -- PRODUCT MANAGEMENT SECTION - adMgmt
+    --
+    -- The "adMgmt" node contains product specific management information.
+    -- Each manageable product will have its own sub-node under this node
+    -- containing the product's management information.  For example, the
+    -- ACTDAXL3 management node is "adACTDAXL3mg" with the numeric
+    -- identifier sequence - 1.3.6.1.4.1.664.2.9.
+    --
+
+    --
+    -- ADMINISTRATION SECTION - adAdmin
+    --
+    -- The "adAdmin" node contains administrative information
+    -- for Adtran products.  The "adProductInfo" group under this
+    -- node contains information about the product, such as
+    -- product name, part number, and revision.
+    --
+
+    --
+    -- Perfomance SECTION - adPerform
+    --
+    -- The "adPerform" node contains frame relay performance statistics
+    -- for all Adtran "IQ" devices (i.e., TSUIQ & DSUIQ). Currently, the
+    -- only mib groups under this branch are defined in the fperform mib.
+    --
+
+    --
+    -- SHARED SECTION - adShared
+    --
+    -- The "adShared" node contains management information for a specific
+    -- function which may be supported by several manageable products.
+    -- Each functional group will have its own sub-node under this node
+    -- and be located within an individual MIB.  For example, the node
+    -- adExLan is the first node under the adShared node with the numeric
+    -- identifier sequence - 1.3.6.1.4.1.664.5.1.
+    --
+
+    --
+    -- MODULE IDENTITY SECTION - adIdentity
+    --
+    -- The "adIdentity" node contains a list of product identifiers that
+    -- are used in the Module Identify OID for SMIv2 MIBs only.  The Module
+    -- Identity name should be the same as the product name under
+    -- the adProducts node, with a suffix of "ID". For example, if the product name
+    -- is adVCP, then the SMIv2 Module Identity clause should be named adVCPID.
+    -- The OID is adIdentity followed by the numeric ProductID.
+    --
+
+    --
+    -- AGENT CAPABILITIES SECTION - adAgentCapModule
+    --
+    -- The "adAgentCapModule" node is the branch that SMIv2 AGENT-CAPABILITIES
+    -- statements use. THere are two subnodes defined to support both product
+    -- specific and generic MIBs. Use these as appropriate.
+
+    --
+    -- CONFORMANCE SECTION - adConformance
+    --
+    -- Conformance statements in SMIv2 consist of OBJECT-GROUP, NOTIFICATION-GROUP
+    -- and MODULE-COMPLIANCE statements. THese are to be placed under this node
+    -- for all product MIBs and under the sub-node for adShared MIBs.
+    -- OID.
+
+
+    --
+    -- Product Information group
+    --
+    -- This group contains information common for most all Adtran
+    -- products.
+    --
+
+    adProductInfo   OBJECT IDENTIFIER ::= { adAdmin 1 }
+
+    adProdName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product Name"
+        ::= { adProductInfo 1 }
+
+    adProdPartNumber  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product Part Number"
+        ::= { adProductInfo 2 }
+
+    adProdCLEIcode  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product CLEI Code"
+        ::= { adProductInfo 3 }
+
+    adProdSerialNumber  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product Serial Number"
+        ::= { adProductInfo 4 }
+
+    adProdRevision  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product Revision Number"
+        ::= { adProductInfo 5 }
+
+    adProdSwVersion  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product Software Version Number"
+        ::= { adProductInfo 6 }
+
+    adProdPhysAddress   OBJECT-TYPE
+        SYNTAX      PhysAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This octet string variable contains the Adtran
+             Physical Address assigned to this product.  For
+             example, the octet sequence 16 02 03 01 specifies
+             bank/shelf number 22 (hex 16), group number 2,
+             slot number 3, unit/port 1. This object value is
+             commonly reported in SNMP Traps to identify the
+             product's location."
+        ::= { adProductInfo 7 }
+
+    adProdProductID  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Adtran Product ID as reported via sysObjectID.
+             Note: In the proprietary ASP protocol, the product reports
+             only its product type number as an octet string."
+        ::= { adProductInfo 8 }
+
+    adProdTransType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The data transmission circuit/facility/payload level of the
+             device (see Appendix A of GR-833-CORE).  Common examples are:
+             T0, T1, T2, T3, STS1, and OC3. For the SCU and other common
+             equipment cards, the code should be EQPT."
+        ::= { adProductInfo 9 }
+
+-- compliance statements
+-- These two subidentifiers are for local use in this MIB only
+adCompliances    OBJECT IDENTIFIER ::= { adConformance  1 }
+adMIBGroups      OBJECT IDENTIFIER ::= { adConformance  2 }
+
+adCompliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+       "The compliance statement for SNMPv2 entities which implement the
+       adtran MIB, which is supported by all ADTRAN SNMP agents."
+
+   MODULE  -- this module
+   MANDATORY-GROUPS {
+       adBaseGroup
+       }
+
+   GROUP  adCNDGroup
+       DESCRIPTION
+           "Group which are supported by all CND products and some END which
+           are supported by the EMS management system."
+   ::= { adCompliances 1 }
+
+
+adBaseGroup OBJECT-GROUP
+    OBJECTS {
+        adProdName,
+        adProdPartNumber,
+        adProdCLEIcode,
+        adProdSerialNumber,
+        adProdRevision,
+        adProdSwVersion,
+        adProdPhysAddress,
+        adProdProductID
+        }
+    STATUS  current
+    DESCRIPTION
+       "The ADTRAN Base Group."
+    ::= { adMIBGroups 1 }
+
+adCNDGroup OBJECT-GROUP
+    OBJECTS {
+        adProdTransType
+        }
+    STATUS  current
+    DESCRIPTION
+       "Variables supported by CND products only."
+    ::= { adMIBGroups 2 }
+
+    END

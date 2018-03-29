@@ -1,0 +1,128 @@
+-- *****************************************************************
+-- NMS-HAL-TRAP.my: NMS EPON HAL RELATED TRAP MIB
+--
+-- October 2011
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-HAL-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmstemporary                                 FROM NMS-SMI
+    nmscardIndex                                 FROM NMS-CHASSIS     
+    ifDescr,ifIndex,ifSpeed                                     FROM RFC1213-MIB;
+
+
+               nmsHalTrap         OBJECT IDENTIFIER ::= { nmstemporary 11 }
+                                        
+               currMacAddrNum OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current MAC address number."
+                   ::= { nmsHalTrap 1 }
+		                
+               maxMacAddrNum OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Maximal MAC address number."
+                   ::= { nmsHalTrap 2 }
+		                
+               alarmThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..100)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Percentage of maximal value. For mac address alarm and port rate alarm."
+                   ::= { nmsHalTrap 3 }
+                   
+               macAddrAlarmStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		   port_alarm(1),
+                   		   slot_alarm(2)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Percentage of maximal value. For mac address alarm."
+                   ::= { nmsHalTrap 4 }
+                   
+               portRateAlarmStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		   ingress_alarm(1),
+                   		   egress_alarm(2)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Percentage of maximal value. For port rate alarm."
+                   ::= { nmsHalTrap 5 }
+                   
+               ifCurrentSpeed OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current interface speed."
+                   ::= { nmsHalTrap 6 }
+                   
+		                
+                         
+             
+
+-- Notifications
+	nmsMacNumNotifications OBJECT IDENTIFIER
+                                ::= { nmsHalTrap 7 }
+
+
+	nmsMacNumNotification NOTIFICATION-TYPE
+    		OBJECTS {
+    		       nmscardIndex,
+                       ifIndex,
+                       currMacAddrNum,
+                       maxMacAddrNum,
+                       alarmThreshold,
+                       macAddrAlarmStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when MAC address number exceeds the threshold."
+    		::= { nmsMacNumNotifications 1 }
+
+
+
+      -- Notifications
+	nmsPortRateNotifications OBJECT IDENTIFIER
+                                ::= { nmsHalTrap 8 }
+
+
+	nmsPortRateNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       ifCurrentSpeed,
+                       ifSpeed,
+                       alarmThreshold,
+                       portRateAlarmStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when current port rate exceeds the threshold of port max speed."
+    		::= { nmsPortRateNotifications 1 }
+
+
+        
+
+END

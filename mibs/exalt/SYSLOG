@@ -1,0 +1,65 @@
+SYSLOG DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString 
+        FROM SNMPv2-TC
+    SyslogEnableT, SyslogFilterSelectT
+        FROM ExaltComm       
+    radioConfig
+        FROM ExaltComProducts;
+
+   advSystemConfig OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION         "This is the device specific advanced configuration section."
+        ::= { radioConfig 5 }
+
+    syslogCfg OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION         "Syslog remote logging configuration."
+        ::= { advSystemConfig 6 }
+
+    syslogEnable OBJECT-TYPE
+        SYNTAX              SyslogEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "this mib to enable/disable the Syslog remote logging in the radio.
+	                     0 - disbale Syslog remote logging. 
+			     1 - enable Syslog remote logging." 
+			      
+        ::= { syslogCfg 1 }
+
+    syslogRemoteIpAddr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of the remote host the Syslog event messages being sent to.
+	                     IP address is in xxx.xxx.xxx.xxx format"
+
+        ::= { syslogCfg 2 }
+
+
+    syslogFilterSelect OBJECT-TYPE
+        SYNTAX              SyslogFilterSelectT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION        "logging filter selection.
+	                   
+			    0 - All - send all event messages to remote                    
+			    1 - Minor - Minor only                 
+			    2 - Minor, Major and critical                  
+			    3 - Major only          
+			    4 - Major and Critical                
+			    5 - Critical only."           
+
+        ::= { syslogCfg 3 }
+
+    commitSyslogSettings OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This command allows saving or clear the Syslog configuration.
+                            Option strings to be written are: save, clear, correspondingly saving changes to
+                            configuration to the persistent storage or clearing unsaved changes."
+        ::= { syslogCfg 1000 }
+END

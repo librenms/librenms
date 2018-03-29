@@ -1,0 +1,854 @@
+--     =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: This mib file is used for management of huawei userlog
+--              information. 
+-- Reference:
+-- Version:     V1.1
+-- History:
+--              tianli,2003.3.31,publish 
+--              Zhang Peng,2004.5.19,Reunification version based on V1.0 .
+-- =================================================================
+
+HUAWEI-USERLOG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP, MODULE-COMPLIANCE                 
+            FROM SNMPv2-CONF                        
+        IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY                   
+            FROM SNMPv2-SMI
+        hwDatacomm            
+            FROM HUAWEI-MIB;
+
+    -- 1.3.6.1.4.1.2011.5.25.18
+    hwUserLogMIB MODULE-IDENTITY 
+        LAST-UPDATED "200304100000Z"
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+            "The HUAWEI-USERLOG-MIB contains objects to 
+            manage configuration and monitor running state 
+            for userlog feature.
+            For users who access network through NAT and BAS 
+            equipments, their IP addresses are generally 
+            unfixed, and so it is hard to exactly locate which 
+            host a certain access comes from and which user 
+            initiates it. This decreases the network security. 
+            User log is designed to solve the problem. User log 
+            can record Network Address Translation (NAT) flow 
+            information, and login/ logout information and flow 
+            information of Broadband Access Server (BAS) user, 
+            thus enabling the administrator know address 
+            information before NAT, access record of BAS user, etc. 
+            Then, network activities and operations can be queried 
+            and tracked, and network availability and security are 
+            improved accordingly."
+        ::= { hwDatacomm 18 }
+    --
+    -- Node definitions
+    --
+            
+    -- 1.3.6.1.4.1.2011.5.25.18.1
+    hwUserlogObjects OBJECT IDENTIFIER ::= { hwUserLogMIB 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1
+    hwUserlogNatObjects OBJECT IDENTIFIER ::= { hwUserlogObjects 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.1
+    hwUserlogNatVersion OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "NAT LOG version. Currently only version 1 is developed."
+        ::= { hwUserlogNatObjects 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.2
+    hwUserlogNatSyslog OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "NAT LOG format. 
+             If 1, LOG format is sysLog.
+             If 0, LOG format is UDP packet. 
+             UDP packet is the default format and is recommended.
+             Syslog can be used in the case that log amount is not too large."
+        ::= { hwUserlogNatObjects 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.3
+    hwUserlogNatSourceIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Source IP address of NAT LOG UDP packet.
+            By default, the source IP address of the UDP packet 
+            is the IP address of the interface through which the 
+            router outputs the user log packet.
+            On the user log server side, the source of log 
+            information can be located rapidly through identifying 
+            the source IP address of the log. You are recommended 
+            to configure a loopback address or router ID to function 
+            as the source IP address of the UDP packet."
+        ::= { hwUserlogNatObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.4
+    hwUserlogNatFlowBegin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Log the NAT flow when it is created. 
+             If 1, this function is enabled.
+             If 0, this function is disabled.
+             This function will be used when real-time monitor is required. 
+             The default value 0 means this function is disabled."
+        ::= { hwUserlogNatObjects 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.5
+    hwUserlogNatActiveTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The active time for long-time existed NAT flow. 
+             Unit: minute. Range: 10 minutes ~ 120 minutes.
+             When setting it, NAT flow can be logged after an interval of active time. 
+             This function will be used when real-time monitor is required.
+             The default value 0 means real-time monitor function is disabled. "
+        ::= { hwUserlogNatObjects 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6
+    hwUserlogNatSlotCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwUserlogNatSlotCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of NAT LOG configuration information for the specified slot.
+            By default, user log function is disabled on the interface board.
+            Only after user log function is enabled, the other configurations 
+            related to user log take effect."
+        ::= { hwUserlogNatObjects 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6.1
+    hwUserlogNatSlotCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwUserlogNatSlotCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "NAT LOG configuration information entry for a slot."
+        INDEX { hwUserlogNatCfgSlotNumber }
+        ::= { hwUserlogNatSlotCfgInfoTable 1 }
+
+    HwUserlogNatSlotCfgInfoEntry ::=
+        SEQUENCE { 
+            hwUserlogNatCfgSlotNumber
+                Integer32,
+            hwUserlogNatEnable
+                Integer32,
+            hwUserlogNatAclNumber
+                Integer32,
+            hwUserlogNatHostAddress
+                IpAddress,
+            hwUserlogNatUdpPort
+                Integer32
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6.1.1
+    hwUserlogNatCfgSlotNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number. 
+             The object specifies which slot is configured with NAT LOG. 
+             For NAT LOG, it is the slot of the egress interface 
+             configured with NAT."
+        ::= { hwUserlogNatSlotCfgInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6.1.2
+    hwUserlogNatEnable OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The NAT LOG feature status. 
+             If 1, NAT LOG is enabled. 
+             If 0, NAT LOG is disabled.
+             The default value 0 means NAT LOG is disabled."
+        ::= { hwUserlogNatSlotCfgInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6.1.3
+    hwUserlogNatAclNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Access-list number. Its range is 2000 ~ 3999. 
+             The value 0 means no ACL is specified.
+             Only when NAT LOG is enabled, and ACL is configured.
+             Only NAT flow which match the ACL will be logged. "
+        ::= { hwUserlogNatSlotCfgInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6.1.4
+    hwUserlogNatHostAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address of NAT LOG server. 
+            If user log is output in UDP packet mode, user log 
+            server must be configured and user log server address 
+            must be specified correctly. Otherwise, user log 
+            function cannot work normally.
+            The address of the destination server must be a valid 
+            unicast address rather than a loop address or multicast 
+            address. In principle, it should be the address of the 
+            user log server that can communicate normally."
+        ::= { hwUserlogNatSlotCfgInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.6.1.5
+    hwUserlogNatUdpPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The UDP Port Number of NAT LOG server. Its range is 1 ~ 65535.
+            In order to avoid confliction with general UDP port numbers, 
+            you are recommended to use the UDP port number above 1024."
+        ::= { hwUserlogNatSlotCfgInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7
+    hwUserlogNatSlotRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwUserlogNatSlotRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of NAT LOG running information for the specified slot."
+        ::= { hwUserlogNatObjects 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1
+    hwUserlogNatSlotRunInfoEntry OBJECT-TYPE
+        SYNTAX HwUserlogNatSlotRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "NAT LOG running information entry for a slot."
+        INDEX { hwUserlogNatRunSlotNumber }
+        ::= { hwUserlogNatSlotRunInfoTable 1 }
+
+    HwUserlogNatSlotRunInfoEntry ::=
+        SEQUENCE { 
+            hwUserlogNatRunSlotNumber
+                Integer32,
+            hwUserlogNatTotalEntries
+                Counter32,
+            hwUserlogNatTotalPackets
+                Counter32,
+            hwUserlogNatFailedEntries
+                Counter32,
+            hwUserlogNatFailedPackets
+                Counter32,
+            hwUserlogNatClearRunStat
+                Integer32
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1.1
+    hwUserlogNatRunSlotNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number. 
+             The object specifies on which slot the NAT LOG statistics are calculated."
+        ::= { hwUserlogNatSlotRunInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1.2
+    hwUserlogNatTotalEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of NAT flow entries which are logged."
+        ::= { hwUserlogNatSlotRunInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1.3
+    hwUserlogNatTotalPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of NAT LOG UDP packets generated by the device."
+        ::= { hwUserlogNatSlotRunInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1.4
+    hwUserlogNatFailedEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of NAT flow entries failed in outputting."
+        ::= { hwUserlogNatSlotRunInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1.5
+    hwUserlogNatFailedPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of NAT LOG UDP packets failed in outputting."
+        ::= { hwUserlogNatSlotRunInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.1.7.1.6
+    hwUserlogNatClearRunStat OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clears the running statistics for NAT LOG. Its access is write-only.
+             If 1, the running statistics for NAT LOG is resetted.
+             Other value is invalid."
+        ::= { hwUserlogNatSlotRunInfoEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2
+    hwUserlogFlowObjects OBJECT IDENTIFIER ::= { hwUserlogObjects 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.1
+    hwUserlogFlowVersion OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BAS FLOW LOG version. Currently only version 1 is developed."
+        ::= { hwUserlogFlowObjects 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.2
+    hwUserlogFlowSyslog OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "BAS FLOW LOG format. 
+             If 1, LOG format is sysLog.
+             If 0, LOG format is UDP packet. 
+             UDP packet is the default format, and is recommended. 
+             Syslog can be used in the case that log amount is not 
+             too large."
+        ::= { hwUserlogFlowObjects 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.3
+    hwUserlogFlowSourceIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Source IP address of BAS FLOW LOG UDP packet.
+            By default, the source IP address of the UDP packet 
+            is the IP address of the interface through which the 
+            router outputs the user log packet.
+            On the user log server side, the source of log 
+            information can be located rapidly through identifying 
+            the source IP address of the log. You are recommended 
+            to configure a loopback address or router ID to function 
+            as the source IP address of the UDP packet."
+        ::= { hwUserlogFlowObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.4
+    hwUserlogFlowFlowBegin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Log the BAS flow when it is created. 
+            If 1, this function is enabled.
+            If 0, this function is disabled.
+            This function will be used when real-time monitor is required. 
+            The default value 0 means this function is disabled."
+        ::= { hwUserlogFlowObjects 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.5
+    hwUserlogFlowActiveTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The active time for long-time existed BAS flow. 
+            Its unit is minute. Its range is 10 minutes ~ 120 minutes.
+            When setting it, BAS flow can be logged after an internal of active time. 
+            This function will be used when real-time monitor is required.
+            The default value 0 means real-time monitor function
+            is disabled. "
+        ::= { hwUserlogFlowObjects 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6
+    hwUserlogFlowSlotCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwUserlogFlowSlotCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of BAS FLOW LOG configuration information for the specified slot.
+            By default, user log function is disabled on the interface board.
+            Only after user log function is enabled, the other configurations 
+            related to user log take effect."
+        ::= { hwUserlogFlowObjects 6 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6.1
+    hwUserlogFlowSlotCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwUserlogFlowSlotCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "BAS FLOW LOG configuration information entry for a slot."
+        INDEX { hwUserlogFlowCfgSlotNumber }
+        ::= { hwUserlogFlowSlotCfgInfoTable 1 }
+
+    HwUserlogFlowSlotCfgInfoEntry ::=
+        SEQUENCE { 
+            hwUserlogFlowCfgSlotNumber
+                Integer32,
+            hwUserlogFlowEnable
+                Integer32,
+            hwUserlogFlowAclNumber
+                Integer32,
+            hwUserlogFlowHostAddress
+                IpAddress,
+            hwUserlogFlowUdpPort
+                Integer32
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6.1.1
+    hwUserlogFlowCfgSlotNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number. 
+            The ojects specifies which slot is configured with BAS FLOW LOG. "
+        ::= { hwUserlogFlowSlotCfgInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6.1.2
+    hwUserlogFlowEnable OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The BAS FLOW LOG feature status.
+             If 1, BAS FLOW LOG is enabled. 
+             If 0, BAS FLOW LOG is disabled.
+             The default value 0 means BAS FLOW LOG is disabled."
+        ::= { hwUserlogFlowSlotCfgInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6.1.3
+    hwUserlogFlowAclNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Access-list number. Its range is 2000 ~ 3999. 
+             The value 0 means no ACL is specified.
+             Only when BAS FLOW LOG is enabled, the ACL be configured.
+             Only BAS flow which match the ACL will be logged. "
+        ::= { hwUserlogFlowSlotCfgInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6.1.4
+    hwUserlogFlowHostAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address of BAS FLOW LOG server. 
+            If user log is output in UDP packet mode, user log 
+            server must be configured and user log server address 
+            must be specified correctly. Otherwise, user log 
+            function cannot work normally.
+            The address of the destination server must be a valid 
+            unicast address rather than a loop address or multicast 
+            address. In principle, it should be the address of the 
+            user log server that can communicate normally."
+        ::= { hwUserlogFlowSlotCfgInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.6.1.5
+    hwUserlogFlowUdpPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The UDP Port Number of BAS FLOW LOG server. Its range is 1 ~ 65535.
+             In order to avoid confliction with general UDP port numbers, 
+             you are recommended to use the UDP port number above 1024."
+        ::= { hwUserlogFlowSlotCfgInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7
+    hwUserlogFlowSlotRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwUserlogFlowSlotRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of BAS FLOW LOG running information for the specified slot."
+        ::= { hwUserlogFlowObjects 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1
+    hwUserlogFlowSlotRunInfoEntry OBJECT-TYPE
+        SYNTAX HwUserlogFlowSlotRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Running Information Entry for a slot."
+        INDEX { hwUserlogFlowRunSlotNumber }
+        ::= { hwUserlogFlowSlotRunInfoTable 1 }
+
+    HwUserlogFlowSlotRunInfoEntry ::=
+        SEQUENCE { 
+            hwUserlogFlowRunSlotNumber
+                Integer32,
+            hwUserlogFlowTotalEntries
+                Counter32,
+            hwUserlogFlowTotalPackets
+                Counter32,
+            hwUserlogFlowFailedEntries
+                Counter32,
+            hwUserlogFlowFailedPackets
+                Counter32,
+            hwUserlogFlowClearRunStat
+                Integer32
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1.1
+    hwUserlogFlowRunSlotNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number. 
+            The object specifies on which slot the BAS FLOW LOG statistics are calculated."
+        ::= { hwUserlogFlowSlotRunInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1.2
+    hwUserlogFlowTotalEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of BAS FLOW Entries which are logged. "
+        ::= { hwUserlogFlowSlotRunInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1.3
+    hwUserlogFlowTotalPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FLOW LOG UDP packet generated by the device. "
+        ::= { hwUserlogFlowSlotRunInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1.4
+    hwUserlogFlowFailedEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of BAS FLOW  entries failed in outputting. "
+        ::= { hwUserlogFlowSlotRunInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1.5
+    hwUserlogFlowFailedPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of BAS FLOW LOG UDP packet failed in outputting."
+        ::= { hwUserlogFlowSlotRunInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.2.7.1.6
+    hwUserlogFlowClearRunStat OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clears the running statistics for FLOW LOG. Its access is write-only.
+             If 1, the running statistics for FLOW LOG is resetted.
+             Other value is invalid."
+        ::= { hwUserlogFlowSlotRunInfoEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3
+    hwUserlogAccessObjects OBJECT IDENTIFIER ::= { hwUserlogObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.1
+    hwUserlogAccessVersion OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BAS ACCESS LOG version. Currently only version 1 is developed."
+        ::= { hwUserlogAccessObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.2
+    hwUserlogAccessSyslog OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "BAS ACCESS LOG format. 
+             If 1, LOG format is sysLog; 
+             If 0, LOG format is UDP packet. 
+             UDP packet is the default format, and is recommended. 
+             Syslog can be used in the case that log amount is not too large."
+        ::= { hwUserlogAccessObjects 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.3
+    hwUserlogAccessSourceIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Source IP address of BAS ACCESS LOG UDP packet. 
+            By default, the source IP address of the UDP packet 
+            is the IP address of the interface through which the 
+            router outputs the user log packet.
+            On the user log server side, the source of log 
+            information can be located rapidly through identifying 
+            the source IP address of the log. You are recommended 
+            to configure a loopback address or router ID to function 
+            as the source IP address of the UDP packet."
+        ::= { hwUserlogAccessObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.4
+    hwUserlogAccessSlotCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwUserlogAccessSlotCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of BAS ACCESS LOG configuration information for the specified slot."
+        ::= { hwUserlogAccessObjects 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.4.1
+    hwUserlogAccessSlotCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwUserlogAccessSlotCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "BAS ACCESS LOG configuration information entry for a slot."
+        INDEX { hwUserlogAccessCfgSlotNumber }
+        ::= { hwUserlogAccessSlotCfgInfoTable 1 }
+
+    HwUserlogAccessSlotCfgInfoEntry ::=
+        SEQUENCE { 
+            hwUserlogAccessCfgSlotNumber
+                Integer32,
+            hwUserlogAccessEnable
+                Integer32,
+            hwUserlogAccessHostAddress
+                IpAddress,
+            hwUserlogAccessUdpPort
+                Integer32
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.4.1.1
+    hwUserlogAccessCfgSlotNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number. 
+             The object specifies which slot is configured with BAS ACCESS LOG. "
+        ::= { hwUserlogAccessSlotCfgInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.4.1.2
+    hwUserlogAccessEnable OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The BAS ACCESS LOG feature status.
+             If 1, BAS ACCESS LOG is enabled. 
+             If 0, BAS ACCESS LOG is disabled.
+             The default value 0 means BAS ACCESS LOG is disabled."
+        ::= { hwUserlogAccessSlotCfgInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.4.1.3
+    hwUserlogAccessHostAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address of BAS ACCESS LOG server. 
+            If user log is output in UDP packet mode, user log 
+            server must be configured and user log server address 
+            must be specified correctly. Otherwise, user log 
+            function cannot work normally.
+            The address of the destination server must be a valid 
+            unicast address rather than a loop address or multicast 
+            address. In principle, it should be the address of the 
+            user log server that can communicate normally."
+        ::= { hwUserlogAccessSlotCfgInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.4.1.4
+    hwUserlogAccessUdpPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The UDP Port Number of BAS ACCESS LOG server. Its range is 1 ~ 65535.
+            In order to avoid confliction with general UDP port numbers, 
+            you are recommended to use the UDP port number above 1024."
+        ::= { hwUserlogAccessSlotCfgInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5
+    hwUserlogAccessSlotRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwUserlogAccessSlotRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of BAS ACCESS LOG running information 
+            for the specified slot."
+        ::= { hwUserlogAccessObjects 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1
+    hwUserlogAccessSlotRunInfoEntry OBJECT-TYPE
+        SYNTAX HwUserlogAccessSlotRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Running Information Entry for a slot."
+        INDEX { hwUserlogAccessRunSlotNumber }
+        ::= { hwUserlogAccessSlotRunInfoTable 1 }
+
+    HwUserlogAccessSlotRunInfoEntry ::=
+        SEQUENCE { 
+            hwUserlogAccessRunSlotNumber
+                Integer32,
+            hwUserlogAccessTotalEntries
+                Counter32,
+            hwUserlogAccessTotalPackets
+                Counter32,
+            hwUserlogAccessFailedEntries
+                Counter32,
+            hwUserlogAccessFailedPackets
+                Counter32,
+            hwUserlogAccessClearRunStat
+                Integer32
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1.1
+    hwUserlogAccessRunSlotNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number. 
+             The object specifies on which slot the BAS ACCESS LOG statistics 
+             are calculated."
+        ::= { hwUserlogAccessSlotRunInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1.2
+    hwUserlogAccessTotalEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of BAS ACCESS records which are logged. "
+        ::= { hwUserlogAccessSlotRunInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1.3
+    hwUserlogAccessTotalPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of ACCESS LOG UDP packet generated by the router."
+        ::= { hwUserlogAccessSlotRunInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1.4
+    hwUserlogAccessFailedEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of BAS ACCESS entries failed in outputting."
+        ::= { hwUserlogAccessSlotRunInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1.5
+    hwUserlogAccessFailedPackets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of BAS ACCESS LOG UDP packet failed in outputting."
+        ::= { hwUserlogAccessSlotRunInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.1.3.5.1.6
+    hwUserlogAccessClearRunStat OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear the running statistics for ACCESS LOG. Its access is write-only.
+             If 1, the running statistics for ACCESS LOG is resetted,
+             the other value is invalid."
+        ::= { hwUserlogAccessSlotRunInfoEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.2
+    hwUserlogNotifications OBJECT IDENTIFIER ::= { hwUserLogMIB 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3
+    hwUserlogConformance OBJECT IDENTIFIER ::= { hwUserLogMIB 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3.1
+    hwUserlogCompliances OBJECT IDENTIFIER ::= { hwUserlogConformance 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3.1.1
+    hwUserlogCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which 
+            implement the Huawei Userlog mib."
+        MODULE -- this module
+        MANDATORY-GROUPS { hwUserlogMandatoryGroup }
+        ::= { hwUserlogCompliances 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3.2
+    hwUserlogGroups OBJECT IDENTIFIER ::= { hwUserlogConformance 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3.2.1
+    hwUserlogMandatoryGroup OBJECT-GROUP
+        OBJECTS { hwUserlogNatEnable, hwUserlogNatHostAddress, hwUserlogNatUdpPort, hwUserlogFlowEnable, hwUserlogFlowHostAddress, 
+            hwUserlogFlowUdpPort, hwUserlogAccessEnable, hwUserlogAccessHostAddress, hwUserlogAccessUdpPort }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing mandatory Userlog information."
+        ::= { hwUserlogGroups 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3.2.2
+    hwUserlogConfigGroup OBJECT-GROUP
+        OBJECTS { hwUserlogNatVersion, hwUserlogNatSyslog, hwUserlogNatSourceIP, hwUserlogNatFlowBegin, hwUserlogNatActiveTime, 
+            hwUserlogNatCfgSlotNumber, hwUserlogNatEnable, hwUserlogNatAclNumber, hwUserlogNatHostAddress, hwUserlogNatUdpPort, 
+            hwUserlogFlowVersion, hwUserlogFlowSyslog, hwUserlogFlowSourceIP, hwUserlogFlowFlowBegin, hwUserlogFlowActiveTime, 
+            hwUserlogFlowCfgSlotNumber, hwUserlogFlowEnable, hwUserlogFlowAclNumber, hwUserlogFlowHostAddress, hwUserlogFlowUdpPort, 
+            hwUserlogAccessVersion, hwUserlogAccessSyslog, hwUserlogAccessSourceIP, hwUserlogAccessCfgSlotNumber, hwUserlogAccessEnable, 
+            hwUserlogAccessHostAddress, hwUserlogAccessUdpPort }
+        STATUS current
+        DESCRIPTION 
+            "All configurable parameters of Userlog feature."
+        ::= { hwUserlogGroups 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.18.3.2.3
+    hwUserlogInfoGroup OBJECT-GROUP
+        OBJECTS { hwUserlogNatTotalEntries, hwUserlogNatTotalPackets, hwUserlogNatFailedEntries, hwUserlogNatFailedPackets, hwUserlogFlowTotalEntries, 
+            hwUserlogFlowTotalPackets, hwUserlogFlowFailedEntries, hwUserlogFlowFailedPackets, hwUserlogAccessTotalEntries, hwUserlogAccessTotalPackets, 
+            hwUserlogAccessFailedEntries, hwUserlogAccessFailedPackets }
+        STATUS current
+        DESCRIPTION 
+            "All running information of Userlog feature."
+        ::= { hwUserlogGroups 3 }
+
+END

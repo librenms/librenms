@@ -1,0 +1,248 @@
+NMS-IPSLA-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+            FROM SNMPv2-SMI
+        
+     	Gauge,TimeTicks
+      		FROM RFC1155-SMI
+                  
+        DisplayString
+			FROM RFC1213-MIB
+        nmsMgmt
+            FROM NMS-SMI 
+        PhysAddress 
+            FROM SNMPv2-TC;
+                        
+nmsIpslaMIB  MODULE-IDENTITY
+        LAST-UPDATED    "20090317"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+                "Definition for host 
+                "
+        ::= { nmsMgmt 102 }
+
+
+       
+nmsIpslaJitterObjects   OBJECT IDENTIFIER ::= { nmsIpslaMIB 1 } 
+
+	--new define for 17 series broadband router: udp jitter table        
+	          IpslaJitterEntry ::= SEQUENCE {
+			    nmsIpslaJobEntryIndex                      INTEGER,
+			    nmsIpslaJobSuccesses			INTEGER,  
+			    nmsIpslaJobFailures         		INTEGER, 
+			    nmsIpslaJitterSamples     		INTEGER,
+			    nmsIpslaJitterSrc2DstMin            INTEGER,	
+			    nmsIpslaJitterSrc2DstMax		INTEGER,
+			    nmsIpslaJitterSrc2DstAvg     	   INTEGER,
+			    nmsIpslaJitterDst2SrcMin	   INTEGER,
+			    nmsIpslaJitterDst2SrcMax     	   INTEGER,
+			    nmsIpslaJitterDst2SrcAvg	       INTEGER,      
+			    nmsIpslaJitterRttMin           INTEGER,
+			    nmsIpslaJitterRttMax	INTEGER,
+			    nmsIpslaJitterRttAvg	INTEGER
+			    
+		  }    
+		  
+         ipslaJitterTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IpslaJitterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "the index of ipsla udp-jitter Table."
+              ::= { nmsIpslaJitterObjects 1 }          
+              
+          nmsIpslaJitterEntry OBJECT-TYPE
+              SYNTAX  IpslaJitterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"An entry (conceptual row) containing information
+             		about a ipsla job."
+              INDEX   { nmsIpslaJobEntryIndex }
+              ::= { ipslaJitterTable 1 }
+              
+              
+		  nmsIpslaJobEntryIndex OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The index for this ipsla job entry."
+			    ::= { nmsIpslaJitterEntry 1 }
+			    
+		  nmsIpslaJobSuccesses OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla job entry's success times."
+			    ::= { nmsIpslaJitterEntry 2 }
+
+		  nmsIpslaJobFailures OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla job entry's failure times."
+			    ::= { nmsIpslaJitterEntry 3 }
+			    
+		  nmsIpslaJitterSamples OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp-jitter's samples ."
+			    ::= { nmsIpslaJitterEntry 4 }
+
+		  nmsIpslaJitterSrc2DstMin OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp min jitter for source to destination."
+			    ::= { nmsIpslaJitterEntry 5 }
+
+		  nmsIpslaJitterSrc2DstMax	 OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp max jitter for source to destination."
+			    ::= { nmsIpslaJitterEntry 6 }
+          
+          nmsIpslaJitterSrc2DstAvg OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp average jitter for source to destination."
+			    ::= { nmsIpslaJitterEntry 7 }
+
+		  nmsIpslaJitterDst2SrcMin OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp min jitter for destination to source."
+			    ::= { nmsIpslaJitterEntry 8 }     
+              
+              
+          nmsIpslaJitterDst2SrcMax OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp max jitter for destination to source."
+			    ::= { nmsIpslaJitterEntry 9 }      
+			    
+          nmsIpslaJitterDst2SrcAvg OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The Ipsla udp average jitter for destination to source."
+			    ::= { nmsIpslaJitterEntry 10 }
+			    
+         nmsIpslaJitterRttMin OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The Ipsla udp jitter's min round trip time "
+              ::= { nmsIpslaJitterEntry 11 }
+     
+
+ 	nmsIpslaJitterRttMax OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The Ipsla udp jitter's max round trip time "
+              ::= { nmsIpslaJitterEntry 12 }
+
+
+	nmsIpslaJitterRttAvg	OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The Ipsla udp jitter's average round trip time "
+              ::= { nmsIpslaJitterEntry 13 }
+
+
+nmsIpslaEchoObjects   OBJECT IDENTIFIER ::= { nmsIpslaMIB 2 } 
+
+	--new define for 5 series broadband router: udp echo table        
+	          IpslaEchoEntry ::= SEQUENCE {
+			    nmsIpslaEchoTargetPort                      INTEGER,
+			    nmsIpslaEchoSourcePort			INTEGER,  
+			    nmsIpslaEchoRtt         		INTEGER, 
+			    nmsIpslaEchoProbeSent     		INTEGER,
+			    nmsIpslaEchoProbeCompletion            INTEGER
+			    
+		  }    
+		  
+         ipslaEchoTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IpslaEchoEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "the index of ipsla udp-jitter Table."
+              ::= { nmsIpslaEchoObjects 1 }          
+              
+          nmsIpslaEchoEntry OBJECT-TYPE
+              SYNTAX  IpslaEchoEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"An entry (conceptual row) containing information
+             		about a ipsla job."
+              INDEX   { nmsIpslaEchoTargetPort }
+              ::= { ipslaEchoTable 1 }
+              
+			nmsIpslaEchoTargetPort OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The udp echo job's target port."
+			    ::= { nmsIpslaEchoEntry 1 }
+			    
+		  nmsIpslaEchoSourcePort OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The udp echo job's source port."
+			    ::= { nmsIpslaEchoEntry 2 }
+
+		  nmsIpslaEchoRtt OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The udp echo's round trip time."
+			    ::= { nmsIpslaEchoEntry 3 }
+			    
+		  nmsIpslaEchoProbeSent OBJECT-TYPE
+			    SYNTAX     INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The times of the udp echo probe sent."
+			    ::= { nmsIpslaEchoEntry 4 }
+
+		  nmsIpslaEchoProbeCompletion OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The times of udp echo successes."
+			    ::= { nmsIpslaEchoEntry 5 }           
+END
+

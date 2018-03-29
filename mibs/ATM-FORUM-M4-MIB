@@ -1,0 +1,4119 @@
+ATM-FORUM-M4-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+          MODULE-IDENTITY, OBJECT-TYPE,
+          NOTIFICATION-TYPE, OBJECT-IDENTITY,
+          Counter32, Integer32, IpAddress,
+          Unsigned32                                                             FROM SNMPv2-SMI
+          TEXTUAL-CONVENTION, DisplayString,
+          AutonomousType, RowStatus, TestAndIncr,
+          RowPointer, TruthValue, TimeStamp,
+          DateAndTime, TimeInterval                      FROM SNMPv2-TC
+          MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP           FROM SNMPv2-CONF
+          ifIndex, OwnerString                                   FROM IF-MIB
+          atmForum                                                                       FROM ATM-FORUM-TC-MIB
+          atmVplEntry, atmVclEntry, atmVpCrossConnectEntry,
+          atmVcCrossConnectEntry, atmVplVpi,
+          atmVclVpi, atmVclVci,
+          atmVpCrossConnectIndex, atmVpCrossConnectLowIfIndex,
+          atmVpCrossConnectLowVpi, atmVpCrossConnectHighIfIndex,
+          atmVpCrossConnectHighVpi, atmVcCrossConnectIndex,
+          atmVcCrossConnectLowIfIndex, atmVcCrossConnectLowVpi,
+          atmVcCrossConnectLowVci, atmVcCrossConnectHighIfIndex,
+          atmVcCrossConnectHighVpi, atmVcCrossConnectHighVci
+                                                                                                         FROM ATM-MIB
+          entPhysicalIndex, entPhysicalClass, entPhysicalContainedIn,
+          entPhysicalParentRelPos
+                                                                                                         FROM ENTITY-MIB
+          hrSWInstalledIndex,
+          hrSWInstalledName                                              FROM HOST-RESOURCES-MIB;
+
+
+atmfM4MIB MODULE-IDENTITY
+          LAST-UPDATED    "9701210000Z"
+          ORGANIZATION    "ATM Forum"
+          CONTACT-INFO
+                        "          Andrew G. Malis
+          Postal:   Ascend Communications, Inc.
+                    5 Carlisle Road
+                    Westford MA  01886
+                    USA
+          Tel:      +1 508 952 7414
+          Fax:      +1 508 392 9250
+          E-Mail:   malis@ascend.com"
+         DESCRIPTION
+                         "This MIB module is the SNMP version of the ATM Forum's
+          M4 interface (network element view)."
+         ::= { atmForum 100 }
+
+atmfM4MIBObjects          OBJECT IDENTIFIER ::= { atmfM4MIB 1 }
+atmfM4MIBTraps            OBJECT IDENTIFIER ::= { atmfM4MIB 2 }
+atmfM4MIBCompliance OBJECT IDENTIFIER ::= { atmfM4MIB 3 }
+
+
+--        This MIB module consists of the following groups:
+--                       (1)     ATM NE High-Level Objects
+--                       (2)     Interfaces: Physical Path Termination Point Table
+--                       (3)     TC Adaptor Table
+--                       (4)     ATM Cell Layer Interface Table
+--                       (5)     VPL Termination Point Table Extensions
+--                       (6)     VCL Termination Point Table Extensions
+--                       (7)     VP Cross-Connect Table Extensions
+--                       (8)     VC Cross-Connect Table Extensions
+--                       (9)     VP 'next VPI' Table
+--                       (10)    VC 'next VCI' Table
+--                       (11)    ATM Cell Protocol Monitoring Current Data Table
+--                       (12)    ATM Cell Protocol Monitoring History Data Table
+--                       (13)    ATM Cell Protocol Monitoring Error Log Table
+--                       (14)    TC Adaptor Protocol Monitoring Current Data Table
+--                       (15)    TC Adaptor Protocol Monitoring History Data Table
+--                       (16)    VPL UPC/NPC Disagreement Monitoring Current Data Table
+--                       (17)    VPL UPC/NPC Disagreement Monitoring History Data Table
+--                       (18)    VCL UPC/NPC Disagreement Monitoring Current Data Table
+--                       (19)    VCL UPC/NPC Disagreement Monitoring History Data Table
+--                       (20)    OAM Loopback Test Definitions
+--                       (21)    VPL/VPC Termination Point Test Table
+--                       (22)    VCL/VCC Termination Point Test Table
+--                       (23)    Equipment Table extension
+--                       (24)    Equipment Holder Table extension
+--                       (25)    Plug-In Unit Table extension
+--                       (26)    Hardware Unit/Running Software Relationship Table
+--                       (27)    Hardware Unit/Installed Software Relationship Table
+--                       (28)    Alarm Forwarding Discriminator Table
+--                       (29)    Trap Log Table
+--                       (30)    Trap Log Entry Table
+--                       (31)    Alarm Trap Log Entry Table extension
+--                       (32)    Notifications (traps)
+--                       (33)    Conformance statements
+
+
+-- ATM Forum M4 ATM network element (NE) high-level objects
+
+atmfM4NeVendor OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The vendor of the ATM network element."
+          ::= { atmfM4MIBObjects 1 }
+
+atmfM4NeVersion OBJECT-TYPE
+          SYNTAX                AutonomousType
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The version of the ATM network element."
+          ::= { atmfM4MIBObjects 2 }
+
+atmfM4NeStartTime OBJECT-TYPE
+          SYNTAX                DateAndTime
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The time at which the agent was last started; in other
+          words, the time at which sysUpTime was zero."
+          ::= { atmfM4MIBObjects 3 }
+
+atmfM4NeAlarmSeverityIndex OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "An index into the alarm severity profile table, specifying
+          the severity assignments for M4 alarms reported for the
+          ATM network element."
+          DEFVAL                { 0 }
+          ::= { atmfM4MIBObjects 4 }
+
+atmfM4NeSuppressZeroStats OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "When the value of this object is true, no entry will be
+          created in any of the the historical statistics tables for
+          intervals in which all counts are zero."
+          DEFVAL                { true }
+          ::= { atmfM4MIBObjects 5 }
+
+
+-- ATM Forum M4 Interface Configuration Table Extensions
+-- Physical Path Termination Point Layer
+
+atmfM4PhysPathTpTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4PhysPathTpEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 interface Configuration table extensions
+          for the physical path termination point."
+          ::= { atmfM4MIBObjects 6 }
+
+atmfM4PhysPathTpEntry OBJECT-TYPE
+          SYNTAX                AtmfM4PhysPathTpEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Columns conceptually added to the interface table
+          entry for an ATM interface to model the physical path
+          termination point.
+
+          The row of the interface table modeling this object should
+          also include columns for the TC Adaptor object and the ATM
+          interface table defined in RFC 1695.
+
+          The interface table entry for the physical path TP
+          fields of an ATM interface are set up without management
+          system control (or else that setup is outside the
+          scope of M4)."
+          INDEX                   { ifIndex }
+          ::= { atmfM4PhysPathTpTable 1 }
+
+AtmfM4PhysPathTpEntry ::= SEQUENCE {
+          atmfM4PhysPathTpHwUnitIndex                     Integer32,
+          atmfM4PhysPathTpPortID                                  Integer32,
+          atmfM4PhysPathTpAlarmSeverityIndex  Integer32
+                         }
+
+atmfM4PhysPathTpHwUnitIndex OBJECT-TYPE
+          SYNTAX                Integer32 (1..2147483647)
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the index of the entry in the entPhysicalTable
+          that represents the device (i.e., card) on which the
+          physical path terminates."
+          ::= { atmfM4PhysPathTpEntry 1 }
+
+atmfM4PhysPathTpPortID OBJECT-TYPE
+          SYNTAX                Integer32 (1..2147483647)
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Identifies the port (within the card identified by the
+          hardware unit index) on which the physical path terminates."
+          ::= { atmfM4PhysPathTpEntry 2 }
+
+atmfM4PhysPathTpAlarmSeverityIndex OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the index of the entry in the communications
+          alarm severity profile table that should be used."
+          DEFVAL                { 0 }
+          ::= { atmfM4PhysPathTpEntry 3 }
+
+
+-- ATM Forum M4 Interface Configuration Table Extensions
+-- TC Adaptor Layer
+
+atmfM4TcAdaptorTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4TcAdaptorEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 interface Configuration table extensions
+          for the TC Adaptor."
+          ::= { atmfM4MIBObjects 7 }
+
+atmfM4TcAdaptorEntry OBJECT-TYPE
+          SYNTAX                AtmfM4TcAdaptorEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Columns conceptually added to the interface table
+          entry for an ATM interface to model the TC Adaptor.
+
+          The row of the interface table modeling this object should
+          also include columns for the physical path TP and the ATM
+          interface table defined in RFC 1695.
+
+          The interface table entry for the TC Adaptor
+          fields of an ATM interface are set up without management
+          system control (or else that setup is outside the
+          scope of M4)."
+          INDEX                   { ifIndex }
+          ::= { atmfM4TcAdaptorTable 1 }
+
+AtmfM4TcAdaptorEntry ::= SEQUENCE {
+          atmfM4TcACellScrambling                 TruthValue,
+          atmfM4TcAlarmSeverityIndex      Integer32
+                         }
+
+atmfM4TcACellScrambling OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "This attribute is used by the management system to
+          activate and deactivate the ATM cell scrambling function.
+          When the value of this attribute is TRUE, cell scrambling
+          on the interface is activated.
+
+          This attribute shall be present only for interfaces that
+          support the deactivation of cell scrambling.  The ATM Forum
+          UNI specification requires cell scrambling for ATM/SONET
+          interfaces but allows cell scrambling to be controlled
+          (i.e., turned on and off) for ATM/DS3 interfaces."
+          DEFVAL                { true }
+          ::= { atmfM4TcAdaptorEntry 1 }
+
+atmfM4TcAlarmSeverityIndex OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the index of the entry in the communications
+          alarm severity profile table that should be used."
+          DEFVAL                { 0 }
+          ::= { atmfM4TcAdaptorEntry 2 }
+
+
+-- ATM Forum M4 Interface Configuration Table Extensions
+-- ATM Cell Layer
+
+atmfM4AtmLayerTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4AtmLayerEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 interface Configuration table extensions
+          for the ATM cell layer."
+          ::= { atmfM4MIBObjects 8 }
+
+atmfM4AtmLayerEntry OBJECT-TYPE
+          SYNTAX                AtmfM4AtmLayerEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Columns conceptually added to the interface table
+          entry for an ATM interface to model the ATM cell layer.
+          The row of the interface table modeling this object should
+          also include columns for the physical path TP and TC Adaptor
+          object, as well as the ATM interface table defined in
+          RFC 1695.
+
+          The default configuration of an entry in this table is
+          used whenever the entries for the physical path TP, etc.,
+          are created.  The management system configures a UNI,
+          B-ICI, or B-ISSI on the interface by first modifying the
+          atmfM4IfType column (this can be done in the same SNMP
+          set-request that sets up the other necessary variables."
+          INDEX                   { ifIndex }
+          ::= { atmfM4AtmLayerTable 1 }
+
+AtmfM4AtmLayerEntry ::= SEQUENCE {
+          atmfM4IfType                                            INTEGER,
+          atmfM4IfLoopbackLocationCode  Integer32,
+          atmfM4IfSubscriberAddress       DisplayString,
+          atmfM4IfPreferredCarrier                DisplayString,
+          atmfM4IfFarEndCarrierNetwork  DisplayString
+                         }
+
+atmfM4IfType OBJECT-TYPE
+          SYNTAX                INTEGER {
+                                                  none(0),
+                                                  uni(1),
+                                                  bici(2),
+                                                  bissi(3)
+                                                                 }
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the type of ATM cell-layer interface defined
+          on the physical path termination point modeled by this
+          entry in the interface table."
+          DEFVAL                { none }
+          ::= { atmfM4AtmLayerEntry 1 }
+
+atmfM4IfLoopbackLocationCode OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the code that shall exist in incoming OAM
+          Loopback cells that are to be looped back at this
+          interface.
+
+          A value of zero shall indicate that the management system
+          has not set any loopback location code for this interface.
+          Therefore, zero should not be used as the actual loopback
+          location code for any interface.
+
+          This object shall be present only for table entries that
+          represent an actual ATM cell layer interface (i.e., the
+          atmM4IfType is not none(0))."
+          DEFVAL                { 0 }
+          ::= { atmfM4AtmLayerEntry 2 }
+
+atmfM4IfSubscriberAddress OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the address or newline-delimited list of
+          addresses assigned to the UNI.
+
+          This object shall be present only for table entries that
+          represent an UNI interface."
+          DEFVAL                { "" }
+          ::= { atmfM4AtmLayerEntry 3 }
+
+atmfM4IfPreferredCarrier OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the name of the default carrier to use when one
+          is not explicitly identified in the call set-up message.
+
+          This object shall be present only for table entries that
+          represent an UNI interface and only when SVC services are
+          supported."
+          DEFVAL                { "" }
+          ::= { atmfM4AtmLayerEntry 4 }
+
+atmfM4IfFarEndCarrierNetwork OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "Specifies the adjacent carrier to which the B-ICI
+          transmission path is connected.
+
+          This object shall be present only for table entries that
+          represent an B-ICI interface and only when SVC services are
+          supported."
+          DEFVAL                { "" }
+          ::= { atmfM4AtmLayerEntry 5 }
+
+
+
+
+-- ATM Forum M4 VPL Termination Point Configuration Table Extensions
+
+atmfM4VplTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4VplEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 VPL Termination Point Configuration
+          table extensions.  This table augments the VPL
+          configuration table in RFC 1695."
+          ::= { atmfM4MIBObjects 9 }
+
+atmfM4VplEntry OBJECT-TYPE
+          SYNTAX                AtmfM4VplEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Additional columns for the VPL configuration table entry."
+          AUGMENTS { atmVplEntry }
+          ::= { atmfM4VplTable 1 }
+
+AtmfM4VplEntry ::= SEQUENCE {
+          atmfM4VplSegEndPt                     TruthValue
+                         }
+
+atmfM4VplSegEndPt OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "Specifies whether the VPL termination point is a segment
+          end-point."
+          ::= { atmfM4VplEntry 1 }
+
+
+-- ATM Forum M4 VCL Termination Point Configuration Table Extensions
+
+atmfM4VclTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4VclEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 VCL Termination Point Configuration
+                         table extensions.  This table augments the VCL
+                         configuration table in RFC 1695."
+     ::= { atmfM4MIBObjects 10 }
+
+atmfM4VclEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VclEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Additional columns for the VCL configuration table entry."
+     AUGMENTS { atmVclEntry }
+     ::= { atmfM4VclTable 1 }
+
+AtmfM4VclEntry ::= SEQUENCE {
+     atmfM4VclSegEndPt        TruthValue
+          }
+
+atmfM4VclSegEndPt OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+          "Specifies whether the VCL termination point is a segment
+                         end-point."
+     ::= { atmfM4VclEntry 1 }
+
+
+-- ATM Forum M4 VP Cross-Connect Table Extensions
+
+atmfM4VpXConnTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VpXConnEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 VP Cross-Connect Configuration
+                         table extensions.  This table augments the VP Cross-Connect
+                         configuration table in RFC 1695."
+     ::= { atmfM4MIBObjects 11 }
+
+atmfM4VpXConnEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VpXConnEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Additional columns for the VP Cross-Connect table entry."
+     AUGMENTS { atmVpCrossConnectEntry }
+     ::= { atmfM4VpXConnTable 1 }
+
+AtmfM4VpXConnEntry ::= SEQUENCE {
+     atmfM4VpXConnRecover     TruthValue
+          }
+
+atmfM4VpXConnRecover OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+          "If FALSE, this cross-connection will be removed on
+                         failure."
+     ::= { atmfM4VpXConnEntry 1 }
+
+
+-- ATM Forum M4 VC Cross-Connect Table Extensions
+
+atmfM4VcXConnTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VcXConnEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 VC Cross-Connect Configuration
+                         table extensions.  This table augments the VC Cross-Connect
+                         configuration table in RFC 1695."
+     ::= { atmfM4MIBObjects 12 }
+
+atmfM4VcXConnEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VcXConnEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Additional columns for the VC Cross-Connect table entry."
+     AUGMENTS { atmVcCrossConnectEntry }
+     ::= { atmfM4VcXConnTable 1 }
+
+AtmfM4VcXConnEntry ::= SEQUENCE {
+     atmfM4VcXConnRecover     TruthValue
+          }
+
+atmfM4VcXConnRecover OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+          "If FALSE, this cross-connection will be removed on
+                         failure."
+     ::= { atmfM4VcXConnEntry 1 }
+
+
+-- ATM Forum M4 VP "Next VPI" Table
+
+atmfM4VpNextVpiTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VpNextVpiEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 VP Next-VPI value
+                         table. This optional table supplied unused VPI values
+                         for use in creating entries in the atmVplTable."
+     ::= { atmfM4MIBObjects 13 }
+
+atmfM4VpNextVpiEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VpNextVpiEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Each entry in this table represents the 'next' VPI
+                         value available for a given ATM interface.
+
+                         Each ATM interface (UNI, BICI, BISSI) automatically has
+                         an entry in this table associated with it."
+     INDEX          { ifIndex }
+     ::= { atmfM4VpNextVpiTable 1 }
+
+AtmfM4VpNextVpiEntry ::= SEQUENCE {
+     atmfM4VpNextVpiValue     INTEGER
+          }
+
+atmfM4VpNextVpiValue OBJECT-TYPE
+     SYNTAX    INTEGER (-1..4095)
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object contains an appropriate value to be used for
+                         atmVplVpi when creating entries in the atmVplTable.    The
+                         value -1 indicates that no unassigned entries are available.
+                         To obtain the atmVplVpi value for a new entry, the manager
+                         issues a management protocol retrieval operation to obtain
+                         the current value of this object.      After each retrieval, the
+                         agent should modify the value to the next unassigned index
+                         (or -1)."
+     ::= { atmfM4VpNextVpiEntry 1 }
+
+
+-- ATM Forum M4 VC "Next VCI" Table
+
+atmfM4VcNextVciTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VcNextVciEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 VC Next-VCI value
+                         table. This optional table supplied unused VCI values
+                         for use in creating entries in the atmVclTable."
+     ::= { atmfM4MIBObjects 14 }
+
+atmfM4VcNextVciEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VcNextVciEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Each entry in this table represents the 'next' VCI
+                         value available for a given ATM interface.
+
+                         Each VPL Termination Point automatically has
+                         an entry in this table associated with it."
+     INDEX          { ifIndex,
+                      atmVplVpi }
+     ::= { atmfM4VcNextVciTable 1 }
+
+AtmfM4VcNextVciEntry ::= SEQUENCE {
+     atmfM4VcNextVciValue     INTEGER
+          }
+
+atmfM4VcNextVciValue OBJECT-TYPE
+     SYNTAX    INTEGER (-1..65535)
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object contains an appropriate value to be used for
+                         atmVclVci when creating entries in the atmVclTable.    The
+                         value -1 indicates that no unassigned entries are available.
+                         To obtain the atmVclVci value for a new entry, the manager
+                         issues a management protocol retrieval operation to obtain
+                         the current value of this object.      After each retrieval, the
+                         agent should modify the value to the next unassigned index
+                         (or -1)."
+     ::= { atmfM4VcNextVciEntry 1 }
+
+
+-- ATM Cell Protocol Monitoring Current Data (per interface)
+
+atmfM4CellProtoCurrTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4CellProtoCurrEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Cell Protocol Monitoring Current Data
+                         table.
+
+                         This table maintains per-interface statistics for the
+                         fifteen-minute interval currently being collected."
+     ::= { atmfM4MIBObjects 15 }
+
+atmfM4CellProtoCurrEntry OBJECT-TYPE
+     SYNTAX    AtmfM4CellProtoCurrEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Cell Protocol Monitoring
+                         Current Data table.
+
+                         Each ATM interface (UNI, BICI, BISSI) automatically has
+                         an entry in this table associated with it."
+     INDEX          { ifIndex }
+     ::= { atmfM4CellProtoCurrTable 1 }
+
+AtmfM4CellProtoCurrEntry ::= SEQUENCE {
+     atmfM4CellProtoCurrSuspect         TruthValue,
+     atmfM4CellProtoCurrElapsedTime     TimeInterval,
+     atmfM4CellProtoCurrSupprIntvls     Counter32,
+     atmfM4CellProtoCurrProtoErrors     Counter32,
+     atmfM4CellProtoCurrInOAMCells      Counter32
+          }
+
+atmfM4CellProtoCurrSuspect OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "If true, the statistics in this entry may be unreliable."
+     ::= { atmfM4CellProtoCurrEntry 1 }
+
+atmfM4CellProtoCurrElapsedTime OBJECT-TYPE
+     SYNTAX    TimeInterval
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "Amount of time, measured in units of 0.01 second, that
+                         statistics for this entry (the current interval) have been
+                         counted."
+     ::= { atmfM4CellProtoCurrEntry 2 }
+
+atmfM4CellProtoCurrSupprIntvls OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This attribute is non-zero only if the ATM NE is
+                         suppressing ATM Cell Protocol Monitoring History Data
+                         entry creation when the current interval terminates with
+                         'all-zeroes' performance measurements."
+     ::= { atmfM4CellProtoCurrEntry 3 }
+
+atmfM4CellProtoCurrProtoErrors OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of ATM cells dropped on this interface, due to
+                         an unrecognized field or set of fields in the ATM cell
+                         header, since the start of this interval."
+     ::= { atmfM4CellProtoCurrEntry 4 }
+
+atmfM4CellProtoCurrInOAMCells OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of OAM cells received at this interface since
+                         the start of this interval."
+     ::= { atmfM4CellProtoCurrEntry 5 }
+
+
+-- ATM Cell Protocol Monitoring History Data (per interface and time
+-- interval)
+
+atmfM4CellProtoHistTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4CellProtoHistEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Cell Protocol Monitoring History Data
+                         table.
+
+                         This table maintains per-interface statistics for previous
+                         fifteen-minute intervals."
+     ::= { atmfM4MIBObjects 16 }
+
+atmfM4CellProtoHistEntry OBJECT-TYPE
+     SYNTAX    AtmfM4CellProtoHistEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Cell Protocol Monitoring
+                         History Data table.
+
+                         Each ATM interface (UNI, BICI, BISSI) automatically has
+                         an entry in this table associated with it for each fifteen-
+                         minute interval in which statistics are collected for it."
+     INDEX          { ifIndex,
+                    atmfM4CellProtoHistIndex }
+     ::= { atmfM4CellProtoHistTable 1 }
+
+
+AtmfM4CellProtoHistEntry ::= SEQUENCE {
+     atmfM4CellProtoHistIndex           INTEGER,
+     atmfM4CellProtoHistSuspect         TruthValue,
+     atmfM4CellProtoHistElapsedTime     TimeInterval,
+     atmfM4CellProtoHistSupprIntvls     Counter32,
+     atmfM4CellProtoHistProtoErrors     Counter32,
+     atmfM4CellProtoHistInOAMCells      Counter32
+          }
+
+atmfM4CellProtoHistIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..96)
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "A number between 1 and 96, which identifies the interval
+                         for which the set of statistics in this entry was
+                         collected.
+
+                         The interval identified by 1 is the most recently completed
+                         15 minute interval, and the interval identified by N is the
+                         interval immediately preceding the one identified by N-1."
+     ::= { atmfM4CellProtoHistEntry 1 }
+
+atmfM4CellProtoHistSuspect OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "If true, the statistics in this entry may be unreliable."
+     ::= { atmfM4CellProtoHistEntry 2 }
+
+atmfM4CellProtoHistElapsedTime OBJECT-TYPE
+     SYNTAX    TimeInterval
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "Amount of time, measured in units of 0.01 second, that
+                         statistics for this entry (the current interval) have been
+                         counted."
+     ::= { atmfM4CellProtoHistEntry 3 }
+
+atmfM4CellProtoHistSupprIntvls OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This attribute is non-zero only if the ATM NE is
+                         suppressing ATM Cell Protocol Monitoring History Data
+                         entry creation when the current interval terminates with
+                         'all-zeroes' performance measurements."
+     ::= { atmfM4CellProtoHistEntry 4 }
+
+atmfM4CellProtoHistProtoErrors OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of ATM cells dropped on this interface, due to
+                         an unrecognized field or set of fields in the ATM cell
+                         header, since the start of this interval."
+     ::= { atmfM4CellProtoHistEntry 5 }
+
+atmfM4CellProtoHistInOAMCells OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of OAM cells received at this interface since
+                         the start of this interval."
+     ::= { atmfM4CellProtoHistEntry 6 }
+
+
+-- ATM Cell Protocol Monitoring Error Log (per interface, error code)
+
+atmfM4CellProtoErrorTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4CellProtoErrorEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Cell Protocol Monitoring Error Log
+                         table.
+
+                         This table maintains a record of the last error of each
+                         type encountered on each interface, as a result of ATM
+                         Cell Protocol Monitoring."
+     ::= { atmfM4MIBObjects 17 }
+
+atmfM4CellProtoErrorEntry OBJECT-TYPE
+     SYNTAX    AtmfM4CellProtoErrorEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Cell Protocol Monitoring
+                         Error Log table.
+
+                         Each ATM interface (UNI, BICI, BISSI) automatically has
+                         an entry in this table associated with it for each error
+                         that has occurred since agent start-up."
+     INDEX          { ifIndex,
+                    atmfM4CellProtoErrorCode }
+     ::= { atmfM4CellProtoErrorTable 1 }
+
+AtmfM4CellProtoErrorEntry ::= SEQUENCE {
+     atmfM4CellProtoErrorCode      Integer32,
+     atmfM4CellProtoErrorTime      TimeStamp,
+     atmfM4CellProtoErrorReason    Integer32,
+     atmfM4CellProtoErrorVpi       INTEGER,
+     atmfM4CellProtoErrorVci       INTEGER
+          }
+
+atmfM4CellProtoErrorCode OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Indicates the type of error for which this entry contains
+                         information."
+     ::= { atmfM4CellProtoErrorEntry 1 }
+
+atmfM4CellProtoErrorTime OBJECT-TYPE
+     SYNTAX    TimeStamp
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "Value of sysUpTime when the error occurred."
+     ::= { atmfM4CellProtoErrorEntry 2 }
+
+atmfM4CellProtoErrorReason OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The cell header abnormality type: the reason for
+                         discarding the ATM cell (i.e., unassigned VPI/VCI value or
+                         VPI/VCI value out of range."
+     ::= { atmfM4CellProtoErrorEntry 3 }
+
+atmfM4CellProtoErrorVpi OBJECT-TYPE
+     SYNTAX    INTEGER (0..4096)
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The VPI value of the discarded cell."
+     ::= { atmfM4CellProtoErrorEntry 4 }
+
+atmfM4CellProtoErrorVci OBJECT-TYPE
+     SYNTAX    INTEGER (0..65535)
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The VCI value of the discarded cell."
+     ::= { atmfM4CellProtoErrorEntry 5 }
+
+
+-- TC Adaptor Protocol Monitoring Current Data (per interface)
+
+atmfM4TcProtoCurrTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4TcProtoCurrEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 TC Adaptor Protocol Monitoring Current
+                         Data table.
+
+                         This table maintains per-interface statistics for the
+                         fifteen-minute interval currently being collected."
+          ::= { atmfM4MIBObjects 18 }
+
+atmfM4TcProtoCurrEntry OBJECT-TYPE
+          SYNTAX                AtmfM4TcProtoCurrEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "An entry in the ATM Forum M4 TC Adaptor Protocol Monitoring
+          Current Data table.
+
+          Each ATM interface (UNI, BICI, BISSI) automatically has
+          an entry in this table associated with it."
+          INDEX                   { ifIndex }
+          ::= { atmfM4TcProtoCurrTable 1 }
+
+AtmfM4TcProtoCurrEntry ::= SEQUENCE {
+          atmfM4TcProtoCurrSuspect                               TruthValue,
+          atmfM4TcProtoCurrElapsedTime           TimeInterval,
+          atmfM4TcProtoCurrSupprIntvls           Counter32,
+          atmfM4TcProtoCurrDiscardHECViol        Counter32
+                         }
+
+atmfM4TcProtoCurrSuspect OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "If true, the statistics in this entry may be unreliable."
+          ::= { atmfM4TcProtoCurrEntry 1 }
+
+atmfM4TcProtoCurrElapsedTime OBJECT-TYPE
+          SYNTAX                TimeInterval
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Amount of time, measured in units of 0.01 second, that
+          statistics for this entry (the current interval) have been
+          counted."
+          ::= { atmfM4TcProtoCurrEntry 2 }
+
+atmfM4TcProtoCurrSupprIntvls OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "This attribute is non-zero only if the ATM NE is
+          suppressing ATM TC Adaptor Protocol Monitoring History Data
+          entry creation when the current interval terminates with
+          'all-zeroes' performance measurements."
+          ::= { atmfM4TcProtoCurrEntry 3 }
+
+atmfM4TcProtoCurrDiscardHECViol OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of ATM cells discarded on this interface, due to
+          an HEC violation, since the start of this interval."
+          ::= { atmfM4TcProtoCurrEntry 4 }
+
+
+-- ATM TC Adaptor Protocol Monitoring History Data (per interface and
+-- time interval)
+
+atmfM4TcProtoHistTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4TcProtoHistEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 TC Adaptor Protocol Monitoring History
+          Data table.
+
+          This table maintains per-interface statistics for previous
+          fifteen-minute intervals."
+          ::= { atmfM4MIBObjects 19 }
+
+atmfM4TcProtoHistEntry OBJECT-TYPE
+          SYNTAX                AtmfM4TcProtoHistEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "An entry in the ATM Forum M4 TC Adaptor Protocol Monitoring
+          History Data table.
+
+          Each ATM interface (UNI, BICI, BISSI) automatically has
+          an entry in this table associated with it for each fifteen-
+          minute interval in which statistics are collected for it."
+          INDEX                   { ifIndex,
+                                                  atmfM4TcProtoHistIndex }
+          ::= { atmfM4TcProtoHistTable 1 }
+
+AtmfM4TcProtoHistEntry ::= SEQUENCE {
+          atmfM4TcProtoHistIndex                                 INTEGER,
+          atmfM4TcProtoHistSuspect                               TruthValue,
+          atmfM4TcProtoHistElapsedTime           TimeInterval,
+          atmfM4TcProtoHistSupprIntvls           Unsigned32,
+          atmfM4TcProtoHistDiscardHECViol        Unsigned32
+                         }
+
+atmfM4TcProtoHistIndex OBJECT-TYPE
+          SYNTAX                INTEGER (1..96)
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "A number between 1 and 96, which identifies the interval
+          for which the set of statistics in this entry was
+          collected.
+
+          The interval identified by 1 is the most recently completed
+          15 minute interval, and the interval identified by N is the
+          interval immediately preceding the one identified by N-1."
+          ::= { atmfM4TcProtoHistEntry 1 }
+
+atmfM4TcProtoHistSuspect OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "If true, the statistics in this entry may be unreliable."
+          ::= { atmfM4TcProtoHistEntry 2 }
+
+atmfM4TcProtoHistElapsedTime OBJECT-TYPE
+          SYNTAX                TimeInterval
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Amount of time, measured in units of 0.01 second, that
+          statistics for this entry (the current interval) have been
+          counted."
+          ::= { atmfM4TcProtoHistEntry 3 }
+
+atmfM4TcProtoHistSupprIntvls OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "This attribute is non-zero only if the ATM NE is
+          suppressing ATM Cell Protocol Monitoring History Data
+          entry creation when the current interval terminates with
+          'all-zeroes' performance measurements."
+          ::= { atmfM4TcProtoHistEntry 4 }
+
+atmfM4TcProtoHistDiscardHECViol OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of ATM cells discarded on this interface, due to
+          an HEC violation, since the start of this interval."
+          ::= { atmfM4TcProtoHistEntry 5 }
+
+
+-- UPC/NPC Disagreement Monitoring Current Data (per VPL
+-- termination point)
+
+atmfM4VpUpcNpcCurrTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4VpUpcNpcCurrEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring Current
+          Data table for VPL termination points.
+
+          This table maintains per-TP statistics for the
+          fifteen-minute interval currently being collected."
+          ::= { atmfM4MIBObjects 20 }
+
+atmfM4VpUpcNpcCurrEntry OBJECT-TYPE
+          SYNTAX                AtmfM4VpUpcNpcCurrEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "An entry in the ATM Forum M4 UPC/NPC Disagreement
+          Monitoring Current Data table for VPL termination points.
+
+          Each VPL Termination Point automatically has
+          an entry in this table associated with it."
+          INDEX                   { ifIndex,
+                                                  atmVplVpi }
+          ::= { atmfM4VpUpcNpcCurrTable 1 }
+
+AtmfM4VpUpcNpcCurrEntry ::= SEQUENCE {
+          atmfM4VpUpcNpcCurrSuspect                      TruthValue,
+          atmfM4VpUpcNpcCurrElapsedTime          TimeInterval,
+          atmfM4VpUpcNpcCurrSupprIntvls          Counter32,
+          atmfM4VpUpcNpcCurrDiscardedCells       Counter32,
+          atmfM4VpUpcNpcCurrDiscardedClp0        Counter32,
+          atmfM4VpUpcNpcCurrPassedCells          Counter32,
+          atmfM4VpUpcNpcCurrPassedClp0           Counter32
+                         }
+
+atmfM4VpUpcNpcCurrSuspect OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "If true, the statistics in this entry may be unreliable."
+          ::= { atmfM4VpUpcNpcCurrEntry 1 }
+
+atmfM4VpUpcNpcCurrElapsedTime OBJECT-TYPE
+          SYNTAX                TimeInterval
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Amount of time, measured in units of 0.01 second, that
+          statistics for this entry (the current interval) have been
+          counted."
+          ::= { atmfM4VpUpcNpcCurrEntry 2 }
+
+atmfM4VpUpcNpcCurrSupprIntvls OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "This attribute is non-zero only if the ATM NE is
+          suppressing UPC/NPC Disagreement Monitoring History Data
+          entry creation when the current interval terminates with
+          'all-zeroes' performance measurements."
+          ::= { atmfM4VpUpcNpcCurrEntry 3 }
+
+atmfM4VpUpcNpcCurrDiscardedCells OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of discarded cells due to combined CLP=0 and
+          CLP=1 UPC/NPC policing."
+          ::= { atmfM4VpUpcNpcCurrEntry 4 }
+
+atmfM4VpUpcNpcCurrDiscardedClp0 OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of discarded cells due to CLP=0 only
+          UPC/NPC policing.
+
+          This object shall be present only if CLP=0 traffic is
+          separately policed."
+          ::= { atmfM4VpUpcNpcCurrEntry 5 }
+
+atmfM4VpUpcNpcCurrPassedCells OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of cells that have been successfully passed by
+          the combined CLP=0 and CLP=1 UPC/NPC policing."
+          ::= { atmfM4VpUpcNpcCurrEntry 6 }
+
+atmfM4VpUpcNpcCurrPassedClp0 OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of cells that have been successfully passed by
+          the CLP=0 UPC/NPC policing.
+
+          This object shall be present only if CLP=0 traffic is
+          separately policed."
+          ::= { atmfM4VpUpcNpcCurrEntry 7 }
+
+
+-- UPC/NPC Disagreement Monitoring History (per VPL termination
+-- point and time interval)
+
+atmfM4VpUpcNpcHistTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4VpUpcNpcHistEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring History
+          Data table for VPL termination points.
+
+          This table maintains per-interface statistics for previous
+          fifteen-minute intervals."
+          ::= { atmfM4MIBObjects 21 }
+
+atmfM4VpUpcNpcHistEntry OBJECT-TYPE
+          SYNTAX                AtmfM4VpUpcNpcHistEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "An entry in the ATM Forum M4 UPC/NPC Disagreement
+          Monitoring History Data table for VPL termination points.
+
+          Each VPL Termination Point automatically has
+          an entry in this table associated with it."
+          INDEX                   { ifIndex,
+                                                  atmVplVpi,
+                                                  atmfM4VpUpcNpcHistIndex }
+          ::= { atmfM4VpUpcNpcHistTable 1 }
+
+AtmfM4VpUpcNpcHistEntry ::= SEQUENCE {
+          atmfM4VpUpcNpcHistIndex                                INTEGER,
+          atmfM4VpUpcNpcHistSuspect                      TruthValue,
+          atmfM4VpUpcNpcHistElapsedTime          TimeInterval,
+          atmfM4VpUpcNpcHistSupprIntvls          Unsigned32,
+          atmfM4VpUpcNpcHistDiscardedCells       Unsigned32,
+          atmfM4VpUpcNpcHistDiscardedClp0        Unsigned32,
+          atmfM4VpUpcNpcHistPassedCells          Unsigned32,
+          atmfM4VpUpcNpcHistPassedClp0           Unsigned32
+                         }
+
+atmfM4VpUpcNpcHistIndex OBJECT-TYPE
+          SYNTAX                INTEGER (1..96)
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "A number between 1 and 96, which identifies the interval
+          for which the set of statistics in this entry was
+          collected.
+
+          The interval identified by 1 is the most recently completed
+          15 minute interval, and the interval identified by N is the
+          interval immediately preceding the one identified by N-1."
+          ::= { atmfM4VpUpcNpcHistEntry 1 }
+
+atmfM4VpUpcNpcHistSuspect OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "If true, the statistics in this entry may be unreliable."
+          ::= { atmfM4VpUpcNpcHistEntry 2 }
+
+atmfM4VpUpcNpcHistElapsedTime OBJECT-TYPE
+          SYNTAX                TimeInterval
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Amount of time, measured in units of 0.01 second, that
+          statistics for this entry (the current interval) have been
+          counted."
+          ::= { atmfM4VpUpcNpcHistEntry 3 }
+
+atmfM4VpUpcNpcHistSupprIntvls OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "This attribute is non-zero only if the ATM NE is
+          suppressing UPC/NPC Disagreement Monitoring History Data
+          entry creation when the current interval terminates with
+          'all-zeroes' performance measurements."
+          ::= { atmfM4VpUpcNpcHistEntry 4 }
+
+atmfM4VpUpcNpcHistDiscardedCells OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of discarded cells due to combined CLP=0 and
+          CLP=1 UPC/NPC policing."
+          ::= { atmfM4VpUpcNpcHistEntry 5 }
+
+atmfM4VpUpcNpcHistDiscardedClp0 OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of discarded cells due to CLP=0 only
+          UPC/NPC policing.
+
+          This object shall be present only if CLP=0 traffic is
+          separately policed."
+          ::= { atmfM4VpUpcNpcHistEntry 6 }
+
+atmfM4VpUpcNpcHistPassedCells OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of cells that have been successfully passed by
+          the combined CLP=0 and CLP=1 UPC/NPC policing."
+          ::= { atmfM4VpUpcNpcHistEntry 7 }
+
+atmfM4VpUpcNpcHistPassedClp0 OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The number of cells that have been successfully passed by
+          the CLP=0 UPC/NPC policing.
+
+          This object shall be present only if CLP=0 traffic is
+          separately policed."
+          ::= { atmfM4VpUpcNpcHistEntry 8 }
+
+
+
+-- UPC/NPC Disagreement Monitoring Current Data (per VCL
+-- termination point)
+
+atmfM4VcUpcNpcCurrTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4VcUpcNpcCurrEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring Current
+          Data table for VCL termination points.
+
+          This table maintains per-TP statistics for the
+          fifteen-minute interval currently being collected."
+          ::= { atmfM4MIBObjects 22 }
+
+atmfM4VcUpcNpcCurrEntry OBJECT-TYPE
+          SYNTAX                AtmfM4VcUpcNpcCurrEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "An entry in the ATM Forum M4 UPC/NPC Disagreement
+          Monitoring Current Data table for VCL termination points.
+
+          Each VCL Termination Point automatically has
+          an entry in this table associated with it."
+          INDEX                   { ifIndex,
+                                                  atmVclVpi,
+                                                  atmVclVci }
+          ::= { atmfM4VcUpcNpcCurrTable 1 }
+
+AtmfM4VcUpcNpcCurrEntry ::= SEQUENCE {
+          atmfM4VcUpcNpcCurrSuspect                      TruthValue,
+          atmfM4VcUpcNpcCurrElapsedTime          TimeInterval,
+          atmfM4VcUpcNpcCurrSupprIntvls          Counter32,
+          atmfM4VcUpcNpcCurrDiscardedCells       Counter32,
+          atmfM4VcUpcNpcCurrDiscardedClp0        Counter32,
+          atmfM4VcUpcNpcCurrPassedCells          Counter32,
+          atmfM4VcUpcNpcCurrPassedClp0           Counter32
+                         }
+
+atmfM4VcUpcNpcCurrSuspect OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "If true, the statistics in this entry may be unreliable."
+          ::= { atmfM4VcUpcNpcCurrEntry 1 }
+
+atmfM4VcUpcNpcCurrElapsedTime OBJECT-TYPE
+          SYNTAX                TimeInterval
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Amount of time, measured in units of 0.01 second, that
+          statistics for this entry (the current interval) have been
+          counted."
+          ::= { atmfM4VcUpcNpcCurrEntry 2 }
+
+atmfM4VcUpcNpcCurrSupprIntvls OBJECT-TYPE
+          SYNTAX                Counter32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "This attribute is non-zero only if the ATM NE is
+                         suppressing UPC/NPC Disagreement Monitoring History Data
+                         entry creation when the current interval terminates with
+                         'all-zeroes' performance measurements."
+     ::= { atmfM4VcUpcNpcCurrEntry 3 }
+
+atmfM4VcUpcNpcCurrDiscardedCells OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of discarded cells due to combined CLP=0 and
+                         CLP=1 UPC/NPC policing."
+     ::= { atmfM4VcUpcNpcCurrEntry 4 }
+
+atmfM4VcUpcNpcCurrDiscardedClp0 OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of discarded cells due to CLP=0 only
+                         UPC/NPC policing.
+
+                         This object shall be present only if CLP=0 traffic is
+                         separately policed."
+     ::= { atmfM4VcUpcNpcCurrEntry 5 }
+
+atmfM4VcUpcNpcCurrPassedCells OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of cells that have been successfully passed by
+                         the combined CLP=0 and CLP=1 UPC/NPC policing."
+     ::= { atmfM4VcUpcNpcCurrEntry 6 }
+
+atmfM4VcUpcNpcCurrPassedClp0 OBJECT-TYPE
+     SYNTAX    Counter32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of cells that have been successfully passed by
+                         the CLP=0 UPC/NPC policing.
+
+                         This object shall be present only if CLP=0 traffic is
+                         separately policed."
+     ::= { atmfM4VcUpcNpcCurrEntry 7 }
+
+
+-- UPC/NPC Disagreement Monitoring History (per VCL termination
+-- point and time interval)
+
+atmfM4VcUpcNpcHistTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VcUpcNpcHistEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 UPC/NPC Disagreement Monitoring History
+                         Data table for VCL termination points.
+
+                         This table maintains per-interface statistics for previous
+                         fifteen-minute intervals."
+     ::= { atmfM4MIBObjects 23 }
+
+atmfM4VcUpcNpcHistEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VcUpcNpcHistEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 UPC/NPC Disagreement
+                         Monitoring History Data table for VCL termination points.
+
+                         Each VCL Termination Point automatically has
+                         an entry in this table associated with it."
+     INDEX          { ifIndex,
+                    atmVclVpi,
+                    atmVclVci,
+                    atmfM4VcUpcNpcHistIndex }
+     ::= { atmfM4VcUpcNpcHistTable 1 }
+
+AtmfM4VcUpcNpcHistEntry ::= SEQUENCE {
+     atmfM4VcUpcNpcHistIndex            INTEGER,
+     atmfM4VcUpcNpcHistSuspect          TruthValue,
+     atmfM4VcUpcNpcHistElapsedTime      TimeInterval,
+     atmfM4VcUpcNpcHistSupprIntvls      Unsigned32,
+     atmfM4VcUpcNpcHistDiscardedCells   Unsigned32,
+     atmfM4VcUpcNpcHistDiscardedClp0    Unsigned32,
+     atmfM4VcUpcNpcHistPassedCells      Unsigned32,
+     atmfM4VcUpcNpcHistPassedClp0       Unsigned32
+          }
+
+atmfM4VcUpcNpcHistIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..96)
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "A number between 1 and 96, which identifies the interval
+                         for which the set of statistics in this entry was
+                         collected.
+
+                         The interval identified by 1 is the most recently completed
+                         15 minute interval, and the interval identified by N is the
+                         interval immediately preceding the one identified by N-1."
+     ::= { atmfM4VcUpcNpcHistEntry 1 }
+
+atmfM4VcUpcNpcHistSuspect OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "If true, the statistics in this entry may be unreliable."
+     ::= { atmfM4VcUpcNpcHistEntry 2 }
+
+atmfM4VcUpcNpcHistElapsedTime OBJECT-TYPE
+     SYNTAX    TimeInterval
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "Amount of time, measured in units of 0.01 second, that
+                         statistics for this entry (the current interval) have been
+                         counted."
+     ::= { atmfM4VcUpcNpcHistEntry 3 }
+
+atmfM4VcUpcNpcHistSupprIntvls OBJECT-TYPE
+     SYNTAX    Unsigned32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This attribute is non-zero only if the ATM NE is
+                         suppressing UPC/NPC Disagreement Monitoring History Data
+                         entry creation when the current interval terminates with
+                         'all-zeroes' performance measurements."
+     ::= { atmfM4VcUpcNpcHistEntry 4 }
+
+atmfM4VcUpcNpcHistDiscardedCells OBJECT-TYPE
+     SYNTAX    Unsigned32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of discarded cells due to combined CLP=0 and
+                         CLP=1 UPC/NPC policing."
+     ::= { atmfM4VcUpcNpcHistEntry 5 }
+
+atmfM4VcUpcNpcHistDiscardedClp0 OBJECT-TYPE
+     SYNTAX    Unsigned32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of discarded cells due to CLP=0 only
+                         UPC/NPC policing.
+
+                         This object shall be present only if CLP=0 traffic is
+                         separately policed."
+     ::= { atmfM4VcUpcNpcHistEntry 6 }
+
+atmfM4VcUpcNpcHistPassedCells OBJECT-TYPE
+     SYNTAX    Unsigned32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of cells that have been successfully passed by
+                         the combined CLP=0 and CLP=1 UPC/NPC policing."
+     ::= { atmfM4VcUpcNpcHistEntry 7 }
+
+atmfM4VcUpcNpcHistPassedClp0 OBJECT-TYPE
+     SYNTAX    Unsigned32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The number of cells that have been successfully passed by
+                         the CLP=0 UPC/NPC policing.
+
+                         This object shall be present only if CLP=0 traffic is
+                         separately policed."
+     ::= { atmfM4VcUpcNpcHistEntry 8 }
+
+
+-- ATM Forum M4 Test Types
+
+atmfM4TestTypes     OBJECT IDENTIFIER
+     ::= { atmfM4MIBObjects 24 }
+
+
+-- OAM Loopback Tests (VPL, VPC, VCL, anc VCC termination points):
+
+atmfM4TestOAMLoopbackSeg OBJECT-IDENTITY
+     STATUS    current
+     DESCRIPTION
+          "This identifies an OAM Loopback Test on a VPL, VPC,
+                         VCL, or VCC termination point, using a segment OAM
+                         cell.
+
+                         The test type must have appended to it a code that uniquely
+                         identifies an intermediate point responsible for looping
+                         back the cell.  If this is absent, the loopback is performed
+                         at the end of the segment or connection.
+
+                         E.g., the OID { atmfM4TestOAMLoopbackSeg 5 } identifies
+                         that the loopback should be performed at the intermediate
+                         point labeled 5."
+     ::= { atmfM4TestTypes 1 }
+
+atmfM4TestOAMLoopbackE2E OBJECT-IDENTITY
+     STATUS    current
+     DESCRIPTION
+          "This identifies an OAM Loopback Test on a VPL, VPC,
+                         VCL, or VCC termination point, using an end-to-end OAM
+                         cell."
+     ::= { atmfM4TestTypes 2 }
+
+
+-- ATM Forum M4 VP Termination Point Test Table
+
+atmfM4VpTestTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VpTestEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 VP Termination Point Test table.
+                         This table allows tests to be run on VPL and VPC
+                         termination points.
+
+                         The operation of this table is entirely analogous
+                         to that of the ifTestTable in RFC 1573, except that
+                         the indexes into this table are different."
+     ::= { atmfM4MIBObjects 25 }
+
+atmfM4VpTestEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VpTestEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry containing objects for invoking tests on a
+                         VPL or VPC termination point."
+     INDEX          { ifIndex,
+                    atmVplVpi,
+                    atmfM4VpTestObject }
+     ::= { atmfM4VpTestTable 1 }
+
+AtmfM4VpTestEntry ::= SEQUENCE {
+     atmfM4VpTestObject  INTEGER,
+     atmfM4VpTestId      TestAndIncr,
+     atmfM4VpTestStatus  INTEGER,
+     atmfM4VpTestType    AutonomousType,
+     atmfM4VpTestResult  INTEGER,
+     atmfM4VpTestCode    OBJECT IDENTIFIER,
+     atmfM4VpTestOwner   OwnerString
+          }
+
+atmfM4VpTestObject OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    vplTp(1),
+                    vpcTp(2)
+                         }
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Specifies whether the test applies to the VPL termination
+                         point with the specified VPI, or the VPC termination point."
+     ::= { atmfM4VpTestEntry 1 }
+
+atmfM4VpTestId         OBJECT-TYPE
+     SYNTAX       TestAndIncr
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "This object identifies the current invocation of the
+                          interface's test."
+     ::= { atmfM4VpTestEntry 2 }
+
+atmfM4VpTestStatus     OBJECT-TYPE
+     SYNTAX       INTEGER { notInUse(1), inUse(2) }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "This object indicates whether or not some manager
+           currently has the necessary 'ownership' required to
+           invoke a test on this interface.  A write to this
+           object is only successful when it changes its value
+           from 'notInUse(1)' to 'inUse(2)'.  After completion of
+           a test, the agent resets the value back to
+           'notInUse(1)'."
+     ::= { atmfM4VpTestEntry 3 }
+
+atmfM4VpTestType       OBJECT-TYPE
+     SYNTAX       AutonomousType
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "A control variable used to start and stop operator-
+           initiated interface tests.  Most OBJECT IDENTIFIER
+           values assigned to tests are defined elsewhere, in
+           association with specific types of interface.
+           However, this document assigns a value for a full-
+           duplex loopback test, and defines the special meanings
+           of the subject identifier:
+
+               noTest  OBJECT IDENTIFIER ::= { 0 0 }
+
+           When the value noTest is written to this object, no
+           action is taken unless a test is in progress, in which
+           case the test is aborted.  Writing any other value to
+           this object is only valid when no test is currently in
+           progress, in which case the indicated test is
+           initiated.
+
+           When read, this object always returns the most recent
+           value that atmfM4VpTestType was set to.  If it has not been
+           set since the last initialization of the network
+           management subsystem on the agent, a value of noTest
+           is returned."
+     ::= { atmfM4VpTestEntry 4 }
+
+atmfM4VpTestResult  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      none(1),          -- no test yet requested
+                      success(2),
+                      inProgress(3),
+                      notSupported(4),
+                      unAbleToRun(5),   -- due to state of system
+                      aborted(6),
+                      failed(7)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+           "This object contains the result of the most recently
+           requested test, or the value none(1) if no tests have
+           been requested since the last reset.  Note that this
+           facility provides no provision for saving the results
+           of one test when starting another, as could be
+           required if used by multiple managers concurrently."
+     ::= { atmfM4VpTestEntry 5 }
+
+atmfM4VpTestCode  OBJECT-TYPE
+     SYNTAX       OBJECT IDENTIFIER
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+           "This object contains a code which contains more
+           specific information on the test result, for example
+           an error-code after a failed test.  Error codes and
+           other values this object may take are specific to the
+           type of interface and/or test.  The value may have the
+           semantics of either the AutonomousType or
+           RowPointer textual conventions as defined in RFC
+           1903 [15].  The identifier:
+
+               testCodeUnknown  OBJECT IDENTIFIER ::= { 0 0 }
+
+           is defined for use if no additional result code is
+           available."
+     ::= { atmfM4VpTestEntry 6 }
+
+atmfM4VpTestOwner      OBJECT-TYPE
+     SYNTAX       OwnerString
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "The entity which currently has the 'ownership'
+           required to invoke a test on this interface."
+     ::= { atmfM4VpTestEntry 7 }
+
+
+
+-- ATM Forum M4 VC Termination Point Test Table
+
+atmfM4VcTestTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4VcTestEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 VC Termination Point Test table.
+          This table allows tests to be run on VCL and VCC
+          termination points.
+
+          The operation of this table is entirely analogous
+          to that of the ifTestTable in RFC 1573, except that
+          the indexes into this table are different."
+     ::= { atmfM4MIBObjects 26 }
+
+atmfM4VcTestEntry OBJECT-TYPE
+     SYNTAX    AtmfM4VcTestEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry containing objects for invoking tests on a
+          VCL or VCC termination point."
+     INDEX          { ifIndex,
+                    atmVclVpi,
+                    atmVclVci,
+                    atmfM4VcTestObject }
+     ::= { atmfM4VcTestTable 1 }
+
+AtmfM4VcTestEntry ::= SEQUENCE {
+     atmfM4VcTestObject  INTEGER,
+     atmfM4VcTestId      TestAndIncr,
+     atmfM4VcTestStatus  INTEGER,
+     atmfM4VcTestType    AutonomousType,
+     atmfM4VcTestResult  INTEGER,
+     atmfM4VcTestCode    OBJECT IDENTIFIER,
+     atmfM4VcTestOwner   OwnerString
+          }
+
+atmfM4VcTestObject OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    vclTp(1),
+                    vccTp(2)
+                         }
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "Specifies whether the test applies to the VCL termination
+          point with the specified VPI and VCI values, or to the VCC
+          termination point."
+     ::= { atmfM4VcTestEntry 1 }
+
+atmfM4VcTestId         OBJECT-TYPE
+     SYNTAX       TestAndIncr
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+          "This object identifies the current invocation of the
+          interface's test."
+     ::= { atmfM4VcTestEntry 2 }
+
+atmfM4VcTestStatus     OBJECT-TYPE
+     SYNTAX       INTEGER { notInUse(1), inUse(2) }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+          "This object indicates whether or not some manager
+                         currently has the necessary 'ownership' required to
+                         invoke a test on this interface.  A write to this
+                         object is only successful when it changes its value
+                         from 'notInUse(1)' to 'inUse(2)'.      After completion of
+                         a test, the agent resets the value back to
+                         'notInUse(1)'."
+     ::= { atmfM4VcTestEntry 3 }
+
+atmfM4VcTestType       OBJECT-TYPE
+     SYNTAX       AutonomousType
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+          "A control variable used to start and stop operator-
+                         initiated interface tests.  Most OBJECT IDENTIFIER
+                         values assigned to tests are defined elsewhere, in
+                         association with specific types of interface.
+                         However, this document assigns a value for a full-
+                         duplex loopback test, and defines the special meanings
+                         of the subject identifier:
+
+                                  noTest         OBJECT IDENTIFIER ::= { 0 0 }
+
+                         When the value noTest is written to this object, no
+                         action is taken unless a test is in progress, in which
+                         case the test is aborted.       Writing any other value to
+                         this object is only valid when no test is currently in
+                         progress, in which case the indicated test is
+                         initiated.
+
+                         When read, this object always returns the most recent
+                         value that atmfM4VcTestType was set to.        If it has not been
+                         set since the last initialization of the network
+                         management subsystem on the agent, a value of noTest
+                         is returned."
+     ::= { atmfM4VcTestEntry 4 }
+
+atmfM4VcTestResult  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                      none(1),          -- no test yet requested
+                      success(2),
+                      inProgress(3),
+                      notSupported(4),
+                      unAbleToRun(5),   -- due to state of system
+                      aborted(6),
+                      failed(7)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+          "This object contains the result of the most recently
+                         requested test, or the value none(1) if no tests have
+                         been requested since the last reset.   Note that this
+                         facility provides no provision for saving the results
+                         of one test when starting another, as could be
+                         required if used by multiple managers concurrently."
+     ::= { atmfM4VcTestEntry 5 }
+
+atmfM4VcTestCode  OBJECT-TYPE
+     SYNTAX       OBJECT IDENTIFIER
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+          "This object contains a code which contains more
+                         specific information on the test result, for example
+                         an error-code after a failed test.      Error codes and
+                         other values this object may take are specific to the
+                         type of interface and/or test. The value may have the
+                         semantics of either the AutonomousType or
+                         RowPointer textual conventions as defined in RFC
+                         1903 [15].      The identifier:
+
+                                  testCodeUnknown        OBJECT IDENTIFIER ::= { 0 0 }
+
+                         is defined for use if no additional result code is
+                         available."
+     ::= { atmfM4VcTestEntry 6 }
+
+atmfM4VcTestOwner      OBJECT-TYPE
+     SYNTAX       OwnerString
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+          "The entity which currently has the 'ownership'
+                         required to invoke a test on this termination point."
+     ::= { atmfM4VcTestEntry 7 }
+
+
+-- ATM Forum M4 Equipment Table
+
+atmfM4EquipTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4EquipEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Equipment table.     This table augments the
+                         physical entity table."
+     ::= { atmfM4MIBObjects 28 }
+
+atmfM4EquipEntry OBJECT-TYPE
+     SYNTAX    AtmfM4EquipEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Equipment table. Each entry
+                         of this type represents a piece of equipment within the ATM
+                         NE that neither is nor accepts a replaceable plug- in unit."
+     INDEX          { entPhysicalIndex }
+     ::= { atmfM4EquipTable 1 }
+
+AtmfM4EquipEntry ::= SEQUENCE {
+     atmfM4EquipAdminStatus   INTEGER,
+     atmfM4EquipLocation      DisplayString,
+     atmfM4EquipOperStatus    INTEGER,
+     atmfM4EquipVendor        DisplayString,
+     atmfM4EquipVersion       AutonomousType,
+     atmfM4EquipUserLabel     DisplayString,
+     atmfM4EquipAlarmSeverityIndex Integer32
+          }
+
+atmfM4EquipAdminStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    up(1),
+                    down(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "Used by the adminstrator to lock and unlock the object."
+     ::= { atmfM4EquipEntry 1 }
+
+atmfM4EquipLocation OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "The specific or general location of the component."
+     ::= { atmfM4EquipEntry 2 }
+
+atmfM4EquipOperStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    up(1),
+                    down(2),
+                    unknown(3)
+                         }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This attributes identifies whether or not the component is
+                         capable of performing its normal functions."
+     ::= { atmfM4EquipEntry 3 }
+
+atmfM4EquipVendor OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The vendor of the component."
+     ::= { atmfM4EquipEntry 4 }
+
+atmfM4EquipVersion OBJECT-TYPE
+     SYNTAX    AutonomousType
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The version of the component."
+     ::= { atmfM4EquipEntry 5 }
+
+atmfM4EquipUserLabel OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "A user-friendly name for the piece of equipment."
+     DEFVAL    { "" }
+     ::= { atmfM4EquipEntry 6 }
+
+atmfM4EquipAlarmSeverityIndex OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "An index into the alarm severity profile table, specifying
+                         the severity assignments for M4 alarms reported for this
+                         component."
+     DEFVAL    { 0 }
+     ::= { atmfM4EquipEntry 7 }
+
+
+-- ATM Forum M4 Equipment Holder Table
+
+atmfM4EquipHolderTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4EquipHolderEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Equipment Holder table.     This table
+                         augments the physical table."
+     ::= { atmfM4MIBObjects 29 }
+
+atmfM4EquipHolderEntry OBJECT-TYPE
+     SYNTAX    AtmfM4EquipHolderEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Equipment Holder table.  Each
+                         entry of this type represents a component within the ATM NE
+                         that accepts a replaceable plug-in unit."
+     INDEX          { entPhysicalIndex }
+     ::= { atmfM4EquipHolderTable 1 }
+
+AtmfM4EquipHolderEntry ::= SEQUENCE {
+     atmfM4EquipHolderType              INTEGER,
+     atmfM4EquipHolderAcceptableTypes   DisplayString,
+     atmfM4EquipHolderSlotStatus        INTEGER,
+     atmfM4EquipHolderSwLoad            INTEGER
+          }
+
+atmfM4EquipHolderType OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    rack(1),
+                    shelf(2),
+                    drawer(3),
+                    slot(4)
+                         }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The type of the component."
+     ::= { atmfM4EquipHolderEntry 1 }
+
+atmfM4EquipHolderAcceptableTypes OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The types of plug-in units that can be supported by the
+                         slot, separated by newline characters.
+
+                         This attribute shall be present only when the Equipment
+                         Holder represents a slot."
+     ::= { atmfM4EquipHolderEntry 2 }
+
+atmfM4EquipHolderSlotStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    empty(1),
+                    full(2)
+                         }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This attributes identifies whether or not a plug-in unit is
+                         present in the slot.
+
+                         This attribute shall be present only when the Equipment
+                         Holder represents a slot."
+     ::= { atmfM4EquipHolderEntry 3 }
+
+atmfM4EquipHolderSwLoad OBJECT-TYPE
+     SYNTAX    INTEGER (1..2147483647)
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "An index into the installed software table, specifying
+                         the software that is to be loaded into the plug-in unit
+                         whenever an automatic reload of software is needed.
+
+                         This attribute shall be present only when the Equipment
+                         Holder represents a slot."
+     ::= { atmfM4EquipHolderEntry 4 }
+
+
+-- ATM Forum M4 Plug-In Unit Table
+
+atmfM4PlugInUnitTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4PlugInUnitEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Plug-In Unittable.  This table augments
+                         the physical entity table."
+     ::= { atmfM4MIBObjects 30 }
+
+atmfM4PlugInUnitEntry OBJECT-TYPE
+     SYNTAX    AtmfM4PlugInUnitEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Plug-In Unit table. Each
+                         entry    of this type represents a piece of equipment within
+                         the ATM NE that is inserted into and removed from an
+                         Equipment Holder."
+     INDEX          { entPhysicalIndex }
+     ::= { atmfM4PlugInUnitTable 1 }
+
+AtmfM4PlugInUnitEntry ::= SEQUENCE {
+     atmfM4PlugInUnitAdminStatus   INTEGER,
+     atmfM4PlugInUnitAvailStatus   INTEGER,
+     atmfM4PlugInUnitOperStatus    INTEGER,
+     atmfM4PlugInUnitVendor        DisplayString,
+     atmfM4PlugInUnitVersion       AutonomousType,
+     atmfM4PlugInUnitAlarmSeverityIndex Integer32
+          }
+
+atmfM4PlugInUnitAdminStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    up(1),
+                    down(2)
+                         }
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "Used by the adminstrator to lock and unlock the object."
+     ::= { atmfM4PlugInUnitEntry 1 }
+
+atmfM4PlugInUnitAvailStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    available(1),
+                    inTest(2),
+                    failed(3),
+                    powerOff(4),
+                    notInstalled(5),
+                    offLine(6),
+                    dependency(7)
+                         }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "Provides further information regarding the state of the
+                         component."
+     ::= { atmfM4PlugInUnitEntry 2 }
+
+atmfM4PlugInUnitOperStatus OBJECT-TYPE
+     SYNTAX    INTEGER {
+                    up(1),
+                    down(2),
+                    unknown(3)
+                         }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This attributes identifies whether or not the component is
+                         capable of performing its normal functions."
+     ::= { atmfM4PlugInUnitEntry 3 }
+
+atmfM4PlugInUnitVendor OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The vendor of the component."
+     ::= { atmfM4PlugInUnitEntry 4 }
+
+atmfM4PlugInUnitVersion OBJECT-TYPE
+     SYNTAX    AutonomousType
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The version of the component."
+     ::= { atmfM4PlugInUnitEntry 5 }
+
+atmfM4PlugInUnitAlarmSeverityIndex OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "An index into the alarm severity profile table, specifying
+                         the severity assignments for M4 alarms reported for this
+                         component."
+     DEFVAL    { 0 }
+     ::= { atmfM4PlugInUnitEntry 6 }
+
+-- ATM Forum M4 Hardware Unit/Running Software Relationship Table
+
+atmfM4HwRunningSwTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4HwRunningSwEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Hardware Unit/Running Software
+                         relationship.   This table describes the software that is
+                         running on each hardware unit in the ATM NE."
+     ::= { atmfM4MIBObjects 32 }
+
+atmfM4HwRunningSwEntry OBJECT-TYPE
+     SYNTAX    AtmfM4HwRunningSwEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Hardware Unit/Running Software
+                         relationship table.     Each entry of this type identifies an
+                         entry in the entPhysicalTable and one in the
+                         hrRunningSoftwareTable."
+     INDEX          { atmfM4HwRunningSwHwIndex,
+                    atmfM4HwRunningSwIndex }
+     ::= { atmfM4HwRunningSwTable 1 }
+
+AtmfM4HwRunningSwEntry ::= SEQUENCE {
+     atmfM4HwRunningSwHwIndex INTEGER,
+     atmfM4HwRunningSwIndex        INTEGER,
+     atmfM4HwRunningSwSwIndex INTEGER
+          }
+
+atmfM4HwRunningSwHwIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..2147483647)
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The index, in the entPhysicalTable, of the containing
+                         hardware unit in this pair."
+     ::= { atmfM4HwRunningSwEntry 1 }
+
+atmfM4HwRunningSwIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..2147483647)
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "A unique number within the context of the containing
+                         hardware unit."
+     ::= { atmfM4HwRunningSwEntry 2 }
+
+atmfM4HwRunningSwSwIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..2147483647)
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "The index, in the hrRunningSwTable, of the software product
+                         represented by this entry."
+     ::= { atmfM4HwRunningSwEntry 3 }
+
+
+-- ATM Forum M4 Hardware Unit/Installed Software Relationship Table
+
+atmfM4HwInstalledSwTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    AtmfM4HwInstalledSwEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ATM Forum M4 Hardware Unit/Installed Software
+                         relationship.   This table describes the software that is
+                         Installed on each hardware unit in the ATM NE."
+     ::= { atmfM4MIBObjects 33 }
+
+atmfM4HwInstalledSwEntry OBJECT-TYPE
+     SYNTAX    AtmfM4HwInstalledSwEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry in the ATM Forum M4 Hardware Unit/Installed
+                         Software relationship table.    Each entry of this type
+                         identifies an entry in the physical entity table and one in the
+                         hrInstalledSoftwareTable."
+     INDEX          { atmfM4HwInstalledSwHwIndex,
+                    atmfM4HwInstalledSwIndex }
+     ::= { atmfM4HwInstalledSwTable 1 }
+
+AtmfM4HwInstalledSwEntry ::= SEQUENCE {
+     atmfM4HwInstalledSwHwIndex    INTEGER,
+     atmfM4HwInstalledSwIndex      INTEGER,
+     atmfM4HwInstalledSwSwIndex    INTEGER,
+     atmfM4HwSwAlarmSeverityIndex  Integer32
+          }
+
+atmfM4HwInstalledSwHwIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..2147483647)
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The index, in the entPhysical table, of the containing
+                         physical entity in this pair."
+     ::= { atmfM4HwInstalledSwEntry 1 }
+
+atmfM4HwInstalledSwIndex OBJECT-TYPE
+     SYNTAX    INTEGER (1..2147483647)
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "A unique number within the context of the containing
+                         hardware unit."
+          ::= { atmfM4HwInstalledSwEntry 2 }
+
+atmfM4HwInstalledSwSwIndex OBJECT-TYPE
+          SYNTAX                INTEGER (1..2147483647)
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The index, in the hrInstalledSwTable, of the software
+          product represented by this entry."
+          ::= { atmfM4HwInstalledSwEntry 3 }
+
+atmfM4HwSwAlarmSeverityIndex OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "An index into the alarm severity profile table, specifying
+          the severity assignments for M4 alarms reported for this
+          piece of software installed on the hardware unit."
+          DEFVAL                { 0 }
+          ::= { atmfM4HwInstalledSwEntry 4 }
+
+
+
+-- ATM Forum M4 Alarm Severity Identifier Textual Convention
+
+AtmfM4AlarmLogSeverity ::= TEXTUAL-CONVENTION
+          STATUS                current
+          DESCRIPTION
+                         "The value of this object identifies the severity of
+          an alarm in the log, including 'cleared'."
+          SYNTAX                INTEGER {
+                                                  cleared(-1),
+                                                  indeterminate(0),
+                                                  critical(1),
+                                                  major(2),
+                                                  minor(3),
+                                                  warning(4)
+                                                                 }
+
+AtmfM4AlarmSeverity ::= TEXTUAL-CONVENTION
+          STATUS                current
+          DESCRIPTION
+                         "The value of this object identifies the severity of
+          an alarm that has occurred.  (Note that there is no
+          value corresponding to 'cleared'.)"
+          SYNTAX                INTEGER {
+                                                  indeterminate(0),
+                                                  critical(1),
+                                                  major(2),
+                                                  minor(3),
+                                                  warning(4)
+                                                                 }
+
+-- ATM Forum M4 Alarm Severity Profile Table
+
+atmfM4AlarmSevDefault OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmSeverity
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "The default severity value used for new profile
+          index/trap ID pairs that have not yet been modified.
+          This value is also used whenever an object's alarm
+          severity profile index is set to 0."
+          DEFVAL                { minor }
+          ::= { atmfM4MIBObjects 34 }
+
+atmfM4AlarmSevProfileIndexNext OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "This object contains an appropriate value to be used for
+          atmfM4AlarmSevProfileIndex when creating entries in the
+          atmfM4AlarmSevProfileTable.
+          The value -1 indicates that no unassigned entries are
+          available.
+          To obtain the index value for a new entry, the manager
+          issues a management protocol retrieval operation to obtain
+          the current value of this object.  After each retrieval, the
+          agent should modify the value to the next unassigned index
+          (or -1)."
+          ::= { atmfM4MIBObjects 35 }
+
+atmfM4AlarmSevProfileTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4AlarmSevProfileEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 alarm severity profile table.
+          This table specifies which profiles exist. Creating
+          or deleting an entry in this table automatically
+          creates or deletes the corresponding entries in the
+          atmfM4AlarmSeverityTable."
+          ::= { atmfM4MIBObjects 36 }
+
+atmfM4AlarmSevProfileEntry OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmSevProfileEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "A group of severities, one for each alarm type in
+          the communications alarm group."
+          INDEX                   { atmfM4AlarmSevProfileIndex }
+          ::= { atmfM4AlarmSevProfileTable 1 }
+
+AtmfM4AlarmSevProfileEntry ::= SEQUENCE {
+          atmfM4AlarmSevProfileIndex                     Integer32,
+          atmfM4AlarmSevProfileRowStatus                 RowStatus
+                         }
+
+atmfM4AlarmSevProfileIndex OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "A number identifying this alarm severity profile."
+          ::= { atmfM4AlarmSevProfileEntry 1 }
+
+atmfM4AlarmSevProfileRowStatus OBJECT-TYPE
+          SYNTAX                RowStatus
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "This object is used to create a new row or to delete
+          an existing row in the table."
+          ::= { atmfM4AlarmSevProfileEntry 2 }
+
+
+-- ATM Forum M4 Alarm Severity Table
+
+atmfM4AlarmSevTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4AlarmSevEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 alarm severity table.
+          This table associates profile index and trap
+          ID pairs with severities to be used for
+          M4 alarm traps that have occurred.
+          (Note that this table does not apply to cleared alarms.)"
+          ::= { atmfM4MIBObjects 37 }
+
+atmfM4AlarmSevEntry OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmSevEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "An entry in this table associates an alarm severity
+          profile index/trap ID pair with a severity.
+          Deleting a particular profile's row in the alarm severity
+          profile table deletes all rows in this table with the
+          same profile index.
+          Conceptually, rows corresponding to all possible trap ID's
+          are created in this table when a new alarm severity profile
+          is created, but the agent will return a default value
+          except for those few traps for which values have been set."
+          INDEX                   { atmfM4AlarmSevProfileIndex,
+                                                  atmfM4AlarmSevTrapId }
+          ::= { atmfM4AlarmSevTable 1 }
+
+AtmfM4AlarmSevEntry ::= SEQUENCE {
+          atmfM4AlarmSevTrapId          Integer32,
+          atmfM4AlarmSeverity           AtmfM4AlarmSeverity
+                         }
+
+atmfM4AlarmSevTrapId OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ID of the trap type to which this entry applies."
+          ::= { atmfM4AlarmSevEntry 1 }
+
+atmfM4AlarmSeverity OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmSeverity
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The severity to be used for this trap type when the
+          is selected.
+          If no value for this object has ever been set since
+          the corresponding profile was created, the agent should
+          return the value of the object atmfM4AlarmSevDefault"
+          ::= { atmfM4AlarmSevEntry 2 }
+
+
+-- ATM Forum M4 Alarm Forwarding Discriminator Table
+
+atmfM4ForwardAllTraps OBJECT-IDENTITY
+          STATUS                current
+          DESCRIPTION
+                         "This is used as the value of the object
+          atmfM4ForwardedTrapObject when traps from all objects
+          are to be forwarded, or when there is only one
+          object of the type that forwards the specified
+          trap type."
+          ::= { atmfM4MIBObjects 38 }
+
+
+atmfM4TrapForwardingTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4TrapForwardingEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 Trap forwarding discriminator
+          table.
+          This table specifies which traps will be sent to
+          which management system."
+          ::= { atmfM4MIBObjects 39 }
+
+atmfM4TrapForwardingEntry OBJECT-TYPE
+          SYNTAX                AtmfM4TrapForwardingEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Information about a group of traps to be sent to
+          a particular IP address.
+
+          A new entry must have values for all attributes that
+          do not have default values before its RowStatus column
+          can be set to active(1)."
+          INDEX                   { atmfM4TrapForwardingIndex }
+          ::= { atmfM4TrapForwardingTable 1 }
+
+AtmfM4TrapForwardingEntry ::= SEQUENCE {
+          atmfM4TrapForwardingIndex       Integer32,
+          atmfM4TrapForwardingDest                IpAddress,
+          atmfM4ForwardedTrapId                   Integer32,
+          atmfM4ForwardedTrapObject       RowPointer,
+          atmfM4TrapForwardingPort                Integer32,
+          atmfM4LowestForwardedSeverity AtmfM4AlarmSeverity,
+          atmfM4ForwardedIndeterminate  TruthValue,
+          atmfM4TrapForwardingRowStatus RowStatus
+                         }
+
+atmfM4TrapForwardingIndex OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "A unique number identifying the table entry."
+          ::= { atmfM4TrapForwardingEntry 1 }
+
+atmfM4TrapForwardingDest OBJECT-TYPE
+          SYNTAX                IpAddress
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The IP address to which traps identified by this
+          table entry should be sent."
+          ::= { atmfM4TrapForwardingEntry 2 }
+
+atmfM4ForwardedTrapId OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The ID of the trap type to which this entry applies."
+          ::= { atmfM4TrapForwardingEntry 3 }
+
+atmfM4ForwardedTrapObject OBJECT-TYPE
+          SYNTAX                RowPointer
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The object to which this entry applies.
+          By convention, this is the name of the first object in
+          the row in the table referenced.
+
+          The special value { 0 0 } indicates that
+          traps of this type from all objects of the type that can
+          generate it.  It should also be used when traps from the
+          ATM NE are to be specified."
+          ::= { atmfM4TrapForwardingEntry 4 }
+
+atmfM4TrapForwardingPort OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The UDP port on the specified management system to
+          which traps identified by this entry should be sent."
+          DEFVAL                { 161 }
+          ::= { atmfM4TrapForwardingEntry 5 }
+
+atmfM4LowestForwardedSeverity OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmSeverity
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The lowest severity of traps of this type from
+          the specified object that should be sent to this
+          address.
+          This object has significance only if the trap type
+          specified has a severity associated with it"
+          DEFVAL                { minor }
+          ::= { atmfM4TrapForwardingEntry 6 }
+
+atmfM4ForwardedIndeterminate OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "When this object has the value TRUE, traps with
+          indeterminate severity will be forwarded to the
+          specified event.
+          This object has significance only if the trap type
+          specified has a severity associated with it"
+          DEFVAL                { false }
+          ::= { atmfM4TrapForwardingEntry 7 }
+
+atmfM4TrapForwardingRowStatus OBJECT-TYPE
+          SYNTAX                RowStatus
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "This object is used to create a new row or to delete
+          an existing row in the table."
+          ::= { atmfM4TrapForwardingEntry 8 }
+
+
+-- ATM Forum M4 Trap Agent MIB Log Table
+
+atmfM4TrapLogTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4TrapLogEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 Trap Agent log table.
+          This table defines the trap logs currently maintained
+          by the agent.
+          The management system creates entries in this table to
+          specify which types of traps, from which ATM network
+          elements, should be logged.
+          Deleting an entry in this table deletes all entries in
+          the corresponding log."
+          ::= { atmfM4MIBObjects 40 }
+
+atmfM4TrapLogEntry OBJECT-TYPE
+          SYNTAX                AtmfM4TrapLogEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Information about a single trap log."
+          INDEX                   { atmfM4TrapLogSrc,
+                                                  atmfM4TrapLogType }
+          ::= { atmfM4TrapLogTable 1 }
+
+AtmfM4TrapLogEntry ::= SEQUENCE {
+          atmfM4TrapLogSrc                                IpAddress,
+          atmfM4TrapLogType                               INTEGER,
+          atmfM4TrapLogAdminStatus                INTEGER,
+          atmfM4TrapLogOperStatus                 INTEGER,
+          atmfM4TrapLogFullAction                 INTEGER,
+          atmfM4TrapLogRowStatus                  RowStatus
+                         }
+
+atmfM4TrapLogSrc OBJECT-TYPE
+          SYNTAX                IpAddress
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The IP address of the SNMP agent whose traps are
+          stored in this log."
+          ::= { atmfM4TrapLogEntry 1 }
+
+atmfM4TrapLogType OBJECT-TYPE
+          SYNTAX                INTEGER {
+                                                  objectCreated(1),
+                                                  objectDeleted(2),
+                                                  configChange(3),
+                                                  stateChange(4),
+                                                  alarm(5)
+                                                                 }
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The type of traps stored in this log."
+          ::= { atmfM4TrapLogEntry 2 }
+
+atmfM4TrapLogAdminStatus OBJECT-TYPE
+          SYNTAX                INTEGER {
+                                                  up(1),
+                                                  down(2)
+                                                                 }
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "The management system uses this object to stop and
+          start the operations of this object."
+          DEFVAL                { up }
+          ::= { atmfM4TrapLogEntry 3 }
+
+atmfM4TrapLogOperStatus OBJECT-TYPE
+          SYNTAX                INTEGER {
+                                                  up(1),
+                                                  down(2),
+                                                  logFull(3)
+                                                                 }
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Indicates whether or not the log is capable of
+          performing its normal operations."
+          DEFVAL                { up }
+          ::= { atmfM4TrapLogEntry 4 }
+
+atmfM4TrapLogFullAction OBJECT-TYPE
+          SYNTAX                INTEGER {
+                                                  halt(1),
+                                                  wrap(2)
+                                                                 }
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "Indicates the action that should be performed when no
+          more log entries can be created due to a log-full
+          condition.  If the value of this object is wrap(2),
+          each new log entry will cause the deletion of the oldest
+          entry still in the log, for as long as the log is still
+          full."
+          DEFVAL                { wrap }
+          ::= { atmfM4TrapLogEntry 5 }
+
+atmfM4TrapLogRowStatus OBJECT-TYPE
+          SYNTAX                RowStatus
+          MAX-ACCESS      read-create
+          STATUS                current
+          DESCRIPTION
+                         "This object is used to create a new row or to delete
+          an existing row in the table."
+          ::= { atmfM4TrapLogEntry 6 }
+
+
+-- ATM Forum M4 Trap Agent MIB Logged Trap Table
+
+atmfM4LoggedTrapTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4LoggedTrapEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 Trap Agent logged trap table.
+          This table is used to maintain the traps logged."
+          ::= { atmfM4MIBObjects 41 }
+
+atmfM4LoggedTrapEntry OBJECT-TYPE
+          SYNTAX                AtmfM4LoggedTrapEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Information about a single trap in the log.
+          Entries in this table are created automatically but
+          can be deleted by the management system.
+          Entries that represent 'alarm' log types are augmented
+          by the atmfM4LoggedAlarmEntry table."
+          INDEX                   { atmfM4TrapLogSrc,
+                                                  atmfM4TrapLogType,
+                                                  atmfM4LoggedTrapIndex }
+          ::= { atmfM4LoggedTrapTable 1 }
+
+AtmfM4LoggedTrapEntry ::= SEQUENCE {
+          atmfM4LoggedTrapIndex                   Unsigned32,
+          atmfM4LoggedTrapTime                    DateAndTime,
+          atmfM4LoggedTrapID                              Integer32,
+          atmfM4LoggedTrapObject                  RowPointer,
+          atmfM4LoggedTrapRowStatus       RowStatus
+                         }
+
+atmfM4LoggedTrapIndex OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "A unique number identifying this entry in the log.
+          When the maximum value for this object has been reached,
+          it will wrap around to 0."
+          ::= { atmfM4LoggedTrapEntry 1 }
+
+atmfM4LoggedTrapTime OBJECT-TYPE
+          SYNTAX                DateAndTime
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The time at which this trap was logged."
+          ::= { atmfM4LoggedTrapEntry 2 }
+
+atmfM4LoggedTrapID OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The type of trap to which this entry applies.
+          Together with the logged trap ID object, this object
+          specifies the entity to which this logged trap referred."
+          ::= { atmfM4LoggedTrapEntry 3 }
+
+atmfM4LoggedTrapObject OBJECT-TYPE
+          SYNTAX                RowPointer
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The object to which this entry applies.
+          By convention, this is the name of the first object in
+          the row in the table referenced.
+          Together with the logged trap ID object, this object
+          specifies the entity to which this logged trap referred.
+
+          The special value { 0 0 } indicates that the trap refers
+          to the ATM NE entity itself."
+          ::= { atmfM4LoggedTrapEntry 4 }
+
+atmfM4LoggedTrapRowStatus OBJECT-TYPE
+          SYNTAX                RowStatus
+          MAX-ACCESS      read-write
+          STATUS                current
+          DESCRIPTION
+                         "This object is used to delete an existing row in the
+          table.  Note that the only value to which a management
+          system can set this object is destroy(6)."
+          ::= { atmfM4LoggedTrapEntry 5 }
+
+
+-- ATM Forum M4 Trap Agent MIB Logged Alarm Table
+
+atmfM4LoggedAlarmTable OBJECT-TYPE
+          SYNTAX                SEQUENCE OF             AtmfM4LoggedAlarmEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "The ATM Forum M4 Trap Agent logged alarm trap table.
+          This table is used to maintain extra information for
+          logged traps that represent alarm types."
+          ::= { atmfM4MIBObjects 42 }
+
+atmfM4LoggedAlarmEntry OBJECT-TYPE
+          SYNTAX                AtmfM4LoggedAlarmEntry
+          MAX-ACCESS      not-accessible
+          STATUS                current
+          DESCRIPTION
+                         "Information about the alarm-specific attributes of
+          a single trap in the log."
+          INDEX                   { atmfM4TrapLogSrc,
+                                                  atmfM4TrapLogType,
+                                                  atmfM4LoggedTrapIndex }
+          ::= { atmfM4LoggedAlarmTable 1 }
+
+AtmfM4LoggedAlarmEntry ::= SEQUENCE {
+          atmfM4LoggedAlarmSeverity       AtmfM4AlarmLogSeverity,
+          atmfM4LoggedAlarmBackedUp       TruthValue,
+          atmfM4LoggedAlarmBUObject       RowPointer,
+          atmfM4LoggedAlarmSpecificProb DisplayString,
+          atmfM4LoggedAlarmRepairAct      DisplayString
+                         }
+
+atmfM4LoggedAlarmSeverity OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmLogSeverity
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "The perceived severity of the alarm, as specified by
+          the agent that generated it."
+          ::= { atmfM4LoggedAlarmEntry 1 }
+
+atmfM4LoggedAlarmBackedUp OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "If the value of this object is true, the agent reported
+          in this trap that the failed object had been backed up.
+
+          This object is only present if it was included in the
+          alarm trap corresponding to this log entry."
+          ::= { atmfM4LoggedAlarmEntry 2 }
+
+atmfM4LoggedAlarmBUObject OBJECT-TYPE
+          SYNTAX                RowPointer
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Indicates the object that provided back-up services to
+          the failed object.
+
+          This object is only present if it was included in the
+          alarm trap corresponding to this log entry."
+          ::= { atmfM4LoggedAlarmEntry 3 }
+
+atmfM4LoggedAlarmSpecificProb OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Indicates further refinements to the problem identified
+          by the alarm type.  If more than one specific problem
+          is described in this object, the problem descriptions are
+          separated by newline characters.
+
+          This object is only present if it was included in the
+          alarm trap corresponding to this log entry."
+          ::= { atmfM4LoggedAlarmEntry 4 }
+
+atmfM4LoggedAlarmRepairAct OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      read-only
+          STATUS                current
+          DESCRIPTION
+                         "Indicates proposed repair actions reported by the agent
+          for the the problem identified by the alarm.  If more than
+          one action is described in this object, the problem
+          descriptions are separated by newline characters.
+
+          This object is only present if it was included in the
+          alarm trap corresponding to this log entry."
+          ::= { atmfM4LoggedAlarmEntry 5 }
+
+
+-- ATM M4 MIB Notification types
+
+-- Auxiliary definitions for alarms
+
+-- Except for perceived severity, the following objects may be
+-- optionally appended to any alarm notification.
+
+atmfM4TrapAlarmSeverity OBJECT-TYPE
+          SYNTAX                AtmfM4AlarmLogSeverity
+          MAX-ACCESS      accessible-for-notify
+          STATUS                current
+          DESCRIPTION
+                         "The perceived severity of the alarm, as specified by
+          the agent that generated it."
+          ::= { atmfM4MIBObjects 43 }
+
+atmfM4TrapAlarmBackedUp OBJECT-TYPE
+          SYNTAX                TruthValue
+          MAX-ACCESS      accessible-for-notify
+          STATUS                current
+          DESCRIPTION
+                         "If the value of this object is true, the failed object
+          has been backed up."
+          ::= { atmfM4MIBObjects 44 }
+
+atmfM4TrapAlarmBUObject OBJECT-TYPE
+          SYNTAX                RowPointer
+          MAX-ACCESS      accessible-for-notify
+          STATUS                current
+          DESCRIPTION
+                         "Indicates the object that provided back-up services to
+          the failed object."
+          ::= { atmfM4MIBObjects 45 }
+
+atmfM4TrapAlarmSpecificProb OBJECT-TYPE
+          SYNTAX                DisplayString
+          MAX-ACCESS      accessible-for-notify
+          STATUS                current
+          DESCRIPTION
+                         "Indicates further refinements to the problem identified
+          by the alarm type.  If more than one specific problem
+          is described in this object, the problem descriptions are
+          separated by newline characters."
+          ::= { atmfM4MIBObjects 46 }
+
+atmfM4TrapAlarmRepairAct OBJECT-TYPE
+          SYNTAX                Unsigned32
+          MAX-ACCESS      accessible-for-notify
+          STATUS                current
+          DESCRIPTION
+                         "Indicates proposed repair actions reported by the agent
+          for the the problem identified by the alarm.  If more than
+          one action is described in this object, the problem
+          descriptions are separated by newline characters."
+          ::= { atmfM4MIBObjects 47 }
+
+
+-- Comunications Alarms (interface)
+
+atmfM4IfAisAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an AIS alarm condition has occurred
+          on the physical path TP associated with the specified
+          interface."
+          ::= { atmfM4MIBTraps 1 }
+
+atmfM4IfLcdAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an LCD (Loss of Cell Delineation)
+          condition has occurred on the TC Adatpr associated
+          with the specified interface."
+          ::= { atmfM4MIBTraps 2 }
+
+atmfM4IfLofAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an LOF (Loss of Frame)
+          condition has occurred on the physical path TP associated
+          with the specified interface."
+          ::= { atmfM4MIBTraps 3 }
+
+atmfM4IfLopAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an LOP (Loss of Pointer)
+          condition has occurred on the physical path TP associated
+          with the specified interface."
+          ::= { atmfM4MIBTraps 4 }
+
+atmfM4IfLosAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an LOS (Loss of Signal)
+          condition has occurred on the physical path TP associated
+          with the specified interface."
+          ::= { atmfM4MIBTraps 5 }
+
+atmfM4IfPayloadMismatchAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that a payload type mismatch condition has
+          occurred
+          on the physical path TP associated with the specified
+          interface."
+          ::= { atmfM4MIBTraps 6 }
+
+atmfM4IfXmissionErrAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an transmission error condition has occurred
+          on the physical path TP associated with the specified
+          interface."
+          ::= { atmfM4MIBTraps 7 }
+
+atmfM4IfPathTraceMismatchAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that path trace mismatch condition has occurred
+          on the physical path TP associated with the specified
+          interface."
+          ::= { atmfM4MIBTraps 8 }
+
+atmfM4IfRdiAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an RDI (Remote Defect Indication)
+          condition has occurred on the physical path TP associated
+          with the specified interface."
+          ::= { atmfM4MIBTraps 9 }
+
+atmfM4IfSignalLabelMismatchAlarm NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4TrapAlarmSeverity }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that a signal label mismatch has occurred
+          on the physical path TP associated with the specified
+          interface."
+          ::= { atmfM4MIBTraps 10 }
+
+
+--Start of commenting out to get MIB to compile (fah@salix.com)
+-- Communications alarms (VPL termination point)
+--
+--atmfM4VplTpAisAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an AIS alarm condition has occurred
+--          on the VPL TP associated with the specified
+--          interface and VPI."
+--               ::= { atmfM4MIBTraps 11 }
+--
+--atmfM4VplTpRdiAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an RDI (Remote Defect Indication)
+--          condition has occurred on the VPL TP associated
+--          with the specified interface."
+--               ::= { atmfM4MIBTraps 12 }
+--
+--
+-- Communications alarms (VPC termination point)
+--
+--atmfM4VpcTpAisAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an AIS alarm condition has occurred
+--          on the VPC TP associated with the specified
+--          interface and VPI."
+--               ::= { atmfM4MIBTraps 13 }
+--
+--atmfM4VpcTpRdiAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an RDI (Remote Defect Indication)
+--          condition has occurred on the VPC TP associated
+--          with the specified interface."
+--               ::= { atmfM4MIBTraps 14 }
+--
+--
+-- Communications alarms (VCL termination point)
+--
+--atmfM4VclTpAisAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci,
+--                                                       atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an AIS alarm condition has occurred
+--          on the VCL TP associated with the specified
+--          interface and VCI."
+--               ::= { atmfM4MIBTraps 15 }
+--
+--atmfM4VclTpRdiAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci,
+--                                                       atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an RDI (Remote Defect Indication)
+--          condition has occurred on the VCL TP associated
+--          with the specified interface."
+--               ::= { atmfM4MIBTraps 16 }
+--
+--
+-- Communications alarms (VCC termination point)
+--
+--atmfM4VccTpAisAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci,
+--                                                       atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an AIS alarm condition has occurred
+--          on the VCC TP associated with the specified
+--          interface and VCI."
+--               ::= { atmfM4MIBTraps 17 }
+--
+--atmfM4VccTpRdiAlarm NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci,
+--                                                       atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an RDI (Remote Defect Indication)
+--          condition has occurred on the VCC TP associated
+--          with the specified interface."
+--               ::= { atmfM4MIBTraps 18 }
+--
+--
+-- ATM NE and Hardware Unit Alarms
+--
+--atmfM4HwBackPlaneAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a back-plane failure condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 19 }
+--
+--atmfM4HwCallEstErrAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a call establishment error condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 20 }
+--
+--atmfM4HwCongestionAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a congestion condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 21 }
+--
+--atmfM4HwExtIfDevProbAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an external interface device problem
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 22 }
+--
+atmfM4HwLineCardAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a line-card problem condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 23 }
+
+--atmfM4HwMultiplexerAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a multiplexer problem condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 24 }
+--
+atmfM4HwPowerAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a power problem alarm condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 25 }
+
+--atmfM4HwProcessorAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a processor problem alarm condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 26 }
+--
+--atmfM4HwProtectionPathAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a protection path problem condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 27 }
+--
+--atmfM4HwReceiverFailAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a receiver failure condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 28 }
+--
+atmfM4HwPIUnitMissingAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a plug-in unit missing condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 29 }
+
+atmfM4HwPIUnitProbAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a plug-in unit problem condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 30 }
+
+atmfM4HwPIUnitMismatchAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a plug-in unit type mismatch condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 31 }
+
+atmfM4HwTimingProbAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a timing problem alarm condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 32 }
+
+--atmfM4HwXmitterFailAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a transmitter failure condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 33 }
+--
+--atmfM4HwTrunkCardAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a trunk-card problem condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 34 }
+--
+--atmfM4HwStorageCapacityAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a storage capacity problem condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 35 }
+--
+--atmfM4HwMemoryMismatchAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a memory mismatch alarm condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 36 }
+--
+--atmfM4HwCorruptDataAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a corrupt data alarm condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 37 }
+--
+--atmfM4HwSwEnvironAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a software environment problem
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 38 }
+--
+atmfM4HwSwDownloadFailAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a software download failure
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 39 }
+
+atmfM4HwVersionMismatchAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a version mismatch condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 40 }
+
+atmfM4HwFanFailAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a cooling fan failure condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 41 }
+
+--atmfM4HwDoorOpenAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that an enclosure door open condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 42 }
+--
+--atmfM4HwFuseFailAlarm NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that a fuse failure alarm condition
+--          has occurred on the hardware unit associated
+--          with the specified index.
+--          A hardware index of 0 indicates that the error
+--          occurred in the ATM NE but not in any one hardware
+--          unit maintained in the MIB table."
+--               ::= { atmfM4MIBTraps 43 }
+--
+atmfM4HwHighTempAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a high temperature condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 44 }
+
+--
+-- Software alarms
+--
+atmfM4SwVersionMismatchAlarm NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4HwInstalledSwIndex,
+                                                       atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that a version mismatch condition
+          has occurred on the hardware unit associated
+          with the specified index.
+          A hardware index of 0 indicates that the error
+          occurred in the ATM NE but not in any one hardware
+          unit maintained in the MIB table."
+               ::= { atmfM4MIBTraps 45 }
+
+--       State change notification traps:
+
+--atmfM4VplTpUp NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VPL termination point has transitioned to 'up'."
+--               ::= { atmfM4MIBTraps 46 }
+--
+--atmfM4VplTpDown NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VPL termination point has transitioned to 'down'."
+--               ::= { atmfM4MIBTraps 47 }
+--
+--atmfM4VclTpUp NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VCL termination point has transitioned to 'up'."
+--               ::= { atmfM4MIBTraps 48 }
+--
+--atmfM4VclTpDown NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VCL termination point has transitioned to 'down'."
+--               ::= { atmfM4MIBTraps 49 }
+--
+--atmfM4VplXConnUp NOTIFICATION-TYPE
+--               OBJECTS          { atmVpCrossConnectIndex,
+--                                                       atmVpCrossConnectLowIfIndex,
+--                                                       atmVpCrossConnectLowVpi,
+--                                                       atmVpCrossConnectHighIfIndex,
+--                                                       atmVpCrossConnectHighVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VPL cross-connection has transitioned to 'up'."
+--               ::= { atmfM4MIBTraps 50 }
+--
+--atmfM4VplXConnDown NOTIFICATION-TYPE
+--               OBJECTS          { atmVpCrossConnectIndex,
+--                                                       atmVpCrossConnectLowIfIndex,
+--                                                       atmVpCrossConnectLowVpi,
+--                                                       atmVpCrossConnectHighIfIndex,
+--                                                       atmVpCrossConnectHighVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VPL cross-connection has transitioned to 'down'."
+--               ::= { atmfM4MIBTraps 51 }
+--
+--atmfM4VclXConnUp NOTIFICATION-TYPE
+--               OBJECTS          { atmVcCrossConnectIndex,
+--                                                       atmVcCrossConnectLowIfIndex,
+--                                                       atmVcCrossConnectLowVpi,
+--                                                       atmVcCrossConnectLowVci,
+--                                                       atmVcCrossConnectHighIfIndex,
+--                                                       atmVcCrossConnectHighVpi,
+--                                                       atmVcCrossConnectHighVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VCL cross-connection has transitioned to 'up'."
+--               ::= { atmfM4MIBTraps 52 }
+--
+--atmfM4VclXConnDown NOTIFICATION-TYPE
+--               OBJECTS          { atmVcCrossConnectIndex,
+--                                                       atmVcCrossConnectLowIfIndex,
+--                                                       atmVcCrossConnectLowVpi,
+--                                                       atmVcCrossConnectLowVci,
+--                                                       atmVcCrossConnectHighIfIndex,
+--                                                       atmVcCrossConnectHighVpi,
+--                                                       atmVcCrossConnectHighVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the operational state of the specified
+--          VCL cross-connection has transitioned to 'down'."
+--               ::= { atmfM4MIBTraps 53 }
+--
+atmfM4HwUnitUp NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that the operational state of the specified
+          hardware unit has transitioned to 'up'."
+               ::= { atmfM4MIBTraps 54 }
+
+atmfM4HwUnitDown NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalIndex, atmfM4TrapAlarmSeverity }
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that the operational state of the specified
+          hardware unit has transitioned to 'down'."
+               ::= { atmfM4MIBTraps 55 }
+
+--
+-- Object creation and deletion notification traps:
+
+atmfM4AtmCellIfCreated NOTIFICATION-TYPE
+          OBJECTS       { ifIndex, atmfM4IfType }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that an ATM cell layer interface has just
+          been created on the interface."
+          ::= { atmfM4MIBTraps 56 }
+
+atmfM4AtmCellIfDeleted NOTIFICATION-TYPE
+          OBJECTS       { ifIndex }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that the ATM cell layer interface has just
+          been deleted."
+          ::= { atmfM4MIBTraps 57 }
+
+--atmfM4VpcTpCreated NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VPC termination point has just
+--          been created."
+--               ::= { atmfM4MIBTraps 58 }
+--
+--atmfM4VpcTpDeleted NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VPC termination point has just
+--          been deleted."
+--               ::= { atmfM4MIBTraps 59 }
+--
+--atmfM4VccTpCreated NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VCC termination point has just
+--          been created."
+--               ::= { atmfM4MIBTraps 60 }
+--
+--atmfM4VccTpDeleted NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VCC termination point has just
+--          been deleted."
+--               ::= { atmfM4MIBTraps 61 }
+--
+--atmfM4VplXConnCreated NOTIFICATION-TYPE
+--               OBJECTS          { atmVpCrossConnectIndex,
+--                                                       atmVpCrossConnectLowIfIndex,
+--                                                       atmVpCrossConnectLowVpi,
+--                                                       atmVpCrossConnectHighIfIndex,
+--                                                       atmVpCrossConnectHighVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VPL cross-connection has just
+--          been created.  When a cross-connection is created along
+--          with its VPL endpoints, this trap should be emitted
+--          to indicate the creation of the entire group of objects."
+--               ::= { atmfM4MIBTraps 62 }
+--
+--atmfM4VplXConnDeleted NOTIFICATION-TYPE
+--               OBJECTS          { atmVpCrossConnectIndex,
+--                                                       atmVpCrossConnectLowIfIndex,
+--                                                       atmVpCrossConnectLowVpi,
+--                                                       atmVpCrossConnectHighIfIndex,
+--                                                       atmVpCrossConnectHighVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VPL cross-connection has just
+--          been deleted.  When a cross-connection is deleted along
+--          with its VPL endpoints, this trap should be emitted
+--          to indicate the deletion of the entire group of objects."
+--               ::= { atmfM4MIBTraps 63 }
+--
+--atmfM4VclXConnCreated NOTIFICATION-TYPE
+--               OBJECTS          { atmVcCrossConnectIndex,
+--                                                       atmVcCrossConnectLowIfIndex,
+--                                                       atmVcCrossConnectLowVpi,
+--                                                       atmVcCrossConnectLowVci,
+--                                                       atmVcCrossConnectHighIfIndex,
+--                                                       atmVcCrossConnectHighVpi,
+--                                                       atmVcCrossConnectHighVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VCL cross-connection has just
+--          been created.  When a cross-connection is created along
+--          with its VCL endpoints, this trap should be emitted
+--          to indicate the creation of the entire group of objects."
+--               ::= { atmfM4MIBTraps 64 }
+--
+--atmfM4VclXConnDeleted NOTIFICATION-TYPE
+--               OBJECTS          { atmVcCrossConnectIndex,
+--                                                       atmVcCrossConnectLowIfIndex,
+--                                                       atmVcCrossConnectLowVpi,
+--                                                       atmVcCrossConnectLowVci,
+--                                                       atmVcCrossConnectHighIfIndex,
+--                                                       atmVcCrossConnectHighVpi,
+--                                                       atmVcCrossConnectHighVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VCL cross-connection has just
+--          been deleted.  When a cross-connection is deleted along
+--          with its VCL endpoints, this trap should be emitted
+--          to indicate the deletion of the entire group of objects."
+--               ::= { atmfM4MIBTraps 65 }
+--
+atmfM4HwUnitCreated NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalContainedIn,
+                                                       entPhysicalParentRelPos,
+                                                       entPhysicalClass,
+                                                       atmfM4TrapAlarmSeverity}
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that the specified hardware unit has been
+          installed at the specified location."
+               ::= { atmfM4MIBTraps 66 }
+
+atmfM4HwUnitDeleted NOTIFICATION-TYPE
+               OBJECTS          { entPhysicalContainedIn,
+                                                       entPhysicalParentRelPos,
+                                                       entPhysicalClass,
+                                                       atmfM4TrapAlarmSeverity}
+               STATUS   current
+               DESCRIPTION
+                              "Indicates that the specified hardware unit has been
+          removed or de-instaleld from the specified location."
+               ::= { atmfM4MIBTraps 67 }
+--
+--atmfM4InstalledSwCreated NOTIFICATION-TYPE
+--               OBJECTS          { atmfM4HwInstalledSwHwIndex,
+--                                                       hrSWInstalledIndex,
+--                                                       hrSWInstalledName }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the specified software package has been
+--          installed."
+--               ::= { atmfM4MIBTraps 68 }
+--
+--atmfM4InstalledSwDeleted NOTIFICATION-TYPE
+--               OBJECTS          { atmfM4HwInstalledSwHwIndex,
+--                                                       hrSWInstalledIndex,
+--                                                       hrSWInstalledName }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the specified software package has been
+--          removed."
+--               ::= { atmfM4MIBTraps 69 }
+--
+--
+--       Configuration change notification traps.
+
+atmfM4IfChanged NOTIFICATION-TYPE
+          OBJECTS       { ifIndex }
+          STATUS                current
+          DESCRIPTION
+                         "Indicates that the configuration of the interface has
+          been changed."
+          ::= { atmfM4MIBTraps 70 }
+
+--atmfM4VplTpChanged NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVplVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VPL termination point config. has
+--          been changed."
+--               ::= { atmfM4MIBTraps 71 }
+--
+--atmfM4VclTpChanged NOTIFICATION-TYPE
+--               OBJECTS          { ifIndex, atmVclVpi, atmVclVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VCL termination point config. has
+--          been changed."
+--               ::= { atmfM4MIBTraps 72 }
+--
+--atmfM4VplXConnChanged NOTIFICATION-TYPE
+--               OBJECTS          { atmVpCrossConnectIndex,
+--                                                       atmVpCrossConnectLowIfIndex,
+--                                                       atmVpCrossConnectLowVpi,
+--                                                       atmVpCrossConnectHighIfIndex,
+--                                                       atmVpCrossConnectHighVpi }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VPL cross-connection config. has
+--          been changed."
+--               ::= { atmfM4MIBTraps 73 }
+--
+--atmfM4VclXConnChanged NOTIFICATION-TYPE
+--               OBJECTS          { atmVcCrossConnectIndex,
+--                                                       atmVcCrossConnectLowIfIndex,
+--                                                       atmVcCrossConnectLowVpi,
+--                                                       atmVcCrossConnectLowVci,
+--                                                       atmVcCrossConnectHighIfIndex,
+--                                                       atmVcCrossConnectHighVpi,
+--                                                       atmVcCrossConnectHighVci }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the VCL cross-connection config. has
+--          been changed."
+--               ::= { atmfM4MIBTraps 74 }
+--
+--atmfM4HwUnitChanged NOTIFICATION-TYPE
+--               OBJECTS          { entPhysicalIndex }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the specified hardware unit config.
+--          has changed."
+--               ::= { atmfM4MIBTraps 75 }
+--
+--atmfM4InstalledSwChanged NOTIFICATION-TYPE
+--               OBJECTS          { hrSWInstalledIndex }
+--               STATUS   current
+--               DESCRIPTION
+--                              "Indicates that the specified software package config.
+--          has changed."
+--               ::= { atmfM4MIBTraps 76 }
+--
+--
+-- Conformance statements
+
+
+atmfM4Groups                            OBJECT IDENTIFIER ::= { atmfM4MIBCompliance 1 }
+atmfM4Compliances                       OBJECT IDENTIFIER ::= { atmfM4MIBCompliance 2 }
+
+-- compliance statements
+
+atmfM4Compliance                        MODULE-COMPLIANCE
+                  STATUS         current
+                  DESCRIPTION
+                                         "The compliance statements are listed as a set up conformance units
+                that correspond to each table. Support for all tables is mandatory."
+                  MODULE         -- this module
+                                         MANDATORY-GROUPS {atmfM4General, atmfM4PhysPathTpGroup, atmfM4TcAdaptorGroup,
+                                         atmfM4AtmLayerGroup, atmfM4VplGroup, atmfM4VclGroup, atmfM4VpXConnGroup,
+                                         atmfM4VcXConnGroup, atmfM4VpNextVpiGroup, atmfM4VcNextVciGroup,
+                                         atmfM4CellProtoCurrGroup, atmfM4CellProtoHistGroup, atmfM4CellProtoErrorGroup,
+                                         atmfM4TcProtoCurrGroup, atmfM4TcProtoHistGroup, atmfM4VpUpcNpcCurrGroup,
+                                         atmfM4VpUpcNpcHistGroup, atmfM4VcUpcNpcCurrGroup, atmfM4VcUpcNpcHistGroup,
+                                         atmfM4VpTestGroup, atmfM4VcTestGroup, atmfM4EquipGroup, atmfM4EquipHolderGroup,
+                                         atmfM4PlugInUnitGroup, atmfM4HwRunningSwGroup, atmfM4HwInstalledSwGroup,
+                                         atmfM4AlarmSevGroup, atmfM4TrapForwardingGroup,
+                                         atmfM4TrapLogGroup, atmfM4LoggedTrapGroup, atmfM4LoggedAlarmGroup}
+                  ::= { atmfM4Compliances 1 }
+-- Replace 3 lines below with line 2 lines above
+--                                       atmfM4TrapLogGroup, atmfM4LoggedTrapGroup, atmfM4LoggedAlarmGroup,
+--                                       atmfM4NotificationsGroup}
+--                ::= { atmfM4Compliances 1 }
+
+-- units of conformance
+
+atmfM4General    OBJECT-GROUP
+                  OBJECTS {atmfM4NeVendor, atmfM4NeVersion, atmfM4NeStartTime, atmfM4NeAlarmSeverityIndex, atmfM4NeSuppressZeroStats}
+                  STATUS         current
+                  DESCRIPTION
+                                         "NE high level objects"
+                  ::= { atmfM4Groups 1}
+
+atmfM4PhysPathTpGroup   OBJECT-GROUP
+                  OBJECTS {atmfM4PhysPathTpHwUnitIndex, atmfM4PhysPathTpPortID,
+                                          atmfM4PhysPathTpAlarmSeverityIndex}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 interface Configuration table extensions
+                for the physical path termination point"
+                  ::= { atmfM4Groups 2 }
+
+atmfM4TcAdaptorGroup            OBJECT-GROUP
+                  OBJECTS {atmfM4TcACellScrambling, atmfM4TcAlarmSeverityIndex}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 interface Configuration table extensions
+                for the TC Adaptor."
+                  ::= { atmfM4Groups 3 }
+
+atmfM4AtmLayerGroup             OBJECT-GROUP
+                  OBJECTS {atmfM4IfType, atmfM4IfLoopbackLocationCode, atmfM4IfSubscriberAddress,
+                                          atmfM4IfPreferredCarrier, atmfM4IfFarEndCarrierNetwork}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 interface Configuration table extensions
+                for the ATM cell layer."
+                  ::= { atmfM4Groups 4 }
+
+atmfM4VplGroup   OBJECT-GROUP
+                  OBJECTS {atmfM4VplSegEndPt}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VPL Termination Point Configuration
+                 table extensions. "
+                  ::= { atmfM4Groups 5 }
+
+atmfM4VclGroup   OBJECT-GROUP
+                  OBJECTS {atmfM4VclSegEndPt}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VCL Termination Point Configuration
+                table extensions."
+                  ::= { atmfM4Groups 6 }
+
+atmfM4VpXConnGroup              OBJECT-GROUP
+                  OBJECTS {atmfM4VpXConnRecover}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VP Cross-Connect Configuration
+                table extensions."
+                  ::= { atmfM4Groups 7 }
+
+atmfM4VcXConnGroup              OBJECT-GROUP
+                  OBJECTS {atmfM4VcXConnRecover}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VC Cross-Connect Configuration
+                table extensions."
+                  ::= { atmfM4Groups 8 }
+
+atmfM4VpNextVpiGroup            OBJECT-GROUP
+                  OBJECTS {atmfM4VpNextVpiValue}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VP Next-VPI value table."
+                  ::= { atmfM4Groups 9 }
+
+atmfM4VcNextVciGroup            OBJECT-GROUP
+                  OBJECTS {atmfM4VcNextVciValue}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VC Next-VCI value table."
+                  ::= { atmfM4Groups 10 }
+
+atmfM4CellProtoCurrGroup                  OBJECT-GROUP
+                  OBJECTS {atmfM4CellProtoCurrSuspect, atmfM4CellProtoCurrElapsedTime,
+                                          atmfM4CellProtoCurrSupprIntvls, atmfM4CellProtoCurrProtoErrors,
+                                          atmfM4CellProtoCurrInOAMCells}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Cell Protocol Monitoring Current Data
+                 table."
+                  ::= { atmfM4Groups 11 }
+
+atmfM4CellProtoHistGroup                  OBJECT-GROUP
+                  OBJECTS {atmfM4CellProtoHistSuspect, atmfM4CellProtoHistElapsedTime,
+                                          atmfM4CellProtoHistSupprIntvls, atmfM4CellProtoHistProtoErrors,
+                                          atmfM4CellProtoHistInOAMCells}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Cell Protocol Monitoring History Data
+                table."
+                  ::= { atmfM4Groups 12 }
+
+atmfM4CellProtoErrorGroup                 OBJECT-GROUP
+                  OBJECTS {atmfM4CellProtoErrorTime, atmfM4CellProtoErrorReason,
+                                          atmfM4CellProtoErrorVpi, atmfM4CellProtoErrorVci}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Cell Protocol Monitoring Error Log
+                table."
+                  ::= { atmfM4Groups 13 }
+
+atmfM4TcProtoCurrGroup  OBJECT-GROUP
+                  OBJECTS {atmfM4TcProtoCurrSuspect, atmfM4TcProtoCurrElapsedTime,
+                                          atmfM4TcProtoCurrSupprIntvls, atmfM4TcProtoCurrDiscardHECViol}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 TC Adaptor Protocol Monitoring Current
+                Data table."
+                  ::= { atmfM4Groups 14 }
+
+atmfM4TcProtoHistGroup  OBJECT-GROUP
+                  OBJECTS {atmfM4TcProtoHistSuspect, atmfM4TcProtoHistElapsedTime,
+                                          atmfM4TcProtoHistSupprIntvls, atmfM4TcProtoHistDiscardHECViol}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 TC Adaptor Protocol Monitoring History
+                Data table."
+                  ::= { atmfM4Groups 15 }
+
+atmfM4VpUpcNpcCurrGroup OBJECT-GROUP
+                  OBJECTS {atmfM4VpUpcNpcCurrSuspect, atmfM4VpUpcNpcCurrElapsedTime,
+                                          atmfM4VpUpcNpcCurrSupprIntvls, atmfM4VpUpcNpcCurrDiscardedCells,
+                                          atmfM4VpUpcNpcCurrDiscardedClp0, atmfM4VpUpcNpcCurrPassedCells,
+                                          atmfM4VpUpcNpcCurrPassedClp0}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring Current
+                Data table for VPL termination points."
+                  ::= { atmfM4Groups 16 }
+
+atmfM4VpUpcNpcHistGroup OBJECT-GROUP
+                  OBJECTS {atmfM4VpUpcNpcHistSuspect, atmfM4VpUpcNpcHistElapsedTime,
+                                          atmfM4VpUpcNpcHistSupprIntvls, atmfM4VpUpcNpcHistDiscardedCells,
+                                          atmfM4VpUpcNpcHistDiscardedClp0, atmfM4VpUpcNpcHistPassedCells,
+                                          atmfM4VpUpcNpcHistPassedClp0}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring History
+                Data table for VPL termination points."
+                  ::= { atmfM4Groups 17 }
+
+atmfM4VcUpcNpcCurrGroup OBJECT-GROUP
+                  OBJECTS {atmfM4VcUpcNpcCurrSuspect, atmfM4VcUpcNpcCurrElapsedTime,
+                                          atmfM4VcUpcNpcCurrSupprIntvls, atmfM4VcUpcNpcCurrDiscardedCells,
+                                          atmfM4VcUpcNpcCurrDiscardedClp0, atmfM4VcUpcNpcCurrPassedCells,
+                                          atmfM4VcUpcNpcCurrPassedClp0}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring Current
+                Data table for VCL termination points"
+                  ::= { atmfM4Groups 18 }
+
+atmfM4VcUpcNpcHistGroup OBJECT-GROUP
+                  OBJECTS {atmfM4VcUpcNpcHistSuspect, atmfM4VcUpcNpcHistElapsedTime,
+                                          atmfM4VcUpcNpcHistSupprIntvls, atmfM4VcUpcNpcHistDiscardedCells,
+                                          atmfM4VcUpcNpcHistDiscardedClp0, atmfM4VcUpcNpcHistPassedCells,
+                                          atmfM4VcUpcNpcHistPassedClp0}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 UPC/NPC Disagreement Monitoring History
+                Data table for VCL termination points."
+                  ::= { atmfM4Groups 19 }
+
+atmfM4VpTestGroup                       OBJECT-GROUP
+                  OBJECTS {atmfM4VpTestId, atmfM4VpTestStatus, atmfM4VpTestType,
+                                          atmfM4VpTestResult, atmfM4VpTestCode, atmfM4VpTestOwner}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VP Termination Point Test table."
+                  ::= { atmfM4Groups 20 }
+
+atmfM4VcTestGroup                       OBJECT-GROUP
+                  OBJECTS {atmfM4VcTestId, atmfM4VcTestStatus, atmfM4VcTestType,
+                                          atmfM4VcTestResult, atmfM4VcTestCode, atmfM4VcTestOwner}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 VC Termination Point Test table."
+                  ::= { atmfM4Groups 21 }
+
+atmfM4EquipGroup                        OBJECT-GROUP
+                  OBJECTS {atmfM4EquipAdminStatus, atmfM4EquipLocation, atmfM4EquipOperStatus,
+                                          atmfM4EquipVendor, atmfM4EquipVersion, atmfM4EquipUserLabel,
+                                          atmfM4EquipAlarmSeverityIndex}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Equipment table."
+                  ::= { atmfM4Groups 22 }
+
+atmfM4EquipHolderGroup  OBJECT-GROUP
+                  OBJECTS {atmfM4EquipHolderType, atmfM4EquipHolderAcceptableTypes,
+                                          atmfM4EquipHolderSlotStatus, atmfM4EquipHolderSwLoad}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Equipment Holder table."
+                  ::= { atmfM4Groups 23 }
+
+atmfM4PlugInUnitGroup   OBJECT-GROUP
+                  OBJECTS {atmfM4PlugInUnitAdminStatus, atmfM4PlugInUnitAvailStatus,
+                                          atmfM4PlugInUnitOperStatus, atmfM4PlugInUnitVendor, atmfM4PlugInUnitVersion,
+                                          atmfM4PlugInUnitAlarmSeverityIndex}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Plug-In Unit table."
+                  ::= { atmfM4Groups 24 }
+
+atmfM4HwRunningSwGroup  OBJECT-GROUP
+                  OBJECTS {atmfM4HwRunningSwSwIndex}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Hardware Unit/Running Software
+                table."
+                  ::= { atmfM4Groups 25 }
+
+atmfM4HwInstalledSwGroup                  OBJECT-GROUP
+                  OBJECTS {atmfM4HwInstalledSwSwIndex, atmfM4HwSwAlarmSeverityIndex}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Hardware Unit/Installed Software
+                table"
+                  ::= { atmfM4Groups 26 }
+
+atmfM4AlarmSevGroup             OBJECT-GROUP
+                  OBJECTS {atmfM4AlarmSevProfileRowStatus, atmfM4AlarmSeverity, atmfM4AlarmSevDefault,
+                                          atmfM4AlarmSevProfileIndexNext }
+                  STATUS         current
+                  DESCRIPTION
+                                         "Alarm handling objects"
+                  ::= { atmfM4Groups 27 }
+
+atmfM4TrapForwardingGroup                 OBJECT-GROUP
+                  OBJECTS {atmfM4TrapForwardingDest, atmfM4ForwardedTrapId, atmfM4ForwardedTrapObject,
+                                          atmfM4TrapForwardingPort, atmfM4LowestForwardedSeverity,
+                                          atmfM4ForwardedIndeterminate, atmfM4TrapForwardingRowStatus}
+                  STATUS         current
+                  DESCRIPTION
+                                         "Trap forwarding table"
+                  ::= { atmfM4Groups 28 }
+
+atmfM4TrapLogGroup              OBJECT-GROUP
+                  OBJECTS {atmfM4TrapLogAdminStatus, atmfM4TrapLogOperStatus, atmfM4TrapLogFullAction,
+                                          atmfM4TrapLogRowStatus}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Trap Agent log table."
+                  ::= { atmfM4Groups 29 }
+
+atmfM4LoggedTrapGroup   OBJECT-GROUP
+                  OBJECTS {atmfM4LoggedTrapTime, atmfM4LoggedTrapID, atmfM4LoggedTrapObject,
+                                          atmfM4LoggedTrapRowStatus}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Trap Agent logged trap table."
+                  ::= { atmfM4Groups 30 }
+
+atmfM4LoggedAlarmGroup  OBJECT-GROUP
+                  OBJECTS {atmfM4LoggedAlarmSeverity, atmfM4LoggedAlarmBackedUp, atmfM4LoggedAlarmBUObject,
+                                          atmfM4LoggedAlarmSpecificProb, atmfM4LoggedAlarmRepairAct,
+                                          atmfM4TrapAlarmSeverity, atmfM4TrapAlarmBackedUp, atmfM4TrapAlarmBUObject,
+                                          atmfM4TrapAlarmSpecificProb, atmfM4TrapAlarmRepairAct}
+                  STATUS         current
+                  DESCRIPTION
+                                         "The ATM Forum M4 Trap Agent logged alarm trap table."
+                  ::= { atmfM4Groups 31 }
+
+--atmfM4NotificationsGroup                       NOTIFICATION-GROUP
+--                       NOTIFICATIONS {atmfM4IfAisAlarm, atmfM4IfLcdAlarm, atmfM4IfLofAlarm, atmfM4IfLopAlarm,
+--                                               atmfM4IfLosAlarm, atmfM4IfPayloadMismatchAlarm, atmfM4IfXmissionErrAlarm,
+--                                               atmfM4IfPathTraceMismatchAlarm, atmfM4IfRdiAlarm,
+--                                               atmfM4IfSignalLabelMismatchAlarm, atmfM4VplTpAisAlarm, atmfM4VplTpRdiAlarm,
+--                                               atmfM4VpcTpAisAlarm, atmfM4VpcTpRdiAlarm, atmfM4VclTpAisAlarm,
+--                                               atmfM4VclTpRdiAlarm, atmfM4VccTpAisAlarm, atmfM4VccTpRdiAlarm,
+--                                               atmfM4HwBackPlaneAlarm, atmfM4HwCallEstErrAlarm, atmfM4HwCongestionAlarm,
+--                                               atmfM4HwExtIfDevProbAlarm, atmfM4HwLineCardAlarm, atmfM4HwMultiplexerAlarm,
+--                                               atmfM4HwPowerAlarm, atmfM4HwProcessorAlarm, atmfM4HwProtectionPathAlarm,
+--                                               atmfM4HwReceiverFailAlarm, atmfM4HwPIUnitMissingAlarm, atmfM4HwPIUnitProbAlarm,
+--                                               atmfM4HwPIUnitMismatchAlarm, atmfM4HwTimingProbAlarm, atmfM4HwXmitterFailAlarm,
+--                                               atmfM4HwTrunkCardAlarm, atmfM4HwStorageCapacityAlarm,
+--                                               atmfM4HwMemoryMismatchAlarm, atmfM4HwCorruptDataAlarm, atmfM4HwSwEnvironAlarm,
+--                                               atmfM4HwSwDowloadFailAlarm, atmfM4HwVersionMismatchAlarm, atmfM4HwFanFailAlarm,
+--                                               atmfM4HwDoorOpenAlarm, atmfM4HwFuseFailAlarm, atmfM4HwHighTempAlarm,
+--                                               atmfM4SwVersionMismatchAlarm, atmfM4VplTpUp, atmfM4VplTpDown, atmfM4VclTpUp,
+--                                               atmfM4VclTpDown, atmfM4VplXConnUp, atmfM4VplXConnDown, atmfM4VclXConnUp,
+--                                               atmfM4VclXConnDown, atmfM4HwUnitUp, atmfM4HwUnitDown, atmfM4AtmCellIfCreated,
+--                                               atmfM4AtmCellIfDeleted, atmfM4VpcTpCreated, atmfM4VpcTpDeleted,
+--                                               atmfM4VccTpCreated, atmfM4VccTpDeleted, atmfM4VplXConnCreated,
+--                                               atmfM4VplXConnDeleted, atmfM4VclXConnCreated, atmfM4VclXConnDeleted,
+--                                               atmfM4HwUnitCreated, atmfM4HwUnitDeleted, atmfM4InstalledSwCreated,
+--                                               atmfM4InstalledSwDeleted, atmfM4IfChanged, atmfM4VplTpChanged,
+--                                               atmfM4VclTpChanged, atmfM4VplXConnChanged, atmfM4VclXConnChanged,
+--                                               atmfM4HwUnitChanged, atmfM4InstalledSwChanged }
+--                       STATUS current
+--                       DESCRIPTION
+--                                              "The ATM Forum M4 notification list."
+--                       ::= { atmfM4Groups 32 }
+
+END
+

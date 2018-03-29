@@ -1,0 +1,4921 @@
+
+-- *****************************************************************************
+-- Juniper-POLICY-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for Policy management
+--
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2005 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-POLICY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Counter64, IpAddress,
+    Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniPolicyMIB  MODULE-IDENTITY
+    LAST-UPDATED "200508081821Z"  -- 08-Aug-05 02:21 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Policy MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200508081821Z"  -- 08-Aug-05 02:21 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Add support for ATM Cell Mode configuration."
+    REVISION    "200502011558Z"  -- 01-Feb-05 10:58 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Add attachment statistics preserve attribute."
+    REVISION    "200310211905Z"  -- 21-Oct-03 03:05 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Policy precedence enhancements.
+         Route class policy feature support."
+    REVISION    "200308252155Z"  -- 25-Aug-03 05:55 PM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Added new forward rules data objects."
+    REVISION    "200303132155Z"  -- 13-Mar-03 04:55 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added noPolicy to the policy attachment type TC.
+         Extended the range for the Classifier Control List Element ID."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200203281453Z"  -- 28-Mar-02 09:53 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Extended rate limit profile objects.
+         Added traffic class rule objects.
+         Obsoleted policy traffic shaped objects."
+    REVISION    "200109071448Z"  -- 07-Sep-01 10:48 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added TCP flag and IP flag support objects.
+         Replaced juniPolicyProfileTable with juniPolicyAttachProfileTable.
+         Created new confomance groupings."
+    REVISION    "200104171210Z"  -- 17-Apr-01 08:10 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added color rule objects.
+         Added Local Input Policy ID and Local Input Stats Enable objects to the
+           juniPolicyProfileTable.
+         Replaced juniPolicyIfTable with juniPolicyIfAttachTable.
+         Replaced juniPolicyIfStatsTable with juniPolicyIfAttachStatsTable."
+    REVISION    "200101232130Z"  -- 23-Jan-01 04:30 PM EST  - JUNOSe 2.8
+    DESCRIPTION
+        "Added log rule objects."
+    REVISION    "200011292030Z"  -- 29-Nov-00 03:30 PM EST  - JUNOSe 2.6
+    DESCRIPTION
+        "Added policy traffic shaped objects."
+    REVISION    "200005150000Z"  -- 15-May-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 27 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniClaclPortOperator ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerates valid operators for use as source and destination port
+        operators within a classifier control list."
+    SYNTAX      INTEGER {
+                    noOperator(0),
+                    lt(1),
+                    gt(2),
+                    eq(3),
+                    ne(4),
+                    range(5) }
+
+JuniPolicyAttachmentType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerates the types of policy attachments."
+    SYNTAX      INTEGER {
+                    noPolicy(0),
+                    inputPolicy(1),
+                    outputPolicy(2),
+                    secondaryInputPolicy(4),
+					auxiliaryInputPolicy(7) }
+
+JuniPolicyForwardingType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerates the type of forwarding to which the policy is applied."
+    SYNTAX      INTEGER {
+                    ipForwarding(1),
+                    cbfForwarding(2) }
+
+JuniPolicyIpFragValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerates the values for IP frag offset classification."
+    SYNTAX       INTEGER {
+                     equalToZero(0),
+                     equalToOne(1),
+                     reserved1(2),
+                     greaterThenOne(3),
+                     notSpecified(4) }
+
+JuniRateLimitProfileType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerates the types of rate limit profiles."
+    SYNTAX      INTEGER {
+                    oneRate(1),
+                    twoRate(2) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyObjects              OBJECT IDENTIFIER ::= { juniPolicyMIB 1 }
+juniClassifierControlList      OBJECT IDENTIFIER ::= { juniPolicyObjects 1 }
+juniRateLimitControlList       OBJECT IDENTIFIER ::= { juniPolicyObjects 2 }
+juniPolicy                     OBJECT IDENTIFIER ::= { juniPolicyObjects 3 }
+juniPolicyIf                   OBJECT IDENTIFIER ::= { juniPolicyObjects 4 }
+juniPolicyProfile              OBJECT IDENTIFIER ::= { juniPolicyObjects 5 }
+juniPolicyStatistics           OBJECT IDENTIFIER ::= { juniPolicyObjects 6 }
+juniTrafficShapeControlList    OBJECT IDENTIFIER ::= { juniPolicyObjects 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Policy Tables
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The policy table
+--
+juniPolicyNextIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniPolicyTable.  This object returns a value of zero when it is the
+        lexicographic successor of a varbind presented in an SNMP GETNEXT or
+        GETBULK request, for which circumstance it is assumed that index
+        allocation is unintended."
+    ::= { juniPolicy 1 }
+
+juniPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries which represent the non-repetive fields of
+        a policy definition."
+    ::= { juniPolicy 2 }
+
+juniPolicyEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the non-repetitive fields of a policy definition."
+    INDEX     { juniPolicyId }
+    ::= { juniPolicyTable 1 }
+
+JuniPolicyEntry ::= SEQUENCE {
+    juniPolicyId             Integer32,
+    juniPolicyRowStatus      RowStatus,
+    juniPolicyAdminState     INTEGER,
+    juniPolicyOperStatus     INTEGER,
+    juniPolicyErrorValue     Integer32,
+    juniPolicyName           DisplayString,
+    juniPolicyReferenceCount Counter32,
+    juniPolicyRuleNextIndex  Integer32,
+    juniPolicyAtmCellModeEnable TruthValue }
+
+juniPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the policy table entry which is defined by this row."
+    ::= { juniPolicyEntry 1 }
+
+juniPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list, i.e. create a
+                            policy table entry with the associated policy name.
+            destroy         Destroy the specified list and all of  its
+                            constituent elements.
+
+        Policy row members may not be modified once the row has been created."
+    ::= { juniPolicyEntry 2 }
+
+juniPolicyAdminState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to control the administrative state of a policy.
+        Enabling a policy will result in the rules which make up a policy being
+        applied to interfaces to which the policy is assigned.
+
+        You should disable the admin state before adding/modifying any rules or 
+        classifier groups in this policy and then re-enable to apply the
+        changes.
+
+        This object may be modified while the row is active."
+    DEFVAL    { disable }
+    ::= { juniPolicyEntry 3 }
+
+juniPolicyOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    invalid(1),
+                    enabled(2) }
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete object was used to retrieve the operational state of a
+        policy.
+
+        If a policy is disabled, it is not applied to any interfaces within the
+        system.
+
+        If a policy is invalid, there is a problem with the policy preventing it
+        from being applied to an interface.  An error code providing diagnostic
+        information about the problem is found in juniPolicyErrorValue.
+
+        If a policy is enabled, it has been applied to one or more interfaces
+        within the system.
+
+        This object was made obsolete due to some changes in E-Series which
+        eliminated the possibility of a policy being operationaly disabled."
+    ::= { juniPolicyEntry 4 }
+
+juniPolicyErrorValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "An error code providing diagnostic information for invalid policies.
+        The enumeration of this field is TBD.  A zero (0) value indicates that
+        there is no error reported.
+
+        This object was made obsolete due to some changes in E-Series which
+        eliminated the possibility of a policy being operationaly disabled."
+    ::= { juniPolicyEntry 5 }
+
+juniPolicyName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..40))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the policy defined by this row."
+    ::= { juniPolicyEntry 6 }
+
+juniPolicyReferenceCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the number of times this policy has been applied within the
+        chassis."
+    ::= { juniPolicyEntry 7 }
+
+juniPolicyRuleNextIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Read only variable which provides the next available PolicyRuleIndex
+        with respect to the policy defined by this row.  This object returns a
+        value of zero when it is the lexicographic successor of a varbind
+        presented in an SNMP GETNEXT or GETBULK request, for which circumstance
+        it is assumed that index allocation is unintended."
+    ::= { juniPolicyEntry 8 }
+
+juniPolicyAtmCellModeEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the policy is in ATM Cell Mode."
+    ::= { juniPolicyEntry 9 }
+
+--
+-- The Policy Rule table
+--
+juniPolicyRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Each entry within this table defines a rule component of a policy.  The
+        entries in this table are created automatically when entries are created
+        in specific rule tables.  This table is read only.  This object is
+        deprecated due to new policy rule table key."
+    ::= { juniPolicy 3 }
+
+juniPolicyRuleEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Each entry defines a single rule component.  This object is deprecated
+        due to new policy rule table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniPolicyRuleTable 1 }
+
+JuniPolicyRuleEntry ::= SEQUENCE {
+    juniPolicyRulePolicyId   Integer32,
+    juniPolicyRulePrec       Integer32,
+    juniPolicyRuleId         Integer32,
+    juniPolicyRuleType       INTEGER,
+    juniPolicySuspend        TruthValue,
+    juniPolicyEclipsed       TruthValue }
+
+juniPolicyRulePolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The PolicyTable index of the policy which owns this rule.  This object
+        is deprecated due to new policy rule table key."
+    ::= { juniPolicyRuleEntry 1 }
+
+juniPolicyRulePrec OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The precedence of this rule within this group of policy rules.  This
+        object is deprecated due to new policy rule table key."
+    ::= { juniPolicyRuleEntry 2 }
+
+juniPolicyRuleId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The index of this rule within the set of rules owned by the policy
+        defined by juniPolicyRulePolicyId.  This object is deprecated due to new
+        policy rule table key."
+    ::= { juniPolicyRuleEntry 3 }
+
+juniPolicyRuleType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noRule(0),
+                    nextHopRule(1),
+                    filterRule(2),
+                    nextInterfaceRule(3),
+                    rateLimitRule(4),
+                    markingRule(5),
+                    trafficClassRule(6),
+                    forwardRule(7),
+                    logRule(8),
+                    colorRule(10),
+		    exceptionRule(11) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "This field specifies the type of rule being defined.  The remaining
+        information which makes up this rule is found in the specific rule table
+        defined by juniPolicyRuleType.  The specific rule tables are indexed by
+        juniPolicyRulePolicyId.juniPolicyRuleId.  This object is deprecated due
+        to new policy rule table key."
+    DEFVAL    { noRule }
+    ::= { juniPolicyRuleEntry 4 }
+
+juniPolicySuspend OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Setting this object to true results in the rule being suspended (taken
+        out of service).  Setting this value to false results in the rule being
+        returned to service.  This object is deprecated due to new policy rule
+        table key."
+    DEFVAL    { false }
+    ::= { juniPolicyRuleEntry 5 }
+
+juniPolicyEclipsed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "This value is true if the policy rule is eclipsed.  A policy rule is
+        eclipsed if a conflicting rule with the same classifier control list
+        precedes the rule, and the preceding rule is not suspended.  A false
+        value indicates that the rule is not eclipsed.  This object is
+        deprecated due to new policy rule table key."
+    ::= { juniPolicyRuleEntry 6 }
+
+
+--
+-- Deprecated Policy Rule Specific rule tables
+--
+
+--
+-- Deprecated Next-hop rule specific rule table.
+--
+juniNextHopRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNextHopRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide next-hop rule data.  Rows created in
+        this table result in an entry being created in the policy rule table.
+        This object is deprecated due to new policy rule table key."
+    ::= { juniPolicy 4 }
+
+juniNextHopRuleEntry OBJECT-TYPE
+    SYNTAX      JuniNextHopRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A next-hop rule entry.  This object is deprecated due to new policy
+        rule table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniNextHopRuleTable 1 }
+
+JuniNextHopRuleEntry ::= SEQUENCE {
+    juniNextHopRowStatus RowStatus,
+    juniNextHopIpAddress IpAddress,
+    juniNextHopClaclId   Integer32 }
+
+juniNextHopRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The next-hop IP address is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniNextHopRuleEntry 1 }
+
+juniNextHopIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address to forward all packets to.  This object is deprecated
+        due to new policy rule table key."
+    DEFVAL    { '00000000'H }  -- 0.0.0.0
+    ::= { juniNextHopRuleEntry 2 }
+
+juniNextHopClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which completes the NextHop policy rule.
+        This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniNextHopRuleEntry 3 }
+
+
+--
+-- Filter rule augmentation table.
+--
+juniFilterRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFilterRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide filter rule data.  Creation of an entry
+        in this table results in a corresponding entry being created in the
+        policy rule table.  This object is deprecated due to new policy rule
+        table key."
+    ::= { juniPolicy 5 }
+
+juniFilterRuleEntry OBJECT-TYPE
+    SYNTAX      JuniFilterRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A filter rule entry.  This object is deprecated due to new policy rule
+        table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniFilterRuleTable 1 }
+
+JuniFilterRuleEntry ::= SEQUENCE {
+    juniFilterRowStatus  RowStatus,
+    juniFilterClaclId    Integer32 }
+
+juniFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniFilterRuleEntry 1 }
+
+juniFilterClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which completes the filter policy rule.
+        This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniFilterRuleEntry 2 }
+
+
+--
+-- Next-Interface rule table.
+--
+juniNextInterfaceRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNextInterfaceRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide NextInterface rule data.  Creation of
+        entries in the table result in a corresponding entry being created in
+        the policy rule table.  This object is deprecated due to new policy
+        rule table key."
+    ::= { juniPolicy 6 }
+
+juniNextInterfaceRuleEntry OBJECT-TYPE
+    SYNTAX      JuniNextInterfaceRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A NextInterface rule entry.  This object is deprecated due to new
+        policy rule table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniNextInterfaceRuleTable 1 }
+
+JuniNextInterfaceRuleEntry ::= SEQUENCE {
+    juniNextInterfaceRowStatus   RowStatus,
+    juniNextInterfaceId          InterfaceIndex,
+    juniNextInterfaceClaclId     Integer32,
+    juniNextInterfaceNextHop     IpAddress }
+
+juniNextInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The next-interface parameter is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniNextInterfaceRuleEntry 1 }
+
+juniNextInterfaceId OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The interface index to which traffic matching the CLACL ID will be
+        routed.  This object is deprecated due to new policy rule table key."
+    ::= { juniNextInterfaceRuleEntry 2 }
+
+juniNextInterfaceClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which completes the NextInterface policy
+        rule.  This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniNextInterfaceRuleEntry 3 }
+
+juniNextInterfaceNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address to forward all packets to.  This object is deprecated
+        due to new policy rule table key."
+    DEFVAL    { '00000000'H }  -- 0.0.0.0
+    ::= { juniNextInterfaceRuleEntry 4 }
+
+
+--
+-- RateLimit rule table.
+--
+juniRateLimitRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRateLimitRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide RateLimit rule data.  Creation of
+        entries in the table result in a corresponding entry being created in
+        the policy rule table.  This object is deprecated due to new policy rule
+        table key."
+    ::= { juniPolicy 7 }
+
+juniRateLimitRuleEntry OBJECT-TYPE
+    SYNTAX      JuniRateLimitRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A RateLimit rule entry.  This object is deprecated due to new policy
+        rule table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniRateLimitRuleTable 1 }
+
+JuniRateLimitRuleEntry ::= SEQUENCE {
+    juniRateLimitRowStatus   RowStatus,
+    juniRateLimitId          Integer32,
+    juniRateLimitClaclId     Integer32 }
+
+juniRateLimitRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The rate limit profile ID is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniRateLimitRuleEntry 1 }
+
+juniRateLimitId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The RLP ID which provides the rate limit data which completes the
+        RateLimit policy rule.  This object is deprecated due to new policy rule
+        table key."
+    ::= { juniRateLimitRuleEntry 2 }
+
+juniRateLimitClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which fills out the RateLimit policy
+        rule.  This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitRuleEntry 3 }
+
+
+--
+-- Marking rule table.
+--
+juniMarkingRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniMarkingRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide Marking rule data.  Creation of entries
+        in the table result in a corresponding entry being created in the policy
+        rule table.  This object is deprecated due to new policy rule table
+        key."
+    ::= { juniPolicy 8 }
+
+juniMarkingRuleEntry OBJECT-TYPE
+    SYNTAX      JuniMarkingRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A Marking rule entry.  This object is deprecated due to new policy rule
+        table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniMarkingRuleTable 1 }
+
+JuniMarkingRuleEntry ::= SEQUENCE {
+    juniMarkingRowStatus RowStatus,
+    juniMarkingTOSByte   Integer32,
+    juniMarkingMask      Integer32,
+    juniMarkingClaclId   Integer32 }
+
+juniMarkingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The IP precedence field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniMarkingRuleEntry 1 }
+
+juniMarkingTOSByte OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP precedence value associated with this policy rule.  This object
+        is deprecated due to new policy rule table key."
+    ::= { juniMarkingRuleEntry 2 }
+
+juniMarkingMask OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The mask to use for TOS byte checks.  This object is deprecated due to
+        new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniMarkingRuleEntry 3 }
+
+juniMarkingClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which fills out the Marking policy rule.
+        This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniMarkingRuleEntry 4 }
+
+
+--
+-- Forward rule augmentation table.
+--
+juniForwardRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniForwardRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide forward rule data.  Creation of an
+        entry in this table results in a corresponding entry being created in
+        the policy rule table.  This object is deprecated due to new policy rule
+        table key."
+    ::= { juniPolicy 9 }
+
+juniForwardRuleEntry OBJECT-TYPE
+    SYNTAX      JuniForwardRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A forward rule entry.  This object is deprecated due to new policy rule
+         table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniForwardRuleTable 1 }
+
+JuniForwardRuleEntry ::= SEQUENCE {
+    juniForwardRowStatus          RowStatus,
+    juniForwardClaclId            Integer32,
+    juniForwardNextInterfaceId    InterfaceIndex,
+    juniForwardNextHop            IpAddress,
+    juniForwardRouterId           Integer32,
+    juniForwardOrder              Integer32,
+    juniForwardIgnoreDefaultRoute TruthValue }
+
+juniForwardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniForwardRuleEntry 1 }
+
+juniForwardClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which completes the forward policy rule.
+        This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniForwardRuleEntry 2 }
+
+juniForwardNextInterfaceId OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The interface index to which traffic matching the CLACL ID will be
+        routed.  This object is deprecated due to new policy rule table key."
+    ::= { juniForwardRuleEntry 3 }
+
+juniForwardNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address to which all packets are forwarded.  This object is
+        deprecated due to new policy rule table key."
+    DEFVAL    { '00000000'H }  -- 0.0.0.0
+    ::= { juniForwardRuleEntry 4 }
+
+juniForwardRouterId  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The index or ID of the router.  This object is deprecated due to new
+        policy rule table key."
+    ::= { juniForwardRuleEntry 5 }
+
+juniForwardOrder OBJECT-TYPE
+    SYNTAX      Integer32 (1..32767)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The order of the forward rules for a given classifier within a policy.
+        The forward rules will be ordered from the lowest order value to the
+        highest.  This object is deprecated due to new policy rule table key."
+    DEFVAL    { 100 }
+    ::= { juniForwardRuleEntry 6 }
+
+juniForwardIgnoreDefaultRoute OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Setting this object to true results in the default route being ignored
+        when determining if a next hop address is reachable.  This object is
+        deprecated due to new policy rule table key."
+    DEFVAL    { false }
+    ::= { juniForwardRuleEntry 7 }
+
+
+--
+-- Traffic Shape rule table - Obsolete.
+--
+juniTrafficShapeRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTrafficShapeRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete list of entries which provide Traffic Shape rule data.
+        Creation of entries in the table result in a corresponding entry being
+        created in the policy rule table.  This list became obsolete when the
+        policy shaper capability was moved into the quality of service
+        component."
+    ::= { juniPolicy 10 }
+
+juniTrafficShapeRuleEntry OBJECT-TYPE
+    SYNTAX      JuniTrafficShapeRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "A TrafficShape rule entry."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniTrafficShapeRuleTable 1 }
+
+JuniTrafficShapeRuleEntry ::= SEQUENCE {
+    juniTrafficShapeRowStatus    RowStatus,
+    juniTrafficShapeId           Integer32 }
+
+juniTrafficShapeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The traffic shape profile ID is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniTrafficShapeRuleEntry 1 }
+
+juniTrafficShapeId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The RLP ID which provides the rate limit data which completes the
+        traffic shape policy rule."
+    ::= { juniTrafficShapeRuleEntry 2 }
+
+
+--
+-- Color rule  table.
+--
+juniColorRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniColorRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide Color rule data.  Creation of entries
+        in the table result in a corresponding entry being created in the policy
+        rule table.  This object is deprecated due to new policy rule table
+        key."
+    ::= { juniPolicy 11 }
+
+juniColorRuleEntry OBJECT-TYPE
+    SYNTAX      JuniColorRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A Color rule entry.  This object is deprecated due to new policy rule
+        table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniColorRuleTable 1 }
+
+JuniColorRuleEntry ::= SEQUENCE {
+    juniColorRowStatus   RowStatus,
+    juniColor            INTEGER,
+    juniColorClaclId     Integer32 }
+
+juniColorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The color field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniColorRuleEntry 1 }
+
+juniColor OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    red(1),
+                    yellow(2),
+                    green(3) }
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The color with which to explicitly color packets associated with this
+        policy rule.  This object is deprecated due to new policy rule table
+        key."
+    ::= { juniColorRuleEntry 2 }
+
+juniColorClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which fills out the Color policy rule.
+        This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniColorRuleEntry 3 }
+
+
+--
+-- Log rule augmentation table.
+--
+juniLogRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniLogRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide log rule data.  Creation of an entry in
+        this table results in a corresponding entry being created in the policy
+        rule table.  This object is deprecated due to new policy rule table
+        key."
+    ::= { juniPolicy 12 }
+
+juniLogRuleEntry OBJECT-TYPE
+    SYNTAX      JuniLogRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A log rule entry.  This object is deprecated due to new policy rule
+        table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniLogRuleTable 1 }
+
+JuniLogRuleEntry ::= SEQUENCE {
+    juniLogRowStatus RowStatus,
+    juniLogClaclId   Integer32 }
+
+juniLogRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key."
+    ::= { juniLogRuleEntry 1 }
+
+juniLogClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which completes the log policy rule.
+        This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniLogRuleEntry 2 }
+
+
+--
+-- Traffic Class rule  table.
+--
+juniTrafficClassRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTrafficClassRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A list of entries which provide traffic Class rule data.  Creation of
+        entries in the table result in a corresponding entry being created in
+        the policy rule table.  This object is deprecated due to new policy rule
+        table key."
+    ::= { juniPolicy 13 }
+
+juniTrafficClassRuleEntry OBJECT-TYPE
+    SYNTAX      JuniTrafficClassRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A Traffic Class rule entry.  This object is deprecated due to new
+        policy rule table key."
+    INDEX     { juniPolicyRulePolicyId,
+                juniPolicyRulePrec,
+                juniPolicyRuleId }
+    ::= { juniTrafficClassRuleTable 1 }
+
+JuniTrafficClassRuleEntry ::= SEQUENCE {
+    juniTrafficClassRowStatus    RowStatus,
+    juniTrafficClassId           Integer32,
+    juniTrafficClassClaclId      Integer32 }
+
+juniTrafficClassRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The juniTrafficClassId field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy.
+
+        This object is deprecated due to new policy rule table key. "
+    ::= { juniTrafficClassRuleEntry 1 }
+
+juniTrafficClassId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The traffic class ID.  This object is deprecated due to new policy rule
+        table key."
+    DEFVAL    { 0 }
+    ::= { juniTrafficClassRuleEntry 2 }
+
+juniTrafficClassClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The classifier control list ID which fills out the traffic class policy
+        rule.  This object is deprecated due to new policy rule table key."
+    DEFVAL    { 0 }
+    ::= { juniTrafficClassRuleEntry 3 }
+
+
+--
+-- The Policy Rule table
+--
+juniPolicyRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry within this table defines a rule component of a policy.  The
+        entries in this table are created automatically when entries are created
+        in specific rule tables.  This table is read only."
+    ::= { juniPolicy 14 }
+
+juniPolicyRule2Entry OBJECT-TYPE
+    SYNTAX      JuniPolicyRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a single rule component."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniPolicyRule2Table 1 }
+
+JuniPolicyRule2Entry ::= SEQUENCE {
+    juniPolicyRulePolicyId2  Integer32,
+    juniPolicyRuleClaclId    Integer32,
+    juniPolicyRuleId2        Integer32,
+    juniPolicyRuleType2      INTEGER,
+    juniPolicySuspend2       TruthValue }
+
+juniPolicyRulePolicyId2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PolicyTable index of the policy which owns this rule."
+    ::= { juniPolicyRule2Entry 1 }
+
+juniPolicyRuleClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The classifier index from the ClassifierControlListTable that this rule
+        references."
+    ::= { juniPolicyRule2Entry 2 }
+
+juniPolicyRuleId2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of this rule within the set of rules owned by the policy
+        defined by juniPolicyRulePolicyId2."
+    ::= { juniPolicyRule2Entry 3 }
+
+juniPolicyRuleType2 OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noRule(0),
+                    nextHopRule(1),
+                    filterRule(2),
+                    nextInterfaceRule(3),
+                    rateLimitRule(4),
+                    markingRule(5),
+                    trafficClassRule(6),
+                    forwardRule(7),
+                    logRule(8),
+                    colorRule(10),
+		    exceptionRule(11) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field specifies the type of rule being defined.  The remaining
+        information which makes up this rule is found in the specific rule table
+        defined by juniPolicyRuleType.  The specific rule tables are indexed by
+        juniPolicyRulePolicyId2, juniPolicyRuleClaclId, juniPolicyRuleId2."
+    DEFVAL    { noRule }
+    ::= { juniPolicyRule2Entry 4 }
+
+juniPolicySuspend2 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to true results in the rule being suspended (taken
+        out of service).  Setting this value to false results in the rule being
+        returned to service."
+    DEFVAL    { false }
+    ::= { juniPolicyRule2Entry 5 }
+
+
+--
+-- Policy Rule Specific rule tables
+--
+
+--
+-- Next-hop rule specific rule table.
+--
+juniNextHopRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNextHopRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide next-hop rule data.  Rows created in
+        this table result in an entry being created in the policy rule table."
+    ::= { juniPolicy 15 }
+
+juniNextHopRule2Entry OBJECT-TYPE
+    SYNTAX      JuniNextHopRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A next-hop rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniNextHopRule2Table 1 }
+
+JuniNextHopRule2Entry ::= SEQUENCE {
+    juniNextHopRowStatus2 RowStatus,
+    juniNextHopIpAddress2 IpAddress }
+
+juniNextHopRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The next-hop IP address is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniNextHopRule2Entry 1 }
+
+juniNextHopIpAddress2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address to forward all packets to."
+    DEFVAL    { '00000000'H }  -- 0.0.0.0
+    ::= { juniNextHopRule2Entry 2 }
+
+
+--
+-- Filter rule augmentation table.
+--
+juniFilterRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFilterRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide filter rule data.  Creation of an entry
+        in this table results in a corresponding entry being created in the
+        policy rule table."
+    ::= { juniPolicy 16 }
+
+juniFilterRule2Entry OBJECT-TYPE
+    SYNTAX      JuniFilterRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A filter rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniFilterRule2Table 1 }
+
+JuniFilterRule2Entry ::= SEQUENCE {
+    juniFilterRowStatus2  RowStatus }
+
+juniFilterRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy. "
+    ::= { juniFilterRule2Entry 1 }
+
+
+--
+-- Next-Interface rule table.
+--
+juniNextInterfaceRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNextInterfaceRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide NextInterface rule data.  Creation of
+        entries in the table result in a corresponding entry being created in
+        the policy rule table."
+    ::= { juniPolicy 17 }
+
+juniNextInterfaceRule2Entry OBJECT-TYPE
+    SYNTAX      JuniNextInterfaceRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A NextInterface rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniNextInterfaceRule2Table 1 }
+
+JuniNextInterfaceRule2Entry ::= SEQUENCE {
+    juniNextInterfaceRowStatus2  RowStatus,
+    juniNextInterfaceId2         InterfaceIndex,
+    juniNextInterfaceNextHop2    IpAddress }
+
+juniNextInterfaceRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The next-interface parameter is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniNextInterfaceRule2Entry 1 }
+
+juniNextInterfaceId2 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interface index to which traffic matching the CLACL ID will be
+        routed."
+    ::= { juniNextInterfaceRule2Entry 2 }
+
+juniNextInterfaceNextHop2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address to forward all packets to."
+    DEFVAL    { '00000000'H }  -- 0.0.0.0
+    ::= { juniNextInterfaceRule2Entry 3 }
+
+
+--
+-- RateLimit rule table.
+--
+juniRateLimitRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRateLimitRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide RateLimit rule data.  Creation of
+        entries in the table result in a corresponding entry being created in
+        the policy rule table."
+    ::= { juniPolicy 18 }
+
+juniRateLimitRule2Entry OBJECT-TYPE
+    SYNTAX      JuniRateLimitRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A RateLimit rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniRateLimitRule2Table 1 }
+
+JuniRateLimitRule2Entry ::= SEQUENCE {
+    juniRateLimitRowStatus2  RowStatus,
+    juniRateLimitId2         Integer32 }
+
+juniRateLimitRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The rate limit profile ID is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniRateLimitRule2Entry 1 }
+
+juniRateLimitId2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The RLP ID which provides the rate limit data which completes the
+        RateLimit policy rule."
+    ::= { juniRateLimitRule2Entry 2 }
+
+
+--
+-- Marking rule table.
+--
+juniMarkingRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniMarkingRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide Marking rule data.  Creation of entries
+        in the table result in a corresponding entry being created in the policy
+        rule table."
+    ::= { juniPolicy 19 }
+
+juniMarkingRule2Entry OBJECT-TYPE
+    SYNTAX      JuniMarkingRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Marking rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniMarkingRule2Table 1 }
+
+JuniMarkingRule2Entry ::= SEQUENCE {
+    juniMarkingRowStatus2 RowStatus,
+    juniMarkingTOSByte2   Integer32,
+    juniMarkingMask2      Integer32 }
+
+juniMarkingRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The IP precedence field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniMarkingRule2Entry 1 }
+
+juniMarkingTOSByte2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP precedence value associated with this policy rule."
+    ::= { juniMarkingRule2Entry 2 }
+
+juniMarkingMask2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The mask to use for TOS byte checks."
+    DEFVAL    { 0 }
+    ::= { juniMarkingRule2Entry 3 }
+
+
+--
+-- Forward rule augmentation table.
+--
+juniForwardRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniForwardRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide forward rule data.  Creation of an
+        entry in this table results in a corresponding entry being created in
+        the policy rule table."
+    ::= { juniPolicy 20 }
+
+juniForwardRule2Entry OBJECT-TYPE
+    SYNTAX      JuniForwardRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A forward rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniForwardRule2Table 1 }
+
+JuniForwardRule2Entry ::= SEQUENCE {
+    juniForwardRowStatus2          RowStatus,
+    juniForwardNextInterfaceId2    InterfaceIndex,
+    juniForwardNextHop2            IpAddress,
+    juniForwardRouterId2           Integer32,
+    juniForwardOrder2              Integer32,
+    juniForwardIgnoreDefaultRoute2 TruthValue }
+
+juniForwardRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniForwardRule2Entry 1 }
+
+juniForwardNextInterfaceId2 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interface index to which traffic matching the CLACL ID will be
+        routed."
+    ::= { juniForwardRule2Entry 2 }
+
+juniForwardNextHop2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address to which all packets are forwarded."
+    DEFVAL    { '00000000'H }  -- 0.0.0.0
+    ::= { juniForwardRule2Entry 3 }
+
+juniForwardRouterId2  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index or ID of the router."
+    ::= { juniForwardRule2Entry 4 }
+
+juniForwardOrder2 OBJECT-TYPE
+    SYNTAX      Integer32 (1..32767)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The order of the forward rules for a given classifier within a policy.
+        The forward rules will be ordered from the lowest order value to the
+        highest."
+    DEFVAL    { 100 }
+    ::= { juniForwardRule2Entry 5 }
+
+juniForwardIgnoreDefaultRoute2 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to true results in the default route being ignored
+        when determining if a next hop address is reachable."
+    DEFVAL    { false }
+    ::= { juniForwardRule2Entry 6 }
+
+
+--
+-- Color rule  table.
+--
+juniColorRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniColorRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide Color rule data.  Creation of entries
+        in the table result in a corresponding entry being created in the policy
+        rule table."
+    ::= { juniPolicy 21 }
+
+juniColorRule2Entry OBJECT-TYPE
+    SYNTAX      JuniColorRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Color rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniColorRule2Table 1 }
+
+JuniColorRule2Entry ::= SEQUENCE {
+    juniColorRowStatus2   RowStatus,
+    juniColor2            INTEGER }
+
+juniColorRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The color field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy. "
+    ::= { juniColorRule2Entry 1 }
+
+juniColor2 OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    red(1),
+                    yellow(2),
+                    green(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The color with which to explicitly color packets associated with this
+        policy rule."
+    ::= { juniColorRule2Entry 2 }
+
+
+--
+-- Log rule augmentation table.
+--
+juniLogRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniLogRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide log rule data.  Creation of an entry in
+        this table results in a corresponding entry being created in the policy
+        rule table."
+    ::= { juniPolicy 22 }
+
+juniLogRule2Entry OBJECT-TYPE
+    SYNTAX      JuniLogRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A log rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniLogRule2Table 1 }
+
+JuniLogRule2Entry ::= SEQUENCE {
+    juniLogRowStatus2 RowStatus }
+
+juniLogRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy."
+    ::= { juniLogRule2Entry 1 }
+
+
+--
+-- Traffic Class rule  table.
+--
+juniTrafficClassRule2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTrafficClassRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which provide traffic Class rule data.  Creation of
+        entries in the table result in a corresponding entry being created in
+        the policy rule table."
+    ::= { juniPolicy 23 }
+
+juniTrafficClassRule2Entry OBJECT-TYPE
+    SYNTAX      JuniTrafficClassRule2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Traffic Class rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniTrafficClassRule2Table 1 }
+
+JuniTrafficClassRule2Entry ::= SEQUENCE {
+    juniTrafficClassRowStatus2    RowStatus,
+    juniTrafficClassId2           Integer32 }
+
+juniTrafficClassRowStatus2 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The juniTrafficClassId2 field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy. "
+    ::= { juniTrafficClassRule2Entry 1 }
+
+juniTrafficClassId2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The traffic class ID."
+    DEFVAL    { 0 }
+    ::= { juniTrafficClassRule2Entry 2 }
+
+
+--
+-- Policy ClassifierGroup table
+--
+juniPolicyClassifierGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyClassifierGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries that provide policy classifier group data.  Creation
+        of entries in this table result in a corresponding entry being created
+        in the policy clacl group table."
+    ::= { juniPolicy 24 }
+
+juniPolicyClassifierGroupEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyClassifierGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A classifier group entry."
+    INDEX     { juniPolicyClassifierGroupPolicyId,
+                juniPolicyClassifierGroupClaclId }
+    ::= { juniPolicyClassifierGroupTable 1 }
+
+JuniPolicyClassifierGroupEntry ::= SEQUENCE {
+    juniPolicyClassifierGroupPolicyId      Integer32,
+    juniPolicyClassifierGroupClaclId       Integer32,
+    juniPolicyClassifierGroupRowStatus     RowStatus,
+    juniPolicyClassifierGroupPrecedence    Integer32 }
+
+juniPolicyClassifierGroupPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PolicyTable index of the policy which owns this classifier group."
+    ::= { juniPolicyClassifierGroupEntry 1 }
+
+juniPolicyClassifierGroupClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The classifier index from the ClassifierControlListTable that this
+        classifier group references."
+    ::= { juniPolicyClassifierGroupEntry 2 }
+
+juniPolicyClassifierGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy.
+
+        Mode create-and-go will create a classifier group entry for the
+        specified policy if the entry does not exist and will set the precedence
+        value if provided.  Mode destroy will delete all policy rules
+        referencing this classifier within this policy and will delete the
+        classifier group entry."
+    ::= { juniPolicyClassifierGroupEntry 3 }
+
+juniPolicyClassifierGroupPrecedence OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The precedence value for this classifier within this policy."
+    DEFVAL     { 100 }
+    ::= {juniPolicyClassifierGroupEntry 4 }
+
+--
+-- Exception rule  table.
+--
+juniExceptionRuleTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF JuniExceptionRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS            current
+    DESCRIPTION
+        "A list of entries which provide Exception rule data.  Creation of entries
+        in the table result in a corresponding entry being created in the policy
+        rule table."
+    ::= { juniPolicy 25 }
+
+juniExceptionRuleEntry OBJECT-TYPE
+    SYNTAX           JuniExceptionRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS            current
+    DESCRIPTION
+        "An Exception rule entry."
+    INDEX     { juniPolicyRulePolicyId2,
+                juniPolicyRuleClaclId,
+                juniPolicyRuleId2 }
+    ::= { juniExceptionRuleTable 1 }
+
+JuniExceptionRuleEntry ::= SEQUENCE {
+    juniExceptionRowStatus   RowStatus,
+    juniExceptionApplication  INTEGER }
+
+juniExceptionRowStatus OBJECT-TYPE
+    SYNTAX           RowStatus
+    MAX-ACCESS  read-create
+    STATUS            current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        The exception field is mandatory and must be specified.
+
+        Modes supported are create-and-go and destroy. "
+    ::= { juniExceptionRuleEntry 1 }
+
+juniExceptionApplication OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    http-redirect (1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The application that will receive the packet exceptioned because of this policy action."
+    ::= { juniExceptionRuleEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Rate Limit Profile Lists
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The Rate Limit list
+--
+juniRateLimitProfileNextIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniRateLimitProfileTable.  This object returns a value of zero when it
+        is the lexicographic successor of a varbind presented in an SNMP GETNEXT
+        or GETBULK request, for which circumstance it is assumed that index
+        allocation is unintended."
+::= { juniRateLimitControlList 1 }
+
+juniRateLimitProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRateLimitProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of Rate Limit Profile (RLP)
+        definitions."
+    ::= { juniRateLimitControlList 2 }
+
+juniRateLimitProfileEntry OBJECT-TYPE
+    SYNTAX      JuniRateLimitProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a rate limit profile
+        element."
+    INDEX     { juniRateLimitProfileId }
+    ::= { juniRateLimitProfileTable 1 }
+
+JuniRateLimitProfileEntry ::= SEQUENCE {
+    juniRateLimitProfileId           Integer32,
+    juniRateLimitProfileRowStatus    RowStatus,
+    juniRateLimitProfileName         DisplayString,
+    juniRateLimitProfileType         JuniRateLimitProfileType,
+    juniRateLimitReferenceCount      Counter32,
+    juniRateLimitCommittedBps        Unsigned32,
+    juniRateLimitCommittedBurst      Unsigned32,
+    juniRateLimitExceedBps           Unsigned32,
+    juniRateLimitExceedBurst         Unsigned32,
+    juniRateLimitExcessBurst         Unsigned32,
+    juniRateLimitCommittedAction     INTEGER,
+    juniRateLimitConformedAction     INTEGER,
+    juniRateLimitExceededAction      INTEGER,
+    juniRateLimitCommittedMarkVal    Integer32,
+    juniRateLimitConformedMarkVal    Integer32,
+    juniRateLimitExceededMarkVal     Integer32,
+    juniRateLimitMask                Unsigned32 }
+
+juniRateLimitProfileId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID number of the rate limit profile (RLP) entry which is defined by
+        this row."
+    ::= { juniRateLimitProfileEntry 1 }
+
+juniRateLimitProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniRateLimitProfileName.
+
+        The rowStatus must be set to notInService in order to modify an
+        entry in this table. After making the desired changes you should
+        set the rowStatus to active to apply the changes. "
+    ::= { juniRateLimitProfileEntry 2 }
+
+juniRateLimitProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..40))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name of the rate limit profile defined by this row."
+    ::= { juniRateLimitProfileEntry 3 }
+
+juniRateLimitReferenceCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reflects the number of times a rate limit profile object is
+        referenced by policies. "
+    ::= { juniRateLimitProfileEntry 4 }
+
+juniRateLimitCommittedBps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The committed access rate in bits per second."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 5 }
+
+juniRateLimitCommittedBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The committed access rate burst value in bytes."
+    DEFVAL    { 8192 }
+    ::= { juniRateLimitProfileEntry 6 }
+
+juniRateLimitExceedBps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The peak access rate in bits per second.  To be configured only if rate
+        limit profile type is two-rate."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 7 }
+
+juniRateLimitExceedBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The peak access rate burst value in bytes.  To be configured only if
+        rate limit profile type is two-rate."
+    DEFVAL    { 8192 }
+    ::= { juniRateLimitProfileEntry 8 }
+
+juniRateLimitCommittedAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    transmit(0),
+                    drop(1),
+                    mark(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to be taken when the access rate is within the bounds of the
+        committed access rate."
+    DEFVAL    { transmit }
+    ::= { juniRateLimitProfileEntry 9 }
+
+juniRateLimitConformedAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    transmit(0),
+                    drop(1),
+                    mark(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to be taken when the access rate exceeds the bounds of the
+        committed access rate."
+    DEFVAL    { transmit }
+    ::= { juniRateLimitProfileEntry 10 }
+
+juniRateLimitExceededAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    transmit(0),
+                    drop(1),
+                    mark(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to be taken when the access rate exceeds the bounds of the peak
+        access rate."
+    DEFVAL    { transmit }
+    ::= { juniRateLimitProfileEntry 11 }
+
+juniRateLimitCommittedMarkVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "New IP precedence to be used when the juniRateLimitCommittedAction mark
+        action is applied."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 12 }
+
+juniRateLimitConformedMarkVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "New IP prececence to be used when the
+        juniRateLimitExceedCommittedAction mark action is applied."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 13 }
+
+juniRateLimitExceededMarkVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "New IP precedence to be used when the juniRateLimitExceedPeakAction
+        mark action is applied."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 14 }
+
+juniRateLimitMask OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Mask to be applied when executing a mark action."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 15 }
+
+juniRateLimitProfileType OBJECT-TYPE
+    SYNTAX      JuniRateLimitProfileType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate limit profile type (i.e. one-rate or two-rate).  Defaults to
+        two-rate, if not specified."
+    DEFVAL    { twoRate }
+    ::= { juniRateLimitProfileEntry 16 }
+
+juniRateLimitExcessBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The excess committed access rate burst value in bytes.  To be
+        configured only if rate limit profile type is one-rate."
+    DEFVAL    { 0 }
+    ::= { juniRateLimitProfileEntry 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Traffic Shape Profile Lists - Obsolete.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The Traffic Shape list
+--
+juniTrafficShapeProfileNextIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete scalar object returns the index of the next available row in
+        the juniTrafficShapeProfileTable.  This object returns a value of zero
+        when it is the lexicographic successor of a varbind presented in an SNMP
+        GETNEXT or GETBULK request, for which circumstance it is assumed that
+        index allocation is unintended.  This object became obsolete when the
+        policy shaper capability was moved into the quality of service
+        component."
+::= { juniTrafficShapeControlList 1 }
+
+juniTrafficShapeProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTrafficShapeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "This table contains entries for elements of Traffic Shape Profile
+        definitions.  This table became obsolete when the policy shaper
+        capability was moved into the quality of service component."
+    ::= { juniTrafficShapeControlList 2 }
+
+juniTrafficShapeProfileEntry OBJECT-TYPE
+    SYNTAX      JuniTrafficShapeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry describes the characteristics of a traffic shape profile
+        element."
+    INDEX     { juniTrafficShapeProfileId }
+    ::= { juniTrafficShapeProfileTable 1 }
+
+JuniTrafficShapeProfileEntry ::= SEQUENCE {
+    juniTrafficShapeProfileId        Integer32,
+    juniTrafficShapeProfileRowStatus RowStatus,
+    juniTrafficShapeProfileName      DisplayString,
+    juniTrafficShapeReferenceCount   Counter32,
+    juniTrafficShapeRate             Integer32,
+    juniTrafficShapeBurst            Integer32 }
+
+juniTrafficShapeProfileId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of the traffic shape profile entry which is defined by this
+        row."
+    ::= { juniTrafficShapeProfileEntry 1 }
+
+juniTrafficShapeProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        All rowStatus modes are supported.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniTrafficShapeProfileRowStatus "
+    ::= { juniTrafficShapeProfileEntry 2 }
+
+juniTrafficShapeProfileName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..40))
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Specifies the name of the traffic shape profile defined by this row."
+    ::= { juniTrafficShapeProfileEntry 3 }
+
+juniTrafficShapeReferenceCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This object reflects the number of times a traffic shape profile object
+        is referenced by policies. "
+    ::= { juniTrafficShapeProfileEntry 4 }
+
+juniTrafficShapeRate OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The traffic shape rate in bits per second."
+    DEFVAL    { 0 }
+    ::= { juniTrafficShapeProfileEntry 5 }
+
+juniTrafficShapeBurst OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The traffic shape burst in bytes."
+    DEFVAL    { 0 }
+    ::= { juniTrafficShapeProfileEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Classifier Control Lists
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The Classifier control list
+--
+juniClassifierControlListNextIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniClassifierControlListTable.  This object returns a value of zero
+        when it is the lexicographic successor of a varbind presented in an SNMP
+        GETNEXT or GETBULK request, for which circumstance it is assumed that
+        index allocation is unintended."
+::= { juniClassifierControlList 1 }
+
+juniClassifierControlListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniClassifierControlListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of classifier control lists.
+        The details pertinent to each CLACL are found in the
+        juniClassifierControlDefTable."
+    ::= { juniClassifierControlList 2 }
+
+juniClassifierControlListEntry OBJECT-TYPE
+    SYNTAX      JuniClassifierControlListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP access list element."
+    INDEX     { juniClassifierControlListId }
+    ::= { juniClassifierControlListTable 1 }
+
+JuniClassifierControlListEntry ::= SEQUENCE {
+    juniClassifierControlListId                  Integer32,
+    juniClassifierControlListRowStatus           RowStatus,
+    juniClassifierControlListName                DisplayString,
+    juniClassifierControlListReferenceCount      Counter32,
+    juniClassifierControlListNextElementIndex    Integer32 }
+
+juniClassifierControlListId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the classifier control list to which this entry belongs."
+    ::= { juniClassifierControlListEntry 1 }
+
+juniClassifierControlListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        Modes supported are create-and-go and destroy.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+             juniClassifierControlListRowStatus
+             juniClassifierControlListElemId "
+    ::= { juniClassifierControlListEntry 3 }
+
+juniClassifierControlListName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..40))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the CLACL being defined."
+    ::= { juniClassifierControlListEntry 4 }
+
+juniClassifierControlListReferenceCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times this CLACL is referenced by policies."
+    ::= { juniClassifierControlListEntry 5 }
+
+juniClassifierControlListNextElementIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Each get of this object will return a unique index which may be used to
+        create classifier control list elements.  This object returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that index allocation is unintended."
+    ::= { juniClassifierControlListEntry 6 }
+
+juniClassifierControlListElementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniClassifierControlListElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of classifier control lists.
+        Entries belonging to the same control list are ordered, and comparisons
+        to those entries are performed in that order until a match is detected.
+        If no match is found, the default action is to 'deny'."
+    ::= { juniClassifierControlList 4 }
+
+juniClassifierControlListElementEntry OBJECT-TYPE
+    SYNTAX      JuniClassifierControlListElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP access list element."
+    INDEX     { juniClassifierControlListId,
+                juniClassifierControlListElemId }
+    ::= { juniClassifierControlListElementTable 1 }
+
+JuniClassifierControlListElementEntry ::= SEQUENCE {
+    juniClassifierControlListElemId                 Integer32,
+    juniClassifierControlListElemRowStatus          RowStatus,
+    juniClassifierControlListNotSrc                 TruthValue,
+    juniClassifierControlListSrc                    IpAddress,
+    juniClassifierControlListSrcMask                IpAddress,
+    juniClassifierControlListNotDst                 TruthValue,
+    juniClassifierControlListDst                    IpAddress,
+    juniClassifierControlListDstMask                IpAddress,
+    juniClassifierControlListNotProtocol            TruthValue,
+    juniClassifierControlListProtocol               Integer32,
+    juniClassifierControlListTosByte                Integer32,
+    juniClassifierControlListMask                   Integer32,
+    juniClassifierControlListLocal                  TruthValue,
+    juniClassifierControlListLocalPresent           TruthValue,
+    juniClassifierControlListSaRouteClass           Integer32,
+    juniClassifierControlListSaRouteClassPresent    TruthValue,
+    juniClassifierControlListDaRouteClass           Integer32,
+    juniClassifierControlListDaRouteClassPresent    TruthValue,
+-- TCP/UDP specific element data.
+    juniClassifierControlListSrcOperator            JuniClaclPortOperator,
+    juniClassifierControlListSrcFromPort            Integer32,
+    juniClassifierControlListSrcToPort              Integer32,
+    juniClassifierControlListDestOperator           JuniClaclPortOperator,
+    juniClassifierControlListDestFromPort           Integer32,
+    juniClassifierControlListDestToPort             Integer32,
+-- ICMP specific element data.
+    juniClassifierControlListICMPType               Integer32,
+    juniClassifierControlListICMPCode               Integer32,
+-- IGMP specific element data.
+    juniClassifierControlListIGMPType               Integer32,
+--- TCP flags classification data.
+    juniClassifierControlListTcpFlagsValue          Integer32,
+    juniClassifierControlListTcpFlagsMask           Integer32,
+--- IP flags and frag classification data.
+    juniClassifierControlListIpFlagsValue           Integer32,
+    juniClassifierControlListIpFlagsMask            Integer32,
+    juniClassifierControlListIpFragValue            JuniPolicyIpFragValue }
+
+juniClassifierControlListElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The relative position of this entry within its classifier control list.
+        Classifier control list entries are searched in this sequence (low to
+        high values) until a match is found."
+    ::= { juniClassifierControlListElementEntry 1 }
+
+juniClassifierControlListElemRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of conceptual rows within this table.
+
+        This table provides a partial implementation for rowStatus.  Rows may be
+        created using createAndGo and createAndWait.  Once a row has been made
+        active the row status may not be changed.  "
+    ::= { juniClassifierControlListElementEntry 2 }
+
+juniClassifierControlListNotSrc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Invert the meaning of the source IP address and mask objects.  For
+        example 'not 10.10.0.90/255.255.255.255 (host address)' would result in
+        all source addresses except for host 10.19.9.90 being matched."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 3 }
+
+juniClassifierControlListSrc OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A source IP address.  A subject IP address is first masked with the
+        value of juniClassifierControlListSrcMask, then the result is compared
+        to this value.  Setting both this object and its corresponding mask to
+        0.0.0.0 acts as a wildcard, matching any source IP address."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniClassifierControlListElementEntry 4 }
+
+juniClassifierControlListSrcMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask to be applied to a subject source IP address before
+        comparing it to juniClassifierControlListSrc.  Ones in the mask identify
+        which bits in the subject IP address are significant for the comparison.
+
+        To be considered valid, a nonzero value for this object must contain a
+        single contiguous string of ones, beginning with the most significant
+        bit of the mask."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniClassifierControlListElementEntry 5 }
+
+juniClassifierControlListNotDst OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Invert the meaning of the destination IP address and mask objects.  For
+        example, 'not 10.10.0.90/255.255.255.255 (host address)' would result in
+        all source addresses except for host 10.19.9.90 being matched."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 6 }
+
+juniClassifierControlListDst OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A destination IP address.  A subject IP address is first masked with
+        the value of juniClassifierControlListDstMask, then the result is
+        compared to this value.  Setting both this object and its corresponding
+        mask to 0.0.0.0 acts as a wildcard, matching any destination IP
+        address."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniClassifierControlListElementEntry 7 }
+
+juniClassifierControlListDstMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask to be applied to a subject destination IP address
+        before comparing it to juniClassifierControlListDst.  Ones in the mask
+        identify which bits in the IP address are significant for the
+        comparison.
+
+        To be considered valid, a nonzero value for this object must contain a
+        single contiguous string of ones, beginning with the most significant
+        bit of the mask."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniClassifierControlListElementEntry 8 }
+
+juniClassifierControlListNotProtocol OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Invert the meaning of the protocol object.  For example, 'not TCP'
+        matches any protocol except for TCP."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 9 }
+
+juniClassifierControlListProtocol OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An IP Protocol value.  Nonzero values match a specific IP Protocol
+        value (e.g. 6 for TCP) carried in an IP packet; a value of zero acts as
+        a wildcard, matching any IP Protocol."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 10 }
+
+juniClassifierControlListTosByte OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP TOS byte value to match."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 11 }
+
+juniClassifierControlListMask OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The mask to use for TOS byte checks.  Allowed values are 0, 224, 252,
+        255."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 12 }
+
+juniClassifierControlListSrcOperator OBJECT-TYPE
+    SYNTAX      JuniClaclPortOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operator for use in comparing source ports."
+    DEFVAL    { noOperator }
+    ::= { juniClassifierControlListElementEntry 13 }
+
+juniClassifierControlListSrcFromPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source UDP or TCP 'from' port number."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 14 }
+
+juniClassifierControlListSrcToPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source UDP or TCP 'to' port number."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 15 }
+
+juniClassifierControlListDestOperator OBJECT-TYPE
+    SYNTAX      JuniClaclPortOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operator for use in comparing Destination ports."
+    DEFVAL    { noOperator }
+    ::= { juniClassifierControlListElementEntry 16 }
+
+juniClassifierControlListDestFromPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination UDP or TCP 'from' port number."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 17 }
+
+juniClassifierControlListDestToPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination UDP or TCP 'to' port number."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 18 }
+
+juniClassifierControlListICMPType OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional ICMP message type for classification."
+    DEFVAL    { 255 }
+    ::= { juniClassifierControlListElementEntry 19 }
+
+juniClassifierControlListICMPCode OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional ICMP message code for classification."
+    DEFVAL    { 255 }
+    ::= { juniClassifierControlListElementEntry 20 }
+
+
+juniClassifierControlListIGMPType OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional IGMP message type for classification."
+    DEFVAL    { 255 }
+    ::= { juniClassifierControlListElementEntry 21 }
+
+juniClassifierControlListTcpFlagsValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional TCP flags value for classification."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 22 }
+
+juniClassifierControlListTcpFlagsMask OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional TCP flags mask for classification.  TCP flag bits not
+        specified in the mask are don't care bits."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 23 }
+
+juniClassifierControlListIpFlagsValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional IP flags value for classification."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 24 }
+
+juniClassifierControlListIpFlagsMask OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional IP flags mask for classification.  IP flag bits not specified
+        in the mask are don't care bits"
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 25 }
+
+juniClassifierControlListIpFragValue OBJECT-TYPE
+    SYNTAX      JuniPolicyIpFragValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Optional IP flags mask for classification.  IP flag bits not specified
+        in the mask are don't care bits"
+    DEFVAL    { notSpecified }
+    ::= { juniClassifierControlListElementEntry 26 }
+
+juniClassifierControlListLocal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Match IP packets that are locally destined, i.e., destined to any one
+        of router's interfaces."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 27 }
+
+juniClassifierControlListLocalPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set to true if local classification field is configured."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 28 }
+
+juniClassifierControlListSaRouteClass OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Match packets with source address route class matching this route
+        class.  The route class value of a packet can be determined in the
+        secondary input policy attachment stage only.  The route class value of
+        a packet is assigned the value 0 in the input and output policy
+        attachment stages."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 29 }
+
+juniClassifierControlListSaRouteClassPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set to true if SA route class classification field is configured."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 30 }
+
+juniClassifierControlListDaRouteClass OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Match packets with destination address route class matching this route
+        class.  The route class value of a packet can be determined in the
+        secondary input policy attachment stage only.  The route class value of
+        a packet is assigned the value 0 in the input and output policy
+        attachment stages."
+    DEFVAL    { 0 }
+    ::= { juniClassifierControlListElementEntry 31 }
+
+juniClassifierControlListDaRouteClassPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set to true if DA route class classification field is configured."
+    DEFVAL    { false }
+    ::= { juniClassifierControlListElementEntry 32 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Policy Interface Table - Obsolete.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete table contains entries which represent attachment of
+        policies to interfaces.  This table became obsolete when the
+        juniPolicyIfAttTable was added."
+    ::= { juniPolicyIf 1 }
+
+juniPolicyIfEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry contains the attachment of policy(s) to an interface."
+    INDEX     { juniPolicyIfInterfaceId }
+    ::= { juniPolicyIfTable 1 }
+
+JuniPolicyIfEntry ::= SEQUENCE {
+    juniPolicyIfInterfaceId          Unsigned32,
+    juniPolicyIfRowStatus            RowStatus,
+    juniPolicyIfInputPolicyId        Integer32,
+    juniPolicyIfOutputPolicyId       Integer32,
+    juniPolicyIfInputStatsEnable     TruthValue,
+    juniPolicyIfOutputStatsEnable    TruthValue }
+
+juniPolicyIfInterfaceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The interface number representing the interface to which policy(s) have
+        been attached."
+    ::= { juniPolicyIfEntry 1 }
+
+juniPolicyIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list, i.e. create a
+                            policy table entry with the associated policy name.
+            destroy         Destroy the specified list and all of its
+                            constituent elements.
+
+        Policy row members may not be modified once the row has been created."
+    ::= { juniPolicyIfEntry 2 }
+
+juniPolicyIfInputPolicyId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the attachment of input policies to the
+        interface specified by juniPolicyIfInterfaceId,
+        juniPolicyIfForwardingType and juniPolicyIfPolicyType.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  If so, the
+        attachment is immediate."
+    DEFVAL    { 0 }
+    ::= { juniPolicyIfEntry 3 }
+
+juniPolicyIfOutputPolicyId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the attachment of output policies to the
+        interface specified by juniPolicyIfInterfaceId,
+        juniPolicyIfForwardingType and juniPolicyIfPolicyType.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  If so, the
+        attachment is immediate."
+    DEFVAL    { 0 }
+    ::= { juniPolicyIfEntry 4 }
+
+juniPolicyIfInputStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for an input policy attachment.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The desired value
+        must be set before the policy is attached or in a multiple object
+        varbind.  Failure to do so will result in the policy being attached with
+        the previous value of juniPolicyInputStatsEnable."
+    DEFVAL    { false }
+    ::= { juniPolicyIfEntry 5 }
+
+juniPolicyIfOutputStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for an output policy attachment.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The desired value
+        must be set before the policy is attached or in a multiple object
+        varbind.  Failure to do so will result in the policy being attached with
+        the previous value of juniPolicyOutputStatsEnable."
+    DEFVAL    { false }
+    ::= { juniPolicyIfEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Policy Interface Attachment Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyIfAttachTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyIfAttachEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries which represent attachment of policies to
+        interfaces."
+    ::= { juniPolicyIf 2 }
+
+juniPolicyIfAttachEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyIfAttachEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the attachment of policy(s) to an interface."
+    INDEX     { juniPolicyIfAttachInterfaceId,
+                juniPolicyIfAttachForwardingType,
+                juniPolicyIfAttachPolicyType }
+    ::= { juniPolicyIfAttachTable 1 }
+
+JuniPolicyIfAttachEntry ::= SEQUENCE {
+    juniPolicyIfAttachInterfaceId    InterfaceIndex,
+    juniPolicyIfAttachForwardingType JuniPolicyForwardingType,
+    juniPolicyIfAttachPolicyType     JuniPolicyAttachmentType,
+    juniPolicyIfAttachRowStatus      RowStatus,
+    juniPolicyIfAttachPolicyId       Integer32,
+    juniPolicyIfAttachStatsEnable    TruthValue,
+    juniPolicyIfAttachStatsPreserve  TruthValue }
+
+juniPolicyIfAttachInterfaceId OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface number representing the interface to which policy(s) have
+        been attached."
+    ::= { juniPolicyIfAttachEntry 1 }
+
+juniPolicyIfAttachForwardingType OBJECT-TYPE
+    SYNTAX      JuniPolicyForwardingType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface type (i.e. IP or CBF) which the policy have been attached
+        to."
+    ::= { juniPolicyIfAttachEntry 2 }
+
+juniPolicyIfAttachPolicyType OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachmentType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The policy type (i.e. input, output or secondary input)."
+    ::= { juniPolicyIfAttachEntry 3 }
+
+juniPolicyIfAttachRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the  target list, i.e. create a
+                            policy table entry with the associated policy name.
+            destroy         Destroy the specified list and all of its
+                            constituent elements.
+
+        Policy row members may not be modified once the row has been created."
+    ::= { juniPolicyIfAttachEntry 4 }
+
+juniPolicyIfAttachPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to control the attachment of policies to the
+        interface specified by juniPolicyIfAttachInterfaceId,
+        juniPolicyIfAttachForwardingType and juniPolicyIfAttachPolicyType.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  If so, the
+        attachment is immediate."
+    DEFVAL    { 0 }
+    ::= { juniPolicyIfAttachEntry 5 }
+
+juniPolicyIfAttachStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for a policy attachment.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The desired value
+        must be set before the policy is attached or in a multiple object
+        varbind.  Failure to do so will result in the policy being attached with
+        the previous value of juniPolicyIfAttachStatsEnable."
+    DEFVAL    { false }
+    ::= { juniPolicyIfAttachEntry 6 }
+
+juniPolicyIfAttachStatsPreserve OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to control the preserving of statistics when a policy
+        is attached to an interface that already has a policy attachment.
+
+        Set this object to true to preserve statistics.
+
+	Get and GetNext will always return false.
+
+        This object may be modified while the row is active.  The desired value
+        must be set before the policy is attached or in a multiple object
+        varbind.  Failure to do so will result in the policy being attached with
+        the previous value of juniPolicyIfAttachStatsPreserve."
+    DEFVAL    { false }
+    ::= { juniPolicyIfAttachEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Policy Profile Table - Obsolete
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "This obsolete table contains entries which represent attachment of
+        policies to dynamic interfaces through profiles.  This table became
+        obsolete when the juniPolicyAttachProfileTable was added."
+    ::= { juniPolicyProfile 1 }
+
+juniPolicyProfileEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry contains the profile for attachment of policy(s) to a
+        dynamic interface."
+    INDEX     { juniPolicyProfileId }
+    ::= { juniPolicyProfileTable 1 }
+
+JuniPolicyProfileEntry ::= SEQUENCE {
+    juniPolicyProfileId                      Unsigned32,
+    juniPolicyProfileRowStatus               RowStatus,
+    juniPolicyProfileInputPolicyId           Integer32,
+    juniPolicyProfileOutputPolicyId          Integer32,
+    juniPolicyProfileInputStatsEnable        TruthValue,
+    juniPolicyProfileOutputStatsEnable       TruthValue,
+    juniPolicyProfileLocalInputPolicyId      Integer32,
+    juniPolicyProfileLocalInputStatsEnable   TruthValue }
+
+juniPolicyProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The profile to which the policy attachment profile data belongs.  When
+        this profile is applied to a dynamic interface the associated policies
+        will be applied to that interface."
+    ::= { juniPolicyProfileEntry 1 }
+
+juniPolicyProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list, i.e. create a
+                            policy table entry with the associated policy name.
+            destroy         Destroy the specified list and all of its
+                            constituent elements.
+
+        Policy row members may not be modified once the row has been created."
+    ::= { juniPolicyProfileEntry 2 }
+
+juniPolicyProfileInputPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the attachment of input policies to
+        dynamic interfaces configured by the profile identified by
+        juniPolicyProfileId.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  Changes made to a
+        row in this table do not take effect until the profile is applied."
+    DEFVAL    { 0 }
+    ::= { juniPolicyProfileEntry 3 }
+
+juniPolicyProfileOutputPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the attachment of output policies to
+        dynamic interfaces configured by the profile identified by
+        juniPolicyProfileId.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  Changes made to a
+        row in this table do not take effect until the profile is applied to an
+        interface."
+    DEFVAL    { 0 }
+    ::= { juniPolicyProfileEntry 4 }
+
+juniPolicyProfileInputStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for an input policy attachment performed by a profile.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The changes will
+        not take effect until the profile is applied to an interface."
+    DEFVAL    { false }
+    ::= { juniPolicyProfileEntry 5 }
+
+juniPolicyProfileOutputStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for an output policy attachment performed by a profile.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The changes will
+        not take effect until the profile is applied to an interface."
+    DEFVAL    { false }
+    ::= { juniPolicyProfileEntry 6 }
+
+juniPolicyProfileLocalInputPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the attachment of local input policies
+        to dynamic interfaces configured by the profile identified by
+        juniPolicyProfileId.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  Changes made to a
+        row in this table do not take effect until the profile is applied."
+    DEFVAL    { 0 }
+    ::= { juniPolicyProfileEntry 7 }
+
+juniPolicyProfileLocalInputStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for a local input policy attachment performed by a profile.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The changes will
+        not take effect until the profile is applied to an interface."
+    DEFVAL    { false }
+    ::= { juniPolicyProfileEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Policy Attachment Profile Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyAttachProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyAttachProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries which represent attachment of policies to
+        dynamic interfaces through profiles."
+    ::= { juniPolicyProfile 2 }
+
+juniPolicyAttachProfileEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the profile for attachment of policy(s) to a
+        dynamic interface."
+    INDEX     { juniPolicyAttachProfileId,
+                juniPolicyAttachProfileForwardingType,
+                juniPolicyAttachProfilePolicyType }
+    ::= { juniPolicyAttachProfileTable 1 }
+
+JuniPolicyAttachProfileEntry ::= SEQUENCE {
+    juniPolicyAttachProfileId                Unsigned32,
+    juniPolicyAttachProfileForwardingType    JuniPolicyForwardingType,
+    juniPolicyAttachProfilePolicyType        JuniPolicyAttachmentType,
+    juniPolicyAttachProfileRowStatus         RowStatus,
+    juniPolicyAttachProfilePolicyId          Integer32,
+    juniPolicyAttachProfileStatsEnable       TruthValue }
+
+juniPolicyAttachProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The profile to which the policy attachment profile data belongs.  When
+        this profile is applied to a dynamic interface the associated policies
+        will be applied to that interface."
+    ::= { juniPolicyAttachProfileEntry 1 }
+
+juniPolicyAttachProfileForwardingType OBJECT-TYPE
+    SYNTAX      JuniPolicyForwardingType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface type (i.e. IP or CBF) which the policy would be attached
+        to."
+    ::= { juniPolicyAttachProfileEntry 2 }
+
+juniPolicyAttachProfilePolicyType OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachmentType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The policy type (i.e. input, output or secondary input)."
+    ::= { juniPolicyAttachProfileEntry 3 }
+
+juniPolicyAttachProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list, i.e. create a
+                            policy table entry with the associated policy name.
+            destroy         Destroy the specified list and all of its
+                            constituent elements.
+
+        Policy row members may not be modified once the row has been created."
+    ::= { juniPolicyAttachProfileEntry 4 }
+
+juniPolicyAttachProfilePolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to control the attachment of policies to dynamic
+        interfaces configured by the profile identified by
+        juniPolicyAttachProfileId, juniPolicyAttachProfileForwardingType and
+        juniPolicyAttachProfilePolicyType.
+
+        Attach a policy by setting this value to the ID of the policy.
+
+        Remove a policy attachment by setting this value to zero.
+
+        This object may be modified while the row is active.  Changes made to a
+        row in this table do not take effect until the profile is applied."
+    DEFVAL    { 0 }
+    ::= { juniPolicyAttachProfileEntry 5 }
+
+juniPolicyAttachProfileStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to control the enabling and disabling of statistics
+        for an policy attachment performed by a profile.
+
+        Set this object to true to enable statistics.  Set this object to false
+        to disable statistics.
+
+        This object may be modified while the row is active.  The changes will
+        not take effect until the profile is applied to an interface."
+    DEFVAL    { false }
+    ::= { juniPolicyAttachProfileEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The Policy interface statistics table - Obsolete
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyIfStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry within this obsolete table contains statistics data for an
+        interface/policy rule combination.  Interfaces with policies attached
+        and statistics disabled are not represented in this table."
+    ::= { juniPolicyStatistics 1 }
+
+juniPolicyIfStatsEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry defines a single statistics entry."
+    INDEX     { juniPolicyIfStatsIfId,
+                juniPolicyIfStatsPolicyType,
+                juniPolicyIfStatsPolicyId,
+                juniPolicyIfStatsRulePrec,
+                juniPolicyIfStatsRuleId,
+                juniPolicyIfStatsClaclEntryNumber }
+    ::= { juniPolicyIfStatsTable 1 }
+
+JuniPolicyIfStatsEntry ::= SEQUENCE {
+    juniPolicyIfStatsIfId                InterfaceIndex,
+    juniPolicyIfStatsPolicyType          JuniPolicyAttachmentType,
+    juniPolicyIfStatsPolicyId            Integer32,
+    juniPolicyIfStatsRulePrec            Integer32,
+    juniPolicyIfStatsRuleId              Integer32,
+    juniPolicyIfStatsClaclEntryNumber    Integer32,
+    juniPolicyIfStatsGreenPackets        Counter64,
+    juniPolicyIfStatsYellowPackets       Counter64,
+    juniPolicyIfStatsRedPackets          Counter64,
+    juniPolicyIfStatsGreenBytes          Counter64,
+    juniPolicyIfStatsYellowBytes         Counter64,
+    juniPolicyIfStatsRedBytes            Counter64 }
+
+juniPolicyIfStatsIfId OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The interface ID corresponding to the stats block represented by this
+        row."
+    ::= { juniPolicyIfStatsEntry 1 }
+
+juniPolicyIfStatsPolicyType OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachmentType
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The attachment point for the policy."
+    ::= { juniPolicyIfStatsEntry 2 }
+
+juniPolicyIfStatsPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The PolicyTable index of the policy corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfStatsEntry 3 }
+
+juniPolicyIfStatsRulePrec OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The precedence of the policy rule corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfStatsEntry 4 }
+
+juniPolicyIfStatsRuleId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The index of the policy rule corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfStatsEntry 5 }
+
+juniPolicyIfStatsClaclEntryNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The index of the clacl entry number corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfStatsEntry 6 }
+
+juniPolicyIfStatsGreenPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of green packets policed by the policy rule."
+    ::= { juniPolicyIfStatsEntry 7 }
+
+juniPolicyIfStatsYellowPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of yellow packets policed by the policy rule."
+    ::= { juniPolicyIfStatsEntry 8 }
+
+juniPolicyIfStatsRedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of red packets policed by the policy rule."
+    ::= { juniPolicyIfStatsEntry 9 }
+
+juniPolicyIfStatsGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of green bytes policed by the policy rule."
+    ::= { juniPolicyIfStatsEntry 10 }
+
+juniPolicyIfStatsYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of yellow bytes policed by the policy rule."
+    ::= { juniPolicyIfStatsEntry 11 }
+
+juniPolicyIfStatsRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of red bytes policed by the policy rule."
+    ::= { juniPolicyIfStatsEntry 12 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The Policy interface attachment statistics table
+--
+-- The policy interface statistics table presents statistics as green,
+-- yellow, and red packets and bytes.  This is because the interpretation
+-- of the statistics is linked to the type of policy rule which has
+-- resulted in the generation of the statistics.
+--
+-- Each policy rule and how the statistics are interpreted is as follows:
+--
+-- nextHopRule:
+--     juniPolicyIfAttachStatsGreenPackets and juniPolicyIfAttachGreenBytes
+--     represent the number of packets and bytes routed to the next-hop IP
+--     address.
+--
+--     juniPolicyIfAttachStatsYellowPackets, juniPolicyIfAttachYellowBytes,
+--     juniPolicyIfAttachStatsRedPackets, and juniPolicyIfAttachRedBytes are
+--     always zero.
+--
+-- filterRule:
+--     juniPolicyIfAttachStatsGreenPackets and juniPolicyIfAttachGreenBytes
+--     represent the number of packets and bytes filtered (dropped) by the
+--     filter rule.
+--
+--     juniPolicyIfAttachStatsYellowPackets, juniPolicyIfAttachYellowBytes,
+--     juniPolicyIfAttachStatsRedPackets, and juniPolicyIfAttachRedBytes are
+--     always zero.
+--
+-- nextInterfaceRule:
+--     juniPolicyIfAttachStatsGreenPackets and juniPolicyIfAttachGreenBytes
+--     represent the number of packets and bytes routed to the next-interface
+--     interface.
+--
+--     juniPolicyIfAttachStatsYellowPackets, juniPolicyIfAttachYellowBytes,
+--     juniPolicyIfAttachStatsRedPackets, and juniPolicyIfAttachRedBytes are
+--     always zero.
+--
+-- rateLimitRule:
+--     juniPolicyIfAttachStatsGreenPackets and juniPolicyIfAttachGreenBytes
+--     represent the number of packets and bytes policed by the rate limit rule
+--     committed action.
+--
+--     juniPolicyIfAttachStatsYellowPackets and juniPolicyIfAttachYellowBytes
+--     represent the number of packets and bytes policed by the rate limit rule
+--     conformed action.
+--
+--     juniPolicyIfAttachStatsRedPackets and juniPolicyIfAttachRedBytes
+--     represent the number of packets and bytes policed by the rateLimitRule
+--     exceeded action.
+--
+-- markingRule:
+--     juniPolicyIfAttachStatsGreenPackets and juniPolicyIfAttachGreenBytes
+--     represent the number of packets and bytes marked by the marking rule.
+--
+--     juniPolicyIfAttachStatsYellowPackets, juniPolicyIfAttachYellowBytes,
+--     juniPolicyIfAttachStatsRedPackets, and juniPolicyIfAttachRedBytes are
+--     always zero.
+--
+-- forwardRule:
+--     juniPolicyIfAttachStatsGreenPackets and juniPolicyIfAttachGreenBytes
+--     represent the number of packets and bytes forwarded by the forwardRule.
+--
+--     juniPolicyIfAttachStatsYellowPackets, juniPolicyIfAttachYellowBytes,
+--     juniPolicyIfAttachStatsRedPackets, and juniPolicyIfAttachRedBytes are
+--     always zero.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyIfAttachStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyIfAttachStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry within this obsolete table contains statistics data for an
+        interface/policy rule combination. Interfaces with policies attached
+        and statistics disabled are not represented in this table.  This table
+        became obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyStatistics 2 }
+
+juniPolicyIfAttachStatsEntry OBJECT-TYPE
+    SYNTAX      JuniPolicyIfAttachStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry defines a single statistics entry."
+    INDEX     { juniPolicyIfAttachStatsIfId,
+                juniPolicyIfAttachStatsForwardingType,
+                juniPolicyIfAttachStatsPolicyType,
+                juniPolicyIfAttachStatsPolicyId,
+                juniPolicyIfAttachStatsRulePrec,
+                juniPolicyIfAttachStatsRuleId,
+                juniPolicyIfAttachStatsClaclEntryNumber }
+    ::= { juniPolicyIfAttachStatsTable 1 }
+
+JuniPolicyIfAttachStatsEntry ::= SEQUENCE {
+    juniPolicyIfAttachStatsIfId              InterfaceIndex,
+    juniPolicyIfAttachStatsForwardingType    JuniPolicyForwardingType,
+    juniPolicyIfAttachStatsPolicyType        JuniPolicyAttachmentType,
+    juniPolicyIfAttachStatsPolicyId          Integer32,
+    juniPolicyIfAttachStatsRulePrec          Integer32,
+    juniPolicyIfAttachStatsRuleId            Integer32,
+    juniPolicyIfAttachStatsClaclEntryNumber  Integer32,
+    juniPolicyIfAttachStatsGreenPackets      Counter64,
+    juniPolicyIfAttachStatsYellowPackets     Counter64,
+    juniPolicyIfAttachStatsRedPackets        Counter64,
+    juniPolicyIfAttachStatsGreenBytes        Counter64,
+    juniPolicyIfAttachStatsYellowBytes       Counter64,
+    juniPolicyIfAttachStatsRedBytes          Counter64 }
+
+juniPolicyIfAttachStatsIfId OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The interface ID corresponding to the stats block represented by this
+        row.  This object became obsolete when policy precedence enhancements
+        were made."
+    ::= { juniPolicyIfAttachStatsEntry 1 }
+
+juniPolicyIfAttachStatsForwardingType OBJECT-TYPE
+    SYNTAX      JuniPolicyForwardingType
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The forwarding type for the policy attachment.  This object became
+        obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 2 }
+
+juniPolicyIfAttachStatsPolicyType OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachmentType
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The attachment point for the policy.  This object became obsolete when
+        policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 3 }
+
+juniPolicyIfAttachStatsPolicyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The PolicyTable index of the policy corresponding to the stats block
+        represented by this row.  This object became obsolete when policy
+        precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 4 }
+
+juniPolicyIfAttachStatsRulePrec OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The precedence of the policy rule corresponding to the stats block
+        represented by this row.  This object became obsolete when policy
+        precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 5 }
+
+juniPolicyIfAttachStatsRuleId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The index of the policy rule corresponding to the stats block
+        represented by this row.  This object became obsolete when policy
+        precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 6 }
+
+juniPolicyIfAttachStatsClaclEntryNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The index of the clacl entry number corresponding to the stats block
+        represented by this row.  This object became obsolete when policy
+        precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 7 }
+
+juniPolicyIfAttachStatsGreenPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of green packets policed by the policy rule.  This object
+        became obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 8 }
+
+juniPolicyIfAttachStatsYellowPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of yellow packets policed by the policy rule.  This object
+        became obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 9 }
+
+juniPolicyIfAttachStatsRedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of red packets policed by the policy rule.  This object
+        became obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 10 }
+
+juniPolicyIfAttachStatsGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of green bytes policed by the policy rule.  This object
+        became obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 11 }
+
+juniPolicyIfAttachStatsYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of yellow bytes policed by the policy rule.  This object
+        became obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 12 }
+
+juniPolicyIfAttachStatsRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of red bytes policed by the policy rule.  This object became
+        obsolete when policy precedence enhancements were made."
+    ::= { juniPolicyIfAttachStatsEntry 13 }
+
+juniPolicyIfAttachStats2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPolicyIfAttachStats2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry within this table contains statistics data for an
+        interface/clacl rule combination.  Interfaces with policies attached
+        and statistics disabled are not represented in this table."
+    ::= { juniPolicyStatistics 3 }
+
+juniPolicyIfAttachStats2Entry OBJECT-TYPE
+    SYNTAX      JuniPolicyIfAttachStats2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a single statistics entry."
+    INDEX     { juniPolicyIfAttachStatsIfId2,
+                juniPolicyIfAttachStatsForwardingType2,
+                juniPolicyIfAttachStatsPolicyType2,
+                juniPolicyIfAttachStatsPolicyId2,
+                juniPolicyIfAttachStatsClaclId,
+                juniPolicyIfAttachStatsClaclEntryNumber2 }
+    ::= { juniPolicyIfAttachStats2Table 1 }
+
+JuniPolicyIfAttachStats2Entry ::= SEQUENCE {
+    juniPolicyIfAttachStatsIfId2              InterfaceIndex,
+    juniPolicyIfAttachStatsForwardingType2    JuniPolicyForwardingType,
+    juniPolicyIfAttachStatsPolicyType2        JuniPolicyAttachmentType,
+    juniPolicyIfAttachStatsPolicyId2          Integer32,
+    juniPolicyIfAttachStatsClaclId            Integer32,
+    juniPolicyIfAttachStatsClaclEntryNumber2  Integer32,
+    juniPolicyIfAttachStatsGreenPackets2      Counter64,
+    juniPolicyIfAttachStatsYellowPackets2     Counter64,
+    juniPolicyIfAttachStatsRedPackets2        Counter64,
+    juniPolicyIfAttachStatsGreenBytes2        Counter64,
+    juniPolicyIfAttachStatsYellowBytes2       Counter64,
+    juniPolicyIfAttachStatsRedBytes2          Counter64 }
+
+juniPolicyIfAttachStatsIfId2 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface ID corresponding to the stats block represented by this
+        row."
+    ::= { juniPolicyIfAttachStats2Entry 1 }
+
+juniPolicyIfAttachStatsForwardingType2 OBJECT-TYPE
+    SYNTAX      JuniPolicyForwardingType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The forwarding type for the policy attachment."
+    ::= { juniPolicyIfAttachStats2Entry 2 }
+
+juniPolicyIfAttachStatsPolicyType2 OBJECT-TYPE
+    SYNTAX      JuniPolicyAttachmentType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The attachment point for the policy."
+    ::= { juniPolicyIfAttachStats2Entry 3 }
+
+juniPolicyIfAttachStatsPolicyId2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PolicyTable index of the policy corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfAttachStats2Entry 4 }
+
+juniPolicyIfAttachStatsClaclId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ClaclTable index of the clacl corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfAttachStats2Entry 5 }
+
+juniPolicyIfAttachStatsClaclEntryNumber2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the clacl entry number corresponding to the stats block
+        represented by this row."
+    ::= { juniPolicyIfAttachStats2Entry 6 }
+
+juniPolicyIfAttachStatsGreenPackets2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of green packets policed by the policy rule."
+    ::= { juniPolicyIfAttachStats2Entry 7 }
+
+juniPolicyIfAttachStatsYellowPackets2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of yellow packets policed by the policy rule."
+    ::= { juniPolicyIfAttachStats2Entry 8 }
+
+juniPolicyIfAttachStatsRedPackets2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of red packets policed by the policy rule."
+    ::= { juniPolicyIfAttachStats2Entry 9 }
+
+juniPolicyIfAttachStatsGreenBytes2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of green bytes policed by the policy rule."
+    ::= { juniPolicyIfAttachStats2Entry 10 }
+
+juniPolicyIfAttachStatsYellowBytes2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of yellow bytes policed by the policy rule."
+    ::= { juniPolicyIfAttachStats2Entry 11 }
+
+juniPolicyIfAttachStatsRedBytes2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of red bytes policed by the policy rule."
+    ::= { juniPolicyIfAttachStats2Entry 12 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyConformance OBJECT IDENTIFIER ::= { juniPolicyMIB 2 }
+juniPolicyCompliances OBJECT IDENTIFIER ::= { juniPolicyConformance 1 }
+juniPolicyGroups      OBJECT IDENTIFIER ::= { juniPolicyConformance 2 }
+
+--
+-- compliance statements
+--
+juniPolicyCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement became obsolete when policy
+        traffic shape and color objects were added to the MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPolicyGroup,
+            juniRateLimitControlListGroup,
+            juniClassifierControlListGroup,
+            juniPolicyIfGroup,
+            juniPolicyProfileGroup,
+            juniPolicyStatisticsGroup }
+    ::= { juniPolicyCompliances 1 }                                -- JUNOSe 1.3
+
+juniPolicyCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement was obsolete when policy log rule
+        objects were added to the MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPolicyGroup2,
+            juniRateLimitControlListGroup,
+            juniClassifierControlListGroup,
+            juniPolicyIfGroup,
+            juniPolicyProfileGroup,
+            juniPolicyStatisticsGroup,
+            juniTrafficShapeProfileGroup }
+    ::= { juniPolicyCompliances 2 }                                -- JUNOSe 2.6
+
+juniPolicyCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement became obsolete when policy color
+        rule objects were added, the policy profile table was extended and the
+        policy interface attachement tables were replaced by new versions."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPolicyGroup2,
+            juniRateLimitControlListGroup,
+            juniClassifierControlListGroup,
+            juniPolicyIfGroup,
+            juniPolicyProfileGroup,
+            juniPolicyStatisticsGroup,
+            juniTrafficShapeProfileGroup,
+            juniLogRuleGroup }
+    ::= { juniPolicyCompliances 3 }                                -- JUNOSe 2.8
+
+juniPolicyCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement became obsolete when TCP flag and
+        IP flag classifier control list objects were added and the
+        juniPolicyProfileTable was repalced by the
+        juniPolicyAttachProfileTable."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPolicyGroup2,
+            juniRateLimitControlListGroup,
+            juniClassifierControlListGroup,
+            juniPolicyIfAttachGroup,
+            juniPolicyProfileGroup2,
+            juniPolicyAttachStatisticsGroup,
+            juniTrafficShapeProfileGroup,
+            juniLogRuleGroup }
+    ::= { juniPolicyCompliances 4 }                                -- JUNOSe 3.0
+
+juniPolicyCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement became obsolete when traffic
+        class rule objects and new rate limit objects were added and when the
+        policy shaper capability was moved into the quality of service
+        component."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPolicyBaseGroup,
+            juniClassifierControlListGroup2,
+            juniPolicyIfAttachGroup,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup }
+        GROUP       juniRateLimitGroup
+            DESCRIPTION
+                "The rate limit group is mandatory only for entities that
+                implement rate limit policy management."
+        GROUP       juniTrafficShapeGroup
+            DESCRIPTION
+                "The traffic shape group is mandatory only for entities that
+                implement traffic shape policy management."
+        GROUP       juniLogRuleGroup
+            DESCRIPTION
+                "The log rule group is mandatory only for entities that
+                implement log policy management."
+        GROUP       juniNextHopRulesGroup
+            DESCRIPTION
+                "The next-hop rules group is mandatory only for entities that
+                implement next-hop policy management."
+        GROUP       juniFilterRulesGroup
+            DESCRIPTION
+                "The filter rules group is mandatory only for entities that
+                implement filter policy management."
+        GROUP       juniNextInterfaceRulesGroup
+            DESCRIPTION
+                "The next-interface rules group is mandatory only for entities
+                that implement next-interface policy management."
+        GROUP       juniMarkingRulesGroup
+            DESCRIPTION
+                "The marking rules group is mandatory only for entities that
+                implement marking policy management."
+        GROUP       juniForwardRulesGroup
+            DESCRIPTION
+                "The forward rules group is mandatory only for entities that
+                implement forward policy management."
+        GROUP       juniColorRulesGroup
+            DESCRIPTION
+                "The color rules group is mandatory only for entities that
+                implement color policy management."
+    ::= { juniPolicyCompliances 5 }                                -- JUNOSe 3.2
+
+juniPolicyCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement became obsolete when new forward
+        rules data objects were added."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniPolicyBaseGroup,
+            juniClassifierControlListGroup2,
+            juniPolicyIfAttachGroup,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup }
+        GROUP       juniRateLimitGroup2
+            DESCRIPTION
+                "The rate limit group is mandatory only for entities that
+                implement rate limit policy management."
+        GROUP       juniLogRuleGroup
+            DESCRIPTION
+                "The log rule group is mandatory only for entities that
+                implement log policy management."
+        GROUP       juniNextHopRulesGroup
+            DESCRIPTION
+                "The next-hop rules group is mandatory only for entities that
+                implement next-hop policy management."
+        GROUP       juniFilterRulesGroup
+            DESCRIPTION
+                "The filter rules group is mandatory only for entities that
+                implement filter policy management."
+        GROUP       juniNextInterfaceRulesGroup
+            DESCRIPTION
+                "The next-interface rules group is mandatory only for entities
+                that implement next-interface policy management."
+        GROUP       juniMarkingRulesGroup
+            DESCRIPTION
+                "The marking rules group is mandatory only for entities that
+                implement marking policy management."
+        GROUP       juniForwardRulesGroup
+            DESCRIPTION
+                "The forward rules group is mandatory only for entities that
+                implement forward policy management."
+        GROUP       juniColorRulesGroup
+            DESCRIPTION
+                "The color rules group is mandatory only for entities that
+                implement color policy management."
+        GROUP       juniTrafficClassRulesGroup
+            DESCRIPTION
+                "The traffic class rule group is mandatory only for entities
+                that implement traffic class policy management."
+    ::= { juniPolicyCompliances 6 }                                -- JUNOSe 4.0
+
+juniPolicyCompliance7  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        policy management MIB.  This statement became obsolete due to new policy
+        rule table key."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniPolicyBaseGroup,
+            juniClassifierControlListGroup2,
+            juniPolicyIfAttachGroup,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup }
+        GROUP       juniRateLimitGroup2
+            DESCRIPTION
+                "The rate limit group is mandatory only for entities that
+                implement rate limit policy management."
+        GROUP       juniLogRuleGroup
+            DESCRIPTION
+                "The log rule group is mandatory only for entities that
+                implement log policy management."
+        GROUP       juniNextHopRulesGroup
+            DESCRIPTION
+                "The next-hop rules group is mandatory only for entities that
+                implement next-hop policy management."
+        GROUP       juniFilterRulesGroup
+            DESCRIPTION
+                "The filter rules group is mandatory only for entities that
+                implement filter policy management."
+        GROUP       juniNextInterfaceRulesGroup
+            DESCRIPTION
+                "The next-interface rules group is mandatory only for entities
+                that implement next-interface policy management."
+        GROUP       juniMarkingRulesGroup
+            DESCRIPTION
+                "The marking rules group is mandatory only for entities that
+                implement marking policy management."
+        GROUP       juniForwardRulesGroup2
+            DESCRIPTION
+                "The forward rules group is mandatory only for entities that
+                implement forward policy management."
+        GROUP       juniColorRulesGroup
+            DESCRIPTION
+                "The color rules group is mandatory only for entities that
+                implement color policy management."
+        GROUP       juniTrafficClassRulesGroup
+            DESCRIPTION
+                "The traffic class rule group is mandatory only for entities
+                that implement traffic class policy management."
+    ::= { juniPolicyCompliances 7 }                                -- JUNOSe 5.2
+
+juniPolicyCompliance8  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        policy management MIB. This statement was made obsolete when
+        support for policy sharing was added."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniPolicyBaseGroup2,
+            juniPolicyClaclGrpGroup,
+            juniClassifierControlListGroup3,
+            juniPolicyIfAttachGroup,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup2 }
+        GROUP       juniRateLimitGroup3
+            DESCRIPTION
+                "The rate limit group is mandatory only for entities that
+                implement rate limit policy management."
+        GROUP       juniLogRuleGroup2
+            DESCRIPTION
+                "The log rule group is mandatory only for entities that
+                implement log policy management."
+        GROUP       juniNextHopRulesGroup2
+            DESCRIPTION
+                "The next-hop rules group is mandatory only for entities that
+                implement next-hop policy management."
+        GROUP       juniFilterRulesGroup2
+            DESCRIPTION
+                "The filter rules group is mandatory only for entities that
+                implement filter policy management."
+        GROUP       juniNextInterfaceRulesGroup2
+            DESCRIPTION
+                "The next-interface rules group is mandatory only for entities
+                that implement next-interface policy management."
+        GROUP       juniMarkingRulesGroup2
+            DESCRIPTION
+                "The marking rules group is mandatory only for entities that
+                implement marking policy management."
+        GROUP       juniForwardRulesGroup3
+            DESCRIPTION
+                "The forward rules group is mandatory only for entities that
+                implement forward policy management."
+        GROUP       juniColorRulesGroup2
+            DESCRIPTION
+                "The color rules group is mandatory only for entities that
+                implement color policy management."
+        GROUP       juniTrafficClassRulesGroup2
+            DESCRIPTION
+                "The traffic class rule group is mandatory only for entities
+                that implement traffic class policy management."
+    ::= { juniPolicyCompliances 8 }                                -- JUNOSe 5.3
+
+juniPolicyCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        policy management MIB. This statement was made obsolete when ATM-cell-mode
+        support was added to the policy configuration."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniPolicyBaseGroup2,
+            juniPolicyClaclGrpGroup,
+            juniClassifierControlListGroup3,
+            juniPolicyIfAttachGroup2,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup2 }
+        GROUP       juniRateLimitGroup3
+            DESCRIPTION
+                "The rate limit group is mandatory only for entities that
+                implement rate limit policy management."
+        GROUP       juniLogRuleGroup2
+            DESCRIPTION
+                "The log rule group is mandatory only for entities that
+                implement log policy management."
+        GROUP       juniNextHopRulesGroup2
+            DESCRIPTION
+                "The next-hop rules group is mandatory only for entities that
+                implement next-hop policy management."
+        GROUP       juniFilterRulesGroup2
+            DESCRIPTION
+                "The filter rules group is mandatory only for entities that
+                implement filter policy management."
+        GROUP       juniNextInterfaceRulesGroup2
+            DESCRIPTION
+                "The next-interface rules group is mandatory only for entities
+                that implement next-interface policy management."
+        GROUP       juniMarkingRulesGroup2
+            DESCRIPTION
+                "The marking rules group is mandatory only for entities that
+                implement marking policy management."
+        GROUP       juniForwardRulesGroup3
+            DESCRIPTION
+                "The forward rules group is mandatory only for entities that
+                implement forward policy management."
+        GROUP       juniColorRulesGroup2
+            DESCRIPTION
+                "The color rules group is mandatory only for entities that
+                implement color policy management."
+        GROUP       juniTrafficClassRulesGroup2
+            DESCRIPTION
+                "The traffic class rule group is mandatory only for entities
+                that implement traffic class policy management."
+    ::= { juniPolicyCompliances 9 }                                -- JUNOSe 6.2
+
+juniPolicyCompliance10  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        policy management MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniPolicyBaseGroup3,
+            juniPolicyClaclGrpGroup,
+            juniClassifierControlListGroup3,
+            juniPolicyIfAttachGroup2,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup2 }
+        GROUP       juniRateLimitGroup3
+            DESCRIPTION
+                "The rate limit group is mandatory only for entities that
+                implement rate limit policy management."
+        GROUP       juniLogRuleGroup2
+            DESCRIPTION
+                "The log rule group is mandatory only for entities that
+                implement log policy management."
+        GROUP       juniNextHopRulesGroup2
+            DESCRIPTION
+                "The next-hop rules group is mandatory only for entities that
+                implement next-hop policy management."
+        GROUP       juniFilterRulesGroup2
+            DESCRIPTION
+                "The filter rules group is mandatory only for entities that
+                implement filter policy management."
+        GROUP       juniNextInterfaceRulesGroup2
+            DESCRIPTION
+                "The next-interface rules group is mandatory only for entities
+                that implement next-interface policy management."
+        GROUP       juniMarkingRulesGroup2
+            DESCRIPTION
+                "The marking rules group is mandatory only for entities that
+                implement marking policy management."
+        GROUP       juniForwardRulesGroup3
+            DESCRIPTION
+                "The forward rules group is mandatory only for entities that
+                implement forward policy management."
+        GROUP       juniColorRulesGroup2
+            DESCRIPTION
+                "The color rules group is mandatory only for entities that
+                implement color policy management."
+        GROUP       juniTrafficClassRulesGroup2
+            DESCRIPTION
+                "The traffic class rule group is mandatory only for entities
+                that implement traffic class policy management."
+        GROUP       juniExceptionRulesGroup1
+            DESCRIPTION
+                "The exception rule group is mandatory only for entities
+                that implement exception policy management."
+    ::= { juniPolicyCompliances 10 }                                -- JUNOSe 7.2
+
+
+--
+-- units of conformance
+--
+juniPolicyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyNextIndex,
+
+        juniPolicyRowStatus,
+        juniPolicyAdminState,
+        juniPolicyOperStatus,
+        juniPolicyErrorValue,
+        juniPolicyName,
+        juniPolicyReferenceCount,
+        juniPolicyRuleNextIndex,
+
+        juniPolicyRuleType,
+        juniPolicySuspend,
+        juniPolicyEclipsed,
+
+        juniNextHopRowStatus,
+        juniNextHopIpAddress,
+        juniNextHopClaclId,
+
+        juniFilterRowStatus,
+        juniFilterClaclId,
+
+        juniNextInterfaceRowStatus,
+        juniNextInterfaceId,
+        juniNextInterfaceClaclId,
+        juniNextInterfaceNextHop,
+
+        juniRateLimitRowStatus,
+        juniRateLimitId,
+        juniRateLimitClaclId,
+
+        juniMarkingRowStatus,
+        juniMarkingTOSByte,
+        juniMarkingMask,
+        juniMarkingClaclId,
+
+        juniForwardRowStatus,
+        juniForwardClaclId }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing policies in a Juniper
+        product.  This group became obsolete when policy traffic shape and color
+        objects were added."
+    ::= { juniPolicyGroups 1 }                                     -- JUNOSe 1.3
+
+juniRateLimitControlListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRateLimitProfileNextIndex,
+
+        juniRateLimitProfileRowStatus,
+        juniRateLimitProfileName,
+        juniRateLimitReferenceCount,
+        juniRateLimitCommittedBps,
+        juniRateLimitCommittedBurst,
+        juniRateLimitExceedBps,
+        juniRateLimitExceedBurst,
+        juniRateLimitCommittedAction,
+        juniRateLimitConformedAction,
+        juniRateLimitExceededAction,
+        juniRateLimitCommittedMarkVal,
+        juniRateLimitConformedMarkVal,
+        juniRateLimitExceededMarkVal,
+        juniRateLimitMask }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing rate limit control lists in
+        a Juniper product.  This group became obsolete when it was replaced by
+        the juniRateLimitGroup so that rate limit support could become
+        optional."
+    ::= { juniPolicyGroups 2 }                                     -- JUNOSe 1.3
+
+juniClassifierControlListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniClassifierControlListNextIndex,
+
+        juniClassifierControlListRowStatus,
+        juniClassifierControlListName,
+        juniClassifierControlListReferenceCount,
+        juniClassifierControlListNextElementIndex,
+
+        juniClassifierControlListElemRowStatus,
+        juniClassifierControlListNotSrc,
+        juniClassifierControlListSrc,
+        juniClassifierControlListSrcMask,
+        juniClassifierControlListNotDst,
+        juniClassifierControlListDst,
+        juniClassifierControlListDstMask,
+        juniClassifierControlListNotProtocol,
+        juniClassifierControlListProtocol,
+        juniClassifierControlListTosByte,
+        juniClassifierControlListMask,
+        juniClassifierControlListSrcOperator,
+        juniClassifierControlListSrcFromPort,
+        juniClassifierControlListSrcToPort,
+        juniClassifierControlListDestOperator,
+        juniClassifierControlListDestFromPort,
+        juniClassifierControlListDestToPort,
+        juniClassifierControlListICMPType,
+        juniClassifierControlListICMPCode,
+        juniClassifierControlListIGMPType }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing elements of classifier
+        control lists in a Juniper product.  This group became obsolete when
+        support was added for TCP flag and IP flag control objects."
+    ::= { juniPolicyGroups 3 }                                     -- JUNOSe 1.3
+
+juniPolicyIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyIfRowStatus,
+        juniPolicyIfInputPolicyId,
+        juniPolicyIfOutputPolicyId,
+        juniPolicyIfInputStatsEnable,
+        juniPolicyIfOutputStatsEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing attachment of policies to
+        interfaces in a Juniper product.  This group became obsolete when the
+        juniPolicyIfTable was replaced by the juniPolicyIfAttachTable."
+    ::= { juniPolicyGroups 4 }                                     -- JUNOSe 1.3
+
+juniPolicyProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyProfileRowStatus,
+        juniPolicyProfileInputPolicyId,
+        juniPolicyProfileOutputPolicyId,
+        juniPolicyProfileInputStatsEnable,
+        juniPolicyProfileOutputStatsEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing attachment of policies to
+        dynamic interfaces through profiles in a Juniper product.  This group
+        became obsolete when the juniPolicyProfileLocalInputPolicyId and the
+        juniPolicyProfileLocalInputStatsEnable objects were added."
+    ::= { juniPolicyGroups 5 }                                     -- JUNOSe 1.3
+
+juniPolicyStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyIfStatsGreenPackets,
+        juniPolicyIfStatsYellowPackets,
+        juniPolicyIfStatsRedPackets,
+        juniPolicyIfStatsGreenBytes,
+        juniPolicyIfStatsYellowBytes,
+        juniPolicyIfStatsRedBytes }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing statistics data for an
+        interface/policy rule combination in a Juniper product.  This group
+        became obsolete when the juniPolicyIfStatsTable was replaced by the
+        juniPolicyIfAttachStatsTable."
+    ::= { juniPolicyGroups 6 }                                     -- JUNOSe 1.3
+
+juniPolicyGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyNextIndex,
+
+        juniPolicyRowStatus,
+        juniPolicyAdminState,
+        juniPolicyOperStatus,
+        juniPolicyErrorValue,
+        juniPolicyName,
+        juniPolicyReferenceCount,
+        juniPolicyRuleNextIndex,
+
+        juniPolicyRuleType,
+        juniPolicySuspend,
+        juniPolicyEclipsed,
+
+        juniNextHopRowStatus,
+        juniNextHopIpAddress,
+        juniNextHopClaclId,
+
+        juniFilterRowStatus,
+        juniFilterClaclId,
+
+        juniNextInterfaceRowStatus,
+        juniNextInterfaceId,
+        juniNextInterfaceClaclId,
+        juniNextInterfaceNextHop,
+
+        juniRateLimitRowStatus,
+        juniRateLimitId,
+        juniRateLimitClaclId,
+
+        juniMarkingRowStatus,
+        juniMarkingTOSByte,
+        juniMarkingMask,
+        juniMarkingClaclId,
+
+        juniForwardRowStatus,
+        juniForwardClaclId,
+
+        juniTrafficShapeRowStatus,
+        juniTrafficShapeId,
+
+        juniColorRowStatus,
+        juniColor,
+        juniColorClaclId }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing policies in a Juniper
+        product.  This group became obsolete when the specific rules objects
+        were broken out into separte groups."
+    ::= { juniPolicyGroups 7 }                                     -- JUNOSe 2.6
+
+juniTrafficShapeProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTrafficShapeProfileNextIndex,
+        juniTrafficShapeProfileRowStatus,
+        juniTrafficShapeProfileName,
+        juniTrafficShapeReferenceCount,
+        juniTrafficShapeRate,
+        juniTrafficShapeBurst }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for traffic shaping data for a policy
+        rule in a Juniper product.  This group became obsolete when it was
+        combined with the traffic shape policy rules objects."
+    ::= { juniPolicyGroups 8 }                                     -- JUNOSe 2.6
+
+juniLogRuleGroup  OBJECT-GROUP
+    OBJECTS {
+        juniLogRowStatus,
+        juniLogClaclId }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for log data for a policy rule in a
+        Juniper product.  This group is deprecated due to a new policy rule
+        table key."
+    ::= { juniPolicyGroups 9 }                                     -- JUNOSe 2.8
+
+juniPolicyIfAttachGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyIfAttachRowStatus,
+        juniPolicyIfAttachPolicyId,
+        juniPolicyIfAttachStatsEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects for managing attachment of policies to
+        interfaces in a Juniper product. This group statement was made 
+        obsolete when support for policy sharing was added."
+    ::= { juniPolicyGroups 10 }                                    -- JUNOSe 3.0
+
+juniPolicyProfileGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyProfileRowStatus,
+        juniPolicyProfileInputPolicyId,
+        juniPolicyProfileOutputPolicyId,
+        juniPolicyProfileInputStatsEnable,
+        juniPolicyProfileOutputStatsEnable,
+        juniPolicyProfileLocalInputPolicyId,
+        juniPolicyProfileLocalInputStatsEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing attachment of policies to
+        dynamic interfaces through profiles.  This group became obsolete when
+        the juniPolicyProfileTable was replaced by the
+        juniPolicyAttachProfileTable."
+    ::= { juniPolicyGroups 11 }                                    -- JUNOSe 3.0
+
+juniPolicyAttachStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyIfAttachStatsGreenPackets,
+        juniPolicyIfAttachStatsYellowPackets,
+        juniPolicyIfAttachStatsRedPackets,
+        juniPolicyIfAttachStatsGreenBytes,
+        juniPolicyIfAttachStatsYellowBytes,
+        juniPolicyIfAttachStatsRedBytes }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing statistics data for an
+        interface/policy rule combination in a Juniper product."
+    ::= { juniPolicyGroups 12 }                                    -- JUNOSe 3.0
+
+juniClassifierControlListGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniClassifierControlListNextIndex,
+
+        juniClassifierControlListRowStatus,
+        juniClassifierControlListName,
+        juniClassifierControlListReferenceCount,
+        juniClassifierControlListNextElementIndex,
+
+        juniClassifierControlListElemRowStatus,
+        juniClassifierControlListNotSrc,
+        juniClassifierControlListSrc,
+        juniClassifierControlListSrcMask,
+        juniClassifierControlListNotDst,
+        juniClassifierControlListDst,
+        juniClassifierControlListDstMask,
+        juniClassifierControlListNotProtocol,
+        juniClassifierControlListProtocol,
+        juniClassifierControlListTosByte,
+        juniClassifierControlListMask,
+        juniClassifierControlListSrcOperator,
+        juniClassifierControlListSrcFromPort,
+        juniClassifierControlListSrcToPort,
+        juniClassifierControlListDestOperator,
+        juniClassifierControlListDestFromPort,
+        juniClassifierControlListDestToPort,
+        juniClassifierControlListICMPType,
+        juniClassifierControlListICMPCode,
+        juniClassifierControlListIGMPType,
+        juniClassifierControlListTcpFlagsValue,
+        juniClassifierControlListTcpFlagsMask,
+        juniClassifierControlListIpFlagsValue,
+        juniClassifierControlListIpFlagsMask,
+        juniClassifierControlListIpFragValue }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects for managing elements of classifier
+        control lists in a Juniper product."
+    ::= { juniPolicyGroups 13 }                                    -- JUNOSe 3.2
+
+juniPolicyAttachProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyAttachProfileRowStatus,
+        juniPolicyAttachProfilePolicyId,
+        juniPolicyAttachProfileStatsEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing attachment of policies to dynamic
+        interfaces through profiles."
+    ::= { juniPolicyGroups 14 }
+
+juniPolicyBaseGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyNextIndex,
+
+        juniPolicyRowStatus,
+        juniPolicyAdminState,
+        juniPolicyOperStatus,
+        juniPolicyErrorValue,
+        juniPolicyName,
+        juniPolicyReferenceCount,
+        juniPolicyRuleNextIndex,
+
+        juniPolicyRuleType,
+        juniPolicySuspend,
+        juniPolicyEclipsed }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of basic objects for managing policies in a Juniper
+        product.  This group became obsolete when oper status and error value
+        objects were removed."
+    ::= { juniPolicyGroups 15 }                                    -- JUNOSe 3.2
+
+juniNextHopRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNextHopRowStatus,
+        juniNextHopIpAddress,
+        juniNextHopClaclId }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing next-hop policy rules
+        in a Juniper product.  This group is deprecated due to a new policy rule
+        table key."
+    ::= { juniPolicyGroups 16 }                                    -- JUNOSe 3.2
+
+juniFilterRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniFilterRowStatus,
+        juniFilterClaclId }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing filter policy rules in
+        a Juniper product.  This group is deprecated due to a new policy rule
+        table key."
+    ::= { juniPolicyGroups 17 }                                    -- JUNOSe 3.2
+
+juniNextInterfaceRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNextInterfaceRowStatus,
+        juniNextInterfaceId,
+        juniNextInterfaceClaclId,
+        juniNextInterfaceNextHop }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing next-interface policy
+        rules in a Juniper product.  This group is deprecated due to a new
+        policy rule table key."
+    ::= { juniPolicyGroups 18 }                                    -- JUNOSe 3.2
+
+juniRateLimitGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRateLimitRowStatus,
+        juniRateLimitId,
+        juniRateLimitClaclId,
+
+        juniRateLimitProfileNextIndex,
+
+        juniRateLimitProfileRowStatus,
+        juniRateLimitProfileName,
+        juniRateLimitReferenceCount,
+        juniRateLimitCommittedBps,
+        juniRateLimitCommittedBurst,
+        juniRateLimitExceedBps,
+        juniRateLimitExceedBurst,
+        juniRateLimitCommittedAction,
+        juniRateLimitConformedAction,
+        juniRateLimitExceededAction,
+        juniRateLimitCommittedMarkVal,
+        juniRateLimitConformedMarkVal,
+        juniRateLimitExceededMarkVal,
+        juniRateLimitMask }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing rate limit policy rules and
+        profile lists in a Juniper product.  This group became obsolete when new
+        rate limit profile objects were added."
+    ::= { juniPolicyGroups 19 }                                    -- JUNOSe 3.2
+
+juniMarkingRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniMarkingRowStatus,
+        juniMarkingTOSByte,
+        juniMarkingMask,
+        juniMarkingClaclId }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing policy rules for
+        marking in a Juniper product.  This group is deprecated due to a new
+        policy rule table key."
+    ::= { juniPolicyGroups 20 }                                    -- JUNOSe 3.2
+
+juniForwardRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniForwardRowStatus,
+        juniForwardClaclId }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing forward policy rules in a
+        Juniper product.  This group became obsolete when new forward rule data
+        objects were added."
+    ::= { juniPolicyGroups 21 }                                    -- JUNOSe 3.2
+
+juniTrafficShapeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTrafficShapeRowStatus,
+        juniTrafficShapeId,
+
+        juniTrafficShapeProfileNextIndex,
+
+        juniTrafficShapeProfileRowStatus,
+        juniTrafficShapeProfileName,
+        juniTrafficShapeReferenceCount,
+        juniTrafficShapeRate,
+        juniTrafficShapeBurst }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing traffic shape policy rules
+        and profile lists in a Juniper product.  This group became obsolete when
+        the policy shaper capability was moved into the quality of service
+        component."
+    ::= { juniPolicyGroups 22 }                                    -- JUNOSe 3.2
+
+juniColorRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniColorRowStatus,
+        juniColor,
+        juniColorClaclId }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing color policy rules in a
+        Juniper product.  This group is deprecated due to a new policy rule
+        table key."
+    ::= { juniPolicyGroups 23 }                                    -- JUNOSe 3.2
+
+juniTrafficClassRulesGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTrafficClassRowStatus,
+        juniTrafficClassId,
+        juniTrafficClassClaclId }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing traffic class policy
+        rules in a Juniper product.  This group is deprecated due to a new
+        policy rule table key."
+    ::= { juniPolicyGroups 24 }                                    -- JUNOSe 4.0
+
+juniRateLimitGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniRateLimitRowStatus,
+        juniRateLimitId,
+        juniRateLimitClaclId,
+
+        juniRateLimitProfileNextIndex,
+
+        juniRateLimitProfileRowStatus,
+        juniRateLimitProfileName,
+        juniRateLimitProfileType,
+        juniRateLimitReferenceCount,
+        juniRateLimitCommittedBps,
+        juniRateLimitCommittedBurst,
+        juniRateLimitExceedBps,
+        juniRateLimitExceedBurst,
+        juniRateLimitExcessBurst,
+        juniRateLimitCommittedAction,
+        juniRateLimitConformedAction,
+        juniRateLimitExceededAction,
+        juniRateLimitCommittedMarkVal,
+        juniRateLimitConformedMarkVal,
+        juniRateLimitExceededMarkVal,
+        juniRateLimitMask }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing rate limit policy rules
+        and profile lists in a Juniper product.  This group is deprecated due to
+        a new policy rule table key."
+    ::= { juniPolicyGroups 25 }                                    -- JUNOSe 4.0
+
+juniForwardRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniForwardRowStatus,
+        juniForwardClaclId,
+        juniForwardNextInterfaceId,
+        juniForwardNextHop,
+        juniForwardRouterId,
+        juniForwardOrder,
+        juniForwardIgnoreDefaultRoute }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated collection of objects for managing forward policy rules in
+        a Juniper product.  This group is deprecated due to a new policy rule
+        table key."
+    ::= { juniPolicyGroups 26 }                                    -- JUNOSe 5.2
+
+juniNextHopRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniNextHopRowStatus2,
+        juniNextHopIpAddress2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing next-hop policy rules in a Juniper
+        product."
+    ::= { juniPolicyGroups 27 }                                    -- JUNOSe 5.3
+
+juniFilterRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniFilterRowStatus2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing filter policy rules in a Juniper
+        product."
+    ::= { juniPolicyGroups 28 }                                    -- JUNOSe 5.3
+
+juniNextInterfaceRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniNextInterfaceRowStatus2,
+        juniNextInterfaceId2,
+        juniNextInterfaceNextHop2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing next-interface policy rules in a
+        Juniper product."
+    ::= { juniPolicyGroups 29 }                                    -- JUNOSe 5.3
+
+juniMarkingRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniMarkingRowStatus2,
+        juniMarkingTOSByte2,
+        juniMarkingMask2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing policy rules for marking in a
+        Juniper product."
+    ::= { juniPolicyGroups 30 }                                    -- JUNOSe 5.3
+
+juniColorRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniColorRowStatus2,
+        juniColor2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing color policy rules in a Juniper
+        product."
+    ::= { juniPolicyGroups 31 }                                    -- JUNOSe 5.3
+
+juniTrafficClassRulesGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniTrafficClassRowStatus2,
+        juniTrafficClassId2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing traffic class policy rules in a
+        Juniper product."
+    ::= { juniPolicyGroups 32 }                                    -- JUNOSe 5.3
+
+juniRateLimitGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniRateLimitRowStatus2,
+        juniRateLimitId2,
+
+        juniRateLimitProfileNextIndex,
+
+        juniRateLimitProfileRowStatus,
+        juniRateLimitProfileName,
+        juniRateLimitProfileType,
+        juniRateLimitReferenceCount,
+        juniRateLimitCommittedBps,
+        juniRateLimitCommittedBurst,
+        juniRateLimitExceedBps,
+        juniRateLimitExceedBurst,
+        juniRateLimitExcessBurst,
+        juniRateLimitCommittedAction,
+        juniRateLimitConformedAction,
+        juniRateLimitExceededAction,
+        juniRateLimitCommittedMarkVal,
+        juniRateLimitConformedMarkVal,
+        juniRateLimitExceededMarkVal,
+        juniRateLimitMask }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing rate limit policy rules and
+        profile lists in a Juniper product."
+    ::= { juniPolicyGroups 33 }                                    -- JUNOSe 5.3
+
+juniPolicyClaclGrpGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyClassifierGroupRowStatus,
+        juniPolicyClassifierGroupPrecedence }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing policy classifier groups in a
+        Juniper product."
+    ::= { juniPolicyGroups 34 }                                    -- JUNOSe 5.3
+
+juniPolicyBaseGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyNextIndex,
+
+        juniPolicyRowStatus,
+        juniPolicyAdminState,
+        juniPolicyName,
+        juniPolicyReferenceCount,
+        juniPolicyRuleNextIndex,
+
+        juniPolicyRuleType2,
+        juniPolicySuspend2 }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of basic objects for managing policies in a Juniper
+        product.  This group was made obsolete when ATM-cell-mode
+        support was added to the policy configuration."
+    ::= { juniPolicyGroups 35 }                                    -- JUNOSe 5.3
+
+juniForwardRulesGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniForwardRowStatus2,
+        juniForwardNextInterfaceId2,
+        juniForwardNextHop2,
+        juniForwardRouterId2,
+        juniForwardOrder2,
+        juniForwardIgnoreDefaultRoute2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing forward policy rules in a Juniper
+        product."
+    ::= { juniPolicyGroups 36 }                                    -- JUNOSe 5.3
+
+juniLogRuleGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniLogRowStatus2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for log data for a policy rule in a Juniper
+        product."
+    ::= { juniPolicyGroups 37 }                                    -- JUNOSe 5.3
+
+juniPolicyAttachStatisticsGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyIfAttachStatsGreenPackets2,
+        juniPolicyIfAttachStatsYellowPackets2,
+        juniPolicyIfAttachStatsRedPackets2,
+        juniPolicyIfAttachStatsGreenBytes2,
+        juniPolicyIfAttachStatsYellowBytes2,
+        juniPolicyIfAttachStatsRedBytes2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing statistics data for an
+        interface/policy rule combination in a Juniper product."
+    ::= { juniPolicyGroups 38 }                                    -- JUNOSe 5.3
+
+juniClassifierControlListGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniClassifierControlListNextIndex,
+
+        juniClassifierControlListRowStatus,
+        juniClassifierControlListName,
+        juniClassifierControlListReferenceCount,
+        juniClassifierControlListNextElementIndex,
+
+        juniClassifierControlListElemRowStatus,
+        juniClassifierControlListNotSrc,
+        juniClassifierControlListSrc,
+        juniClassifierControlListSrcMask,
+        juniClassifierControlListNotDst,
+        juniClassifierControlListDst,
+        juniClassifierControlListDstMask,
+        juniClassifierControlListNotProtocol,
+        juniClassifierControlListProtocol,
+        juniClassifierControlListTosByte,
+        juniClassifierControlListMask,
+        juniClassifierControlListLocal,
+        juniClassifierControlListLocalPresent,
+        juniClassifierControlListSaRouteClass,
+        juniClassifierControlListSaRouteClassPresent,
+        juniClassifierControlListDaRouteClass,
+        juniClassifierControlListDaRouteClassPresent,
+        juniClassifierControlListSrcOperator,
+        juniClassifierControlListSrcFromPort,
+        juniClassifierControlListSrcToPort,
+        juniClassifierControlListDestOperator,
+        juniClassifierControlListDestFromPort,
+        juniClassifierControlListDestToPort,
+        juniClassifierControlListICMPType,
+        juniClassifierControlListICMPCode,
+        juniClassifierControlListIGMPType,
+        juniClassifierControlListTcpFlagsValue,
+        juniClassifierControlListTcpFlagsMask,
+        juniClassifierControlListIpFlagsValue,
+        juniClassifierControlListIpFlagsMask,
+        juniClassifierControlListIpFragValue }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing elements of classifier control
+        lists in a Juniper product."
+    ::= { juniPolicyGroups 39 }                                    -- JUNOSe 5.3
+
+juniPolicyIfAttachGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyIfAttachRowStatus,
+        juniPolicyIfAttachPolicyId,
+        juniPolicyIfAttachStatsEnable,
+	juniPolicyIfAttachStatsPreserve }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing attachment of policies to
+        interfaces in a Juniper product."
+    ::= { juniPolicyGroups 40 }                                    -- JUNOSe 6.2
+
+juniExceptionRulesGroup1  OBJECT-GROUP
+    OBJECTS {
+        juniExceptionRowStatus,
+        juniExceptionApplication }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing exception policy rules in a
+        Juniper product."
+    ::= { juniPolicyGroups 41 }                                    -- JUNOSe 7.1
+
+juniPolicyBaseGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPolicyNextIndex,
+
+        juniPolicyRowStatus,
+        juniPolicyAdminState,
+        juniPolicyName,
+        juniPolicyReferenceCount,
+        juniPolicyRuleNextIndex,
+
+        juniPolicyRuleType2,
+        juniPolicySuspend2,
+        juniPolicyAtmCellModeEnable  }
+    STATUS      current
+    DESCRIPTION
+        "A collection of basic objects for managing policies in a Juniper
+        product."
+    ::= { juniPolicyGroups 42 }                                    -- JUNOSe 7.2
+
+
+END

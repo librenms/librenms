@@ -1,0 +1,217 @@
+NBS-TRAPCONTROL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB;
+
+nbsTrapControlMib  MODULE-IDENTITY
+    LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "MIB to specify which SNMP Notifications (Traps) are supported,
+       and for which interfaces (ports) each should be sent."
+    ::= { nbs 209 }
+
+-- *******************************************************************
+-- NBS-TRAPCONTROL-MIB local defines
+-- *******************************************************************
+
+nbsTrapListGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "List of SNMP Notifications (Traps) emitted by Agent"
+    ::= { nbsTrapControlMib 1 }
+
+nbsTrapIfGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "List of interfaces managed by Agent"
+    ::= { nbsTrapControlMib 2 }
+
+
+-- *******************************************************************
+--
+-- the nbsTrapListGrp
+--
+-- *******************************************************************
+
+nbsTrapListTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsTrapListTable."
+        ::= { nbsTrapListGrp 1 }
+
+nbsTrapListTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsTrapListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A table to list SNMP Notifications emitted by Agent"
+        ::= { nbsTrapListGrp 2 }
+
+nbsTrapListEntry      OBJECT-TYPE
+        SYNTAX      NbsTrapListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Describes a particular SNMP Notification/Trap."
+        INDEX { nbsTrapListIndex }
+        ::= { nbsTrapListTable 1 }
+
+NbsTrapListEntry ::= SEQUENCE {
+        nbsTrapListIndex             Unsigned32,
+        nbsTrapListTrapMib           DisplayString,
+        nbsTrapListTrapName          DisplayString,
+        nbsTrapListTrapDescription   DisplayString,
+        nbsTrapListTrapOID           DisplayString
+}
+
+nbsTrapListIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Agent-generated unique ID.  Numbering is contiguous
+           and starts from 1."
+        ::= { nbsTrapListEntry 1 }
+
+nbsTrapListTrapMib OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The name of the mib where this SNMP Notification is
+           defined.  An example would be IF-MIB."
+        ::= { nbsTrapListEntry 2 }
+
+nbsTrapListTrapName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..50))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Trap Name; the name given in the NOTIFICATION-TYPE
+           definition. An example would be linkUp"
+        ::= { nbsTrapListEntry 3 }
+
+nbsTrapListTrapDescription OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..100))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Brief explanation of this SNMP Notification.  Agent
+           may use the first 100 characters of the DESCRIPTION
+           clause from the Notification's MIB definition."
+        ::= { nbsTrapListEntry 4 }
+
+nbsTrapListTrapOID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..100))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Concatenation of the enterprise and the specific-trap number
+           used in the SNMPv1 trap PDU"
+        ::= { nbsTrapListEntry 5 }
+
+-- *******************************************************************
+--
+-- the nbsTrapIfGrp
+--
+-- *******************************************************************
+
+
+nbsTrapIfTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsTrapIfTable."
+        ::= { nbsTrapIfGrp 1 }
+
+nbsTrapIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsTrapIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A list of all interfaces managed by Agent, and which traps
+           to send for each."
+        ::= { nbsTrapIfGrp 2 }
+
+nbsTrapIfEntry      OBJECT-TYPE
+        SYNTAX      NbsTrapIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Indicates traps for a particular interface."
+        INDEX { nbsTrapIfIndex }
+        ::= { nbsTrapIfTable 1 }
+
+NbsTrapIfEntry ::= SEQUENCE {
+        nbsTrapIfIndex        InterfaceIndex,
+        nbsTrapIfTrapsCaps    OCTET STRING,
+        nbsTrapIfTrapsSelect  OCTET STRING
+}
+
+nbsTrapIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The ifIndex from the Mib2 ifTable."
+        ::= { nbsTrapIfEntry 1 }
+
+nbsTrapIfTrapsCaps OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Bitmask indicating which SNMP Notifications are supported
+           for this interface.
+
+           Bit 0 is reserved.
+
+           Subsequent bits refer to the nbsTrapListTable.  Bit 1
+           corresponds to the first table entry, Bit 2 to the second
+           entry, and so on.
+
+           A bit is set (1) if that SNMP Notification can be sent for
+           this interface, and cleared (0) if unavailable.
+
+           OCTET STRING bitmasks count the leftmost bit (MSB) as 0."
+        ::= { nbsTrapIfEntry 2 }
+
+nbsTrapIfTrapsSelect OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Bitmask administrating which SNMP Notifications should be
+           sent for this interface.
+
+           Bit 0 is reserved.
+
+           Subsequent bits refer to the nbsTrapListTable.  Bit 1
+           corresponds to the first table entry, Bit 2 to the second
+           entry, and so on.
+
+           A bit is set (1) if that SNMP Notification should be
+           emitted for this interface, and cleared (0) if it should be
+           suppressed.
+
+           OCTET STRING bitmasks count the leftmost bit (MSB) as 0."
+        ::= { nbsTrapIfEntry 3 }
+
+END

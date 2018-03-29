@@ -1,0 +1,62 @@
+CTRON-DCM-MIB DEFINITIONS ::= BEGIN
+
+--    Cabletron Systems, Inc.
+--     35 Industrial Way, P.O. Box 5005
+--     Rochester, NH 03867-0505
+--     (603) 332-9400
+--     support@ctron.com
+--  Descr
+--    ctron-dcm-mib.txt
+--    Revision: 1.00.00
+--    Part Number:
+--    Date: October 3, 1997
+
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages. Copyright Cabletron Systems 1996
+--
+--
+-- This MIB allows a user to determine if a module is in standalone or
+-- distributed mode, and to change the mode.
+
+
+IMPORTS
+ OBJECT-TYPE             FROM RFC-1212
+ ctDcm                   FROM CTRON-MIB-NAMES;
+
+
+-- cabletron      OBJECT IDENTIFIER ::= { enterprises 52}
+-- mibs           OBJECT IDENTIFIER ::= { cabletron 4 }
+-- ctron          OBJECT IDENTIFIER ::= { mibs 1 }
+-- ctDcm          OBJECT IDENTIFIER ::= { ctron 6 }
+
+-- DCM is the parent branch of a group of mibs related to
+-- distributed chassis management, of which Dcm is the first. 
+
+dCM               OBJECT IDENTIFIER ::= { ctDcm 1 }
+
+dCMMode OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "A value which indicates whether this module supports
+            a view chassis-wide of management information, accessed
+            via chassis-ip. This MIB view is actually composed of
+            information which is distributed between modules within
+            the chassis but is able to be viewed as a collective whole.
+            When a module is in standalone mode, it only supports
+            original, module-level mibs. In distributed mode, the
+            module will operate in conjunction with other distributed
+            modules to share management information and present it to
+            management clients through the chassis ip.
+
+                0 = STANDALONE
+                1 = DISTRIBUTED
+            "
+    ::= { dCM 1 }
+ 
+END

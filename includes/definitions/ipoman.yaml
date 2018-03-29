@@ -1,0 +1,12 @@
+os: ipoman
+text: 'Ingrasys iPoMan'
+type: power
+icon: ingrasys
+mib_dir:
+    - ingrasys
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_power, text: Power }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2468.1.4.2.1

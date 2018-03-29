@@ -1,0 +1,100 @@
+-- *****************************************************************
+-- NMS-SMI.my:  NMS Enterprise Structure of Management Information
+--
+-- June 2000
+-- December 2010 PBN V2
+-- *****************************************************************
+
+NMS-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS   
+
+    OBJECT-IDENTITY,
+ 		FROM SNMPv2-SMI
+ 	
+ 	pbn
+       FROM PBN-ROOT;	
+	
+
+nms OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"nms Products is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned."
+	::= { pbn 10}	
+
+
+
+nmsProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"nms Products is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned."
+	::= { nms 1 }
+
+nmslocal OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 MIBS were built."
+	::= { nms 2 }
+	
+nmstemporary OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 experiments were
+		placed."
+	::= { nms 3 }
+	
+nmsMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"nmsMgmt is the main subtree for new mib development."
+	::= { nms 9 }  
+nmsModules OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"nmsModules provides a root object identifier
+		from which MODULE-IDENTITY values may be assigned."
+	::= { nms 12 } 
+nmsPolicyAuto OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "nmsPolicyAuto is the root of the nms-assigned
+                OID subtree for OIDs which are automatically assigned
+                for use in Policy Management."
+         ::= { nms 18 }
+
+--  Note that 1.3.6.1.4.1.9.18.1 is currently unassigned
+
+nmsPibToMib OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "nmsPibToMib is the root of the nms-assigned
+                OID subtree for MIBs which are algorithmically
+                generated/translated from nms PIBs with OIDs
+                assigned under the nmsPIB subtree.
+                These generated MIBs allow management
+                entities (other the current Policy Server) to
+                read the downloaded policy.  By convention, for PIB
+                'nmsPIB.x', the generated MIB shall have the
+                name 'nmsPibToMib.x'."
+         ::= { nmsPolicyAuto 2 }
+
+nmsWorkGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"nmsWorkGroup is the main subtree for new mib development categorized by module function."
+	::= { nms 20 }   
+	
+	
+nmsEPONGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"nmsEPONGroup is the main subtree for new epon mib ."
+	::= { nms 101 }   
+	
+
+
+
+END
+

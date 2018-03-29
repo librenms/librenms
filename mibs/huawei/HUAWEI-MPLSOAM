@@ -1,0 +1,923 @@
+-- ==================================================================
+-- Copyright (C) 2005 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI Layer Two MAC management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- ==================================================================
+-- HUAWEI-MPLSOAM-MIB.mib
+-- ==================================================================
+-- 
+-- Variables and types to be imported
+--
+-- ==================================================================
+
+	HUAWEI-MPLSOAM-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hwMpls			
+				FROM HUAWEI-MIB			
+			IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, 
+			NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI
+			DisplayString, TruthValue, TimeStamp, RowStatus, TEXTUAL-CONVENTION       
+				FROM SNMPv2-TC;
+	
+	
+--  1.3.6.1.4.1.2011.5.12.7
+-- April 27, 2005 at 17:24 GMT
+		-- 1.3.6.1.4.1.2011.5.12.7
+		hwMplsOam MODULE-IDENTITY 
+			LAST-UPDATED "200504271724Z"		-- April 27, 2005 at 17:24 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co., Ltd."
+			CONTACT-INFO 
+			    "R&D BeiJing, Huawei Technologies co.,Ltd.
+            	Huawei Bld.,NO.3 Xinxi Rd., 
+            	Shang-Di Information Industry Base,
+            	Hai-Dian District Beijing P.R. China
+            	Zip:100085 
+            	Http://www.huawei.com                                       
+            	E-mail:support@huawei.com"
+			DESCRIPTION 
+				"The HUAWEI-MPLSOAM-MIB contains objects to configure OAM module. 
+				The Operation, Administration and Maintenance (OAM) 
+				is an effective means for decreasing the cost of network maintenance. 
+				The MPLS OAM is used to administrate and maintain MPLS.  "		
+			::= { hwMpls 7 }
+
+		
+	
+--
+-- Node definitions
+--
+	
+--  Node definitions
+-- 
+-- 1.3.6.1.4.1.2011.5.12.7.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1
+		hwMplsOamPs OBJECT IDENTIFIER ::= { hwMplsOam 1 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1
+		hwMplsOamObjects OBJECT IDENTIFIER ::= { hwMplsOamPs 1 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.1
+		hwMplsOamCapability OBJECT-TYPE
+			SYNTAX Unsigned32 (0..1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Whether OAM is globally capable.
+				1: capable;
+				0: incapable;
+				The default value is incapable."
+			::= { hwMplsOamObjects 1 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.2
+		hwMplsOamIgrTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwMplsOamIgrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table specifies per-LSP MPLS OAM capability and 
+				associated information, such as IgrTunnName and IgrDetType."
+			::= { hwMplsOamObjects 2 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1
+		hwMplsOamIgrEntry OBJECT-TYPE
+			SYNTAX HwMplsOamIgrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in this table is created by an LSR for every LSP
+				capable of supporting MPLS OAM at ingress."
+			INDEX { hwMplsOamIgrIndex }
+			::= { hwMplsOamIgrTable 1 }
+
+		
+		HwMplsOamIgrEntry ::=
+			SEQUENCE { 
+				hwMplsOamIgrIndex
+					Unsigned32,
+				hwMplsOamIgrTunnName
+					OCTET STRING,
+				hwMplsOamIgrDetType
+					INTEGER,
+				hwMplsOamIgrDetFreq
+					INTEGER,
+				hwMplsOamIgrRevType
+					INTEGER,
+				hwMplsOamIgrRevLspName
+					OCTET STRING,
+				hwMplsOamIgrRevLsrId
+					IpAddress,
+				hwMplsOamIgrRevSessTunnId
+					Integer32,
+				hwMplsOamIgrEnable
+					INTEGER,
+				hwMplsOamIgrValid
+					Integer32,
+				hwMplsOamIgrAvaState
+					Integer32,
+				hwMplsOamIgrDefectType
+					Integer32,
+				hwMplsOamIgrRowStatus
+					RowStatus
+			 }
+
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.1
+		hwMplsOamIgrIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This is a unique index for an OAM ingress entry in the OAM table."
+			::= { hwMplsOamIgrEntry 1 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.6
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.2
+		hwMplsOamIgrTunnName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The name of a tunnel.
+				For ingress, it means the tunnel name of the detected LSP.
+				For egress, it means the tunnel name of the reverse LSP."
+			::= { hwMplsOamIgrEntry 2 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.3
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.3
+		hwMplsOamIgrDetType OBJECT-TYPE     
+			SYNTAX INTEGER {                                            
+			           cv(1),
+                       ffd(2)
+            }
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"There are two types of OAM packets, CV and FFD.
+				The CV flow is generated at the source LSR of the LSP with
+				a nominal frequency of 1/s and terminated at the sink LSR of the LSP.
+				FFD provides failure detection option for an LSP independent 
+				of the CV based availability model and is not tied to the 
+				CV insertion rate. Insertion rates at 1/s or faster may 
+				also be used.
+				The CV/FFD packet contains a network-unique identifier (TTSI) 
+				so that all types of defects can be detected.    
+				1: CV;
+				2: FFD."
+			::= { hwMplsOamIgrEntry 3 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.4
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.4
+		hwMplsOamIgrDetFreq OBJECT-TYPE
+			SYNTAX INTEGER {                   
+			    cv1000ms(0),                     
+				ffd10ms2(1),           
+				ffd20ms3(2),
+				ffd50ms4(3),
+				ffd100ms5(4),
+				ffd200ms6(5),
+				ffd500ms7(6),
+				ffd3ms8(7)           
+			}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"For CV: the frequency is static, per second.
+				For FFD: the frequency is set by user. The value 
+				can be 10ms, 20ms, 50ms,100ms,200ms,500ms,3ms.
+				Any other frequency is wrong.
+				0: 1000ms(only for cv);
+				1: 10ms;
+				2: 20ms;
+				3: 50ms;
+				4: 100ms;
+				5: 200ms;
+				6: 500ms;
+				7: 3ms."
+			::= { hwMplsOamIgrEntry 4 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.5
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.5
+		hwMplsOamIgrRevType OBJECT-TYPE
+			SYNTAX INTEGER {  
+			     private(1),
+			     share(2)
+			}   		
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"When an LSP is found to be in defect, the sink LSR if the LSP
+				should send BDI to inform the source LSR of the LSP, the BDI is 
+				transferred through the reverse LSP.
+				The type of reverse LSP can be private or shared.
+				If private, then the reverse LSP can be used only when the only 
+				LSP is in defect;
+				If shared, the reverse LSP which is shared between many forward 
+				LSPs, whose source LSRs are the same and sink LSRs are the same.
+				1: private;
+				2: share."
+			::= { hwMplsOamIgrEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.6
+		hwMplsOamIgrRevLspName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates name of the reverse LSP."
+			::= { hwMplsOamIgrEntry 6 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.10
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.7
+		hwMplsOamIgrRevLsrId OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Only for ingress, the object indicates the ingress LSR ID of the 
+				reverse LSP,, expressed in IP address."
+			::= { hwMplsOamIgrEntry 7 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.11
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.8
+		hwMplsOamIgrRevSessTunnId OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Only for ingress, the object indicates the session tunnel ID of
+				 the reverse LSP."
+			::= { hwMplsOamIgrEntry 8 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.15
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.9
+		hwMplsOamIgrEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+			    disable(0),
+			    enable(1)		
+			}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Whether one LSP is OAM enable.
+				If disable, LSP is not monitored;
+				If enable, CV/FFD is generated at the source LSR of the LSP and 
+				checked at the sink LSR of the LSP,and user can set 
+				other configuration.
+				0: The OAM function is disabled on the ingress;
+				1: The OAM function is enabled on the ingress."
+			::= { hwMplsOamIgrEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.10
+		hwMplsOamIgrValid OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0: stop detect;
+				 1: start detect."
+			::= { hwMplsOamIgrEntry 10 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.16
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.11
+		hwMplsOamIgrAvaState OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"If the LSP Timer (T1) expires, then the LSP enters the 
+				Unavailable state. The start point of the Unavailable state 
+				is deemed to be at the entry into the LSP defect state.
+				An LSP re-enters the Available state after the LSP Defect state
+				exists first.
+				T1 defines the length of time the LSP is in the Defect state 
+				before declaring an LSP Unavailable or returning to defect 
+				free state. 
+				0: available state;
+				1: unavailable state."
+			::= { hwMplsOamIgrEntry 11 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.17
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.12
+		hwMplsOamIgrDefectType OBJECT-TYPE
+			SYNTAX Integer32 (0..9)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Defect is defined as interruption of the capability of a 
+				transport entity (e.g., network connection) to transfer user 
+				or OAM information. There are six types of defect:
+				0: no defect;
+				1: dServer;
+				2: dPeerMe;
+				3: dLOCV, Loss of Connectivity Verification defect;
+				4: dTTSI-Mismatch, Trail Termination Source Identifier Mismatch defect;
+				5: dTTSI-Mismerge, Trail Termination Source Identifier Mismerge defect;
+				6: dExcess, Receiving excess rate of CV/FFD;
+				7: dUnknown, Unknown defect in the MPLS network..
+				8: rlsn down;
+				9: dIngressDown."
+			::= { hwMplsOamIgrEntry 12 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.3.1.18
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3.1.13
+		hwMplsOamIgrRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This variable is used to create, modify, and
+                 		delete a row in this table."
+			::= { hwMplsOamIgrEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.3
+		hwMplsOamEgrTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwMplsOamEgrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table specifies per-LSP MPLS OAM capability and 
+				 associated information, such as DetectType, DetectFrequency."
+			::= { hwMplsOamObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1
+		hwMplsOamEgrEntry OBJECT-TYPE
+			SYNTAX HwMplsOamEgrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in this table is created by an LSR for every LSP
+				 capable of supporting MPLS OAM at egress."
+			INDEX { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId }
+			::= { hwMplsOamEgrTable 1 }
+
+		
+		HwMplsOamEgrEntry ::=
+			SEQUENCE { 
+				hwMplsOamEgrLspName
+					OCTET STRING,
+				hwMplsOamEgrLsrId
+					IpAddress,
+				hwMplsOamEgrSessTunnId
+					Integer32,
+				hwMplsOamEgrDetType
+					INTEGER,
+				hwMplsOamEgrDetFreq
+					INTEGER,
+				hwMplsOamEgrRevType
+					INTEGER,
+				hwMplsOamEgrRevTunnName
+					OCTET STRING,
+				hwMplsOamEgrAutoEn
+					INTEGER,
+				hwMplsOamEgrAutoOvertime
+					Integer32,
+				hwMplsOamEgrBDIFreq
+					INTEGER,
+				hwMplsOamEgrEnable
+					INTEGER,
+				hwMplsOamEgrValid
+					INTEGER,
+				hwMplsOamEgrAvaState
+					Integer32,
+				hwMplsOamEgrDefectType
+					Integer32,
+				hwMplsOamEgrRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.1
+		hwMplsOamEgrLspName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the name of static LSP at egress."
+			::= { hwMplsOamEgrEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.2
+		hwMplsOamEgrLsrId OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the Ingress LSR ID of the LSP."
+			::= { hwMplsOamEgrEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.3
+		hwMplsOamEgrSessTunnId OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the the Ingress session tunnel ID of the LSP.."
+			::= { hwMplsOamEgrEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.4
+		hwMplsOamEgrDetType OBJECT-TYPE
+			SYNTAX INTEGER {
+			       invalid(0),
+			       cv(1),
+			       ffd(2)
+	     	}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"0: invalid, if auto-protocol, this detect type is invalid;
+				 1: CV;
+				 2: FFD."
+			::= { hwMplsOamEgrEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.5
+		hwMplsOamEgrDetFreq OBJECT-TYPE
+			SYNTAX INTEGER{ 
+			    cv1000ms(0),                     
+				ffd10ms2(1),           
+				ffd20ms3(2),
+				ffd50ms4(3),
+				ffd100ms5(4),
+				ffd200ms6(5),
+				ffd500ms7(6),
+				invalid8(7),
+				ffd3ms9(8)           
+			}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"0: 1000ms(only for cv);
+				 1: 10ms;
+				 2: 20ms;
+				 3: 50ms;
+				 4: 100ms;
+				 5: 200ms;
+				 6: 500ms;
+				 7: invalid;
+				 8: 3ms."
+			::= { hwMplsOamEgrEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.6
+		hwMplsOamEgrRevType OBJECT-TYPE
+			SYNTAX INTEGER {
+			     invalid(0),
+			     private(1),
+			     share(2) 
+		    }
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"When an LSP is found to be in defect, the sink LSR of the LSP 
+				should send BDI to inform the source LSR of the LSP,the BDI is 
+				transferred through the reverse LSP.
+				The type of reverse LSP can be private or shared.
+				If private, then the reverse LSP can be used only when the only 
+				LSP in defect;
+				If shared, the reverse LSP, which is shared between many forward 
+				LSPs that have the same source LSRs and sink LSRs.
+				0: invalid, when the reverse LSR does not exist;
+				1: private;
+				2: share."
+			::= { hwMplsOamEgrEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.7
+		hwMplsOamEgrRevTunnName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the name of a reverse tunnel."
+			::= { hwMplsOamEgrEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.8
+		hwMplsOamEgrAutoEn OBJECT-TYPE
+			SYNTAX INTEGER { 
+			       disable(0),
+				   enable(1)
+            }
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"If autoprotocol,  then the egress can process extended FDI sent 
+				by ingress.
+				0: disable;
+				1: enable;
+				Valid only for the egress configuration."
+			::= { hwMplsOamEgrEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.9
+		hwMplsOamEgrAutoOvertime OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This time is set at the egress.
+				If the egress receives CV/FFD, it records the parameters 
+				included in the packet, such as OAM type and frequency.
+				If the egress does not receive any OAM packet before the timer
+				expires, the sink LSR will send BDI with dLOCV defect.
+				Valid only for the egress configuration."
+			::= { hwMplsOamEgrEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.10
+		hwMplsOamEgrBDIFreq OBJECT-TYPE
+			SYNTAX INTEGER { 
+			       perSecond(0),
+				   detectFrequency(1)
+            }
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"BDI is generated at the trail termination source point of 
+				a return path in response to a defect detected at the trail 
+				termination sink point of an LSP in the forwarding direction. 
+				The frequency of BDI can be set by user.
+				Only valid for egress configuration.
+				The default value is detect frequency and it is valid only when a 
+				backward-LSP exists.
+				0: per-second;
+				1: same as detect frequency."
+			::= { hwMplsOamEgrEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.11
+		hwMplsOamEgrEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+			    disable(0),
+			    enable(1)		
+			}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Whether one LSP is enabled with OAM.
+				If disable, LSP is not monitored;
+				If enable, CV/FFD is generated at the source LSR of the LSP and 
+				checked at the sink LSR of the LSP, and user can set 
+				other configuration.
+				0: The OAM function is disabled on the egress;
+				1: The OAM function is enabled on the egress."
+			::= { hwMplsOamEgrEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.12
+		hwMplsOamEgrValid OBJECT-TYPE
+			SYNTAX INTEGER { 
+				stop(1),
+			    start(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"1: stop detect;
+				 2: start detect."
+			::= { hwMplsOamEgrEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.13
+		hwMplsOamEgrAvaState OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"If the LSP Timer (T1) expires, then the LSP enters the 
+				Unavailable state. The start point of the Unavailable state 
+				is deemed to be at the entry into the LSP defect state.
+				An LSP re-enters the Available state after the LSP Defect State.
+				first exists.
+				T1 defines the length of time the LSP is in the Defect state 
+				before declaring an LSP Unavailable or returning to defect 
+				free state
+				0: available state;
+				1: unavailable state."
+			::= { hwMplsOamEgrEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.14
+		hwMplsOamEgrDefectType OBJECT-TYPE
+			SYNTAX Integer32 (0..9)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0: no defect;
+				 1: dServer,
+				 2: dPeerMe,
+				 3: dLOCV, Loss of Connectivity Verification defect;
+				 4: dTTSI-Mismatch, Trail Termination Source Identifier Mismatch defect;
+				 5: dTTSI-Mismerge, Trail Termination Source Identifier Mismerge defect.;
+				 6: dExcess, Receiving excess rate of CV/FFD;
+				 7: dUnknown, Unknown defect in the MPLS network.
+				 8: rlsn down;
+				 9: dEgressDown."
+			::= { hwMplsOamEgrEntry 14 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4.1.15
+		hwMplsOamEgrRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This variable is used to create, modify, and
+                 delete a row in this table."
+			::= { hwMplsOamEgrEntry 15 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.4
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.4
+		hwMplsOamRlsnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwMplsOamRlsnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table specifies RLSN capability and 
+				 associated information, such as RlsnLsrId and RlsnLsrId."
+			::= { hwMplsOamObjects 4 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.4.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1
+		hwMplsOamRlsnEntry OBJECT-TYPE
+			SYNTAX HwMplsOamRlsnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in this table is created by an LSR to binding the name,				lsr-id and tunnel-id of the LSP at egress."
+			INDEX { hwMplsOamRlsnLspName, hwMplsOamRlsnLsrId, hwMplsOamRlsnSessTunnId, hwMplsOamRlsnIfIndex }
+			::= { hwMplsOamRlsnTable 1 }
+
+		
+		HwMplsOamRlsnEntry ::=
+			SEQUENCE { 
+				hwMplsOamRlsnLspName
+					OCTET STRING,
+				hwMplsOamRlsnLsrId
+					IpAddress,
+				hwMplsOamRlsnSessTunnId
+					Integer32,
+				hwMplsOamRlsnIfIndex
+					Integer32,
+				hwMplsOamRlsnIfName
+					OCTET STRING,
+				hwMplsOamRlsnIsDown
+					INTEGER,
+				hwMplsOamRlsnRowStatus
+					RowStatus
+			 }
+
+--  1.3.6.1.4.1.2011.5.12.7.1.1.4.1.2
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.1
+		hwMplsOamRlsnLspName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"For egress, the object indicates name of the LSP."
+			::= { hwMplsOamRlsnEntry 1 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.4.1.3
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.2
+		hwMplsOamRlsnLsrId OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"For egress, the object indicates the Ingress LSR ID of the LSP"
+			::= { hwMplsOamRlsnEntry 2 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.1.4.1.4
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.3
+		hwMplsOamRlsnSessTunnId OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"For egress, the object indicates the Ingress session tunnel ID 
+				of the LSP"
+			::= { hwMplsOamRlsnEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.4
+		hwMplsOamRlsnIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the index of outbound interface."
+			::= { hwMplsOamRlsnEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.5
+		hwMplsOamRlsnIfName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the name of outbound interface."
+			::= { hwMplsOamRlsnEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.6
+		hwMplsOamRlsnIsDown OBJECT-TYPE
+			SYNTAX INTEGER {
+			       up(1),
+			       down(2)		
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"1: up
+				 2: down"
+			::= { hwMplsOamRlsnEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5.1.7
+		hwMplsOamRlsnRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This variable is used to create, modify, and
+				delete a row in this table. "
+			::= { hwMplsOamRlsnEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.1.5
+		hwMplsOamTrapOpen OBJECT-TYPE
+			SYNTAX Unsigned32 (0..1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0: disable                 
+				 1: enable"                
+			::= { hwMplsOamObjects 5 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.3
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2
+		hwMplsOamNotifications OBJECT IDENTIFIER ::= { hwMplsOamPs 2 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.3.1
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.1
+		hwMplsOamIgrLSPOutDefect NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 not in the defect state at the LSP ingress."
+			::= { hwMplsOamNotifications 1 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.3.2
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.2
+		hwMplsOamIgrLSPInDefect NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 in the defect state at the LSP ingress."
+			::= { hwMplsOamNotifications 2 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.3.3
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.3
+		hwMplsOamIgrLSPAva NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 in the available state at the LSP ingress."
+			::= { hwMplsOamNotifications 3 }
+
+		
+--  1.3.6.1.4.1.2011.5.12.7.1.3.4
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.4
+		hwMplsOamIgrLSPUnAva NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 in the unavailable state at the LSP ingress."
+			::= { hwMplsOamNotifications 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.5
+		hwMplsOamEgrLSPOutDefect NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 not in the defect state at the LSP egress."
+			::= { hwMplsOamNotifications 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.6
+		hwMplsOamEgrLSPInDefect NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 in the defect state at the LSP egress."
+			::= { hwMplsOamNotifications 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.7
+		hwMplsOamEgrLSPAva NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 in the available state at the LSP egress."
+			::= { hwMplsOamNotifications 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.8
+		hwMplsOamEgrLSPUnAva NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the LSP is found
+				 in the unavailable state at the LSP egress."
+			::= { hwMplsOamNotifications 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.9
+		hwMplsOamEgrFirstPkt NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrDetType, hwMplsOamEgrDetFreq
+				 }
+			STATUS current
+			DESCRIPTION 
+				"If autoprotocol is enabled, this notification is generated when 
+				 egress receives the first CV/FFD packet."
+			::= { hwMplsOamNotifications 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.10
+		hwMplsOamEgrAutoProFDI NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrEnable }
+			STATUS current
+			DESCRIPTION 
+				"The FDI packet is used by the upstream node in an LSP 
+				to inform the egress of the defect information.
+				It is also generated when the auto protocol is enabled, 
+				with which the LSP ingress notifies the egress to stop 
+				the OAM detection."
+			::= { hwMplsOamNotifications 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.12.7.1.2.11
+		hwMplsOamEgrRlsnDown NOTIFICATION-TYPE
+			OBJECTS { hwMplsOamRlsnLspName, hwMplsOamRlsnLsrId, hwMplsOamRlsnIsDown, hwMplsOamRlsnIfName, hwMplsOamRlsnSessTunnId
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This notification is generated when the Rlsn is down."
+			::= { hwMplsOamNotifications 11 }
+
+		
+	
+	END
+
+--
+-- HUAWEI-MPLSOAM-MIB.mib
+--

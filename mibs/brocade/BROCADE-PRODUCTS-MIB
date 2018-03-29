@@ -1,0 +1,69 @@
+-- ****************************************************************
+-- BROCADE-PRODUCTS-MIB.my: Brocade Products MIB.
+--
+-- Feb 2012, Sanjeev C Joshi, Yasar Khan
+--
+-- Copyright (c) 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+--
+-- ****************************************************************
+BROCADE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY
+      	FROM SNMPv2-SMI
+        bcsiReg  
+        	FROM Brocade-REG-MIB;
+
+      brocadeProductsMIB MODULE-IDENTITY
+        LAST-UPDATED "201202030000Z"
+        ORGANIZATION "Brocade Communications Systems, Inc.,"
+        CONTACT-INFO 
+				"Brocade Communications Systems, Inc.
+                Postal: 130 Holger Way
+                San Jose, CA 95134
+                U.S.A
+				Tel: +1-408-333-8000
+				E-mail: support@Brocade.com
+				web: www.brocade.com."
+
+        DESCRIPTION "This MIB module is for defining all the object 
+		             identifiers to identify various hardware 
+					 platforms. These identifiers are used as value
+					 for 'sysObjectID'."
+
+		REVISION "201202030000Z" 
+	    DESCRIPTION "Initial version of this MIB module."
+		REVISION "201311210000Z"
+		DESCRIPTION "Updated name for Blackbird as vdx2740"
+		REVISION "201309251300Z" 
+	    DESCRIPTION "Added new product name for Draco-T platform."
+		REVISION "201410071405Z" 
+	    DESCRIPTION "Added product name for RIGEL1U as vdx7770P36
+				and RIGEL2U as vdx7770P72."
+		REVISION "201508111305Z" 
+	    DESCRIPTION "Updated the product name for RIGEL1U as vdx6940Q36.
+				 then added RIGELMOR product name as vdx6940S144 and Removed RIGEL2U platform"
+		
+        ::= { bcsiReg 3 }
+
+      brocadeProducts   OBJECT IDENTIFIER ::= { brocadeProductsMIB 1 }
+
+      vdx6740		OBJECT IDENTIFIER ::= { brocadeProducts 131 }
+
+      vdx6740T		OBJECT IDENTIFIER ::= { brocadeProducts 137 }
+
+	  vdx2740        OBJECT IDENTIFIER ::= { brocadeProducts 138 }
+
+      vdx6740T1G  	OBJECT IDENTIFIER ::= { brocadeProducts 151 }
+
+	  vdx6940Q36 	OBJECT IDENTIFIER ::= { brocadeProducts 153 }
+
+	  vdx6940S144 	OBJECT IDENTIFIER ::= { brocadeProducts 164 }
+
+      vdx8770S4		OBJECT IDENTIFIER ::= { brocadeProducts 1000 }
+
+      vdx8770S8   	OBJECT IDENTIFIER ::= { brocadeProducts 1001 }
+
+      vdx8770S16  	OBJECT IDENTIFIER ::= { brocadeProducts 1002 }
+
+END

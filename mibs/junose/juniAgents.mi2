@@ -1,0 +1,1005 @@
+
+-- *****************************************************************************
+-- Juniper-Agents
+--
+-- Juniper Networks SNMP agent capabilities registry for the E-series products.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2004 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Agents  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    juniAgentCapability
+        FROM Juniper-UNI-SMI;
+
+juniAgents  MODULE-IDENTITY
+    LAST-UPDATED "200801071112Z"  -- 07-Jan-08 04:42 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definition identifiers for the Juniper Networks
+        E-series products.  This is the top-level object identifier registry for
+        SNMP modules containing agent capabilities definitions."
+    -- Revision History
+    REVISION    "200801071112Z"  -- 07-Jan-08 04:42 PM EST  - JUNOSe 9.1
+    DESCRIPTION
+	"Added module OID for MPLS FTN MIB agent capabilities."
+    REVISION    "200610181436Z"  -- 18-Oct-06 09:36 AM EST  - JUNOSe 8.1
+    DESCRIPTION
+	"Added module OID for LDP MIB agent capabilities."
+    REVISION    "200607220726Z"  -- 22-Jul-06 02:26 AM EST  - JUNOSe 7.3
+    DESCRIPTION
+	"Added module OID for MobileIpv4 agent capabilities."
+    REVISION    "200603291803Z"  -- 29-Mar-06 12:03 PM IST  - JUNOSe 7.3
+    DESCRIPTION
+	"Added module OID for MPLS-TE MIB agent capabilities."
+	REVISION    "200601010000Z"  --  1-Jan-06 00:00 PM EDT  - JUNOSe 7.3
+    DESCRIPTION
+	"Added module OID for Dos Protection and Dos Protection Platform  
+	agent capabilities."
+    REVISION    "200506301803Z"  -- 30-Jun-05 02:03 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+	"Added module OID for Packet Mirror agent capabilities."
+    REVISION    "200406231741Z"  -- 23-Jun-04 01:41 PM EDT  - JUNOSe 6.1.0
+    DESCRIPTION
+	"Updated the comments for juniMplsAgent: added support for 
+	MPLS-LSR-STD-MIB."
+    REVISION    "200406081539Z"  -- 08-Jun-04 11:39 AM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Added module OIDs for the generic E-series system MIB, the RADIUS
+        Proxy MIB and the RADIUS Initiated Request MIB agent capabilities.
+	Obsoleted some objects in the enterprise MPLS MIB."
+    REVISION    "200310031835Z"  -- 03-Oct-03 02:35 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Added module OIDs for the Event Manager, IPsec Tunnel, Internet Key
+        Exchange (IKE), and Tunnel Server Manager (TSM) MIB Agent capabilities."
+    REVISION    "200305081744Z"  -- 08-May-03 01:44 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added module OIDs for the ATM 1483 Profile, IPv6 Profile, and DHCPv6
+        MIB agent capabilities."
+    REVISION    "200305021818Z"  -- 03-May-03 02:18 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+        Added module OIDs for the bridge, bridging manager, L2TP dialout, and
+        RADIUS Disconnect MIB agent capabilities."
+    REVISION    "200304291414Z"  -- 29-Apr-03 10:14 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added module OIDs for the multicast router, notification logging and
+        TACACS+ client MIB agent capabilities."
+    REVISION    "200304231356Z"  -- 23-Apr-03 09:56 AM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added module OIDs for the QoS manager, MPLS, system clock and X.21/V.35
+        MIB agent capabilities. Obsoleted L2F MIB."
+    REVISION    "200201241523Z"  -- 24-Jan-02 10:23 AM EST  - JUNOSe 3.4
+    DESCRIPTION
+        "Added module OID for the VRRP MIB agent capabilities."
+    REVISION    "200104131716Z"  -- 13-Apr-01 01:16 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgentCapability 2 }
+
+
+-- *****************************************************************************
+-- Juniper Networks object identifier registry for SNMP modules containing agent
+-- capabilities definitions for E-series products.
+-- *****************************************************************************
+juniAaaServerAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Authentication, Authorization and Accounting (AAA) Server component of
+--      the Juniper E-series family of products.  The supported MIB is the
+--      Juniper-AAA-MIB.
+--
+--      The actual capabilities are defined in the Juniper-AAA-CONF module (in
+--      the juniAaaServerAC.mi2 file).
+    ::= { juniAgents 1 }
+
+juniAccountingAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      network connection accounting information management component of the
+--      Juniper E-series family of products.  The supported MIBs are the
+--      ACCOUNTING-CONTROL-MIB and the Juniper-Accounting-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Accounting-CONF
+--      module (in the juniAccountingAC.mi2 file).
+    ::= { juniAgents 2 }
+
+juniAtmAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      ATM component of the Juniper E-series family of products.  The supported
+--      MIBs are the ATM-MIB and the Juniper-UNI-ATM-MIB.
+--
+--      The actual capabilities are defined in the Juniper-ATM-CONF module (in
+--      the juniAtmAC.mi2 file).
+    ::= { juniAgents 3 }
+
+juniBgpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      border gateway protocol (BGP) component of the Juniper E-series family
+--      of products.  The supported MIBs are the BGP4-MIB and the
+--      Juniper-BGP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-BGP-CONF module (in
+--      the juniBgpAC.mi2 file).
+    ::= { juniAgents 4 }
+
+juniBridgedEthernetAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Bridged Ethernet components of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Bridged-Ethernet-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Bridged-Ethernet-CONF
+--      module (in the juniBridgedEthernetAC.mi2 file).
+    ::= { juniAgents 5 }
+
+juniCliAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      command line interface (CLI) component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-CLI-MIB.
+--
+--      The actual capabilities are defined in the Juniper-CLI-CONF module (in
+--      the juniCliAC.mi2 file).
+    ::= { juniAgents 6 }
+
+juniCopsAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      COPS component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-COPS-MIB.
+--
+--      The actual capabilities are defined in the Juniper-COPS-CONF module (in
+--      the juniCopsAC.mi2 file).
+    ::= { juniAgents 7 }
+
+juniDhcpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DHCP component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-DHCP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DHCP-CONF module (in
+--      the juniDhcpAC.mi2 file).
+    ::= { juniAgents 8 }
+
+juniDnsAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DNS component of the Juniper E-series family of products.  The supported
+--      MIB is the Juniper-DNS-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DNS-CONF module (in
+--      the juniDnsAC.mi2 file).
+    ::= { juniAgents 9 }
+
+juniDs1Agent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DS1 component of the Juniper E-series family of products.  The supported
+--      MIBs are the DS1-MIB and the Juniper-DS1-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DS1-CONF module (in
+--      the juniDs1AC.mi2 file).
+    ::= { juniAgents 10 }
+
+juniDs3Agent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DS3 component of the Juniper E-series family of products.  The supported
+--      MIBs are the DS3-MIB and the Juniper-DS3-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DS3-CONF module (in
+--      the juniDs3AC.mi2 file).
+    ::= { juniAgents 11 }
+
+juniDvmrpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DVMRP component of the Juniper E-series family of products.  The
+--      supported MIBs are the DVMRP-STD-MIB and the Juniper-DVMRP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DVMRP-CONF module (in
+--      the juniDvmrpAC.mi2 file).
+    ::= { juniAgents 12 }
+
+juniEntityAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      physical and logical entity components of the Juniper E-series family
+--      of products.  The supported MIB is the ENTITY-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Entity-CONF module
+--      (in the juniEntityAC.mi2 file).
+    ::= { juniAgents 13 }
+
+juniEthernetAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Ethernet components of the Juniper E-series family of products.  The
+--      supported MIBs are the EtherLike-MIB and the Juniper-Ethernet-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Ethernet-CONF module
+--      (in the juniEthernetAC.mi2 file).
+    ::= { juniAgents 14 }
+
+juniFileTransferAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      file transfer component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-File-Transfer-MIB.
+--
+--      The actual capabilities are defined in the Juniper-File-Transfer-CONF
+--      module (in the juniFileTransferAC.mi2 file).
+    ::= { juniAgents 15 }
+
+juniFractionalT1Agent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Fractional T1 component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-Fractional-T1-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Fractional-T1-CONF
+--      module (in the juniFractionalT1AC.mi2 file).
+    ::= { juniAgents 16 }
+
+juniFrameRelayAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      frame relay component of the Juniper E-series family of products.  The
+--      supported MIBs are the FRAME-RELAY-DTE-MIB and the
+--      Juniper-Frame-Relay-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Frame-Relay-CONF
+--      module (in the juniFrameRelayAC.mi2 file).
+    ::= { juniAgents 17 }
+
+juniHdlcAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      HDLC component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-HDLC-MIB.
+--
+--      The actual capabilities are defined in the Juniper-HDLC-CONF module (in
+--      the juniHdlcAC.mi2 file).
+    ::= { juniAgents 18 }
+
+juniIgmpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      IGMP component of the Juniper E-series family of products.  The
+--      supported MIB is the IGMP-STD-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IGMP-CONF module (in
+--      the juniIgmpAC.mi2 file).
+    ::= { juniAgents 19 }
+
+juniInterfacesAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      basic interfaces (IF) component of the Juniper E-series family of
+--      products.  The supported MIBs are the IF-MIB and the Juniper-UNI-IF-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Interfaces-CONF
+--      module (in the juniInterfacesAC.mi2 file).
+    ::= { juniAgents 20 }
+
+juniInternetAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Internet (basic layer 3 and 4 protocols) component of the Junipers
+--      E-series family of products.  The supported MIBs are the IP-MIB, the
+--      IP-FORWARD-MIB, the UDP-MIB, the TCP-MIB, the Juniper-IP-MIB and the
+--      Juniper-Host-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Internet-CONF module
+--      (in the juniInternetAC.mi2 file).
+    ::= { juniAgents 21 }
+
+juniIpPolicyAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      IP policy component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-IP-Policy-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IP-Policy-CONF module
+--      (in the juniIpPolicyAC.mi2 file).
+    ::= { juniAgents 22 }
+
+juniIsisAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      IS-IS protocol component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-ISIS-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IS-IS-CONF module (in
+--      the juniIsisAC.mi2 file).
+    ::= { juniAgents 23 }
+
+juniL2tpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      layer 2 tunneling protocol (L2TP) component of the Juniper E-series
+--      family of products.  The supported MIB is the Juniper-L2TP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-L2TP-CONF module (in
+--      the juniL2tpAC.mi2 file).
+    ::= { juniAgents 24 }
+
+juniLocalAddressServerAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      local address server component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-Address-Pool-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Local-Address-Server-
+--      CONF module (in the juniLocalAddressServerAC.mi2 file).
+    ::= { juniAgents 25 }
+
+juniLogAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      logging managment component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Log-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Log-CONF module (in
+--      the juniLogAC.mi2 file).
+    ::= { juniAgents 26 }
+
+juniNsLookupAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      remote name server lookup component of the Juniper E-series family of
+--      products.  The supported MIB is the DISMAN-NSLOOKUP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-NS-Lookup-CONF module
+--      (in the juniNsLookupAC.mi2 file).
+    ::= { juniAgents 27 }
+
+juniOspfAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      OSPF component of the Juniper E-series family of products.  The
+--      supported MIBs are the OSPF-MIB and the Juniper-OSPF-MIB.
+--
+--      The actual capabilities are defined in the Juniper-OSPF-CONF module (in
+--      the juniOspfAC.mi2 file).
+    ::= { juniAgents 28 }
+
+juniPimAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Protocol Independent Multicast (PIM) component of the Juniper  E-series
+--      family of products.  The supported MIBs are the PIM-MIB and the
+--      Juniper-PIM-MIB.
+--
+--      The actual capabilities are defined in the Juniper-PIM-CONF module (in
+--      the juniPimAC.mi2 file).
+    ::= { juniAgents 29 }
+
+juniPingAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      remote ping operation component of the Juniper E-series family of
+--      products.  The supported MIB is the DISMAN-PING-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Ping-CONF module (in
+--      the juniPingAC.mi2 file).
+    ::= { juniAgents 30 }
+
+juniPolicyManagerAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      policy manager component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Policy-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Policy-Manager-CONF
+--      module (in the juniPolicyManagerAC.mi2 file).
+    ::= { juniAgents 31 }
+
+juniPppAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      point-to-point protocol (PPP) component of the Juniper E-series family
+--      of products.  The supported MIBs are the PPP-LCP-MIB, the PPP-IP-NCP-MIB
+--      and the Juniper-PPP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-PPP-CONF module (in
+--      the juniPppAC.mi2 file).
+    ::= { juniAgents 32 }
+
+juniPppoeAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      point-to-point protocol over Ethernet (PPPoE) component of the Juniper
+--      E-series family of products.  The supported MIB is the
+--      Juniper-PPPoE-MIB.
+--
+--      The actual capabilities are defined in the Juniper-PPPoE-CONF module (in
+--      the juniPppoeAC.mi2 file).
+    ::= { juniAgents 33 }
+
+juniProfileAgents  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The group of Agent Capabilities modules that are deal with profile
+        management."
+    ::= { juniAgents 34 }
+
+juniProfileManagerAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      profile manager component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Profile-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Profile-CONF module
+--      (in the juniProfileAC.mi2 file).
+    ::= { juniProfileAgents 1 }
+
+juniIpProfileAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      IP profile manager component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-IP-Profile-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IP-Profile-CONF
+--      module (in the juniIpProfileAC.mi2 file).
+    ::= { juniProfileAgents 2 }
+
+juniPppProfileAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      PPP profile manager component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-PPP-Profile-MIB.
+--
+--      The actual capabilities are defined in the Juniper-PPP-Profile-CONF
+--      module (in the juniPppProfileAC.mi2 file).
+    ::= { juniProfileAgents 3 }
+
+juniPppoeProfileAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      PPPoE profile manager component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-PPPoE-Profile-MIB.
+--
+--      The actual capabilities are defined in the Juniper-PPPoE-Profile-CONF
+--      module (in the juniPppoeProfileAC.mi2 file).
+    ::= { juniProfileAgents 4 }
+
+juniIpv6ProfileAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      IPv6 profile manager component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-IPV6-PROFILE-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IPv6-Profile-CONF
+--      module (in the juniIpv6ProfileAC.mi2 file).
+    ::= { juniProfileAgents 5 }
+
+juniAtm1483ProfileAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      ATM 1483 profile manager component of the Juniper E-series router family
+--      of products.  The supported MIB is the Juniper-ATM-1483-Profile-MIB.
+--
+--      The actual capabilities are defined in the Juniper-ATM-1483-Profile-CONF
+--      module (in the juniAtmProfileAC.mi2 file).
+    ::= { juniProfileAgents 6 }
+
+juniHttpProfileAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      HTTP profile manager component of the Juniper E-series router family
+--      of products.  The supported MIB is the Juniper-HTTP-Profile-MIB.
+--
+--      The actual capabilities are defined in the Juniper-HTTP-Profile-CONF
+--      module (in the juniHttpProfileAC.mi2 file).
+    ::= { juniProfileAgents 7 }
+
+juniRadiusClientAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      RADIUS client component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-RADIUS-Client-MIB.
+--
+--      The actual capabilities are defined in the Juniper-RADIUS-Client-CONF
+--      module (in the juniRadiusClientAC.mi2 file).
+    ::= { juniAgents 35 }
+
+juniRipAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Routing Information Protocol (RIP) component of the Juniper E-series
+--      family of products.  The supported MIB is the RIPv2-MIB.
+--
+--      The actual capabilities are defined in the Juniper-RIP-CONF module (in
+--      the juniRipAC.mi2 file).
+    ::= { juniAgents 36 }
+
+juniRouterAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      router component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-Router-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Router-CONF module
+--      (in the juniRouterAC.mi2 file).
+    ::= { juniAgents 37 }
+
+juniSlepAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Serial Line Encapsulation Protocol (SLEP) component of the Juniper
+--      E-series family of products.  The supported MIB is the Juniper-SLEP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-SLEP-CONF module (in
+--      the juniSlepAC.mi2 file).
+    ::= { juniAgents 38 }
+
+juniSnmpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      SNMP components of the Juniper E-series family of products.  The
+--      supported MIBs are the SNMPv2-MIB, the SNMP-FRAMEWORK-MIB, the
+--      SNMP-MPD-MIB, the SNMP-TARGET-MIB, the SNMP-NOTOFICATION-MIB, the
+--      SNMP-USER-BASE-SM-MIB, the SNMP-VIEW-BASED-ACM-MIB and the
+--      Juniper-SNMP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-SNMP-CONF module (in
+--      the juniSnmpAC.mi2 file).
+    ::= { juniAgents 39 }
+
+juniSonetAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      SONET component of the Juniper E-series family of products.  The
+--      supported MIBs are the SONET-MIB and the Juniper-UNI-SONET-MIB.
+--
+--      The actual capabilities are defined in the Juniper-SONET-CONF module (in
+--      the juniSonetAC.mi2 file).
+    ::= { juniAgents 40 }
+
+juniSscClientAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Service Selection Center (SSC) client component of the Juniper E-series
+--      family of products.  The supported MIB is the Juniper-SSC-Client-MIB.
+--
+--      The actual capabilities are defined in the Juniper-SSC-Client-CONF
+--      module (in the juniSscClientAC.mi2 file).
+    ::= { juniAgents 41 }
+
+juniSystemAgents  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The root object identifier under which are registered the platform-
+        specific SNMP modules containing the AGENT-CAPABILITIES definitions for
+        the system components of the Juniper E-series family of products."
+   ::= { juniAgents 42 }
+
+juniErxSystemAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      system components of the first generation Juniper E-series (ERX) family
+--      of products.  The supported MIBs are the Juniper E-series generic system
+--      MIB (Juniper-System-MIB) and the deprecated Juniper ERX platform-
+--      specific system MIB (Juniper-ERX-System-MIB).
+--
+--      The actual capabilities are defined in the Juniper-ERX-System-CONF
+--      module (in the juniErxSystemAC.mi2 file).
+    ::= { juniSystemAgents 1 }
+
+juniSystemAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      generic system components of the Juniper E-series family of products.
+--      The supported MIB is the Juniper E-series generic system MIB
+--      (Juniper-System-MIB).
+--
+--      The actual capabilities are defined in the Juniper-System-CONF
+--      module (in the juniSystemAC.mi2 file).
+    ::= { juniSystemAgents 2 }
+
+juniTraceRouteAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      remote trace-route component of the Juniper E-series family of products.
+--      The supported MIB is the DISMAN-TRACEROUTE-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Trace-Route-CONF
+--      module (in the juniTraceRouteAC.mi2 file).
+    ::= { juniAgents 43 }
+
+juniAutoConfAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      auto-configuration component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Autoconfigure-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Autoconfigure-CONF
+--      module (in the juniAutoconfAC.mi2 file).
+    ::= { juniAgents 44 }
+
+juniSubscriberAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      subscriber component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-Subscriber-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Subscriber-CONF
+--      module (in the juniSubscriberAC.mi2 file).
+    ::= { juniAgents 45 }
+
+juniSmdsAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Switched Multimegabit Data Service (SMDS) management component of the
+--      Juniper E-series family of products.  The supported MIB is the
+--      Juniper-SMDS-MIB.
+--
+--      The actual capabilities are defined in the Juniper-SMDS-CONF module (in
+--      the juniSmdsAC.mi2 file).
+    ::= { juniAgents 46 }
+
+juniIpTunnelAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      IP Tunnel (GRE/DVMRP) management component of the Juniper E-series
+--      family of products.  The supported MIB is the Juniper-IP-Tunnel-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IP-Tunnel-CONF module
+--      (in the juniIpTunnelAC.mi2 file).
+    ::= { juniAgents 47 }
+
+juniCbfAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Connection-Based Forwarding (CBF) Protocol management component of the
+--      Juniper E-series family of products.  The supported MIB is the
+--      Juniper-CBF-MIB.
+--
+--      The actual capabilities are defined in the Juniper-CBF-CONF module (in
+--      the juniCbfAC.mi2 file).
+    ::= { juniAgents 48 }
+
+juniL2fAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      Obsolete SNMP module containing the AGENT-CAPABILITIES definitions for
+--      the Layer 2 Forwarding (L2F) Protocol management component of the
+--      Juniper E-series family of products.  This module is no longer
+--      supported.
+    ::= { juniAgents 49 }
+
+juniQosManagerAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Quality of Service (QoS) Manager component of the Juniper E-series
+--      family of products.  The supported MIB is the Juniper-QoS-MIB.
+--
+--      The actual capabilities are defined in the Juniper-QoS-Manager-CONF
+--      module (in the juniQosManagerAC.mi2 file).
+    ::= { juniAgents 50 }
+
+juniMplsAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Multiprotocol Label Switching (MPLS) component of the Juniper E-series
+--      family of products.  The supported MIB is the Juniper-MPLS-MIB and
+--      MPLS-LSR-STD-MIB.
+--
+--      The actual capabilities are defined in the Juniper-MPSL-CONF module (in
+--      the juniMplsAC.mi2 file).
+    ::= { juniAgents 51 }
+
+juniSysClockAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      system clock component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-System-Clock-MIB.
+--
+--      The actual capabilities are defined in the Juniper-System-Clock-CONF
+--      module (in the juniSysClockAC.mi2 file).
+    ::= { juniAgents 52 }
+
+juniVrrpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Virtual Router Redundancy Protocol (VRRP) component of the Juniper
+--      E-series family of products.  The supported MIB is the VRRP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-VRRP-CONF module (in
+--      the juniVrrpAC.mi2 file).
+    ::= { juniAgents 53 }
+
+juniV35Agent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      X.21/V.35 component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-V35-MIB.
+--
+--      The actual capabilities are defined in the Juniper-V35-CONF module (in
+--      the juniV35AC.mi2 file).
+    ::= { juniAgents 54 }
+
+juniMRouterAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the IP
+--      multicast router component of the SNMP agent in the Juniper E-series
+--      family of products.  The supported MIBs are the IPMROUTE-STD-MIB and the
+--      Juniper-MROUTER-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Multicast-Router-CONF
+--      module (in the juniMRouterAC.mi2 file).
+    ::= { juniAgents 55 }
+
+juniNotificationLogAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      notification logging component of the Juniper E-series family of
+--      products.  The supported MIB is the NOTIFICATION-LOG-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Notification-Log-CONF
+--      module (in the juniNotificationLogAC.mi2 file).
+    ::= { juniAgents 56 }
+
+juniTacacsPlusClientAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Terminal Access Controller Access Control System Plus (TACACS+) client
+--      component of the Juniper E-series family of products.  The supported MIB
+--      is the Juniper-TACACS-Plus-Client-MIB.
+--
+--      The actual capabilities are defined in the Juniper-TACACS-Plus-Client-
+--      CONF module (in the juniTacacsPlusClientAC.mi2 file).
+    ::= { juniAgents 57 }
+
+juniL2tpDialoutAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      layer 2 tunneling protocol (L2TP) Dialout component of the Juniper
+--      E-series family of products.  The supported MIB is the L2TP-Dialout-MIB.
+--
+--      The actual capabilities are defined in the Juniper-L2TP-Dialout-CONF
+--      module (in the juniL2tpDialoutAC.mi2 file).
+    ::= { juniAgents 59 }
+
+juniBridgeAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Bridge component of the Juniper E-series family of products.  The
+--      supported MIBs are the BRIDGE-MIB and the Juniper-BRIDGE-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Bridge-CONF module
+--      (in the juniBridgeAC.mi2 file).
+    ::= { juniAgents 60 }
+
+juniBridgingMgrAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Bridging Manager component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Bridging-Manager-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Bridging-Manager-CONF
+--      module (in the juniBridgingMgrAC.mi2 file).
+    ::= { juniAgents 61 }
+
+juniEventManagerAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Event Manager component of the Juniper E-series family of products. The
+--      supported MIBs are the DISMAN-EVENT-MIB and the Juniper-DISMAN-EVENT-
+--      MIB.
+--
+--      The actual capabilities are defined in the Juniper-Event-Manager-CONF
+--      module (in the juniEventMgrAC.mi2 file).
+    ::= { juniAgents 62 }
+
+juniRadiusDisconnectAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      RADIUS disconnect component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-RADIUS-Disconnect-MIB.
+--
+--      The actual capabilities are defined in the Juniper-RADIUS-Disconnect-
+--      CONF module (in the juniRadiusDisconnectAC.mi2 file).
+    ::= { juniAgents 63 }
+
+juniDhcpv6Agent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DHCPv6 component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-DHCPv6-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DHCPv6-CONF module
+--      (in the juniDhcpv6AC.mi2 file).
+    ::= { juniAgents 64 }
+
+juniIpsecTunnelAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      St component of the Juniper E-series family of products.  The
+--      supported MIB is the Juniper-IPsec-Tunnel-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IPsec-Tunnel-CONF
+--      module (in the juniIpsecTunnel.mi2 file).
+    ::= { juniAgents 65 }
+
+juniIkeAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Internet Key Exchange (IKE) component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-IKE-MIB.
+--
+--      The actual capabilities are defined in the Juniper-IKE-CONF module (in
+--      the juniIkeAC.mi2 file).
+    ::= { juniAgents 66 }
+
+juniTsmAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Tunnel Server Management (TSM) component of the Juniper E-series family
+--      of products.  The supported MIB is the Juniper-TSM-MIB.
+--
+--      The actual capabilities are defined in the Juniper-TSM-CONF module (in
+--      the juniTsmAC.mi2 file).
+    ::= { juniAgents 67 }
+
+juniRadiusProxyAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      RADIUS proxy component of the Juniper E-series family of products.
+--      The supported MIBs are the RADIUS-AUTH-SERVER-MIB, the
+--      RADIUS-ACC-SERVER-MIB and the Juniper-RADIUS-Proxy-MIB.
+--
+--      The actual capabilities are defined in the Juniper-RADIUS-Proxy-CONF
+--      module (in the juniRadiusProxyAC.mi2 file).
+    ::= { juniAgents 68 }
+
+juniHaRedundancyAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      Redundancy component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-REDUNDANCY-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Ha-Redundancy-CONF 
+--      module (in the juniHaRedundancyAC.mi2 file).
+    ::= { juniAgents 69 }
+
+juniRadiusRequestAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      RADIUS Request component of the Juniper E-series family of
+--      products.  The supported MIB is the Juniper-RADIUS-Initiated-Request-MIB.
+--
+--      The actual capabilities are defined in the 
+--      Juniper-Radius-Initiated-Request-CONF module 
+--      (in the juniRadiusInitiatedRequestAC.mi2 file).
+    ::= { juniAgents 70 }
+
+juniLicenseMgrAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      License Manager component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-License-MIB.
+--
+--      The actual capabilities are defined in the Juniper-License-Manager-CONF
+--      module (in the juniLicenseManagerAC.mi2 file).
+    ::= { juniAgents 71 }
+
+juniPacketMirrorAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      packet mirror application of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-Packet-Mirror-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Packet-Mirror-CONF
+--      module (in the juniPacketMirrorAC.mi2 file).
+    ::= { juniAgents 72 }
+
+juniVpnmibAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      VPN component of the Juniper E-series family of products.  The
+--      supported MIB is the MPLS-L3VPN-STD-MIB-JUNI.
+--
+--      The actual capabilities are defined in the Juniper-Vpnmib-CONF module
+--      (in the juniVpnmibAC.mi2 file).
+    ::= { juniAgents 73 }
+	
+juniHttpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      HTTP component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-HTTP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-HTTP-CONF
+--      module (in the juniHttpAC.mi2 file).
+    ::= { juniAgents 74 }
+    
+juniBfdmibAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      BFD component of the Juniper E-series family of products.  The
+--      supported MIB is the BFD-STD-MIB-JUNI.
+--
+--      The actual capabilities are defined in the Juniper-Bfdmib-CONF module
+--      (in the juniBfdmibAC.mi2 file).
+    ::= { juniAgents 75}
+
+
+juniDosProtectionAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DosProtection component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-DosProtection-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DosProtection-CONF
+--      module (in the juniDosProtectionAC.mi2 file).
+    ::= { juniAgents 76 }
+
+juniDosProtectionPlatformAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      DosProtection component of the Juniper E-series family of products.
+--      The supported MIB is the Juniper-DosProtection-MIB.
+--
+--      The actual capabilities are defined in the Juniper-DosProtection-CONF
+--      module (in the juniDosProtectionAC.mi2 file).
+    ::= { juniAgents 77 }
+    
+juniMplsteAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      MPLS-TE component of the Juniper E-series family of products.  The
+--      supported MIB is the MPLS-TE-STD-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Mplste-CONF module
+--      (in the mplsteAC.mi2 file).
+    ::= { juniAgents 78 }    
+
+juniMplsLdpAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      LDP component of the Juniper E-series family of products.  The
+--      supported MIBs are MPLS-LDP-STD-MIB and MPLS-LDP-GENERIC-STD-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Mplste-CONF module
+--      (in the ldpAC.mi2 file).
+    ::= { juniAgents 79 }    
+
+juniMobileIpv4HaAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      MobileIpv4 component of the Juniper E-series family of products.  The
+--      supported MIB is the MIP-MIB.
+--
+--      The actual capabilities are defined in the Juniper-MobileIpv4-CONF module
+--      (in the mobileIpv4HaAC.mi2 file).
+    ::= { juniAgents 80 }    
+
+
+juniFtnMgrAgent  OBJECT IDENTIFIER
+--  MODULE-IDENTITY
+--      The SNMP module containing the AGENT-CAPABILITIES definitions for the
+--      MPLS FTN component of the Juniper E-series family of products.  The
+--      supported MIB is the MPLS-FTN-STD-MIB.
+--
+--      The actual capabilities are defined in the Juniper-Ftn-Mgr-CONF  module
+--      (in the ftnMgrAC.mi2 file).
+    ::= { juniAgents 81 }   
+
+END

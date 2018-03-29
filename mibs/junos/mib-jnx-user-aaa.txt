@@ -1,0 +1,1146 @@
+-- *******************************************************************
+-- Juniper User AAA objects MIB.
+--
+-- Copyright (c) 2001-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    JUNIPER-USER-AAA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter64, IpAddress, Integer32, Counter32, Unsigned32,
+        NOTIFICATION-TYPE, MODULE-IDENTITY, 
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue
+            FROM SNMPv2-TC
+        Ipv6AddressPrefix, Ipv6AddressIfIdentifier, Ipv6Address
+            FROM IPV6-TC
+        EnabledStatus
+            FROM JUNIPER-MIMSTP-MIB
+        jnxUserAAAMibRoot
+            FROM JUNIPER-SMI
+        InetAddressType, InetAddress, InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB;
+
+    jnxUserAAAMib  	MODULE-IDENTITY
+        LAST-UPDATED "201307100000Z"
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the objects pertaining to User authentication,
+             authorization and accounting"
+        REVISION      "201307100000Z"
+        DESCRIPTION   "Adding jnxUserAAADomainStripUsername and 
+                       jnxUserAAADomainOverridePassword to jnxUserAAADomain"      
+        REVISION      "201303180000Z"
+        DESCRIPTION   "jnxAccessAuthServerEnabled, corrected description" 
+        REVISION      "201212290000Z"
+        DESCRIPTION   "jnxUserAAADomainDynamicPorfile object has been
+                       deprecated and replaced by jnxUserAAADomainDynamicProfile"
+        REVISION      "201012080000Z"
+        DESCRIPTION   "Updates related to adding address pool display"
+        REVISION      "201011230000Z"
+        DESCRIPTION   "Updates related to adding address pool traps"
+        REVISION    "201002091110Z"
+        DESCRIPTION   "Added jnxUserAAAAssignment, jnxUserAAAGeneral,
+                       jnxUserAAADomainDelimiters,
+                       jnxUserAAADomainParseDirection, jnxUserAAADomain,
+                       jnxUserAAADomainTable, jnxUserAAADomainEntry,
+                       jnxUserAAADomainName, jnxUserAAADomainStripDomain,
+                       jnxUserAAADomainLogicalSystem,
+                       jnxUserAAADomainRoutingInstance,
+                       jnxUserAAADomainAddrPoolName,
+                       jnxUserAAADomainDynamicPorfile,
+                       jnxUserAAADomainTargetLogicalSystem,
+                       jnxUserAAADomainTargetRoutingInstance,
+                       jnxUserAAADomainTunnelProfile,
+                       jnxUserAAADomainTunnelTable, jnxUserAAADomainTunnelEntry,
+                       jnxUserAAADomainTunnelName, jnxUserAAADomainTunnelDefId,
+                       jnxUserAAADomainTunnelPreference,
+                       jnxUserAAADomainTunnelRemoteGwName,
+                       jnxUserAAADomainTunnelRemoteGwAddress,
+                       jnxUserAAADomainTunnelSourceGwName,
+                       jnxUserAAADomainTunnelSourceGwAddress,
+                       jnxUserAAADomainTunnelSecret,
+                       jnxUserAAADomainTunnelLogicalSystems,
+                       jnxUserAAADomainTunnelRoutingInstance,
+                       jnxUserAAADomainTunnelMedium, jnxUserAAADomainTunnelType,
+                       jnxUserAAADomainTunnelId,
+                       jnxUserAAADomainTunnelMaxSessions,
+                       jnxUserAAADomainPadnTable, jnxUserAAADomainPadnEntry,
+                       jnxUserAAADomainPadnIpAddress,
+                       jnxUserAAADomainPadnIpMask, jnxUserAAADomainPadnDistance,
+                       jnxUserAAAAccessProfile, jnxUserAAAAccessProfileGeneral,
+                       jnxUserAAAAccessProfileTable,
+                       jnxUserAAAAccessProfileEntry,
+                       jnxUserAAAAccessProfileName,
+                       jnxUserAAAAccessProfileAuthenticationOrder,
+                       jnxUserAAAAccessProfileAccountingOrder,
+                       jnxUserAAAAccessProfileAuthorizationOrder,
+                       jnxUserAAAAccessProfileProvisioningOrder,
+                       jnxUserAAAAccessProfileAccStopOnFailure,
+                       jnxUserAAAAccessProfileAccStopOnDeny,
+                       jnxUserAAAAccessProfileImmediateUpdate,
+                       jnxUserAAAAccessProfileCoaImmediateUpdate,
+                       jnxUserAAAAccessProfileInterval,
+                       jnxUserAAAAccessProfileStatType."
+        REVISION      "200708210000Z"
+        DESCRIPTION   "Updates related to SecurID authentication"
+        REVISION      "200705140000Z"
+        DESCRIPTION   "Creation Date"
+    	::= { jnxUserAAAMibRoot 1 }   
+
+
+    jnxUserAAANotifications OBJECT IDENTIFIER ::= { jnxUserAAAMib 0 }
+    jnxUserAAAObjects       OBJECT IDENTIFIER ::= { jnxUserAAAMib 1 }
+
+
+    -- ***************************************************************
+    --  Next Branch node. 
+    -- ***************************************************************
+
+	jnxUserAAAGlobalStats        OBJECT IDENTIFIER ::= { jnxUserAAAObjects 1 }
+	jnxUserAAAAccessAuthStats    OBJECT IDENTIFIER ::= { jnxUserAAAObjects 2 }
+	jnxUserAAATrapVars           OBJECT IDENTIFIER ::= { jnxUserAAAObjects 3 }
+	jnxUserAAAAccessPool         OBJECT IDENTIFIER ::= { jnxUserAAAObjects 4 }
+	jnxUserAAAAssignment         OBJECT IDENTIFIER ::= { jnxUserAAAObjects 5 }
+	jnxUserAAAAccessProfile      OBJECT IDENTIFIER ::= { jnxUserAAAObjects 6 }
+
+
+    -- ***************************************************************
+    --  Textual Conventions
+    -- ***************************************************************
+
+    JnxAuthenticateType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION 
+           "There several way to authenticate a user, these are 
+            the types:
+            radius - authentication via a radius server.
+            local  - local authenticaiton.
+            ldap   - authentication via a LDAP server.
+            securid- authentication via RSA's SecurID authentication server
+            jsrc   - authentication via jsrc"
+
+        SYNTAX  INTEGER {
+                            none      (0),
+                            radius    (1),
+                            local     (2),
+                            ldap      (3),
+                            securid   (4),
+                            jsrc      (5)
+                        }
+    
+    JnxAccountingType  ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "There several choices for accounting, these are 
+            the types:
+            radius - accounting via a radius server.
+            local  - local accounting.
+            ldap   - accounting via a LDAP server.
+            securid- accounting via RSA's SecurID accounting server
+            jsrc   - accounting via jsrc"
+            
+        SYNTAX  INTEGER {
+                            none      (0),
+                            radius    (1),
+                            local     (2),
+                            ldap      (3),
+                            securid   (4),
+                            jsrc      (5)
+                         }
+
+    JnxAuthorizationType  ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "There several choices for authorization, these are 
+            the types:
+            radius - authorization via a radius server.
+            local  - local authorization.
+            ldap   - authorization via a LDAP server.
+            securid- authorization via RSA's SecurID authorization server
+            jsrc   - authorization via jsrc"
+            
+        SYNTAX  INTEGER {
+                            none      (0),
+                            radius    (1),
+                            local     (2),
+                            ldap      (3),
+                            securid   (4),
+                            jsrc      (5)
+                         }
+    JnxProvisioningType  ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "There several choices for provisioning, these are 
+            the types:
+            radius - provisioning via a radius server.
+            local  - local provisioning.
+            ldap   - provisioning via a LDAP server.
+            securid- provisioning via RSA's SecurID provisioning server
+            jsrc   - provisioning via jsrc"
+            
+        SYNTAX  INTEGER {
+                            none      (0),
+                            radius    (1),
+                            local     (2),
+                            ldap      (3),
+                            securid   (4),
+                            jsrc      (5)
+                         }
+    
+    -- ***************************************************************
+    -- Statistic counters for related to access authentication.
+    -- ***************************************************************
+
+    jnxTotalAuthenticationRequests  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total authentication requests received."
+        ::= { jnxUserAAAGlobalStats  1 }
+
+    jnxTotalAuthenticationResponses OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total authentication responses."
+        ::= { jnxUserAAAGlobalStats  2 }
+
+
+    -- ***************************************************************
+    -- Authentication Statistic Table :
+    -- ***************************************************************
+    jnxUserAAAStatTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxAuthStatEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes the user authentication statistics." 
+        ::= { jnxUserAAAAccessAuthStats 1 }	
+
+    jnxUserAAAStatEntry OBJECT-TYPE
+    	SYNTAX        JnxAuthStatEntry 
+    	MAX-ACCESS    not-accessible
+    	STATUS        current
+    	DESCRIPTION
+            "Statistic entry collects for authentication."
+        INDEX   { jnxUserAAAStatAuthType }
+    	::= { jnxUserAAAStatTable 1 }
+
+    JnxAuthStatEntry ::= SEQUENCE
+    {
+        jnxUserAAAStatAuthType          JnxAuthenticateType,
+        jnxUserAAAStatRequestReceived   Counter64,
+        jnxUserAAAStatAccessAccepted    Counter64,
+        jnxUserAAAStatAccessRejected    Counter64
+    }
+	
+    jnxUserAAAStatAuthType OBJECT-TYPE
+    	SYNTAX          JnxAuthenticateType 
+        MAX-ACCESS	    not-accessible
+    	STATUS          current
+        DESCRIPTION
+            "The entry indicates the authentication type.  It
+             uniquely identifies the statistics counters related to
+             its authentication."
+        ::= { jnxUserAAAStatEntry 1 }
+
+    jnxUserAAAStatRequestReceived OBJECT-TYPE
+    	SYNTAX          Counter64	
+        MAX-ACCESS    	read-only
+    	STATUS        	current
+        DESCRIPTION
+            "The number of request received."
+        ::= { jnxUserAAAStatEntry 2 }
+
+    jnxUserAAAStatAccessAccepted OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of access granted.  It is an aggregated 
+             statistics for this type of authenticaiton."
+        ::= { jnxUserAAAStatEntry 3 }
+
+    jnxUserAAAStatAccessRejected OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+    	    "This number of access request rejected.  It is an aggregated 
+             statistics for this type of authentication."
+        ::= { jnxUserAAAStatEntry 4 }
+
+
+    -- ********************************************************************
+    -- Objects used for the traps 
+    -- ********************************************************************
+    jnxUserAAAServerName   OBJECT-TYPE
+        SYNTAX      DisplayString 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The server name which identifies the authentication server."
+        ::= { jnxUserAAATrapVars 1 }
+
+    jnxUserAAAAddressPoolName   OBJECT-TYPE
+        SYNTAX      DisplayString 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The address pool name which identifies the local address pool."
+        ::= { jnxUserAAATrapVars 2 }
+
+
+    -- ***************************************************************
+    -- definition of access authentication related traps.
+    -- ***************************************************************
+
+    -- 
+    -- Authentication Service is up 
+    -- 
+    jnxAccessAuthServiceUp NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that the 
+             specified service has started. "
+        ::= { jnxUserAAANotifications 1 } 
+
+    -- 
+    -- Authentication Service is down 
+    --
+    jnxAccessAuthServiceDown NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that the 
+             specified service has been stopped."
+        ::= { jnxUserAAANotifications 2 }
+
+    -- 
+    -- Authentication server is not accessible.
+    -- 
+	jnxAccessAuthServerDisabled NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAServerName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             the External authentication server is not responding."
+        ::= { jnxUserAAANotifications 3 }
+
+
+    -- 
+    -- Authentication server state change to UP .
+    -- 
+    jnxAccessAuthServerEnabled NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAServerName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that the 
+             AAA client has changed the status of the External authentication server to UP."
+        ::= { jnxUserAAANotifications 4 }
+
+    -- 
+    -- Address Pool or Linked Pool chain has reached its warning
+    -- threshold.
+    -- 
+	jnxAccessAuthAddressPoolHighThreshold NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAAddressPoolName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             the address pool has reached its high threshold."
+        ::= { jnxUserAAANotifications 5 }
+
+    -- 
+    -- Address Pool or Linked Pool chain has reached its abate
+    -- threshold.
+    -- 
+    jnxAccessAuthAddressPoolAbateThreshold NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAAddressPoolName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             the address pool has reached its abate threshold"
+        ::= { jnxUserAAANotifications 6 }
+
+    -- 
+    -- Address Pool or Linked Pool chain is completely used up.
+    -- 
+	jnxAccessAuthAddressPoolOutOfAddresses NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAAddressPoolName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             an Out Of Addresses event occured on the pool."
+        ::= { jnxUserAAANotifications 7 }
+
+    -- 
+    -- Address Pool or Linked Pool chain is completely used up.
+    -- 
+	jnxAccessAuthAddressPoolOutOfMemory NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAAddressPoolName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             an Out Of Memory event occured on the pool."
+        ::= { jnxUserAAANotifications 8 }
+
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Managed objects for Access profile
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxUserAAAAccessPoolGeneral OBJECT IDENTIFIER ::= { jnxUserAAAAccessPool 1 }
+
+    jnxUserAAAAccessPoolTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxUserAAAAccessPool
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "The entries in this table specify the address pools."
+         ::= { jnxUserAAAAccessPoolGeneral 1 }
+
+    jnxUserAAAAccessPoolEntry OBJECT-TYPE
+        SYNTAX      JnxUserAAAAccessPool
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A read-only description of the local address pools."
+        INDEX     { jnxUserAAAAccessPoolIdent }
+        ::= { jnxUserAAAAccessPoolTable 1 }
+
+    JnxUserAAAAccessPool ::= SEQUENCE {
+        jnxUserAAAAccessPoolIdent                Unsigned32,
+        jnxUserAAAAccessPoolRoutingInstance      DisplayString,
+        jnxUserAAAAccessPoolName                 DisplayString,
+        jnxUserAAAAccessPoolLinkName             DisplayString,
+        jnxUserAAAAccessPoolFamilyType           InetAddressType,
+        jnxUserAAAAccessPoolInetNetwork          InetAddress,
+        jnxUserAAAAccessPoolInetPrefixLength     InetAddressPrefixLength,
+        jnxUserAAAAccessPoolOutOfMemory          Counter64,
+        jnxUserAAAAccessPoolOutOfAddresses       Counter64,
+        jnxUserAAAAccessPoolAddressTotal         Counter64,
+        jnxUserAAAAccessPoolAddressesInUse       Counter64,
+        jnxUserAAAAccessPoolAddressUsage         INTEGER,
+        jnxUserAAAAccessPoolAddressUsageHigh     INTEGER,
+        jnxUserAAAAccessPoolAddressUsageAbate    INTEGER
+    }
+
+    jnxUserAAAAccessPoolIdent OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The address identifier key."
+        ::= { jnxUserAAAAccessPoolEntry 1 }
+
+    jnxUserAAAAccessPoolRoutingInstance OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The routing instance of the address pool."
+        ::= { jnxUserAAAAccessPoolEntry 2 }
+
+    jnxUserAAAAccessPoolName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The address pool name."
+        ::= { jnxUserAAAAccessPoolEntry 3 }
+
+    jnxUserAAAAccessPoolLinkName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The address pool link name."
+        ::= { jnxUserAAAAccessPoolEntry 4 }
+
+    jnxUserAAAAccessPoolFamilyType OBJECT-TYPE
+        SYNTAX       InetAddressType
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The family type of this pool."
+         ::= { jnxUserAAAAccessPoolEntry 5 }
+
+    jnxUserAAAAccessPoolInetNetwork OBJECT-TYPE
+        SYNTAX       InetAddress (SIZE(2..48))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Match criteria for this pool. Network or Prefix"
+         ::= { jnxUserAAAAccessPoolEntry 6 }
+
+    jnxUserAAAAccessPoolInetPrefixLength OBJECT-TYPE
+        SYNTAX       InetAddressPrefixLength
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Prefix Length for an IPv6 pool"
+         ::= { jnxUserAAAAccessPoolEntry 7 }
+
+    jnxUserAAAAccessPoolOutOfMemory OBJECT-TYPE
+        SYNTAX       Counter64
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Number of times this pool has flagged an Out of Memory condition."
+         ::= { jnxUserAAAAccessPoolEntry 8 }
+
+    jnxUserAAAAccessPoolOutOfAddresses OBJECT-TYPE
+        SYNTAX       Counter64
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Number of times this pool has flagged an Out of Address condition."
+         ::= { jnxUserAAAAccessPoolEntry 9 }
+
+    jnxUserAAAAccessPoolAddressTotal OBJECT-TYPE
+        SYNTAX       Counter64
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of Addresses or prefixes in this pool."
+         ::= { jnxUserAAAAccessPoolEntry 10 }
+
+    jnxUserAAAAccessPoolAddressesInUse OBJECT-TYPE
+        SYNTAX       Counter64
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of Addresses or prefixes given out from this pool."
+         ::= { jnxUserAAAAccessPoolEntry 11 }
+
+    jnxUserAAAAccessPoolAddressUsage OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The percentage of addresses used in this pool or linked pool.
+            If this pool is the head of a linked chain of pools, this number
+            reflects the Usage for the whole chain. Conversely, if this pool
+            it part of a linked chain of pools but not the head of the chain,
+            the value will not be used."
+         ::= { jnxUserAAAAccessPoolEntry 12 }
+
+    jnxUserAAAAccessPoolAddressUsageHigh OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The configured high percentage threshold of addresses used in this
+            pool or linked pool. An SNMP trap is generated when this threshold
+            is exceeded. This trap will only be generated for unlinked pools or
+            pools that are the head of a linked chain of pools Conversely, if 
+            this pool it part of a linked chain of pools but not the head of the
+            chain, then no traps will be generated."
+         ::= { jnxUserAAAAccessPoolEntry 13 }
+
+    jnxUserAAAAccessPoolAddressUsageAbate OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The configured abate percentage threshold of addresses used in this
+            pool or linked pool. An SNMP trap clear is generated when address use
+            falls below this threshold percentage. This trap will only be generated
+            for unlinked pools or pools that are the head of a linked chain of
+            pools Conversely, if this pool it part of a linked chain of pools but
+            not the head of the chain, then no traps will be generated."
+         ::= { jnxUserAAAAccessPoolEntry 14 }
+
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Managed objects for Assignment functions
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    jnxUserAAAGeneral   OBJECT IDENTIFIER ::= { jnxUserAAAAssignment 1 }
+
+    jnxUserAAADomainDelimiters OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..8))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The list of delimiters used to separate the user's name from the
+             user's domain in the username field.  The default is '@'."
+        ::= { jnxUserAAAGeneral 1 }
+
+    jnxUserAAADomainParseDirection OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        rightToLeft(1),
+                        leftToRight(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The direction in which the user's name is parsed: either search
+            for domain delimiter from left to right or right to left; first
+            delimiter marks boundry. The default is right to left."
+        DEFVAL    { rightToLeft }
+        ::= { jnxUserAAAGeneral 2 }
+
+    jnxUserAAADomain     OBJECT IDENTIFIER ::= { jnxUserAAAAssignment 2 }
+
+    jnxUserAAADomainTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxUserAAADomainEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The entries in this table specify the assignment of a remote access
+            user to a logical system, based on the user's domain."
+        ::= { jnxUserAAADomain 1 }
+
+    jnxUserAAADomainEntry OBJECT-TYPE
+        SYNTAX      JnxUserAAADomainEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A specification of the logical system to which users on a specified
+            domain should be assigned."
+        INDEX     { IMPLIED jnxUserAAADomainName }
+        ::= { jnxUserAAADomainTable 1 }
+
+    JnxUserAAADomainEntry ::= SEQUENCE {
+        jnxUserAAADomainName                  DisplayString,
+        jnxUserAAADomainStripDomain           TruthValue,
+        jnxUserAAADomainLogicalSystem         DisplayString,
+        jnxUserAAADomainRoutingInstance       DisplayString,
+        jnxUserAAADomainAddrPoolName          DisplayString,
+        jnxUserAAADomainDynamicPorfile        DisplayString,
+        jnxUserAAADomainTargetLogicalSystem   DisplayString,
+        jnxUserAAADomainTargetRoutingInstance DisplayString,
+        jnxUserAAADomainTunnelProfile         DisplayString,
+        jnxUserAAADomainDynamicProfile        DisplayString,
+        jnxUserAAADomainStripUsername         INTEGER,
+        jnxUserAAADomainOverridePassword      TruthValue }
+
+    jnxUserAAADomainName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..63))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The domain name uniquely identifying this entry."
+        ::= { jnxUserAAADomainEntry 1 }
+
+    jnxUserAAADomainStripDomain OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the domain name stripping feature, which causes
+             the system to strip the domain name before sending the
+             access-request to RADIUS for authentication."
+        DEFVAL    { false }
+        ::= { jnxUserAAADomainEntry 2 }
+
+    jnxUserAAADomainLogicalSystem OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the logical system, which will be used by the AAA
+             subsystem for this session. If not specified, will be mapped to
+             default."
+        DEFVAL    { "" }
+        ::= { jnxUserAAADomainEntry 3 }
+
+    jnxUserAAADomainRoutingInstance OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the routing instance, which will be used by the AAA
+             subsystem for this session. If not specified, will be mapped to
+             default."
+        DEFVAL    { "" }
+        ::= { jnxUserAAADomainEntry 4 }
+
+    jnxUserAAADomainAddrPoolName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..63))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The configured the address-pool-name for the domain name."
+        DEFVAL    { "" }
+        ::= { jnxUserAAADomainEntry 5 }
+
+    jnxUserAAADomainDynamicPorfile OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The configured dynamic-profile which will be used for this session
+             upon succeeding validation."
+        DEFVAL    { "" }
+        ::= { jnxUserAAADomainEntry 6 }
+
+    jnxUserAAADomainTargetLogicalSystem OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The configured target logical-system that this session will need to
+             be mapped to. If not specified, will be mapped to default."
+        ::= { jnxUserAAADomainEntry 7 }
+
+    jnxUserAAADomainTargetRoutingInstance OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The configured routing-instance that this session will need to be
+             mapped to."
+        ::= { jnxUserAAADomainEntry 8 }
+
+    jnxUserAAADomainTunnelProfile OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The associated tunnel profile."
+        ::= { jnxUserAAADomainEntry 9 }
+
+    jnxUserAAADomainDynamicProfile OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The configured dynamic-profile to be used for this session."
+        DEFVAL    { "" }
+        ::= { jnxUserAAADomainEntry 10 }
+
+    jnxUserAAADomainStripUsername OBJECT-TYPE
+        SYNTAX      INTEGER {
+            disabled(0),
+            leftToRight(1),
+            rightToLeft(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Displays the strip-username configuration."
+        DEFVAL    { 0 }
+        ::= { jnxUserAAADomainEntry 11 }
+
+    jnxUserAAADomainOverridePassword OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Displays the override-password configuration."
+        DEFVAL    { false }
+        ::= { jnxUserAAADomainEntry 12 }
+
+    jnxUserAAADomainTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxUserAAADomainTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The entries in this table specify the tunnels associated with a
+            domain."
+        ::= { jnxUserAAADomain 2 }
+
+    jnxUserAAADomainTunnelEntry OBJECT-TYPE
+        SYNTAX      JnxUserAAADomainTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A specification of the tunnels associated with a domain."
+        INDEX     { jnxUserAAADomainTunnelName,
+                    jnxUserAAADomainTunnelDefId }
+        ::= { jnxUserAAADomainTunnelTable 1 }
+
+    JnxUserAAADomainTunnelEntry ::= SEQUENCE {
+        jnxUserAAADomainTunnelName                 OCTET STRING,
+        jnxUserAAADomainTunnelDefId                Integer32,
+        jnxUserAAADomainTunnelPreference           Integer32,
+        jnxUserAAADomainTunnelRemoteGwName         DisplayString,
+        jnxUserAAADomainTunnelRemoteGwAddress      IpAddress,
+        jnxUserAAADomainTunnelSourceGwName         DisplayString,
+        jnxUserAAADomainTunnelSourceGwAddress      IpAddress,
+        jnxUserAAADomainTunnelSecret               DisplayString,
+        jnxUserAAADomainTunnelLogicalSystems       DisplayString,
+        jnxUserAAADomainTunnelRoutingInstance      DisplayString,
+        jnxUserAAADomainTunnelMedium               INTEGER,
+        jnxUserAAADomainTunnelType                 INTEGER,
+        jnxUserAAADomainTunnelId                   DisplayString,
+        jnxUserAAADomainTunnelMaxSessions          Unsigned32}
+
+    jnxUserAAADomainTunnelName OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(1..63))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The domain name associated with this entry."
+        ::= { jnxUserAAADomainTunnelEntry 1 }
+
+    jnxUserAAADomainTunnelDefId OBJECT-TYPE
+        SYNTAX      Integer32 (1..31)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The tunnel definition id value associated with this entry."
+        ::= { jnxUserAAADomainTunnelEntry 2 }
+
+    jnxUserAAADomainTunnelPreference OBJECT-TYPE
+        SYNTAX      Integer32 (1..31)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The tunnel's preference value associated with this entry. "
+        ::= { jnxUserAAADomainTunnelEntry 3 }
+
+    jnxUserAAADomainTunnelRemoteGwName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This name specifies the hostname expected from the peer (the LNS)
+             when a tunnel is setup."
+        ::= { jnxUserAAADomainTunnelEntry 4 }
+
+    jnxUserAAADomainTunnelRemoteGwAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP address of LNS tunnel endpoint"
+        ::= { jnxUserAAADomainTunnelEntry 5 }
+
+    jnxUserAAADomainTunnelSourceGwName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This name specifies the hostname expected from the peer (the LNS)
+             when a tunnel is setup."
+        ::= { jnxUserAAADomainTunnelEntry 6 }
+
+    jnxUserAAADomainTunnelSourceGwAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source address of the tunnel (overrides the default address for
+             this LS/RI.) "
+        ::= { jnxUserAAADomainTunnelEntry 7 }
+
+    jnxUserAAADomainTunnelSecret OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel password associated with this entry."
+        ::= { jnxUserAAADomainTunnelEntry 8 }
+
+    jnxUserAAADomainTunnelLogicalSystems OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The logical systems associated with this entty."
+        ::= { jnxUserAAADomainTunnelEntry 9 }
+
+    jnxUserAAADomainTunnelRoutingInstance OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The routing instance associated with this entty."
+        ::= { jnxUserAAADomainTunnelEntry 10 }
+
+    jnxUserAAADomainTunnelMedium OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        tunnelMediumIPv4(1),
+                        tunnelMediumUnknown(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel medium associated with this entry.  The medium dictates
+             the format of the tunnel address."
+        ::= { jnxUserAAADomainTunnelEntry 11 }
+
+    jnxUserAAADomainTunnelType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        tunnelL2tp(1),
+                        tunnelUnknown(2),
+                        tunnelL2f(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel type associated with this entry."
+        ::= { jnxUserAAADomainTunnelEntry 12 }
+
+    jnxUserAAADomainTunnelId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel identifier associated with this entry."
+        ::= { jnxUserAAADomainTunnelEntry 13 }
+
+    jnxUserAAADomainTunnelMaxSessions OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The maximum number of tunnel sessions allowed in this tunnel
+             entry."
+        ::= { jnxUserAAADomainTunnelEntry 14 }
+
+
+    jnxUserAAADomainPadnTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxUserAAADomainPadnEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The entries in this table specify the PPPoE active discovery
+             network (PADN) parameters associated with a domain."
+        ::= { jnxUserAAADomain 3 }
+
+    jnxUserAAADomainPadnEntry OBJECT-TYPE
+        SYNTAX      JnxUserAAADomainPadnEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A specification of the PPPoE active discovery network parameters
+            associated with a domain."
+        INDEX     { jnxUserAAADomainName,
+                    jnxUserAAADomainPadnIpAddress,
+                    jnxUserAAADomainPadnIpMask }
+        ::= { jnxUserAAADomainPadnTable 1 }
+
+    JnxUserAAADomainPadnEntry ::= SEQUENCE {
+        jnxUserAAADomainPadnIpAddress     IpAddress,
+        jnxUserAAADomainPadnIpMask        IpAddress,
+        jnxUserAAADomainPadnDistance      Integer32 }
+
+    jnxUserAAADomainPadnIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The IP address of this entry."
+        ::= { jnxUserAAADomainPadnEntry 1 }
+
+    jnxUserAAADomainPadnIpMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The IP mask of this entry."
+        ::= { jnxUserAAADomainPadnEntry 2 }
+
+    jnxUserAAADomainPadnDistance OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The administrative distance metric of this entry."
+        ::= { jnxUserAAADomainPadnEntry 3 }
+
+
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Managed objects for Access profile
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxUserAAAAccessProfileGeneral OBJECT IDENTIFIER ::= { jnxUserAAAAccessProfile 1 }
+
+    jnxUserAAAAccessProfileTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxUserAAAAccessProfileEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "The entries in this table specify the assignment of authentication
+             methods for a particular subscriber type."
+         ::= { jnxUserAAAAccessProfileGeneral 1 }
+
+    jnxUserAAAAccessProfileEntry OBJECT-TYPE
+        SYNTAX      JnxUserAAAAccessProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A specification of the authentication methods for a particular
+            subscriber type."
+        INDEX     { IMPLIED jnxUserAAAAccessProfileName }
+        ::= { jnxUserAAAAccessProfileTable 1 }
+
+    JnxUserAAAAccessProfileEntry ::= SEQUENCE {
+        jnxUserAAAAccessProfileName                 DisplayString,
+        jnxUserAAAAccessProfileAuthenticationOrder  OCTET STRING,
+        jnxUserAAAAccessProfileAccountingOrder      OCTET STRING,
+        jnxUserAAAAccessProfileAuthorizationOrder   OCTET STRING,
+        jnxUserAAAAccessProfileProvisioningOrder    OCTET STRING,
+        jnxUserAAAAccessProfileAccStopOnFailure     TruthValue,
+        jnxUserAAAAccessProfileAccStopOnDeny        TruthValue,
+        jnxUserAAAAccessProfileImmediateUpdate      TruthValue,
+        jnxUserAAAAccessProfileCoaImmediateUpdate   TruthValue,
+        jnxUserAAAAccessProfileInterval             Integer32,
+        jnxUserAAAAccessProfileStatType             INTEGER
+    }
+
+    jnxUserAAAAccessProfileName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..63))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The access profile name."
+        ::= { jnxUserAAAAccessProfileEntry 1 }
+
+    jnxUserAAAAccessProfileAuthenticationOrder OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..5))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The set of authentication mechanisms configured on this system.  Each
+            octet in this object contains one of the values defined in the
+            JnxAuthenticateType TEXTUAL-CONVENTION.
+
+            The system will sequence through each octet of this object starting at
+            octet 1 and attempt to use the corresponding authentication protocol
+            defined by JnxAuthenticateType.
+
+            If an authentication protocol is configured and attempts to reach the
+            authentication server fail, the system will move to the next octet in
+            this object and retry the authentication in the form dictated by the
+            corresponding authentication protocoltype. The process of sequencing
+            thru each octet will stop if the authentication server is successfully
+            contacted, or there are no more configured octets in this object."
+         ::= { jnxUserAAAAccessProfileEntry 2 }
+
+    jnxUserAAAAccessProfileAccountingOrder OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..5))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The set of accounting mechanisms configured on this system.  Each
+            octet in this object contains one of the values defined in the
+            JnxAccountingType TEXTUAL-CONVENTION.
+
+            The system will sequence through each octet of this object starting at
+            octet 1 and attempt to use the corresponding accounting protocol
+            defined by JnxAccountingType.
+
+            If an accounting protocol is configured and attempts to reach the
+            accounting server fail, the system will move to the next octet in
+            this object and retry the accounting in the form dictated by the
+            corresponding accounting protocoltype. The process of sequencing
+            thru each octet will stop if the accounting server is successfully
+            contacted, or there are no more configured octets in this object."
+         ::= { jnxUserAAAAccessProfileEntry 3 }
+
+    jnxUserAAAAccessProfileAuthorizationOrder OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..5))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The set of accounting mechanisms configured on this system.  Each
+            octet in this object contains one of the values defined in the
+            JnxAuthorizationType TEXTUAL-CONVENTION.
+
+            The system will sequence through each octet of this object starting at
+            octet 1 and attempt to use the corresponding accounting protocol
+            defined by JnxAuthorizationType.
+
+            If an accounting protocol is configured and attempts to reach the
+            accounting server fail, the system will move to the next octet in
+            this object and retry the accounting in the form dictated by the
+            corresponding accounting protocoltype. The process of sequencing
+            thru each octet will stop if the accounting server is successfully
+            contacted, or there are no more configured octets in this object."
+         ::= { jnxUserAAAAccessProfileEntry 4 }
+
+     jnxUserAAAAccessProfileProvisioningOrder OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..5))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The set of provisioning mechanisms configured on this system.  Each
+            octet in this object contains one of the values defined in the
+            JnxProvisioningType TEXTUAL-CONVENTION.
+
+            The system will sequence through each octet of this object starting at
+            octet 1 and attempt to use the corresponding accounting protocol
+            defined by JnxProvisioningType.
+
+            If an accounting protocol is configured and attempts to reach the
+            accounting server fail, the system will move to the next octet in
+            this object and retry the accounting in the form dictated by the
+            corresponding accounting protocoltype. The process of sequencing
+            thru each octet will stop if the accounting server is successfully
+            contacted, or there are no more configured octets in this object."
+         ::= { jnxUserAAAAccessProfileEntry 5 }
+
+
+    jnxUserAAAAccessProfileAccStopOnFailure OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Enables/disables the Acct-Stop message if a user fails
+             authentication, but AAA-server grants access."
+         ::= { jnxUserAAAAccessProfileEntry 6 }
+
+    jnxUserAAAAccessProfileAccStopOnDeny OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Enables/disables the Acct-Stop message if AAA-server denies
+             access."
+         ::= { jnxUserAAAAccessProfileEntry 7 }
+
+    jnxUserAAAAccessProfileImmediateUpdate OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Enables/disables the Acct-Update message on receipt of a
+             Acct-response for the Acct-Start message."
+         ::= { jnxUserAAAAccessProfileEntry 8 }
+
+    jnxUserAAAAccessProfileCoaImmediateUpdate OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Enables/disables the Acct-Update message on completion of
+             processing a change of authorization."
+         ::= { jnxUserAAAAccessProfileEntry 9 }
+
+    jnxUserAAAAccessProfileInterval OBJECT-TYPE
+        SYNTAX       Integer32
+        UNITS        "minutes"
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The interval in minutes between accounting updates(Interim-stats
+             off, if not specified)."
+         ::= { jnxUserAAAAccessProfileEntry 10 }
+
+    jnxUserAAAAccessProfileStatType OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        time(0),
+                        volume-time(1) }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The type of statistics are collected. These are the configured
+             types:
+                time         - the option to report only uptime
+                volume-time  - the option to report both volume and uptime"
+         ::= { jnxUserAAAAccessProfileEntry 11 }
+
+END

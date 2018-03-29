@@ -1,0 +1,784 @@
+PULSESECURE-PSG-MIB DEFINITIONS ::= BEGIN
+        IMPORTS 
+        	NOTIFICATION-TYPE, MODULE-IDENTITY, enterprises
+        		FROM SNMPv2-SMI
+        	NetworkAddress
+        		FROM RFC1155-SMI
+        	IpAddress
+        		FROM RFC1155-SMI;
+        
+pulsesecure-gateway MODULE-IDENTITY
+    LAST-UPDATED "201607071610Z"
+    ORGANIZATION "Pulse Secure"
+    CONTACT-INFO    
+	 "Internet: https://www.pulsesecure.net"
+    DESCRIPTION
+	"This file defines the private Pulse Secure MIB extensions."
+    REVISION     "201607071610Z"
+    DESCRIPTION
+	"Initial Version"
+    ::= { enterprises 12532 }
+
+
+logFullPercent OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Percentage of log file full"
+    ::= { pulsesecure-gateway 1 } 
+
+signedInWebUsers OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Number of Signed-In Web Users"
+    ::= { pulsesecure-gateway 2 } 
+
+signedInMailUsers OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Number of Signed-In Mail Users"
+    ::= { pulsesecure-gateway 3 } 
+
+blockedIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Address that is blocked due to consecutive failed login attempts"
+    ::= { pulsesecure-gateway 4 }
+
+authServerName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of an external authentication server"
+    ::= { pulsesecure-gateway 5 }
+
+productName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IVE Licensed Product Name"
+    ::= { pulsesecure-gateway 6 }
+
+productVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IVE System Software Version"
+    ::= { pulsesecure-gateway 7 }
+    
+fileName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "File name"
+    ::= { pulsesecure-gateway 8 }
+    
+meetingUserCount OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+	"the number of concurrent meeting users"
+    ::= { pulsesecure-gateway 9 } 
+
+    
+iveCpuUtil OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The CPU Utilization of the IVE system"
+    ::= { pulsesecure-gateway 10 } 
+
+iveMemoryUtil OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Memory Utilization of the IVE system"
+    ::= { pulsesecure-gateway 11 } 
+
+iveConcurrentUsers OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of Concurrent user Licenses used for the IVE Node"
+    ::= { pulsesecure-gateway 12 } 
+
+clusterConcurrentUsers OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of Concurrent user Licenses used for the Cluster"
+    ::= { pulsesecure-gateway 13 } 
+
+iveTotalHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of hits to the IVE since last reboot"
+    ::= { pulsesecure-gateway 14 } 
+
+iveFileHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of File hits to the IVE since last reboot"
+    ::= { pulsesecure-gateway 15 } 
+
+iveWebHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of hits via the Web Interface since the last reboot"
+    ::= { pulsesecure-gateway 16 } 
+
+iveAppletHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of applet hits to the IVE  since last reboot"
+    ::= { pulsesecure-gateway 17 } 
+
+ivetermHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of terminal hits to the IVE since last reboot"
+    ::= { pulsesecure-gateway 18 } 
+
+iveSAMHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of SAM(Secure Application manager)hits of since last
+reboot"
+    ::= { pulsesecure-gateway 19 } 
+
+iveNCHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of NC(Network Connect) hits of since last reboot"
+    ::= { pulsesecure-gateway 20 } 
+
+meetingHits OBJECT-TYPE
+    SYNTAX      Counter64	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Total number of Meeting hits of since last reboot"
+    ::= { pulsesecure-gateway 21 } 
+
+meetingCount OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+	"the number of concurrent meetings"
+    ::= { pulsesecure-gateway 22 } 
+
+logName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the log (admin/user/event)"
+    ::= { pulsesecure-gateway 23 }
+
+iveSwapUtil OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Swap Utilization of the IVE system"
+    ::= { pulsesecure-gateway 24 } 
+
+diskFullPercent OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Percentage of disk space full"
+    ::= { pulsesecure-gateway 25 } 
+
+blockedIPList OBJECT-TYPE
+    SYNTAX	SEQUENCE OF IPEntry
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Table of 10 most recently blocked IPs"
+    ::= { pulsesecure-gateway 26 } 
+
+ipEntry OBJECT-TYPE
+    SYNTAX      IPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing a blocked IP"
+    INDEX       { ipIndex }
+    ::= { blockedIPList 1 }
+
+IPEntry	::= SEQUENCE {
+    ipIndex	Integer32,
+    ipValue	NetworkAddress
+}
+
+ipIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index for IP Table"
+    ::= { ipEntry 1 }
+
+ipValue OBJECT-TYPE
+    SYNTAX      NetworkAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Blocked IP Entry"
+    ::= { ipEntry 2 }
+
+logID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "The unique ID of the log message."
+    ::= { pulsesecure-gateway 27 }
+
+logType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "String stating whether log message is major or critical."
+    ::= { pulsesecure-gateway 28 }
+
+logDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "The actual log message string."
+    ::= { pulsesecure-gateway 29 }
+
+ivsName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+        "Virtual System name"
+    ::= { pulsesecure-gateway 30 }
+
+ocspResponderURL OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of an OCSP Responder"
+    ::= { pulsesecure-gateway 31 }
+ 
+fanDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "The status of the fans"
+    ::= { pulsesecure-gateway 32 }
+
+psDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "The status of the power supplies"
+    ::= { pulsesecure-gateway 33 }
+
+raidDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "The status of the RAID"
+    ::= { pulsesecure-gateway 34 }
+
+
+
+-- J&J traps
+
+clusterName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "Cluster Name"
+    ::= { pulsesecure-gateway 35 }
+
+
+nodeList OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+	"List of disabled nodes"
+    ::= { pulsesecure-gateway 36 } 
+
+
+vipType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "Whether the VIP is external or internal"
+    ::= { pulsesecure-gateway 37 }
+
+currentVIP OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "Current value of VIP being changed"
+    ::= { pulsesecure-gateway 38 }
+
+newVIP OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	    "New value for the VIp being changed"
+    ::= { pulsesecure-gateway 39 }
+
+
+nicEvent OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+	"Type of event that generated a the Trap: admin, external"
+    ::= { pulsesecure-gateway 40 } 
+
+nodeName OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+	"Node Name"
+    ::= { pulsesecure-gateway 41 } 
+
+iveTemperature OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The Temperature of MAG application blade. Other platform such as SA
+and IC will return 0"
+    ::= { pulsesecure-gateway 42 } 
+
+iveVPNTunnels OBJECT-TYPE
+    SYNTAX      Gauge32	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"The number of concurrent Pulse IPSec and NC users"
+    ::= { pulsesecure-gateway 43 } 
+
+iveSSLConnections OBJECT-TYPE
+    SYNTAX      Gauge32	
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION  
+	"Total number of SSL connection "
+    ::= { pulsesecure-gateway 44 } 
+
+esapVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Active ESAP Version"
+    ::= { pulsesecure-gateway 45 }
+
+vipChangeReason OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Reason for the VIP node change"
+    ::= { pulsesecure-gateway 46 }
+
+processName OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+	"Process Name"
+    ::= { pulsesecure-gateway 47 }
+
+iveTotalSignedInUsers OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Total number of Users Logged In for the Cluster"
+    ::= { pulsesecure-gateway 48 } 
+
+vpnACLSPercentage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The percentage of system ACL entries reached"
+    ::= { pulsesecure-gateway 49 }
+
+vpnACLSCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of system ACL entries reached"
+    ::= { pulsesecure-gateway 50 }
+
+blockedIPv6 OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS	current
+    DESCRIPTION  
+        "IPv6 Address that is blocked due to consecutive failed login attempts"
+    ::= { pulsesecure-gateway 51 }
+
+iveTraps OBJECT IDENTIFIER ::= { pulsesecure-gateway 251 }
+
+-- iveTraps.1 and iveTraps.2 are loaded incorrectly in HP OpenView 
+-- so avoid defining them
+    
+iveLogNearlyFull NOTIFICATION-TYPE
+    OBJECTS { logFullPercent, logName }
+    STATUS	current
+    DESCRIPTION
+	"Log file nearly full"
+    ::= { iveTraps 4 }
+
+iveLogFull NOTIFICATION-TYPE
+    OBJECTS { logName }
+    STATUS	current
+    DESCRIPTION
+	"Log file full"
+    ::= { iveTraps 5 }
+
+iveMaxConcurrentUsersSignedIn NOTIFICATION-TYPE
+    OBJECTS { iveConcurrentUsers }
+    STATUS	current
+    DESCRIPTION
+	"Maximum number of concurrent users signed in"
+    ::= { iveTraps 6 }
+    
+iveTooManyFailedLoginAttempts NOTIFICATION-TYPE
+    OBJECTS { blockedIP }
+    STATUS	current
+    DESCRIPTION
+	"Too many failed login attempts from IPv4 address"
+    ::= { iveTraps 7 }
+
+externalAuthServerUnreachable NOTIFICATION-TYPE
+    OBJECTS { authServerName }
+    STATUS	current
+    DESCRIPTION
+	"External authentication server is not responding"
+    ::= { iveTraps 8 }
+
+iveStart NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"IVE startup under administrator's instruction."
+    ::= { iveTraps 9 }
+
+iveShutdown NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"IVE shutdown under administrator's instruction."
+    ::= { iveTraps 10 }
+
+iveReboot NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"IVE reboot under administrator's instruction."
+    ::= { iveTraps 11 }
+    
+archiveServerUnreachable NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"Archive server is not responding"
+    ::= { iveTraps 12 }
+
+archiveServerLoginFailed NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"Could not login into archive server. Verify FTP username and
+password."
+    ::= { iveTraps 13 }
+    
+archiveFileTransferFailed NOTIFICATION-TYPE   
+    OBJECTS { fileName }
+    STATUS	current
+    DESCRIPTION
+	"Could not store file on archive server"
+    ::= { iveTraps 14 }
+    
+    
+meetingUserLimit NOTIFICATION-TYPE
+    OBJECTS { meetingUserCount }
+    STATUS	current
+    DESCRIPTION
+	"Concurrent user count over license limit"
+    ::= { iveTraps 15 }
+
+iveRestart NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"IVE has restarted under administrator's instruction."
+    ::= { iveTraps 16 }
+
+meetingLimit NOTIFICATION-TYPE
+    OBJECTS { meetingCount }
+    STATUS	current
+    DESCRIPTION
+	"Concurrent meeting count over license limit"
+    ::= { iveTraps 17 }
+
+iveDiskNearlyFull NOTIFICATION-TYPE
+    OBJECTS { diskFullPercent }
+    STATUS	current
+    DESCRIPTION
+	"Disk space nearly full"
+    ::= { iveTraps 18 }
+
+iveDiskFull NOTIFICATION-TYPE
+    STATUS	current
+    DESCRIPTION
+	"Disk space full"
+    ::= { iveTraps 19 }
+
+logMessageTrap NOTIFICATION-TYPE
+    OBJECTS { logID, logType, logDescription }
+    STATUS  current
+	DESCRIPTION
+	    "The TRAP generated from a log message."
+    ::= { iveTraps 20 }
+
+memUtilNotify NOTIFICATION-TYPE
+    OBJECTS { iveMemoryUtil }
+    STATUS	current
+    DESCRIPTION
+	"IVE memory utilization above threshold"
+    ::= { iveTraps 21 }
+
+cpuUtilNotify NOTIFICATION-TYPE
+    OBJECTS { iveCpuUtil }
+    STATUS	current
+    DESCRIPTION
+	"IVE CPU utilization above threshold"
+    ::= { iveTraps 22 }
+
+swapUtilNotify NOTIFICATION-TYPE
+    OBJECTS { iveSwapUtil }
+    STATUS	current
+    DESCRIPTION
+	"IVE swap utilization above threshold"
+    ::= { iveTraps 23 }
+
+iveMaxConcurrentUsersVirtualSystem NOTIFICATION-TYPE
+    OBJECTS { ivsName }
+    STATUS	deprecated
+    DESCRIPTION
+	"Maximum number of concurrent Virtual System users signed in"
+    ::= { iveTraps 24 }
+
+ocspResponderConnectionFailed NOTIFICATION-TYPE
+    OBJECTS { ocspResponderURL }
+    STATUS	current
+    DESCRIPTION
+	"OCSP Responder cannot be connected"
+    ::= { iveTraps 25 }
+
+iveFanNotify NOTIFICATION-TYPE
+    OBJECTS { fanDescription }
+    STATUS	current
+    DESCRIPTION
+	"The status of the fans has changed"
+    ::= { iveTraps 26 }
+    
+ivePowerSupplyNotify NOTIFICATION-TYPE
+    OBJECTS { psDescription }
+    STATUS	current
+    DESCRIPTION
+	"The status of the power supplies has changed"
+    ::= { iveTraps 27 }
+    
+iveRaidNotify NOTIFICATION-TYPE
+    OBJECTS { raidDescription }
+    STATUS	current
+    DESCRIPTION
+	"The status of the RAID has changed"
+    ::= { iveTraps 28 }
+
+iveClusterDisableNodeTrap NOTIFICATION-TYPE
+    OBJECTS { clusterName, nodeList }
+    STATUS	current
+    DESCRIPTION
+	"A Given node(s) in a cluster has(have) been disabled"
+    ::= { iveTraps 29 }
+
+iveClusterChangedVIPTrap NOTIFICATION-TYPE
+    OBJECTS { vipType, currentVIP, newVIP }
+    STATUS	current
+    DESCRIPTION
+	"A external/internal VIP has changed from its current value to a new
+one"
+    ::= { iveTraps 30 }
+
+iveNetExternalInterfaceDownTrap NOTIFICATION-TYPE
+    OBJECTS { nicEvent }
+    STATUS	current
+    DESCRIPTION
+	"The External interface has gone down, reason is in nicEvent"
+    ::= { iveTraps 31 }
+
+iveClusterDeleteTrap NOTIFICATION-TYPE
+    OBJECTS { nodeName }
+    STATUS	current
+    DESCRIPTION
+	"Cluster delete inititaed by nodeName"
+    ::= { iveTraps 32 }
+
+iveNetInternalInterfaceDownTrap NOTIFICATION-TYPE
+    OBJECTS { nicEvent }
+    STATUS	current
+    DESCRIPTION
+	"The Internal interface has gone down, reason is in nicEvent"
+    ::= { iveTraps 33 }
+
+iveNetManagementInterfaceDownTrap NOTIFICATION-TYPE
+    OBJECTS { nicEvent }
+    STATUS	current
+    DESCRIPTION
+	"The Management interface has gone down, reason is in nicEvent"
+    ::= { iveTraps 34 }
+
+iveTemperatureNotify NOTIFICATION-TYPE
+    OBJECTS { iveTemperature }
+    STATUS	current
+    DESCRIPTION
+	"IVE Temperature is above threshold"
+    ::= { iveTraps 35 }
+
+iveVIPNodeChanged NOTIFICATION-TYPE
+    OBJECTS { nodeName, vipChangeReason}
+    STATUS      current
+    DESCRIPTION
+        "Notifies that VIP node has changed. 
+	 nodeName is the new node which is hosting the VIP.
+	 vipChangeReason specifies the reason for the change."
+    ::= { iveTraps 36 }
+
+iveProcessesNearMaxLimit NOTIFICATION-TYPE
+    OBJECTS { processName }
+    STATUS	current
+    DESCRIPTION
+	"The count of processes (by processName) is about reach to maximum
+limit"
+    ::= { iveTraps 37 }
+    
+iveProcessesReachedMaxLimit NOTIFICATION-TYPE
+    OBJECTS { processName }
+    STATUS	current
+    DESCRIPTION
+	"The count of processes (by processName) has reached to maximum limit"
+    ::= { iveTraps 38 }
+
+iveACLsNearMaxLimit NOTIFICATION-TYPE
+    OBJECTS { vpnACLSPercentage }
+    STATUS current
+    DESCRIPTION
+    "The percentage of ACL entries has reached maximum supported limit"
+    ::= { iveTraps 39 }
+
+iveACLsCrossedMaxLimit NOTIFICATION-TYPE
+    OBJECTS { vpnACLSCount }
+    STATUS current
+    DESCRIPTION
+    "The count of ACL entries has crossed maximum supported limit"
+    ::= { iveTraps 40 }
+    
+iveTooManyFailedLoginAttemptsIPv6 NOTIFICATION-TYPE
+    OBJECTS { blockedIPv6 }
+    STATUS	current
+    DESCRIPTION
+	"Too many failed login attempts from IPv6 address"
+    ::= { iveTraps 41 }
+
+-- Product Name
+iveSAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 252 }
+iveICProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 253 }
+iveMAGProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 254 }
+iveVAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 255 }
+ivePSAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 256 }
+
+--MAG platform
+iveProductMAG2600  OBJECT IDENTIFIER ::= {iveMAGProduct 1 }
+iveProductMAG4610  OBJECT IDENTIFIER ::= {iveMAGProduct 2 }
+iveProductSM160  OBJECT IDENTIFIER ::= {iveMAGProduct 3 }
+iveProductSM360 OBJECT IDENTIFIER ::= {iveMAGProduct 4 }
+
+--VA platform
+iveProductVASPE  OBJECT IDENTIFIER ::= {iveVAProduct 1 }
+iveProductVADTE  OBJECT IDENTIFIER ::= {iveVAProduct 2 }
+
+--PSA platform
+iveProductPSA300    OBJECT IDENTIFIER ::= {ivePSAProduct 1 }
+iveProductPSA3000   OBJECT IDENTIFIER ::= {ivePSAProduct 2 }
+iveProductPSA5000   OBJECT IDENTIFIER ::= {ivePSAProduct 3 }
+iveProductPSA7000f  OBJECT IDENTIFIER ::= {ivePSAProduct 4 }
+iveProductPSA7000c  OBJECT IDENTIFIER ::= {ivePSAProduct 5 }
+iveProductPSA10000  OBJECT IDENTIFIER ::= {ivePSAProduct 6 }
+
+--MAG platform incase we have other rev
+iveMAG2600  OBJECT IDENTIFIER ::= {iveProductMAG2600 1}
+iveMAG4610  OBJECT IDENTIFIER ::= {iveProductMAG4610 1}
+iveMAGSM160   OBJECT IDENTIFIER ::= {iveProductSM160 1}
+iveMAGSM360   OBJECT IDENTIFIER ::= {iveProductSM360 1}
+
+--VA platform incase we have to extend further
+iveVASPE OBJECT IDENTIFIER ::= {iveProductVASPE 1}
+iveVADTE OBJECT IDENTIFIER ::= {iveProductVADTE 1}
+
+--PSA platform incase we have other rev
+ivePSA300    OBJECT IDENTIFIER ::= {iveProductPSA300 1 }
+ivePSA3000   OBJECT IDENTIFIER ::= {iveProductPSA3000 1 }
+ivePSA5000   OBJECT IDENTIFIER ::= {iveProductPSA5000 1 }
+ivePSA7000f  OBJECT IDENTIFIER ::= {iveProductPSA7000f 1 }
+ivePSA7000c  OBJECT IDENTIFIER ::= {iveProductPSA7000c 1 }
+ivePSA10000  OBJECT IDENTIFIER ::= {iveProductPSA10000 1 }
+
+END

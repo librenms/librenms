@@ -1,0 +1,129 @@
+CTRON-BUS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-bus-mib.txt
+--  Revision: 01.00.00
+--  Part Number:
+--  Date: May 5, 1997
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific trap log mib.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright January 1997 Cabletron Systems
+
+
+IMPORTS
+    ctAtmfLanEmulation
+            FROM CTRON-MIB-NAMES
+    DisplayString
+            FROM RFC1213-MIB
+    OBJECT-TYPE
+            FROM RFC-1212;
+
+    -- DisplayString ::= OCTET STRING
+
+
+ctBus OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 4 }
+
+ctBusConfGroup  OBJECT IDENTIFIER ::= { ctBus 1 }
+
+CtLaneDebugLevel ::= INTEGER {
+        user(1),
+        all(2),
+        error(3),
+        warning(4),
+        informational(5),
+        detailed(6),
+        trace(7)
+        }
+
+ctBusDSStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        connected(1),
+        connectionLost(2),
+        unknown(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Reports the current status of the Secure Fast Directory
+         Services connection."
+    DEFVAL { unknown }
+    ::= { ctBusConfGroup 1 }
+
+ctBusUNIVersion OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(1),
+        uni30(2),
+        uni31(3),
+        uni40(4)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Reports the UNI version that the bus is using."
+    DEFVAL { unknown }
+    ::= { ctBusConfGroup 2 }
+
+ctBusLaneDbgOutputFile OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..255))
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Full path and file for Debug Output."
+    DEFVAL { "" }
+    ::= { ctBusConfGroup 3 }
+
+ctBusLaneDbgConnectionServices OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for Connection Services subsystem."
+    DEFVAL { user }
+    ::= { ctBusConfGroup 4 }
+
+ctBusLaneDbgSNMP OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for SNMP Agent subsystem."
+    DEFVAL { user }
+    ::= { ctBusConfGroup 5 }
+
+ctBusLaneDbgBUS OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for BUS subsystem."
+    DEFVAL { user }
+    ::= { ctBusConfGroup 6 }
+
+END

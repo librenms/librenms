@@ -1,0 +1,1200 @@
+-- *****************************************************************
+-- CISCO-IF-THRESHOLD-MIB.my: Cisco Interface Threshold MIB
+--
+-- May 2001, E. Mickey Spiegel, Sonal Maheshwari
+--
+-- Copyright (c) 2001 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-IF-THRESHOLD-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TimeStamp,
+    TruthValue                                  FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
+    ciscoMgmt                                   FROM CISCO-SMI
+    InterfaceIndex, ifIndex                     FROM IF-MIB;
+
+
+ciscoIfThresholdMIB MODULE-IDENTITY
+    LAST-UPDATED   "200109140000Z"
+    ORGANIZATION   "Cisco Systems, Inc."
+    CONTACT-INFO   "Cisco Systems
+                    Customer Service
+
+                    Postal: 170 W Tasman Drive
+                    San Jose, CA 95134
+                    USA
+
+                    Tel: +1 800 553-NETS
+
+                    E-mail: cs-dwdm@cisco.com"
+    DESCRIPTION
+        "This MIB module defines the managed objects that support
+        monitoring of thresholds on interfaces.  Configuration and
+        monitoring of the thresholds is done through threshold
+        templates that can be assigned to any subset of interfaces on
+        the network element.  More than one threshold template can be
+        assigned to a given interface.
+
+        This MIB module should be used when it is desired to apply a
+        common set of thresholds to a subset of the available
+        interfaces.  If a threshold is to be applied to only one
+        interface, then the EVENT-MIB or the RMON-MIB may be used as
+        simpler alternatives.  If a threshold is to be applied to all
+        available interfaces, then the EVENT-MIB may be used as a
+        simpler alternative."
+    REVISION        "200109140000Z"
+    DESCRIPTION
+        "Second version of this MIB module."
+    REVISION        "200106140000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 218 }
+
+
+-- Textual Conventions
+
+CifthTemplateIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer that uniquely identifies a threshold
+        template.  The value for each threshold template must remain
+        constant at least from one re-initialization of the agent's
+        network management system to the next re-initialization.  The
+        value may change when the agent's network management system is
+        rebooted or re-initialized."
+    SYNTAX      Unsigned32 (1..1000)
+
+CifthTemplateIndexOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value of either '0' or a valid template index. The
+        distinguished value '0' indicates no template or no unassigned
+        template index values are available."
+    SYNTAX      Unsigned32 (0..1000)
+
+CifthThresholdIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer that uniquely identifies a threshold
+        within a threshold template.  The value for each threshold must
+        remain constant when the agent's network management system is
+        rebooted or re-initialized."
+    SYNTAX      Unsigned32 (0..63)
+
+CifthThresholdList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A list of thresholds defined in a given template, in which
+        each bit represents one threshold.  The bits in the first octet
+        represent thresholds identified by cifthThresholdIndex values 0
+        through 7, inclusive.  The bits in the second octet represent
+        thresholds identified by integer values 8 through 15,
+        inclusive, and so forth.  The least significant bit of an octet
+        represents the threshold identified by the lowest integer
+        value, and the most significant bit represents the threshold
+        identified by the highest integer value.  The figure shown
+        below illustrates the format of a threshold list.
+
+         Octet 1             Octet 8
+
+         7 6 5 4 3 2 1 0     7 6 5 4 3 2 1 0
+        +-+-+-+-+-+-+-+-+   +-+-+-+-+-+-+-+-+
+        |               |...|               |
+        +-+-+-+-+-+-+-+-+   +-+-+-+-+-+-+-+-+
+         | | | | | | | |     | | | | | | | |
+         | | | | | | | |     | | | | | | | +- Threshold 56
+         | | | | | | | |     | | | | | | +--- Threshold 57
+         | | | | | | | |     | | | | | +----- Threshold 58
+         | | | | | | | |     | | | | +------- Threshold 59
+         | | | | | | | |     | | | +--------- Threshold 60
+         | | | | | | | |     | | +----------- Threshold 61
+         | | | | | | | |     | +------------- Threshold 62
+         | | | | | | | |     +--------------- Threshold 63
+         | | | | | | | |                          :
+         | | | | | | | |                          :
+         | | | | | | | +--------------------- Threshold 0
+         | | | | | | +----------------------- Threshold 1
+         | | | | | +------------------------- Threshold 2
+         | | | | +--------------------------- Threshold 3
+         | | | +----------------------------- Threshold 4
+         | | +------------------------------- Threshold 5
+         | +--------------------------------- Threshold 6
+         +----------------------------------- Threshold 7
+
+        A bit value of '1' indicates that the threshold is being
+        exceeded in current operation (i.e., the threshold is fired).
+        A bit value of '0' indicates that the threshold is not being
+        exceeded in current operation (i.e., the threshold is cleared).
+
+        A threshold list of length N, where N < 8, represents a
+        threshold list for which thresholds N*8 through 63 have the
+        value of '0'.  A special case is a threshold list having a
+        length of '0', which represents a threshold list of all zeros."
+    SYNTAX      OCTET STRING (SIZE(0..8))
+
+CifthThresholdSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The severity of the condition when the threshold is fired.
+        A smaller enumerated integer value indicates that the threshold
+        exceeded condition is more severe.
+
+        The value 'fail' indicates a hard failure condition where
+        no data can be received, or where the data received has a large
+        number of errors which makes it impossible to recover most of
+        the data.
+
+        The value 'degrade' indicates a soft failure condition in which
+        data received on this interface is affected, but a significant
+        portion of the data can be recovered.
+
+        The value 'info' is used to raise attention to a condition that
+        could possibly be an impending problem or to notify the
+        customer of an event that improves operation."
+    SYNTAX      INTEGER {
+                    fail(1),
+                    degrade(2),
+                    info(3),
+                    other(4)
+                }
+
+CifthThresholdSeverityOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value of either '0' or a valid threshold severity."
+    SYNTAX      INTEGER (0..4)
+
+
+-- MIB Object Definitions
+
+cIfThresholdMIBObjects OBJECT IDENTIFIER ::= { ciscoIfThresholdMIB 1 }
+
+cifthTemplateGroup OBJECT IDENTIFIER ::= { cIfThresholdMIBObjects 1 }
+
+cifthTemplateIfAssignGroup OBJECT IDENTIFIER
+                                     ::= { cIfThresholdMIBObjects 2 }
+cifthIfThresholdFiredGroup OBJECT IDENTIFIER
+                                     ::= { cIfThresholdMIBObjects 3 }
+
+
+-- Template Table
+
+cifthTemplateIndexNext OBJECT-TYPE
+    SYNTAX      CifthTemplateIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains an appropriate value to be used for
+        cifthTemplateIndex when creating entries in the
+        cifthTemplateTable.  The distinguished value 0 indicates that
+        no unassigned entries are available.
+
+        To obtain a suggested cifthTemplateIndex value for a new entry,
+        the manager issues a management protocol retrieval operation to
+        obtain the current value of this object.  The manager may
+        ignore this object and use alternative mechanisms for choosing
+        an unused value of cifthTemplateIndex for a new entry.
+
+        The agent will modify the value to the next unassigned index,
+        when a new entry is created in cifthTemplateTable with the
+        current value of this object.  After deletion of an entry in
+        cifthTemplateTable the agent will determine through its local
+        policy when its index value will be made available for reuse."
+    ::= { cifthTemplateGroup 1 }
+
+cifthTemplateLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        there was either a change to any object in any entry in
+        cifthTemplateTable, or an entry was created or destroyed in
+        cifthTemplateTable.  If no change to cifthTemplateTable has
+        occurred since the last re-initialization of the local network
+        management subsystem, then this object contains a zero value."
+    ::= { cifthTemplateGroup 2 }
+
+cifthTemplateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CifthTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to create threshold templates.
+        Each template includes one or more thresholds (defined in the
+        cifthThresholdTable), and can be assigned to multiple
+        interfaces.  An interface may be associated with more than one
+        template.  The assignment of templates to interfaces is done in
+        the cifthTemplateIfAssignTable."
+    ::= { cifthTemplateGroup 3 }
+
+cifthTemplateEntry OBJECT-TYPE
+    SYNTAX      CifthTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the general properties of a threshold
+        template.
+
+        The template is created using the cifthTemplateRowStatus
+        object.  Prior to creating an entry in the table, the manager
+        should obtain a unique value of cifthTemplateIndex by reading
+        the cifthTemplateIndexNext object.  The values of
+        cifthTemplateName and cifthTemplateNotifyHoldDownType must be
+        provided before activating the entry.
+
+        After creating an entry, thresholds can be defined for the
+        template by creating entries with the same value of
+        cifthTemplateIndex in the cifthThresholdTable.  The template
+        can then be assigned to one or more interfaces using the
+        cifthTemplateIfAssignTable.
+
+        Once an entry has been activated, the value of
+        cifthTemplateName cannot be modified.  In order to use a new
+        value of cifthTemplateName, a new template must be defined.
+        The values of cifthTemplateNotifyHoldDownType and
+        cifthTemplateNotifyHoldDownTime may be modified when the entry
+        is active.  See the description clause of
+        cifthTemplateNotifyHoldDownType for further caveats on
+        modification of that object."
+    INDEX       { cifthTemplateIndex }
+    ::= { cifthTemplateTable 1 }
+
+CifthTemplateEntry ::=
+    SEQUENCE {
+        cifthTemplateIndex                CifthTemplateIndex,
+        cifthTemplateName                 SnmpAdminString,
+        cifthTemplateNotifyHoldDownType   INTEGER,
+        cifthTemplateNotifyHoldDownTime   Unsigned32,
+        cifthTemplateRowStatus            RowStatus
+    }
+
+cifthTemplateIndex OBJECT-TYPE
+    SYNTAX      CifthTemplateIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer that uniquely identifies a threshold
+        template.  The value for each threshold template must remain
+        constant at least from one re-initialization of the agent's
+        network management system to the next re-initialization.  The
+        value may change when the agent's network management system is
+        rebooted or re-initialized."
+    ::= { cifthTemplateEntry 1 }
+
+cifthTemplateName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies a unique name associated with the
+        threshold template by the management client, and provides a
+        non-volatile 'handle' for the template.  The name must not
+        include whitespace characters.
+
+        After this value has been written to the startup configuration,
+        the agent must retain the value until a management client
+        deletes it.  The level of retention must span reboots and
+        re-initializations of the agent, including those that result in
+        different assignments to the value of cifthTemplateIndex
+        associated with this template.
+
+        Once an entry has been activated, this value cannot be
+        modified.  In order to use a new value of cifthTemplateName, a
+        new template must be defined."
+    ::= { cifthTemplateEntry 2 }
+
+cifthTemplateNotifyHoldDownType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    holdDownTimer(2),
+                    fireAndClearThresholds(3)   -- hysteresis
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the method used to prevent an excess of
+        notifications from being generated when operation fluctuates
+        around a threshold level.
+
+        The value 'holdDownTimer' indicates that notifications for a
+        given threshold and interface are suppressed for a short amount
+        of time after each notification.  The time value is specified
+        in cifthTemplateNotifyHoldDownTime, which is instantiated only
+        when this object is set to 'holdDownTimer'.  After a
+        notification is received for a given threshold and interface,
+        the next notification for that threshold and interface will be
+        generated after at least cifthTemplateNotifyHoldDownTime amount
+        of time has passed, only when the threshold is next fired or
+        cleared.
+
+        The value 'fireAndClearThresholds' indicates that hysteresis
+        is used.  The management client configures two values for each
+        threshold:  one for asserting that the threshold has been
+        exceeded (see cifthThresholdFiredValue), and a second value for
+        asserting that the threshold is no longer being exceeded (see
+        cifthThresholdClearedValue, which is instantiated only when
+        this object is set to 'fireAndClearThresholds').
+
+        When this entry in cifthTemplateTable is active, this object
+        may only be modified if there are no active entries in
+        cifthThresholdTable with the same value of cifthTemplateIndex."
+    ::= { cifthTemplateEntry 3 }
+
+cifthTemplateNotifyHoldDownTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The minimum amount of time between successive
+        cifthIfThresholdFired or cifthIfThresholdCleared notifications
+        for a given interface and template.
+
+        This object is instantiated only when
+        cifthTemplateNotifyHoldDownType is set to 'holdDownTimer'."
+    DEFVAL { 5 }
+    ::= { cifthTemplateEntry 4 }
+
+cifthTemplateRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create and delete threshold templates.
+
+        The values of cifthTemplateName and
+        cifthTemplateNotifyHoldDownType must be provided before
+        activating the entry.
+
+        An entry can only be deleted when there are no active entries
+        in the cifthTemplateIfAssignTable with the same value of
+        cifthTemplateIndex.
+
+        When an entry is deleted, all associated entries in the
+        cifthThresholdTable are also deleted.
+
+        After the entry has been activated, this object cannot be set
+        to any value other than 'destroy'.  The row status never
+        changes to 'notInService' after reaching the value 'active'."
+    ::= { cifthTemplateEntry 5 }
+
+
+-- Threshold Table
+
+cifthThresholdLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        there was either a change to any object in any entry in
+        cifthThresholdTable, or an entry was created or destroyed in
+        cifthThresholdTable.  If no change to cifthThresholdTable has
+        occurred since the last re-initialization of the local network
+        management subsystem, then this object contains a zero value."
+    ::= { cifthTemplateGroup 4 }
+
+cifthThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CifthThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies the interface thresholds used in each
+        template."
+    ::= { cifthTemplateGroup 5 }
+
+cifthThresholdEntry OBJECT-TYPE
+    SYNTAX      CifthThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry specifying an interface threshold used in a threshold
+        template.
+
+        The entry is created using the cifthThresholdRowStatus object.
+        The values of cifthThresholdObject, cifthThresholdSeverity,
+        cifthThresholdType, and cifthThresholdFiredValue must be
+        provided before activating the entry.  If the value of
+        cifthTemplateNotifyHoldDownType in the cifthTemplateEntry with
+        the same value of cifthTemplateIndex is
+        'fireAndClearThresholds', then the value of
+        cifthThresholdClearedValue must also be provided before
+        activating the entry.  If the value of cifthThresholdType is
+        other than 'rateOfIncreaseExponentXIfSpeed', then the value of
+        cifthThresholdSampleInterval must also be provided before
+        activating the entry.
+
+        The agent should not allow creation of two entries in the table
+        with the same values of cifthTemplateIndex,
+        cifthThresholdObject, cifthThresholdSeverity, and
+        cifthThresholdDirection.
+
+        Once an entry has been activated, the values of
+        cifthThresholdObject, cifthThresholdSeverity,
+        cifthThresholdType, and cifthThresholdDirection cannot be
+        modified.  In order to use new values of these objects, a new
+        threshold must be defined.  The values of cifthThresholdDescr,
+        cifthThresholdFiredValue, cifthThresholdClearedValue,
+        cifthThresholdSampleInterval, and cifthThresholdApsSwitchover
+        may be modified when the entry is active."
+    INDEX { cifthTemplateIndex, cifthThresholdIndex }
+    ::= { cifthThresholdTable 1 }
+
+CifthThresholdEntry ::=
+    SEQUENCE {
+        cifthThresholdIndex                     CifthThresholdIndex,
+        cifthThresholdDescr                     SnmpAdminString,
+        cifthThresholdObject                    OBJECT IDENTIFIER,
+        cifthThresholdSeverity                  CifthThresholdSeverity,
+        cifthThresholdType                      INTEGER,
+        cifthThresholdDirection                 INTEGER,
+        cifthThresholdFiredValue                Integer32,
+        cifthThresholdClearedValue              Integer32,
+        cifthThresholdSampleInterval            Unsigned32,
+        cifthThresholdApsSwitchover             TruthValue,
+        cifthThresholdRowStatus                 RowStatus
+    }
+
+cifthThresholdIndex OBJECT-TYPE
+    SYNTAX      CifthThresholdIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer that uniquely identifies a threshold in
+        a threshold template.  The value for each threshold must remain
+        constant when the agent's network management system is rebooted
+        or re-initialized."
+    ::= { cifthThresholdEntry 1 }
+
+cifthThresholdDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A description of the threshold's function and use.  The
+        description must not include carriage returns."
+    DEFVAL { "" }
+    ::= { cifthThresholdEntry 2 }
+
+cifthThresholdObject OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object to be compared against the threshold values.
+        The object must be defined in a table indexed only by ifIndex.
+        All of the instance portion of the object identifier is
+        truncated, since the instance(s) to be compared against
+        the threshold are identified using the
+        cifthTemplateIfAssignTable.
+
+        If the object has syntax 'Integer32', 'Unsigned32', or
+        'Gauge32', then cifthThresholdType should be set to
+        'absoluteValue'.  If the object has syntax 'Counter32' or
+        'Counter64', then cifthThresholdType should be set to
+        'deltaValue' or 'rateOfIncreaseExponentXIfSpeed'."
+    ::= { cifthThresholdEntry 3 }
+
+cifthThresholdSeverity OBJECT-TYPE
+    SYNTAX      CifthThresholdSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the severity associated with the
+        condition when the threshold is exceeded."
+    ::= { cifthThresholdEntry 4 }
+
+cifthThresholdType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    absoluteValue(1),
+                    deltaValue(2),
+                    rateOfIncreaseExponentXIfSpeed(3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The manner in which to compare cifthThresholdObject to
+        cifthThresholdFiredValue and cifthThresholdClearedValue.
+
+        The value 'absoluteValue' indicates that the value of
+        cifthThresholdObject is to be compared directly to
+        cifthThresholdFiredValue or cifthThresholdClearedValue.
+        
+        The value 'deltaValue' indicates that the difference between
+        two successive samples of cifthThresholdObject is to be
+        compared to cifthThresholdFiredValue or
+        cifthThresholdClearedValue.  The polling interval between
+        successive samples is defined in cifthThresholdSampleInterval.
+        
+        The value 'rateOfIncreaseExponentXIfSpeed' indicates that the
+        rate of increase of cifthThresholdObject is to be compared to
+        the negated value of cifthThresholdFiredValue used as the
+        exponent of 10, times the value of ifSpeed (if the value of
+        ifSpeed is less than the maximum value) or ifHighSpeed
+        (otherwise).  For example, a value of cifthThresholdFiredValue
+        of 5 on a gigabit ethernet interface indicates a threshold of
+        10^-5 times the interface speed, which is equal to 10,000 per
+        second.  When the value of this object is
+        'rateOfIncreaseExponentXIfSpeed', the polling interval between
+        successive samples is determined automatically by the agent.
+
+        When the object identified by cifthThresholdObject is a
+        counter, a threshold type of 'deltaValue' or
+        'rateOfIncreaseExponentXIfSpeed' should be used.  When the
+        object identified by cifthThresholdObject is not a counter, a
+        threshold type of 'absoluteValue' should be used."
+    ::= { cifthThresholdEntry 5 }
+
+cifthThresholdDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rising(1),
+                    falling(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates which direction of movement causes the
+        threshold to fire.
+
+        The value 'rising' indicates that the threshold is fired when
+        the current sampled value is numerically greater than or equal
+        to the value of cifthThresholdFiredValue, and the threshold was
+        considered to be cleared at the last sampling interval.  If the
+        value of the corresponding cifthTemplateNotifyHoldDownType
+        object is 'fireAndClearThresholds', the threshold is cleared
+        when the current sampled value is less than the value of
+        cifthThresholdClearedValue, and the threshold was considered to
+        be fired at the last sampling interval.  If the value of the
+        corresponding cifthTemplateNotifyHoldDownType object is other
+        than 'fireAndClearThresholds', the threshold is cleared when
+        the current sampled value is less than the value of
+        cifthThresholdFiredValue, and the threshold was considered to
+        be fired at the last sampling interval.
+
+        The value 'falling' indicates that the threshold is fired when
+        the current sampled value is numerically less than or equal to
+        the value of cifthThresholdFiredValue, and the threshold was
+        considered to be cleared at the last sampling interval.  If the
+        value of the corresponding cifthTemplateNotifyHoldDownType
+        object is 'fireAndClearThresholds', the threshold is cleared
+        when the current sampled value is greater than the value of
+        cifthThresholdClearedValue, and the threshold was considered to
+        be fired at the last sampling interval.  If the value of the
+        corresponding cifthTemplateNotifyHoldDownType object is other
+        than 'fireAndClearThresholds', the threshold is cleared when
+        the current sampled value is greater than the value of
+        cifthThresholdFiredValue, and the threshold was considered to
+        be fired at the last sampling interval."
+    DEFVAL { rising }
+    ::= { cifthThresholdEntry 6 }
+
+cifthThresholdFiredValue OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A threshold value to check against the object identified in
+        cifthThresholdObject.  If the value of cifthThresholdDirection
+        is 'rising', then the threshold is fired when the current
+        sampled value (absolute, delta, or rate of increase, depending
+        on the value of cifthThresholdType) of the object identified in
+        cifthThresholdObject is greater than or equal to this value.
+        If the value of cifthThresholdDirection is 'falling', then the
+        threshold is fired when the current sampled value (absolute,
+        delta, or rate of increase, depending on the value of
+        cifthThresholdType) of the object identified in
+        cifthThresholdObject is less than or equal to this value."
+    ::= { cifthThresholdEntry 7 }
+
+cifthThresholdClearedValue OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A threshold value to check against the object identified in
+        cifthThresholdObject.  If the value of cifthThresholdDirection
+        is 'rising', then the threshold is cleared when the current
+        sampled value (absolute, delta, or rate of increase, depending
+        on the value of cifthThresholdType) of the object identified in
+        cifthThresholdObject is less than this value.  If the value of
+        cifthThresholdDirection is 'falling', then the threshold is
+        cleared when the current sampled value (absolute, delta, or
+        rate of increase, depending on the value of cifthThresholdType)
+        of the object identified in cifthThresholdObject is greater
+        than this value.
+
+        This object is instantiated only when the value of
+        cifthTemplateNotifyHoldDownType in the cifthTemplateEntry with
+        the same value of cifthTemplateIndex is
+        'fireAndClearThresholds'."
+    ::= { cifthThresholdEntry 8 }
+
+cifthThresholdSampleInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..900000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of milliseconds to wait between samples of the
+        object identified in cifthThresholdObject.  To encourage
+        consistency in sampling, the interval is measured from the
+        beginning of one check to the beginning of the next and the
+        timer is restarted immediately when it expires, not when the
+        check completes.
+
+        This object is not instantiated when the value of
+        cifthThresholdType is 'rateOfIncreaseExponentXIfSpeed'."
+    ::= { cifthThresholdEntry 9 }
+
+cifthThresholdApsSwitchover OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether automatic protection switching
+        (APS) switchover should be triggered, if applicable, when the
+        threshold is fired.  The value of this object takes effect when
+        the template identified by cifthTemplateIndex is assigned to an
+        interface that is part of an APS group.  One way to configure
+        an interface in an APS group is using the cApsChanConfigTable
+        in the CISCO-APS-MIB."
+    DEFVAL { false }
+    ::= { cifthThresholdEntry 10 }
+
+cifthThresholdRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create and delete thresholds in
+        templates.
+
+        A new entry can only be created when there is an active entry
+        in the cifthTemplateTable with the same value of
+        cifthTemplateIndex.  The values of cifthThresholdObject,
+        cifthThresholdSeverity, cifthThresholdType, and
+        cifthThresholdFiredValue must be provided before activating the
+        entry.  If the value of cifthTemplateNotifyHoldDownType in the
+        cifthTemplateEntry with the same value of cifthTemplateIndex is
+        'fireAndClearThresholds', then the value of
+        cifthThresholdClearedValue must also be provided before
+        activating the entry.  If the value of cifthThresholdType is
+        other than 'rateOfIncreaseExponentXIfSpeed', then the value of
+        cifthThresholdSampleInterval must also be provided before
+        activating the entry.
+
+        When an entry is activated, if there are any entries in
+        cifthTemplateIfAssignTable with the same value of
+        cifthTemplateIndex, then the threshold is activated on all
+        interfaces identified in those entries that have instances of
+        the object identified by cifthThresholdObject.
+
+        When an entry is destroyed, if there are any entries in
+        cifthTemplateIfAssignTable with the same value of
+        cifthTemplateIndex, then the threshold is de-activated on the
+        interfaces identified in those entries.  If there are any
+        entries in cifthIfThresholdFiredTable with
+        cifthIfThresholdFiredTemplate value equal to this value of
+        cifthTemplateIndex, then the bit in cifthIfThresholdsFired
+        corresponding to this threshold is cleared in all such entries.
+
+        After the entry has been activated, this object cannot be set
+        to any value other than 'destroy'.  The row status never
+        changes to 'notInService' after reaching the value 'active'."
+    ::= { cifthThresholdEntry 11 }
+
+
+-- Interface Assignment Table
+
+cifthTemplateIfLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        there was either a change to any object in any entry in
+        cifthTemplateIfAssignTable, or an entry was created or
+        destroyed in cifthTemplateIfAssignTable.  If no change to
+        cifthTemplateIfAssignTable has occurred since the last
+        re-initialization of the local network management subsystem,
+        then this object contains a zero value."
+    ::= { cifthTemplateIfAssignGroup 1 }
+
+cifthTemplateIfAssignTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CifthTemplateIfAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies the assignment of threshold templates to
+        specific interfaces.  Each threshold template may be assigned
+        to multiple interfaces.  Each interface may have multiple
+        threshold templates assigned to it."
+    ::= { cifthTemplateIfAssignGroup 2 }
+
+cifthTemplateIfAssignEntry OBJECT-TYPE
+    SYNTAX      CifthTemplateIfAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the assignment of a particular threshold
+        template to a particular interface.  The entry is created using
+        the cifthTemplateIfAssignRowStatus object."
+    INDEX { cifthTemplateIndex, cifthTemplateIfAssignInterface }
+    ::= { cifthTemplateIfAssignTable 1 }
+
+CifthTemplateIfAssignEntry ::=
+    SEQUENCE {
+        cifthTemplateIfAssignInterface          InterfaceIndex,
+        cifthTemplateIfAssignOperStatus         INTEGER,
+        cifthTemplateIfAssignRowStatus          RowStatus
+    }
+
+cifthTemplateIfAssignInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies an interface to which the template
+        is assigned."
+    ::= { cifthTemplateIfAssignEntry 1 }
+
+cifthTemplateIfAssignOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(1),
+                    down(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the threshold template
+        identified by cifthTemplateIndex is operational on the
+        interface identified by cifthTemplateIfAssignInterface.
+
+        When the value of this object is 'up', this indicates that
+        the thresholds in this template (identified by
+        cifthTemplateIndex) are activated on this interface, with the
+        following exception:  If a threshold is defined on an object
+        that does not have an instance for this interface, then the
+        threshold is not activated on this interface.  If any of the
+        thresholds are being exceeded, then a corresponding entry
+        exists in the cifthIfThresholdFiredTable.
+
+        When the value of this object is 'down', this indicates that
+        all thresholds in the template are de-activated on this
+        interface and there is no corresponding entry in the
+        cifthIfThresholdFiredTable, regardless of whether any of the
+        thresholds in the template are being exceeded on this
+        interface.
+
+        One reason for a template not to be operational on an
+        interface to which it is assigned is when the interface has two
+        (or more) templates assigned to it that contain thresholds on
+        the same object with the same severity and direction, i.e.,
+        thresholds with the same values of cifthThresholdObject,
+        cifthThresholdSeverity, and cifthThresholdDirection.  This may
+        occur when a template is assigned to the interface, or when a
+        threshold is added to a template that is already active on the
+        interface.  When this occurs, the implementation may operate on
+        both (or all) threshold values, or it may take down one (or
+        more) of the templates on this interface, which is indicated by
+        changing the value of this object from 'up' to 'down'."
+    ::= { cifthTemplateIfAssignEntry 2 }
+
+cifthTemplateIfAssignRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create and delete entries in the table,
+        assigning templates to interfaces and removing templates from
+        interfaces, respectively.
+
+        A new entry can only be created when there is an active entry
+        in the cifthTemplateTable with the same value of
+        cifthTemplateIndex.
+
+        When an entry is activated, the thresholds in this template
+        (identified by cifthTemplateIndex) are activated on this
+        interface, with the following exception:  If a threshold is
+        defined on an object that does not have an instance for this
+        interface, then the threshold is not activated on this
+        interface.
+
+        When an entry is destroyed, all thresholds in the template are
+        de-activated on this interface and the corresponding entry in
+        the cifthIfThresholdFiredTable is deleted, if it exists.
+
+        After the entry has been activated, this object cannot be set
+        to any value other than 'destroy'.  The row status never
+        changes to 'notInService' after reaching the value 'active'."
+    ::= { cifthTemplateIfAssignEntry 3 }
+
+
+-- Interface Threshold Fired Group
+
+cifthThresholdFiredNotifyEnable OBJECT-TYPE
+    SYNTAX      CifthThresholdSeverityOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the minimum severity threshold governing
+        the generation of cifthIfThresholdFired and
+        cifthIfThresholdCleared notifications.  For example, if the
+        value of this object is set to 'degrade', then the agent
+        generates these notifications if and only if the severity of
+        the threshold being exceeded is 'degrade' or 'fail'.  When the
+        value is other than '0', the generation of
+        cifthTemplateIfStatusChange notifications is also enabled.  The
+        value of '0' disables the generation of all notifications.  By
+        default, the value of this object is set to '0'."
+    ::= { cifthIfThresholdFiredGroup 1 }
+
+cifthThresholdFiredLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        there was either a change to any object in any entry in
+        cifthIfThresholdFiredTable, or an entry was added or deleted in
+        cifthIfThresholdFiredTable.  If no change to
+        cifthIfThresholdFiredTable has occurred since the last
+        re-initialization of the local network management subsystem,
+        then this object contains a zero value."
+    ::= { cifthIfThresholdFiredGroup 2 }
+
+cifthIfThresholdFiredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CifthIfThresholdFiredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table indicates the interfaces that currently have
+        threshold fired conditions."
+    ::= { cifthIfThresholdFiredGroup 3 }
+
+cifthIfThresholdFiredEntry OBJECT-TYPE
+    SYNTAX      CifthIfThresholdFiredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry indicating an interface that currently has one or
+        more threshold fired conditions based on one template."
+    INDEX { ifIndex, cifthIfThresholdFiredTemplate }
+    ::= { cifthIfThresholdFiredTable 1 }
+
+CifthIfThresholdFiredEntry ::=
+    SEQUENCE {
+        cifthIfThresholdFiredTemplate           CifthTemplateIndex,
+        cifthIfThresholdsFired                  CifthThresholdList,
+        cifthIfLastThresholdFired               CifthThresholdIndex,
+        cifthIfThresholdFiredLstChange          TimeStamp,
+        cifthIfThresholdFiredLstSeverity        CifthThresholdSeverity,
+        cifthIfThresholdFiredMaxSeverity        CifthThresholdSeverity
+    }
+
+cifthIfThresholdFiredTemplate OBJECT-TYPE
+    SYNTAX      CifthTemplateIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies a template for which one or more of the
+        thresholds are fired on this interface."
+    ::= { cifthIfThresholdFiredEntry 1 }
+
+cifthIfThresholdsFired OBJECT-TYPE
+    SYNTAX      CifthThresholdList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies those thresholds that are currently
+        being exceeded on this interface.
+
+        If a threshold is currently being exceeded (i.e., the threshold
+        is fired) on the interface, then the corresponding bit in the
+        threshold list is set to one.  Otherwise, the bit will be set
+        to zero, or the bit will not be present.  Only the first N
+        octets are present in the threshold list, such that the highest
+        octet present has at least one bit set to '1'.  All higher
+        octets with value '0' are truncated."
+    ::= { cifthIfThresholdFiredEntry 2 }
+
+cifthIfLastThresholdFired OBJECT-TYPE
+    SYNTAX      CifthThresholdIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the last threshold fired or cleared on
+        the interface."
+    ::= { cifthIfThresholdFiredEntry 3 }
+
+cifthIfThresholdFiredLstChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        a threshold was fired or cleared on the interface."
+    ::= { cifthIfThresholdFiredEntry 4 }
+
+cifthIfThresholdFiredLstSeverity OBJECT-TYPE
+    SYNTAX      CifthThresholdSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the severity of the threshold that was
+        last fired or cleared on the interface."
+    ::= { cifthIfThresholdFiredEntry 5 }
+
+cifthIfThresholdFiredMaxSeverity OBJECT-TYPE
+    SYNTAX      CifthThresholdSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the highest severity among the
+        thresholds that are currently being exceeded on this
+        interface."
+    ::= { cifthIfThresholdFiredEntry 6 }
+
+
+-- Notifications
+
+cIfThresholdMIBNotifications OBJECT IDENTIFIER
+                                ::= { ciscoIfThresholdMIB 2 }
+cifthMIBNotificationsPrefix OBJECT IDENTIFIER
+                                ::= { cIfThresholdMIBNotifications 0 }
+
+cifthIfThresholdFired NOTIFICATION-TYPE
+    OBJECTS {
+        cifthIfLastThresholdFired,
+        cifthIfThresholdFiredLstChange,
+        cifthIfThresholdFiredLstSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+        "The agent generates this notification when a threshold defined
+        in a template is asserted on an interface.
+
+        If a threshold is asserted for a given interface and template,
+        cifthTemplateNotifyHoldDownTime is set to 'holdDownTimer' for
+        that template, and this notification has recently been sent for
+        the same threshold on the same interface, then this
+        notification may be suppressed."
+    ::= { cifthMIBNotificationsPrefix 1 }
+
+cifthIfThresholdCleared NOTIFICATION-TYPE
+    OBJECTS {
+        cifthIfLastThresholdFired,
+        cifthIfThresholdFiredLstChange,
+        cifthIfThresholdFiredLstSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+        "The agent generates this notification when a threshold, that
+        has previously fired, is cleared on an interface.
+
+        If a threshold is cleared for a given interface and template,
+        cifthTemplateNotifyHoldDownTime is set to 'holdDownTimer' for
+        that template, and this notification has recently been sent for
+        the same threshold on the same interface, then this
+        notification may be suppressed."
+    ::= { cifthMIBNotificationsPrefix 2 }
+
+cifthTemplateIfStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        cifthTemplateIfAssignOperStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The agent generates this notification when a template comes up
+        or goes down on an interface to which it is assigned, i.e.,
+        when the value of cifthTemplateIfAssignOperStatus changes.  If
+        a template becomes operationally down on an interface upon
+        activation of a new entry in the cifthTemplateIfAssignTable,
+        the agent generates this notification.  The agent need not
+        generate this notification when a new entry in the
+        cifthTemplateIfAssignTable is activated, if the template
+        becomes operational on the interface.  The agent need not
+        generate this notification when an entry in the
+        cifthTemplateIfAssignTable is destroyed."
+    ::= { cifthMIBNotificationsPrefix 3 }
+
+
+-- Conformance Information
+
+cIfThresholdMIBConformance OBJECT IDENTIFIER
+                                ::= { ciscoIfThresholdMIB 3 }
+cIfThresholdMIBCompliances OBJECT IDENTIFIER
+                                ::= { cIfThresholdMIBConformance 1 }
+cIfThresholdMIBGroups OBJECT IDENTIFIER
+                                ::= { cIfThresholdMIBConformance 2 }
+
+-- Compliance Statement
+
+cIfThresholdMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Cisco
+        Interface Threshold MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            cIfThresholdTemplateGroup,
+            cIfThresholdFiredGroup,
+            cIfThresholdNotifsGroup
+        }
+
+        OBJECT      cifthTemplateNotifyHoldDownType
+        DESCRIPTION
+            "At least one of the codepoints 'holdDownTimer' and
+            'fireAndClearThresholds' must be supported."
+
+        GROUP       cifthHoldDownTimerGroup
+        DESCRIPTION
+            "This group is required only for entities that support
+            suppression of excess notifications in a short time
+            interval based on a timer, i.e., systems that support the
+            cifthTemplateNotifyHoldDownType value 'holdDownTimer'. At
+            least one of this group and
+            cifthHoldDownHysteresisGroup must be supported."
+
+        GROUP       cifthHoldDownHysteresisGroup
+        DESCRIPTION
+            "This group is required only for entities that prevent
+            excess notifications in a short time interval by using
+            hysteresis, i.e., systems that support the
+            cifthTemplateNotifyHoldDownType value
+            'fireAndClearThresholds'. At least one of this group and
+            cifthHoldDownTimerGroup must be supported."
+
+        OBJECT      cifthThresholdType
+        DESCRIPTION
+            "At least one of the codepoints 'deltaValue' and
+            'rateOfIncreaseExponentXIfSpeed' must be supported."
+
+        GROUP       cifthApsGroup
+        DESCRIPTION
+            "This group is required only for entities that support the
+            Cisco Interface Threshold MIB and support triggering of
+            automatic protection switching (APS) based on thresholds of
+            interface counters."
+
+        GROUP       cifthTemplateIfNotifsGroup
+        DESCRIPTION
+            "This group is required only for entities that do not allow
+            multiple threshold values (in different threshold
+            templates) of the same severity and direction on the same
+            object to be applied on one interface."
+
+    ::= { cIfThresholdMIBCompliances 1 }
+
+
+-- Units of Conformance
+
+cIfThresholdTemplateGroup OBJECT-GROUP
+    OBJECTS {
+        cifthTemplateIndexNext,
+        cifthTemplateLastChange,
+        cifthTemplateName,
+        cifthTemplateNotifyHoldDownType,
+        cifthTemplateRowStatus,
+        cifthThresholdLastChange,
+        cifthThresholdDescr,
+        cifthThresholdObject,
+        cifthThresholdSeverity,
+        cifthThresholdType,
+        cifthThresholdDirection,
+        cifthThresholdFiredValue,
+        cifthThresholdSampleInterval,
+        cifthThresholdRowStatus,
+        cifthTemplateIfLastChange,
+        cifthTemplateIfAssignOperStatus,
+        cifthTemplateIfAssignRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of mandatory managed objects for configuration of
+        threshold templates."
+    ::= { cIfThresholdMIBGroups 1 }
+
+cIfThresholdFiredGroup OBJECT-GROUP
+    OBJECTS {
+        cifthThresholdFiredNotifyEnable,
+        cifthThresholdFiredLastChange,
+        cifthIfThresholdsFired,
+        cifthIfLastThresholdFired,
+        cifthIfThresholdFiredLstChange,
+        cifthIfThresholdFiredLstSeverity,
+        cifthIfThresholdFiredMaxSeverity 
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of mandatory managed objects for monitoring
+        interfaces where thresholds have been exceeded."
+    ::= { cIfThresholdMIBGroups 2 }
+
+cifthHoldDownTimerGroup OBJECT-GROUP
+    OBJECTS {
+        cifthTemplateNotifyHoldDownTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of managed objects for configuration of
+        a timer-based mechanism for suppression of excess notifications
+        in a short time interval."
+    ::= { cIfThresholdMIBGroups 3 }
+
+cifthHoldDownHysteresisGroup OBJECT-GROUP
+    OBJECTS {
+        cifthThresholdClearedValue
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of managed objects for configuration of
+        threshold values used to assert that the threshold is no longer
+        being exceeded. These objects are part of the hysteresis
+        mechanism used to prevent excess notifications in a short time
+        interval."
+    ::= { cIfThresholdMIBGroups 4 }
+
+cifthApsGroup OBJECT-GROUP
+    OBJECTS {
+        cifthThresholdApsSwitchover
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of managed objects for configuration of APS
+        switchover triggers based on interface thresholds."
+    ::= { cIfThresholdMIBGroups 5 }
+
+cIfThresholdNotifsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cifthIfThresholdFired,
+        cifthIfThresholdCleared
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of notifications generated when an interface has
+        a threshold fired or a threshold cleared condition."
+   ::= { cIfThresholdMIBGroups 6 }
+
+cifthTemplateIfNotifsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cifthTemplateIfStatusChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of notifications related to the assignment of
+        templates to interfaces."
+   ::= { cIfThresholdMIBGroups 7 }
+
+
+END
+

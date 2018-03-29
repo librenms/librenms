@@ -1,0 +1,818 @@
+CTRON-VLAN-CLASSIFY-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+--  ctron-vlan-classify-mib.txt
+--
+--  This module provides authoritative definitions for Enterasys's
+--  enterprise-specific VLAN classification MIB.
+--
+--  This module will be extended, as required.
+--
+-- -------------------------------------------------------------
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys products.
+--
+--  Copyright December 1999-2002 Enterasys Networks, Inc.
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    PortList
+        FROM Q-BRIDGE-MIB
+    ctVlanExt
+        FROM CTRON-MIB-NAMES;
+
+ctVlanClassify MODULE-IDENTITY
+    LAST-UPDATED "200301292215Z"  -- Wed Jan 29 22:15 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "       Enterasys Networks, Inc.
+        Postal: 35 Industrial Way, P.O. Box 5005
+                Rochester, NH 03867-0505
+         Phone: (603) 332-9400
+         Email: support@enterasys.com
+           Web: http://www.enterasys.com"
+    DESCRIPTION
+        "The Enterasys VLAN Classify MIB module for controlling
+         Enterasys specific VLAN classification criteria based
+         on packet content."
+
+    REVISION    "200212191631Z"  -- Thu Dec 19 16:31 GMT 2002
+    DESCRIPTION "This revision primarily contains modifications to,
+                 and expansion of, the CtVlanClassifyType Textual
+                 Convention.  These modification address historical
+                 and future usage."
+
+    REVISION    "200203272055Z"  -- Wed Mar 27 20:55 GMT 2002
+    DESCRIPTION "This revision, 01.02.00, is a merge of revision 00.00.01,
+                 dated March 18, 1999, and revision 01.01.00, dated
+                 September 26, 2001."
+
+    ::= { ctVlanExt 6 }
+
+ctVlanClassifyObjects OBJECT IDENTIFIER ::= { ctVlanClassify 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+
+CtVlanClassifyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each enumerated value represents a unique classification
+        type.  Different types have different rules regarding
+        how data is interpreted during classification.  These
+        rules are spelled out in the comments preceding each type.
+
+        Unless otherwise specified providing a value for DataMask is 
+        optional and the description for DataMask is as follows:
+
+        DataMask is the same logical size the as the associated DataVal.
+        DataMask is the one's complement of the DataVal bits to attempt
+        to match on.  (e.g., to match on the IP subnet 255.255.240.0
+        the value for DataMask would be 0x00000fff)
+        Working from the most significant to the least significant bit
+        '1 to 0' transitions are not allowed.  (e.g., 0x000ffffe is not
+        valid.)
+        For DataVal objects that are less than 32 bits the leading
+        inconsequential bits in the corresponding DataMask value must
+        be zero.  (e.g., 0x0000000f would attempt to match on the high
+        order four bits in an eight bit DataVal.)"
+    SYNTAX      INTEGER {
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The EtherType field which is present
+        --               in Ethernet II type packets.
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(1536..65535)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        etherType(1),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The DSAP/SSAP pair present in 802.3
+        --               framed packets
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..65535) further limitations
+        --               may exist on an implementation by  
+        --               implementation basis (DSAP must equal
+        --               SSAP for example)                    
+        --     DataMask: (optional) INTEGER holding the one byte 
+        --               control field in it's most significant
+        --               byte and an EtherType value in it's next 
+        --               two significant bytes.  The least  
+        --               significant byte holds a value indicating  
+        --               the number of relevant bits in the 
+        --               DataVal and remaining DataMask (from
+        --               left to right) beginning at the two
+        --               least significant bytes in the DataVal.   
+        --               A value of zero indicates all bits are 
+        --               relevant (to maintain backwards 
+        --               compatibility).
+        -- -----------------------------------------------------
+        llcDsapSsap(2),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The Type of Service field present in IP
+        --               packets (3 bits of precedence, plus     
+        --               bits for delay, throughput, and reli-
+        --               ability)                              
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..255)        
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipTypeOfService(3),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The IP Protocol field (ref. RFC 1700)
+        --               examples include (TCP,UDP,ICMP,etc)                                             
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..255)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipProtocolType(4),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Transmission control used by IPX 
+        --               routers, set to zero before network
+        --               transmission.                       
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..255)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipxClassOfService(5),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  IPX packet type, administered by Novell
+        --               0 ...... Hello or SAP                      
+        --               1 ...... RIP
+        --               2 ...... Echo Packet                      
+        --               3 ...... Error Packet                      
+        --               4 ...... Netware 386 or SAP
+        --               5 ...... Sequenced Packet Protocol
+        --               17 ..... Netware 286
+        --               16-31 .. Experimental protocols
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..31)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipxPacketType(6),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  This group represents IP addresses
+        --               which are present in packets using
+        --               the IP protocol.
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address if bilateral rules are supported,
+        --               additional entries fail.
+        --               However, if the bilateral type is not supported 
+        --               a Source and a Destination rule with the 
+        --               same IP address can exist. 
+        --
+        --     DataVal:  Each octet of an IP address uses one
+        --               octet of this Unsigned32 value starting
+        --               with the most significant octet (e.g.,
+        --               an IP address of 170.187.204.221 is
+        --               represented by a value of 0xaabbccdd.
+
+        --     DataMask: Required, but otherwise as described in the
+        --               DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipAddressSource(7),      -- Source IP address only.
+        ipAddressDestination(8), -- Destination IP address only.
+        ipAddressBilateral(9),   -- Both Source and Dest IP.
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The network number assigned to this 
+        --               IPX network (zero is the local network)
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address if bilateral rules are supported,
+        --               additional entries fail.
+        --               However, if the bilateral type is not supported 
+        --               a Source and a Destination rule with the 
+        --               same IP address can exist. 
+        --
+        --     DataVal:  INTEGER
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipxNetworkSource(10),
+        ipxNetworkDestination(11),
+        ipxNetworkBilateral(12),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a UDP/IP port(socket).  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts. (ref. RFC 762)
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address if bilateral rules are supported,
+        --               additional entries fail.
+        --               However, if the bilateral type is not supported 
+        --               a Source and a Destination rule with the 
+        --               same IP address can exist. 
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipUdpPortSource(13),
+        ipUdpPortDestination(14),
+        ipUdpPortBilateral(15),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a TCP/IP port(socket).  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts. (ref. RFC 762)
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address if bilateral rules are supported,
+        --               additional entries fail.
+        --               However, if the bilateral type is not supported 
+        --               a Source and a Destination rule with the 
+        --               same IP address can exist. 
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipTcpPortSource(16),
+        ipTcpPortDestination(17),
+        ipTcpPortBilateral(18),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a IPX socket.  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address if bilateral rules are supported,
+        --               additional entries fail.
+        --               However, if the bilateral type is not supported 
+        --               a Source and a Destination rule with the 
+        --               same IP address can exist. 
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        ipxSocketSource(19),
+        ipxSocketDestination(20),
+        ipxSocketBilateral(21),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a MAC address.  These
+        --               values uniquely describe nodes on a
+        --               OSI Layer 2 network.
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address if bilateral rules are supported,
+        --               additional entries fail.
+        --               However, if the bilateral type is not supported 
+        --               a Source and a Destination rule with the 
+        --               same IP address can exist. 
+        --
+        --     DataVal:  INTEGER holding the first 4 bytes of
+        --               the 6 byte MAC address.
+        --    DataMask:  INTEGER holding the last 2 bytes of 
+        --               the 6 byte MAC address in the 2 most
+        --               significant bytes of the INTEGER.
+        --               The two least significant bytes will 
+        --               hold a value from 0 to 48 indicating 
+        --               the number of relevant bits in the MAC
+        --               Address (from left to right).  A value
+        --               of zero indicates all bits are relevant
+        --               (to maintain backwards compatibility).
+        --     Example:  MAC address is 00-12-34-56-78-9A,
+        --               DataVal is  00123456
+        --               DataMask is 789A0000 
+        -- -----------------------------------------------------
+        macAddressSource(22),
+        macAddressDestination(23),
+        macAddressBilateral(24),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes IP Fragments.  IP frames 
+        --               which exceed the MTU of the media on
+        --               which they travel may be fragmented 
+        --               into smaller packets.  These packets
+        --               no longer contain the UDP/TCP port   
+        --               numbers, although they do still      
+        --               contain the IP addresses from the    
+        --               original frame.                      
+        --
+        -- LIMITATIONS:
+        --      DataVal: Val not used (0)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipFragments(25),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a UDP/IP port(socket) range.  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts. (ref. RFC 762)   These types should
+        --               not be used on devices going forward.  The
+        --               mask portion of the UDP/IP port values should
+        --               be implemented instead.
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same port unique, only one
+        --               entry from this group may exist for a
+        --               given port.  Additional entries fail.
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: Not used.
+        -- -----------------------------------------------------
+        ipUdpPortSourceRange(26),
+        ipUdpPortDestinationRange(27),
+        ipUdpPortBilateralRange(28),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a TCP/IP port(socket) range.  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts. (ref. RFC 762) These types should
+        --               not be used on devices going forward.  The
+        --               mask portion of the TCP/IP port values should
+        --               be implemented instead.
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same port unique, only one
+        --               entry from this group may exist for a
+        --               given port.  Additional entries fail.
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: Not used.
+        -- -----------------------------------------------------
+        ipTcpPortSourceRange(29),
+        ipTcpPortDestinationRange(30),
+        ipTcpPortBilateralRange(31),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes the ICMP Type and ICMP Code
+        --               values found in an ICMP/IP header.  
+        --               These DataVal must be formatted such
+        --               that the desired Type is represented
+        --               in the second most least significant 
+        --               byte while the desired Code is repre-
+        --               sented in the least significant byte.
+        --               Support for DataMask is primarily 
+        --               intended to allow the Type to be speci-
+        --               fied and the Code be wild-carded.
+        --
+        -- LIMITATIONS:
+        --      DataVal: INTEGER(0..65535)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        icmpType(32),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes the VLAN_ID field found in a
+        --               frame with an 802.1D TCI present.   
+        --               Such a frame has an EtherII type field
+        --               of 0x8100.
+        --
+        -- LIMITATIONS:
+        --      DataVal: INTEGER(0..4095)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        vlanId(33),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes the entire TCI field found 
+        --               in an 802.1D tagged frame. Such a frame   
+        --               an EtherII type field of 0x8100. 
+        --               Support for DataMask is primarily 
+        --               intended to allow for specification of
+        --               the 802.1D priority bits located in the
+        --               three most significant bits of the TCI.
+        --
+        -- LIMITATIONS:
+        --      DataVal: INTEGER(0..65535)
+        --     DataMask: As described in the DESCRIPTION clause.
+        -- -----------------------------------------------------
+        tci(34)
+    }
+
+-- -------------------------------------------------------------
+-- The VlanIndex TEXTUAL-CONVENTION although similar to the 
+-- Q-BRIDGE-MIB as defined in draft-ietf-bridge-bridgemib-05.txt
+-- has been extended to cover Vids 0 and 4095 which are used 
+-- for the following purposes:
+--      0      Indicates that the forwarding action 
+--             is to drop any packets matching the rule. 
+--                        
+--      4095   Indicates that the forwarding action
+--             is to forward any packets matching the rule
+--             without specifying a VLAN in the rule.
+--
+-- -------------------------------------------------------------
+
+VlanIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value used to index per-VLAN tables: values of 0 and
+        4095 have special meaning; if the value is between 1 and
+        4094 inclusive, it represents an 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent. If the value is 0 it indicates that the 
+        packets will be dropped.  If the value is 4095, it indicates
+        that the packets will be forwarded, but no VLAN is 
+        specified here."
+    SYNTAX      Unsigned32
+
+-- -------------------------------------------------------------
+-- VLAN Classification Group
+-- -------------------------------------------------------------
+
+ctVlanClassifyStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allows the VLAN Classification feature to be globally
+        enabled/disabled.  A value of disable(2), functionally
+        supersedes the RowStatus of individual entries in the
+        ctVlanClassifyTable, but does not change their actual
+        RowStatus value."
+    DEFVAL { disable }
+    ::= { ctVlanClassifyObjects 1}
+
+ctVlanClassifyMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+        ctVlanClassifyTable."
+    ::= { ctVlanClassifyObjects 2}
+
+ctVlanClassifyNumEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the ctVlanClassifyTable."
+    ::= { ctVlanClassifyObjects 3}
+
+-- -------------------------------------------------------------
+-- VLAN Classification Table
+-- -------------------------------------------------------------
+
+ctVlanClassifyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtVlanClassifyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration information for each
+        VLAN classification configured into the device by (local
+        or network) management.  All entries are permanent and
+        will be restored after the device is reset."
+    ::= { ctVlanClassifyObjects 4 }
+
+ctVlanClassifyEntry OBJECT-TYPE
+    SYNTAX      CtVlanClassifyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes a particular entry of ctVlanClassifyTable."
+    INDEX   { ctVlanClassifyVlanIndex, ctVlanClassifyDataMeaning,
+              ctVlanClassifyDataVal,   ctVlanClassifyDataMask }
+    ::= { ctVlanClassifyTable 1 }
+
+CtVlanClassifyEntry ::=
+    SEQUENCE {
+        ctVlanClassifyVlanIndex
+            VlanIndex,
+        ctVlanClassifyDataMeaning
+            CtVlanClassifyType,
+        ctVlanClassifyDataVal
+            Unsigned32,
+        ctVlanClassifyDataMask
+            Unsigned32,
+        ctVlanClassifyIngressList
+            PortList,
+        ctVlanClassifyRowStatus
+            RowStatus,
+        ctVlanClassifyRowInfo
+            DisplayString
+    }
+
+ctVlanClassifyVlanIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN index for this entry.  Any packet meeting the
+        classification criteria specified by this conceptual row
+        will be put into the VLAN indicated by this object."
+    ::= { ctVlanClassifyEntry 1 }
+
+ctVlanClassifyDataMeaning OBJECT-TYPE
+    SYNTAX      CtVlanClassifyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The meaning of the ctVlanClassifyDataVal leaf for this
+        conceptual row.  The ctVlanClassifyDataVal specifies a
+        particular value which, when compared to packet data,
+        is used to classify that packet into a particular VLAN.
+        The part of the packet (if any), to which this data
+        comparison applies, is determined by this object.
+
+        For example, the value ipAddressBilateral(8) means that
+        the value ctVlanClassifyDataVal for this entry is an IP
+        address.  It further means that the given IP address
+        will be compared against both source and destination
+        IP address fields in a packet.  Such an entry obviously
+        would not not match against any non-IP packets.
+
+        Additionally, the value of this leaf will impose certain
+        implicit ranges and interpretations of data contained
+        within the ctVlanClassifyDataVal leaf for this entry.  The
+        specific limitations of each type should be spelled out
+        in the comments for that type."
+    ::= { ctVlanClassifyEntry 2 }
+
+ctVlanClassifyDataVal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The data value associated with ctVlanClassifyDataMeaning.
+        The explicit range of this value is any unsigned 32-bit
+        integer(0..4294967295).  This range may vary, however, 
+        depending upon the value of ctVlanClassifyDataMeaning.
+        Illegal values should not be allowed."
+    ::= { ctVlanClassifyEntry 3 }
+
+ctVlanClassifyDataMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object is the one's complement of a 32-bit mask.
+        This mask is applicable to the data comparison of
+        ctVlanClassifyDataVal.  The mask is applied to the actual
+        packet data under consideration through a logical bitwise
+        AND operation.  This result is then compared to the data.
+
+        For example, we want to classify according to a bilateral
+        IP address of 134.141.0.0 with a mask of 255.255.240.0.
+        This would be reflected by the following values:
+
+        ctVlanClassifyDataMeaning: ipAddressBilateral(8)
+        ctVlanClassifyDataVal:     0x868d0000
+        ctVlanClassifyDataMask:    0x00000fff
+
+        Again there are contextual implications for this leaf
+        depending upon the value of ctVlanClassifyDataMeaning.
+        Not all types will use the mask, and others will impose
+        restrictions.  This value should however be a true
+        indication of the masking operation.  In other words,
+        data types that don't use a mask should only allow a
+        value of zero, indicating that all data bits are
+        significant in the comparison.
+
+        The specific restrictions of each type should be spelled
+        out in the comments for that type.  Illegal values should
+        not be allowed."
+    ::= { ctVlanClassifyEntry 4 }
+
+ctVlanClassifyIngressList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports on which this classification rule applies.
+        Classification occurs on ingress.  An agent implementation
+        should allow a set operation of this object to create a
+        row if it does not exist."
+    DEFVAL      { '0000'H }
+    ::= { ctVlanClassifyEntry 5 }
+
+ctVlanClassifyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object provides both control and status for the
+        associated conceptual row in the table.  Rows can be
+        created in two ways.
+
+        createAndGo - The specified row will be created and
+            activated if the instance is allowable.  If not, an
+            inconsistentValue exception will be returned and the
+            row will not be created.  This provides the most
+            optimal method of creating an active row, but provides
+            the user no explanation if the row cannot be created.
+
+        createAndWait - The specified row will be created and put
+            in the notInService state if the instance is allowable.
+            A subsequent activation of this row will bring it into
+            the active state.  If the instance is not allowable,
+            the row will be created and put in the notReady state.
+            A subsequent activation of this row will fail.  Since
+            the inappropriate information is always contained in the
+            indexing leaves, activation will never succeed and the
+            row should be removed by the management station.  When
+            a row is in the notReady state, the ctVlanClassifyRowInfo
+            may be retrieved to obtain a plain English explanation
+            of why this row cannot be activated.  createAndWait is
+            the preferred method for this reason.
+        
+        Both methods described above leave ctVlanClassifyIngressList
+        in it's default state, requiring an additional set operation
+        in order to modify it.  An even more optimal twist on the
+        createAndWait method is to set the ctVlanClassifyIngressList
+        to it's desired value as a method for row creation.  This
+        will essentially cause an implicit createAndWait since it
+        too will leave the row in either the notInService or
+        notReady state.  This leaves only activation or error
+        analysis as the last step.
+
+        Any rows left in the notReady or notInService state for
+        more than 5 minutes should be automatically removed by
+        the agent implementation."
+    ::= { ctVlanClassifyEntry 6 }
+
+ctVlanClassifyRowInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides info about this row in the form of
+        an ASCII string, suitable for display purposes.  The
+        intended purpose of this object is to provide an
+        'agent-specific' explanation as to why the
+        ctVlanClassifyRowStatus for this conceptual row is in
+        the 'notReady' state.  A management station should read
+        this object and display it to the user in this case.
+
+        A conceptual row that does not fall into this category may
+        simply return a single NULL, but may also provide any useful
+        info of its choice.  A management station may attempt to
+        display such info if it so chooses, but is under no burden
+        to do so."
+    ::= { ctVlanClassifyEntry 7 }
+
+-- -------------------------------------------------------------
+-- Supported Ability Table
+-- -------------------------------------------------------------
+
+ctVlanClassifyAbilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtVlanClassifyAbilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information for each of the VLAN
+        classification types.  Types for which there is no
+        corresponding row are not supported by this device."
+    ::= { ctVlanClassifyObjects 5 }
+
+ctVlanClassifyAbilityEntry OBJECT-TYPE
+    SYNTAX      CtVlanClassifyAbilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes a particular entry of ctVlanClassifyAbilityTable."
+    INDEX   { ctVlanClassifyAbility }
+    ::= { ctVlanClassifyAbilityTable 1 }
+
+CtVlanClassifyAbilityEntry ::=
+    SEQUENCE {
+        ctVlanClassifyAbility
+            CtVlanClassifyType,
+        ctVlanClassifyPorts
+            PortList,
+        ctVlanClassifyActionStatus
+            INTEGER
+    }
+
+ctVlanClassifyAbility OBJECT-TYPE
+    SYNTAX      CtVlanClassifyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN classification type associated with this entry."
+    ::= { ctVlanClassifyAbilityEntry 1 }
+
+ctVlanClassifyPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports on which the classification type
+        specified by ctVlanClassifyAbility is supported."
+    ::= { ctVlanClassifyAbilityEntry 2 }
+
+ctVlanClassifyActionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forwardNoFrames(1),
+                    forwardAllFrames(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The action taken for all frames which apply this entry's
+        associated classification rule.
+
+        When this object is forwardNoFrames(1), the device will
+        drop all frames which apply this classification rule.
+
+        When this object is forwardAllFrames(2), the device will
+        forward all applicable frames to this classification entry's
+        VLAN."
+    ::= { ctVlanClassifyAbilityEntry 3 }
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+ctVlanClassifyConformance OBJECT IDENTIFIER ::= { ctVlanClassify 2 }
+
+ctVlanClassifyGroups      OBJECT IDENTIFIER ::= { ctVlanClassifyConformance 1 }
+ctVlanClassifyCompliances OBJECT IDENTIFIER ::= { ctVlanClassifyConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+ctVlanClassifyBaseGroup OBJECT-GROUP
+    OBJECTS {
+        ctVlanClassifyStatus,
+        ctVlanClassifyMaxEntries,
+        ctVlanClassifyNumEntries,
+        ctVlanClassifyIngressList,
+        ctVlanClassifyRowStatus,
+        ctVlanClassifyRowInfo,
+        ctVlanClassifyPorts,
+        ctVlanClassifyActionStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device level control
+        and status information for VLAN classification."
+    ::= { ctVlanClassifyGroups 1 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+ctVlanClassifyCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support
+        VLAN classification."
+
+    MODULE
+        MANDATORY-GROUPS { ctVlanClassifyBaseGroup }
+
+    ::= { ctVlanClassifyCompliances 1 }
+
+END

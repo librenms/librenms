@@ -1,0 +1,1 @@
+CREATE TABLE `api_tokens` ( `id` int(11) NOT NULL AUTO_INCREMENT, `user_id` int(11) NOT NULL, `token_hash` varchar(32) NOT NULL, `description` varchar(100) NOT NULL, `disabled` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`), UNIQUE KEY `token_hash` (`token_hash`)) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;

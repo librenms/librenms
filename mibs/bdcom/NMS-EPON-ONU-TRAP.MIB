@@ -1,0 +1,252 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-TRAP.my: NMS EPON OLT CHIP STATUS TRAP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-ONU-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                                 FROM NMS-SMI
+    llidIfIndex                                 FROM NMS-EPON-LLID
+    ifDescr                                     FROM RFC1213-MIB                                                 
+    onuID,onuStatus,onuVendorID,onuModuleID,onuSerialPortCount,onuPonPortCount,onuBakupPonStatus,onuActivePonPortIndex,
+    onuCurrentPONInUse,onuCurrentPONMAC,onuPeerPONDiid,onuPeerPONMAC,onuPeerPONIndex,onuConfigurablePortDiid,cap2ProtectionType,
+    opModuleTemp,opModuleVolt,opModuleCurrent,opModuleRxPower,opModuleTxPower         FROM NMS-EPON-ONU
+    currentActiveEponDiid,currentStandbyEponDiid,psgDiid,psgIfDescr FROM NMS-EPON-OLT-PSG
+    llidToEponPortDiid FROM NMS-EPON-LLID;
+
+
+               nmsEponOnuTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 18 }
+               
+               TypeOfRemoteFailureIndication ::= INTEGER
+                	{ link_fault(1),
+                           dying_gasp(2),
+                           critical_link_event(3)
+                         }
+
+               TypeOfVersionUpdateStatus ::= INTEGER
+                	{ start(1),
+                           success(2),
+                           failed(3)
+                         }                        
+                         
+               onuRemoteFailureIndication OBJECT-TYPE
+                   SYNTAX  TypeOfRemoteFailureIndication
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS ONU remote failure indication."
+                   ::= { nmsEponOnuTrap 1 }
+		                
+               onuVersionUpdateStatus OBJECT-TYPE
+                   SYNTAX  TypeOfVersionUpdateStatus
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS ONU software version update status."
+                   ::= { nmsEponOnuTrap 2 }
+		                
+               onuEpromVersionUpdateStatus OBJECT-TYPE
+                   SYNTAX  TypeOfVersionUpdateStatus
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS ONU EPROM software version update status."
+                   ::= { nmsEponOnuTrap 3 }
+		                
+                         
+             
+
+-- Notifications
+	nmsOnuNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOnuTrap 4 }
+
+
+	nmsOnuNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       onuID,
+                       onuRemoteFailureIndication,
+                       onuStatus,
+                       onuVersionUpdateStatus,
+                       onuEpromVersionUpdateStatus,
+                       onuVendorID,
+                       onuModuleID,
+                       onuSerialPortCount,
+                       currentActiveEponDiid,
+                       currentStandbyEponDiid,
+                       llidToEponPortDiid,
+                       onuPonPortCount,
+                       cap2ProtectionType,
+                       onuPeerPonPortStatus,
+                       onuCurrentPONInUse
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when onu changes ."
+    		::= { nmsOnuNotifications 1 }
+
+
+
+      -- Notifications
+	nmsOnuBakupPonNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOnuTrap 5 }
+
+
+	nmsOnuBakupPonNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       onuID,
+                       onuActivePonPortIndex,
+                       onuBakupPonStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when onu bakup PON port status changes ."
+    		::= { nmsOnuBakupPonNotifications 1 }
+
+
+
+               nms2Pon2Mac         OBJECT IDENTIFIER ::= { nmsEponOnuTrap 6 }
+
+               onuPeerPonIfDesc OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "ONU peer PON port description."
+                   ::= { nms2Pon2Mac 1 }
+
+               onuPeerOLTPonIfDesc OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "ONU bakup OLT PON port description."
+                   ::= { nms2Pon2Mac 2 }
+                   
+               onuCurrentOLTPonIfDesc OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "ONU current OLT PON port description."
+                   ::= { nms2Pon2Mac 3 }
+                   
+               onuCurrentOLTPonDIid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "ONU current PON belongs to OLT PON port DIid."
+                   ::= { nms2Pon2Mac 4 }
+
+               onuPeerOLTPonDIid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "ONU peer PON belongs to OLT PON port DIid."
+                   ::= { nms2Pon2Mac 5 }
+      -- Notifications
+	nmsOnu2Pon2MacNotifications OBJECT IDENTIFIER
+                                ::= { nms2Pon2Mac 6 }
+
+
+	nmsOnu2Pon2MacNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       onuID,
+                       onuCurrentPONInUse,
+                       onuCurrentPONMAC,
+                       onuPeerPONMAC,
+                       onuPeerPONDiid,
+                       onuPeerPonIfDesc,
+                       onuCurrentOLTPonDIid,
+                       onuCurrentOLTPonIfDesc,
+                       onuPeerOLTPonDIid,
+                       onuPeerOLTPonIfDesc,
+                       psgDiid,
+                       psgIfDescr,
+                       onuConfigurablePortDiid,
+                       onuVendorID,
+                       onuModuleID,
+                       onuSerialPortCount
+                       
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when PON port of ONU with 2 PON and 2 MAC happens to switch."
+    		::= { nmsOnu2Pon2MacNotifications 1 }
+    		
+    		
+    		
+    		
+               onuPeerPonPortStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          authenticated(0),
+                          registered(1),
+                          deregistered(2),
+                          auto_config(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU peer pon port status. 0-authenticated, 1-registered,  2-deregistered."
+                   ::= { nms2Pon2Mac 7 } 
+    	
+
+               nmsOnuSFPParameter         OBJECT IDENTIFIER ::= { nmsEponOnuTrap 7 }
+
+               onuPonSFPStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   above(1),
+                                   below(2),
+                                   normal(3)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "ONU PON port SFP parameter alarm notation. 1- higher than uplimit, 2- lower than downlimit, 3- back to noraml."
+                   ::= { nmsOnuSFPParameter 1 }
+
+
+	nmsOnuSFPParameterNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       onuID,
+                       onuCurrentOLTPonDIid,
+                       onuCurrentPONInUse,
+                       onuPonSFPStatus,
+                       opModuleTemp,
+                       opModuleVolt,
+                       opModuleCurrent,
+                       opModuleRxPower,
+                       opModuleTxPower
+                       
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this trap when onu optical module  works in abnormal status. "
+    		::= { nmsOnuSFPParameter 2 }
+    		
+    		
+
+        
+
+END

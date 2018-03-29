@@ -1,0 +1,449 @@
+ALCATEL-IND1-SESSION-MGR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	IpAddress            FROM SNMPv2-SMI
+	DisplayString,
+	RowStatus            FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP   FROM SNMPv2-CONF
+	softentIND1Sesmgr,
+	switchMgtTraps       FROM ALCATEL-IND1-BASE;
+
+alcatelIND1SessionMgrMIB MODULE-IDENTITY
+	LAST-UPDATED "200704030000Z"
+	ORGANIZATION "Alcatel-Lucent"
+	CONTACT-INFO
+	    "Please consult with Customer Service to ensure the most appropriate
+	     version of this document is used with the products in question:
+
+			Alcatel-Lucent, Enterprise Solutions Division
+		       (Formerly Alcatel Internetworking, Incorporated)
+			       26801 West Agoura Road
+			    Agoura Hills, CA  91301-5122
+			      United States Of America
+
+	    Telephone:               North America  +1 800 995 2696
+				     Latin America  +1 877 919 9526
+				     Europe         +31 23 556 0100
+				     Asia           +65 394 7933
+				     All Other      +1 818 878 4507
+
+	    Electronic Mail:         support@ind.alcatel.com
+	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+	DESCRIPTION
+	    "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 User Sessions Manager Subsystem.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+	::= { softentIND1Sesmgr 1}
+
+    alcatelIND1SessionMgrMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Session Manager Subsystem Managed Objects."
+        ::= { alcatelIND1SessionMgrMIB 1 }
+
+
+    alcatelIND1SessionMgrMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Session Manager Subsystem Conformance Information."
+        ::= { alcatelIND1SessionMgrMIB 2 }
+
+
+    alcatelIND1SessionMgrMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Session Manager Subsystem Units Of Conformance."
+        ::= { alcatelIND1SessionMgrMIBConformance 1 }
+
+
+    alcatelIND1SessionMgrMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Session Manager Subsystem Compliance Statements."
+        ::= { alcatelIND1SessionMgrMIBConformance 2 }
+
+    sessionMgr  OBJECT IDENTIFIER ::= { alcatelIND1SessionMgrMIBObjects 1 }
+
+-- Session configuration table
+
+	sessionConfigTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF SessionConfigEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The configuration parameters of a user session."
+	    ::= { sessionMgr 1 }
+
+	sessionConfigEntry  OBJECT-TYPE
+	    SYNTAX  SessionConfigEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"An entry of the session configuration table."
+	    INDEX { sessionType }
+	    ::= { sessionConfigTable 1 }
+
+	SessionConfigEntry ::= SEQUENCE {
+	    sessionType			INTEGER,
+	    sessionBannerFileName	DisplayString,
+	    sessionInactivityTimerValue	INTEGER,
+	    sessionDefaultPromptString	DisplayString
+	    }
+
+	sessionType  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		cli (1),
+		http (2),
+		ftp (3),
+		snmp (4)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The type of the session interface."
+	    ::= { sessionConfigEntry 1 }
+
+	sessionBannerFileName  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..255))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Optional Banner File Name.
+		For CLI, HTTP, and FTP sessions only."
+            DEFVAL  { "" }
+	    ::= { sessionConfigEntry 2 }
+
+	sessionInactivityTimerValue  OBJECT-TYPE
+	    SYNTAX  INTEGER (1..596523)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The inactivity timer value for this type
+		of session, in minutes."
+            DEFVAL  { 4 }
+	    ::= { sessionConfigEntry 3 }
+
+	sessionDefaultPromptString  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..31))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Prompt string.
+		For CLI sessions only."
+            DEFVAL  { "-> " }
+	    ::= { sessionConfigEntry 4 }
+
+
+-- Session active table
+
+	sessionActiveTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF SessionActiveEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of active users sessions."
+	    ::= { sessionMgr 2 }
+
+	sessionActiveEntry  OBJECT-TYPE
+	    SYNTAX  SessionActiveEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"An entry in the session active table."
+	    INDEX { sessionIndex }
+	    ::= { sessionActiveTable 1 }
+
+	SessionActiveEntry ::= SEQUENCE {
+	    sessionIndex		INTEGER,
+	    sessionAccessType		INTEGER,
+	    sessionPhysicalPort		INTEGER,
+	    sessionUserName		DisplayString,
+	    sessionUserReadPrivileges	OCTET STRING,
+	    sessionUserWritePrivileges	OCTET STRING,
+	    sessionUserProfileName  	DisplayString,
+	    sessionUserIpAddress	IpAddress,
+	    sessionRowStatus		RowStatus
+	    }
+
+	sessionIndex  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..63)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The index of the session."
+	    ::= { sessionActiveEntry 1 }
+
+	sessionAccessType  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		console (1),
+		telnet (2),
+		ftp (3),
+		http (4),
+		ssh (5)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The access type of the session."
+	    ::= { sessionActiveEntry 2 }
+
+	sessionPhysicalPort  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		notSignificant (0),
+		emp (1),
+		ni (2),
+		local (3)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The physical port type of the session.
+		notSignificant : use for console port or
+		when information is not available,
+		emp : ethernet port on the CMM board,
+		ni : ethernet port on a NI coupler board."
+	    ::= { sessionActiveEntry 3 }
+
+	sessionUserName  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..31))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The user name of the user logged-in."
+	    ::= { sessionActiveEntry 4 }
+
+	sessionUserReadPrivileges  OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (8))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The read privileges of the user logged-in.
+		These privileges are stored as a bitmap.
+		Each bit represents a command family.
+		The number of families may go up to 64.
+		Applied for functional authorization
+		(partitioned management)."
+	    ::= { sessionActiveEntry 5 }
+
+	sessionUserWritePrivileges  OBJECT-TYPE
+	    SYNTAX  OCTET STRING (SIZE (8))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The write privileges of the user logged-in.
+		These privileges are stored as a bitmap.
+		Each bit represents a command family.
+		The number of families may go up to 64.
+		Applied for functional authorization
+		(partitioned management)."
+	    ::= { sessionActiveEntry 6 }
+
+	sessionUserProfileName  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..31))
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The profile name of the user logged-in.
+		Applied for the end-user partitioned management."
+	    ::= { sessionActiveEntry 7 }
+
+	sessionUserIpAddress  OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The IP address of the user logged-in."
+	    ::= { sessionActiveEntry 8 }
+
+	sessionRowStatus  OBJECT-TYPE
+	    SYNTAX  RowStatus
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The status of this table entry.
+		An entry in this table is dynamically created when a user
+		connects to the switch (through console, telnet, ftp or http).
+		The only value supported for set is destroy(6),
+		to kill a user session."
+	    ::= { sessionActiveEntry 9 }
+
+
+-- Session login timout
+
+	sessionLoginTimeout  OBJECT-TYPE
+	    SYNTAX  INTEGER (5..600)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"At login time, it is the time in seconds to get
+		the password, after the username has been keyed in."
+            DEFVAL  { 55 }
+	    ::= { sessionMgr 3 }
+
+-- Session login attempt
+
+	sessionLoginAttempt  OBJECT-TYPE
+	    SYNTAX  INTEGER (1..10)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The maximum number of login attempts for one session."
+            DEFVAL  { 3 }
+	    ::= { sessionMgr 4 }
+
+-- CLI command log enable
+
+	sessionCliCommandLogEnable  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	    	enable(1),
+	    	disable(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"CLI command logging status. Enable(1) will save all CLI set command
+		activilies on flash memory. Disable(2) will stop the record"
+            DEFVAL  { disable }
+	    ::= { sessionMgr 5 }
+
+-- Session XonXoff enable
+
+	sessionXonXoffEnable  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	    	enable(1),
+	    	disable(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Enable or disable xon-xoff flow control on console port"
+            DEFVAL  { disable }
+	    ::= { sessionMgr 6 }
+
+
+
+--
+-- Trap description
+--
+
+switchMgtTrapsDesc  OBJECT IDENTIFIER ::= { switchMgtTraps 1 }
+switchMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 2 }
+
+    sessionAuthenticationTrap  NOTIFICATION-TYPE
+        OBJECTS {
+	    sessionAccessType,
+	    sessionUserName,
+	    sessionUserIpAddress,
+	    sessionAuthFailure
+	}
+	STATUS  current
+        DESCRIPTION
+	    "Authentication Failure Trap is sent each time a user
+	    authentication is refused."
+	::= {switchMgtTrapsDesc 0 1 }
+
+--
+-- Object used in the trap
+--
+
+	sessionAuthFailure  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		unknownUser (1)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The reason why the user authentication failed."
+	    ::= { switchMgtTrapsObj 1 }
+
+
+--
+-- Compliance Statements
+--
+
+    alcatelIND1SessionMgrMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Session Manager Subsystem."
+        MODULE  -- this module
+            MANDATORY-GROUPS
+            {
+                sessionConfigGroup,
+                sessionActiveGroup,
+                sessionTrapsGroup
+            }
+
+        ::= { alcatelIND1SessionMgrMIBCompliances 1 }
+
+
+--
+-- Units Of Conformance
+--
+
+    sessionConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    sessionType,           -- Session configuration table
+	    sessionBannerFileName,
+	    sessionInactivityTimerValue,
+	    sessionDefaultPromptString
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Session Manager."
+        ::= { alcatelIND1SessionMgrMIBGroups 1 }
+
+
+    sessionActiveGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    sessionIndex,          -- Active users session table
+	    sessionAccessType,
+	    sessionPhysicalPort,
+	    sessionUserName,
+	    sessionUserReadPrivileges,
+	    sessionUserWritePrivileges,
+	    sessionUserProfileName,
+	    sessionUserIpAddress,
+	    sessionRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of users sessions."
+        ::= { alcatelIND1SessionMgrMIBGroups 2 }
+
+
+    sessionTrapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+	    sessionAuthenticationTrap
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of Traps for management of users sessions."
+        ::= { alcatelIND1SessionMgrMIBGroups 3 }
+
+
+END

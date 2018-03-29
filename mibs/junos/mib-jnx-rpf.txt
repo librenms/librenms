@@ -1,0 +1,108 @@
+--
+-- Juniper Enterprise Specific MIB: Reverse Path Forwarding MIB
+-- 
+-- Copyright (c) 2002-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-RPF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI               -- RFC 2578
+    InterfaceIndex
+        FROM IF-MIB                   -- RFC 2863
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxRpf MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:59 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+            "This is Juniper Networks' enterprise-specific MIB for 
+             Reverse Path Forwarding (RPF)"
+    REVISION     "200202250000Z"
+    DESCRIPTION
+            "Initial revision"
+    ::= { jnxMibs 17 }
+
+
+    jnxRpfStats     OBJECT IDENTIFIER ::= { jnxRpf 1 }
+
+    jnxRpfStatsTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxRpfStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains statistics for traffic that is rejected
+                due to RPF processing."
+        ::= { jnxRpfStats 1 }
+
+    jnxRpfStatsEntry    OBJECT-TYPE
+        SYNTAX      JnxRpfStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Each entry in this table counts RPF-rejected traffic that
+                is received on a particular interface and belongs to a
+                particular address family."
+        INDEX   { jnxRpfStatsIfIndex, jnxRpfStatsAddrFamily }
+        ::= { jnxRpfStatsTable 1 }
+
+    JnxRpfStatsEntry ::=
+        SEQUENCE {
+            jnxRpfStatsIfIndex          InterfaceIndex,
+            jnxRpfStatsAddrFamily       INTEGER,
+            jnxRpfStatsPackets          Counter64,
+            jnxRpfStatsBytes            Counter64
+        }
+
+    jnxRpfStatsIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The ingress interface for traffic that is counted in this
+                RpfStats entry."
+        ::= { jnxRpfStatsEntry 1 }
+
+    jnxRpfStatsAddrFamily OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ipv4 (1),
+                        ipv6 (2)
+        }
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+                "The address family of this entry's traffic."
+        ::= { jnxRpfStatsEntry 2 }
+
+    jnxRpfStatsPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of packets received on this interface, belonging
+                to this address family, that have been rejected due to RPF
+                processing."
+        ::= { jnxRpfStatsEntry 3 }
+
+    jnxRpfStatsBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of bytes received on this interface, belonging
+                to this address family, that have been rejected due to RPF
+                processing."
+        ::= { jnxRpfStatsEntry 4 }
+
+END

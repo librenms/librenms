@@ -1,0 +1,11 @@
+node_modules/
+libs/
+gh-pages/
+demo/
+.idea
+.DS_Store
+*.iml
+vendor
+*.gem
+*.css.map
+demos/assets/css/demo.css

@@ -1,0 +1,100 @@
+
+-- *****************************************************************************
+-- Juniper-IS-IS-CONF
+--
+-- SNMP Agent Capabilities definitions for the IS-IS MIB.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-IS-IS-CONF DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniIsisAgent  MODULE-IDENTITY
+    LAST-UPDATED "200209061654Z"  -- 06-Sep-02 12:54 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the intermediate system to
+        intermediate system (IS-IS) protocol management component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200204042037Z"  -- 04-Apr-02 03:37 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added MPLS support."
+    REVISION    "200104241930Z"  -- 24-Apr-01 03:30 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 23 }
+
+
+-- *****************************************************************************
+-- IS-IS SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniIsisAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the IS-IS component of the JUNOSe SNMP agent.  This
+        version of the IS-IS component was supported in JUNOSe 2.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the intermediate system to
+        intermediate system (IS-IS) protocol application in JUNOSe.  These
+        capabilities became obsolete when the juniIsisCircState object was
+        added."
+    SUPPORTS    Juniper-ISIS-MIB
+        INCLUDES {
+            juniIsisSystemMgmtGroup,
+            juniIsisCircuitMgmtGroup }
+    ::= { juniIsisAgent 1 }
+
+juniIsisAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the IS-IS component of the JUNOSe SNMP agent.  This
+        version of the IS-IS component was supported in JUNOSe 3.x system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the intermediate system to
+        intermediate system (IS-IS) protocol application in JUNOSe.  These
+        capabilities became obsolete when MPLS support was added."
+    SUPPORTS    Juniper-ISIS-MIB
+        INCLUDES {
+            juniIsisSystemMgmtGroup,
+            juniIsisCircuitMgmtGroup2 }
+    ::= { juniIsisAgent 2 }
+
+juniIsisAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the IS-IS component of the JUNOSe SNMP agent.  This
+        version of the IS-IS component is supported in JUNOSe 4.0 and subsequent
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the intermediate system to
+        intermediate system (IS-IS) protocol application in JUNOSe."
+    SUPPORTS    Juniper-ISIS-MIB
+        INCLUDES {
+            juniIsisSystemMgmtGroup2,
+            juniIsisCircuitMgmtGroup2 }
+    ::= { juniIsisAgent 3 }
+
+END

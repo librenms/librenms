@@ -1,0 +1,240 @@
+-- This module defines enterprise MIBs for Gateway VPN
+-- configuration
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-GATEWAY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnGatewayMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for Gateway VPN
+         configuration"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation date"
+    ::= { netscreenVpnMibModule 4 }
+
+NsVpnGwEntry ::= SEQUENCE
+{
+    nsVpnGwIndex          Integer32,
+    nsVpnGwName           DisplayString,
+    nsVpnGwRemoteType     INTEGER,
+    nsVpnGwRemoteStaticIp IpAddress,
+    nsVpnGwRemotePeerId   DisplayString,
+    nsVpnGwDialup         DisplayString,
+    nsVpnGwInitMode       INTEGER,
+    nsVpnGwPhOnePropOne   DisplayString,
+    nsVpnGwPhOnePropTwo   DisplayString,
+    nsVpnGwPhOnePropThree DisplayString,
+    nsVpnGwPhOnePropFour  DisplayString,
+    nsVpnGwCertLocal      DisplayString,
+    nsVpnGwPeerCa         DisplayString,
+    nsVpnGwPeerType       INTEGER,
+    nsVpnGwVsys           Integer32
+}
+
+nsVpnGateway OBJECT IDENTIFIER ::= { netscreenVpn 4 }
+
+nsVpnGwTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnGwEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Remote tunnel gateway table collects tunnel gateway
+         configurations."
+    ::= { nsVpnGateway 1 }
+
+nsVpnGwEntry OBJECT-TYPE
+    SYNTAX        NsVpnGwEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnGwTable holds a set of configuration
+         parameters  associated with an instance of tunnel gateway."
+    INDEX
+        { nsVpnGwIndex }
+    ::= { nsVpnGwTable 1 }
+
+nsVpnGwIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for ike gateway table.  Its value ranges
+         between 0 and 65535 and may not be contiguous."
+    ::= { nsVpnGwEntry 1 }
+
+nsVpnGwName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Tunnel gateway name."
+    ::= { nsVpnGwEntry 2 }
+
+nsVpnGwRemoteType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        static-ip(0),
+        dynamic-ip(1),
+        dialup-user(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Remote tunnel gateway type.It shows whether the gateway use
+         static ip, dynamic ip or dialup user."
+    ::= { nsVpnGwEntry 3 }
+
+nsVpnGwRemoteStaticIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ip address of static-ip gateway."
+    ::= { nsVpnGwEntry 4 }
+
+nsVpnGwRemotePeerId OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Remote gateway peer id, which can be used for static-ip and
+         dynamic ip gateway. This is optional for the static-ip
+         gateway."
+    ::= { nsVpnGwEntry 5 }
+
+nsVpnGwDialup OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Remote gateway dialup user or group"
+    ::= { nsVpnGwEntry 6 }
+
+nsVpnGwInitMode OBJECT-TYPE
+    SYNTAX        INTEGER {
+        main(0),
+        aggressive(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 1 can take place in either Main mode or Aggressive
+         mode."
+    ::= { nsVpnGwEntry 7 }
+
+nsVpnGwPhOnePropOne OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 1 Proposal one."
+    ::= { nsVpnGwEntry 8 }
+
+nsVpnGwPhOnePropTwo OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 1 Proposal two."
+    ::= { nsVpnGwEntry 9 }
+
+nsVpnGwPhOnePropThree OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 1 Proposal three."
+    ::= { nsVpnGwEntry 10 }
+
+nsVpnGwPhOnePropFour OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 1 Proposal four."
+    ::= { nsVpnGwEntry 11 }
+
+nsVpnGwCertLocal OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Local Certificate configuration for preferred
+         certification.(optional)"
+    ::= { nsVpnGwEntry 12 }
+
+nsVpnGwPeerCa OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Preferred Peer CA(optional)"
+    ::= { nsVpnGwEntry 13 }
+
+nsVpnGwPeerType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        none(0),
+        pkcs7(1),
+        pgp(2),
+        dns(3),
+        x509-sig(4),
+        x509-ke(5),
+        keerberos(6),
+        crl(7),
+        arl(8),
+        spki(9),
+        x509-att(10)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Peer Type(optional)"
+    ::= { nsVpnGwEntry 14 }
+
+nsVpnGwVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this gateway configuration belongs to."
+    ::= { nsVpnGwEntry 15 }
+
+END
+
+

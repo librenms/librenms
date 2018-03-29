@@ -1,0 +1,843 @@
+
+-- *****************************************************************************
+-- Juniper-ADDRESS-POOL-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Address Pool MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ADDRESS-POOL-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    juniRouterName
+        FROM Juniper-ROUTER-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniAddressPoolMIB  MODULE-IDENTITY
+    LAST-UPDATED "200502112135Z"  -- 11-Feb-05 04:35 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Road
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The Address Pool MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200502112135Z"  -- 11-Feb-05 04:35 PM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Added support for  juniAddressSharedPoolTable."
+    REVISION    "200409172237Z"  -- 17-Sep-04 05:37 PM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Added support for next pool profile index.
+        Changed the description of the juniAddressPoolRowStatus and 
+        the juniAddressAliasRowStatus objects."
+    REVISION    "200311032237Z"  -- 03-Nov-03 05:37 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added support for address pool aliases."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200205061838Z"  -- 06-May-02 02:38 PM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Added juniAddressPoolProfileTable to support an address pool with
+        multiple address ranges."
+    REVISION    "200105021157Z"  -- 02-May-01 07:57 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added pool exhaustion variables and notifications for high pool
+        utilization and pool exhaustion."
+    REVISION    "200104271500Z"  -- 27-Apr-01 11:00 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Fixed range on juniAddressPoolNextPoolIndex."
+    REVISION      "9906010000Z"  -- 01-Jun-99               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 21 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAddressPoolObjects  OBJECT IDENTIFIER ::= { juniAddressPoolMIB 1 }
+juniAddressPool         OBJECT IDENTIFIER ::= { juniAddressPoolObjects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Address Pools
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAddressPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAddressPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IP address pool configuration entries."
+    ::= { juniAddressPool 1 }
+
+juniAddressPoolEntry OBJECT-TYPE
+    SYNTAX      JuniAddressPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing an IP address pool configuration."
+    INDEX     { juniAddressPoolIndex }
+    ::= { juniAddressPoolTable 1 }
+
+JuniAddressPoolEntry ::= SEQUENCE {
+    juniAddressPoolIndex                 Integer32,
+    juniAddressPoolName                  OCTET STRING,
+    juniAddressPoolRowStatus             RowStatus,
+    juniAddressPoolStart                 IpAddress,
+    juniAddressPoolEnd                   IpAddress,
+    juniAddressPoolSize                  Integer32,
+    juniAddressPoolInUse                 Integer32,
+    juniAddressPoolHighUtilThreshold     Integer32,
+    juniAddressPoolAbatedUtilThreshold   Integer32,
+    juniAddressPoolUtilPct               Integer32,
+    juniAddressPoolTrapEnable            TruthValue,
+    juniAddressPoolNextPoolProfileIndex  Integer32 }
+
+juniAddressPoolIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index that distinguishes this address pool."
+    ::= { juniAddressPoolEntry 1 }
+
+juniAddressPoolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of address pools.
+        
+        Only value 'active' will be observed with GET.
+        Only values 'createAndGo' and 'destroy' are supported for SET.
+
+        To create an entry in this table, the following entry object MUST be
+        explicitly configured:
+            juniAddressPoolName
+
+        Once created, the objects with current status can be modified with the
+        exception of the juniAddressPoolName object.
+
+        Deleting a row in this table will result in the removal of all rows in 
+        the juniAddressPoolProfileTable with the same pool index."
+    ::= { juniAddressPoolEntry 2 }
+
+juniAddressPoolName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of this address pool.  Represents textual information taken
+        from the NVT ASCII graphics character set (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    ::= { juniAddressPoolEntry 3 }
+
+juniAddressPoolStart OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The starting IP address for the range of addresses comprising the
+        'first' pool profile entry.  This object is deprecated in favor of
+        juniAddressPoolProfileStart because it applies to a single address range
+        and can only show one of possibly many address ranges found in the newer
+        juniAddressPoolProfileTable.  The value in this table maps to the value
+        in the juniAddressPoolProfileTable for the entry with
+        juniAddressPoolProfileIndex equal to 1."
+    DEFVAL    { 0 }
+    ::= { juniAddressPoolEntry 4 }
+
+juniAddressPoolEnd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The ending IP address for the range of addresses comprising the 'first'
+        pool profile entry.  This object is deprecated in favor of
+        juniAddressPoolProfileEnd because it applies to a single address range
+        and can only show one of possibly many address ranges found in the newer
+        juniAddressPoolProfileTable.  The value in this table maps to the value
+        in the juniAddressPoolProfileTable for the entry with
+        juniAddressPoolProfileIndex equal to 1."
+    DEFVAL    { 0 }
+    ::= { juniAddressPoolEntry 5 }
+
+juniAddressPoolSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of addresses available in the 'first' pool profile entry.
+        This object is deprecated in favor of juniAddressPoolProfileSize because
+        it applies to a single address range and can only show one of possibly
+        many address ranges found in the newer juniAddressPoolProfileTable.  The
+        value in this table maps to the value in the juniAddressPoolProfileTable
+        for the entry with juniAddressPoolProfileIndex equal to 1."
+    ::= { juniAddressPoolEntry 6 }
+
+juniAddressPoolInUse OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of addresses currently allocated from the 'first' pool
+        profile entry.  This object is deprecated in favor of
+        juniAddressPoolProfileInUse because it applies to a single address range
+        and can only show one of possibly many address ranges found in the newer
+        juniAddressPoolProfileTable.  The value in this table maps to the value
+        in the juniAddressPoolProfileTable for the entry with
+        juniAddressPoolProfileIndex equal to 1."
+    ::= { juniAddressPoolEntry 7 }
+
+juniAddressPoolHighUtilThreshold  OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of address pool utilization, where if reached for the first
+        time, will generate a high address pool utilization event to the
+        management entity on this system.
+ 
+        The value of this object must be greater than the value of
+        juniAddressPoolAbatedUtilThreshold."
+    DEFVAL    { 85 }
+    ::= { juniAddressPoolEntry 8 }
+
+juniAddressPoolAbatedUtilThreshold OBJECT-TYPE 
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of address pool utilization that is used to determine when to
+        generate an abated address pool utilization event notification to the
+        management entity on this system.
+
+        The value of this object must be less than the value of the
+        juniAddressPoolHighUtilThreshold.
+
+        The abated address pool utilization event is sent once if the high
+        address pool utilization threshold is reached and utilization falls to
+        the value of this object."
+    DEFVAL    { 75 }
+    ::= { juniAddressPoolEntry 9 }
+
+juniAddressPoolUtilPct OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION
+        "The current address utilization for this pool."
+    ::= { juniAddressPoolEntry 10 }
+    
+juniAddressPoolTrapEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configuration setting for address pool notifications.  Setting this
+        object to enable(1) will enable the sending of juniAddressPool event
+        notifications to the management entity on this device.  Setting this
+        object to false(2) will disable event notification reports."
+    DEFVAL    { false }
+    ::= { juniAddressPoolEntry 11 }
+ 
+juniAddressPoolNextPoolProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate juniAddressPoolProfileIndex value allocation for entries in
+        juniAddressPoolProfileTable.
+
+        A GET of this object returns the next available 
+        juniAddressPoolProfileIndex value to be used to create an entry in the 
+        associated juniAddressPoolProfileTable; or zero, if no valid 
+        juniAddressPoolProfileIndex is available.  This object returns a value
+        of zero when it is the lexicographic successor of a varbind presented 
+        in an SNMP GETNEXT or GETBULK request, for which circumstance it is 
+        assumed that a new index allocation is unintended."
+    ::= { juniAddressPoolEntry 12 }
+
+--
+-- Address pool profile table.
+--
+juniAddressPoolProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAddressPoolProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IP address pool profile entries."
+    ::= { juniAddressPool 3 }
+
+juniAddressPoolProfileEntry OBJECT-TYPE
+    SYNTAX      JuniAddressPoolProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An IP address pool profile entry.
+
+        Deleting an entry in the juniAddressPoolProfileTable will result in the
+        removal of all entries in this table that have the same pool index
+        value."
+    INDEX     { juniAddressPoolIndex,
+                juniAddressPoolProfileIndex }
+    ::= { juniAddressPoolProfileTable 1 }
+
+JuniAddressPoolProfileEntry ::= SEQUENCE { 
+    juniAddressPoolProfileIndex      Integer32,
+    juniAddressPoolProfileRowStatus  RowStatus,
+    juniAddressPoolProfileStart      IpAddress,
+    juniAddressPoolProfileEnd        IpAddress,
+    juniAddressPoolProfileSize       Integer32,
+    juniAddressPoolProfileInUse      Integer32 }
+
+juniAddressPoolProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A monotonically increasing integer for the sole purpose of indexing
+        entries within the named address pool."
+    ::= { juniAddressPoolProfileEntry 1 }
+
+juniAddressPoolProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of address pools.
+        
+        Only value 'active' will be observed with GET.
+        Only values 'createAndGo' and 'destroy' are supported for SET.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniAddressPoolProfileStart
+            juniAddressPoolProfileEnd
+
+        Once created, entry content cannot be modified except by deleting and
+        recreating an entry with the same index."
+    ::= { juniAddressPoolProfileEntry 2 }
+
+juniAddressPoolProfileStart OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The starting IP address for the range of addresses comprising this
+        pool."
+    ::= { juniAddressPoolProfileEntry 3 }
+
+juniAddressPoolProfileEnd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ending IP address for the range of addresses comprising this pool."
+    ::= { juniAddressPoolProfileEntry 4 }
+
+juniAddressPoolProfileSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses available in this pool."
+    ::= { juniAddressPoolProfileEntry 5 }
+
+juniAddressPoolProfileInUse OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses currently allocated from this pool."
+    ::= { juniAddressPoolProfileEntry 6 }
+
+
+--
+-- Address alias table.
+--
+juniAddressAliasTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAddressAliasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IP address alias entries.
+
+        An alias is an alternate name for an existing local address pool within
+        a virtual router.  It is comprised of an alias name and a pool name.
+        Multiple aliases may be configured for each virtual router.  They will
+        be stored in an alias table that will be managed by the virtual router's
+        local address server.  A maximum number of 32 aliases may be configured
+        per virtual router.
+
+        When an AAA Server requests an IP address from a specific local address
+        pool within a virtual router, the local address server will first search
+        its alias table for a matching alias name.  If an alias exists, the IP
+        address would be allocated from the pool specified by the alias.  If no
+        alias exists, the IP address would be allocated from the pool specified
+        in the request.  If a pool is not specified in the request, the local
+        address server would disregard its alias table and allocate the first
+        available IP address from its pools."
+    ::= { juniAddressPool 4 }
+
+juniAddressAliasEntry OBJECT-TYPE
+    SYNTAX      JuniAddressAliasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An IP address alias entry."
+    INDEX     { IMPLIED juniAddressAliasName }
+    ::= { juniAddressAliasTable 1 }
+
+JuniAddressAliasEntry ::= SEQUENCE { 
+    juniAddressAliasName       DisplayString,
+    juniAddressAliasRowStatus  RowStatus,
+    juniAddressAliasPoolName   DisplayString }
+
+juniAddressAliasName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of this alias.  It should match a local address pool name that
+        would appear in an IP address request from an AAA Server.
+
+        Represents textual information taken from the NVT ASCII graphics
+        character set (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    ::= { juniAddressAliasEntry 1 }
+
+juniAddressAliasRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of address aliases.
+        
+        Only value 'active' will be observed with GET, GETNEXT, and GETBULK.
+        Only values 'createAndGo' and 'destroy' are supported for SET."
+    ::= { juniAddressAliasEntry 2 }
+
+juniAddressAliasPoolName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the address pool for this alias; corresponds to a
+        juniAddressPoolName value in an existing juniAddressPoolTable entry.
+
+        Represents textual information taken from the NVT ASCII graphics
+        character set (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    ::= { juniAddressAliasEntry 3 } 
+
+--
+-- Shared address pool table.
+--
+
+juniAddressSharedPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAddressSharedPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of shared address pool configuration entries.  These pools
+         rely on DHCP for address allocations."
+    ::= { juniAddressPool 5 }
+
+juniAddressSharedPoolEntry OBJECT-TYPE
+    SYNTAX      JuniAddressSharedPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing a shared address pool configuration."
+    INDEX     { juniAddressSharedPoolIndex }
+    ::= { juniAddressSharedPoolTable 1 }
+
+JuniAddressSharedPoolEntry ::= SEQUENCE {
+    juniAddressSharedPoolIndex            Integer32,
+    juniAddressSharedPoolRowStatus        RowStatus,
+    juniAddressSharedPoolName             OCTET STRING,
+    juniAddressSharedPoolDhcpPoolName     OCTET STRING,
+    juniAddressSharedPoolInUse            Integer32 }
+
+
+juniAddressSharedPoolIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index that distinguishes this address pool."
+    ::= { juniAddressSharedPoolEntry 1 }
+
+juniAddressSharedPoolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of address pools.
+        
+        Only value 'active' will be observed with GET.
+        Only values 'createAndGo' and 'destroy' are supported for SET.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniAddressSharedPoolName, juniAddressSharedPoolDhcpPoolName.
+
+        Once created, the objects in this table can not be modified."
+    ::= { juniAddressSharedPoolEntry 2 }
+
+juniAddressSharedPoolName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of this address pool.  Represents textual information taken
+        from the NVT ASCII graphics character set (codes 32 through 126). 
+        Values for this object are mutually exclusive with juniAddressPoolName."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    ::= { juniAddressSharedPoolEntry 3 }
+
+
+juniAddressSharedPoolDhcpPoolName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the DHCP pool that allocates addresses for this
+        pool.  Represents textual information taken
+        from the NVT ASCII graphics character set (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    ::= { juniAddressSharedPoolEntry 4 }
+
+juniAddressSharedPoolInUse OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of address allocations for this entry."
+      ::= { juniAddressSharedPoolEntry 5 }
+
+
+--
+-- juniAddressPoolIndex selection for creating new address pools 
+--
+juniAddressPoolNextPoolIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate values of juniAddressPoolIndex and juniAddressSharedPoolIndex
+        for entries in juniAddressPoolTable and juniAddressSharedPoolTable.
+
+        A GET of this object returns the next available index
+        value to be used to create an entry in the associated
+        juniAddressPoolTable or juniAddressSharedPoolTable or zero,
+        if no valid index is available.
+
+        This object returns a value of zero when it is the
+        lexicographic successor of a varbind presented in an SNMP GETNEXT or
+        GETBULK request, for which circumstance it is assumed that a new index
+        allocation is unintended."
+    ::= { juniAddressPool 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholder follows.
+-- juniAddressPoolTrapControl  OBJECT IDENTIFIER ::= { juniAddressPoolMIB 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The following two OBJECT IDENTIFIERS are used to define SNMPv2 
+-- Notifications that are easily translated into SNMPv1 Traps.
+
+juniAddressPoolTraps            OBJECT IDENTIFIER ::= { juniAddressPoolMIB 3 }
+juniAddressPoolTrapPrefix       OBJECT IDENTIFIER ::= { juniAddressPoolTraps 0 }
+
+juniAddressPoolHighAddrUtil NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniAddressPoolName,
+        juniAddressPoolSize,
+        juniAddressPoolInUse,
+        juniAddressPoolUtilPct }
+    STATUS      current
+    DESCRIPTION
+        "Reports address pool utilization has reached the configured high
+        utilization threshold."
+    ::= { juniAddressPoolTrapPrefix 1 }
+
+juniAddressPoolAbatedAddrUtil NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniAddressPoolName,
+        juniAddressPoolSize,
+        juniAddressPoolInUse,
+        juniAddressPoolUtilPct }
+    STATUS      current
+    DESCRIPTION
+        "Reports address pool utilization has fallen to the configured abated
+        threshold level."
+    ::= { juniAddressPoolTrapPrefix 2 }
+
+juniAddressPoolNoAddresses NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniAddressPoolName,
+        juniAddressPoolSize }
+    STATUS      current
+    DESCRIPTION
+        "Reports address pool has exhausted its supply of addresses.  This trap
+        is issued every time a request is made to allocate an address from a
+        fully utilized pool."
+    ::= { juniAddressPoolTrapPrefix 3 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAddressPoolMIBConformance
+             OBJECT IDENTIFIER ::= { juniAddressPoolMIB 4 }
+juniAddressPoolMIBCompliances
+             OBJECT IDENTIFIER ::= { juniAddressPoolMIBConformance 1 }
+juniAddressPoolMIBGroups
+             OBJECT IDENTIFIER ::= { juniAddressPoolMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniAddressPoolCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems providing local address
+        pools.  This statement became obsolete when pool exhaustion variables
+        and notifications were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAddressPoolGroup }
+    ::= { juniAddressPoolMIBCompliances 1 }                        -- JUNOSe 1.3
+
+juniAddressPoolCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems providing local address
+        pools.  This statement became obsolete when support was added for
+        address pools with multiple address ranges."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAddressPoolGroup2,
+            juniAddressPoolTrapGroup }
+    ::= { juniAddressPoolMIBCompliances 2 }                        -- JUNOSe 3.2
+
+juniAddressPoolCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems providing local address
+        pools.  This statement became obsolete when support was added for
+        address aliases."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAddressPoolGroup3,
+            juniAddressPoolTrapGroup }
+    ::= { juniAddressPoolMIBCompliances 3 }                        -- JUNOSe 3.3
+
+juniAddressPoolCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems providing local address
+        pools.  This statement became obsolete when support was added for
+        next PoolProfile index."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAddressPoolGroup3,
+            juniAddressPoolTrapGroup,
+            juniAddressAliasGroup }
+    ::= { juniAddressPoolMIBCompliances 4 }                        -- JUNOSe 5.3  
+    
+juniAddressPoolCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems providing local address
+        pools.  This statement became obsolete when support was added for
+        shared address pools."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAddressPoolGroup4,
+            juniAddressPoolTrapGroup,
+            juniAddressAliasGroup }
+    ::= { juniAddressPoolMIBCompliances 5 }                        -- JUNOSe 6.0
+
+juniAddressPoolCompliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems providing local address pools."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAddressPoolGroup5,
+            juniAddressPoolTrapGroup,
+            juniAddressAliasGroup }
+    ::= { juniAddressPoolMIBCompliances 6 }                        -- JUNOSe 7.0
+
+--
+-- units of conformance
+--
+juniAddressPoolGroup  OBJECT-GROUP
+    OBJECTS {
+        juniAddressPoolRowStatus,
+        juniAddressPoolName,
+        juniAddressPoolStart,
+        juniAddressPoolEnd,
+        juniAddressPoolSize,
+        juniAddressPoolInUse,
+        juniAddressPoolNextPoolIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of local address
+        pools.  This group became obsolete when pool exhaustion variables and
+        notifications were added."
+    ::= { juniAddressPoolMIBGroups 1 }                             -- JUNOSe 1.3
+
+juniAddressPoolGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniAddressPoolRowStatus,
+        juniAddressPoolName,
+        juniAddressPoolStart,
+        juniAddressPoolEnd,
+        juniAddressPoolSize,
+        juniAddressPoolInUse,
+        juniAddressPoolNextPoolIndex,
+        juniAddressPoolHighUtilThreshold,
+        juniAddressPoolAbatedUtilThreshold,
+        juniAddressPoolUtilPct,
+        juniAddressPoolTrapEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of local address
+        pools.  This group became obsolete when support was added for address
+        pools with multiple address ranges."
+    ::= { juniAddressPoolMIBGroups 2 }                             -- JUNOSe 3.2
+
+juniAddressPoolTrapGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniAddressPoolHighAddrUtil,
+        juniAddressPoolAbatedAddrUtil,
+        juniAddressPoolNoAddresses }
+    STATUS      current
+    DESCRIPTION
+        "The notifications providing alarms for high pool utilization and pool
+        exhaustion of local address pools."
+    ::= { juniAddressPoolMIBGroups 3 }                             -- JUNOSe 3.2
+
+juniAddressPoolGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniAddressPoolRowStatus,
+        juniAddressPoolName,
+        juniAddressPoolNextPoolIndex,
+        juniAddressPoolHighUtilThreshold,
+        juniAddressPoolAbatedUtilThreshold,
+        juniAddressPoolUtilPct,
+        juniAddressPoolTrapEnable,
+        juniAddressPoolProfileRowStatus,
+        juniAddressPoolProfileStart,
+        juniAddressPoolProfileEnd,
+        juniAddressPoolProfileSize,
+        juniAddressPoolProfileInUse }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of local address
+        pools."
+    ::= { juniAddressPoolMIBGroups 4 }                             -- JUNOSe 3.3
+
+juniAddressPoolDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniAddressPoolStart,
+        juniAddressPoolEnd,
+        juniAddressPoolSize,
+        juniAddressPoolInUse }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of deprecated objects providing management of local
+        address pools.  This group became deprecated when support was added for
+        address pools with multiple address ranges."
+    ::= { juniAddressPoolMIBGroups 5 }                             -- JUNOSe 3.3
+
+juniAddressAliasGroup OBJECT-GROUP
+    OBJECTS {
+        juniAddressAliasRowStatus,
+        juniAddressAliasPoolName }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of local address
+        aliases."
+    ::= { juniAddressPoolMIBGroups 6 }                             -- JUNOSe 5.3
+
+juniAddressPoolGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniAddressPoolRowStatus,
+        juniAddressPoolName,
+        juniAddressPoolNextPoolIndex,
+        juniAddressPoolHighUtilThreshold,
+        juniAddressPoolAbatedUtilThreshold,
+        juniAddressPoolUtilPct,
+        juniAddressPoolTrapEnable,
+        juniAddressPoolProfileRowStatus,
+        juniAddressPoolProfileStart,
+        juniAddressPoolProfileEnd,
+        juniAddressPoolProfileSize,
+        juniAddressPoolProfileInUse,
+        juniAddressPoolNextPoolProfileIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of local address
+        pools."
+    ::= { juniAddressPoolMIBGroups 7 }                             -- JUNOSe 6.0
+
+juniAddressPoolGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniAddressPoolRowStatus,
+        juniAddressPoolName,
+        juniAddressPoolNextPoolIndex,
+        juniAddressPoolHighUtilThreshold,
+        juniAddressPoolAbatedUtilThreshold,
+        juniAddressPoolUtilPct,
+        juniAddressPoolTrapEnable,
+        juniAddressPoolProfileRowStatus,
+        juniAddressPoolProfileStart,
+        juniAddressPoolProfileEnd,
+        juniAddressPoolProfileSize,
+        juniAddressPoolProfileInUse,
+        juniAddressPoolNextPoolProfileIndex,
+        juniAddressSharedPoolRowStatus,
+        juniAddressSharedPoolName,
+        juniAddressSharedPoolDhcpPoolName,
+        juniAddressSharedPoolInUse }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of local address
+        pools."
+    ::= { juniAddressPoolMIBGroups 8 }                             -- JUNOSe 7.0
+
+END

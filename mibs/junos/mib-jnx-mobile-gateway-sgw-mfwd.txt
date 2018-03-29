@@ -1,0 +1,85 @@
+-- ********************************************************************
+-- Juniper Mobile Gateway SGW MFWD(Mobile Packet Forwarding objects MIB.
+--
+-- Copyright (c) 2011-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- ********************************************************************
+
+JUNIPER-MOBILE-GW-SGW-MFWD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE,
+    Counter64, Unsigned32, Gauge32 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, 
+    TruthValue                     FROM SNMPv2-TC
+    EnabledStatus                  FROM JUNIPER-MIMSTP-MIB
+    jnxMobileGatewaySgw            FROM JUNIPER-MBG-SMI
+    jnxMbgGwName                   FROM JUNIPER-MOBILE-GATEWAYS;
+
+jnxMbgSgwMfwdMib MODULE-IDENTITY
+    LAST-UPDATED "201108041200Z" -- Aug 04, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to SGW MFWD 
+         (Serving Gateway Mobile Packet Forwarding Daemon) "
+    ::= { jnxMobileGatewaySgw 7 }
+
+jnxMbgSgwMfwdNotifications OBJECT IDENTIFIER
+    ::= { jnxMbgSgwMfwdMib 0 }
+
+jnxMbgSgwMfwdNotificationVars  OBJECT IDENTIFIER
+    ::= { jnxMbgSgwMfwdMib 1 }
+
+jnxMbgSgwMfwdServicePicName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8..15))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "This identifies the session-pic, in the form ms-a/b/0, 
+     where <a> is the slot and <b> could be either 0 or 1."
+   ::= { jnxMbgSgwMfwdNotificationVars 1 }
+
+jnxMbgSgwMfwdBufMemLimit OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "percent"
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION 
+        "This indicates the percentage of total buffer memory being used"
+    ::= { jnxMbgSgwMfwdNotificationVars 2 }
+
+jnxMbgSgwMfwdBufMemThresRaise NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwName,
+                  jnxMbgSgwMfwdServicePicName,
+                  jnxMbgSgwMfwdBufMemLimit }
+
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the high memory buffering threshold 
+         for MFWD has reached at the SPIC level. 
+         The gateway name, SPIC name and memory buffer threshold will be 
+         displayed."
+    ::= { jnxMbgSgwMfwdNotifications 1 }
+
+jnxMbgSgwMfwdBufMemThresClear NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgGwName,
+                  jnxMbgSgwMfwdServicePicName,
+                  jnxMbgSgwMfwdBufMemLimit }
+
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the low memory buffering threshold 
+         for MFWD has reached at the SPIC level. 
+         The gateway name, SPIC name and memory buffer threshold will be 
+         displayed."
+    ::= { jnxMbgSgwMfwdNotifications 2 }
+
+END

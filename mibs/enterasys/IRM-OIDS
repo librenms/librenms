@@ -1,0 +1,37 @@
+IRM-OIDS DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                cabletron       FROM CTRON-OIDS;
+
+--      OID definitions common in all IRM MIBs
+
+commsDevice     OBJECT IDENTIFIER ::= { cabletron 1 }
+layerMgmt       OBJECT IDENTIFIER ::= { cabletron 2 }
+common          OBJECT IDENTIFIER ::= { commsDevice 1 } 
+repeater        OBJECT IDENTIFIER ::= { commsDevice 2 }
+bridge          OBJECT IDENTIFIER ::= { commsDevice 3 }
+router          OBJECT IDENTIFIER ::= { commsDevice 4 }
+product         OBJECT IDENTIFIER ::= { commsDevice 5 }
+subsystem       OBJECT IDENTIFIER ::= { commsDevice 6 }
+
+commonRev1      OBJECT IDENTIFIER ::= { common 1 }
+sysOIDs         OBJECT IDENTIFIER ::= { common 2 }
+
+repeaterRev1    OBJECT IDENTIFIER ::= { repeater 1 }
+repeaterRev2    OBJECT IDENTIFIER ::= { repeater 2 }
+
+subSysMMAC      OBJECT IDENTIFIER ::= { subsystem 1 }
+subSysDevice    OBJECT IDENTIFIER ::= { subsystem 2 }
+ups             OBJECT IDENTIFIER ::= { subsystem 3 }
+dl              OBJECT IDENTIFIER ::= { subsystem 4 }
+backplaneProtocol       OBJECT IDENTIFIER ::= { subsystem 5 }
+nb30Rev1        OBJECT IDENTIFIER ::= { subsystem 12 }
+
+sysOtherType    OBJECT IDENTIFIER ::= { sysOIDs 1 }
+sysChassis      OBJECT IDENTIFIER ::= { sysOIDs 2 }
+sysRepeaters    OBJECT IDENTIFIER ::= { sysOIDs 3 }
+sysBridges      OBJECT IDENTIFIER ::= { sysOIDs 4 }
+sysRouters      OBJECT IDENTIFIER ::= { sysOIDs 5 }
+sysIntDev       OBJECT IDENTIFIER ::= { sysOIDs 6 }
+
+END

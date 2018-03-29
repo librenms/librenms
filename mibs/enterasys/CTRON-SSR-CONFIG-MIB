@@ -1,0 +1,269 @@
+CTRON-SSR-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific SNMP API to manage SmartSwitch Router
+--  configuration files and system images.
+--
+--  This module will be extended, as required.
+ 
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+ 
+--  Copyright June 1998-2000 Cabletron Systems
+
+IMPORTS
+   OBJECT-TYPE, MODULE-IDENTITY, IpAddress
+        FROM SNMPv2-SMI
+   ssrMibs
+        FROM CTRON-SSR-SMI-MIB
+   DisplayString, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+ssrConfigMIB MODULE-IDENTITY  
+    LAST-UPDATED "200007150000Z"  -- June 15, 2000
+    ORGANIZATION "Cabletron Systems, Inc"
+    CONTACT-INFO
+    "Enterasys Networks
+     35 Industrial Way, P.O. Box 5005
+     Rochester, NH 03867-0505
+     (603) 332-9400
+     support@enterasys.com
+     http://www.enterasys.com"
+    DESCRIPTION
+         "This mib module defines an SNMP API to manage SmartSwitch 
+          Router configuration files and system images"
+
+    REVISION     "200007150000Z"
+    DESCRIPTION
+         "Revision #3. Update contact information for Enterasys Networks as this mib
+          is found on the Riverstione RS product line as well as Enterasys SSR product line."
+
+    REVISION     "200002200000Z"
+    DESCRIPTION
+         "Revision #2. add two objects to obtain current prom and firmware version."
+
+    REVISION     "9808170000Z"
+    DESCRIPTION
+         "Revision #1. Provide startup configuration file retrieval, 
+          startup log and append new commands."
+ ::= { ssrMibs 230 }
+
+  SSRErrorCode ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+        "A unique value, greater than zero defining the operation
+         completion status."
+       SYNTAX       INTEGER {
+                      noStatus(1),
+                      timeout(2),
+                      networkError(3),
+                      noSpace(4),
+                      invalidConfig(5),
+                      commandCompleted(6),
+                      internalError(7),
+                      tftpServerError(8)
+                }
+
+
+-- The Config Management Group
+
+cfgGroup        OBJECT IDENTIFIER ::= { ssrMibs 231 }
+
+   cfgTransferOp  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                      noop(1),
+                      sendConfigToAgent(2),
+                      receiveConfigFromAgent(3),
+                      receiveBootlogFromAgent(4)
+                   }    
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+        "Tranfer operation to be performed. Configuration
+        files are ASCII NVT text files describing the operation of the shelf.
+        Send operations use tftp to transfer a file from the manager to agent.
+        Receive operations use tftp to transfer the file from the agent to the 
+        manager. Default value is no operation or noop."
+       ::= { cfgGroup 1 }
+
+   cfgManagerAddress  OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+        "The IPv4 address of the Manager to be used by the agent for
+         for cfgTransferOp operations. Default value is 0.0.0.0. Address must be 
+         a unicast address that is reachable from the agent and no firewalls/acls 
+         preventing tftp datagrams from being transferred."
+       ::= { cfgGroup 2 }
+
+   cfgFileName  OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+        "The file name to be retrieved from the tftp server at 
+         host cfgManagerAddress or to be written to. Default value is blank. 
+         Length of filename string must not exceed 255 alpha-numeric characters, 
+         no spaces in filenames."
+       ::= { cfgGroup 3 }
+
+   cfgActivateTransfer  OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+        "Activate the file transfer operation with a value of True(1) or 
+         stop it with False(2). Poll cfgTransferStatus for current status. 
+        Default value is False. cfgFileName, cfgManagerAddress and cfgTransferOp
+        must be valid prior to setting this object to True. This object is equivalent to
+        the CLI command: copy tftp-server to startup if cfgRequestOp == sendConfig"
+       ::= { cfgGroup 4 }
+
+
+   cfgTransferStatus  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                      idle(1),
+                      sending(2),
+                      receiving(3),
+                      transferComplete(4),
+                      error(5)
+                   }    
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "The current status of the transfer task. Default state is idle. 
+         sending indicates a file transfer (agent->mgr) in progress. 
+         receiving indicates sending a file from Manager to agent. 
+         transferComplete indicates a successful transfer. error indicates
+         a failed transfer. See cfgLastError to diagnose why the transfer failed."
+       ::= { cfgGroup 5 }
+
+   cfgActivateFile  OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+        "Once a transfer to the SmartSwitchRouter is complete, Set this object
+         to True to activate the new configuration.
+         If activateConfigFile operation was successful, this object performs
+         the CLI equivalent to these commands: negate all existing commands,
+         copy scratchpad to active, copy scratchpad to startup"
+       ::= { cfgGroup 6 }
+
+   cfgLastError  OBJECT-TYPE
+       SYNTAX      SSRErrorCode
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "A reason code for the last transfer operation. Poll this value
+         when doing sets against cfgMakeActive for config files obtain status."
+       ::= { cfgGroup 7 }
+
+   cfgLastErrorReason  OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+        "A string representation of cfgLastError which may contain addtional details."
+       ::= { cfgGroup 8 }
+
+
+--  Current system software image description
+
+  cfgActiveImageVersion  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The Version string of the current image executing on this control module. This
+          is the same description as the system show version command. example:  1.1.0.0"
+        ::= { cfgGroup 9 }
+
+  cfgActiveImageBootLocation  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The URL location string from whence the current image was loaded. 
+          example:  slot0:boot/ssr8.tar.gz/"
+        ::= { cfgGroup 10 }
+
+-- Conformance statements
+configConformance OBJECT IDENTIFIER ::= { ssrConfigMIB 3 }
+configCompliances OBJECT IDENTIFIER ::= { configConformance 1 }
+configGroups      OBJECT IDENTIFIER ::= { configConformance 2 }
+ 
+configCompliance MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            the SmartSwitch Router Config Management MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { configGroup10 }
+    ::= { configCompliances 1 }
+
+configCompliance2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            the SmartSwitch Router Config Management MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { configGroup20 }
+    ::= { configCompliances 2 }
+
+
+-- MIB groupings
+ 
+configGroup10    OBJECT-GROUP
+    OBJECTS {
+      cfgTransferOp,
+      cfgManagerAddress,
+      cfgFileName,
+      cfgActivateTransfer,
+      cfgTransferStatus,
+      cfgActivateFile,
+      cfgLastError,
+      cfgLastErrorReason
+    }
+    STATUS  deprecated
+    DESCRIPTION
+            "The collection of objects which are used to represent version 1.0
+             file transfer operations in the SmartSwitch Router."
+    ::= { configGroups 1 }
+
+configGroup20    OBJECT-GROUP
+    OBJECTS {
+      cfgTransferOp,
+      cfgManagerAddress,
+      cfgFileName,
+      cfgActivateTransfer,
+      cfgTransferStatus,
+      cfgActivateFile,
+      cfgLastError,
+      cfgLastErrorReason,
+      cfgActiveImageVersion,
+      cfgActiveImageBootLocation 
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent version 2.0
+             configuration operations in the SmartSwitch Router version."
+    ::= { configGroups 2 }
+
+END

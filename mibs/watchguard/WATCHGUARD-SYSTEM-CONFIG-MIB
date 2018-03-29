@@ -1,0 +1,167 @@
+WATCHGUARD-SYSTEM-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+    Integer32, Unsigned32, IpAddress, Gauge32,
+    enterprises, NOTIFICATION-TYPE        FROM SNMPv2-SMI
+    watchguard                            FROM WATCHGUARD-SMI;
+
+
+wgSystemConfigMIB MODULE-IDENTITY
+    LAST-UPDATED  "200811100000Z"
+    ORGANIZATION  "WatchGuard Technologies, Inc."
+    CONTACT-INFO
+               "  WatchGuard Technologies, Inc.
+               
+                  505 Fifth Avenue South
+                  Suite 500
+                  Seattle, WA 98104
+                  United States
+                  
+                  +1.206.613.6600 " 
+                  
+    DESCRIPTION
+        "This MIB module defines WatchGuard Firebox system
+         configuration."
+    REVISION      "200701251200Z"
+    DESCRIPTION
+        "Initial revision."
+    REVISION      "200811100000Z"
+    DESCRIPTION
+        "Updated CONTACT-INFO."
+    ::= { watchguard 2 }
+
+ -- significant branches
+ 
+wgSysTraps OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is the base object for system wide traps 
+         in this entity."
+    ::= { wgSystemConfigMIB 3 }
+
+wgSysTrapObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is the base object for objects which are used
+         as part of traps."
+    ::= { wgSystemConfigMIB 4 }
+
+wgSysTrapControl OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is the base object identifier for all objects
+         which are trap control for the entity."
+    ::= { wgSystemConfigMIB 5 }
+
+ --
+ -- wgSysTraps
+ --
+ -- object used in trap reporting
+
+wgAlarmId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The id of the alarm that generates a trap."
+    ::= { wgSysTrapObjects 1 }
+
+wgAlarmLabel OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the alarm that generates a trap."
+    ::= { wgSysTrapObjects 2 }
+
+wgAlarmTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the alarm that generates a trap."
+    ::= { wgSysTrapObjects 3 }
+
+wgAlarmLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     normal(4),
+                     warning(3),
+                     error(2), 
+                     critical(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The level of an alarm generated."
+    ::= { wgSysTrapObjects 4 }
+
+wgAlarmHostname OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host name of the system where alarm occurred"
+    ::= { wgSysTrapObjects 5 }
+
+wgAlarmMsg OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The message describing the nature of this alarm."
+    ::= { wgSysTrapObjects 6 }
+
+
+ --
+ -- trap control
+ --
+wgAlarmTrapEnable  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     false(0),
+                     true(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether wgAlarmTrap trap should be generated."
+    DEFVAL { true }
+    ::= { wgSysTrapControl 1 }
+
+ -- 
+ -- traps themselves
+ --
+
+wgSysTrapsPrefix OBJECT-IDENTITY
+        STATUS     current
+        DESCRIPTION ""
+        ::= { wgSysTraps 0 }
+
+wgAlarmTrap  NOTIFICATION-TYPE
+    OBJECTS {
+        wgAlarmId,
+        wgAlarmLabel,
+        wgAlarmTime,
+        wgAlarmLevel,
+        wgAlarmHostname,
+        wgAlarmMsg
+    }
+    STATUS     current
+    DESCRIPTION
+        "An alarm was raised by Monitoring Agent of this
+         WatchGuard entity."
+    ::= { wgSysTrapsPrefix 1 }
+
+wgSnmpShutdown  NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+        "This trap is sent when the snmp terminates."
+    ::= { wgSysTrapsPrefix 2 }
+
+wgSnmpStart  NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the snmp starts."
+    ::= { wgSysTrapsPrefix 3 }
+
+END

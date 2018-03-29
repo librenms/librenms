@@ -1,0 +1,1556 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-ZD-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusZDSystemModule
+        FROM RUCKUS-ROOT-MIB
+    RuckusAdminStatus,
+    RuckusRadioMode,
+    RuckusSSID,
+    RuckusdB,
+    RuckusNameString,
+    RuckusCountryCode
+        FROM RUCKUS-TC-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusZDSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus ZD System mib"
+    ::= { ruckusZDSystemModule 1 }
+
+ruckusZDSystemObjects OBJECT IDENTIFIER     ::= { ruckusZDSystemMIB 1 }
+
+ruckusZDSystemInfo OBJECT IDENTIFIER    ::= { ruckusZDSystemObjects 1 }
+
+ruckusZDSystemName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "System name"
+    ::= { ruckusZDSystemInfo 1 }
+
+ruckusZDSystemIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZDSystemInfo 2 }
+
+ruckusZDSystemMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZDSystemInfo 3 }
+
+ruckusZDSystemUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time"
+    ::= { ruckusZDSystemInfo 8 }
+
+ruckusZDSystemModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model"
+    ::= { ruckusZDSystemInfo 9 }
+
+ruckusZDSystemLicensedAPs OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Licensed APs"
+    ::= { ruckusZDSystemInfo 12 }
+
+ruckusZDSystemMaxSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of max stations allowed."
+    ::= { ruckusZDSystemInfo 13 }
+
+ruckusZDSystemSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number"
+    ::= { ruckusZDSystemInfo 15 }
+
+ruckusZDSystemVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version"
+    ::= { ruckusZDSystemInfo 18 }
+
+ruckusZDSystemCountryCode OBJECT-TYPE
+    SYNTAX  RuckusCountryCode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Country code"
+    ::= { ruckusZDSystemInfo 20 }
+
+ruckusZDSystemAdminName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+        "Administrator account name."
+    ::= { ruckusZDSystemInfo 25 }
+
+ruckusZDSystemAdminPassword OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS write-only
+    STATUS current
+    DESCRIPTION
+        "Administrator account password."
+    ::= { ruckusZDSystemInfo 26 }
+    
+ruckusZDSystemStatus OBJECT-TYPE
+    SYNTAX  INTEGER { master(1), standby(2),noredundancy(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "current zd system status: 
+        if enable smart redundancy, the status is master or standby,
+        if disable smart redundancy,the status is noredundancy"
+    DEFVAL { noredundancy }
+    ::= { ruckusZDSystemInfo 30 }    
+    
+ruckusZDSystemPeerConnectedStatus OBJECT-TYPE
+    SYNTAX  INTEGER { connected(1), disconnected(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "peer zd connected status"
+    DEFVAL { disconnected }
+    ::= { ruckusZDSystemInfo 31 }     
+
+ruckusZDSystemExpInfo OBJECT IDENTIFIER    ::= { ruckusZDSystemObjects 5 }
+
+ruckusZDSystemNEId OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "NE Id."
+    ::= { ruckusZDSystemExpInfo 50 }
+
+ruckusZDSystemManufacturer OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Manufacturer."
+    ::= { ruckusZDSystemExpInfo 51 }
+
+ruckusZDSystemSoftwareName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software name."
+    ::= { ruckusZDSystemExpInfo 52 }
+
+ruckusZDSystemCPUUtil OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization"
+    ::= { ruckusZDSystemExpInfo 58 }
+
+ruckusZDSystemMemoryUtil OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory utilization"
+    ::= { ruckusZDSystemExpInfo 59 }
+
+ruckusZDSystemMemorySize OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS
+        "MB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory size"
+    ::= { ruckusZDSystemExpInfo 60 }
+
+ruckusZDSystemFlashFreeSize OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS
+        "KByte"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Flash free size"
+    ::= { ruckusZDSystemExpInfo 65 }
+
+ruckusZDSystemMgmtVlanID OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management Vlan ID"
+    ::= { ruckusZDSystemExpInfo 67 }
+
+ruckusZDSystemCPUModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU Model"
+    ::= { ruckusZDSystemExpInfo 70 }
+
+ruckusZDSystemtCPUSpeed OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS
+        "BogoMIPS"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU Speed"
+    ::= { ruckusZDSystemExpInfo 71 }
+
+ruckusZDSystemtFlashModel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Flash Model"
+    ::= { ruckusZDSystemExpInfo 72 }
+
+ruckusZDSystemtMemModel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory Model"
+    ::= { ruckusZDSystemExpInfo 73 }
+
+ruckusZDSystemStartTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System Startup Time"
+    ::= { ruckusZDSystemExpInfo 74 }
+
+ruckusZDSystemCurrentTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System current time."
+    ::= { ruckusZDSystemExpInfo 80 }
+
+ruckusZDSystemAPFirmwareServer OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP firmware download server."
+    ::= { ruckusZDSystemExpInfo 81 }
+
+ruckusZDSystemAPConfigServer OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP configuration server."
+    ::= { ruckusZDSystemExpInfo 82 }
+
+ruckusZDSystemIDSAllowedESSID OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "List of allowed ESSID, separated by semiclon."
+    ::= { ruckusZDSystemExpInfo 85 }
+
+ruckusZDSystemIDSAllowBSSID OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "List of allowed BSSID, separated by semicolon."
+    ::= { ruckusZDSystemExpInfo 86 }
+
+ruckusZDSystemIDSAllowOUI OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "List of allowed OUI, separated by semicolon."
+    ::= { ruckusZDSystemExpInfo 87 }
+
+ruckusZDSystemBandwidthUtilValve OBJECT-TYPE
+    SYNTAX Unsigned32 (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of system bandwidth utilization percent."
+    ::= { ruckusZDSystemExpInfo 90 }
+
+ruckusZDSystemDropPacketRateValve OBJECT-TYPE
+    SYNTAX Unsigned32 (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of system drop packets rate percent."
+    ::= { ruckusZDSystemExpInfo 91 }
+
+ruckusZDSystemCPUUtilValve OBJECT-TYPE
+    SYNTAX Unsigned32 (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of system CPU utilization percent."
+    ::= { ruckusZDSystemExpInfo 92 }
+
+ruckusZDSystemMemUtilValve OBJECT-TYPE
+    SYNTAX Unsigned32 (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of system memory utilization percent."
+    ::= { ruckusZDSystemExpInfo 95 }
+
+ruckusZDSystemOnlineStaValve OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of system online STA."
+    ::= { ruckusZDSystemExpInfo 96 }
+
+ruckusZDSystemACLocationLongitude OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AC longitude."
+    ::= { ruckusZDSystemExpInfo 97 }
+
+ruckusZDSystemACLocationLatitude OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AC latitude."
+    ::= { ruckusZDSystemExpInfo 98 }
+
+ruckusZDSystemDHCPServer OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System DHCP server enable or disable"
+    ::= { ruckusZDSystemExpInfo 110 }
+
+ruckusZDAPCPUvalve OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP's CPU utilization valve for sending trap"
+    ::= { ruckusZDSystemExpInfo 120 }
+
+ruckusZDAPMemoryvalve OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP'S Memory utilization valve for sending trap"
+    ::= { ruckusZDSystemExpInfo 121 }
+
+ruckusZDHeartBeatStatus OBJECT-TYPE
+    SYNTAX  TruthValue { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Current heartbeat on-off status."
+    ::= { ruckusZDSystemExpInfo 122 }
+
+ruckusZDHeartBeatPeriod OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..10000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Heartbeat interval between ZD and NMS(unit:second)."
+    ::= { ruckusZDSystemExpInfo 123 }
+    
+ruckusZDSystemIPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDSystemIPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD System IP table."
+    ::= { ruckusZDSystemObjects 8 }
+
+ruckusZDSystemIPEntry OBJECT-TYPE
+    SYNTAX  RuckusZDSystemIPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies IP configuration entry. ifIndex  always be 1"
+    INDEX {
+        ruckusZDSystemIPIndex  }
+    ::= { ruckusZDSystemIPTable 1 } 
+    
+RuckusZDSystemIPEntry ::= SEQUENCE {
+  ruckusZDSystemIPIndex							Unsigned32,
+  ruckusZDSystemIPVersion						INTEGER,
+  ruckusZDSystemIPAddrMode						INTEGER,
+  ruckusZDSystemIPAddress                       IpAddress,
+  ruckusZDSystemIPAddrNetmask                   IpAddress,
+  ruckusZDSystemIPGateway                       IpAddress,
+  ruckusZDSystemIPPrimaryDNS                    IpAddress,
+  ruckusZDSystemIPSecondaryDNS                  IpAddress,
+  ruckusZDSystemIPV6AddressModel                INTEGER,
+  ruckusZDSystemIPV6Address                     OCTET STRING,
+  ruckusZDSystemIPV6PrefixLen                   INTEGER,
+  ruckusZDSystemIPV6Gateway                     OCTET STRING,
+  ruckusZDSystemIPV6PrimaryDNS                  OCTET STRING,
+  ruckusZDSystemIPV6SecondaryDNS                OCTET STRING
+}
+
+ruckusZDSystemIPIndex OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface index."
+    ::= { ruckusZDSystemIPEntry 1 }
+
+ruckusZDSystemIPVersion OBJECT-TYPE
+    SYNTAX  INTEGER { ipv4(1), ipv6(2),dualstack(3) }  
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "current ip version "
+    ::= { ruckusZDSystemIPEntry 2 }    
+
+ruckusZDSystemIPAddrMode OBJECT-TYPE
+    SYNTAX  INTEGER { static(1), dhcp(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address mode, static ip or by dhcp."
+    ::= { ruckusZDSystemIPEntry 5 }
+
+ruckusZDSystemIPAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusZDSystemIPEntry 6 }
+
+ruckusZDSystemIPAddrNetmask OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address netmask."
+    ::= { ruckusZDSystemIPEntry 8 }
+
+ruckusZDSystemIPGateway OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Gateway IP address."
+    ::= { ruckusZDSystemIPEntry 10 }
+
+ruckusZDSystemIPPrimaryDNS OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Primary DNS IP address."
+    ::= { ruckusZDSystemIPEntry 12 }
+
+ruckusZDSystemIPSecondaryDNS OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Secondary DNS IP address."
+    ::= { ruckusZDSystemIPEntry 13 }
+    
+ruckusZDSystemIPV6AddressModel OBJECT-TYPE
+    SYNTAX  INTEGER { auto-configuration(1),
+            	      static(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "current ipv6 address model "
+    ::= { ruckusZDSystemIPEntry 20 }
+        
+ruckusZDSystemIPV6Address OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IPV6 Address"
+    ::= { ruckusZDSystemIPEntry 21 }
+    
+ruckusZDSystemIPV6PrefixLen OBJECT-TYPE
+    SYNTAX  INTEGER (3..128)  
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the ip v6 address prefix length if the ruckusZDSystemIPV6AddrModel
+        is set to static(2)."
+    ::= { ruckusZDSystemIPEntry 22 }
+    
+ruckusZDSystemIPV6Gateway OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the gateway ipv6 address if the ruckusZDSystemIPV6AddrModel
+        is set to static(2)."
+    ::= { ruckusZDSystemIPEntry 25 }      
+    
+ruckusZDSystemIPV6PrimaryDNS OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40)) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies primary DNS IPV6 address."
+    ::= { ruckusZDSystemIPEntry 28 }
+
+
+ruckusZDSystemIPV6SecondaryDNS OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40)) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies secondary DNS IPV6 address."
+    ::= { ruckusZDSystemIPEntry 29 }
+        
+
+ruckusZDSystemServices OBJECT IDENTIFIER    ::= { ruckusZDSystemObjects 12 }
+
+ruckusZDSystemNTP OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 3 }
+
+ruckusZDSystemTimeWithNTP OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) }  
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the Zone Director system to synchronize its system time with NTP."
+    DEFVAL { disable }
+    ::= { ruckusZDSystemNTP 1 }
+
+ruckusZDSystemTimeNTPServer OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The NTP Server (URL) the Zone Director system to synchronize it system time with."
+    ::= { ruckusZDSystemNTP 2 }
+
+ruckusZDSystemSMTP OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 5 }
+
+ruckusZDSystemEmailTriggerEnable OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Send an email message when an alarm is triggered for the Zone Director system. 
+         Make sure the ruckusZDSystemEmailAddress and ruckusZDSystemSMTPServerPort are not empty before enable it."
+    DEFVAL { disable }
+    ::= { ruckusZDSystemSMTP 1 }    
+
+ruckusZDSystemEmailAddress OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Email Address receive the alarm message from the Zone Director system."
+    ::= { ruckusZDSystemSMTP 2 }   
+
+ruckusZDSystemSMTPServerName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SMTP Server Name."
+    ::= { ruckusZDSystemSMTP 3 }   
+
+ruckusZDSystemSMTPServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)  
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SMTP Server Port."
+    DEFVAL { 25 }
+    ::= { ruckusZDSystemSMTP 4 }   
+
+ruckusZDSystemSMTPAuthUsername OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SMTP Authentication Username."
+    ::= { ruckusZDSystemSMTP 5 }   
+
+ruckusZDSystemSMTPAuthPassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "MTP Authentication Password."
+    ::= { ruckusZDSystemSMTP 6 }   
+    
+ruckusZDSystemFromEmailAddress OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The From Email Address ."
+    ::= { ruckusZDSystemSMTP 7 }     
+
+ruckusZDSystemSMTPEncryptionOptions OBJECT-TYPE
+    SYNTAX  INTEGER { none(1), tls(2), starttls(3) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SMTP Encryption Options ."
+    DEFVAL { none }
+    ::= { ruckusZDSystemSMTP 8 } 
+                                
+ruckusZDSystemSyslog OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 8 }
+
+ruckusZDSystemLogWithSysLog OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) }  
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the Zone Director system to log its system events with sysLog facility."
+    DEFVAL { disable }
+    ::= { ruckusZDSystemSyslog 1 }
+
+ruckusZDSystemSysLogServer OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The sysLog Server IP or IPV6 address ,the Zone Director system reports its' system events to it."
+    ::= { ruckusZDSystemSyslog 2 }
+    
+ruckusZDSystemFlexMaster OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 9 }
+
+ruckusZDSystemFlexMasterEnable OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable FlexMaster Network Management for the Zone Director system."
+    DEFVAL { disable }    
+    ::= { ruckusZDSystemFlexMaster 1 }
+
+ruckusZDSystemFlexMasterServer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..128)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The FlexMaster Server URL to connect the Zone Director system ."
+    ::= { ruckusZDSystemFlexMaster 2 }
+
+ruckusZDSystemFlexMasterInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The FlexMaster Interval to connect the Zone Director (Minutes)."
+    DEFVAL { 10 }
+    ::= { ruckusZDSystemFlexMaster 3 }
+
+ruckusZDSystemStpInfo OBJECT IDENTIFIER ::= { ruckusZDSystemServices 12 }
+
+ruckusZDSystemStpStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    	"Enable/disable spanning tree."
+    ::= { ruckusZDSystemStpInfo 1 }
+                
+ruckusZDSystemSNMP OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 15 }
+
+ruckusZDSystemSNMPTrapInfo OBJECT IDENTIFIER    ::= { ruckusZDSystemSNMP 3 }
+
+ruckusZDSystemSNMPTrapEnable OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the SNMP Trap facility for the Zone Director system."
+    DEFVAL { disable }
+    ::= { ruckusZDSystemSNMPTrapInfo 1 }
+
+ruckusZDSystemSNMPTrapVersion OBJECT-TYPE
+    SYNTAX  INTEGER { snmpv2(1), snmpv3(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP Trap version for the Zone Director system."
+    DEFVAL { snmpv2 }
+    ::= { ruckusZDSystemSNMPTrapInfo 2 }
+    
+ruckusZDSystemSNMPV2TrapSvrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDSystemSNMPV2TrapSvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD SNMPV2 trap server table."
+    ::= { ruckusZDSystemSNMPTrapInfo 35 }
+
+ruckusZDSystemSNMPV2TrapSvrEntry OBJECT-TYPE
+    SYNTAX  RuckusZDSystemSNMPV2TrapSvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies SNMPV2 Trap server configuration entry.index be 1-4."
+    INDEX {
+        ruckusZDSystemSNMPV2TrapSvrIndex  }
+    ::= { ruckusZDSystemSNMPV2TrapSvrTable 1 } 
+    
+RuckusZDSystemSNMPV2TrapSvrEntry ::= SEQUENCE {  
+  ruckusZDSystemSNMPV2TrapSvrIndex                INTEGER,
+  ruckusZDSystemSNMPV2TrapServer         	  OCTET STRING,
+  ruckusZDSystemSNMPV2TrapSvrRowStatus            RowStatus
+}
+
+ruckusZDSystemSNMPV2TrapSvrIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..4)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMPV2 Trap server index."
+    ::= { ruckusZDSystemSNMPV2TrapSvrEntry 1 }
+
+ruckusZDSystemSNMPV2TrapServer OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V2 Trap Server4 IP (V4 or V6) address for the Zone Director system."
+    ::= { ruckusZDSystemSNMPV2TrapSvrEntry 3 }
+    
+ruckusZDSystemSNMPV2TrapSvrRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete snmp V2 trap server table.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDSystemSNMPV2TrapSvrEntry 8 }
+    
+ruckusZDSystemSNMPV3TrapSvrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDSystemSNMPV3TrapSvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD SNMPV3 trap server table."
+    ::= { ruckusZDSystemSNMPTrapInfo 36 }
+
+ruckusZDSystemSNMPV3TrapSvrEntry OBJECT-TYPE
+    SYNTAX  RuckusZDSystemSNMPV3TrapSvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies SNMPV3 Trap server configuration entry.index be 1-4."
+    INDEX {
+        ruckusZDSystemSNMPV3TrapSvrIndex  }
+    ::= { ruckusZDSystemSNMPV3TrapSvrTable 1 }
+    
+RuckusZDSystemSNMPV3TrapSvrEntry ::= SEQUENCE {  
+  ruckusZDSystemSNMPV3TrapSvrIndex                INTEGER,
+  ruckusZDSystemSNMPV3TrapServer		OCTET STRING,
+  ruckusZDSystemSNMPV3TrapUser                  DisplayString,
+  ruckusZDSystemSNMPV3TrapAuth                  INTEGER,
+  ruckusZDSystemSNMPV3TrapAuthKey               DisplayString,
+  ruckusZDSystemSNMPV3TrapPrivacy		INTEGER,
+  ruckusZDSystemSNMPV3TrapPrivacyKey            DisplayString,
+  ruckusZDSystemSNMPV3TrapSvrRowStatus           	RowStatus
+}
+
+ruckusZDSystemSNMPV3TrapSvrIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..4)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMPV3 Trap server index."
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 1 }
+    
+ruckusZDSystemSNMPV3TrapServer OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V2 Trap Server4 IP (V4 or V6) address for the Zone Director system."
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 5 }
+
+ruckusZDSystemSNMPV3TrapUser OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Trap Username ."
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 8 }
+         
+ruckusZDSystemSNMPV3TrapAuth OBJECT-TYPE
+    SYNTAX  INTEGER { md5(1), sha(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP V3 Trap Authentication type."
+    DEFVAL { md5 }
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 10 }
+                
+ruckusZDSystemSNMPV3TrapAuthKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Trap Authentication Pass Phrase .the read value is ********."
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 11 }
+
+ruckusZDSystemSNMPV3TrapPrivacy OBJECT-TYPE
+    SYNTAX  INTEGER { des(1), aes(2), none(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP V3 Trap Privacy type."
+    DEFVAL { des }
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 15 }
+         
+ruckusZDSystemSNMPV3TrapPrivacyKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Trap Privacy Phrase .the read value is ********."
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 16 }
+    
+ruckusZDSystemSNMPV3TrapSvrRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete snmp trap server table.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDSystemSNMPV3TrapSvrEntry 20 }
+
+    
+ruckusZDSystemSNMPV2Table OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDSystemSNMPV2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD SNMPV2 table."
+    ::= { ruckusZDSystemSNMP 5 }
+
+ruckusZDSystemSNMPV2Entry OBJECT-TYPE
+    SYNTAX  RuckusZDSystemSNMPV2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies SNMP V2 configuration entry.ifIndex always be 1."
+    INDEX {
+        ifIndex  }
+    ::= { ruckusZDSystemSNMPV2Table 1 }
+    
+RuckusZDSystemSNMPV2Entry ::= SEQUENCE {
+  ruckusZDSystemSNMPEnable                	INTEGER,
+  ruckusZDSystemSNMPROCommunity         	DisplayString,
+  ruckusZDSystemSNMPRWCommunity			DisplayString,
+  ruckusZDSystemSNMPSysContact                  DisplayString,
+  ruckusZDSystemSNMPSysLocation                 DisplayString
+}
+    
+ruckusZDSystemSNMPEnable OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable SNMP."
+    ::= { ruckusZDSystemSNMPV2Entry 2 }
+
+ruckusZDSystemSNMPROCommunity OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP read-only community.the read value is ********."
+    ::= { ruckusZDSystemSNMPV2Entry 5 }
+
+ruckusZDSystemSNMPRWCommunity OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP read-write community.the read value is ********."
+    ::= { ruckusZDSystemSNMPV2Entry 6 }
+    
+ruckusZDSystemSNMPSysContact OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP read-write community."
+    ::= { ruckusZDSystemSNMPV2Entry 7 }
+    
+ruckusZDSystemSNMPSysLocation OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP read-write community."
+    ::= { ruckusZDSystemSNMPV2Entry 8 }
+
+ruckusZDSystemSNMPV3Table OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDSystemSNMPV3Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD SNMPV3 table."
+    ::= { ruckusZDSystemSNMP 8 }
+
+ruckusZDSystemSNMPV3Entry OBJECT-TYPE
+    SYNTAX  RuckusZDSystemSNMPV3Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies SNMP V3 configuration entry.ifIndex  always be 1"
+    INDEX {
+        ifIndex  }
+    ::= { ruckusZDSystemSNMPV3Table 1 } 
+    
+RuckusZDSystemSNMPV3Entry ::= SEQUENCE {
+  ruckusZDSystemSNMPV3Enable                	INTEGER,
+  ruckusZDSystemSNMPV3RoUser         		DisplayString,
+  ruckusZDSystemSNMPV3RoAuth			INTEGER,
+  ruckusZDSystemSNMPV3RoAuthKey			DisplayString,
+  ruckusZDSystemSNMPV3RoPrivacy			INTEGER,
+  ruckusZDSystemSNMPV3RoPrivacyKey              DisplayString,
+  ruckusZDSystemSNMPV3RwUser         		DisplayString,
+  ruckusZDSystemSNMPV3RwAuth			INTEGER,
+  ruckusZDSystemSNMPV3RwAuthKey			DisplayString,
+  ruckusZDSystemSNMPV3RwPrivacy			INTEGER,
+  ruckusZDSystemSNMPV3RwPrivacyKey              DisplayString
+}
+         
+ruckusZDSystemSNMPV3Enable OBJECT-TYPE
+    SYNTAX  INTEGER { enable(1), disable(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable SNMPV3."
+    ::= { ruckusZDSystemSNMPV3Entry 2 }
+                      
+ruckusZDSystemSNMPV3RoUser OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Ro Username ."
+    ::= { ruckusZDSystemSNMPV3Entry 5 }
+
+ruckusZDSystemSNMPV3RoAuth OBJECT-TYPE
+    SYNTAX  INTEGER { md5(1), sha(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP V3 Ro Authentication type."
+    DEFVAL { md5 }
+    ::= { ruckusZDSystemSNMPV3Entry 6 }
+                
+ruckusZDSystemSNMPV3RoAuthKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Ro Authentication Pass Phrase .the read value is ********."
+    ::= { ruckusZDSystemSNMPV3Entry 7 }
+
+ruckusZDSystemSNMPV3RoPrivacy OBJECT-TYPE
+    SYNTAX  INTEGER { des(1), aes(2), none(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP V3 Ro Privacy type."
+    DEFVAL { des }
+    ::= { ruckusZDSystemSNMPV3Entry 8 }
+         
+ruckusZDSystemSNMPV3RoPrivacyKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Ro Privacy Phrase .the read value is ********."
+    ::= { ruckusZDSystemSNMPV3Entry 9 } 
+    
+ruckusZDSystemSNMPV3RwUser OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Rw Username ."
+    ::= { ruckusZDSystemSNMPV3Entry 12 }
+
+ruckusZDSystemSNMPV3RwAuth OBJECT-TYPE
+    SYNTAX  INTEGER { md5(1), sha(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP V3 Ro Authentication type."
+    DEFVAL { md5 }
+    ::= { ruckusZDSystemSNMPV3Entry 13 }
+                
+ruckusZDSystemSNMPV3RwAuthKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8..32)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Rw Authentication Pass Phrase .the read value is ********."
+    ::= { ruckusZDSystemSNMPV3Entry 14 }
+
+ruckusZDSystemSNMPV3RwPrivacy OBJECT-TYPE
+    SYNTAX  INTEGER { des(1), aes(2), none(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config the SNMP V3 Rw Privacy type."
+    DEFVAL { des }
+    ::= { ruckusZDSystemSNMPV3Entry 15 }
+         
+ruckusZDSystemSNMPV3RwPrivacyKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SNMP V3 Rw Privacy Phrase .the read value is ********."
+    ::= { ruckusZDSystemSNMPV3Entry 16 }
+
+ruckusZDSystemLoadBalanceInfo OBJECT IDENTIFIER    ::= { ruckusZDSystemServices 20 }
+
+ruckusZDSystemLoadBalance24GStatus OBJECT-TYPE
+    SYNTAX  TruthValue {false(0), true(1)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable load balance on 2.4G radio."
+    ::= { ruckusZDSystemLoadBalanceInfo 1 }
+
+ruckusZDSystemLoadBalance5GStatus OBJECT-TYPE
+    SYNTAX  TruthValue {false(0), true(1)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable load balance on 5G radio."
+    ::= { ruckusZDSystemLoadBalanceInfo 2 }    
+
+ruckusZDSystemLoadBalanceAdjacent24GThreshold OBJECT-TYPE
+    SYNTAX  INTEGER (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Adjacent 2.4G radio threshold(dB)."
+    ::= { ruckusZDSystemLoadBalanceInfo 3 }
+
+ruckusZDSystemLoadBalanceAdjacent5GThreshold OBJECT-TYPE
+    SYNTAX  INTEGER (1..100) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Adjacent 5G radio threshold(dB)."
+    ::= { ruckusZDSystemLoadBalanceInfo 4 }
+
+ruckusZDSystemLoadBalanceTrafficDifference OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    UNITS
+        "Kbps"
+    MAX-ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+        "This node had been deprecated from 9.9; Load balance traffic difference."
+    ::= { ruckusZDSystemLoadBalanceInfo 5 }
+
+ruckusZDSystemLoadBalanceType OBJECT-TYPE
+    SYNTAX  INTEGER { user(1), traffic(2) }
+    MAX-ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+        "This node had been deprecated from 9.9; Load balance type."
+    ::= { ruckusZDSystemLoadBalanceInfo 6 }
+
+--
+-- End, Zone Director System Configuration
+--            
+
+--
+-- Zone Director System Statistics, Operation Status
+--
+ruckusZDSystemStats OBJECT IDENTIFIER    ::= { ruckusZDSystemObjects 15 }
+
+ruckusZDSystemStatsNumAP OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of AP"
+    ::= { ruckusZDSystemStats 1 }
+
+ruckusZDSystemStatsNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of authorized client devices"
+    ::= { ruckusZDSystemStats 2 }
+
+ruckusZDSystemStatsNumRogue OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of rogue devices"
+    ::= { ruckusZDSystemStats 3 }
+
+ruckusZDSystemStatsNumRogueKnown OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of known rogue devices"
+    ::= { ruckusZDSystemStats 4 }
+
+ruckusZDSystemStatsWLANTotalRxPkts OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received packets of wireless interfaces"
+    ::= { ruckusZDSystemStats 5 }
+
+ruckusZDSystemStatsWLANTotalRxBytes OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received bytes of wireless interfaces"
+    ::= { ruckusZDSystemStats 6 }
+
+ruckusZDSystemStatsWLANTotalRxMulticast OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received multicast packets of wireless interfaces"
+    ::= { ruckusZDSystemStats 7 }
+
+ruckusZDSystemStatsWLANTotalTxPkts OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted packets of wireless interfaces"
+    ::= { ruckusZDSystemStats 8 }
+
+ruckusZDSystemStatsWLANTotalTxBytes OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted bytes of wireless interfaces"
+    ::= { ruckusZDSystemStats 9 }
+
+ruckusZDSystemStatsWLANTotalTxMulticast OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted multicast packets of wireless interfaces"
+    ::= { ruckusZDSystemStats 10 }
+
+ruckusZDSystemStatsWLANTotalTxFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted fail packets of wireless interfaces"
+    ::= { ruckusZDSystemStats 11 }
+
+ruckusZDSystemStatsWLANTotalTxRetry OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted retry packets of wireless interfaces"
+    ::= { ruckusZDSystemStats 12 }
+
+ruckusZDSystemStatsCPUUtil OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization"
+    ::= { ruckusZDSystemStats 13 }
+
+ruckusZDSystemStatsMemoryUtil OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory utilization"
+    ::= { ruckusZDSystemStats 14 }
+
+ruckusZDSystemStatsNumRegisteredAP OBJECT-TYPE
+	SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of registered AP"
+    ::= { ruckusZDSystemStats 15 }
+
+ruckusZDSystemStatsWLANTotalAssocFail OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of failed station associations."
+    ::= { ruckusZDSystemStats 16 }
+
+ruckusZDSystemStatsWLANTotalRxErrFrm OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of errornous downlink frames."
+    ::= { ruckusZDSystemStats 17 }
+    
+ruckusZDSystemStatsWLANTotalTxDroppedPkt OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of dropped downlink packets."
+    ::= { ruckusZDSystemStats 19 }
+
+ruckusZDSystemStatsWLANTotalTxErrFrm OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of errornous downlink frames."
+    ::= { ruckusZDSystemStats 20 }
+
+ruckusZDSystemStatsWLANTotalTxDroppedFrm OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of dropped downlink frames."
+    ::= { ruckusZDSystemStats 21 }
+
+ruckusZDSystemStatsLanTxRate OBJECT-TYPE
+	SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Lan transmit rate kbyte/s in last 5 minutes ."
+    ::= { ruckusZDSystemStats 23 }
+
+ruckusZDSystemStatsLanRxRate OBJECT-TYPE
+	SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Lan received rate kbyte/s in last 5 minutes ."
+    ::= { ruckusZDSystemStats 24 }
+    
+ruckusZDSystemStatsAllNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of All client devices"
+    ::= { ruckusZDSystemStats 30 }
+
+ruckusZDEthInfo OBJECT IDENTIFIER    ::= { ruckusZDSystemObjects 18 }
+
+ruckusZDEthNum OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of ethernet devices."
+    ::= { ruckusZDEthInfo 1 }
+
+ruckusZDEthTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDEthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Ethernet device table."
+    ::= { ruckusZDEthInfo 2 }
+
+ruckusZDEthEntry OBJECT-TYPE
+    SYNTAX  RuckusZDEthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Ethernet device entry."
+    INDEX {
+        ruckusZDEthIfIndex }
+    ::= { ruckusZDEthTable 1 }
+
+RuckusZDEthEntry ::= SEQUENCE {
+  ruckusZDEthIfIndex             Unsigned32,
+  ruckusZDEthName                DisplayString,
+  ruckusZDEthDesc                DisplayString,
+  ruckusZDEthType                INTEGER,
+  ruckusZDEthStatus              INTEGER,
+  ruckusZDEthPhysAddr            MacAddress,
+  ruckusZDEthMtu                 Unsigned32,
+  ruckusZDEthIfSpeed             Unsigned32,
+  ruckusZDEthUtil                INTEGER,
+  ruckusZDEthTxBcastPkts         Counter32,
+  ruckusZDEthTxMcastPkts         Counter32,
+  ruckusZDEthRxBcastPkts         Counter32,
+  ruckusZDEthRxMcastPkts         Counter32,
+  ruckusZDEthTxUniPkts           Counter32,
+  ruckusZDEthRxUniPkts           Counter32,
+  ruckusZDEthTxPkts              Counter32,
+  ruckusZDEthRxPkts              Counter32,
+  ruckusZDEthDropTxPkts          Counter32,
+  ruckusZDEthDropRxPkts          Counter32,
+  ruckusZDEthTxBytes          	 Counter32,
+  ruckusZDEthRxBytes          	 Counter32
+}
+
+ruckusZDEthIfIndex OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device interface index."
+    ::= { ruckusZDEthEntry 1 }
+
+ruckusZDEthName OBJECT-TYPE
+    SYNTAX  DisplayString 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ethernet device name."
+    ::= { ruckusZDEthEntry 2 }
+
+ruckusZDEthDesc OBJECT-TYPE
+    SYNTAX  DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device description."
+    ::= { ruckusZDEthEntry 3 }
+
+ruckusZDEthType OBJECT-TYPE
+    SYNTAX  INTEGER { other(1), ethernet-csmacd(2) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device type."
+    ::= { ruckusZDEthEntry 4 }
+
+ruckusZDEthStatus OBJECT-TYPE
+    SYNTAX  INTEGER { up(1), down(2) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device status."
+    ::= { ruckusZDEthEntry 5 }
+
+ruckusZDEthPhysAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device MAC address."
+    ::= { ruckusZDEthEntry 6 }
+
+ruckusZDEthMtu OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ethernet device mtu size."
+    ::= { ruckusZDEthEntry 7 }
+
+ruckusZDEthIfSpeed OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    UNITS
+        "Mbps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device interface speed."
+    ::= { ruckusZDEthEntry 8 }
+
+ruckusZDEthUtil OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device utilization."
+    ::= { ruckusZDEthEntry 9 }
+
+ruckusZDEthTxBcastPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device transmitted broadcast packets number ."
+    ::= { ruckusZDEthEntry 10 }
+    
+ruckusZDEthTxMcastPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device transmitted multicast packets number ."
+    ::= { ruckusZDEthEntry 11 }
+    
+ruckusZDEthRxBcastPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device received broadcast packets number ."
+    ::= { ruckusZDEthEntry 12 }
+    
+ruckusZDEthRxMcastPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device received mutilcast packets number ."
+    ::= { ruckusZDEthEntry 13 }
+
+ruckusZDEthTxUniPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device transmitted unicast packets number ."
+    ::= { ruckusZDEthEntry 14 }
+
+ruckusZDEthRxUniPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device received unicast packets number ."
+    ::= { ruckusZDEthEntry 15 }
+
+ruckusZDEthTxPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device transmitted packets number ."
+    ::= { ruckusZDEthEntry 16 }
+
+ruckusZDEthRxPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device received packets number ."
+    ::= { ruckusZDEthEntry 17 }
+
+ruckusZDEthDropTxPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device transmitted drop packets number ."
+    ::= { ruckusZDEthEntry 18 }
+
+ruckusZDEthDropRxPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device received drop packets number ."
+    ::= { ruckusZDEthEntry 19 }
+
+ruckusZDEthTxBytes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device transmitted bytes number ."
+    ::= { ruckusZDEthEntry 20 }
+
+ruckusZDEthRxBytes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet device received bytes number ."
+    ::= { ruckusZDEthEntry 21 }
+
+END

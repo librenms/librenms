@@ -1,0 +1,56 @@
+-- ============================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:  HUAWEI MA5200 Common Oid MIB Defintion
+-- Reference:  
+-- Version: V1.00
+-- History:
+--
+-- ============================================================================
+
+    HUAWEI-MA5200-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwProducts            
+                FROM HUAWEI-MIB            
+            MODULE-IDENTITY            
+                FROM SNMPv2-SMI;
+    
+    
+        musa MODULE-IDENTITY 
+            LAST-UPDATED "200303110900Z"        -- March 11, 2003 at 09:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                    "
+                    NanJing Institute,Huawei Technologies Co.,Ltd.
+                    HuiHong Mansion,No.91 BaiXia Rd.
+                    NanJing, P.R. of China
+                    Zipcode:210001
+                     
+                    Http://www.huawei.com                                       
+                    E-mail:support@huawei.com "
+            DESCRIPTION 
+                "The HUAWEI-MA5200-MIB contains objects of MA5200"
+            ::= { hwProducts 6 }
+        
+    
+        hwMA5200Mib OBJECT IDENTIFIER ::= { musa 2 }
+        
+    hwMA5200G-16 OBJECT IDENTIFIER ::= { hwMA5200Mib 29 }
+    
+    hwMA5200G-8  OBJECT IDENTIFIER ::= { hwMA5200Mib 30 }
+
+    hwMA5200G-4  OBJECT IDENTIFIER ::= { hwMA5200Mib 31 }
+
+    hwMA5200G-2  OBJECT IDENTIFIER ::= { hwMA5200Mib 32 }
+            
+    hwMA5200Ifcfg OBJECT IDENTIFIER ::= { hwMA5200Mib 100 }     
+
+    hwMA5200L2tp OBJECT IDENTIFIER ::= { hwMA5200Mib 101 }     
+    
+    hwMA5200PPPoX OBJECT IDENTIFIER ::= { hwMA5200Mib 102 }  
+    
+    hwMA5200Srvcfg OBJECT IDENTIFIER ::= { hwMA5200Mib 103 }  
+    
+    END

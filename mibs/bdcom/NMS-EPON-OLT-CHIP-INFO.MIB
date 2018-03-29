@@ -1,0 +1,115 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-CHIP-INFO.MIB:  NMS OLT-COMM MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-CHIP-INFO DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI;
+          
+               nmsEponOltChipInfo         OBJECT IDENTIFIER ::= { nmsEPONGroup 2 }
+
+               nmseponoltchipTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltChipEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt chip table entries."
+                   ::= { nmsEponOltChipInfo 1 }
+
+               nmsEponOltChipEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltChipEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt chip table."
+                   INDEX { oltChipIndex }
+               ::= { nmseponoltchipTable 1 }
+
+               NMSEponOltChipEntry ::=
+                   SEQUENCE {
+                       oltChipIndex
+                           INTEGER,
+                       oltChipSlotID
+                           INTEGER,
+                       oltChipModuleID
+                           INTEGER,
+                       oltChipDeviceID
+                           INTEGER,
+                       oltChipMACAddress
+                           PhysAddress,
+                       oltChipStatus
+                           INTEGER
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               oltChipIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT chip index corresponding allocated by system."
+                   ::= { nmsEponOltChipEntry 1 } 
+
+               oltChipSlotID OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT chip slot id."
+                   ::= { nmsEponOltChipEntry 2 } 
+
+               oltChipModuleID OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT chip module id."
+                   ::= { nmsEponOltChipEntry 3 } 
+
+               oltChipDeviceID OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT chip device id."
+                   ::= { nmsEponOltChipEntry 4 } 
+
+               oltChipMACAddress OBJECT-TYPE
+                   SYNTAX  PhysAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT chip MAC address."
+                   ::= { nmsEponOltChipEntry 5 } 
+
+               oltChipStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          wait_config(1),
+                          operational(2),
+                          shut_down(3),
+                          timed_out(4),
+                          downloading_image(5)                          
+                               	    }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT chip Status."
+                   ::= { nmsEponOltChipEntry 6 } 
+
+
+
+END

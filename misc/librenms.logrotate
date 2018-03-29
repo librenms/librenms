@@ -1,0 +1,11 @@
+# /etc/logrotate.d/librenms
+/opt/librenms/logs/*log {
+    su librenms librenms
+    weekly
+    rotate 6
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 664 librenms librenms
+}

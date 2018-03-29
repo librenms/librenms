@@ -1,0 +1,85 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-MULTICAST-VLAN.MIB:  NMS LLID ONU MULTICAST VLAN MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-MULTICAST-VLAN DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOnuMulticastVlan         OBJECT IDENTIFIER ::= { nmsEPONGroup 14 }
+
+               
+               nmsepononumulticastvlanTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuMulticastVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU port multicast vlan table entries."
+                   ::= { nmsEponOnuMulticastVlan 1 }
+
+               nmsEponOnuVlanEntry OBJECT-TYPE
+                   SYNTAX  NMSEponOnuMulticastVlanEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU port multicast vlan property table."
+                   INDEX { onuLlidDiid,onuIfSequenceNo,onuMcstMcVlanID }
+               ::= { nmsepononumulticastvlanTable 1 }
+
+               NMSEponOnuMulticastVlanEntry ::=
+                   SEQUENCE {
+                       onuLlidDiid
+                           INTEGER,
+                       onuIfSequenceNo
+                           INTEGER,
+                       onuMcstMcVlanID
+                           INTEGER,
+		       onuMcVlanRowStatus
+		           RowStatus
+			}
+               onuLlidDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID port DIID, as one of the index together with onuIfSequenceNo."
+                   ::= { nmsEponOnuVlanEntry 1 } 
+
+               onuIfSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface sequence number, as one of the index together with onuLlidDiid."
+                   ::= { nmsEponOnuVlanEntry 2 } 
+
+               onuMcstMcVlanID OBJECT-TYPE
+                   SYNTAX  INTEGER(2..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface multicast vlan id. This configuration can be set only as vlan mode is igmp-snooping mode."
+                   ::= { nmsEponOnuVlanEntry 3 } 
+
+               onuMcVlanRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface multicast vlan table row status."
+                   ::= { nmsEponOnuVlanEntry 4 } 
+
+END               

@@ -1,0 +1,463 @@
+-- *******************************************************************
+-- Juniper enterprise security UTM MIB.       
+--
+-- Copyright (c) 2001-2011, Juniper Networks, Inc.
+-- All rights reserved.      
+--                 
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    
+JUNIPER-JS-UTM-AV-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Integer32, 
+        NOTIFICATION-TYPE,                 
+        MODULE-IDENTITY, OBJECT-TYPE   FROM SNMPv2-SMI
+        DisplayString                  FROM SNMPv2-TC
+        jnxJsUTMRoot                   FROM JUNIPER-JS-SMI;
+        
+
+    jnxJsAntiVirus MODULE-IDENTITY
+        LAST-UPDATED  "201102080800Z" -- Feb 08, 2011
+        ORGANIZATION  "Juniper Networks, Inc."    
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue     
+             Sunnyvale, CA 94089      
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"           
+        DESCRIPTION            
+            "This module defines the MIB for Juniper Enterprise specific
+             antivirus functionality. Juniper documentation is recommended
+             as the reference."
+            
+        REVISION      "201102080800Z" 
+        DESCRIPTION   "Creation Date"
+
+        ::= { jnxJsUTMRoot 1 }                 
+
+
+    jnxJsAntiVirusObjects     OBJECT IDENTIFIER ::= { jnxJsAntiVirus 1 }
+    jnxJsAntiVirusTraps       OBJECT IDENTIFIER ::= { jnxJsAntiVirus 2 }
+    jnxJsAntiVirusTrapsPrefix OBJECT IDENTIFIER ::= { jnxJsAntiVirus 0 }
+    jnxJsAntiVirusTrapVars    OBJECT IDENTIFIER ::= { jnxJsAntiVirus 3 }
+
+
+    -- ***************************************************************
+    --  anti-virus objects
+    -- ***************************************************************
+
+        
+    -- ***************************************************************
+    --  scan engine objects
+    -- ***************************************************************
+
+    jnxJsAntiVirusEngine OBJECT IDENTIFIER ::= { jnxJsAntiVirusObjects 1 }
+
+    jnxJsAVEngineType OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown-engine         (1),
+            kaspersky-lab-engine   (2),
+            juniper-express-engine (3),
+            sophos-engine          (4)
+        }
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "The scan engine type in use. User can use CLI to set the
+             engine type to either full AV (kaspersky-lab-engine),
+             express AV (juniper-express-engine) or Sophos AV
+             (sophos-engine). If AV is not configured then engine type
+             is not known."
+        ::= { jnxJsAntiVirusEngine 1 }
+
+    jnxJsAVCurrentPatternVersionString       OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Anti-Virus pattern database version currently in use."
+        ::= { jnxJsAntiVirusEngine 2 }
+
+    jnxJsAVDatabaseType OBJECT-TYPE
+        SYNTAX INTEGER {
+            full            (1),
+            express         (2),
+            unknown         (3),
+            sophos          (4)
+        }
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "The Database type in use. User can use CLI to set the
+             engine type to full AV, express AV or Sophos AV. 
+             Corresponding database types are Full for KL Engine,
+             Express for Juniper Express Engine and Sophos for Sophos 
+             AV Engine."
+        ::= { jnxJsAntiVirusEngine 3 }
+
+    -- ***************************************************************
+    --  scan statistics objects
+    -- ***************************************************************
+
+    jnxJsAntiVirusStats OBJECT IDENTIFIER ::= { jnxJsAntiVirusObjects 2 }
+
+    jnxJsAVScanCodeClean           OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests passed Anti-Virus scan."
+        ::= { jnxJsAntiVirusStats 1 }
+
+    jnxJsAVScanCodeInfected        OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests found infected by Anti-Virus scan engine."
+        ::= { jnxJsAntiVirusStats 2 }
+
+    jnxJsAVScanCodeProtected       OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to protected by password."
+        ::= { jnxJsAntiVirusStats 3 }
+
+    jnxJsAVScanCodeDecompress      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to exceeding max 
+            decmopress layer."
+        ::= { jnxJsAntiVirusStats 4 }
+
+    jnxJsAVScanCodeCorrupted       OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to file corrupted."
+        ::= { jnxJsAntiVirusStats 5 }
+
+    jnxJsAVScanCodeNoResource      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to out-of-resource."
+        ::= { jnxJsAntiVirusStats 6 }
+
+
+    jnxJsAVScanCodeInternalError   OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to internal error."
+        ::= { jnxJsAntiVirusStats 7 }
+
+    jnxJsAVScanCodeMaxContentSize  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to exceeding max content
+             size limit."
+        ::= { jnxJsAntiVirusStats 8 }
+
+    jnxJsAVScanCodeTooManyReq      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to exceeding maximum 
+             requests limit."
+        ::= { jnxJsAntiVirusStats 9 }
+
+
+    jnxJsAVScanCodeTimeout         OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to scan timeout."
+        ::= { jnxJsAntiVirusStats 10 }
+
+    jnxJsAVScanCodeEngineNotReady  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+            "Number of requests cannot be scanned due to scan engine not ready."
+        ::= { jnxJsAntiVirusStats 11 }
+
+    -- ***************************************************************
+    -- scan engine table objects
+    -- ***************************************************************
+
+    jnxJsUTMAntiVirusEngine OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsUTMAntiVirusEngineEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Table of anti-virus engine objects."
+        ::= { jnxJsAntiVirusObjects 3 }
+        
+    jnxJsUTMAntiVirusEngineEntry OBJECT-TYPE
+        SYNTAX        JnxJsUTMAntiVirusEngineEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Entry for anti-virus engine table."
+        INDEX         { jnxJsUTMAVEngineIndex }
+        ::= { jnxJsUTMAntiVirusEngine 1 }
+    
+    JnxJsUTMAntiVirusEngineEntry ::= SEQUENCE {
+        jnxJsUTMAVEngineIndex                    Integer32,
+        jnxJsUTMAVEngineType                     INTEGER,
+        jnxJsUTMAVPatternVersionString           DisplayString,
+        jnxJsUTMAVDatabaseType                   INTEGER
+    }
+
+    jnxJsUTMAVEngineIndex OBJECT-TYPE
+        SYNTAX        Integer32 (0..'7fffffff'h)
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "Index is the cluster node number. If the device is
+             not in a cluster mode then it will be the local node
+             number."
+        ::= { jnxJsUTMAntiVirusEngineEntry 1 }
+
+    jnxJsUTMAVEngineType OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown-engine         (1),
+            kaspersky-lab-engine   (2),
+            juniper-express-engine (3),
+            sophos-engine          (4)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The scan engine type in use. User can use CLI to set the
+             engine type to either full AV (kaspersky-lab-engine),
+             express AV (juniper-express-engine) or Sophos AV
+             (sophos-engine). If AV is not configured then engine type
+             is not known."
+        ::= { jnxJsUTMAntiVirusEngineEntry 2 }
+
+    jnxJsUTMAVPatternVersionString       OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Anti-Virus pattern database version currently in use."
+        ::= { jnxJsUTMAntiVirusEngineEntry 3 }
+
+    jnxJsUTMAVDatabaseType OBJECT-TYPE
+        SYNTAX INTEGER {
+            full            (1),
+            express         (2),
+            unknown         (3),
+            sophos          (4)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Database type in use. User can use CLI to set the
+             engine type to full AV, express AV or Sophos AV.
+             Corresponding database types are Full for KL Engine,
+             Express for Juniper Express Engine and Sophos for Sophos
+             AV Engine."
+        ::= { jnxJsUTMAntiVirusEngineEntry 4 }
+
+    -- ***************************************************************
+    -- scan statistics table objects
+    -- ***************************************************************
+
+    jnxJsUTMAntiVirusStats OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsUTMAntiVirusStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Table of anti-virus stats objects."
+        ::= { jnxJsAntiVirusObjects 4 }
+
+    jnxJsUTMAntiVirusStatsEntry OBJECT-TYPE
+        SYNTAX        JnxJsUTMAntiVirusStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Entry of anti-virus stats object."
+        INDEX         { jnxJsUTMAVStatsIndex }
+        ::= { jnxJsUTMAntiVirusStats 1 }
+
+    JnxJsUTMAntiVirusStatsEntry ::= SEQUENCE {
+        jnxJsUTMAVStatsIndex                Integer32,
+        jnxJsUTMAVScanCodeClean             Integer32,
+        jnxJsUTMAVScanCodeInfected          Integer32,
+        jnxJsUTMAVScanCodeProtected         Integer32,
+        jnxJsUTMAVScanCodeDecompress        Integer32,
+        jnxJsUTMAVScanCodeCorrupted         Integer32,
+        jnxJsUTMAVScanCodeNoResource        Integer32,
+        jnxJsUTMAVScanCodeInternalError     Integer32,
+        jnxJsUTMAVScanCodeMaxContentSize    Integer32,
+        jnxJsUTMAVScanCodeTooManyReq        Integer32,
+        jnxJsUTMAVScanCodeTimeout           Integer32,
+        jnxJsUTMAVScanCodeEngineNotReady    Integer32
+    }
+
+    jnxJsUTMAVStatsIndex OBJECT-TYPE
+        SYNTAX        Integer32 (0..'7fffffff'h)
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "Index is the cluster node number. If the device is
+             not in a cluster mode then it will be the local node
+             number."
+        ::= { jnxJsUTMAntiVirusStatsEntry 1 }
+
+    jnxJsUTMAVScanCodeClean           OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests passed Anti-Virus scan."
+        ::= { jnxJsUTMAntiVirusStatsEntry 2 }
+
+    jnxJsUTMAVScanCodeInfected        OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests found infected by Anti-Virus scan engine."
+        ::= { jnxJsUTMAntiVirusStatsEntry 3 }
+
+    jnxJsUTMAVScanCodeProtected       OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to protected by password."
+        ::= { jnxJsUTMAntiVirusStatsEntry 4 }
+
+    jnxJsUTMAVScanCodeDecompress      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to exceeding max
+            decmopress layer."
+        ::= { jnxJsUTMAntiVirusStatsEntry 5 }
+
+    jnxJsUTMAVScanCodeCorrupted       OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to file corrupted."
+        ::= { jnxJsUTMAntiVirusStatsEntry 6 }
+
+    jnxJsUTMAVScanCodeNoResource      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to out-of-resource."
+        ::= { jnxJsUTMAntiVirusStatsEntry 7 }
+
+    jnxJsUTMAVScanCodeInternalError   OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to internal error."
+        ::= { jnxJsUTMAntiVirusStatsEntry 8 }
+
+    jnxJsUTMAVScanCodeMaxContentSize  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to exceeding max content
+             size limit."
+        ::= { jnxJsUTMAntiVirusStatsEntry 9 }
+
+    jnxJsUTMAVScanCodeTooManyReq      OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to exceeding maximum
+             requests limit."
+        ::= { jnxJsUTMAntiVirusStatsEntry 10 }
+
+    jnxJsUTMAVScanCodeTimeout         OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to scan timeout."
+        ::= { jnxJsUTMAntiVirusStatsEntry 11 }
+
+    jnxJsUTMAVScanCodeEngineNotReady  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of requests cannot be scanned due to scan engine not ready."
+        ::= { jnxJsUTMAntiVirusStatsEntry 12 }
+
+
+    -- ***************************************************************
+    --  antivirus traps
+    -- ***************************************************************
+
+    --
+    -- When new pattern is updated, a trap is generated.
+    --
+
+    jnxJsAvPatternUpdateTrap NOTIFICATION-TYPE
+        OBJECTS       { jnxAVPatternVersionString,
+                        jnxAVPatternTimestamp
+                      }
+        STATUS        current
+        DESCRIPTION
+            "This traps is raised when the Anti-Virus pattern database is 
+             updated successfully."
+        ::= { jnxJsAntiVirusTrapsPrefix 1 }
+
+
+    --
+    -- Trap variables
+    --
+
+    jnxAVPatternVersionString       OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Anti-Virus last successfully updated pattern database version."
+        ::= { jnxJsAntiVirusTrapVars 1 }
+
+
+    jnxAVPatternTimestamp           OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Anti-Virus last successfully updated pattern database timestamp."
+        ::= { jnxJsAntiVirusTrapVars 2 }
+
+--
+-- End of File
+--
+
+END

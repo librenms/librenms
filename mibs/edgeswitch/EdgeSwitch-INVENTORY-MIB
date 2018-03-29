@@ -1,0 +1,1321 @@
+EdgeSwitch-INVENTORY-MIB DEFINITIONS ::= BEGIN
+
+-- Copyright Broadcom Inc (2003-2013) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Broadcom Inc's confidential and proprietary
+-- intellectual property.  Broadcom Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter32,
+        Unsigned32, TimeTicks, NOTIFICATION-TYPE  FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, 
+        RowStatus                                 FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                                                  FROM SNMPv2-CONF
+        fastPath                                  FROM EdgeSwitch-REF-MIB;
+
+    fastPathInventory MODULE-IDENTITY
+        LAST-UPDATED "201310150000Z" -- 15 Oct 2013 12:00:00 GMT
+        ORGANIZATION "Broadcom Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+            "This MIB defines the objects used for FastPath to 
+            configure and report information and status of units, 
+            slots and supported cards."
+        
+        -- Revision history.	  
+        REVISION
+            "201310150000Z" -- 15 Oct 2013 12:00:00 GMT
+        DESCRIPTION
+            "Object support modifications for LinuxHost systems."
+        REVISION
+            "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+            "Postal address updated."
+        REVISION
+            "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+            "Ubiquiti branding related changes."
+        REVISION
+            "200410282037Z" -- Thu Jun 26 20:37:34 2003 GMT
+        DESCRIPTION
+            "Version 2 - Add support for Front Panel Stacking configuration."
+        REVISION
+            "200305261930Z" -- Thu Jun 26 19:30:54 2003 GMT
+        DESCRIPTION
+            "Initial version."
+ 
+        ::= { fastPath 13 }
+
+    AgentInventoryUnitPreference ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Indicates the preference the unit has for being the 
+            management unit in the stack.  If the value is 0, it 
+            indicates the unit is disabled for management."
+        SYNTAX  INTEGER {
+                 disabled(0),
+                 unsassigned(1),
+                 assigned(2)
+                 }
+        
+    AgentInventoryUnitType ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "x"
+        STATUS      current
+        DESCRIPTION
+            "The Unit Type value for a given unit, displayed in hexadecimal."
+        SYNTAX  Unsigned32
+
+    AgentInventoryCardType ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "x"
+        STATUS      current
+        DESCRIPTION
+            "The Card Type value for a given card, displayed in hexadecimal."
+        SYNTAX  Unsigned32
+
+    --**************************************************************************************
+    -- agentInventoryStackGroup
+    --
+    --**************************************************************************************
+    agentInventoryStackGroup                      OBJECT IDENTIFIER ::= { fastPathInventory 1 }
+    agentInventoryStackReplicateSTK OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Initiates STK copy from management unit to all other management capable units in
+            the stack."
+        ::= { agentInventoryStackGroup 1 }
+    
+    agentInventoryStackReload OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Initiates stack reload."
+        ::= { agentInventoryStackGroup 2 }
+        
+    agentInventoryStackMaxUnitNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the maximum allowed Unit Number configurable on the stack."
+        ::= { agentInventoryStackGroup 3 }
+
+    agentInventoryStackReplicateSTKStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    inProgress(1),
+                    notInProgress(2),
+                    finishedWithSuccess(3),
+                    finishedWithError(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the current status of an STK copy from management unit to all other 
+            management capable units inthe stack."
+        ::= { agentInventoryStackGroup 4 }
+
+    agentInventoryStackSTKname OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    unconfigured(1),
+                    image1(2),
+                    image2(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "STK file on management unit for copy/activate/delete operations to all units in the stack
+             unconfigured(1) - indicates a default state and can not be set."
+        ::= { agentInventoryStackGroup 5 }
+
+    agentInventoryStackActivateSTK OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Activates the specified STK file on all units on the stack."
+        ::= { agentInventoryStackGroup 6 }
+
+    agentInventoryStackDeleteSTK OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Deletes the specified STK file from all units on the stack."
+        ::= { agentInventoryStackGroup 7 }
+
+    agentInventoryStackTemplateId OBJECT-TYPE
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Sets the stack template ID on all units in the stack. Deletes the startup configuration 
+             on all affected units and resets all units in the stack.
+             This is write-only value. It always returns '0' on request."
+        ::= { agentInventoryStackGroup 8 }
+    --**************************************************************************************
+    -- agentInventoryUnitGroup
+    --
+    --**************************************************************************************
+
+    agentInventoryUnitGroup                       OBJECT IDENTIFIER ::= { fastPathInventory 2 }
+
+    --**************************************************************************************
+    -- agentInventorySupportedUnitTable
+    --
+    --**************************************************************************************
+
+    agentInventorySupportedUnitTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentInventorySupportedUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "TODO"
+        ::= { agentInventoryUnitGroup 1 }
+
+    agentInventorySupportedUnitEntry OBJECT-TYPE
+        SYNTAX         AgentInventorySupportedUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "TODO"
+        INDEX          { agentInventorySupportedUnitIndex }
+        ::= { agentInventorySupportedUnitTable 1 }
+         
+    AgentInventorySupportedUnitEntry ::=
+        SEQUENCE {
+         agentInventorySupportedUnitIndex
+                 Unsigned32,
+         agentInventorySupportedUnitModelIdentifier
+                 DisplayString,
+         agentInventorySupportedUnitDescription
+                 DisplayString,
+         agentInventorySupportedUnitExpectedCodeVer
+                 DisplayString
+         }
+
+    agentInventorySupportedUnitIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..100)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The unit identifier associated with the supported unit."
+        ::= { agentInventorySupportedUnitEntry 1 }
+        
+    agentInventorySupportedUnitModelIdentifier OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The model identifier for the supported unit."
+        ::= { agentInventorySupportedUnitEntry 4 }
+
+    agentInventorySupportedUnitDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The description of the supported unit."
+        ::= { agentInventorySupportedUnitEntry 5 }
+
+    agentInventorySupportedUnitExpectedCodeVer OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "The expected code version."
+        ::= { agentInventorySupportedUnitEntry 6 }
+
+
+    --**************************************************************************************
+    -- agentInventoryUnitTable
+    --
+    --**************************************************************************************
+
+    agentInventoryUnitTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentInventoryUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "A table of Per-Unit configuration objects."
+        ::= { agentInventoryUnitGroup 2 }
+
+    agentInventoryUnitEntry OBJECT-TYPE
+        SYNTAX         AgentInventoryUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Each Instance corresponds with a different unit managed by this agent."
+        INDEX          { agentInventoryUnitNumber }
+        ::= { agentInventoryUnitTable 1 }
+         
+    AgentInventoryUnitEntry ::=
+        SEQUENCE {
+         agentInventoryUnitNumber
+                 Unsigned32,
+         agentInventoryUnitAssignNumber
+                 Unsigned32,
+         agentInventoryUnitType
+                 AgentInventoryUnitType,
+         agentInventoryUnitSupportedUnitIndex
+                 Unsigned32,
+         agentInventoryUnitMgmtAdmin
+                 INTEGER,
+         agentInventoryUnitHWMgmtPref
+                 AgentInventoryUnitPreference,
+         agentInventoryUnitHWMgmtPrefValue
+                 Unsigned32,
+         agentInventoryUnitAdminMgmtPref
+                 AgentInventoryUnitPreference,
+         agentInventoryUnitAdminMgmtPrefValue
+                 Unsigned32,
+         agentInventoryUnitStatus
+                 INTEGER,
+         agentInventoryUnitDetectedCodeVer
+                 DisplayString,
+         agentInventoryUnitDetectedCodeInFlashVer
+                 DisplayString,
+         agentInventoryUnitUpTime
+                 TimeTicks,
+         agentInventoryUnitDescription
+                 DisplayString,
+         agentInventoryUnitReplicateSTK
+                 INTEGER,
+         agentInventoryUnitReload
+                 INTEGER,
+         agentInventoryUnitRowStatus
+                 RowStatus,
+         agentInventoryUnitSerialNumber
+                 DisplayString,
+         agentInventoryUnitImage1Version
+                 DisplayString,
+         agentInventoryUnitImage2Version
+                 DisplayString,
+         agentInventoryUnitSTKname
+                 INTEGER,
+         agentInventoryUnitActivateSTK
+                 INTEGER,
+         agentInventoryUnitDeleteSTK
+                 INTEGER,
+         agentInventoryUnitReplicateSTKStatus
+                 INTEGER,
+         agentInventoryUnitStandby
+                 INTEGER
+         ,agentInventoryUnitSFSTransferStatus
+                 INTEGER
+         ,agentInventoryUnitSFSLastAttemptStatus
+                 INTEGER
+         }
+
+    agentInventoryUnitNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The unit number associated with this unit."
+        ::= { agentInventoryUnitEntry 1 }
+
+    agentInventoryUnitAssignNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Allows setting the unit number associated with this unit.  This number must 
+            be less than the value returned by agentInventoryStackMaxUnitNumber. Setting 
+            this object to a non-zero value will initate unit renumbering. The switch will 
+            be reset to perform unit renumbering and the configuration of switch interfaces 
+            will be cleared. If the unit being renumbered is the manager of the stack, then
+            all the switches in the stack will be reset to perform Manager unit renumbering 
+            and the configuration of Manager switch interfaces will be cleared."
+        ::= { agentInventoryUnitEntry 2 }
+
+    agentInventoryUnitType OBJECT-TYPE
+        SYNTAX      AgentInventoryUnitType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Unit Type identifier for this unit."
+        ::= { agentInventoryUnitEntry 3 }
+
+    agentInventoryUnitSupportedUnitIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The index of the unit type in agentInventorySupportedUnitTable which this unit
+            is associated with."
+        ::= { agentInventoryUnitEntry 4 }
+
+    agentInventoryUnitMgmtAdmin OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    mgmtUnit(1),
+                    stackUnit(2),
+                    mgmtUnassigned(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the unit is a Management Unit, a Stack Unit, or has 
+            been configured to be a Management Unit.
+            
+            Setting this object to mgmtUnit(1) initiates transfer of the 
+            management functionality to the specified stack unit. Object values 
+            stackUnit(2) and mgmtUnassigned(3) cannot be set."
+        ::= { agentInventoryUnitEntry 6 }
+
+
+
+    agentInventoryUnitHWMgmtPref OBJECT-TYPE
+        SYNTAX      AgentInventoryUnitPreference
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "Indicates the default preference assigned to the unit."
+        ::= { agentInventoryUnitEntry 7 }
+
+    agentInventoryUnitHWMgmtPrefValue OBJECT-TYPE
+        SYNTAX      Unsigned32 (0|1..15)
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "Indicates the default preference value assigned to the unit.
+            The preference value indicates how likely this unit is to be
+            chosen as the management unit.  A value of 0 indicates a disabled
+            or unassigned preference."
+        ::= { agentInventoryUnitEntry 8 }
+
+
+     agentInventoryUnitAdminMgmtPref OBJECT-TYPE
+        SYNTAX      AgentInventoryUnitPreference
+        MAX-ACCESS  read-create
+        STATUS      obsolete
+        DESCRIPTION
+            "Indicates the configured preference assigned to the unit. This object
+            can not be set to assigned(3).  Setting this object to disabled(1),
+            or unassigned(2) will set agentInventoryUnitHWMgmtPrefValue to 0."
+        ::= { agentInventoryUnitEntry 9 }
+
+    agentInventoryUnitAdminMgmtPrefValue OBJECT-TYPE
+        SYNTAX      Unsigned32 (0|1..15)
+        MAX-ACCESS  read-create
+        STATUS      obsolete
+        DESCRIPTION
+            "Indicates the configured preference value assigned to the unit.
+            The preference value indicates how likely this unit is to be
+            chosen as the management unit.  A value of 0 indicates a disabled
+            or unassigned preference.  Setting this object to 0 will also set
+            agentInventoryUnitHWMgmtPref to unassigned(2).  Setting this object
+            to a non-zero value will set agentInventoryUnitHWMgmtPref to
+            assigned(3).  This value overrides the value of
+            agentInventoryUnitHWMgmtPref if assigned."
+        ::= { agentInventoryUnitEntry 10 }
+
+
+    agentInventoryUnitStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    ok(1),
+                    unsupported(2),
+                    codeMismatch(3),
+                    configMismatch(4),
+                    sdmMismatch(5),
+                    notPresent(6),
+                    codeUpdate(7)
+                    ,stmMismatch(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The unit status of this unit."
+        ::= { agentInventoryUnitEntry 11 }
+
+    agentInventoryUnitDetectedCodeVer OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The version of code running on this unit. If the unit is not 
+            detected then the code version is an empty string."
+        ::= { agentInventoryUnitEntry 12 }
+
+    agentInventoryUnitDetectedCodeInFlashVer OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The version of code that is currently stored in FLASH 
+            memory on the unit. This code will execute after the unit 
+            is reset. If the unit is not detected then this object will 
+            return an empty string."
+        ::= { agentInventoryUnitEntry 13 }
+
+    agentInventoryUnitUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system up time of the unit."
+        ::= { agentInventoryUnitEntry 14 }
+
+    agentInventoryUnitDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The description of the unit."
+        ::= { agentInventoryUnitEntry 15 }
+
+    agentInventoryUnitReplicateSTK OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Initiates the specified STK file copy from management unit to this unit."
+        ::= { agentInventoryUnitEntry 16 }
+
+    agentInventoryUnitReload OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Reload a specific unit in the stack."
+         ::= { agentInventoryUnitEntry 17 }
+    
+    agentInventoryUnitRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this unit instance.  Creation of new instances requires the object
+            agentInventoryUnitSupportedUnitIndex to be set at the same time to indicate the type 
+            of of unit to pre-configure.
+            
+            active(1)      - This instance is active.
+            createAndGo(4) - Creates a new instance.
+            destroy(6)     - Removes this instance."
+        ::= { agentInventoryUnitEntry 18 }
+    
+    agentInventoryUnitSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Serial Number of the unit."
+        ::= { agentInventoryUnitEntry 19 }
+
+    agentInventoryUnitImage1Version OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Code version for Image1."
+        ::= { agentInventoryUnitEntry 20 }
+
+    agentInventoryUnitImage2Version OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Code version for Image2."
+        ::= { agentInventoryUnitEntry 21 }
+
+    agentInventoryUnitSTKname OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    image1(2),
+                    image2(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "STK file to be used for copy/delete/activate operatiosn."
+        ::= { agentInventoryUnitEntry 22 }
+
+    agentInventoryUnitActivateSTK OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Activates the specified STK file on this unit."
+        ::= { agentInventoryUnitEntry 23 }
+
+    agentInventoryUnitDeleteSTK OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Deletes the specified STK file on this unit."
+        ::= { agentInventoryUnitEntry 24 }
+
+    agentInventoryUnitReplicateSTKStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    inProgress(1),
+                    notInProgress(2),
+                    finishedWithSuccess(3),
+                    finishedWithError(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the current status of an STK copy from the management unit to another
+            management capable unit in the stack."
+        ::= { agentInventoryUnitEntry 25 }
+
+    agentInventoryUnitStandby OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    unassigned(1),
+                    standby-opr(2),
+                    standby-cfg(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Configures the standby status of this unit.  The Management unit may not be 
+             configured.  A unit that is standby_cfg(3) may be set to uassigned(1) to clear 
+             standby configuration.  A unit that is standby_opr(2) may NOT be set to
+             unassigned(1)."
+        ::= { agentInventoryUnitEntry 26 }
+        
+    agentInventoryUnitSFSTransferStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    noAction(1),
+                    inProgress(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status parameter to indicate stack firmware synchronization operation status for a particular unit.
+			If SFS transfer is in progress for a particular unit status will be inProgress(2),otherwise status will
+			be noAction(1)."
+        ::= { agentInventoryUnitEntry 27 }
+		
+    agentInventoryUnitSFSLastAttemptStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    none(1),
+                    success(2),
+                    failure(3),
+					          min-bootcode-version-not-present(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status parameter to indicate whether the last synchronization attempt 
+             succeeded or failed.If SFS is initated for a particular unit and if it 
+             completes successfully this object will return success(2),if SFS operation 
+             failed lasttime for this unit,this object will return failure(3).if SFS did 
+             not initiate for this unit,this object will retunrn none(1). If activation of
+             the image failed because the underlying bootcode version is older than the minimum boot 
+             code version specified in the image, this object returns min-bootcode-version-not-met(4)"
+        ::= { agentInventoryUnitEntry 28 }
+
+
+    --**************************************************************************************
+    -- agentInventorySlotGroup
+    --
+    --**************************************************************************************
+
+    agentInventorySlotGroup                       OBJECT IDENTIFIER ::= { fastPathInventory 3 }
+
+    --**************************************************************************************
+    -- agentInventorySlotTable
+    --
+    --**************************************************************************************
+
+    agentInventorySlotTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentInventorySlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "TODO"
+        ::= { agentInventorySlotGroup 1 }
+
+    agentInventorySlotEntry OBJECT-TYPE
+        SYNTAX         AgentInventorySlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "TODO"
+        INDEX          { agentInventoryUnitNumber, agentInventorySlotNumber }
+        ::= { agentInventorySlotTable 1 }
+         
+    AgentInventorySlotEntry ::=
+        SEQUENCE {
+         agentInventorySlotNumber
+                 Unsigned32,
+         agentInventorySlotStatus
+                 INTEGER,
+         agentInventorySlotPowerMode
+                 INTEGER,
+         agentInventorySlotAdminMode
+                 INTEGER,
+         agentInventorySlotInsertedCardType
+                 AgentInventoryCardType,
+         agentInventorySlotConfiguredCardType
+                 AgentInventoryCardType,
+         agentInventorySlotCapabilities
+                 BITS
+         }
+
+    agentInventorySlotNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An incrimental index of the slot in this unit."
+        ::= { agentInventorySlotEntry 1 }
+
+    agentInventorySlotStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    empty(1),
+                    full(2),
+                    error(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the current status of the slot."
+        ::= { agentInventorySlotEntry 3 }
+
+    agentInventorySlotPowerMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether a card in this slot will be powered on."
+        ::= { agentInventorySlotEntry 4 }
+
+    agentInventorySlotAdminMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether this card is administratively enabled or 
+            disabled."
+        ::= { agentInventorySlotEntry 5 }
+
+    agentInventorySlotInsertedCardType OBJECT-TYPE
+        SYNTAX      AgentInventoryCardType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the inserted card type. Will return 0 if the slot is 
+            not full."
+        ::= { agentInventorySlotEntry 6 }
+
+    agentInventorySlotConfiguredCardType OBJECT-TYPE
+        SYNTAX      AgentInventoryCardType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates the configured card type.  This object may be set with a
+            corresponding value of agentInventoryCardType if this slot supports
+            removable cards."
+        ::= { agentInventorySlotEntry 7 }
+
+    agentInventorySlotCapabilities OBJECT-TYPE
+        SYNTAX      BITS {
+                    pluggable(0),
+                    power-down(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the different capabilities this slot has.
+            
+            pluggable(0)   - This slot can contain pluggable cards.
+            power-down(1)  - Power to this slot can be controlled through the object
+                             agentInventorySlotPowerMode
+            "
+        ::= { agentInventorySlotEntry 8 }
+
+    --**************************************************************************************
+    -- agentInventoryCardGroup
+    --
+    --**************************************************************************************
+
+    agentInventoryCardGroup                       OBJECT IDENTIFIER ::= { fastPathInventory 4 }
+
+    --**************************************************************************************
+    -- agentInventoryCardTypeTable
+    --
+    --**************************************************************************************
+
+    agentInventoryCardTypeTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentInventoryCardTypeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Contains information for all supported Card Types in the system."
+        ::= { agentInventoryCardGroup 1 }
+
+    agentInventoryCardTypeEntry OBJECT-TYPE
+        SYNTAX         AgentInventoryCardTypeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Contains information related to a specific Card Type."
+        INDEX          { agentInventoryCardIndex }
+        ::= { agentInventoryCardTypeTable 1 }
+         
+    AgentInventoryCardTypeEntry ::=
+        SEQUENCE {
+         agentInventoryCardIndex
+                 Unsigned32,
+         agentInventoryCardType
+                 AgentInventoryCardType,
+         agentInventoryCardModelIdentifier
+                 DisplayString,
+         agentInventoryCardDescription
+                 DisplayString
+         }
+
+    agentInventoryCardIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An arbitrary index used to identify cards in the table."
+        ::= { agentInventoryCardTypeEntry 1 }
+
+    agentInventoryCardType OBJECT-TYPE
+        SYNTAX      AgentInventoryCardType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Card Type associated with this instance."
+        ::= { agentInventoryCardTypeEntry 2 }
+
+    agentInventoryCardModelIdentifier OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The model identifier for the supported Card Type."
+        ::= { agentInventoryCardTypeEntry 3 }
+
+    agentInventoryCardDescription OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The card description for the supported Card Type."
+        ::= { agentInventoryCardTypeEntry 4 }
+
+    --**************************************************************************************
+    -- agentInventoryComponentGroup
+    --
+    --**************************************************************************************
+
+    agentInventoryComponentGroup                  OBJECT IDENTIFIER ::= { fastPathInventory 5 }
+    
+
+    --**************************************************************************************
+    -- agentInventoryComponentTable
+    --
+    --**************************************************************************************
+
+    agentInventoryComponentTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentInventoryComponentEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Contains information for all supported Components in the system."
+        ::= { agentInventoryComponentGroup 1 }
+
+    agentInventoryComponentEntry OBJECT-TYPE
+        SYNTAX         AgentInventoryComponentEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Contains information related to a specific Components."
+        INDEX          { agentInventoryComponentIndex }
+        ::= { agentInventoryComponentTable 1 }
+         
+    AgentInventoryComponentEntry ::=
+        SEQUENCE {
+         agentInventoryComponentIndex
+                 Unsigned32,
+         agentInventoryComponentMnemonic
+                 DisplayString,
+         agentInventoryComponentName
+                 DisplayString
+         }
+
+    agentInventoryComponentIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An arbitrary index used to reference components in the table."
+        ::= { agentInventoryComponentEntry 1 }
+
+    agentInventoryComponentMnemonic OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The abreviated name of this component."
+        ::= { agentInventoryComponentEntry 2 }
+
+    agentInventoryComponentName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the component for this instance."
+        ::= { agentInventoryComponentEntry 3 }
+
+    --**************************************************************************************
+    -- agentInventoryStackPortGroup
+    --
+    --**************************************************************************************
+
+    agentInventoryStackPortGroup                  OBJECT IDENTIFIER ::= { fastPathInventory 7 }
+
+    agentInventoryStackPortIpTelephonyQOSSupport OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Controls whether the Stack Ports give higher priority to IP Telephony traffic."
+        ::= { agentInventoryStackPortGroup 1 }
+
+  --**************************************************************************************
+    -- agentInventorySFSGroup
+    --
+    --**************************************************************************************
+
+    agentInventorySFSGroup                  OBJECT IDENTIFIER ::= { fastPathInventory 8 }
+
+
+    agentInventoryStackUnitNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The unit number associated with stack unit ."
+        ::= { agentInventorySFSGroup 1 }
+ 
+    agentInventorySFS OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Controls whether the Stack Firmware Synchronization is enabled or disabled."
+        ::= { agentInventorySFSGroup 2 }
+
+    agentInventorySFSAllowDowngrade OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 enable(1),
+                 disable(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Controls whether downgrading the image on the stack member is allowed or not if the firmware version of manager is older to firmware version of stack member"
+        ::= { agentInventorySFSGroup 3 }
+        
+    agentInventorySFSTrap OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Controls sending of traps during Stack firmware synchronization operation"            
+        ::= { agentInventorySFSGroup 4 }
+       
+
+    --**************************************************************************************
+    -- agentInventoryStackPortTable
+    --
+    --**************************************************************************************
+
+    agentInventoryStackPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentInventoryStackPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Contains information for all Stack Ports present in the system."
+        ::= { agentInventoryStackPortGroup 2 }
+
+    agentInventoryStackPortEntry OBJECT-TYPE
+        SYNTAX         AgentInventoryStackPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Contains information related to a specific Stack Port."
+        INDEX          { agentInventoryStackPortIndex }
+        ::= { agentInventoryStackPortTable 1 }
+         
+    AgentInventoryStackPortEntry ::=
+        SEQUENCE {
+         agentInventoryStackPortIndex
+                 Unsigned32,
+         agentInventoryStackPortUnit
+                 Unsigned32,
+         agentInventoryStackPortTag
+                 DisplayString,
+         agentInventoryStackPortConfiguredStackMode
+                 INTEGER,
+         agentInventoryStackPortRunningStackMode
+                 INTEGER,
+         agentInventoryStackPortLinkStatus
+                 INTEGER,
+         agentInventoryStackPortLinkSpeed
+                 Gauge32,
+         agentInventoryStackPortDataRate
+                 Counter32,
+         agentInventoryStackPortErrorRate
+                 Counter32,
+         agentInventoryStackPortTotalErrors
+                 Counter32
+         }
+
+    agentInventoryStackPortIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An arbitrary index used to reference Stack Ports in the table."
+        ::= { agentInventoryStackPortEntry 1 }
+
+    agentInventoryStackPortUnit OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Unit Index this Stack Port is physically located on."
+        ::= { agentInventoryStackPortEntry 2 }
+
+    agentInventoryStackPortTag OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the Stack Port for this instance."
+        ::= { agentInventoryStackPortEntry 3 }
+    
+    agentInventoryStackPortConfiguredStackMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     stack(1),
+                     ethernet(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Configured mode of the Stack Port.  Changes to this
+            value happen only after a reset of the switch."
+        ::= { agentInventoryStackPortEntry 4 }
+    
+    agentInventoryStackPortRunningStackMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     stack(1),
+                     ethernet(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Currently operational mode of the Stack Port."
+        ::= { agentInventoryStackPortEntry 5 }
+    
+    agentInventoryStackPortLinkStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     up(1),
+                     down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link status of the Stack Port.  Ports which are in ethernet
+            mode will return a status of down(2)."
+        ::= { agentInventoryStackPortEntry 6 }
+    
+    agentInventoryStackPortLinkSpeed OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Speed of the Stack Port measured in Gb/s.  Ports which are
+            in ethernet mode will return a speed of 0."
+        ::= { agentInventoryStackPortEntry 7 }
+
+    agentInventoryStackPortDataRate OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Approximate data rate on the stacking port. Measured in Gb/s.
+            Ports which are in ethernet mode will return 0."
+        ::= { agentInventoryStackPortEntry 8 }
+        
+    agentInventoryStackPortErrorRate OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Approximate error rate on the stack port. Measured in Errors 
+            per Second.  Ports which are in ethernet mode will return 0."
+        ::= { agentInventoryStackPortEntry 9 }
+        
+    agentInventoryStackPortTotalErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of errors since boot. The counter may wrap. Ports 
+            which are in ethernet mode will return 0."
+        ::= { agentInventoryStackPortEntry 10 }
+
+        
+    --**************************************************************************************
+    -- agentInventory   Traps
+    --
+    --**************************************************************************************
+
+    agentInventoryTraps                           OBJECT IDENTIFIER ::= { fastPathInventory 0 }
+
+    agentInventoryCardMismatch NOTIFICATION-TYPE
+        OBJECTS {
+                 agentInventoryUnitNumber,
+                 agentInventorySlotNumber,
+                 agentInventorySlotInsertedCardType,
+                 agentInventorySlotConfiguredCardType
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when a card is inserted which is a different type than 
+            what the slot was configured for."
+         ::= { agentInventoryTraps 1 }
+
+    agentInventoryCardUnsupported NOTIFICATION-TYPE
+        OBJECTS {
+                 agentInventoryUnitNumber,
+                 agentInventorySlotNumber,
+                 agentInventorySlotInsertedCardType
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when a card is inserted which is of a type that is not 
+            supported by the slot."
+         ::= { agentInventoryTraps 2 }
+
+    agentInventoryStackPortLinkUp NOTIFICATION-TYPE
+        OBJECTS {
+                 agentInventoryStackPortUnit,
+                 agentInventoryStackPortTag
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when a Stack Port is connected to annother Stack Member."
+         ::= { agentInventoryTraps 3 }
+
+    agentInventoryStackPortLinkDown NOTIFICATION-TYPE
+        OBJECTS {
+                 agentInventoryStackPortUnit,
+                 agentInventoryStackPortTag
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when a Stack Port is disconnected from annother Stack Member."
+         ::= { agentInventoryTraps 4 }
+
+agentInventorySFSStart NOTIFICATION-TYPE
+        OBJECTS {
+			agentInventoryStackUnitNumber
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when Stack Firmware Synchronization operation is started on a Stack Member."
+         ::= { agentInventoryTraps 5 }
+
+agentInventorySFSComplete NOTIFICATION-TYPE
+        OBJECTS {
+			agentInventoryStackUnitNumber
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when Stack Firmware Synchronization operation is complete on a Stack Member."
+         ::= { agentInventoryTraps 6 }
+
+		 
+agentInventorySFSFail NOTIFICATION-TYPE
+        OBJECTS {
+			agentInventoryStackUnitNumber
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when Stack Firmware Synchronization operation failed for a Stack Member."
+         ::= { agentInventoryTraps 7 }
+
+
+-- conformance information
+fastPathInventoryConformance OBJECT IDENTIFIER ::= { fastPathInventory 6 }
+
+fastPathInventoryCompliances OBJECT IDENTIFIER ::= { fastPathInventoryConformance 1 }
+fastPathInventoryGroups      OBJECT IDENTIFIER ::= { fastPathInventoryConformance 2 }
+
+-- compliance statements
+fastPathInventoryCompliance MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            version 1 of the fastPathInventory MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                           fastPathInventorySlotGroup,
+                           fastPathInventoryCardGroup,
+                           fastPathInventoryCardGroup
+        }
+        GROUP fastPathInventoryUnitGroup
+        DESCRIPTION
+            "Implementation of the agentInventoryUnitTable is only mandatory
+            on systems which support the capability of managing multiple units
+            in a stack."
+    ::= { fastPathInventoryCompliances 1 }
+
+fastPathInventoryCompliance2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities which implement
+            version 2 of the fastPathInventory MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                           fastPathInventorySlotGroup,
+                           fastPathInventoryCardGroup,
+                           fastPathInventoryCardGroup
+        }
+        GROUP fastPathInventoryUnitGroup
+        DESCRIPTION
+            "Implementation of the agentInventoryUnitTable is only mandatory
+            on systems which support the capability of managing multiple units
+            in a stack."
+    
+    ::= { fastPathInventoryCompliances 2 }
+
+-- MIB groupings
+fastPathInventorySupportedUnitGroup    OBJECT-GROUP
+    OBJECTS {
+                 agentInventorySupportedUnitIndex,
+                 agentInventorySupportedUnitModelIdentifier,
+                 agentInventorySupportedUnitDescription,
+                 agentInventorySupportedUnitExpectedCodeVer
+            }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent
+            multiple units in the stack."
+    ::= { fastPathInventoryGroups 1 }
+    
+fastPathInventoryUnitGroup    OBJECT-GROUP
+    OBJECTS {
+                 agentInventoryUnitNumber,
+                 agentInventoryUnitAssignNumber,
+                 agentInventoryUnitType,
+                 agentInventoryUnitMgmtAdmin,
+                 agentInventoryUnitHWMgmtPref,
+                 agentInventoryUnitAdminMgmtPref,
+                 agentInventoryUnitStatus,
+                 agentInventoryUnitDetectedCodeVer,
+                 agentInventoryUnitDetectedCodeInFlashVer,
+                 agentInventoryUnitUpTime,
+                 agentInventoryUnitDescription,
+                 agentInventoryUnitReplicateSTK,
+                 agentInventoryUnitRowStatus
+                 ,agentInventoryUnitImage1Version
+                 ,agentInventoryUnitImage2Version
+                 ,agentInventoryUnitSTKname
+                 ,agentInventoryUnitActivateSTK
+                 ,agentInventoryUnitDeleteSTK
+                 ,agentInventoryUnitSTKname
+            }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent
+            multiple units in the stack."
+    ::= { fastPathInventoryGroups 2 }
+
+fastPathInventorySlotGroup    OBJECT-GROUP
+    OBJECTS {
+                 agentInventorySlotNumber,
+                 agentInventorySlotStatus,
+                 agentInventorySlotPowerMode,
+                 agentInventorySlotAdminMode,
+                 agentInventorySlotInsertedCardType,
+                 agentInventorySlotConfiguredCardType
+            }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent
+            slots in the each unit managed by this agent."
+    ::= { fastPathInventoryGroups 3 }
+
+fastPathInventoryCardGroup    OBJECT-GROUP
+    OBJECTS {
+                 agentInventoryCardIndex,
+                 agentInventoryCardType,
+                 agentInventoryCardModelIdentifier,
+                 agentInventoryCardDescription
+            }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent
+            the card types this system can manage."
+    ::= { fastPathInventoryGroups 4 }
+
+fastPathInventoryNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+                        agentInventoryCardMismatch,
+                        agentInventoryCardUnsupported
+                  }
+    STATUS        current
+    DESCRIPTION
+            "The collection of notifications used to indicate problems
+            associated with the insertion of cards."
+    ::= { fastPathInventoryGroups 5 }
+
+END

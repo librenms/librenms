@@ -1,0 +1,332 @@
+-- ============================================================================
+-- AT-EPSRv2-MIB, Allied Telesis enterprise MIB: Ethernet Protection Switching Ring
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-EPSRv2-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules, DisplayStringUnsized
+                FROM AT-SMI-MIB
+            InterfaceIndex
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION, TruthValue
+                FROM SNMPv2-TC;
+
+
+        atEpsrv2 MODULE-IDENTITY
+            LAST-UPDATED "201107070000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "Convert epsrv2Variables into a table entry, so variable of multiple
+                EPSRv2 domains can be obtained."
+            REVISION "201107070000Z"
+            DESCRIPTION
+                "Added 5 new objects for superloop prevention (EPSR-SLP)"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006140455Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201005240119Z"
+            DESCRIPTION
+                "OID of atEpsrv2Events reverted to 1 but deprecated. Added atEpsrv2Notifications"
+            REVISION "201001150039Z"
+            DESCRIPTION
+                "Changed the OID value of atEpsrv2Events from 1 to 0 to meet RFC 3584 3.1"
+            REVISION "200812230130Z"
+            DESCRIPTION
+                "Initial Revision"
+            ::= { modules 536 }
+
+
+
+--
+-- Textual conventions
+--
+
+        AtEpsrv2NodeState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Defines the node states that can be passed around
+                in EPSRv2 Node Traps."
+            SYNTAX INTEGER
+                {
+                idle(0),
+                complete(1),
+                failed(2),
+                linksUp(3),
+                linksDown(4),
+                preForward(5),
+                unknown(6)
+                }
+
+        AtEpsrv2InterfaceState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Defines the interface states that can be passed around
+                in EPSRv2 Node Traps."
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                down(2),
+                blocked(3),
+                forward(4)
+                }
+
+
+--
+-- Node definitions
+--
+
+        atEpsrv2Notifications OBJECT IDENTIFIER ::= { atEpsrv2 0 }
+
+
+        atEpsrv2Notify NOTIFICATION-TYPE
+            OBJECTS { atEpsrv2NodeType, atEpsrv2DomainName, atEpsrv2DomainID,
+                      atEpsrv2FromState, atEpsrv2CurrentState, atEpsrv2ControlVlanId,
+                      atEpsrv2PrimaryIfIndex, atEpsrv2PrimaryIfState,
+                      atEpsrv2SecondaryIfIndex, atEpsrv2SecondaryIfState,
+                      atEpsrv2DomainPriority, atEpsrv2PrimaryIfIsOnCommonSeg,
+                      atEpsrv2SecondaryIfIsOnCommonSeg, atEpsrv2HasControlOfPrimaryIf,
+                      atEpsrv2HasControlOfSecondaryIf
+                    }
+            STATUS current
+            DESCRIPTION
+                "EPSRv2 Master/Transit node state transition notification."
+            ::= { atEpsrv2Notifications 1 }
+
+
+        atEpsrv2Events OBJECT IDENTIFIER ::= { atEpsrv2 1 }
+
+
+        atEpsrv2NodeTrap NOTIFICATION-TYPE
+            OBJECTS { atEpsrv2NodeType, atEpsrv2DomainName, atEpsrv2DomainID, atEpsrv2FromState, atEpsrv2CurrentState,
+                atEpsrv2ControlVlanId, atEpsrv2PrimaryIfIndex, atEpsrv2PrimaryIfState, atEpsrv2SecondaryIfIndex, atEpsrv2SecondaryIfState
+                 }
+            STATUS deprecated
+            DESCRIPTION
+                "EPSRv2 Master/Transit node state transition trap."
+            ::= { atEpsrv2Events 1 }
+
+
+        atEpsrv2VariablesTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEpsrv2VariablesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains rows of epsrv2VariablesEntry."
+            ::= { atEpsrv2 2 }
+
+
+        atEpsrv2VariablesEntry OBJECT-TYPE
+            SYNTAX AtEpsrv2VariablesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the ATL enterprise epsrv2VariablesTable."
+            INDEX { atEpsrv2DomainID }
+            ::= { atEpsrv2VariablesTable 1 }
+
+
+        AtEpsrv2VariablesEntry ::=
+            SEQUENCE {
+                atEpsrv2NodeType
+                    INTEGER,
+                atEpsrv2DomainName
+                    DisplayStringUnsized,
+                atEpsrv2DomainID
+                    INTEGER,
+                atEpsrv2FromState
+                    AtEpsrv2NodeState,
+                atEpsrv2CurrentState
+                    AtEpsrv2NodeState,
+                atEpsrv2ControlVlanId
+                    INTEGER,
+                atEpsrv2PrimaryIfIndex
+                    InterfaceIndex,
+                atEpsrv2PrimaryIfState
+                    AtEpsrv2InterfaceState,
+                atEpsrv2SecondaryIfIndex
+                    InterfaceIndex,
+                atEpsrv2SecondaryIfState
+                    AtEpsrv2InterfaceState,
+                atEpsrv2DomainPriority
+                    INTEGER,
+                atEpsrv2PrimaryIfIsOnCommonSeg
+                    TruthValue,
+                atEpsrv2SecondaryIfIsOnCommonSeg
+                    TruthValue,
+                atEpsrv2HasControlOfPrimaryIf
+                    TruthValue,
+                atEpsrv2HasControlOfSecondaryIf
+                    TruthValue
+             }
+
+        atEpsrv2NodeType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                masterNode(1),
+                transitNode(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This is the type of the EPSRv2 node (master/transit)."
+            ::= { atEpsrv2VariablesEntry 1 }
+
+
+        atEpsrv2DomainName OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (1..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Assigned name of the EPSRv2 domain."
+            ::= { atEpsrv2VariablesEntry 2 }
+
+
+        atEpsrv2DomainID OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Assigned ID of the EPSRv2 domain."
+            ::= { atEpsrv2VariablesEntry 3 }
+
+
+        atEpsrv2FromState OBJECT-TYPE
+            SYNTAX AtEpsrv2NodeState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defined state that an EPSR domain is transitioning from."
+            ::= { atEpsrv2VariablesEntry 4 }
+
+
+        atEpsrv2CurrentState OBJECT-TYPE
+            SYNTAX AtEpsrv2NodeState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defined the current state of an EPSRv2 domain."
+            ::= { atEpsrv2VariablesEntry 5 }
+
+
+        atEpsrv2ControlVlanId OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VLAN identifier for the control VLAN."
+            ::= { atEpsrv2VariablesEntry 6 }
+
+
+        atEpsrv2PrimaryIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IfIndex of the primary interface."
+            ::= { atEpsrv2VariablesEntry 7 }
+
+
+        atEpsrv2PrimaryIfState OBJECT-TYPE
+            SYNTAX AtEpsrv2InterfaceState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defined current state of the primary interface."
+            ::= { atEpsrv2VariablesEntry 8 }
+
+
+        atEpsrv2SecondaryIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IfIndex of the secondary interface."
+            ::= { atEpsrv2VariablesEntry 9 }
+
+
+        atEpsrv2SecondaryIfState OBJECT-TYPE
+            SYNTAX AtEpsrv2InterfaceState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defined current state of the secondary interface."
+            ::= { atEpsrv2VariablesEntry 10 }
+
+
+        atEpsrv2DomainPriority OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The priority of the EPSRv2 domain. This value is used for
+                 superloop prevention."
+            ::= { atEpsrv2VariablesEntry 11 }
+
+
+        atEpsrv2PrimaryIfIsOnCommonSeg OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns 1 (true) if the primary interface is on a common
+                 segment i.e. the port is shared with other instances that have
+                 the port in the same set of data VLANs, else it returns
+                 2 (false)."
+            ::= { atEpsrv2VariablesEntry 12 }
+
+
+        atEpsrv2SecondaryIfIsOnCommonSeg OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns 1 (true) if the secondary interface is on a common
+                 segment i.e. the port is shared with other instances that have
+                 the port in the same set of data VLANs, else it returns
+                 2 (false)."
+            ::= { atEpsrv2VariablesEntry 13 }
+
+
+        atEpsrv2HasControlOfPrimaryIf OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns 2 (false) if the EPSR instance does not have physical
+                 control of its primary interface because it is on a common
+                 segment and is not the highest priority instance, else it
+                 returns 1 (true)."
+            ::= { atEpsrv2VariablesEntry 14 }
+
+
+        atEpsrv2HasControlOfSecondaryIf OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns 2 (false) if the EPSR instance does not have physical
+                 control of its secondary interface because it is on a common
+                 segment and is not the highest priority instance, else it
+                 returns 1 (true)."
+            ::= { atEpsrv2VariablesEntry 15 }
+
+
+
+    END
+
+--
+-- at-epsrv2.mib
+--

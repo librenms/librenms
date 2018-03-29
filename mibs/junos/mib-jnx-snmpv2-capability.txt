@@ -1,0 +1,98 @@
+
+-- *****************************************************************
+-- JNX-SNMPv2-CAPABILITY.mib: Juniper SNMPv2-MIB AGENT-CAPABILITIES
+--
+-- Copyright (c) 2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************
+
+JNX-SNMPv2-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    jnxAgentCapability
+        FROM JUNIPER-SMI;
+
+
+jnxSnmpV2Capability MODULE-IDENTITY
+    LAST-UPDATED "201306180000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+        "Agent capabilities for SNMPv2-MIB"
+    ::= { jnxAgentCapability 2 }
+
+jnxSnmpV2CapJunos AGENT-CAPABILITIES
+    PRODUCT-RELEASE "All JUNOS Version"
+    STATUS          current
+    DESCRIPTION
+        "JUNOS SNMPv2 MIB capabilities"
+
+    SUPPORTS        SNMPv2-MIB
+    INCLUDES        {
+                        systemGroup,
+                        snmpGroup,
+                        snmpCommunityGroup,
+                        snmpSetGroup,
+                        snmpBasicNotificationsGroup
+                    }
+
+    VARIATION       sysDescr
+    ACCESS          read-only
+    DESCRIPTION
+        "A textual description of the entity.
+         It will include product type, software
+         release, and build date.
+         Here is the sample output:
+
+         Juniper Networks, Inc. mx480 internet router,
+         kernel JUNOS 12.2R2.1,
+         Build date: 2012-10-27 01:54:15 UTC Copyright (c)
+                     1996-2012 Juniper Networks, Inc."
+
+
+    VARIATION       sysObjectID
+    ACCESS          read-only
+    DESCRIPTION
+        "It is the assigned identifier to represent platform
+         name. For example enterprises.2636.1.1.1.2.21 to
+         jnxProductNameMX960"
+
+    VARIATION       sysORLastChange
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       sysORID
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       sysORDescr
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       sysORUpTime
+    ACCESS          not-implemented
+    DESCRIPTION
+        "This object is not implemented."
+
+    VARIATION       snmpSetSerialNo 
+    ACCESS          read-only
+    DESCRIPTION
+        "snmp write is not supported."
+
+    ::= { jnxSnmpV2Capability 1 }
+
+END
+

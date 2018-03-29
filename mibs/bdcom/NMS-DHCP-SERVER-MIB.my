@@ -1,0 +1,119 @@
+-- *****************************************************************
+-- NMS-DHCP-SERVER-MIB.my: NMS WLAN MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-DHCP-SERVER-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    IpAddress   				FROM RFC1155-SMI
+    nmsMgmt                             FROM NMS-SMI;
+
+--definition of NMS device DHCP server related address
+
+              dhcp         OBJECT IDENTIFIER ::= { nmsMgmt 355 }
+
+	      dhcpServerStatus OBJECT-TYPE
+              SYNTAX  INTEGER{disable(0),
+                              enable(1)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "NMS device DHCP server status. 0-disable, 1-enable."
+              ::= { dhcp 1 }
+
+               nmsDhcpIpAddrPoolTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSDhcpIpAddrPoolEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS DHCP server IP address pool table."
+                   ::= { dhcp 2 }
+        
+               nmsDhcpIpAddrPoolEntry OBJECT-TYPE
+                   SYNTAX  NMSDhcpIpAddrPoolEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS DHCP IP address pool table entry."
+                   INDEX   { nmsDhcpIpAddrPoolIndex }
+                   ::= { nmsDhcpIpAddrPoolTable 1 }
+        
+               NMSDhcpIpAddrPoolEntry ::=
+                   SEQUENCE {
+                       nmsDhcpIpAddrPoolIndex
+                           INTEGER,
+                       nmsDhcpIpAddrPoolSubNetwork
+                           IpAddress,
+                       nmsDhcpIpAddrPoolMask
+                           IpAddress,
+                       nmsDhcpIpAddrPoolStart
+                           IpAddress,
+                       nmsDhcpIpAddrPoolEnd
+                           IpAddress,
+                       nmsDhcpIpAddrPoolReserveAddrList
+                           OCTET STRING
+                   }
+
+                nmsDhcpIpAddrPoolIndex OBJECT-TYPE
+                    SYNTAX  INTEGER
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "A unique value for each DHCP IP address pool table entry."
+                    ::= { nmsDhcpIpAddrPoolEntry 1 }
+               
+                nmsDhcpIpAddrPoolSubNetwork OBJECT-TYPE
+                    SYNTAX  IpAddress
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "DHCP IP address pool subnetwork address information."
+                    ::= { nmsDhcpIpAddrPoolEntry 2 }
+               
+                nmsDhcpIpAddrPoolMask OBJECT-TYPE
+                    SYNTAX  IpAddress
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "DHCP IP address pool network mask."
+                    ::= { nmsDhcpIpAddrPoolEntry 3 }
+               
+               
+                nmsDhcpIpAddrPoolStart OBJECT-TYPE
+                    SYNTAX  IpAddress
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "DHCP IP address pool start address."
+                    ::= { nmsDhcpIpAddrPoolEntry 4 }
+               
+                nmsDhcpIpAddrPoolEnd OBJECT-TYPE
+                    SYNTAX  IpAddress
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "DHCP IP address pool end address."
+                    ::= { nmsDhcpIpAddrPoolEntry 5 }
+               
+                nmsDhcpIpAddrPoolReserveAddrList OBJECT-TYPE
+                    SYNTAX  OCTET STRING
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "DHCP IP address pool reserve IP address list. Every item is separated by comma, the length is less than 64."
+                    ::= { nmsDhcpIpAddrPoolEntry 6 }
+               
+               
+END               
+               

@@ -1,0 +1,2042 @@
+CM-IP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Unsigned32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        MacAddress, RowStatus, StorageType, DisplayString, VariablePointer,  
+        TEXTUAL-CONVENTION,  TruthValue
+                FROM SNMPv2-TC
+        VlanId, IpVersion
+             FROM  CM-COMMON-MIB
+        Ipv6Address
+             FROM  IPV6-TC
+        fsp150cm
+             FROM  ADVA-MIB;
+
+cmIPMIB MODULE-IDENTITY
+    LAST-UPDATED    "201012080000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the IP MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201012080000Z"
+    DESCRIPTION
+            "Notes from release 201407180000Z,
+             (1) Added new IpManagementTunnelType literals:
+                 - gcc0based,
+                 - gcc1based,
+                 - gcc2based.
+
+            Notes from release 201012080000Z,
+             (1)Added cmIpManagementTrafficBridgingSecurityEnabled scalar
+             for the Bridged Management LAN feature on GE20x devices
+             for Release 5.1CC. 
+
+            Notes from release 201010230000Z,
+             (1)Added cmIpManagementTrafficBridgingEnabled scalar
+             for the Bridged Management LAN feature on GE20x devices
+             for Release 5.1CC. 
+
+            Notes from release 200904200000Z,
+             (1)MIB version ready for release FSP150CC 4.1.
+              (a)Added new table IpManagementTunnel
+              (b)Added attribute cmIpInterfaceRIPv2Enabled
+              (c)Added attribute cmARPEntryType 
+              (d)Added attribute cmStaticRouteInterface, cmStaticRouteAdvertise 
+
+            Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 11}    
+
+-- 
+-- OID definitions
+-- 
+cmIpObjects         OBJECT IDENTIFIER ::= {cmIPMIB 1}
+cmIpConformance     OBJECT IDENTIFIER ::= {cmIPMIB 2}
+cmIpScalars         OBJECT IDENTIFIER ::= {cmIPMIB 3}
+
+-- 
+-- Textual Conventions 
+-- 
+CmDhcpRole ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "DHCP role when DHCP is enabled on an interface."
+    SYNTAX       INTEGER {
+                   dhcp-client(1),
+                   dhcp-server(2)
+                 }
+
+IpManagementTunnelType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "IP Management Tunnel type."
+    SYNTAX       INTEGER {
+                   macbased(1),
+                   vlanbased(2),
+                   itagbased(3),
+                   gcc0based(4),
+                   gcc1based(5),
+                   gcc2based(6)
+                 }
+
+IpManagementTunnelEncapsulationType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "IP Management Tunnel Encapsulation type."
+    SYNTAX       INTEGER {
+                   ethernet(1),
+                   ppp(2)
+                 }
+
+IpEntryType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "IP Entry type."
+    SYNTAX       INTEGER {
+                   static(1),
+                   dynamic(2)
+                 }
+
+IpSourceAddrType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "IP Source Address type."
+    SYNTAX       INTEGER {
+                   systemipaddr(1),
+                   outipinterfaceaddr(2)
+                 }
+
+IpActionType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "."
+     SYNTAX    INTEGER {
+                 not-applicable(0),
+                 initiate (1)
+               }
+
+Ipv6OverIpv4TunnelType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "include four types."
+     SYNTAX    INTEGER {
+                 sixToFour (1),
+                 ipv4-compatible (2),
+                 isatap (3),
+                 static-config (4),
+                 gre (5),
+                 ipv6-6rd (6)
+               }
+
+IpMode ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "include 3 types."
+     SYNTAX    INTEGER {
+                 ipv4-only (0),
+                 ipv6-only (1),
+                 ipv4-and-ipv6(2)
+               }
+
+DHCPCIDType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "DHCP Client ID Type."
+     SYNTAX    INTEGER {
+                 notApplicable(1),
+                 sysName(2),
+                 macAddr(3),
+                 userDefined(4),
+                 serialNumber(5)
+               }
+
+DHCPHostNameType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "DHCP Hostname Type."
+     SYNTAX    INTEGER {
+                 notApplicable(1),
+                 sysName(2),
+                 userDefined(3)
+               }
+
+PtpArpActionType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "."
+     SYNTAX    INTEGER {
+                 not-applicable(0),
+                 retrieve (1)
+               }
+
+DHCPVendorInfoType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION 
+         "DHCP Vendor Info Type."
+     SYNTAX    INTEGER {
+                 notApplicable(1),
+                 sysName(2),
+                 userDefined(3)
+               }
+
+-- Scalars
+cmIpSystemScalars      OBJECT IDENTIFIER ::= {cmIpScalars 1}
+cmIpSourceAddrScalars  OBJECT IDENTIFIER ::= {cmIpScalars 2}
+
+cmIpFlushARPCacheAction OBJECT-TYPE
+    SYNTAX IpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to initiate Flush ARP action."
+    ::= { cmIpSystemScalars 1 }
+
+cmIpProxyARPEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to enable/disable Proxy ARP."
+    ::= { cmIpSystemScalars 2 }
+
+cmIpPingDestination OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IP Address to which
+        ICMP Ping will be initiated."
+    ::= { cmIpSystemScalars 3 }
+
+cmIpInitiatePingAction OBJECT-TYPE
+    SYNTAX IpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to initiate ICMP Ping on cmIpPingDestination."
+    ::= { cmIpSystemScalars 4 }
+
+cmIpPingResult OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object provides the results of a previous ICMP Ping Action."
+    ::= { cmIpSystemScalars 5 }
+
+cmIpTraceRouteDestination OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IP Address to which
+        Trace Route will be initiated."
+    ::= { cmIpSystemScalars 6 }
+
+cmIpInitiateTraceRouteAction OBJECT-TYPE
+    SYNTAX IpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to initiate TraceRoute 
+        on cmIpTraceRouteDestination."
+    ::= { cmIpSystemScalars 7 }
+
+cmIpTraceRouteResult OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object provides the results of a previous TraceRoute Action."
+    ::= { cmIpSystemScalars 8 }
+
+cmIpManagementTrafficBridgingEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to control the IP Management Traffic
+        Bridging feature.  When enabled, the system is managed using the
+        IP address specified at the Management LAN port.  All IP packets
+        that are not terminated at the node will be bridged over the 
+        Management LAN." 
+    ::= { cmIpSystemScalars 9 }
+
+cmIpManagementTrafficBridgingSecurityEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to control the IP Management Traffic
+        Bridging feature's security.  When enables, the system supports 
+        a secure Management Traffic Bridge." 
+    ::= { cmIpSystemScalars 10 }
+
+cmIpv6PingInterface OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IPV6 Address related interface."
+    ::= { cmIpSystemScalars 11 }
+
+cmIpv6PingDestination OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IPV6 Address to which
+        ICMP Ping will be initiated."
+    ::= { cmIpSystemScalars 12 }
+
+cmIpv6InitiatePingAction OBJECT-TYPE
+    SYNTAX IpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to initiate ICMP Ping on cmIpv6PingDestination."
+    ::= { cmIpSystemScalars 13 }
+
+cmIpv6TraceRouteDestination OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to specify the IPV6 Address to which
+        Trace Route will be initiated."
+    ::= { cmIpSystemScalars 14 }
+
+cmIpv6InitiateTraceRouteAction OBJECT-TYPE
+    SYNTAX IpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to initiate TraceRoute 
+        on cmIpv6TraceRouteDestination."
+    ::= { cmIpSystemScalars 15 }
+
+cmIpv6ProxyNDPEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object whether enabled proxy NDP." 
+    ::= { cmIpSystemScalars 16 }
+
+cmIpv6FwdEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object whether NE works in router mode or host mode.
+       Forwarding enable:router mode, forwarding disable: host mode." 
+    ::= { cmIpSystemScalars 17 }
+
+cmIpFlushNDPCacheAction OBJECT-TYPE
+    SYNTAX IpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows user to initiate Flush NDP action."
+    ::= { cmIpSystemScalars 18 }
+
+cmIpPtpArpRtrvAction OBJECT-TYPE
+    SYNTAX PtpArpActionType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "If user want to get PTP arp from cmARPEntry, user need to configure this object first."
+    ::= { cmIpSystemScalars 19 }
+
+cmIpManagementTrafficDscpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object controls whether the DSCP value is modified for the transmitted
+        management traffic whether it is locally generated or routed."
+    ::= { cmIpSystemScalars 20 }
+ 
+cmIpManagementTrafficDscp OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..63)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object specifies the DSCP value and it is applicable when
+        cmIpManagementTrafficDscpEnabled is enabled."
+    ::= { cmIpSystemScalars 21 }
+
+cmIpSNMPv1InterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..15))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to specify the IP interface name,
+        which will be used in the SNMPv1 TRAP PDUs as the Agent's IP Address."
+    ::= { cmIpSourceAddrScalars 1 }
+
+cmIpSourceAddressType OBJECT-TYPE
+    SYNTAX     IpSourceAddrType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to specify whether the System IP
+        Address or the Outgoing IP Interface's Address should be used 
+        in outgoing IP PDUs."
+    ::= { cmIpSourceAddrScalars 2 }
+
+cmIpSourceAddressInterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..15))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows the user to specify the IP interface name when
+        cmIpSourceAddressType is 'systemipaddr'.  The IP Address associated
+        with the IP interface name is set as the source IP Address in
+        outgoing PDUs." 
+    ::= { cmIpSourceAddrScalars 3 }
+
+
+--  FSP150 CM IP Interface Configuration Table
+cmIpInterfaceTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF CmIpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "User managed IP Address Table." 
+    ::= { cmIpObjects 1 }
+
+cmIpInterfaceEntry OBJECT-TYPE
+    SYNTAX   CmIpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "Allows management of IP Interfaces."
+    INDEX { cmIpInterfaceName }
+    ::= { cmIpInterfaceTable 1 }
+
+CmIpInterfaceEntry ::= SEQUENCE {
+        cmIpInterfaceName                  DisplayString,
+        cmIpInterface                      IpAddress,
+        cmIpInterfaceMask                  IpAddress,
+        cmIpInterfaceDhcpEnabled           TruthValue,
+        cmIpInterfaceMTU                   Integer32,
+        cmIpInterfaceDhcpRole              CmDhcpRole,
+        cmIpInterfacePhysicalAddress       DisplayString,
+        cmIpInterfaceRIPv2Enabled          TruthValue,
+        cmIpInterfaceDHCPClientIdEnabled   TruthValue,
+        cmIpInterfaceDHCPClientId          DisplayString,
+        cmIpInterfaceIpMode                IpMode,
+        cmIpInterfaceDhcpClassIdEnabled    TruthValue,
+        cmIpInterfaceDhcpHostNameEnabled   TruthValue,
+        cmIpInterfaceDhcpHostName          DisplayString,
+        cmIpInterfaceDhcpLogServerEnabled  TruthValue,
+        cmIpInterfaceDhcpNTPServerEnabled  TruthValue,
+        cmIpInterfaceDhcpClientIdType      DHCPCIDType,
+        cmIpInterfaceDhcpHostNameType      DHCPHostNameType,
+        cmIpInterfaceDhcpVendorInfoEnabled TruthValue,
+        cmIpInterfaceDhcpVendorInfoType    DHCPVendorInfoType,
+        cmIpInterfaceDhcpVendorInfo        DisplayString
+    }
+
+cmIpInterfaceName   OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..15))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "Name of the IP interface."
+    ::= { cmIpInterfaceEntry 1 }
+
+cmIpInterface   OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "IP Address of the interface." 
+    ::= { cmIpInterfaceEntry 2 }
+
+cmIpInterfaceMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IP Mask of the interface." 
+    ::= { cmIpInterfaceEntry 3 }
+
+cmIpInterfaceDhcpEnabled OBJECT-TYPE
+    SYNTAX   TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "Whether or not DHCP is enabled on this interface."
+    ::= { cmIpInterfaceEntry 4 }
+
+cmIpInterfaceMTU OBJECT-TYPE
+    SYNTAX   Integer32 (0..1500)
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "IP Interface MTU."
+    DEFVAL { 1 }
+    ::= { cmIpInterfaceEntry 5 }
+
+cmIpInterfaceDhcpRole OBJECT-TYPE
+    SYNTAX   CmDhcpRole
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "Specify the DHCP role on this interface."
+    ::= { cmIpInterfaceEntry 6 }
+
+cmIpInterfacePhysicalAddress OBJECT-TYPE
+    SYNTAX   DisplayString (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "Physical Address associated with the IP Address."
+    ::= { cmIpInterfaceEntry 7 }
+
+cmIpInterfaceRIPv2Enabled OBJECT-TYPE
+    SYNTAX   TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object allows to enable/disable RIPv2 on the IP Interface."
+    ::= { cmIpInterfaceEntry 8 }
+
+cmIpInterfaceDHCPClientIdEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object enables DHCP Option 61 on the IP interface.  This object
+        is only applicable when DHCP client is enabled."
+    ::= { cmIpInterfaceEntry 9 }
+
+cmIpInterfaceDHCPClientId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object is applicable when cmIpInterfaceDHCPClientIdEnabled is
+        set to TRUE.  It allows users to specify the DHCP Client Id as
+        a DisplayString - instead of the MAC address."
+    ::= { cmIpInterfaceEntry 10 }
+
+cmIpInterfaceIpMode OBJECT-TYPE
+    SYNTAX  IpMode
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object is the ipmode for the interface."
+    ::= { cmIpInterfaceEntry 11 }
+
+cmIpInterfaceDhcpClassIdEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether class id editable enabled."
+    ::= { cmIpInterfaceEntry 12 }
+
+cmIpInterfaceDhcpHostNameEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether host name editable enabled."
+    ::= { cmIpInterfaceEntry 13 }
+
+cmIpInterfaceDhcpHostName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the host name."
+    ::= { cmIpInterfaceEntry 14 }
+
+cmIpInterfaceDhcpLogServerEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp log server enabled."
+    ::= { cmIpInterfaceEntry 15 }
+
+cmIpInterfaceDhcpNTPServerEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp ntp server enabled."
+    ::= { cmIpInterfaceEntry 16 }
+
+cmIpInterfaceDhcpClientIdType OBJECT-TYPE
+    SYNTAX  DHCPCIDType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp cid type."
+    ::= { cmIpInterfaceEntry 17 }
+
+cmIpInterfaceDhcpHostNameType OBJECT-TYPE
+    SYNTAX  DHCPHostNameType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp host name type."
+    ::= { cmIpInterfaceEntry 18 }
+
+cmIpInterfaceDhcpVendorInfoEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the vendor information whether enabled."
+    ::= { cmIpInterfaceEntry 19 }
+
+cmIpInterfaceDhcpVendorInfoType OBJECT-TYPE
+    SYNTAX  DHCPVendorInfoType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp vendor information type."
+    ::= { cmIpInterfaceEntry 20 }
+
+cmIpInterfaceDhcpVendorInfo OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the vendor information."
+    ::= { cmIpInterfaceEntry 21 }
+
+--  FSP150 CM Static Routes Configuration Table
+cmStaticRouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF CmStaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "This entity's user configured Static IP Routing table."
+    ::= { cmIpObjects 2 }
+
+cmStaticRouteEntry OBJECT-TYPE
+    SYNTAX   CmStaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A particular route to  a  particular  destina-
+       tion, under a particular policy."
+    INDEX {
+        cmStaticRouteDest,
+        cmStaticRouteMask,
+        cmStaticRouteNextHop,
+        cmStaticRouteInterface
+        }
+    ::= { cmStaticRouteTable 1 }
+
+CmStaticRouteEntry ::= SEQUENCE {
+        cmStaticRouteDest        IpAddress,
+        cmStaticRouteMask        IpAddress,
+        cmStaticRouteNextHop     IpAddress,
+        cmStaticRouteMetric      Integer32,
+        cmStaticRouteRowStatus   RowStatus,
+        cmStaticRouteInterface   DisplayString,
+        cmStaticRouteAdvertise   TruthValue
+    }
+
+cmStaticRouteDest OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The destination IP address of this route.
+       This object may not take a Multicast (Class  D)
+       address value.
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       cmStaticRouteMask object is not equal to x."
+    ::= { cmStaticRouteEntry 1 }
+
+cmStaticRouteMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "Indicate the mask to be logical-ANDed with the
+       destination  address  before  being compared to
+       the value  in  the  cmStaticRouteDest  field.   For
+       those  systems  that  do  not support arbitrary
+       subnet masks, an agent constructs the value  of
+       the  cmStaticRouteMask  by  reference to the IP Ad-
+       dress Class.
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       cmStaticRouteDest object is not equal to
+       cmStaticRouteDest."
+    ::= { cmStaticRouteEntry 2 }
+
+cmStaticRouteNextHop OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "On remote routes, the address of the next sys-
+       tem en route; Otherwise, 0.0.0.0."
+    ::= { cmStaticRouteEntry 3 }
+
+cmStaticRouteMetric OBJECT-TYPE
+    SYNTAX   Integer32 (0..65535)
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The primary routing  metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       cmStaticRouteProto  value.   If  this metric is not
+       used, its value should be set to 1."
+    DEFVAL { 1 }
+    ::= { cmStaticRouteEntry 4 }
+
+cmStaticRouteRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { cmStaticRouteEntry 5 }
+
+cmStaticRouteInterface   OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..15))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "Name of the IP interface for the interface static route."
+    ::= { cmStaticRouteEntry 6 }
+
+cmStaticRouteAdvertise   OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "Whether this static route will be advertised via routing protocol."
+    ::= { cmStaticRouteEntry 7 }
+
+--
+-- FSP150 CM IP ARP Table
+--
+cmARPTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmARPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of ARP entries on the NIDs."
+    ::= { cmIpObjects 3 }
+
+cmARPEntry  OBJECT-TYPE
+    SYNTAX      CmARPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmARPTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { cmARPInterface, cmARPIPAddress }
+    ::= { cmARPTable 1 }
+
+CmARPEntry ::= SEQUENCE {
+    cmARPIndex          Integer32,
+    cmARPIPAddress      IpAddress,
+    cmARPMacAddress     MacAddress,
+    cmARPInterface      DisplayString,
+    cmARPStorageType    StorageType,
+    cmARPRowStatus      RowStatus,
+    cmARPEntryType      IpEntryType 
+}
+
+cmARPIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             this ARP Entry in the cmARPTable."
+    ::= { cmARPEntry 1 }
+
+cmARPIPAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the ARP Entry IP Address."
+     ::= { cmARPEntry 2 }
+
+cmARPMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the ARP Entry MAC Address."
+     ::= { cmARPEntry 3 }
+
+cmARPInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the ARP Entry Interface."
+     ::= { cmARPEntry 4 }
+
+cmARPStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmARPEntry 5 }
+
+cmARPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+             The cmARPRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { cmARPEntry 6 }
+
+cmARPEntryType OBJECT-TYPE
+    SYNTAX     IpEntryType
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+            "The type of ARP Entry. Note that static entries can be created."
+    ::= { cmARPEntry 7 }
+
+--
+-- FSP150 CM Proxy ARP Table
+--
+cmProxyARPTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmProxyARPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of Proxy ARP entries on the NIDs.  This table is not 
+             supported in GE206 Release 4.1CC."
+    ::= { cmIpObjects 4 }
+
+cmProxyARPEntry  OBJECT-TYPE
+    SYNTAX      CmProxyARPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmProxyARPTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { cmProxyARPInterface, cmProxyARPIPAddress, cmProxyARPSubnetMask }
+    ::= { cmProxyARPTable 1 }
+
+CmProxyARPEntry ::= SEQUENCE {
+    cmProxyARPIndex         Integer32,
+    cmProxyARPIPAddress     IpAddress,
+    cmProxyARPSubnetMask    IpAddress,
+    cmProxyARPInterface     DisplayString,
+    cmProxyARPStorageType   StorageType,
+    cmProxyARPRowStatus     RowStatus
+}
+
+cmProxyARPIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             this Proxy ARP Entry in the cmProxyARPTable."
+    ::= { cmProxyARPEntry 1 }
+
+cmProxyARPIPAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the ProxyARP Entry IP Address."
+     ::= { cmProxyARPEntry 2 }
+
+cmProxyARPSubnetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the Proxy ARP Entry Subnet Mask."
+     ::= { cmProxyARPEntry 3 }
+
+cmProxyARPInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the Proxy ARP Entry Interface."
+     ::= { cmProxyARPEntry 4 }
+
+cmProxyARPStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmProxyARPEntry 5 }
+
+cmProxyARPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+             The cmProxyARPRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { cmProxyARPEntry 6 }
+
+--
+-- FSP150 IP Management Tunnel Table
+--
+ipManagementTunnelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpManagementTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of IP Management Tunnel entries on the fsp150 family of products."
+    ::= { cmIpObjects 5 }
+
+ipManagementTunnelEntry  OBJECT-TYPE
+    SYNTAX      IpManagementTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ipManagementTunnelTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { ipManagementTunnelIndex }
+    ::= { ipManagementTunnelTable 1 }
+
+IpManagementTunnelEntry ::= SEQUENCE {
+    ipManagementTunnelIndex               Integer32,
+    ipManagementTunnelAssociatedPort      VariablePointer,
+    ipManagementTunnelName                DisplayString,
+    ipManagementTunnelType                IpManagementTunnelType,
+    ipManagementTunnelMTU                 Integer32, 
+    ipManagementTunnelEncapsulationType   IpManagementTunnelEncapsulationType,
+    ipManagementTunnelIpAddress           IpAddress,
+    ipManagementTunnelSubnetMask          IpAddress,
+    ipManagementTunnelVlanId              VlanId,
+    ipManagementTunnelSVlanEnabled        TruthValue,
+    ipManagementTunnelSVlanId             VlanId,
+    ipManagementTunnelDhcpEnabled         TruthValue,
+    ipManagementTunnelRip2PktsEnabled     TruthValue,
+    ipManagementTunnelPhysicalAddress     DisplayString,
+    ipManagementTunnelCOS                 Integer32,
+    ipManagementTunnelCIR                 Unsigned32,
+    ipManagementTunnelEIR                 Unsigned32,
+    ipManagementTunnelBufferSize          Unsigned32,
+    ipManagementTunnelStorageType         StorageType,
+    ipManagementTunnelRowStatus           RowStatus,
+    ipManagementTunnelDHCPClientIdEnabled TruthValue,
+    ipManagementTunnelDHCPClientId        DisplayString,
+    ipManagementTunnelQosQueueProfile     VariablePointer,
+    ipManagementTunnelCVlanEnabled        TruthValue,
+    ipManagementTunnelDHCPv6Enabled       TruthValue,
+    ipManagementTunnelIpv6Address         Ipv6Address,
+    ipManagementTunnelIpv6AddrPrefixLen   Integer32,
+    ipManagementTunnelIpv6StateAddrAutoConfigEnabled  TruthValue,
+    ipManagementTunnellinkLocIpv6Addr                 Ipv6Address,
+    ipManagementTunnellinkLocIpv6AddrPrefixLen        Integer32,
+    ipManagementTunnelIpv6PrefixAdvertiseEnabled      TruthValue,
+    ipManagementTunnelIpv6Prefix                      Ipv6Address,
+    ipManagementTunnelIpv6PrefixLen                   Integer32,
+    ipManagementTunnelIpMode                          IpMode,
+    ipManagementTunnelIpv6RipngEnabled                TruthValue,
+    ipManagementTunnelDhcpClassIdEnabled              TruthValue,
+    ipManagementTunnelDhcpHostNameEnabled             TruthValue,
+    ipManagementTunnelDhcpHostName                    DisplayString,
+    ipManagementTunnelDhcpLogServerEnabled            TruthValue,
+    ipManagementTunnelDhcpNTPServerEnabled            TruthValue,
+    ipManagementTunnelDhcpClientIdType                DHCPCIDType,
+    ipManagementTunnelDhcpHostNameType                DHCPHostNameType,
+    ipManagementTunnelDhcpVendorInfoEnabled           TruthValue,
+    ipManagementTunnelDhcpVendorInfoType              DHCPVendorInfoType,
+    ipManagementTunnelDhcpVendorInfo                  DisplayString
+}
+
+ipManagementTunnelIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "A unique integer index value used to uniquely identify
+             a Management Tunnel Entry in the ipManagementTunnelTable."
+    ::= { ipManagementTunnelEntry 1 }
+
+ipManagementTunnelAssociatedPort OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This allows specification of the associated physical port on the device,
+             to which the Management Tunnel is attached."
+    ::= { ipManagementTunnelEntry 2 }
+
+ipManagementTunnelName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This allows specification of a unique name which is also used as the name of the IP interface,
+             to which the Management Tunnel is attached."
+    ::= { ipManagementTunnelEntry 3 }
+
+ipManagementTunnelType OBJECT-TYPE
+    SYNTAX      IpManagementTunnelType 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This allows specification of the type of management tunnel, 
+             whether it is a VLAN based tunnel or a MAC based tunnel."
+    ::= { ipManagementTunnelEntry 4 }
+
+ipManagementTunnelMTU OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This provides the MTU of the Management Tunnel." 
+    ::= { ipManagementTunnelEntry 5 }
+
+ipManagementTunnelEncapsulationType OBJECT-TYPE
+    SYNTAX      IpManagementTunnelEncapsulationType 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This allows specification of the encapsulation type of management tunnel.
+             Only Ethernet encapsulation is currently supported."
+    ::= { ipManagementTunnelEntry 6 }
+
+ipManagementTunnelIpAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the Management Tunnel IP Address."
+     ::= { ipManagementTunnelEntry 7 }
+
+ipManagementTunnelSubnetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the Management Tunnel Subnet Mask."
+     ::= { ipManagementTunnelEntry 8 }
+
+ipManagementTunnelVlanId OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the VLAN Id in the case of 
+          a VLAN management tunnel.  This object is not relevant for a 
+          MAC based management tunnel."
+     ::= { ipManagementTunnelEntry 9 }
+
+ipManagementTunnelSVlanEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of whether or not the S-TAG is enabled
+          on the IP Management Tunnel. 
+          This object is not relevant for a MAC based management tunnel."
+     ::= { ipManagementTunnelEntry 10 }
+
+ipManagementTunnelSVlanId OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the S-TAG VLAN Id in the case of 
+          a VLAN management tunnel, when S-TAG is also enabled.  
+          This object is not relevant for a MAC based management tunnel,
+          as well as when the ipManagementTunnelSVlanEnabled is set to false."
+     ::= { ipManagementTunnelEntry 11 }
+
+ipManagementTunnelDhcpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of whether or not DHCP is enabled
+          on the IP Management Tunnel." 
+     ::= { ipManagementTunnelEntry 12 }
+
+ipManagementTunnelRip2PktsEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of whether or not RIP2 is enabled
+          on the IP Management Tunnel." 
+     ::= { ipManagementTunnelEntry 13 }
+
+ipManagementTunnelPhysicalAddress OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the physical address (MAC Address) associated with the
+          IP Management Tunnel."
+     ::= { ipManagementTunnelEntry 14 }
+
+ipManagementTunnelCOS OBJECT-TYPE
+    SYNTAX     Integer32(0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Class of Service associated with the
+          IP Management Tunnel. This value is also used in the p-bits of the VLAN
+          based management tunnels (for both VLANs in case S-TAG is enabled)."
+     ::= { ipManagementTunnelEntry 15 }
+
+ipManagementTunnelCIR OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Management Tunnel CIR."
+     ::= { ipManagementTunnelEntry 16 }
+
+ipManagementTunnelEIR OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Management Tunnel EIR."
+     ::= { ipManagementTunnelEntry 17 }
+
+ipManagementTunnelBufferSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Management Tunnel Buffer Size."
+     ::= { ipManagementTunnelEntry 18 }
+
+ipManagementTunnelStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { ipManagementTunnelEntry 19 }
+
+ipManagementTunnelRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+             The ipManagementTunnelRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { ipManagementTunnelEntry 20 }
+
+ipManagementTunnelDHCPClientIdEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object enables DHCP Option 61 on the Management Tunnel.  
+        This object is only applicable when DHCP client is enabled."
+    ::= { ipManagementTunnelEntry 21 }
+
+ipManagementTunnelDHCPClientId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object is applicable when ipManagementTunnelDHCPClientIdEnabled is
+        set to TRUE.  It allows users to specify the DHCP Client Id as
+        a DisplayString - instead of the MAC address."
+    ::= { ipManagementTunnelEntry 22 }
+
+ipManagementTunnelQosQueueProfile OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object identifies the OID of cmQosQueueProfileIndex in the cmQosQueueProfileTable."
+    ::= { ipManagementTunnelEntry 23 }
+    
+ipManagementTunnelCVlanEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object CTAG whether enabled, By default it is enabled."
+    ::= { ipManagementTunnelEntry 24 }
+
+ipManagementTunnelDHCPv6Enabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object DHCPv6 whether enabled, By default it is enabled."
+    ::= { ipManagementTunnelEntry 25 }
+
+ipManagementTunnelIpv6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the unicast ipv6 address."
+    ::= { ipManagementTunnelEntry 26 }
+
+ipManagementTunnelIpv6AddrPrefixLen OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the unicast ipv6 address prefix length."
+    ::= { ipManagementTunnelEntry 27 }
+
+ipManagementTunnelIpv6StateAddrAutoConfigEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object Ipv6StateAddrAutoConfig whether enabled, By default it is enabled."
+    ::= { ipManagementTunnelEntry 28 }
+
+ipManagementTunnellinkLocIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object means the link local ipv6 address."
+    ::= { ipManagementTunnelEntry 29 }
+
+ipManagementTunnellinkLocIpv6AddrPrefixLen OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object means the link local ipv6 address prefix length."
+    ::= { ipManagementTunnelEntry 30 }
+
+ipManagementTunnelIpv6PrefixAdvertiseEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the prefix advertise whether enabled."
+    ::= { ipManagementTunnelEntry 31 }
+
+ipManagementTunnelIpv6Prefix OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the prefix ipv6 address."
+    ::= { ipManagementTunnelEntry 32 }
+
+ipManagementTunnelIpv6PrefixLen OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the link local ipv6 address prefix length."
+    ::= { ipManagementTunnelEntry 33 }
+
+ipManagementTunnelIpMode OBJECT-TYPE
+    SYNTAX     IpMode 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the ip mode for the management tunnel."
+    ::= { ipManagementTunnelEntry 34 }
+
+ipManagementTunnelIpv6RipngEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the ipv6's Ripng whether enabled."
+    ::= { ipManagementTunnelEntry 35 }
+
+ipManagementTunnelDhcpClassIdEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the class id whether enabled."
+    ::= { ipManagementTunnelEntry 36 }
+
+ipManagementTunnelDhcpHostNameEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the host name whether enabled."
+    ::= { ipManagementTunnelEntry 37 }
+
+ipManagementTunnelDhcpHostName OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the host name."
+    ::= { ipManagementTunnelEntry 38 }
+
+ipManagementTunnelDhcpLogServerEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp log server enabled."
+    ::= { ipManagementTunnelEntry 39 }
+
+ipManagementTunnelDhcpNTPServerEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp ntp server enabled."
+    ::= { ipManagementTunnelEntry 40 }
+
+ipManagementTunnelDhcpClientIdType OBJECT-TYPE
+    SYNTAX  DHCPCIDType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp cid type."
+    ::= { ipManagementTunnelEntry 41 }
+
+ipManagementTunnelDhcpHostNameType OBJECT-TYPE
+    SYNTAX  DHCPHostNameType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp host name type."
+    ::= { ipManagementTunnelEntry 42 }
+
+ipManagementTunnelDhcpVendorInfoEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object means the vendor information whether enabled."
+    ::= { ipManagementTunnelEntry 43 }
+
+ipManagementTunnelDhcpVendorInfoType OBJECT-TYPE
+    SYNTAX  DHCPVendorInfoType
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether the dhcp vendor information type."
+    ::= { ipManagementTunnelEntry 44 }
+
+ipManagementTunnelDhcpVendorInfo OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the vendor information."
+    ::= { ipManagementTunnelEntry 45 }
+
+cmIpv6InterfaceTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF CmIpv6InterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "User managed IPv6 Address Table." 
+    ::= { cmIpObjects 6 }
+
+cmIpv6InterfaceEntry OBJECT-TYPE
+    SYNTAX   CmIpv6InterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "Allows management of IPv6 Interfaces."
+    AUGMENTS { cmIpInterfaceEntry }
+    ::= { cmIpv6InterfaceTable 1 }
+
+CmIpv6InterfaceEntry ::= SEQUENCE {
+        cmIpv6InterfaceMTU                 Integer32,
+        cmIpv6UnicastAddr                  Ipv6Address,
+        cmIpv6UnicastAddrPrefixLen         Integer32,
+        cmIpv6PrefixAdvertiseEnabled       TruthValue,
+        cmIpv6RAPrefix                     Ipv6Address,
+        cmIpv6RAPrefixLength               Integer32,
+        cmIpv6StateAddrAutoConfigEnabled   TruthValue,
+        cmIpv6DhcpEnabled                  TruthValue,
+        cmIpv6DhcpRole                     CmDhcpRole,
+        cmIpv6RIPngEnabled                 TruthValue,
+        cmIpv6LinkLocAddr                  Ipv6Address,
+        cmIpv6LinkLocAddrPrefixLen         Integer32
+    }
+
+cmIpv6InterfaceMTU OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object describe the MTU for ipv6 address interface."
+    ::= { cmIpv6InterfaceEntry 1 }
+
+cmIpv6UnicastAddr OBJECT-TYPE
+    SYNTAX  Ipv6Address
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe IPv6 Unicast Address together with Prefix."
+    ::= { cmIpv6InterfaceEntry 2 }
+
+cmIpv6UnicastAddrPrefixLen OBJECT-TYPE
+    SYNTAX  Integer32 (0..128)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe prefix length of unicast address."
+    ::= { cmIpv6InterfaceEntry 3 }
+
+cmIpv6PrefixAdvertiseEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether to advertise prefix to link in router mode."
+    ::= { cmIpv6InterfaceEntry 4 }
+
+cmIpv6RAPrefix OBJECT-TYPE
+    SYNTAX  Ipv6Address
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the IPv6 Prefix to be dispatched to link in Router mode."
+    ::= { cmIpv6InterfaceEntry 5 }
+
+cmIpv6RAPrefixLength OBJECT-TYPE
+    SYNTAX  Integer32 (0..128)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe Length of RA prefix."
+    ::= { cmIpv6InterfaceEntry 6 }
+
+cmIpv6StateAddrAutoConfigEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether enable or disable stateless 
+       address auto configuration."
+    ::= { cmIpv6InterfaceEntry 7 }
+
+cmIpv6DhcpEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe whether dhcp is enabled on the ipv6 interface."
+    ::= { cmIpv6InterfaceEntry 8 }
+
+cmIpv6DhcpRole OBJECT-TYPE
+    SYNTAX  CmDhcpRole
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the dhcp role."
+    ::= { cmIpv6InterfaceEntry 9 }
+
+cmIpv6RIPngEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe RIPng whether enabled."
+    ::= { cmIpv6InterfaceEntry 10 }
+
+cmIpv6LinkLocAddr OBJECT-TYPE
+    SYNTAX  Ipv6Address
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object describe Automatically generated Link-local Address."
+    ::= { cmIpv6InterfaceEntry 11}
+
+cmIpv6LinkLocAddrPrefixLen OBJECT-TYPE
+    SYNTAX  Integer32 (0..128)
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object describe Length of link local IPv6 address prefix."
+    ::= { cmIpv6InterfaceEntry 12 }
+
+
+--  FSP150 CM IPv6 Static Routes Configuration Table
+cmIpv6StaticRouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF CmIpv6StaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "This entity's user configured Static Ipv6 Routing table."
+    ::= { cmIpObjects 7 }
+
+cmIpv6StaticRouteEntry OBJECT-TYPE
+    SYNTAX   CmIpv6StaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A particular route to  a  particular  destina-
+       tion, under a particular policy."
+    INDEX {
+        cmIpv6StaticRouteDest,
+        cmIpv6StaticRoutePrefixLen,
+        cmIpv6StaticRouteNextHop,
+        cmIpv6StaticRouteInterface
+        }
+    ::= { cmIpv6StaticRouteTable 1 }
+
+CmIpv6StaticRouteEntry ::= SEQUENCE {
+        cmIpv6StaticRouteDest        Ipv6Address,
+        cmIpv6StaticRoutePrefixLen   Integer32,
+        cmIpv6StaticRouteNextHop     Ipv6Address,
+        cmIpv6StaticRouteMetric      Integer32,
+        cmIpv6StaticRouteRowStatus   RowStatus,
+        cmIpv6StaticRouteInterface   DisplayString,
+        cmIpv6StaticRouteAdvertise   TruthValue
+    }
+
+cmIpv6StaticRouteDest OBJECT-TYPE
+    SYNTAX   Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The destination Ipv6 address of this route.
+       This object may not take a Multicast (Class  D)
+       address value.
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       cmIpv6StaticRouteMask object is not equal to x."
+    ::= { cmIpv6StaticRouteEntry 1 }
+
+cmIpv6StaticRoutePrefixLen OBJECT-TYPE
+    SYNTAX   Integer32 (0..128)
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "Indicate the mask to be logical-ANDed with the
+       destination  address  before  being compared to
+       the value  in  the  cmIpv6StaticRouteDest  field.   For
+       those  systems  that  do  not support arbitrary
+       subnet masks, an agent constructs the value  of
+       the  cmIpv6StaticRoutePrefixLen  by  reference to the IP Ad-
+       dress Class.
+       Any assignment (implicit or  otherwise)  of  an
+       instance  of  this  object to a value x must be
+       rejected if the bitwise logical-AND of  x  with
+       the  value of the corresponding instance of the
+       cmIpv6StaticRouteDest object is not equal to
+       cmIpv6StaticRouteDest."
+    ::= { cmIpv6StaticRouteEntry 2 }
+
+cmIpv6StaticRouteNextHop OBJECT-TYPE
+    SYNTAX   Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "On remote routes, the address of the next sys-
+       tem en route; Otherwise, 0.0.0.0."
+    ::= { cmIpv6StaticRouteEntry 3 }
+
+cmIpv6StaticRouteMetric OBJECT-TYPE
+    SYNTAX   Integer32 (0..65535)
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The primary routing  metric  for  this  route.
+       The  semantics of this metric are determined by
+       the routing-protocol specified in  the  route's
+       cmIpv6StaticRouteProto  value.   If  this metric is not
+       used, its value should be set to 1."
+    DEFVAL { 1 }
+    ::= { cmIpv6StaticRouteEntry 4 }
+
+cmIpv6StaticRouteRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { cmIpv6StaticRouteEntry 5 }
+
+cmIpv6StaticRouteInterface   OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..15))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "Name of the Ipv6 interface for the interface static route."
+    ::= { cmIpv6StaticRouteEntry 6 }
+
+cmIpv6StaticRouteAdvertise   OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "Whether this static route will be advertised via routing protocol."
+    ::= { cmIpv6StaticRouteEntry 7 }
+
+--
+-- FSP150 CM IPV6 NDP Table
+--
+cmNDPTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmNDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of NDP entries on the NIDs."
+    ::= { cmIpObjects 8 }
+
+cmNDPEntry  OBJECT-TYPE
+    SYNTAX      CmNDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmNDPTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { cmNDPInterface, cmNDPIpv6Address }
+    ::= { cmNDPTable 1 }
+
+CmNDPEntry ::= SEQUENCE {
+    cmNDPIpv6Address    Ipv6Address,
+    cmNDPMacAddress     MacAddress,
+    cmNDPInterface      DisplayString,
+    cmNDPStorageType    StorageType,
+    cmNDPRowStatus      RowStatus,
+    cmNDPEntryType      IpEntryType 
+}
+
+cmNDPIpv6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the NDP Entry IP Address."
+     ::= { cmNDPEntry 1 }
+
+cmNDPMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the NDP Entry MAC Address."
+     ::= { cmNDPEntry 2 }
+
+cmNDPInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the NDP Entry Interface."
+     ::= { cmNDPEntry 3 }
+
+cmNDPStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmNDPEntry 4 }
+
+cmNDPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+             The cmNDPRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { cmNDPEntry 5 }
+
+cmNDPEntryType OBJECT-TYPE
+    SYNTAX     IpEntryType
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+            "The type of NDP Entry. Note that static entries can be created."
+    ::= { cmNDPEntry 6 }
+
+--
+-- FSP150 CM Proxy NDP Table
+--
+cmProxyNDPTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmProxyNDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of Proxy NDP entries on the NIDs.  This table is not 
+             supported in GE206 Release 4.1CC."
+    ::= { cmIpObjects 9 }
+
+cmProxyNDPEntry  OBJECT-TYPE
+    SYNTAX      CmProxyNDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmProxyNDPTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { cmProxyNDPInterface, cmProxyNDPIpv6Address, cmProxyNDPIpv6PrefixLen }
+    ::= { cmProxyNDPTable 1 }
+
+CmProxyNDPEntry ::= SEQUENCE {
+    cmProxyNDPIpv6Address   Ipv6Address,
+    cmProxyNDPIpv6PrefixLen Integer32,
+    cmProxyNDPInterface     DisplayString,
+    cmProxyNDPStorageType   StorageType,
+    cmProxyNDPRowStatus     RowStatus
+}
+
+cmProxyNDPIpv6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the ProxyNDP Entry IP Address."
+     ::= { cmProxyNDPEntry 1 }
+
+cmProxyNDPIpv6PrefixLen OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the Proxy NDP Entry Subnet Mask."
+     ::= { cmProxyNDPEntry 2 }
+
+cmProxyNDPInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows management of the Proxy NDP Entry Interface."
+     ::= { cmProxyNDPEntry 3 }
+
+cmProxyNDPStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmProxyNDPEntry 4 }
+
+cmProxyNDPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+             The cmProxyNDPRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { cmProxyNDPEntry 5 }
+
+--
+-- FSP150 CM IPV6 OVER IPV4 TUNNEL Table
+--
+cmIpv6OverIpv4TunnelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmIpv6OverIpv4TunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of Ipv6OverIpv4Tunnel entries on the NIDs."
+    ::= { cmIpObjects 10 }
+
+cmIpv6OverIpv4TunnelEntry  OBJECT-TYPE
+    SYNTAX      CmIpv6OverIpv4TunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmIpv6OverIpv4TunnelTable. Entries can
+            be created/deleted in this table by management application action."
+    INDEX { cmIpv6OverIpv4TunnelIndex }
+    ::= { cmIpv6OverIpv4TunnelTable 1 }
+
+CmIpv6OverIpv4TunnelEntry ::= SEQUENCE {
+    cmIpv6OverIpv4TunnelIndex                     Integer32,
+    cmIpv6OverIpv4TunnelName                      DisplayString,
+    cmIpv6OverIpv4TunnelType                      Ipv6OverIpv4TunnelType,
+    cmIpv6OverIpv4TunnelDestIpv4Addr              IpAddress,
+    cmIpv6OverIpv4TunnelIpv6UnicastAddress        Ipv6Address,
+    cmIpv6OverIpv4TunnelIpv6UnicastAddrPrefixLen  Integer32,
+    cmIpv6OverIpv4TunnelLinkLocalAddress          Ipv6Address,
+    cmIpv60verIpv4TunnelLinkLocalAddrPrefixLen    Integer32,
+    cmIpv6OverIpv4TunnelAssociatedIpv4Interface   VariablePointer,
+    cmIpv6OverIpv4TunnelStorageType               StorageType,
+    cmIpv6OverIpv4TunnelRowStatus                 RowStatus,
+    cmIpv6OverIpv4PotentialRouterList             DisplayString
+}
+
+cmIpv6OverIpv4TunnelIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             this Ipv6OverIpv4TunnelEntry in the cmIpv6OverIpv4TunnelTable."
+    ::= { cmIpv6OverIpv4TunnelEntry 1 }
+
+cmIpv6OverIpv4TunnelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the tunnel name."
+    ::= { cmIpv6OverIpv4TunnelEntry 2 }
+
+cmIpv6OverIpv4TunnelType OBJECT-TYPE
+    SYNTAX      Ipv6OverIpv4TunnelType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the tunnel type."
+    ::= { cmIpv6OverIpv4TunnelEntry 3 }
+
+cmIpv6OverIpv4TunnelDestIpv4Addr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe Destination IPv4 address.
+             Only applicable for configured tunnel."
+    ::= { cmIpv6OverIpv4TunnelEntry 4 }
+
+cmIpv6OverIpv4TunnelIpv6UnicastAddress OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe Source IPv6 address used to transmit 
+            IPv6 packets on tunnel. Only writable for Configured Tunnel, 
+            read-only for other types of Tunnels."
+    ::= { cmIpv6OverIpv4TunnelEntry 5 }
+
+cmIpv6OverIpv4TunnelIpv6UnicastAddrPrefixLen OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the prefix length for the unicast ipv6 address."
+    ::= { cmIpv6OverIpv4TunnelEntry 6 }
+
+cmIpv6OverIpv4TunnelLinkLocalAddress OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describe the link local adderss."
+    ::= { cmIpv6OverIpv4TunnelEntry 7 }
+
+cmIpv60verIpv4TunnelLinkLocalAddrPrefixLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describe the prefix length for link local address."
+    ::= { cmIpv6OverIpv4TunnelEntry 8 }
+
+cmIpv6OverIpv4TunnelAssociatedIpv4Interface OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "the IPv4 Interface that Tunnel is created on, 
+            which could be DCN or Management tunnel."
+    ::= { cmIpv6OverIpv4TunnelEntry 9 }
+
+cmIpv6OverIpv4TunnelStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmIpv6OverIpv4TunnelEntry 10 }
+
+cmIpv6OverIpv4TunnelRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+             The cmIpv6OverIpv4TunnelRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { cmIpv6OverIpv4TunnelEntry 11 }
+
+cmIpv6OverIpv4PotentialRouterList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object describe the potential router list. 
+            And its format should be like 'a.b.c.d,e.f.g.h', split by ',' and no breakspace there."
+    ::= { cmIpv6OverIpv4TunnelEntry 12 }
+
+--
+-- Conformance Section
+--
+ipCompliances OBJECT IDENTIFIER ::= { cmIpConformance 1 }
+ipGroups      OBJECT IDENTIFIER ::= { cmIpConformance 2 }
+
+ipCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for compliance to the IP Module."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              ipGroup
+        }
+    ::= { ipCompliances 1 }
+
+ipGroup OBJECT-GROUP
+    OBJECTS {
+        cmIpFlushARPCacheAction, cmIpProxyARPEnabled,
+        cmIpPingDestination, cmIpInitiatePingAction, 
+        cmIpPingResult, 
+        cmIpTraceRouteDestination, cmIpInitiateTraceRouteAction, 
+        cmIpTraceRouteResult, 
+        cmIpSNMPv1InterfaceName,
+        cmIpSourceAddressType, cmIpSourceAddressInterfaceName,
+        cmIpManagementTrafficBridgingEnabled,
+        cmIpManagementTrafficBridgingSecurityEnabled,
+
+        cmIpInterfaceName, cmIpInterface, cmIpInterfaceMask,
+        cmIpInterfaceDhcpEnabled, cmIpInterfaceMTU, cmIpInterfaceDhcpRole,
+        cmIpInterfacePhysicalAddress, cmIpInterfaceRIPv2Enabled,
+        cmIpInterfaceDHCPClientIdEnabled, cmIpInterfaceDHCPClientId,
+        cmIpInterfaceIpMode,
+
+        cmIpInterfaceDhcpClassIdEnabled,
+        cmIpInterfaceDhcpHostNameEnabled,
+        cmIpInterfaceDhcpHostName,
+        cmIpInterfaceDhcpLogServerEnabled,
+        cmIpInterfaceDhcpNTPServerEnabled,
+        cmIpInterfaceDhcpClientIdType,
+        cmIpInterfaceDhcpHostNameType,
+        cmIpInterfaceDhcpVendorInfoEnabled,
+        cmIpInterfaceDhcpVendorInfoType,
+        cmIpInterfaceDhcpVendorInfo,
+
+        cmStaticRouteDest, cmStaticRouteMask,
+        cmStaticRouteNextHop, cmStaticRouteMetric,
+        cmStaticRouteRowStatus, cmStaticRouteInterface, cmStaticRouteAdvertise,
+        cmARPIndex, cmARPIPAddress,
+        cmARPMacAddress, cmARPInterface, cmARPStorageType,
+        cmARPRowStatus, cmARPEntryType,
+        cmProxyARPIndex, cmProxyARPIPAddress,
+        cmProxyARPSubnetMask, cmProxyARPInterface,
+        cmProxyARPStorageType, cmProxyARPRowStatus,
+
+        ipManagementTunnelIndex, ipManagementTunnelAssociatedPort,
+        ipManagementTunnelName, ipManagementTunnelType, 
+        ipManagementTunnelMTU,
+        ipManagementTunnelEncapsulationType, ipManagementTunnelIpAddress,
+        ipManagementTunnelSubnetMask, ipManagementTunnelVlanId,
+        ipManagementTunnelSVlanEnabled, ipManagementTunnelSVlanId,
+        ipManagementTunnelDhcpEnabled, ipManagementTunnelRip2PktsEnabled,
+        ipManagementTunnelPhysicalAddress, ipManagementTunnelCOS,
+        ipManagementTunnelCIR, ipManagementTunnelEIR,
+        ipManagementTunnelBufferSize, ipManagementTunnelStorageType,
+        ipManagementTunnelRowStatus, ipManagementTunnelQosQueueProfile,
+        ipManagementTunnelDHCPClientIdEnabled, ipManagementTunnelDHCPClientId,
+        ipManagementTunnelCVlanEnabled, ipManagementTunnelIpMode,
+     
+        ipManagementTunnelDhcpClassIdEnabled,
+        ipManagementTunnelDhcpHostNameEnabled,
+        ipManagementTunnelDhcpHostName,
+        ipManagementTunnelDhcpLogServerEnabled,
+        ipManagementTunnelDhcpNTPServerEnabled,
+        ipManagementTunnelDhcpClientIdType,
+        ipManagementTunnelDhcpHostNameType,
+
+        cmIpManagementTrafficDscpEnabled,
+        cmIpManagementTrafficDscp,
+        ipManagementTunnelDhcpVendorInfoEnabled,
+        ipManagementTunnelDhcpVendorInfoType,
+        ipManagementTunnelDhcpVendorInfo
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the FSP150CM IP Services."
+    ::= { ipGroups 1 }
+
+ipv6Group OBJECT-GROUP
+    OBJECTS {
+        ipManagementTunnelDHCPv6Enabled,
+        ipManagementTunnelIpv6Address,
+        ipManagementTunnelIpv6AddrPrefixLen,
+        ipManagementTunnelIpv6StateAddrAutoConfigEnabled,
+        ipManagementTunnellinkLocIpv6Addr,
+        ipManagementTunnellinkLocIpv6AddrPrefixLen,
+        ipManagementTunnelIpv6PrefixAdvertiseEnabled,
+        ipManagementTunnelIpv6Prefix,
+        ipManagementTunnelIpv6PrefixLen,
+        ipManagementTunnelIpv6RipngEnabled,
+        cmIpv6InterfaceMTU, cmIpv6UnicastAddr, cmIpv6UnicastAddrPrefixLen,
+        cmIpv6PrefixAdvertiseEnabled, cmIpv6RAPrefix,
+        cmIpv6RAPrefixLength, cmIpv6StateAddrAutoConfigEnabled,
+        cmIpv6DhcpEnabled, cmIpv6DhcpRole,
+        cmIpv6RIPngEnabled, cmIpv6LinkLocAddr,
+        cmIpv6LinkLocAddrPrefixLen, cmIpv6StaticRouteDest,
+        cmIpv6StaticRoutePrefixLen, cmIpv6StaticRouteNextHop,
+        cmIpv6StaticRouteMetric, cmIpv6StaticRouteRowStatus,
+        cmIpv6StaticRouteInterface, cmIpv6StaticRouteAdvertise,
+        cmNDPIpv6Address, cmNDPMacAddress,
+        cmNDPInterface, cmNDPStorageType,
+        cmNDPRowStatus, cmNDPEntryType,
+        cmProxyNDPIpv6Address, cmProxyNDPIpv6PrefixLen,
+        cmProxyNDPInterface, cmProxyNDPStorageType,
+        cmProxyNDPRowStatus, cmIpv6OverIpv4TunnelIndex,
+        cmIpv6OverIpv4TunnelName, cmIpv6OverIpv4TunnelType,
+        cmIpv6OverIpv4TunnelDestIpv4Addr,
+        cmIpv6OverIpv4TunnelIpv6UnicastAddress,
+        cmIpv6OverIpv4TunnelAssociatedIpv4Interface,
+        cmIpv6OverIpv4TunnelStorageType,
+        cmIpv6OverIpv4TunnelRowStatus, cmIpv6InitiatePingAction,        
+        cmIpv6InitiatePingAction, cmIpv6TraceRouteDestination,
+        cmIpv6InitiateTraceRouteAction, cmIpv6PingInterface,
+        cmIpv6OverIpv4TunnelIpv6UnicastAddrPrefixLen,
+        cmIpv6OverIpv4TunnelLinkLocalAddress,
+        cmIpv60verIpv4TunnelLinkLocalAddrPrefixLen,
+        cmIpv6OverIpv4PotentialRouterList, cmIpv6FwdEnabled,
+        cmIpv6ProxyNDPEnabled, cmIpFlushNDPCacheAction, cmIpPtpArpRtrvAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the FSP150CM IPv6 Services."
+    ::= { ipGroups 2 }
+
+END

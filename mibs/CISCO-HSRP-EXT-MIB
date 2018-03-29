@@ -1,0 +1,618 @@
+-- *****************************************************************
+-- CISCO-HSRP-EXT-MIB
+--   
+-- Jan 2010, Sreenadh Gaddam
+-- Copyright (c) 1998-2005, 2009-2010 by cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-HSRP-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    IpAddress,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TruthValue,
+    RowStatus
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    cHsrpGrpNumber
+        FROM CISCO-HSRP-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoHsrpExtMIB MODULE-IDENTITY
+    LAST-UPDATED    "201009020000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-hsrp@cisco.com"
+    DESCRIPTION
+        "The Extension MIB module for the CISCO-HSRP-MIB which is
+        based on RFC2281.
+
+        This MIB provides an extension to the CISCO-HSRP-MIB which 
+        defines Cisco's proprietary Hot Standby Routing Protocol 
+        (HSRP), defined in RFC2281. The extensions cover assigning 
+        of secondary HSRP ip addresses, modifying an HSRP Group's 
+        priority by tracking the operational status of interfaces, 
+        etc. 
+
+        Terminology:
+        HSRP is a protocol used amoung a group of routers for the 
+        purpose of selecting an active router and a standby router. 
+
+        An active router is the router of choice for routing 
+        packets.
+
+        A standby router is a router that takes over the routing 
+        duties when an active router fails, or when preset 
+        conditions have been met.
+
+        A HSRP group or a standby group is a set of routers 
+        which communicate using HSRP. An HSRP group has a group 
+        MAC address and a group IP address. These are the 
+        designated addresses. The active router assumes  
+        (i.e. inherits) these group addresses. An HSRP group is
+        identified by a ( ifIndex, cHsrpGrpNumber ) pair.
+
+        BIA stands for Burned In Address."
+    REVISION        "201009020000Z"
+    DESCRIPTION
+        "The following changes have been made.
+
+        [1] Objects cHsrpExtIfTrackedIpNone has been deprecated.
+
+        [2] Deprecates object group cHsrpExtIfTrackedGroupSup1, which
+            supplementary to cHsrpExtIfTrackedGroup.
+
+
+        [3] Added new compliance cHsrpExtComplianceRev2, which
+            deprecates cHsrpExtComplianceRev1."
+    REVISION        "201002050000Z"
+    DESCRIPTION
+        "Added cHsrpExtIfTrackedIpNone to
+        cHsrpExtIfTrackedTable
+
+        Added new table cHsrpExtIfStandbyTable.
+
+        Added OBJECT-GROUP cHsrpExtIfStandbyGroup91.
+
+        Added OBJECT-GROUP cHsrpExtIfTrackedGroupSup1, which
+        supplementary to cHsrpExtIfTrackedGroup.
+
+        Added MODULE-COMPLIANCE cHsrpExtComplianceRev1, which
+        deprecates cHsrpExtCompliance."
+    REVISION        "200602150000Z"
+    DESCRIPTION
+        "Updated the imports such that Unsigned32 is imported from
+        SNMPv2-SMI instead of CISCO-TC. Updated the module 
+        description. Also updated the descriptions of 
+        cHsrpExtIfTrackedEntry and cHsrpExtIfTracked. Formatted the
+        complete MIB."
+    REVISION        "9808030000Z"
+    DESCRIPTION
+        "Initial version of this mib."
+    ::= { ciscoMgmt 107 }
+
+
+ciscoHsrpExtMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoHsrpExtMIB 1 }
+
+-- HSRP Extension Tables
+-- Extention group info
+
+cHsrpExtGroup  OBJECT IDENTIFIER
+    ::= { ciscoHsrpExtMIBObjects 1 }
+
+-- Interface Use Burned-In Address state
+
+cHsrpExtIfBIA  OBJECT IDENTIFIER
+    ::= { ciscoHsrpExtMIBObjects 2 }
+
+
+cHsrpExtIfTrackedTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CHsrpExtIfTrackedEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table containing information about tracked interfaces per
+        HSRP group."
+    ::= { cHsrpExtGroup 1 }
+
+cHsrpExtIfTrackedEntry OBJECT-TYPE
+    SYNTAX          CHsrpExtIfTrackedEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each row of this table allows the tracking of one
+        interface of the HSRP group which is identified by the
+        (ifIndex, cHsrpGrpNumber) values in this table's INDEX clause.
+        Weight(priority) is given to each and every interface tracked. 
+        When a tracked interface is unavailable, the HSRP priority of
+        the router is decreased. i.e cHsrpGrpPriority value assigned 
+        to an HSRP group will reduce by the value assigned to
+        cHsrpExtIfTrackedPriority. This reduces the likelihood 
+        of a router with a failed key interface becoming the 
+        active router.
+
+        Setting cHsrpExtIfTrackedRowStatus to active starts
+        the tracking of cHsrpExtIfTracked by the HSRP group. 
+        The value of cHsrpExtIfTrackedRowStatus may be set 
+        to destroy at any time.
+
+        Entries may not be created via SNMP without explicitly setting
+        cHsrpExtIfTrackedRowStatus to either 'createAndGo' 
+        or 'createAndWait'.
+
+        Entries can be created and modified via the management
+        protocol or by the device's local management interface.
+
+        If the row is not active, and a local management interface
+        command modifies that row, the row may transition to active
+        state.
+
+        A row entry in the cHsrpExtIfTrackedTable can not be created
+        unless the corresponding row in the cHsrpGrpTable has been 
+        created. If that corresponding row in cHsrpGrpTable is 
+        deleted, the interfaces it tracks also get deleted.
+
+        A row which is not in active state will timeout after a
+        configurable period (five minutes by default). This timeout
+        period can be changed by setting cHsrpConfigTimeout."
+    INDEX           {
+                        ifIndex,
+                        cHsrpGrpNumber,
+                        cHsrpExtIfTracked
+                    } 
+    ::= { cHsrpExtIfTrackedTable 1 }
+
+CHsrpExtIfTrackedEntry ::= SEQUENCE {
+        cHsrpExtIfTracked          InterfaceIndex,
+        cHsrpExtIfTrackedPriority  Unsigned32,
+        cHsrpExtIfTrackedRowStatus RowStatus,
+        cHsrpExtIfTrackedIpNone    TruthValue
+}
+
+cHsrpExtIfTracked OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The ifIndex value of the tracked interface." 
+    ::= { cHsrpExtIfTrackedEntry 1 }
+
+cHsrpExtIfTrackedPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Priority of the tracked interface for the corresponding
+        { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0
+        is the lowest priority and 255 is the highest. When a tracked 
+        interface is unavailable, the cHsrpGrpPriority of the router 
+        is decreased by the value of this object instance (If the 
+        cHsrpGrpPriority is less than the 
+        cHsrpExtIfTrackedPriority, then the HSRP priority 
+        becomes 0). This allows a standby router to be configured 
+        with a priority such that if the currently active router's 
+        priority is lowered because the tracked interface goes down, 
+        the standby router can takeover."
+    DEFVAL          { 0 } 
+    ::= { cHsrpExtIfTrackedEntry 2 }
+
+cHsrpExtIfTrackedRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The control that allows modification, creation, and deletion
+        of entries. For detailed rules see the DESCRIPTION for
+        cHsrpExtIfTrackedEntry." 
+    ::= { cHsrpExtIfTrackedEntry 3 }
+
+cHsrpExtIfTrackedIpNone OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          deprecated
+    DESCRIPTION
+        "This object specifies the disable HSRP IPv4 virtual
+        IP address."
+    DEFVAL          { false } 
+    ::= { cHsrpExtIfTrackedEntry 4 }
+ 
+
+
+cHsrpExtSecAddrTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CHsrpExtSecAddrEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table containing information about secondary HSRP IP
+        Addresses per interface and group."
+    ::= { cHsrpExtGroup 2 }
+
+cHsrpExtSecAddrEntry OBJECT-TYPE
+    SYNTAX          CHsrpExtSecAddrEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The CHsrpExtSecAddrEntry allows creation of secondary
+        IP Addresses for each cHsrpGrpEntry row.
+
+        Secondary addresses can be added by setting 
+        cHsrpExtSecAddrRowStatus to be active. The value of
+        cHsrpExtSecAddrRowStatus may be set to destroy at any
+        time.
+
+        Entries may not be created via SNMP without explicitly setting
+        cHsrpExtSecAddrRowStatus to either 'createAndGo'
+        or 'createAndWait'.
+
+        Entries can be created and modified via the management
+        protocol or by the device's local management interface.
+
+        If the row is not active, and a local management interface
+        command modifies that row, the row may transition to active
+        state.
+
+        A row which is not in active state will timeout after a
+        configurable period (five minutes by default). This timeout
+        period can be changed by setting cHsrpConfigTimeout.
+
+        Before creation of a cHsrpExtSecAddrEntry row,
+        either cHsrpGrpConfiguredVirtualIpAddr or 
+        cHsrpGrpLearnedVirtualIpAddr must have a valid IP Address.
+        This is because a secondary ip address cannot be created
+        unless the primary ip address has already been set.
+
+        To create a new cHsrpExtSecAddrEntry row, a management 
+        station should choose the ifIndex of the interface which is to 
+        be added as part of an HSRP group. Also, an HSRP group number 
+        and a cHsrpExtSecAddrAddress should be chosen.
+
+        Deleting a {ifIndex, cHsrpGrpNumber} row in the
+        cHsrpGrpTable will delete all corresponding
+        rows in the cHsrpExtSecAddrTable.
+        Deleting a primary address value in the cHsrpGrpEntry row
+        will delete all secondary addresses for the same
+        {ifIndex, cHsrpGrpNumber} pair."
+    INDEX           {
+                        ifIndex,
+                        cHsrpGrpNumber,
+                        cHsrpExtSecAddrAddress
+                    } 
+    ::= { cHsrpExtSecAddrTable 1 }
+
+CHsrpExtSecAddrEntry ::= SEQUENCE {
+        cHsrpExtSecAddrAddress   IpAddress,
+        cHsrpExtSecAddrRowStatus RowStatus
+}
+
+cHsrpExtSecAddrAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.
+        As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a
+        primary address must exist before a secondary address for 
+        the same {ifIndex, cHsrpGrpNumber} pair can be created." 
+    ::= { cHsrpExtSecAddrEntry 1 }
+
+cHsrpExtSecAddrRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The control that allows modification, creation, and deletion
+        of entries. For detailed rules see the DESCRIPTION for
+        cHsrpExtSecAddrEntry." 
+    ::= { cHsrpExtSecAddrEntry 2 }
+ 
+
+
+cHsrpExtIfStandbyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CHsrpExtIfStandbyEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table containing information about standby
+        interfaces per HSRP group."
+    ::= { cHsrpExtGroup 3 }
+
+cHsrpExtIfStandbyEntry OBJECT-TYPE
+    SYNTAX          CHsrpExtIfStandbyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The cHsrpExtIfStandbyEntry allows an HSRP group
+        interface to track one or more standby interfaces.
+
+        To create a new cHsrpExtIfStandbyEntry row, a
+        management station should choose the ifIndex of
+        the interface which is to be added as part of an
+        HSRP group. Also, an HSRP group number and a
+        cHsrpExtIfStandbyIndex should be chosen."
+    INDEX           {
+                        ifIndex,
+                        cHsrpGrpNumber,
+                        cHsrpExtIfStandbyIndex
+                    } 
+    ::= { cHsrpExtIfStandbyTable 1 }
+
+CHsrpExtIfStandbyEntry ::= SEQUENCE {
+        cHsrpExtIfStandbyIndex          Unsigned32,
+        cHsrpExtIfStandbyDestAddrType   InetAddressType,
+        cHsrpExtIfStandbyDestAddr       InetAddress,
+        cHsrpExtIfStandbySourceAddrType InetAddressType,
+        cHsrpExtIfStandbySourceAddr     InetAddress,
+        cHsrpExtIfStandbyRowStatus      RowStatus
+}
+
+cHsrpExtIfStandbyIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object defines the index of the standby table." 
+    ::= { cHsrpExtIfStandbyEntry 1 }
+
+cHsrpExtIfStandbyDestAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the type of Internet address
+        denoted by cHsrpExtIfStandbyDestAddr." 
+    ::= { cHsrpExtIfStandbyEntry 2 }
+
+cHsrpExtIfStandbyDestAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the destination IP address of
+        the standby router." 
+    ::= { cHsrpExtIfStandbyEntry 3 }
+
+cHsrpExtIfStandbySourceAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the type of Internet address
+        denoted by cHsrpExtIfStandbySourceAddr." 
+    ::= { cHsrpExtIfStandbyEntry 4 }
+
+cHsrpExtIfStandbySourceAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the source IP address of
+        the standby router." 
+    ::= { cHsrpExtIfStandbyEntry 5 }
+
+cHsrpExtIfStandbyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The control that allows modification, creation,
+        and deletion of entries. Entries may not be created
+        via SNMP without explicitly setting
+        cHsrpExtIfStandbyRowStatus to either
+        'createAndGo' or 'createAndWait'." 
+    ::= { cHsrpExtIfStandbyEntry 6 }
+ 
+
+
+cHsrpExtIfTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CHsrpExtIfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "HSRP-specific configurations for each physical interface."
+    ::= { cHsrpExtIfBIA 1 }
+
+cHsrpExtIfEntry OBJECT-TYPE
+    SYNTAX          CHsrpExtIfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "If HSRP entries on this interface must use the BIA (Burned
+        In Address), there must be an entry for the interface in this 
+        table. Entries of this table are only accessible if HSRP has 
+        been enabled i.e entries can not be created if HSRP is not
+        enabled. Also, the interfaces should be of IEEE 802 ones
+        (Ethernet, Token Ring, FDDI,VLAN, LANE, TR-LANE).
+
+        Setting cHsrpExtIfRowStatus to active initiates the
+        entry with default value for cHsrpExtIfUseBIA as FALSE.
+        The value of cHsrpExtIfRowStatus may be set to destroy
+        at any time. If the row is not initiated, it is similar to
+        having cHsrpExtIfUseBIA as FALSE.
+
+        Entries may not be created via SNMP without explicitly setting
+        cHsrpExtIfRowStatus to either 'createAndGo' or 'createAndWait'.
+
+        Entries can be created and modified via the management
+        protocol or by the device's local management interface.
+
+        If the row is not active, and a local management interface
+        command modifies that row, the row may transition to active
+        state.
+
+        A row which is not in active state will timeout after a
+        configurable period (five minutes by default). This timeout
+        period can be changed by setting cHsrpConfigTimeout."
+    INDEX           { ifIndex } 
+    ::= { cHsrpExtIfTable 1 }
+
+CHsrpExtIfEntry ::= SEQUENCE {
+        cHsrpExtIfUseBIA    TruthValue,
+        cHsrpExtIfRowStatus RowStatus
+}
+
+cHsrpExtIfUseBIA OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "If set to TRUE, the HSRP Group MAC Address for all groups
+        on this  interface will be the burned-in-address. Otherwise,
+        this will be determined by ciscoHsrpGroupNumber. In case of
+        sub-interfaces, UseBIA applies to all sub-interfaces on an 
+        interface and to all groups on those sub-interfaces."
+    DEFVAL          { false } 
+    ::= { cHsrpExtIfEntry 1 }
+
+cHsrpExtIfRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The control that allows modification, creation, and deletion
+        of entries. For detailed rules see the DESCRIPTION for
+        cHsrpExtIfEntry." 
+    ::= { cHsrpExtIfEntry 2 }
+ 
+
+-- Notifications
+-- None
+--   
+-- Conformance groups
+
+cHsrpExtConformance  OBJECT IDENTIFIER
+    ::= { ciscoHsrpExtMIB 3 }
+
+cHsrpExtCompliances  OBJECT IDENTIFIER
+    ::= { cHsrpExtConformance 1 }
+
+cHsrpExtComplianceGroups  OBJECT IDENTIFIER
+    ::= { cHsrpExtConformance 2 }
+
+
+-- compliance statements
+
+cHsrpExtCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the CISCO-HSRP-EXT-MIB. This is deprecated by
+        cHsrpExtComplianceRev1."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cHsrpExtIfTrackedGroup,
+                        cHsrpExtSecAddrGroup,
+                        cHsrpExtIfGroup
+                    }
+    ::= { cHsrpExtCompliances 1 }
+
+cHsrpExtComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "the compliance statement for entities which implement
+        the CISCO-HSRP-EXT-MIB.This is deprecated by
+        cHsrpExtComplianceRev2."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cHsrpExtIfTrackedGroup,
+                        cHsrpExtSecAddrGroup,
+                        cHsrpExtIfGroup,
+                        cHsrpExtIfStandbyGroup91,
+                        cHsrpExtIfTrackedGroupSup1
+                    }
+    ::= { cHsrpExtCompliances 2 }
+
+cHsrpExtComplianceRev2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "the compliance statement for entities which implement
+        the CISCO-HSRP-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cHsrpExtIfTrackedGroup,
+                        cHsrpExtSecAddrGroup,
+                        cHsrpExtIfGroup,
+                        cHsrpExtIfStandbyGroup91
+                    }
+    ::= { cHsrpExtCompliances 3 }
+
+cHsrpExtIfTrackedGroup OBJECT-GROUP
+    OBJECTS         {
+                        cHsrpExtIfTrackedPriority,
+                        cHsrpExtIfTrackedRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects used to add, delete and retrieve
+        the interfaces getting tracked for HSRP groups."
+    ::= { cHsrpExtComplianceGroups 1 }
+
+cHsrpExtSecAddrGroup OBJECT-GROUP
+    OBJECTS         { cHsrpExtSecAddrRowStatus }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects used to add, delete and retrieve
+        primary and secondary Ip Addresses for HSRP groups."
+    ::= { cHsrpExtComplianceGroups 2 }
+
+cHsrpExtIfGroup OBJECT-GROUP
+    OBJECTS         {
+                        cHsrpExtIfUseBIA,
+                        cHsrpExtIfRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Object which tells if HSRP entries on this interface must
+        use BIA or not."
+    ::= { cHsrpExtComplianceGroups 3 }
+
+cHsrpExtIfStandbyGroup91 OBJECT-GROUP
+    OBJECTS         {
+                        cHsrpExtIfStandbyDestAddrType,
+                        cHsrpExtIfStandbyDestAddr,
+                        cHsrpExtIfStandbySourceAddrType,
+                        cHsrpExtIfStandbySourceAddr,
+                        cHsrpExtIfStandbyRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects used to add, delete and
+        retrieve the interfaces getting standby for
+        HSRP groups."
+    ::= { cHsrpExtComplianceGroups 4 }
+
+cHsrpExtIfTrackedGroupSup1 OBJECT-GROUP
+    OBJECTS         { cHsrpExtIfTrackedIpNone }
+    STATUS          deprecated
+    DESCRIPTION
+        "The collection of HSRP interface tracked objects
+        which suppliments cHsrpExtIfTrackedGroup."
+    ::= { cHsrpExtComplianceGroups 5 }
+
+END
+
+
+

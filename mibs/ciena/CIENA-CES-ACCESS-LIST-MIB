@@ -1,0 +1,958 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ -- 
+ -- CIENA-CES-ACCESS-LIST-MIB
+ --                                                                                         
+
+ CIENA-CES-ACCESS-LIST-MIB DEFINITIONS ::= BEGIN
+
+ 
+ IMPORTS        
+   Integer32, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+        
+   DisplayString, MacAddress, TruthValue, TEXTUAL-CONVENTION            
+        FROM SNMPv2-TC  
+        
+   cienaCesConfig
+        FROM CIENA-SMI         
+                                                  
+   CienaGlobalState
+        FROM CIENA-TC
+        
+   InetAddressType, InetAddress, InetAddressPrefixLength, InetPortNumber  
+        FROM INET-ADDRESS-MIB;  
+    
+    
+ cienaCesAccessListMIB MODULE-IDENTITY
+        LAST-UPDATED "201504020000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "Mib Meister
+             115 North Sullivan Road
+             Spokane Valley, WA 99037                     
+             USA             
+             Phone:  +1 509 242 9000
+             Email:  support@ciena.com"                              
+        DESCRIPTION
+            "This MIB module defines objects that describe Hardware 
+             ACLs (Access Control Lists).      
+             The MIB describes different objects that enable the
+             network administrator to remotely view ACL profile/rule, 
+             configuration in addition to monitoring ACL rule statistics."
+
+        REVISION  "201504020000Z"
+        DESCRIPTION
+            "The initial version of this MIB module."        
+        ::= { cienaCesConfig 35 }
+
+
+
+ --
+ -- Node definitions
+ --
+   
+ cienaCesAccessListMIBObjects     OBJECT IDENTIFIER ::= { cienaCesAccessListMIB 1 }
+
+ cienaCesAclConfiguration         OBJECT IDENTIFIER ::= { cienaCesAccessListMIBObjects 1 }
+ cienaCesAclStatistics            OBJECT IDENTIFIER ::= { cienaCesAccessListMIBObjects 2 }
+  
+ cienaCesAccessListMIBConformance OBJECT IDENTIFIER ::= { cienaCesAccessListMIB 2 } 
+ 
+ cienaCesAccessListMIBCompliances OBJECT IDENTIFIER ::= { cienaCesAccessListMIBConformance 1 }     
+ cienaCesAccessListMIBGroups      OBJECT IDENTIFIER ::= { cienaCesAccessListMIBConformance 2 }
+
+
+
+ -- 
+ -- Textual Conventions                                              
+ --  
+            
+ AclFilterAction ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "An enumeration value to indicate the filter action applied by an ACL rule."
+     SYNTAX       INTEGER
+                  {
+                     allow(1),
+                     deny(2)
+                  } 
+
+ AclTrafficDirection ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "An enumeration value to indicate the traffic direction to which
+                   an ACL profile is applied."
+     SYNTAX       INTEGER
+                  {
+                     ingress(1),
+                     egress(2)
+                  } 
+
+ AclIpFragmentMatchType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "An enumeration value to indicate the type of IP fragment filtering
+                   to be done as part of an ACL rule."
+     SYNTAX       INTEGER
+                  {
+                     any(1),
+                     isfragment(2),
+                     notfragment(3)                    
+                  }
+ 
+ AclL4PortMatchType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "An enumeration value to indicate the type of match to perform on
+                   an L4 src/dst port filter term."
+     SYNTAX       INTEGER
+                  {
+                     any(1),
+                     single(2),
+                     range(3)
+                  } 
+ 
+ AclInterfaceType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "An enumeration value to indicate the type of interface to which
+                   an ACL profile is attached."
+     SYNTAX       INTEGER
+                  {
+                     port(1),
+                     vlan(2),
+                     virtualswitch(3),
+                     ipinterface(4),
+                     remoteinterface(5),
+                     localinterface(6)
+                  }
+
+ AclL4DstProtocol ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "An enumeration value to indicate the L4 destination protocol
+                   specified as part of an ACL rule filter term."
+     SYNTAX       INTEGER
+                  {
+                     any(1),
+                     bgp(2),
+                     bootpclient(3),                     
+                     bootpserver(4),                     
+                     dhcpclient(5),                     
+                     dhcpserver(6),                     
+                     dhcpv6client(7),
+                     dhcpv6server(8),
+                     dns(9),
+                     ftp(10),
+                     http(11),
+                     ldp(12),
+                     ntp(13),
+                     olsr(14),
+                     rip(15),
+                     rpc(16),
+                     snmp(17),
+                     snmptrap(18),
+                     ssh(19),
+                     syslog(20),  
+                     tacacs(21),
+                     telnet(22),
+                     tftp(23),
+                     twampctrl(24)
+                  } 
+ 
+  
+ --
+ -- ACL Global Config Objects 
+ --
+ 
+ cienaCesAclGlobalConfig  OBJECT IDENTIFIER ::= { cienaCesAclConfiguration 1 }
+    
+ cienaCesAclAdminStatus OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Indicates whether the ACL feature is globally enabled or disabled."
+    ::= { cienaCesAclGlobalConfig 1 }
+
+ cienaCesAclFilterMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   l2l3combo(1),
+                   l3only(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates which global ACL device mode is currently in use."
+    ::= { cienaCesAclGlobalConfig 2 }
+
+ cienaCesAclNumAclProfileDefs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the total number of configured ACL profile definitions on the device."
+    ::= { cienaCesAclGlobalConfig 3 }
+
+ cienaCesAclRemainingAclProfileDefs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of remaining ACL profile definitions that can be configured on the device."
+    ::= { cienaCesAclGlobalConfig 4 }
+
+ cienaCesAclNumAclRuleDefs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the total number of configured ACL rule definitions on the device."
+    ::= { cienaCesAclGlobalConfig 5 }
+
+ cienaCesAclRemainingAclRuleDefs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of remaining ACL rule definitions that can be configured on the device."
+    ::= { cienaCesAclGlobalConfig 6 }
+
+
+
+ --
+ --  ACL Profile Config Table
+ --                                   
+ cienaCesAclProfileConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesAclProfileConfigTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of ACL profiles configured on the device. Each
+         entry contains the ACL profile configuration data."  
+    ::= { cienaCesAclConfiguration 2 }
+               
+ cienaCesAclProfileConfigTableEntry OBJECT-TYPE
+    SYNTAX      CienaCesAclProfileConfigTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the ACL profile configuration data."
+    INDEX { cienaCesAclProfileId }
+    ::= { cienaCesAclProfileConfigTable 1 }
+                
+ CienaCesAclProfileConfigTableEntry ::=  SEQUENCE { 
+    cienaCesAclProfileId                     Integer32,
+    cienaCesAclProfileName                   DisplayString,  
+    cienaCesAclProfileAdminState             CienaGlobalState,
+    cienaCesAclProfileOperState              CienaGlobalState,    
+    cienaCesAclProfileDefaultFilterAction    AclFilterAction,
+    cienaCesAclProfileNumRules               Integer32,
+    cienaCesAclProfileAttachedInterfaces     Unsigned32
+    }
+        
+ cienaCesAclProfileId OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of this ACL profile."
+    ::= { cienaCesAclProfileConfigTableEntry 1 }
+            
+ cienaCesAclProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique name of this ACL profile."
+    ::= { cienaCesAclProfileConfigTableEntry 2 }
+
+ cienaCesAclProfileAdminState OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured administrative State of the ACL profile."
+    ::= { cienaCesAclProfileConfigTableEntry 3 }
+
+ cienaCesAclProfileOperState OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Operational State of the ACL profile.
+         A profile is operationally enabled if it is administratively enabled
+         and attached to at least one interface. It is otherwise disabled.
+         Note that the ACL feature must also be globally enabled for
+         any profile to be operationally enabled."
+    ::= { cienaCesAclProfileConfigTableEntry 4 }
+
+ cienaCesAclProfileDefaultFilterAction OBJECT-TYPE
+    SYNTAX      AclFilterAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured default filter action for this ACL profile."
+    ::= { cienaCesAclProfileConfigTableEntry 5 }
+
+ cienaCesAclProfileNumRules OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ACL rules configured in this profile. There will always
+         be at least one rule defined in each profile - the default rule."
+    ::= { cienaCesAclProfileConfigTableEntry 6 }
+
+ cienaCesAclProfileAttachedInterfaces OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of interfaces to which this profile is attached."
+    ::= { cienaCesAclProfileConfigTableEntry 7 }
+
+
+ --
+ --  ACL Rule Config Table
+ --                                   
+ cienaCesAclRuleConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesAclRuleConfigTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of ACL rules configured on the device. Each
+         entry contains the ACL rule configuration data."  
+    ::= { cienaCesAclConfiguration 3 }
+               
+ cienaCesAclRuleConfigTableEntry OBJECT-TYPE
+    SYNTAX      CienaCesAclRuleConfigTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the ACL rule configuration data."
+    INDEX { cienaCesAclProfileId, 
+            cienaCesAclRulePrecedence 
+          }
+    ::= { cienaCesAclRuleConfigTable 1 }
+                
+ CienaCesAclRuleConfigTableEntry ::=  SEQUENCE { 
+    cienaCesAclRulePrecedence              Unsigned32,    
+    cienaCesAclRuleName                    DisplayString,
+    cienaCesAclRuleFilterAction            AclFilterAction,
+    cienaCesAclRuleMatchAny                TruthValue,     
+    cienaCesAclRuleMatchSrcMacAddr         TruthValue,                                                                                                                                                                                                                               
+    cienaCesAclRuleSrcMacAddr              MacAddress,
+    cienaCesAclRuleSrcMacAddrMask          MacAddress,
+    cienaCesAclRuleMatchDstMacAddr         TruthValue,    
+    cienaCesAclRuleDstMacAddr              MacAddress,    
+    cienaCesAclRuleDstMacAddrMask          MacAddress,
+    cienaCesAclRuleMatchOuterVid           TruthValue,    
+    cienaCesAclRuleOuterVid                Unsigned32,
+    cienaCesAclRuleOuterVidMask            Unsigned32,
+    cienaCesAclRuleMatchOuterPcp           TruthValue,            
+    cienaCesAclRuleOuterPcp                Unsigned32,
+    cienaCesAclRuleOuterPcpMask            Unsigned32,
+    cienaCesAclRuleMatchOuterDei           TruthValue,            
+    cienaCesAclRuleOuterDei                Unsigned32,
+    cienaCesAclRuleMatchBaseEtype          TruthValue,        
+    cienaCesAclRuleBaseEtype               Unsigned32,
+    cienaCesAclRuleMatchSrcIpAddr          TruthValue,
+    cienaCesAclRuleSrcIpAddrType           InetAddressType,            
+    cienaCesAclRuleSrcIpAddr               InetAddress,
+    cienaCesAclRuleSrcIpAddrPrefixLength   InetAddressPrefixLength,
+    cienaCesAclRuleMatchDstIpAddr          TruthValue,
+    cienaCesAclRuleDstIpAddrType           InetAddressType,                            
+    cienaCesAclRuleDstIpAddr               InetAddress,
+    cienaCesAclRuleDstIpAddrPrefixLength   InetAddressPrefixLength,
+    cienaCesAclRuleMatchIpProtocol         TruthValue,            
+    cienaCesAclRuleIpProtocol              Unsigned32,
+    cienaCesAclRuleMatchDscp               TruthValue,            
+    cienaCesAclRuleDscp                    Unsigned32,
+    cienaCesAclRuleDscpMask                Unsigned32,
+    cienaCesAclRuleMatchL4SrcPort          AclL4PortMatchType,        
+    cienaCesAclRuleL4SrcPort               InetPortNumber,    
+    cienaCesAclRuleL4SrcPortUpper          InetPortNumber,
+    cienaCesAclRuleMatchL4DstPort          AclL4PortMatchType,                
+    cienaCesAclRuleL4DstPort               InetPortNumber,    
+    cienaCesAclRuleL4DstPortUpper          InetPortNumber,
+    cienaCesAclRuleMatchL4DstProtocol      AclL4DstProtocol,
+    cienaCesAclRuleMatchIpFragment         AclIpFragmentMatchType,
+    cienaCesAclRuleMatchTcpFlags           TruthValue,    
+    cienaCesAclRuleTcpFlags                DisplayString
+    }
+        
+ cienaCesAclRulePrecedence OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique precedence value (within the profile) of this ACL rule."
+    ::= { cienaCesAclRuleConfigTableEntry 1 }
+            
+ cienaCesAclRuleName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique name (within the profile) of this ACL rule."
+    ::= { cienaCesAclRuleConfigTableEntry 2 }
+
+ cienaCesAclRuleFilterAction OBJECT-TYPE
+    SYNTAX      AclFilterAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured filter action for this ACL rule."
+    ::= { cienaCesAclRuleConfigTableEntry 3 }
+
+ cienaCesAclRuleMatchAny OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches any traffic, False otherwise. 
+         Matching on any traffic automatically disregards all the remaining fields."
+    ::= { cienaCesAclRuleConfigTableEntry 4 }
+
+ cienaCesAclRuleMatchSrcMacAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the source MAC address, False otherwise.
+         When True, the cienaCesAclRuleSrcMacAddr and cienaCesAclRuleSrcMacAddrMask fields
+         will contain the source MAC address and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 5 }
+
+ cienaCesAclRuleSrcMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the source MAC address that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchSrcMacAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 6 }
+
+ cienaCesAclRuleSrcMacAddrMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the source MAC address mask that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchSrcMacAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 7 }
+
+ cienaCesAclRuleMatchDstMacAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the destination MAC address, False otherwise.
+         When True, the cienaCesAclRuleDstMacAddr and cienaCesAclRuleDstMacAddrMask fields
+         will contain the destination MAC address and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 8 }
+
+ cienaCesAclRuleDstMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the destination MAC address that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchDstMacAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 9 }
+
+ cienaCesAclRuleDstMacAddrMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the destination MAC address mask that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchDstMacAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 10 }
+
+ cienaCesAclRuleMatchOuterVid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the outer VID, False otherwise.
+         When True, the cienaCesAclRuleOuterVid and cienaCesAclRuleOuterVidMask fields
+         will contain the outer VID value and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 11 }
+
+ cienaCesAclRuleOuterVid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the outer VID that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchOuterVid field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 12 }
+
+ cienaCesAclRuleOuterVidMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the outer VID mask that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchOuterVid field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 13 }
+
+ cienaCesAclRuleMatchOuterPcp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the outer PCP, False otherwise.
+         When True, the cienaCesAclRuleOuterPcp and cienaCesAclRuleOuterPcpMask fields
+         will contain the outer PCP value and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 14 }
+ 
+  cienaCesAclRuleOuterPcp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the outer PCP that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchOuterPcp field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 15 }
+
+ cienaCesAclRuleOuterPcpMask OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the outer PCP mask that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchOuterPcp field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 16 }
+
+ cienaCesAclRuleMatchOuterDei OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the outer DEI bit, False otherwise.
+         When True, the cienaCesAclRuleOuterDei field
+         will contain the outer DEI value that is to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 17 }
+
+  cienaCesAclRuleOuterDei OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the outer DEI bit that is to be matched by this rule. 
+         This field is not applicable when the cienaCesAclRuleMatchOuterDei field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 18 }
+
+ cienaCesAclRuleMatchBaseEtype OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the base ethertype, False otherwise.
+         When True, the cienaCesAclRuleBaseEtype field
+         will contain the base ethertype value that is to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 19 }
+
+  cienaCesAclRuleBaseEtype OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the base ethertype that is to be matched by this rule. 
+         This field is not applicable when the cienaCesAclRuleMatchBaseEtype field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 20 }
+
+ cienaCesAclRuleMatchSrcIpAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the source IP address, False otherwise.
+         When True, the cienaCesAclRuleSrcIpAddrType field will contain the 
+         IP address type (IPv4 or IPv6) and the cienaCesAclRuleSrcIpAddr and 
+         cienaCesAclRuleSrcIpAddrPrefixLength fields will contain the IP address
+         value and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 21 }
+
+ cienaCesAclRuleSrcIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the address family of the source IP address (IPv4/IPv6). This field is  
+         not applicable when the cienaCesAclRuleMatchSrcIpAddr field is set to False"
+    ::= { cienaCesAclRuleConfigTableEntry 22 }
+
+ cienaCesAclRuleSrcIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the source IP address that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchSrcIpAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 23 }
+
+ cienaCesAclRuleSrcIpAddrPrefixLength OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the prefix length of the source IP address that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchSrcIpAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 24 }
+
+ cienaCesAclRuleMatchDstIpAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the destination IP address, False otherwise.
+         When True, the cienaCesAclRuleDstIpAddrType field will contain the 
+         IP address type (IPv4 or IPv6) and the cienaCesAclRuleDstIpAddr and 
+         cienaCesAclRuleDstIpAddrPrefixLength fields will contain the IP address
+         value and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 25 }
+
+ cienaCesAclRuleDstIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the address family of the destination IP address (IPv4/IPv6).   
+         This field is not applicable when the cienaCesAclRuleMatchDstIpAddr field is set to False"
+    ::= { cienaCesAclRuleConfigTableEntry 26 }
+
+ cienaCesAclRuleDstIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the destination IP address that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchDstIpAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 27 }
+
+ cienaCesAclRuleDstIpAddrPrefixLength OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the prefix length of the destination IP address that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchDstIpAddr field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 28 }
+
+ cienaCesAclRuleMatchIpProtocol OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the IP protocol, False otherwise.
+         When True, the cienaCesAclRuleIpProtocol field
+         will contain the IP protocol value that is to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 29 }
+
+ cienaCesAclRuleIpProtocol OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the IP protocol value that is to be matched by this rule. This field is 
+         not applicable when the cienaCesAclRuleMatchIpProtocol field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 30 }
+
+ cienaCesAclRuleMatchDscp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on the DSCP value, False otherwise.
+         When True, the cienaCesAclRuleDscp and cienaCesAclRuleDscpMask fields
+         will contain the DSCP value and mask that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 31 }
+
+  cienaCesAclRuleDscp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the DSCP value that is to be matched by this rule.  
+         This field is not applicable when the cienaCesAclRuleMatchDscp field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 32 }
+
+ cienaCesAclRuleDscpMask OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the outer DSCP mask that is to be matched by this rule. 
+         This field is not applicable when the cienaCesAclRuleMatchDscp field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 33 }
+
+ cienaCesAclRuleMatchL4SrcPort OBJECT-TYPE
+    SYNTAX      AclL4PortMatchType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the type of L4 source port matching that the ACL rule is performing.
+         A value of 'any' indicates that the rule matches any L4 source port.
+         A value of 'single' indicates that the rules matches on a single L4 source port 
+         specified in the cienaCesAclRuleL4SrcPort field. A value of 'range' indicates that 
+         the rule matches on a range of ports, with the cienaCesAclRuleL4SrcPort field specifiying
+         the lower bound and the cienaCesAclRuleL4SrcPortUpper specifying the upper bound of the range."
+    ::= { cienaCesAclRuleConfigTableEntry 34 }
+
+ cienaCesAclRuleL4SrcPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the lower bound or single L4 source port value that is to be matched by this rule 
+         depending on the value of cienaCesAclRuleMatchL4SrcPort.  
+         This field is not applicable when the cienaCesAclRuleMatchL4SrcPort field is set to 'any'."
+    ::= { cienaCesAclRuleConfigTableEntry 35 }
+
+ cienaCesAclRuleL4SrcPortUpper OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the upper bound of the L4 source port range that is to be matched by this rule 
+         depending on the value of cienaCesAclRuleMatchL4SrcPort.  
+         This field is not applicable when the cienaCesAclRuleMatchL4SrcPort field is set to 'any' or 'single'."
+    ::= { cienaCesAclRuleConfigTableEntry 36 }
+
+ cienaCesAclRuleMatchL4DstPort OBJECT-TYPE
+    SYNTAX      AclL4PortMatchType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the type of L4 destination port matching that the ACL rule is performing.
+         A value of 'any' indicates that the rule matches any L4 destination port.
+         A value of 'single' indicates that the rules matches on a single L4 destination port 
+         specified in the cienaCesAclRuleL4SrcPort field. A value of 'range' indicates that 
+         the rule matches on a range of ports, with the cienaCesAclRuleL4DstPort field specifiying
+         the lower bound and the cienaCesAclRuleL4DstPortUpper specifying the upper bound of the range."
+    ::= { cienaCesAclRuleConfigTableEntry 37 }
+
+ cienaCesAclRuleL4DstPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the lower bound or single L4 destination port value that is to be matched by this rule 
+         depending on the value of cienaCesAclRuleMatchL4DstPort.  
+         This field is not applicable when the cienaCesAclRuleMatchL4DstPort field is set to 'any'."
+    ::= { cienaCesAclRuleConfigTableEntry 38 }
+
+ cienaCesAclRuleL4DstPortUpper OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains the upper bound of the L4 destination port range that is to be matched by this rule 
+         depending on the value of cienaCesAclRuleMatchL4DstPort.  
+         This field is not applicable when the cienaCesAclRuleMatchL4DstPort field is set to 'any' or 'single'."
+    ::= { cienaCesAclRuleConfigTableEntry 39 }
+
+ cienaCesAclRuleMatchL4DstProtocol OBJECT-TYPE
+    SYNTAX      AclL4DstProtocol
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the L4 destination protocol name that is to be matched by this rule. 
+         A value of 'any' indicates that the rule will match any protocol. Note that
+         this field is mutually exclusive with cienaCesAclRuleMatchL4DstPort - i.e. only
+         one of these fields can have a value different from 'any' at a given time."
+    ::= { cienaCesAclRuleConfigTableEntry 40 }
+
+ cienaCesAclRuleMatchIpFragment OBJECT-TYPE
+    SYNTAX      AclIpFragmentMatchType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the type of IP fragment matching that is to be matched by this rule.
+         A value of 'any' indicates that the rule will match both fragmented and non-fragmented
+         packets. A value of 'fragment' indicates that the rule will match only fragmented packets. 
+         A value of 'nonfragment' indicates that the rule will match only non-fragmented (head) packets."
+    ::= { cienaCesAclRuleConfigTableEntry 41 }
+
+ cienaCesAclRuleMatchTcpFlags OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True if the ACL rule matches on specific TCP Flags, False otherwise.
+         When True, the cienaCesAclRuleTcpFlags field will contain the TCP Flags 
+         that are to be matched by this rule."
+    ::= { cienaCesAclRuleConfigTableEntry 42 }
+
+ cienaCesAclRuleTcpFlags OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contains a comma-separated uppercase string list of TCP Flags 
+         that are to be matched by this rule, i.e. 'SYN,ACK,RST,...'. 
+         This field is not applicable when the cienaCesAclRuleMatchTcpFlags 
+         field is set to False."
+    ::= { cienaCesAclRuleConfigTableEntry 43 }
+
+
+ --
+ --  ACL Profile Attachment Table
+ --                                   
+ cienaCesAclProfileAttachmentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesAclProfileAttachmentTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table showing the interface attachments for each
+         profile on the device. Each entry contains the name of
+         the interface and the traffic direction on which the profile is applied." 
+    ::= { cienaCesAclConfiguration 4 }
+               
+ cienaCesAclProfileAttachmentTableEntry OBJECT-TYPE
+    SYNTAX      CienaCesAclProfileAttachmentTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the ACL profile attachment data."
+    INDEX { cienaCesAclProfileId, 
+            cienaCesAclInterfaceType, 
+            cienaCesAclInterfaceId 
+          }
+    ::= { cienaCesAclProfileAttachmentTable 1 }
+                
+ CienaCesAclProfileAttachmentTableEntry ::=  SEQUENCE { 
+    cienaCesAclInterfaceType     AclInterfaceType,  
+    cienaCesAclInterfaceId       Integer32,  
+    cienaCesAclInterfaceName     DisplayString,
+    cienaCesAclDirection         AclTrafficDirection                
+    }
+                    
+ cienaCesAclInterfaceType OBJECT-TYPE
+    SYNTAX      AclInterfaceType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of the interface to which this ACL profile is attached."
+    ::= { cienaCesAclProfileAttachmentTableEntry 1 }
+
+ cienaCesAclInterfaceId OBJECT-TYPE
+    SYNTAX      Integer32 (1..1048576)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID of the interface to which this ACL profile is attached."
+    ::= { cienaCesAclProfileAttachmentTableEntry 2 }
+
+ cienaCesAclInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface to which this ACL profile is attached."
+    ::= { cienaCesAclProfileAttachmentTableEntry 3 }
+
+ cienaCesAclDirection OBJECT-TYPE
+    SYNTAX      AclTrafficDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface's traffic direction (ingress/egress) on which the ACL profile is applied."
+    ::= { cienaCesAclProfileAttachmentTableEntry 4 }
+
+
+
+ --
+ --  ACL Profile Global Rule Stats Table
+ --                                   
+ cienaCesAclProfileGlobalRuleStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesAclProfileGlobalRuleStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of global ACL profile rule statistics. Global ACL profile rule statistics
+         are the aggregate counts of the hit statistics for all instances of the ACL profile's rules."  
+    ::= { cienaCesAclStatistics 1 }
+               
+ cienaCesAclProfileGlobalRuleStatsTableEntry OBJECT-TYPE
+    SYNTAX      CienaCesAclProfileGlobalRuleStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the ACL profile global rule hit statistics."
+    INDEX { cienaCesAclProfileId, 
+            cienaCesAclRulePrecedence 
+          }
+    ::= { cienaCesAclProfileGlobalRuleStatsTable 1 }
+                
+ CienaCesAclProfileGlobalRuleStatsTableEntry ::=  SEQUENCE { 
+    cienaCesAclGlobalRuleStatsPacketCount      Counter64,
+    cienaCesAclGlobalRuleStatsByteCount        Counter64
+    }
+        
+ cienaCesAclGlobalRuleStatsPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that matched this ACL rule."
+    ::= { cienaCesAclProfileGlobalRuleStatsTableEntry 1 }
+
+ cienaCesAclGlobalRuleStatsByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes that matched this ACL rule."
+    ::= { cienaCesAclProfileGlobalRuleStatsTableEntry 2 }
+
+
+ --
+ --  ACL Profile Rule Instance Stats Table
+ --                                   
+ cienaCesAclProfileRuleInstanceStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesAclProfileRuleInstanceStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of ACL profile rule instance statistics. These ACL rule hit statistics are
+         specific to the rules applied on the particular interface."  
+    ::= { cienaCesAclStatistics 2 }
+               
+ cienaCesAclProfileRuleInstanceStatsTableEntry OBJECT-TYPE
+    SYNTAX      CienaCesAclProfileRuleInstanceStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the ACL profile rule instance hit statistics."
+    INDEX { cienaCesAclProfileId, 
+            cienaCesAclInterfaceType,
+            cienaCesAclInterfaceId, 
+            cienaCesAclRulePrecedence 
+          }
+    ::= { cienaCesAclProfileRuleInstanceStatsTable 1 }
+                
+ CienaCesAclProfileRuleInstanceStatsTableEntry ::=  SEQUENCE { 
+    cienaCesAclRuleInstanceStatsPacketCount       Counter64,
+    cienaCesAclRuleInstanceStatsByteCount         Counter64
+    }
+        
+ cienaCesAclRuleInstanceStatsPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that matched this ACL rule instance."
+    ::= { cienaCesAclProfileRuleInstanceStatsTableEntry 1 }
+
+ cienaCesAclRuleInstanceStatsByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes that matched this ACL rule instance."
+    ::= { cienaCesAclProfileRuleInstanceStatsTableEntry 2 }
+
+
+
+END
+

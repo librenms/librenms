@@ -1,0 +1,887 @@
+-- *****************************************************************
+-- CISCO-POWER-ETHERNET-EXT-MIB
+--   
+-- March 2004, Seth Wang
+--   
+-- Copyright (c) 2004-2007 by Cisco Systems, Inc.
+--   
+-- All rights reserved.
+-- ****************************************************************
+
+CISCO-POWER-ETHERNET-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TruthValue
+        FROM SNMPv2-TC
+    pethPsePortEntry,
+    pethMainPseGroupIndex
+        FROM POWER-ETHERNET-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    EntPhysicalIndexOrZero
+        FROM CISCO-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoPowerEthernetExtMIB MODULE-IDENTITY
+    LAST-UPDATED    "200704120000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA 95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-lan-switch-snmp@cisco.com"
+    DESCRIPTION
+        "A MIB module for extending the POWER-ETHERNET-MIB
+        (RFC3621) to add objects which provide additional
+        management information about Power Sourcing Equipment
+        (PSE) not available in POWER-ETHERNET-MIB.
+
+        Glossary
+
+        Power Sourcing Equipment (PSE)
+            These are devices supplying electrical power to
+            other equipment. They are, for example, inline power
+            switches, inline power daughterboards and power patch
+            panels.
+
+        Powered Device (PD)
+            These are devices receiving their electrical power
+            supply from Power Sourcing Equipment. They are, for
+            example, IP telephones and wireless access points
+            or bridges."
+    REVISION        "200704120000Z"
+    DESCRIPTION
+        "Added 'overdrawLog' value to cpeExtPsePortAdditionalStatus.
+        Added cpeExtPortPolicingActionGroup, cpeExtPortPwrManAllocGroup
+        cpeExtPolicingNotifEnableGroup, and cpeExtPolicingNotifGroup."
+    REVISION        "200702020000Z"
+    DESCRIPTION
+        "Added cpeExtPsePortEntPhyIndex,
+        cpeExtPsePortPolicingCapable and 
+        cpeExtPsePortPolicingEnable to cpeExtPsePortTable.
+        Added cpeExtPdStatsTotalDevices and cpeExtPdStatsTable.
+        Added enumerated value disable(5) to cpeExtPsePortEnable."
+    REVISION        "200506100000Z"
+    DESCRIPTION
+        "Added 'limit' to cpeExtPsePortEnable, 'overdraw' to
+        cpeExtPsePortAdditionalStatus and the groups
+        cpeExtPsePortPwrMonitorGroup and
+        cpeExtMainPseGroup."
+    REVISION        "200404120000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 402 }
+
+
+cpeExtMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoPowerEthernetExtMIB 0 }
+
+cpeExtMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoPowerEthernetExtMIB 1 }
+
+cpeExtMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoPowerEthernetExtMIB 2 }
+
+
+cpeExtDefaultAllocation OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the default inline power allocation per
+        port. This is a global configuration parameter that applies
+        to all inline power capable ports in the system.
+
+        The system must consider this object as well as the per port
+        configuration object, cpeExtPsePortPwrMax, when determining
+        how much power to allocate to a port. The system will use the
+        lower of the two numbers." 
+    ::= { cpeExtMIBObjects 1 }
+
+cpeExtPsePortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpeExtPsePortEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table extends the POWER-ETHERNET-MIB pethPsePortTable
+        for power Ethernet ports on a Powered Sourcing Equipment
+        (PSE) device."
+    REFERENCE       "RFC3621"
+    ::= { cpeExtMIBObjects 2 }
+
+cpeExtPsePortEntry OBJECT-TYPE
+    SYNTAX          CpeExtPsePortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A cpeExtPsePortEntry extends a corresponding
+        pethPsePortTable entry. This entry displays and
+        controls more characteristics of a power Ethernet
+        port on a PSE device."
+    AUGMENTS           { pethPsePortEntry  } 
+ 
+    ::= { cpeExtPsePortTable 1 }
+
+CpeExtPsePortEntry ::= SEQUENCE {
+        cpeExtPsePortEnable           INTEGER ,
+        cpeExtPsePortDiscoverMode     INTEGER ,
+        cpeExtPsePortDeviceDetected   TruthValue,
+        cpeExtPsePortIeeePd           TruthValue,
+        cpeExtPsePortAdditionalStatus BITS,
+        cpeExtPsePortPwrMax           Unsigned32,
+        cpeExtPsePortPwrAllocated     Unsigned32,
+        cpeExtPsePortPwrAvailable     Unsigned32,
+        cpeExtPsePortPwrConsumption   Unsigned32,
+        cpeExtPsePortMaxPwrDrawn      Unsigned32,
+        cpeExtPsePortEntPhyIndex      EntPhysicalIndexOrZero,
+        cpeExtPsePortPolicingCapable  TruthValue,
+        cpeExtPsePortPolicingEnable   INTEGER ,
+        cpeExtPsePortPolicingAction   INTEGER ,
+        cpeExtPsePortPwrManAlloc      Unsigned32
+}
+
+cpeExtPsePortEnable OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        auto(1),
+                        static(2),
+                        limit(3),
+                        disable(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is an extension of the pethPsePortAdminEnable
+        object from RFC3621. It allows the user to be more specific
+        when enabling the PSE functions. The states, 'auto', 'static'
+        and 'limit' correspond to a value of 'true' for the
+        pethPsePortAdminEnable object. The state 'disable' corresponds
+        to a value of 'false' for the pethPsePortAdminEnable object.
+
+        Setting this value to 'auto' enables Powered Device discovery
+        on the interface and the amount of power allocated depends on
+        the Powered Device discovered. If pethPsePortAdminEnable was
+        'false' prior to this set operation, then it will become
+        'true'.
+
+        Setting this value to 'static' will also enable Powered
+        Device discovery. However, this is different from 'auto'
+        in that the amount of power is pre-allocated based on the
+        configuration on the Power Sourcing Equipment. If
+        pethPsePortAdminEnable was 'false' prior to this set
+        operation, then it will become 'true'.
+
+        Setting this value to 'limit' enables Powered Device
+        discovery on the interface. The amount of power allocated
+        depends on the Powered Device discovered and the value
+        of cpeExtPsePortPwrMax. The lower value will be used.
+        If pethPsePortAdminEnable was 'false' prior to this set
+        operation, then it will become 'true'.
+
+        Setting this value to 'disable' disables the PSE functions.
+        The pethPsePortAdminEnable object will adopt the value of
+        'false' if it was 'true' prior to this set operation. When
+        setting the pethPsePortAdminEnable object to 'false' this
+        object cpeExtPsePortEnable will adopt the value of 'disable'.
+
+        If cpeExtPsePortPolicingCapable of the PSE port, or
+        cpeExtMainPsePwrMonitorCapable of the PSE port's
+        main group, has the value of 'false', this object
+        can only be set to 'auto', 'static' or 'disable'.
+        Otherwise, this object can be set to 'auto', 'static',
+        'limit' or 'disable'." 
+    ::= { cpeExtPsePortEntry 1 }
+
+cpeExtPsePortDiscoverMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        off(2),
+                        ieee(3),
+                        cisco(4),
+                        ieeeAndCisco(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the discover mode used by the system to
+        discover the PD.
+
+        A value of 'unknown' indicates that the discover mode on the
+        interface is unknown.
+
+        A value of 'off' indicates that discovery is disabled on the
+        interface.
+
+        A value of 'ieee' indicates that the discover mode on the
+        interface is IEEE based.
+
+        A value of 'cisco' indicates that the discover mode on the
+        interface is Cisco based.
+
+        A value of 'ieeeAndCisco' indicates that the discover mode on
+        the interface is both IEEE and Cisco based." 
+    ::= { cpeExtPsePortEntry 2 }
+
+cpeExtPsePortDeviceDetected OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates if a Powered Device (PD) has been
+        detected on the interface.
+
+        A value of 'true' indicates that a PD has been detected on
+        the interface.
+
+        A value of 'false' indicates that no PD has been detected on
+        the interface." 
+    ::= { cpeExtPsePortEntry 3 }
+
+cpeExtPsePortIeeePd OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether the Powered Device attached
+        to the interface is an IEEE compliant Powered Device or not.
+
+        A value of 'true' indicates the attached Powered Device is
+        an IEEE compliant Powered Device.
+
+        A value of 'false' indicates the attached Powered Device
+        is not an IEEE compliant Powered Device. This also means
+        that the value of the corresponding object from the
+        pethPsePortTable, pethPsePortPowerClassifications is
+        irrelevant." 
+    ::= { cpeExtPsePortEntry 4 }
+
+cpeExtPsePortAdditionalStatus OBJECT-TYPE
+    SYNTAX          BITS {
+                        deny(0),
+                        overdraw(1),
+                        overdrawLog(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is an extension of the pethPsePortDetectionStatus
+        object from RFC3621 and provides additional status
+        information.
+
+        deny: When set, the PD attached to the interface is being
+              denied power due to insufficient power resources on
+              the Power Sourcing Equipment.
+
+        overdraw: When set, the PD attached to the interface is 
+                  being denied power because the PD is trying 
+                  to consume more power than it has been 
+                  configured to consume.
+
+        overdrawLog: When set, the PD attached to the interface 
+                     is trying to consume more power than it has 
+                     been configured to consume, but is not being 
+                     denied power." 
+    ::= { cpeExtPsePortEntry 5 }
+
+cpeExtPsePortPwrMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This indicates the maximum amount of power that the PSE will
+        make available to the PD connected to this interface." 
+    ::= { cpeExtPsePortEntry 6 }
+
+cpeExtPsePortPwrAllocated OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the amount of power allocated from the
+        PSE for the PD." 
+    ::= { cpeExtPsePortEntry 7 }
+
+cpeExtPsePortPwrAvailable OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the amount of power available for
+        the PD to use. This value may differ from the value
+        cpeExtPsePortPwrAllocated due to the efficiency issues
+        of delivering the power from the PSE to the PD.
+
+        When sufficient power is available to power a PD, this
+        value should be equal to the lower of the two objects,
+        cpeExtDefaultAllocation and cpeExtPsePortPwrMax." 
+    ::= { cpeExtPsePortEntry 8 }
+
+cpeExtPsePortPwrConsumption OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the actual power consumption of the PD
+        connected to this interface. It may not necessarily
+        be equal to the value of cpeExtPsePortPwrAvailable." 
+    ::= { cpeExtPsePortEntry 9 }
+
+cpeExtPsePortMaxPwrDrawn OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the maximum amount of power drawn by the PD
+        connected to this interface, since it was powered on." 
+    ::= { cpeExtPsePortEntry 10 }
+
+cpeExtPsePortEntPhyIndex OBJECT-TYPE
+    SYNTAX          EntPhysicalIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The entPhysicalIndex value that uniquely identifies the
+        PSE port. If the PSE port does not have a corresponding 
+        physical entry in entPhysicalTable or if the 
+        entPhysicalTable is not supported by the management
+        system, this object has the value of zero."
+    REFERENCE       "RFC 2737, entPhysicalIndex." 
+    ::= { cpeExtPsePortEntry 11 }
+
+cpeExtPsePortPolicingCapable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether the PSE port hardware is
+        capable of policing the port for proper power consumption 
+        based on the allocated value." 
+    ::= { cpeExtPsePortEntry 12 }
+
+cpeExtPsePortPolicingEnable OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        on(1),
+                        off(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object allows the user to turn on or turn off the
+        power policing of the PSE port. If the instance value of 
+        cpeExtPsePortPolicingCapable is 'TRUE', the user is allowed
+        to set this object to 'on' or 'off'. Otherwise, this
+        object is read-only and always has the value of 'off'." 
+    ::= { cpeExtPsePortEntry 13 }
+
+cpeExtPsePortPolicingAction OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        deny(1),
+                        logOnly(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the power policing action that
+        the device will take on this PSE port when the real-time 
+        power consumption exceeds its max power allocation if 
+        the value of cpeExtPsePortPolicingEnable is 'on'. 
+             'deny'          - the device will deny the power to 
+                               the PSE port 
+             'logOnly'       - the device will not deny the power 
+                               to the PSE port" 
+    ::= { cpeExtPsePortEntry 14 }
+
+cpeExtPsePortPwrManAlloc OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the manual power allocation that
+        the PSE will allocate to the PD connected to this 
+        interface regardless of the amount requested via CDP 
+        or IEEE. 
+
+        Setting this object value to zero disables the manual 
+        power allocation. 
+
+        Warning: Misconfiguring this manual power allocation may 
+        cause demage to the system and void the warranty. Take 
+        precautions not to oversubscribe the power supply." 
+    ::= { cpeExtPsePortEntry 15 }
+ 
+
+
+cpeExtMainPseTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpeExtMainPseEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the additional information for the
+        main PSE group in pethMainPseTable."
+    REFERENCE       "RFC3621, pethMainPseTable"
+    ::= { cpeExtMIBObjects 3 }
+
+cpeExtMainPseEntry OBJECT-TYPE
+    SYNTAX          CpeExtMainPseEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A cpeExtMainPseEntry contains information about
+        a particular pethMainPseGroupIndex. An entry is
+        created by the agent when a main PSE group is added
+        to the pethMainPseTable. An entry is deleted by the
+        agent when a main PSE group is removed from the
+        pethMainPseTable."
+    REFERENCE       "RFC3621, pethMainPseTable"
+    INDEX           { pethMainPseGroupIndex } 
+    ::= { cpeExtMainPseTable 1 }
+
+CpeExtMainPseEntry ::= SEQUENCE {
+        cpeExtMainPseEntPhyIndex       EntPhysicalIndexOrZero,
+        cpeExtMainPseDescr             SnmpAdminString,
+        cpeExtMainPsePwrMonitorCapable TruthValue
+}
+
+cpeExtMainPseEntPhyIndex OBJECT-TYPE
+    SYNTAX          EntPhysicalIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The entPhysicalIndex value that uniquely identifies the
+        main PSE group. If the main PSE group does not have a
+        corresponding physical entry in entPhysicalTable or if
+        the entPhysicalTable is not supported by the management
+        system, then this object has the value of zero."
+    REFERENCE       "RFC 2737, entPhysicalIndex." 
+    ::= { cpeExtMainPseEntry 1 }
+
+cpeExtMainPseDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A textual string containing information about the Power
+        Source Equipment (PSE) group." 
+    ::= { cpeExtMainPseEntry 2 }
+
+cpeExtMainPsePwrMonitorCapable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates if the given group is capable of
+        monitoring the power consumption of the interfaces that
+        belong to the group. The value 'true' means that the
+        group is capable. The value 'false' means that the group
+        in not capable." 
+    ::= { cpeExtMainPseEntry 3 }
+ 
+
+cpeExtPdStatistics  OBJECT IDENTIFIER
+    ::= { cpeExtMIBObjects 4 }
+
+
+cpeExtPdStatsTotalDevices OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of the
+        powered devices with any power classifications
+        in the system.
+
+        Classification is a way to tag different terminals
+        on the Power over LAN network according to their
+        power consumption. Devices such as IP telephones,
+        WLAN access points and others, will be classified
+        according to their power requirements."
+    REFERENCE
+        "IEEE Std 802.3af Section 30.9.1.1.6
+         aPSEPowerClassification" 
+    ::= { cpeExtPdStatistics 1 }
+
+cpeExtPdStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpeExtPdStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the statistics information
+        of the powered devices fallen into different power
+        classifications in the system."
+    REFERENCE
+        "IEEE Std 802.3af Section 30.9.1.1.6
+               aPSEPowerClassification"
+    ::= { cpeExtPdStatistics 2 }
+
+cpeExtPdStatsEntry OBJECT-TYPE
+    SYNTAX          CpeExtPdStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A cpeExtPdStatsEntry contains the statistics
+        information about a particular power classification
+        defined in cpeExtPdStatsIndex."
+    INDEX           { cpeExtPdStatsClass } 
+    ::= { cpeExtPdStatsTable 1 }
+
+CpeExtPdStatsEntry ::= SEQUENCE {
+        cpeExtPdStatsClass       INTEGER ,
+        cpeExtPdStatsDeviceCount Unsigned32
+}
+
+cpeExtPdStatsClass OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        cisco(1),
+                        class0(2),
+                        class1(3),
+                        class2(4),
+                        class3(5)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The power classification as the index for the
+        statistics information for powered devices.
+
+        A value of 'cisco' indicates that the powered
+        devices are CISCO proprietary and their power 
+        classification does not fall into any class
+        in IEEE specifications.
+
+        A value of 'class0' indicates that the power 
+        classification of the powered devices falls into
+        class 0 in IEEE specifications.
+
+        A value of 'class1' indicates that the power
+        classification of the powered devices falls into
+        class 1 in IEEE specifications.
+
+        A value of 'class2' indicates that the power
+        classification of the powered devices falls into
+        class 2 in IEEE specifications.
+
+        A value of 'class3' indicates that the power
+        classification of the powered devices falls into
+        class 3 in IEEE specifications."
+    REFERENCE
+        "IEEE Std 802.3af Section 30.9.1.1.6
+               aPSEPowerClassification" 
+    ::= { cpeExtPdStatsEntry 1 }
+
+cpeExtPdStatsDeviceCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the count of the powered
+        devices whose power classification falls into 
+        a specific value of cpeExtPdStatsIndex." 
+    ::= { cpeExtPdStatsEntry 2 }
+ 
+
+
+cpeExtPolicingNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable/disable the
+        the cpeExtPolicingNotif notification." 
+    ::= { cpeExtMIBObjects 5 }
+
+-- Notifications
+
+cpeExtPolicingNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        cpeExtPsePortPolicingAction,
+                        cpeExtPsePortAdditionalStatus,
+                        cpeExtPsePortPwrAllocated,
+                        cpeExtPsePortMaxPwrDrawn
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the value of
+        cpeExtPsePortAdditionalStatus changes."
+   ::= { cpeExtMIBNotifs 1 }
+-- Conformance
+
+cpeExtMIBCompliances  OBJECT IDENTIFIER
+    ::= { cpeExtMIBConformance 1 }
+
+cpeExtMIBGroups  OBJECT IDENTIFIER
+    ::= { cpeExtMIBConformance 2 }
+
+
+cpeExtMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-POWER-ETHERNET-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpeExtPsePortGroup }
+
+    GROUP           cpeExtPsePortGlobalConfigGroup
+    DESCRIPTION
+        "The cpeExtPsePortGlobalConfigGroup is mandatory for agents
+        that support global configurations on the PSE interfaces."
+    ::= { cpeExtMIBCompliances 1 }
+
+cpeExtMIBCompliance2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-POWER-ETHERNET-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpeExtPsePortGroup }
+
+    GROUP           cpeExtPsePortGlobalConfigGroup
+    DESCRIPTION
+        "The cpeExtPsePortGlobalConfigGroup is mandatory for agents
+        that support global configurations on the PSE interfaces."
+
+    GROUP           cpeExtPsePortPwrMonitorGroup
+    DESCRIPTION
+        "The cpeExtPsePortPwrMonitorGroup is mandatory for agents
+        that provide power monitoring on PD's connected to the
+        PSE interfaces."
+
+    GROUP           cpeExtMainPseGroup
+    DESCRIPTION
+        "The cpeExtMainPseGroup is mandatory for agents
+        that support the interface power consumption
+        monitoring, or need additional info to identify
+        the PSE group."
+    ::= { cpeExtMIBCompliances 2 }
+
+cpeExtMIBCompliance3 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-POWER-ETHERNET-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpeExtPsePortGroup }
+
+    GROUP           cpeExtPsePortGlobalConfigGroup
+    DESCRIPTION
+        "The cpeExtPsePortGlobalConfigGroup is mandatory for agents
+        that support global configurations on the PSE interfaces."
+
+    GROUP           cpeExtPsePortPwrMonitorGroup
+    DESCRIPTION
+        "The cpeExtPsePortPwrMonitorGroup is mandatory for agents
+        that provide power monitoring on PD's connected to the
+        PSE interfaces."
+
+    GROUP           cpeExtMainPseGroup2
+    DESCRIPTION
+        "The cpeExtMainPseGroup2 is mandatory for agents
+        that need additional information to identify the PSE 
+        group."
+
+    GROUP           cpeExtPseGrpPwrGroup
+    DESCRIPTION
+        "The cpeExtPseGrpPwrGroup is mandatory for agents
+        that support the power consumption monitoring for
+        PSE groups."
+
+    GROUP           cpeExtPortEntityIndexGroup
+    DESCRIPTION
+        "The cpeExtPortEntityIndexGroup is mandatory for agents
+        that needs additional info to identify the interfaces 
+        of the PSE port."
+
+    GROUP           cpeExtPortPolicingGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingGroup is mandatory for agents
+        that provide power consumption policing for the PSE 
+        ports."
+
+    GROUP           cpeExtPdStatsGroup
+    DESCRIPTION
+        "The cpeExtPdStatsGroup is mandatory for agents
+        that provide the statistics information for powered 
+        devices."
+
+    GROUP           cpeExtPortPolicingActionGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide control of the power policing
+        action."
+
+    GROUP           cpeExtPortPwrManAllocGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide manual power allocation."
+
+    GROUP           cpeExtPolicingNotifEnableGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifEnableGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPolicingNotifGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+    ::= { cpeExtMIBCompliances 3 }
+
+-- Units of Conformance
+
+cpeExtPsePortGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtPsePortEnable,
+                        cpeExtPsePortDiscoverMode,
+                        cpeExtPsePortDeviceDetected,
+                        cpeExtPsePortIeeePd,
+                        cpeExtPsePortAdditionalStatus,
+                        cpeExtPsePortPwrMax,
+                        cpeExtPsePortPwrAllocated,
+                        cpeExtPsePortPwrAvailable,
+                        cpeExtPsePortPwrConsumption
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group provides information and configuration objects
+        in addition to those provided in the POWER-ETHERNET-MIB
+        (RFC3621)."
+    ::= { cpeExtMIBGroups 1 }
+
+cpeExtPsePortGlobalConfigGroup OBJECT-GROUP
+    OBJECTS         { cpeExtDefaultAllocation }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide global
+        configuration of the PSE interfaces."
+    ::= { cpeExtMIBGroups 2 }
+
+cpeExtPsePortPwrMonitorGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPsePortMaxPwrDrawn }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide power
+        monitoring on PD's connected to the PSE interfaces."
+    ::= { cpeExtMIBGroups 3 }
+
+cpeExtMainPseGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtMainPseEntPhyIndex,
+                        cpeExtMainPseDescr,
+                        cpeExtMainPsePwrMonitorCapable
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This is a collection of objects which provide
+        additional information for the PSE group."
+    ::= { cpeExtMIBGroups 4 }
+
+cpeExtPortEntityIndexGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPsePortEntPhyIndex }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide
+        entity physical index information for PSE port."
+    ::= { cpeExtMIBGroups 5 }
+
+cpeExtPortPolicingGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtPsePortPolicingCapable,
+                        cpeExtPsePortPolicingEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide
+        the hardware power consumption policing information 
+        for PSE port."
+    ::= { cpeExtMIBGroups 6 }
+
+cpeExtPdStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtPdStatsTotalDevices,
+                        cpeExtPdStatsDeviceCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide
+        the statistics information for powered devices."
+    ::= { cpeExtMIBGroups 7 }
+
+cpeExtMainPseGroup2 OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtMainPseEntPhyIndex,
+                        cpeExtMainPseDescr
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide
+        additional information to identify the PSE group."
+    ::= { cpeExtMIBGroups 8 }
+
+cpeExtPseGrpPwrGroup OBJECT-GROUP
+    OBJECTS         { cpeExtMainPsePwrMonitorCapable }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide
+        power monitoring information for the PSE group."
+    ::= { cpeExtMIBGroups 9 }
+
+cpeExtPortPolicingActionGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPsePortPolicingAction }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide control
+        of the power policing action of the PSE port."
+    ::= { cpeExtMIBGroups 10 }
+
+cpeExtPortPwrManAllocGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPsePortPwrManAlloc }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide manual
+        power allocation for the PSE port."
+    ::= { cpeExtMIBGroups 11 }
+
+cpeExtPolicingNotifEnableGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPolicingNotifEnable }
+    STATUS          current
+    DESCRIPTION
+        "A collection of object that provides control over
+        power consumption policing status notification."
+    ::= { cpeExtMIBGroups 12 }
+
+cpeExtPolicingNotifGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { cpeExtPolicingNotif }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of notifications related to
+        power consumption policing information for PSE ports."
+    ::= { cpeExtMIBGroups 13 }
+
+END
+
+
+
+

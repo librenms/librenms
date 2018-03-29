@@ -1,0 +1,239 @@
+TIMERANGE-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE     FROM SNMPv2-SMI
+         IpAddress                        FROM RFC1155-SMI
+         DateAndTime ,RowStatus, DisplayString
+                                          FROM SNMPv2-TC
+         dlink-common-mgmt                FROM DLINK-ID-REC-MIB;
+
+     swTimeRangeMIB MODULE-IDENTITY
+         LAST-UPDATED "0811200000Z"
+         ORGANIZATION "D-Link Corp."
+         CONTACT-INFO
+             "http://support.dlink.com"
+         DESCRIPTION
+             "This MIB defines a specific range of time to activate a function."
+         ::= { dlink-common-mgmt 50 }
+
+-- -----------------------------------------------------------------------------
+-- OID Tree Allocation in TimeRang.MIB
+-- -----------------------------------------------------------------------------
+    swTimeRangeCtrl             OBJECT IDENTIFIER ::= { swTimeRangeMIB 1 }
+    swTimeRangeInfo             OBJECT IDENTIFIER ::= { swTimeRangeMIB 2 }
+    swTimeRangeMgmt             OBJECT IDENTIFIER ::= { swTimeRangeMIB 3 }
+
+-- -----------------------------------------------------------------------------
+-- Object Definition for
+-- -----------------------------------------------------------------------------
+
+-- -----------------------------------------------------------------------------
+-- swTimeRangeMgmt
+-- -----------------------------------------------------------------------------
+       swTimeRangeMgmtTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF SwTimeRangeMgmtEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "A table that contains the information of each time range."
+           ::= { swTimeRangeMgmt 1 }
+
+       swTimeRangeMgmtEntry OBJECT-TYPE
+           SYNTAX      SwTimeRangeMgmtEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "A list of information of each time range."
+           INDEX { swTimeRangeMgmtRangeName }
+           ::= { swTimeRangeMgmtTable 1 }
+
+       SwTimeRangeMgmtEntry ::=
+           SEQUENCE {
+               swTimeRangeMgmtRangeName
+                   DisplayString,
+               swTimeRangeMgmtSelectDays
+                   DisplayString,
+               swTimeRangeMgmtStartTime
+                   DisplayString,
+               swTimeRangeMgmtEndTime
+                   DisplayString,
+               swimeRangeMgmtStatus
+                   RowStatus
+           }
+
+       swTimeRangeMgmtRangeName           OBJECT-TYPE
+           SYNTAX      DisplayString (SIZE (1..32))
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The range name of the time range."
+           ::= { swTimeRangeMgmtEntry 1 }
+
+       swTimeRangeMgmtSelectDays          OBJECT-TYPE
+           SYNTAX      DisplayString
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION
+               "Each day in the week is presented by an abbreviation: 'SUN',
+                'MON', TUE', 'WED', 'THU', 'FRI', and 'SAT'. The 'SUN' stands
+                for Sunday, 'MON' stands for Monday, and so on. If more than
+                one day is required, a comma is used to separate those days."
+           ::= { swTimeRangeMgmtEntry 2 }
+
+       swTimeRangeMgmtStartTime        OBJECT-TYPE
+           SYNTAX      DisplayString (SIZE (8))
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION
+                "The start time of a day. The format is hh:mm:ss ONLY; and
+                 cannot be set using a different format. The ending time must be
+                 set later than the starting time. The default value is 00:00:00."
+           ::= { swTimeRangeMgmtEntry 3 }
+
+       swTimeRangeMgmtEndTime  OBJECT-TYPE
+           SYNTAX      DisplayString (SIZE (8))
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION
+               "The end time of a day. The format is hh:mm:ss ONLY; and cannot
+                be set using a different format. The ending time must be set later
+                than the starting time. The default value is 23:59:59."
+           ::= { swTimeRangeMgmtEntry 4 }
+
+       swimeRangeMgmtStatus OBJECT-TYPE
+           SYNTAX      RowStatus
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION
+               "This object indicates the RowStatus of this entry."
+           ::= { swTimeRangeMgmtEntry  5 }
+
+-- -----------------------------------------------------------------------------
+       swTimeRangeACLTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF SwTimeRangeACLEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "This table maintains time-range settings associated with a specific
+                rule in the ACL rule table. Please refer to the swACLEtherRuleTable,
+                swACLIpRuleTable, swACLIpv6RuleTable and swACLPktContRuleTable
+                for detailed ACL rule information."
+           ::= { swTimeRangeMgmt 2 }
+
+       swTimeRangeACLEntry OBJECT-TYPE
+           SYNTAX      SwTimeRangeACLEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The entry maintains time-range names associated with the ACL
+                rule table."
+           INDEX { swTimeRangeACLProfileID, swTimeRangeACLAccessID}
+           ::= { swTimeRangeACLTable 1 }
+
+       SwTimeRangeACLEntry ::=
+           SEQUENCE {
+               swTimeRangeACLProfileID
+                   INTEGER,
+               swTimeRangeACLAccessID
+                   INTEGER,
+               swTimeRangeACLTimeRangeName
+                   DisplayString
+           }
+
+       swTimeRangeACLProfileID OBJECT-TYPE
+           SYNTAX      INTEGER
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The ID of the ACL mask entry, which is unique in the mask
+                list."
+           ::= { swTimeRangeACLEntry 1 }
+
+       swTimeRangeACLAccessID OBJECT-TYPE
+           SYNTAX      INTEGER(1..65535)
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The ID of the ACL rule entry as related to the
+                swTimeRangeACLProfileID."
+           ::= { swTimeRangeACLEntry 2 }
+
+       swTimeRangeACLTimeRangeName OBJECT-TYPE
+           SYNTAX      DisplayString  (SIZE (0..32))
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "Specifies a time-range name associated with a specific ACL
+                entry. The time-range name must first be created before being
+                associated with the access rule. If this name is an empty
+                string, it means the time-range profile will no longer be
+                associated with the access rule. When a rule is de-associated
+                with a time range, the access rule will be enabled all the
+                time."
+           ::= { swTimeRangeACLEntry 3 }
+
+-- -----------------------------------------------------------------------------
+       swTimeRangeCPUACLTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF SwTimeRangeCPUACLEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "This table maintains time-range settings associated with a specific
+                rule in the CPU ACL rule table. Please refer to the swCpuAclEtherRuleTable,
+                swCpuAclIpRuleTable, swCpuAclPktContRuleTable and swCpuAclIpv6RuleTable
+                for detailed CPU ACL rule information."
+           ::= { swTimeRangeMgmt 3 }
+
+       swTimeRangeCPUACLEntry OBJECT-TYPE
+           SYNTAX      SwTimeRangeCPUACLEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The entry maintains time-range names associated with the CPU ACL
+                rule table."
+           INDEX { swTimeRangeCPUACLProfileID, swTimeRangeCPUACLAccessID}
+           ::= { swTimeRangeCPUACLTable 1 }
+
+       SwTimeRangeCPUACLEntry ::=
+           SEQUENCE {
+               swTimeRangeCPUACLProfileID
+                   INTEGER,
+               swTimeRangeCPUACLAccessID
+                   INTEGER,
+               swTimeRangeCPUACLTimeRangeName
+                   DisplayString
+           }
+
+       swTimeRangeCPUACLProfileID OBJECT-TYPE
+           SYNTAX      INTEGER
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The ID of the CPU ACL mask entry, which is unique in the mask
+                list."
+           ::= { swTimeRangeCPUACLEntry 1 }
+
+       swTimeRangeCPUACLAccessID OBJECT-TYPE
+           SYNTAX      INTEGER(1..65535)
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The ID of the CPU ACL rule entry as related to the
+                swTimeRangeCPUACLProfileID."
+           ::= { swTimeRangeCPUACLEntry 2 }
+
+       swTimeRangeCPUACLTimeRangeName OBJECT-TYPE
+           SYNTAX      DisplayString  (SIZE (0..32))
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "Specifies a time-range name associated with a specific CPU ACL
+                entry. The time-range name must first be created before being
+                associated with the access rule. If this name is an empty
+                string, it means the time-range profile will no longer be
+                associated with the access rule. When a rule is de-associated
+                with a time range, the access rule will be enabled all the
+                time."
+           ::= { swTimeRangeCPUACLEntry 3 }
+           
+END

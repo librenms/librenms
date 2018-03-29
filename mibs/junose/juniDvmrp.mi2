@@ -1,0 +1,717 @@
+
+-- *****************************************************************************
+-- Juniper-DVMRP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DVMRP MIB
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DVMRP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, NOTIFICATION-TYPE,
+    IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    junidDvmrpInterfaceEntry
+        FROM DVMRP-STD-MIB-JUNI
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniDvmrpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200301162055Z"  -- 16-Jan-03 03:55 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Enterprise MIB module for management of Juniper DVMRP routers."
+    -- Revision History
+    REVISION    "200301162055Z"  -- 16-Jan-03 03:55 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added support for unicast routing and the interface announce list
+         name."
+    REVISION    "200111302124Z"  -- 30-Nov-01 04:24 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 44 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDvmrpMIBObjects OBJECT IDENTIFIER ::= { juniDvmrpMIB 1 }
+juniDvmrp           OBJECT IDENTIFIER ::= { juniDvmrpMIBObjects 1 }
+juniDvmrpScalar     OBJECT IDENTIFIER ::= { juniDvmrp 1 }
+
+--
+-- Juniper DVMRP scalar objects.
+--
+juniDvmrpAdminState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether DVMRP is enabled or not."
+    ::= { juniDvmrpScalar 1 }
+
+juniDvmrpMcastAdminState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether multicast is enabled or not.  This is settable via the
+        multicast component."
+    ::= { juniDvmrpScalar 2 }
+
+juniDvmrpRouteHogNotification  OBJECT-TYPE
+    SYNTAX      Integer32 (0..134217727)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of routes allowed within a 1 minute interval before a trap
+        is issued warning that there may be a route surge going on."
+    ::= { juniDvmrpScalar 3 }
+
+juniDvmrpRouteLimit  OBJECT-TYPE
+    SYNTAX      Integer32 (0..134217727)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The limit on the number of routes that may be advertised on a DVMRP
+        interface."
+    ::= { juniDvmrpScalar 4 }
+
+juniDvmrpS32PrunesOnly  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies when DVMRP is sending prunes and grafts with only a 32 bit
+        source masks."
+    ::= { juniDvmrpScalar 5 }
+
+juniDvmrpUnicastRouting  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable the unicast routing portion of the DVMRP."
+    ::= { juniDvmrpScalar 6 }
+
+
+--
+-- The Juniper DVMRP access list distance neighbor group.
+--
+juniDvmrpAclDistNbrTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDvmrpAclDistNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the access lists distance for a list of
+        neighbors."
+    ::= { juniDvmrp 2 }
+
+juniDvmrpAclDistNbrEntry  OBJECT-TYPE
+    SYNTAX      JuniDvmrpAclDistNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniDvmrpAclDistNbrTable."
+    INDEX     { juniDvmrpAclDistNbrIfIndex,
+                juniDvmrpAclDistNbrAclListName }
+    ::= { juniDvmrpAclDistNbrTable 1 }
+
+JuniDvmrpAclDistNbrEntry ::= SEQUENCE {
+    juniDvmrpAclDistNbrIfIndex              InterfaceIndex,
+    juniDvmrpAclDistNbrAclListName          DisplayString,
+    juniDvmrpAclDistNbrDistance             Integer32,
+    juniDvmrpAclDistNbrNbrListName          DisplayString,
+    juniDvmrpAclDistNbrStatus               RowStatus }
+
+juniDvmrpAclDistNbrIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which DVMRP is enabled."
+    ::= { juniDvmrpAclDistNbrEntry 1 }
+
+juniDvmrpAclDistNbrAclListName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..80))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the access list to be used in the filter."
+    ::= { juniDvmrpAclDistNbrEntry 2 }
+
+juniDvmrpAclDistNbrDistance  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administritive distance metric that will be used"
+    DEFVAL    { 1 }
+    ::= { juniDvmrpAclDistNbrEntry 3 }
+
+juniDvmrpAclDistNbrNbrListName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the access list of nbrs for this accept-filter to be applied,
+        this field must be supplied when the row is created"
+    ::= { juniDvmrpAclDistNbrEntry 4 }
+
+juniDvmrpAclDistNbrStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry."
+    ::= { juniDvmrpAclDistNbrEntry 5 }
+
+
+--
+-- The Juniper DVMRP Local Address table.
+-- This is used to retrive all of the addresses configured
+-- on a DVMRP interface.
+--
+juniDvmrpLocalAddrTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDvmrpLocalAddrTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the local addresses.  This is used to
+        retrive all of the addresses configured on a DVMRP interface."
+    ::= { juniDvmrp 3 }
+
+juniDvmrpLocalAddrTableEntry  OBJECT-TYPE
+    SYNTAX      JuniDvmrpLocalAddrTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniDvmrpLocalAddrTable."
+    INDEX     { juniDvmrpLocalAddrIfIndex,
+                juniDvmrpLocalAddrAddrOrIfIndex }
+    ::= { juniDvmrpLocalAddrTable 1 }
+
+JuniDvmrpLocalAddrTableEntry ::= SEQUENCE {
+    juniDvmrpLocalAddrIfIndex            InterfaceIndex,
+    juniDvmrpLocalAddrAddrOrIfIndex      Unsigned32,
+    juniDvmrpLocalAddrMask               IpAddress }
+
+juniDvmrpLocalAddrIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which DVMRP is enabled."
+    ::= { juniDvmrpLocalAddrTableEntry 1 }
+
+juniDvmrpLocalAddrAddrOrIfIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For unnumbered interfaces, this takes on the value of the ifIndex.  For
+        numbered interfaces, this is the address of one of the addresses
+        associated with the interface."
+    ::= { juniDvmrpLocalAddrTableEntry 2 }
+
+juniDvmrpLocalAddrMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address mask associated with this entry."
+    ::= { juniDvmrpLocalAddrTableEntry 3 }
+
+
+--
+-- The Juniper DVMRP Summary Address table.
+-- This is used to retrive all of the summary address configured
+-- on a DVMRP interface.
+--
+juniDvmrpSummaryAddrTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDvmrpSummaryAddrTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the DVMRP summary addresses.  This is
+        used to retrive all of the summary address configured on a DVMRP
+        interface."
+    ::= { juniDvmrp 4 }
+
+juniDvmrpSummaryAddrTableEntry  OBJECT-TYPE
+    SYNTAX      JuniDvmrpSummaryAddrTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniDvmrpSummaryAddrTable."
+    INDEX     { juniDvmrpSummaryAddrIfIndex,
+                juniDvmrpSummaryAddrAddress,
+                juniDvmrpSummaryAddrMask }
+    ::= { juniDvmrpSummaryAddrTable 1 }
+
+JuniDvmrpSummaryAddrTableEntry ::= SEQUENCE {
+    juniDvmrpSummaryAddrIfIndex          InterfaceIndex,
+    juniDvmrpSummaryAddrAddress          IpAddress,
+    juniDvmrpSummaryAddrMask             IpAddress,
+    juniDvmrpSummaryAddrCost             Integer32,
+    juniDvmrpSummaryAddrStatus           RowStatus }
+
+juniDvmrpSummaryAddrIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which DVMRP is enabled."
+    ::= { juniDvmrpSummaryAddrTableEntry 1 }
+
+juniDvmrpSummaryAddrAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the summary address that will be created."
+    ::= { juniDvmrpSummaryAddrTableEntry 2 }
+
+juniDvmrpSummaryAddrMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask of the summary address to be created."
+    ::= { juniDvmrpSummaryAddrTableEntry 3 }
+
+juniDvmrpSummaryAddrCost  OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administritive distance metric used to actually calculate distance
+        vectors."
+    DEFVAL    { 1 }
+    ::= { juniDvmrpSummaryAddrTableEntry 4 }
+
+juniDvmrpSummaryAddrStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry."
+    ::= { juniDvmrpSummaryAddrTableEntry 5 }
+
+
+--
+-- The Juniper DVMRP Interface Table.
+--
+juniDvmrpInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDvmrpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the router's multicast-capable
+        interfaces.  This table augments the DvmrpInterfaceTable."
+    ::= { juniDvmrp 5 }
+
+juniDvmrpInterfaceEntry  OBJECT-TYPE
+    SYNTAX      JuniDvmrpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniDvmrpInterfaceTable.  This row
+        extends ipMRouteInterfaceEntry in the IP Multicast MIB, where the
+        threshold object resides."
+    AUGMENTS  { junidDvmrpInterfaceEntry }
+    ::= { juniDvmrpInterfaceTable 1 }
+
+JuniDvmrpInterfaceEntry ::= SEQUENCE {
+    juniDvmrpInterfaceAutoSummary           INTEGER,
+    juniDvmrpInterfaceMetricOffsetOut       Integer32,
+    juniDvmrpInterfaceMetricOffsetIn        Integer32,
+    juniDvmrpInterfaceAdminState            INTEGER,
+    juniDvmrpInterfaceAnnounceListName      DisplayString }
+
+juniDvmrpInterfaceAutoSummary  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables or disable auto-summarization on this interface."
+    ::= { juniDvmrpInterfaceEntry 3 }
+
+juniDvmrpInterfaceMetricOffsetOut  OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The distance metric for this interface which is used to calculate
+        outbound distance vectors."
+    DEFVAL    { 0 }
+    ::= { juniDvmrpInterfaceEntry 4 }
+
+juniDvmrpInterfaceMetricOffsetIn  OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The distance metric for this interface which is used to calculate
+        inbound distance vectors."
+    DEFVAL    { 1 }
+    ::= { juniDvmrpInterfaceEntry 5 }
+
+juniDvmrpInterfaceAdminState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls whether DVMRP is enabled or not."
+    ::= { juniDvmrpInterfaceEntry 6 }
+
+juniDvmrpInterfaceAnnounceListName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures the name of the acceptance announce filter for the IP access
+        list."
+    ::= { juniDvmrpInterfaceEntry 7 }
+
+
+--
+-- The Juniper DVMRP Prune Table
+--
+juniDvmrpPruneTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDvmrpPruneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the router's upstream prune state."
+    ::= { juniDvmrp 6 }
+
+juniDvmrpPruneEntry  OBJECT-TYPE
+    SYNTAX      JuniDvmrpPruneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniDvmrpPruneTable."
+    INDEX     { juniDvmrpPruneGroup,
+                juniDvmrpPruneSource,
+                juniDvmrpPruneSourceMask }
+    ::= { juniDvmrpPruneTable 1 }
+
+JuniDvmrpPruneEntry ::= SEQUENCE {
+    juniDvmrpPruneGroup              IpAddress,
+    juniDvmrpPruneSource             IpAddress,
+    juniDvmrpPruneSourceMask         IpAddress,
+    juniDvmrpPruneIIFIfIndex         InterfaceIndex,
+    juniDvmrpPruneUpTime             TimeTicks }
+
+juniDvmrpPruneGroup  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group address which has been pruned."
+    ::= { juniDvmrpPruneEntry 1 }
+
+juniDvmrpPruneSource  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address of the source or source network which has been pruned."
+    ::= { juniDvmrpPruneEntry 2 }
+
+juniDvmrpPruneSourceMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address of the source or source network which has been pruned.  The
+        mask must either be all 1's, or else juniDvmrpPruneSource and
+        juniDvmrpPruneSourceMask must match juniDvmrpRouteSource and
+        juniDvmrpRouteSourceMask for some entry in the juniDvmrpRouteTable."
+    ::= { juniDvmrpPruneEntry 3 }
+
+juniDvmrpPruneIIFIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the upstream interface for this source group entry."
+    ::= { juniDvmrpPruneEntry 4 }
+
+juniDvmrpPruneUpTime  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the amount of time that this prune has remained valid."
+    ::= { juniDvmrpPruneEntry 5 }
+
+
+--
+-- The Juniper DVMRP source group OIF table
+--
+juniDvmrpSrcGrpOifTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDvmrpSrcGrpOifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) OIFs for particular source group entries."
+    ::= { juniDvmrp 7 }
+
+juniDvmrpSrcGrpOifEntry  OBJECT-TYPE
+    SYNTAX      JuniDvmrpSrcGrpOifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniDvmrpSrcGrpOifTable."
+    INDEX     { juniDvmrpSrcGrpOifGroup,
+                juniDvmrpSrcGrpOifSource,
+                juniDvmrpSrcGrpOifSourceMask,
+                juniDvmrpSrcGrpOifOIFIfIndex }
+    ::= { juniDvmrpSrcGrpOifTable 1 }
+
+JuniDvmrpSrcGrpOifEntry ::= SEQUENCE {
+    juniDvmrpSrcGrpOifGroup              IpAddress,
+    juniDvmrpSrcGrpOifSource             IpAddress,
+    juniDvmrpSrcGrpOifSourceMask         IpAddress,
+    juniDvmrpSrcGrpOifOIFIfIndex         InterfaceIndex,
+    juniDvmrpSrcGrpOifOIFPruned          INTEGER,
+    juniDvmrpSrcGrpOifOIFDnTTL           TimeTicks }
+
+juniDvmrpSrcGrpOifGroup  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group address which has been pruned."
+    ::= { juniDvmrpSrcGrpOifEntry 1 }
+
+juniDvmrpSrcGrpOifSource  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address of the source or source network which has been pruned."
+    ::= { juniDvmrpSrcGrpOifEntry 2 }
+
+juniDvmrpSrcGrpOifSourceMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address of the source or source network which has been pruned.  The
+        mask must either be all 1's, or else juniDvmrpPruneSource and
+        juniDvmrpPruneSourceMask must match juniDvmrpRouteSource and
+        juniDvmrpRouteSourceMask for some entry in the juniDvmrpRouteTable."
+    ::= { juniDvmrpSrcGrpOifEntry 3 }
+
+juniDvmrpSrcGrpOifOIFIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of one of the downstream interfaces for this source group
+        entry."
+    ::= { juniDvmrpSrcGrpOifEntry 4 }
+
+juniDvmrpSrcGrpOifOIFPruned  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    false(0),
+                    true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true this OIF has been pruned."
+    ::= { juniDvmrpSrcGrpOifEntry 5 }
+
+juniDvmrpSrcGrpOifOIFDnTTL  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The timeout for this OIF.  If juniDvmrpSrcGrpOifOIFPruned is false
+        then this is undefined."
+    ::= { juniDvmrpSrcGrpOifEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDvmrpTraps OBJECT IDENTIFIER ::= { juniDvmrp 0 }
+
+juniDvmrpRouteHogNotificationTrap  NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This is an indication that the route hog notification limit has been
+        exceeded during the past minute.  It may mean that a route surge is
+        going on."
+   ::= { juniDvmrpTraps 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDvmrpConformance OBJECT IDENTIFIER ::= { juniDvmrpMIB 4 }
+juniDvmrpCompliances OBJECT IDENTIFIER ::= { juniDvmrpConformance 1 }
+juniDvmrpGroups      OBJECT IDENTIFIER ::= { juniDvmrpConformance 2 }
+
+--
+-- compliance statements
+--
+juniDvmrpCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DVMRP MIB.  This statement became obsolete when new objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDvmrpBaseGroup,
+            juniDvmrpAclDistNbrGroup,
+            juniDvmrpInterfaceGroup,
+            juniDvmrpSourceGroup }
+    ::= { juniDvmrpCompliances 1 }                                 -- JUNOSe 3.0
+
+juniDvmrpCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper DVMRP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDvmrpBaseGroup2,
+            juniDvmrpAclDistNbrGroup,
+            juniDvmrpInterfaceGroup2,
+            juniDvmrpSourceGroup }
+    ::= { juniDvmrpCompliances 2 }                                 -- JUNOSe 5.0
+
+
+--
+-- units of conformance
+--
+juniDvmrpBaseGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDvmrpAdminState,
+        juniDvmrpMcastAdminState,
+        juniDvmrpRouteHogNotification,
+        juniDvmrpRouteLimit,
+        juniDvmrpS32PrunesOnly }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing basic management of DVMRP in a
+        Juniper product.  This group became obsolete when support was added for
+        the DVMRP unicast routing object."
+    ::= { juniDvmrpGroups 1 }
+
+juniDvmrpAclDistNbrGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDvmrpAclDistNbrDistance,
+        juniDvmrpAclDistNbrNbrListName,
+        juniDvmrpAclDistNbrStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of DVMRP access list
+        distance neighbors in a Juniper product."
+    ::= { juniDvmrpGroups 2 }
+
+juniDvmrpInterfaceGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDvmrpLocalAddrMask,
+
+        juniDvmrpSummaryAddrCost,
+        juniDvmrpSummaryAddrStatus,
+
+        juniDvmrpInterfaceAutoSummary,
+        juniDvmrpInterfaceMetricOffsetOut,
+        juniDvmrpInterfaceMetricOffsetIn,
+        juniDvmrpInterfaceAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of a DVMRP
+        interface in a Juniper product.  This group became obsolete when support
+        for the DVMRP interface announce list name object was added."
+    ::= { juniDvmrpGroups 3 }
+
+juniDvmrpSourceGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDvmrpPruneIIFIfIndex,
+        juniDvmrpPruneUpTime,
+
+        juniDvmrpSrcGrpOifOIFPruned,
+        juniDvmrpSrcGrpOifOIFDnTTL }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of a DVMRP source group in
+        a Juniper product."
+    ::= { juniDvmrpGroups 4 }
+
+juniDvmrpNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniDvmrpRouteHogNotificationTrap }
+    STATUS      current
+    DESCRIPTION
+        "A notification for signaling important DVMRP events."
+    ::= { juniDvmrpGroups 5 }
+
+juniDvmrpBaseGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniDvmrpAdminState,
+        juniDvmrpMcastAdminState,
+        juniDvmrpRouteHogNotification,
+        juniDvmrpRouteLimit,
+        juniDvmrpS32PrunesOnly,
+        juniDvmrpUnicastRouting  }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing basic management of DVMRP in a
+        Juniper product."
+    ::= { juniDvmrpGroups  6 }
+
+juniDvmrpInterfaceGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniDvmrpLocalAddrMask,
+
+        juniDvmrpSummaryAddrCost,
+        juniDvmrpSummaryAddrStatus,
+
+        juniDvmrpInterfaceAutoSummary,
+        juniDvmrpInterfaceMetricOffsetOut,
+        juniDvmrpInterfaceMetricOffsetIn,
+        juniDvmrpInterfaceAdminState ,
+        juniDvmrpInterfaceAnnounceListName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of a DVMRP interface in a
+        Juniper product."
+    ::= { juniDvmrpGroups 7 }
+
+END

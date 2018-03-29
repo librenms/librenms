@@ -1,0 +1,2433 @@
+--
+-- Juniper Enterprise Specific MIB: OTN interface management
+--
+-- Copyright (c) 2012-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-IFOTN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, NOTIFICATION-TYPE,
+    Unsigned32, Counter32, Integer32
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime, TEXTUAL-CONVENTION, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    jnxIfOtnMibRoot, jnxIfOtnNotifications
+        FROM JUNIPER-SMI
+    ifIndex, ifDescr
+        FROM IF-MIB
+    JnxoptIfOTNOChAlarms, JnxoptIfOTNODUkTcmAlarms
+        FROM JNX-OPT-IF-EXT-MIB;
+
+jnxIfOtnMib MODULE-IDENTITY
+    LAST-UPDATED "201609122015Z" -- Mon Sep 12 20:15:00 IST 2016
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION " Deprecated OCh2 tables and entries"
+    REVISION    "201609122015Z"
+    DESCRIPTION 
+            " Added OTN table entries for handling sub-port
+             in the interface name. With suffix OCH2"
+    REVISION   "201506241227Z" 
+    DESCRIPTION
+            "This MIB module defines objects used for managing the
+             OTN interface for Juniper products."
+    REVISION      "201201270000Z"
+    DESCRIPTION
+               "Added OTN Alarms and PM data."
+    REVISION      "201201270000Z"
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxIfOtnMibRoot 1 }
+
+--
+-- Textual Conventions
+--
+JnxIfAdminStates ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Admin states for an interface"
+    SYNTAX       INTEGER {
+                      jnxAdminStateInService(1), 
+                                      -- In service
+                      jnxAdminStateInServiceMA(2),
+                                      -- In service maintenance, the link is in
+                                      -- service, but alarms are suppressed
+                      jnxAdminStateOutofService(3), 
+                                      -- Out of service due to a fault
+                      jnxAdminStateOutofServiceMA(4)
+                                      -- OOS maintenance as configured by the
+                                      -- user, may or may not have alarms`
+                 }
+JnxIfOperStates ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Operational states for an interface"
+    SYNTAX       INTEGER {
+                       jnxOperStateInit(1),
+                                     -- Starting state of the interface
+                       jnxOperStateNormal(2),
+                                     -- The interface is working normally
+                       jnxOperStateFault(3),
+                                     -- There is some traffic affecting fault
+                                     -- on the interface eg LOS
+                       jnxOperStateDegraded(4)
+                                     -- There is some function affecting 
+                                     -- degrading the performance on the
+                                     --  interface for eg  BER
+                 }
+
+JnxIfOtnRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Rates for an interface "
+    SYNTAX       INTEGER {
+                   otu0(1),
+                   otu1(2),
+                   otu2(3),
+                   otu2e(4),
+                   otu3(5),
+                   otu4(6), 
+                   otu1e(7),
+                   otu5(8)
+                 }
+
+JnxIfOtnFecType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "fec modes of an interface "
+    SYNTAX       INTEGER {
+                     nofec(0),
+                     gfec(1),
+                     efecI2(2),
+                     efecI3(3),
+                     efecI4(4),
+                     efecI5(5),
+                     efecI6(6),
+                     efecI7(7),
+                     efecI8(8),
+                     efecI9(9),
+                     gfecandsdfec(10),
+                     sdfec(11),
+                     hgfec(12)
+                 }
+
+JnxIfOtnLayer  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  " Layer which describes the table"
+    SYNTAX       INTEGER {
+                    jnxOch(1),
+                    jnxOTUk(2),
+                    jnxODUk(3),
+                    jnxTCM(4)
+                 }
+
+JnxIfOtnType  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  " Near End or Far End "
+    SYNTAX       INTEGER {
+                    jnxNearEnd(1),
+                    jnxFarEnd(2)      
+                 }
+
+JnxIfOtnDirection  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  " Direction for the entities in the table"
+    SYNTAX       INTEGER {
+                    jnxTxDir(1),
+                    jnxRxDir(2),
+                    jnxBiDir(3)
+                 }
+
+
+JnxIfOtnSeverity  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  " Severity of the Notification"
+    SYNTAX       INTEGER {
+                     jnxCritical(1),
+                     jnxMajor(2),
+                     jnxMinor(3),
+                     jnxInfo(4)
+                 }
+
+JnxIfOtnServiceStateAction  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  " Notification's action on the service state"
+    SYNTAX       INTEGER {
+                     jnxNotSupported(0),
+                     jnxNonServiceAffecting(1),
+                     jnxServiceAffecting(2)
+                 }
+
+
+
+jnxIfOtn               OBJECT IDENTIFIER ::= { jnxIfOtnMib 1 }
+jnxIfOtnOCh2           OBJECT IDENTIFIER ::= { jnxIfOtnMib 2 }
+
+--
+-- Otn OCh options
+jnxIfOtnOChCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnOChCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the Otn OCh Config Table. "
+        ::= { jnxIfOtn 1 }
+
+jnxIfOtnOChCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnOChCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains of the Otn OCh Config Table."
+        INDEX   { jnxIfOtnOChCfgContainerIndex, jnxIfOtnOChCfgL1Index,
+                  jnxIfOtnOChCfgL2Index, jnxIfOtnOChCfgL3Index }
+        ::= { jnxIfOtnOChCfgTable 1 }
+
+JnxIfOtnOChCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnOChCfgContainerIndex
+                             Integer32,
+            jnxIfOtnOChCfgL1Index       
+                             Integer32,
+            jnxIfOtnOChCfgL2Index       
+                             Integer32,
+            jnxIfOtnOChCfgL3Index       
+                             Integer32,
+            jnxIfOtnLocalLoopback       
+                             TruthValue,
+            jnxIfOtnLineLoopback       
+                             TruthValue,
+            jnxIfOtnPayloadLoopback       
+                             TruthValue,
+            jnxIfOtnAdminState          
+                             JnxIfAdminStates,
+            jnxIfOtnOperState           
+                             JnxIfOperStates,
+            jnxIfOtnIndex              
+                             Unsigned32,
+            jnxIfOtnOChStatus         
+                             BITS,
+            jnxIfOtnOChPortMode
+                             Unsigned32
+    }
+
+    jnxIfOtnOChCfgContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+               "The associated jnxContentsContainerIndex  - eg shelf.."
+        ::= { jnxIfOtnOChCfgEntry 1 }
+
+    jnxIfOtnOChCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level one index associated with this subject ... eg fpc
+                 slot."
+        ::= { jnxIfOtnOChCfgEntry 2 }
+
+    jnxIfOtnOChCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level two index associated with this subject .. eg pic
+                 slot."
+        ::= { jnxIfOtnOChCfgEntry 3 }
+
+    jnxIfOtnOChCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level three index associated with this subject..
+                 eg port.
+                "
+        ::= { jnxIfOtnOChCfgEntry 4 }
+
+    jnxIfOtnLocalLoopback OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This is the local loopback at the Line (after the optics)."
+        ::= { jnxIfOtnOChCfgEntry 5 }
+
+    jnxIfOtnLineLoopback OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This is the line loopback at the Line."
+        ::= { jnxIfOtnOChCfgEntry 6 }
+
+    jnxIfOtnPayloadLoopback OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This is the Payload loopback before the optics."
+        ::= { jnxIfOtnOChCfgEntry 7 }
+
+    jnxIfOtnAdminState OBJECT-TYPE
+        SYNTAX          JnxIfAdminStates
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The Admin state of this interface"
+        ::= { jnxIfOtnOChCfgEntry 8 }
+
+    jnxIfOtnOperState OBJECT-TYPE
+        SYNTAX          JnxIfOperStates
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The operational state of this interface"
+        ::= { jnxIfOtnOChCfgEntry 9 }
+
+    jnxIfOtnIndex OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The interface ifIndex of this interface"
+        ::= { jnxIfOtnOChCfgEntry 10 }
+
+    jnxIfOtnOChStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            los(0),
+                            lof(1),
+                            lom(2),
+                            wavelengthlockerr(3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The interface status at the OCh layer."
+        ::= { jnxIfOtnOChCfgEntry 11 }
+
+    jnxIfOtnOChPortMode OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Port Mode for this interface
+                 0  -  default (not applicable)
+                 1  -  lan
+                 2  -  wan 
+                 3  -  gfp
+                "
+        ::= { jnxIfOtnOChCfgEntry 12 }
+
+
+
+
+-- otn interface options 
+--
+jnxIfOtnOTUkCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnOTUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the Otn OTUk config table. "
+        ::= { jnxIfOtn 2 }
+
+jnxIfOtnOTUkCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnOTUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains the Otn OTUk config table.
+                 "
+        INDEX   { jnxIfOtnOTUkCfgContainerIndex, jnxIfOtnOTUkCfgL1Index,
+                  jnxIfOtnOTUkCfgL2Index, jnxIfOtnOTUkCfgL3Index }
+        ::= { jnxIfOtnOTUkCfgTable 1 }
+
+JnxIfOtnOTUkCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnOTUkCfgContainerIndex         
+                                  Integer32,
+            jnxIfOtnOTUkCfgL1Index         
+                                  Integer32,
+            jnxIfOtnOTUkCfgL2Index       
+                                  Integer32,
+            jnxIfOtnOTUkCfgL3Index    
+                                  Integer32,
+            jnxIfOtnOTUkCfgRate 
+                                  JnxIfOtnRate,
+            jnxIfOtnOTUkCfgFecMode
+                                  JnxIfOtnFecType,
+            jnxIfOtnOTUkEnableAutoFrrByteInsert
+                                  TruthValue,
+            jnxIfOtnOTUkEnableBERFrrSupport
+                                  TruthValue,
+            jnxIfOtnOTUkPreFecBERThresholdMantissa
+                                  Integer32,
+            jnxIfOtnOTUkPreFecBERThresholdExponent
+                                  Integer32,
+            jnxIfOtnOTUkPreFecBERThresholdTime    
+                                  Integer32,
+            jnxIfOtnOTUkTIMActEnabled
+                                  TruthValue,
+            jnxIfOtnOTUkTxTTI
+                                  OCTET STRING,
+            jnxIfOtnOTUkRxTTI
+                                  OCTET STRING,
+            jnxIfOtnOTUkExpectedRxSapi
+                                  OCTET STRING,
+            jnxIfOtnOTUkExpectedRxDapi
+                                  OCTET STRING,
+            jnxIfOtnOTUkStatus
+                                  BITS,
+            jnxIfOtnOTUkPreFecBERThresholdClearMantissa
+                                  Integer32,
+            jnxIfOtnOTUkPreFecBERThresholdClearExponent
+                                  Integer32
+    }
+
+    jnxIfOtnOTUkCfgContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The associated jnxContentsContainerIndex  - eg shelf."
+        ::= { jnxIfOtnOTUkCfgEntry 1 }
+
+    jnxIfOtnOTUkCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level one index associated with this subject ... eg fpc
+                 slot."
+        ::= { jnxIfOtnOTUkCfgEntry 2 }
+
+    jnxIfOtnOTUkCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level two index associated with this subject .. eg pic
+                 slot."
+        ::= { jnxIfOtnOTUkCfgEntry 3 }
+
+    jnxIfOtnOTUkCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level three index associated with this subject.. 
+                 eg port.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 4 }
+
+
+    jnxIfOtnOTUkCfgRate OBJECT-TYPE
+        SYNTAX          JnxIfOtnRate
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This is the rate for the interface and the rates depend
+                  on the interface/fru type. 
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 5 }
+
+    jnxIfOtnOTUkCfgFecMode OBJECT-TYPE
+        SYNTAX          JnxIfOtnFecType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This is the Fec type in the OTU frame and the selection
+                  depends on the interface/fru type.  "
+        ::= { jnxIfOtnOTUkCfgEntry 6 }
+
+    jnxIfOtnOTUkEnableAutoFrrByteInsert OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will enable/disable the automatic insertion of 
+                  the frr SF/SD byte in the overhead bytes(RES) "
+        ::= { jnxIfOtnOTUkCfgEntry 7 }
+
+    jnxIfOtnOTUkEnableBERFrrSupport OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will enable/disable the FRR support for BER "
+        ::= { jnxIfOtnOTUkCfgEntry 8 }
+
+    jnxIfOtnOTUkPreFecBERThresholdMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(mantissa), which when
+                  crossed will trigger Signal Degrade.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 9 }
+
+    jnxIfOtnOTUkPreFecBERThresholdExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(exponent), which when
+                  crossed will trigger Signal Degrade.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 10 }
+
+    jnxIfOtnOTUkPreFecBERThresholdTime OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ms"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " 
+                  The collection times (1ms - 1sec) to calculate the BER.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 11 }
+
+    jnxIfOtnOTUkTIMActEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                 Indicates whether the Trace Identifier Mismatch (TIM)
+                 Consequent Action function is enabled.
+                 The default value of this object is false(2).
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 12 }
+
+    jnxIfOtnOTUkTxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " 
+                  The Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined  
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 13 }
+
+    jnxIfOtnOTUkRxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                  The Receive Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 14 }
+
+    jnxIfOtnOTUkExpectedRxSapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Expected receive SAPI.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 15 }
+
+    jnxIfOtnOTUkExpectedRxDapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Expected receive DAPI. 
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 16 }
+
+    jnxIfOtnOTUkStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            ais(0),
+                            bdi(1),
+                            iae(2),
+                            ttim(3),
+                            sf(4),
+                            sd(5),
+                            biae(6),
+                            tsf(7),
+                            ssf(8),
+                            fecexcessive(9),
+                            fecdegrade(10)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The interface status at the OTUk layer."
+        ::= { jnxIfOtnOTUkCfgEntry 17 }
+
+    jnxIfOtnOTUkPreFecBERThresholdClearMantissa OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(mantissa) for clear signal
+                  degrade condition, which signal degrade condition will be
+                  cleared when Pre-Fec error count is below the clear
+                  threshold error count.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 18 }
+
+    jnxIfOtnOTUkPreFecBERThresholdClearExponent OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This will set the BER threshold(exponent) for clear signal
+                  degrade condition, which signal degrade condition will be
+                  cleared when Pre-Fec error count is below the clear threshold
+                  error count.
+                "
+        ::= { jnxIfOtnOTUkCfgEntry 19 }
+
+--
+-- ODUk config table
+--
+
+jnxIfOtnODUkCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnODUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the Otn ODUk config table. "
+        ::= { jnxIfOtn 3 }
+
+jnxIfOtnODUkCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnODUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains information about the 
+                  Otn ODUk config.
+                 "
+        INDEX   { jnxIfOtnODUkCfgContainerIndex, jnxIfOtnODUkCfgL1Index,
+                  jnxIfOtnODUkCfgL2Index, jnxIfOtnODUkCfgL3Index
+                 }
+        ::= { jnxIfOtnODUkCfgTable 1 }
+
+JnxIfOtnODUkCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnODUkCfgContainerIndex
+                                  Integer32,
+            jnxIfOtnODUkCfgL1Index       
+                                  Integer32,
+            jnxIfOtnODUkCfgL2Index       
+                                  Integer32,
+            jnxIfOtnODUkCfgL3Index       
+                                  Integer32,
+            jnxIfOtnODUkAPSPCC0          
+                                  Integer32,
+            jnxIfOtnODUkAPSPCC1          
+                                  Integer32,
+            jnxIfOtnODUkAPSPCC2          
+                                  Integer32,
+            jnxIfOtnODUkAPSPCC3          
+                                  Integer32,
+            jnxIfOtnODUkPayloadType      
+                                  Integer32,
+            jnxIfOtnODUkTIMActEnabled
+                                  TruthValue,
+            jnxIfOtnODUkTxTTI
+                                  OCTET STRING,
+            jnxIfOtnODUkRxTTI
+                                  OCTET STRING,
+            jnxIfOtnODUkExpectedRxSapi
+                                  OCTET STRING,
+            jnxIfOtnODUkExpectedRxDapi
+                                  OCTET STRING,
+            jnxIfOtnODUkStatus
+                                  BITS,
+            jnxIfOtnODUkRxPayloadType      
+                                  Integer32
+     }
+
+    jnxIfOtnODUkCfgContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+               "The associated jnxContentsContainerIndex  - eg shelf.."
+        ::= { jnxIfOtnODUkCfgEntry 1 }
+
+    jnxIfOtnODUkCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level one index associated with this subject ... eg fpc
+                 slot."
+        ::= { jnxIfOtnODUkCfgEntry 2 }
+
+    jnxIfOtnODUkCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level two index associated with this subject .. eg 
+                 pic slot."
+        ::= { jnxIfOtnODUkCfgEntry 3 }
+
+    jnxIfOtnODUkCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level three index associated with this subject..
+                  eg port.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 4 }
+
+
+     jnxIfOtnODUkAPSPCC0 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 0 for this ODUk only.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 5 }
+
+     jnxIfOtnODUkAPSPCC1 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 1 for this ODUk only.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 6 }
+
+     jnxIfOtnODUkAPSPCC2 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 2 for this ODUk only.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 7 }
+
+     jnxIfOtnODUkAPSPCC3 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 3 for this ODUk only.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 8 }
+
+     jnxIfOtnODUkPayloadType OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Read/Write Payload Type for ODUk only.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 9 }
+
+    jnxIfOtnODUkTIMActEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                 Indicates whether the Trace Identifier Mismatch (TIM)
+                 Consequent Action function is enabled.
+                 The default value of this object is false(2).
+                "
+        ::= { jnxIfOtnODUkCfgEntry 10 }
+
+    jnxIfOtnODUkTxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  The Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 11 }
+
+    jnxIfOtnODUkRxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                  The Receive Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 12 }
+
+    jnxIfOtnODUkExpectedRxSapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                "
+                  Expected receive SAPI for this layer.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 13 }
+
+    jnxIfOtnODUkExpectedRxDapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Expected receive DAPI for this layer.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 14 }
+
+    jnxIfOtnODUkStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            ais(0),
+                            bdi(1),
+                            iae(2),
+                            ttim(3),
+                            sf(4),
+                            sd(5),
+                            biae(6),
+                            tsf(7),
+                            ssf(8),
+                            csf(9),
+                            oci(10),
+                            lck(11),
+                            ltc(12),
+                            ptm(13)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The  status at the ODUk layer
+                 Only some of these alarms are valid for the TCM layer
+                "
+        ::= { jnxIfOtnODUkCfgEntry 15 }
+
+     jnxIfOtnODUkRxPayloadType OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                  Receive  Payload Type for ODUk only.
+                "
+        ::= { jnxIfOtnODUkCfgEntry 16 }
+
+--
+-- TCM Config Table
+--
+
+
+jnxIfOtnTcmCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnTcmCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the Otn TCM config table. "
+        ::= { jnxIfOtn 4 }
+
+jnxIfOtnTcmCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnTcmCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains information about the
+                  Otn Tcm config.
+                 "
+        INDEX   { jnxIfOtnTcmCfgContainerIndex, jnxIfOtnTcmCfgL1Index,
+                  jnxIfOtnTcmCfgL2Index, jnxIfOtnTcmCfgL3Index,
+                  jnxIfOtnTcmCfgLevel
+                 }
+        ::= { jnxIfOtnTcmCfgTable 1 }
+
+
+JnxIfOtnTcmCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnTcmCfgContainerIndex
+                                  Integer32,
+            jnxIfOtnTcmCfgL1Index
+                                  Integer32,
+            jnxIfOtnTcmCfgL2Index
+                                  Integer32,
+            jnxIfOtnTcmCfgL3Index
+                                  Integer32,
+            jnxIfOtnTcmCfgLevel
+                                  Integer32,
+            jnxIfOtnTCMEnable
+                                  TruthValue,
+            jnxIfOtnTcmTxTTI
+                                  OCTET STRING,
+            jnxIfOtnTcmRxTTI
+                                  OCTET STRING,
+            jnxIfOtnTcmExpectedRxSapi
+                                  OCTET STRING,
+            jnxIfOtnTcmExpectedRxDapi
+                                  OCTET STRING,
+            jnxIfOtnTcmStatus
+                                  BITS
+     }
+
+    jnxIfOtnTcmCfgContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The associated jnxContentsContainerIndex  - eg shelf."
+        ::= { jnxIfOtnTcmCfgEntry 1 }
+
+    jnxIfOtnTcmCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+               "The level one index associated with this subject ... eg fpc
+                slot."
+        ::= { jnxIfOtnTcmCfgEntry 2 }
+
+    jnxIfOtnTcmCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level two index associated with this subject .. eg pic
+                 slot."
+        ::= { jnxIfOtnTcmCfgEntry 3 }
+
+    jnxIfOtnTcmCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level three index associated with this subject..
+                 eg port.
+                "
+        ::= { jnxIfOtnTcmCfgEntry 4 }
+
+
+     jnxIfOtnTcmCfgLevel OBJECT-TYPE
+        SYNTAX          Integer32 (1..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    The TCM level for the Table
+                "
+        ::= { jnxIfOtnTcmCfgEntry 5 }
+
+     jnxIfOtnTCMEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   Enable this TCM layer (only for TCM layers)
+                "
+        ::= { jnxIfOtnTcmCfgEntry 6 }
+
+
+    jnxIfOtnTcmTxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  The Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnTcmCfgEntry 7 }
+
+    jnxIfOtnTcmRxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                  The Receive Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnTcmCfgEntry 8 }
+
+
+    jnxIfOtnTcmExpectedRxSapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Expected receive SAPI for this layer.
+                "
+        ::= { jnxIfOtnTcmCfgEntry 9 }
+
+    jnxIfOtnTcmExpectedRxDapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Expected receive DAPI for this layer.
+                "
+        ::= { jnxIfOtnTcmCfgEntry 10 }
+
+
+    jnxIfOtnTcmStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            ais(0),
+                            bdi(1),
+                            iae(2),
+                            ttim(3),
+                            biae(6),
+                            tsf(7),
+                            ssf(8),
+                            ltc(9)
+                        }
+
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                 The  status at the TCM layer.
+                "
+        ::= { jnxIfOtnTcmCfgEntry 11 }
+
+
+
+
+--
+-- ODUK Maintainenance/Test table
+--
+jnxIfOtnODUkTcmTestTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnODUkTcmTestEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the Otn ODUk Test function table. "
+        ::= { jnxIfOtn 5 }
+
+jnxIfOtnODUkTcmTestEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnODUkTcmTestEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains information about the
+                  Otn ODUk Test function.
+                 "
+        INDEX   { ifIndex, jnxIfOtnODUkTcmTestLayer,
+                  jnxIfOtnODUkTcmTestTCMLevel }
+        ::= { jnxIfOtnODUkTcmTestTable 1 }
+
+JnxIfOtnODUkTcmTestEntry ::=
+    SEQUENCE {
+            jnxIfOtnODUkTcmTestLayer
+                                  JnxIfOtnLayer,
+            jnxIfOtnODUkTcmTestTCMLevel
+                                  Integer32,
+            jnxIfOtnODUkTcmInsertAis
+                                  TruthValue,
+            jnxIfOtnODUkTcmInsertLck
+                                  TruthValue,
+            jnxIfOtnODUkTcmInsertOci
+                                  TruthValue,
+            jnxIfOtnODUkPayloadPRBS
+                                  TruthValue,
+            jnxIfOtnODUkPayloadPRBSResult 
+                                  OCTET STRING
+      }
+
+    jnxIfOtnODUkTcmTestLayer OBJECT-TYPE
+        SYNTAX          JnxIfOtnLayer
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    The layer OTU/ODU/TCM layer for the alarm
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 1 }
+
+    jnxIfOtnODUkTcmTestTCMLevel OBJECT-TYPE
+        SYNTAX          Integer32(0..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    For ODUk will be this will be 0
+                    If layer is TCM then this will give the TCM
+                    level 1..6.
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 2 }
+
+     jnxIfOtnODUkTcmInsertAis OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                    Insert ODU Ais into OTN stream.
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 3 }
+
+     jnxIfOtnODUkTcmInsertLck OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                    Insert ODU Lck into OTN stream.
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 4 }
+
+     jnxIfOtnODUkTcmInsertOci OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                    Insert ODU Oci into OTN stream.
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 5 }
+
+     jnxIfOtnODUkPayloadPRBS OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                    Insert Payload PRBS, For ODUK layer and TCM level is 0.
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 6 }
+
+     jnxIfOtnODUkPayloadPRBSResult OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                  Result of the Payload PRBS .
+                "
+        ::= { jnxIfOtnODUkTcmTestEntry 7 }
+
+--
+-- ODUK/TCM Delay Measurement Table
+--
+
+jnxIfOtnODUkTcmDMTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnODUkTcmDMEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table for Otn ODUk/TCM  Delay Measurement config table. "
+        ::= { jnxIfOtn 6 }
+
+jnxIfOtnODUkTcmDMEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnODUkTcmDMEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains information about the
+                  Delay Measurement test table. 
+                 "
+        INDEX   { ifIndex, jnxIfOtnODUkTcmDMLayer,
+                  jnxIfOtnODUkTcmDMLevel
+                }
+        ::= { jnxIfOtnODUkTcmDMTable 1 }
+
+JnxIfOtnODUkTcmDMEntry ::=
+    SEQUENCE {
+        jnxIfOtnODUkTcmDMLayer
+                     Integer32,
+        jnxIfOtnODUkTcmDMLevel
+                     Integer32,
+        jnxIfOtnDMConnectionMonitoringEndpoint
+                     TruthValue,
+        jnxIfOtnDMBypass
+                     TruthValue,
+        jnxIfOtnDMPersistFrames
+                     Integer32,
+        jnxIfOtnDMEnable
+                     TruthValue
+    }
+
+    jnxIfOtnODUkTcmDMLayer OBJECT-TYPE
+        SYNTAX          JnxIfOtnLayer
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    The layer OTU/ODU/TCM layer for the alarm
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 1 }
+
+    jnxIfOtnODUkTcmDMLevel OBJECT-TYPE
+        SYNTAX          Integer32(0..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    For ODUk will be this will be 0
+                    If layer is TCM then this will give the TCM
+                    level 1..6.
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 2 }
+
+    jnxIfOtnDMConnectionMonitoringEndpoint OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   Originate Connection Monitoring Endpoint for the Delay 
+                   Measurement
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 3 }
+
+    jnxIfOtnDMBypass OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   Act as tandem, passing Dm value through node
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 4 }
+
+    jnxIfOtnDMPersistFrames OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Number of consequtive frames required to declare Dm Complete 
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 5 }
+
+    jnxIfOtnDMEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                  Start/Stop the DM measurement 
+                "
+        ::= { jnxIfOtnODUkTcmDMEntry 6 }
+
+
+
+
+--
+-- Notification Trigger Table
+-- 
+
+jnxIfOtnNotificationTrigDefaultHoldtimeUp OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   This object will indicate the time (ms) for the defect to
+                   persist before it is declared an alarm.
+                "
+       ::= { jnxIfOtn 7 } 
+
+jnxIfOtnNotificationTrigDefaultHoldtimeDown OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   This object will indicate the time (ms) for the defect to
+                   absent before the alarm is cleared.
+                "
+       ::= { jnxIfOtn 8 }
+
+jnxIfOtnNotificationTrigTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnNotificationTrigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the otn Alarm/Alart/Info trigger table. "
+        ::= { jnxIfOtn 9 }
+
+jnxIfOtnNotificationTrigEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnNotificationTrigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that contains information about the Otn
+                  Alarm Trigger Table.
+                 "
+        INDEX   { jnxIfOtnNotificationTrigContainerIndex,
+                  jnxIfOtnNotificationTrigL1Index,
+                  jnxIfOtnNotificationTrigL2Index,
+                  jnxIfOtnNotificationTrigL3Index,
+                  jnxIfOtnNotificationTrigLayer,
+                  jnxIfOtnNotificationTrigTCMLevel,
+                  jnxIfOtnNotificationTrigAlmId }
+        ::= { jnxIfOtnNotificationTrigTable 1 }
+
+JnxIfOtnNotificationTrigEntry ::=
+    SEQUENCE {
+            jnxIfOtnNotificationTrigContainerIndex
+                                Integer32,
+            jnxIfOtnNotificationTrigL1Index
+                                Integer32,
+            jnxIfOtnNotificationTrigL2Index       
+                                Integer32,
+            jnxIfOtnNotificationTrigL3Index       
+                                Integer32,
+            jnxIfOtnNotificationTrigLayer         
+                                JnxIfOtnLayer,
+            jnxIfOtnNotificationTrigTCMLevel      
+                                Integer32,
+            jnxIfOtnNotificationTrigAlmId           
+                                Integer32,
+            jnxIfOtnNotificationTrigSeverity       
+                                JnxIfOtnSeverity,
+            jnxIfOtnNotificationTrigIgnore         
+                                TruthValue,
+            jnxIfOtnNotificationTrigHoldtimeUp    
+                                Integer32,
+            jnxIfOtnNotificationTrigHoldtimeDown     
+                                Integer32,
+            jnxIfOtnTrigServiceStateAction       
+                                JnxIfOtnServiceStateAction
+    }
+
+    jnxIfOtnNotificationTrigContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The associated jnxContentsContainerIndex  - eg shelf."
+        ::= { jnxIfOtnNotificationTrigEntry 1 }
+
+    jnxIfOtnNotificationTrigL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level one index associated with this subject ... eg fpc
+                 slot."
+        ::= { jnxIfOtnNotificationTrigEntry 2 }
+
+    jnxIfOtnNotificationTrigL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level two index associated with this subject .. eg pic
+                 slot."
+        ::= { jnxIfOtnNotificationTrigEntry 3 }
+
+    jnxIfOtnNotificationTrigL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The level three index associated with this subject..
+                 eg port.
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 4 }
+
+    jnxIfOtnNotificationTrigLayer OBJECT-TYPE
+        SYNTAX          JnxIfOtnLayer 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    The layer OTU/ODU/TCM layer for the alarm
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 5 }
+
+    jnxIfOtnNotificationTrigTCMLevel OBJECT-TYPE
+        SYNTAX          Integer32(0..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    For OCh/OTUk/ODUk will be this will be 0
+                    If layer is TCM then this will give the TCM
+                    level 1..6. 
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 6 }
+
+    jnxIfOtnNotificationTrigAlmId OBJECT-TYPE
+        SYNTAX          Integer32(0..255) 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "
+                    This will be the ID of Alarm for that layer 
+                    'JnxoptIfOTNOChAlarms'/'JnxoptIfOTNODUkTcmAlarms'.
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 7 }
+
+    jnxIfOtnNotificationTrigSeverity OBJECT-TYPE
+        SYNTAX          JnxIfOtnSeverity
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                 This will be the Severity of the Notification for that layer.
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 8 }
+
+    jnxIfOtnNotificationTrigIgnore OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   This object will ignore the alarm when set. 
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 9 }
+
+
+    jnxIfOtnNotificationTrigHoldtimeUp OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   This object will indicate the time (ms) for the defect to 
+                   persist before it is declared an alarm.
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 10 }
+
+    jnxIfOtnNotificationTrigHoldtimeDown OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "
+                   This object will indicate the time (ms) for the defect is
+                   absent before the alarm is cleared.
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 11 }
+
+    jnxIfOtnTrigServiceStateAction OBJECT-TYPE
+        SYNTAX          JnxIfOtnServiceStateAction
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "
+                   This will indicate whether this alarm is service affecting
+                   or not .
+                "
+        ::= { jnxIfOtnNotificationTrigEntry 12 }
+
+
+
+-- Clear for all Performance monitoring counters on this interface
+--
+jnxOtnClearAllPMs OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                " To clear all Performance monitoring counters on OTN
+                  interfaces "
+        ::= { jnxIfOtn  10 }
+
+jnxOtnClearInterfacePMs OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                " To clear all Performance monitoring counters on this OTN
+                  interfaces "
+        INDEX       { ifIndex }
+        ::= { jnxIfOtn  11 }
+
+jnxOtnClearInterfaceCurrentPM OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                " To clear the current Performance monitoring counters on 
+                  this OTN interfaces "
+        INDEX       { ifIndex }
+        ::= { jnxIfOtn  12 }
+
+
+-- Clear PM's for Interfaces
+jnxOtnClearIfPMsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnClearIfPMsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                " To clear OTN Performance monitoring counters on this OTN
+                  interfaces "
+        INDEX       { ifIndex }
+        ::= { jnxIfOtn  13 }
+
+jnxOtnClearIfPMsEntry OBJECT-TYPE
+        SYNTAX     JnxOtnClearIfPMsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "A conceptual row that s used to clear the OTN PM Table."
+        INDEX   { ifIndex }
+        ::= { jnxOtnClearIfPMsTable 1 }
+
+JnxOtnClearIfPMsEntry ::=
+    SEQUENCE {
+            jnxOtnClearCurrent
+                             TruthValue,
+            jnxOtnClearInterfaceInterval
+                             TruthValue,
+            jnxOtnClearInterfaceDay
+                             TruthValue,
+            jnxOtnClearInterfaceAll
+                             TruthValue
+    }
+
+    jnxOtnClearCurrent OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+               " 1- to clear all the current OTN PM's for this interface
+               "
+        ::= { jnxOtnClearIfPMsEntry 1 }
+
+    jnxOtnClearInterfaceInterval OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+               " 1- to clear all the OTN PM's intervals(1-96) for this
+                 interface
+               "
+        ::= { jnxOtnClearIfPMsEntry 2 }
+
+    jnxOtnClearInterfaceDay OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+               " 1 - to clear all the Current Day and Previous Day OTN PM's
+                     for this interface
+               "
+        ::= { jnxOtnClearIfPMsEntry 3 }
+
+    jnxOtnClearInterfaceAll OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+               " 1 - to clear all the OTN PM's for this interface
+               "
+        ::= { jnxOtnClearIfPMsEntry 4 }
+
+
+
+-- Otn OCh2 options
+--
+jnxIfOtnOCh2CfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnOCh2CfgEntry
+        MAX-ACCESS not-accessible
+        STATUS    obsolete 
+        DESCRIPTION
+                "Table was for 48x10G/12x40G gingerALE PIC in 10G mode. 
+                 It is not supported hence marked as obsolete.
+                 Information about the Otn OCh2 Config Table. "
+        ::= { jnxIfOtnOCh2 1 }
+
+jnxIfOtnOCh2CfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnOCh2CfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                 "A conceptual row that contains of the Otn OCh2 Config Table."
+        INDEX   { jnxIfOtnOCh2CfgContainerIndex, jnxIfOtnOCh2CfgL1Index,
+                  jnxIfOtnOCh2CfgL2Index, jnxIfOtnOCh2CfgL3Index,
+                  jnxIfOtnOCh2CfgL4Index }
+        ::= { jnxIfOtnOCh2CfgTable 1 }
+
+JnxIfOtnOCh2CfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnOCh2CfgContainerIndex
+                          Integer32,
+            jnxIfOtnOCh2CfgL1Index 
+                          Integer32,
+            jnxIfOtnOCh2CfgL2Index 
+                          Integer32,
+            jnxIfOtnOCh2CfgL3Index 
+                          Integer32,
+            jnxIfOtnOCh2CfgL4Index 
+                          Integer32,
+            jnxIfOtnOCh2LocalLoopback
+                             TruthValue,
+            jnxIfOtnOCh2LineLoopback     
+                             TruthValue,
+            jnxIfOtnOCh2PayloadLoopback
+                             TruthValue,
+            jnxIfOtnOCh2AdminState
+                             JnxIfAdminStates,
+            jnxIfOtnOCh2OperState
+                             JnxIfOperStates,
+            jnxIfOtnOCh2Index
+                             Unsigned32,
+            jnxIfOtnOCh2Status
+                             BITS,
+            jnxIfOtnOCh2PortMode
+                             Unsigned32
+    }
+
+    jnxIfOtnOCh2CfgContainerIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Container Index associated with the object instance."
+        ::= { jnxIfOtnOCh2CfgEntry 1 }
+
+    jnxIfOtnOCh2CfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "FPC slot number of the interface."
+        ::= { jnxIfOtnOCh2CfgEntry 2 }
+
+    jnxIfOtnOCh2CfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "PIC slot number of the interface."
+        ::= { jnxIfOtnOCh2CfgEntry 3 }        
+
+    jnxIfOtnOCh2CfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Port number of the interface."
+        ::= { jnxIfOtnOCh2CfgEntry 4 }
+
+    jnxIfOtnOCh2CfgL4Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Sub-Port number of the interface."
+        ::= { jnxIfOtnOCh2CfgEntry 5 }
+
+    jnxIfOtnOCh2LocalLoopback OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "This is the local loopback at the Line (after the optics)."
+        ::= { jnxIfOtnOCh2CfgEntry 6 }
+
+    jnxIfOtnOCh2LineLoopback OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "This is the line loopback at the Line."
+        ::= { jnxIfOtnOCh2CfgEntry 7 }
+
+    jnxIfOtnOCh2PayloadLoopback OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "This is the Payload loopback before the optics."
+        ::= { jnxIfOtnOCh2CfgEntry 8 }
+
+    jnxIfOtnOCh2AdminState OBJECT-TYPE
+        SYNTAX          JnxIfAdminStates
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "The Admin state of this interface"
+        ::= { jnxIfOtnOCh2CfgEntry 9 }
+
+    jnxIfOtnOCh2OperState OBJECT-TYPE
+        SYNTAX          JnxIfOperStates
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "The operational state of this interface"
+        ::= { jnxIfOtnOCh2CfgEntry 10 }
+
+    jnxIfOtnOCh2Index OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "The interface ifIndex of this interface"
+        ::= { jnxIfOtnOCh2CfgEntry 11 }
+
+    jnxIfOtnOCh2Status OBJECT-TYPE
+        SYNTAX          BITS {
+                            los(0),
+                            lof(1),
+                            lom(2),
+                            wavelengthlockerr(3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The interface status at the OCh layer."
+        ::= { jnxIfOtnOCh2CfgEntry 12 }
+
+    jnxIfOtnOCh2PortMode OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "The Port Mode for this interface
+                 0  -  default (not applicable)
+                 1  -  lan
+                 2  -  wan 
+                 3  -  gfp
+                "
+        ::= { jnxIfOtnOCh2CfgEntry 13 }
+
+-- otn ch2 interface options 
+--
+jnxIfOtnOCh2OTUkCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnOCh2OTUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                "Table was for 48x10G/12x40G gingerALE PIC in 10G mode.
+                 It is not supported hence marked as obsolete.
+                 Information about the Otn OCh2 OTUk config table. "
+        ::= { jnxIfOtnOCh2 2 }
+
+jnxIfOtnOCh2OTUkCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnOCh2OTUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                 "A conceptual row that contains the Otn OCh2 OTUk config table.
+                 "
+        INDEX   { jnxIfOtnOCh2OTUkCfgContIndx, jnxIfOtnOCh2OTUkCfgL1Index,
+                  jnxIfOtnOCh2OTUkCfgL2Index, jnxIfOtnOCh2OTUkCfgL3Index,
+                  jnxIfOtnOCh2OTUkCfgL4Index }
+        ::= { jnxIfOtnOCh2OTUkCfgTable 1 }
+
+JnxIfOtnOCh2OTUkCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnOCh2OTUkCfgContIndx 
+                                  Integer32,
+            jnxIfOtnOCh2OTUkCfgL1Index 
+                                  Integer32,
+            jnxIfOtnOCh2OTUkCfgL2Index 
+                                  Integer32,
+            jnxIfOtnOCh2OTUkCfgL3Index 
+                                  Integer32,
+            jnxIfOtnOCh2OTUkCfgL4Index 
+                                  Integer32,
+            jnxIfOtnOCh2OTUkCfgRate
+                                  JnxIfOtnRate,
+            jnxIfOtnOCh2OTUkCfgFecMode
+                                  JnxIfOtnFecType,
+            jnxIfOtnOCh2OTUkEnAutoFrrByteIns
+                                  TruthValue,
+            jnxIfOtnOCh2OTUkEnBERFrrSupport
+                                  TruthValue,
+            jnxIfOtnOCh2OTUkPreFecBERThMant
+                                  Integer32,
+            jnxIfOtnOCh2OTUkPreFecBERThExpo
+                                  Integer32,
+            jnxIfOtnOCh2OTUkPreFecBERThTime
+                                  Integer32,
+            jnxIfOtnOCh2OTUkTIMActEnabled
+                                  TruthValue,
+            jnxIfOtnOCh2OTUkTxTTI
+                                  OCTET STRING,
+            jnxIfOtnOCh2OTUkRxTTI
+                                  OCTET STRING,
+            jnxIfOtnOCh2OTUkExpectedRxSapi
+                                  OCTET STRING,
+            jnxIfOtnOCh2OTUkExpectedRxDapi
+                                  OCTET STRING,
+            jnxIfOtnOCh2OTUkStatus
+                                  BITS,
+            jnxIfOtnOCh2OTUkPreFecBERThClrMn
+                                  Integer32,
+            jnxIfOtnOCh2OTUkPreFecBERThClrEx
+                                  Integer32
+    }
+
+    jnxIfOtnOCh2OTUkCfgContIndx OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Container Index associated with the object instance. "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 1 }
+
+    jnxIfOtnOCh2OTUkCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "FPC slot number of the interface. "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 2 }
+
+    jnxIfOtnOCh2OTUkCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "PIC slot number of the interface. "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 3 }
+
+    jnxIfOtnOCh2OTUkCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Port number of the interface. "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 4 }
+
+    jnxIfOtnOCh2OTUkCfgL4Index OBJECT-TYPE
+        SYNTAX          Integer32 (1..1024)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Port number of the interface. "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 5 }
+
+    jnxIfOtnOCh2OTUkCfgRate OBJECT-TYPE
+        SYNTAX          JnxIfOtnRate
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This is the rate for the interface and the rates depend
+                  on the interface/fru type. 
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 6 }
+
+    jnxIfOtnOCh2OTUkCfgFecMode OBJECT-TYPE
+        SYNTAX          JnxIfOtnFecType
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This is the Fec type in the OTU frame and the selection
+                  depends on the interface/fru type.  "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 7 }
+
+    jnxIfOtnOCh2OTUkEnAutoFrrByteIns OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This will enable/disable the automatic insertion of 
+                  the frr SF/SD byte in the overhead bytes(RES) "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 8 }
+
+    jnxIfOtnOCh2OTUkEnBERFrrSupport OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This will enable/disable the FRR support for BER "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 9 }
+
+    jnxIfOtnOCh2OTUkPreFecBERThMant OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This will set the BER threshold(mantissa), which when
+                  crossed will trigger Signal Degrade.
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 10 }
+
+    jnxIfOtnOCh2OTUkPreFecBERThExpo OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This will set the BER threshold(exponent), which when
+                  crossed will trigger Signal Degrade.
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 11 }
+
+    jnxIfOtnOCh2OTUkPreFecBERThTime OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "ms"
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " 
+                  The collection times (1ms - 1sec) to calculate the BER.
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 12 }
+
+    jnxIfOtnOCh2OTUkTIMActEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                 Indicates whether the Trace Identifier Mismatch (TIM)
+                 Consequent Action function is enabled.
+                 The default value of this object is false(2).
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 13 }
+
+    jnxIfOtnOCh2OTUkTxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " 
+                  The Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined  
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 14 }
+
+    jnxIfOtnOCh2OTUkRxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(64))
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  The Receive Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 15 }
+
+    jnxIfOtnOCh2OTUkExpectedRxSapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Expected receive SAPI.
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 16 }
+
+    jnxIfOtnOCh2OTUkExpectedRxDapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Expected receive DAPI. 
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 17 }
+
+    jnxIfOtnOCh2OTUkStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            ais(0),
+                            bdi(1),
+                            iae(2),
+                            ttim(3),
+                            sf(4),
+                            sd(5),
+                            biae(6),
+                            tsf(7),
+                            ssf(8),
+                            fecexcessive(9),
+                            fecdegrade(10)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "The interface status at the OTUk layer."
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 18 }
+
+    jnxIfOtnOCh2OTUkPreFecBERThClrMn OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This will set the BER threshold(mantissa) for clear signal
+                  degrade condition, which signal degrade condition will be
+                  cleared when Pre-Fec error count is below the clear
+                  threshold error count.
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 19 }
+
+    jnxIfOtnOCh2OTUkPreFecBERThClrEx OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                " This will set the BER threshold(exponent) for clear signal
+                  degrade condition, which signal degrade condition will be
+                  cleared when Pre-Fec error count is below the clear threshold
+                  error count.
+                "
+        ::= { jnxIfOtnOCh2OTUkCfgEntry 20 }
+
+--
+-- ODUk config table
+--
+
+jnxIfOtnOCh2ODUkCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnOCh2ODUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                "Table was for 48x10G/12x40G gingerALE PIC in 10G mode.
+                 It is not supported hence marked as obsolete.
+                 Information about the Otn ODUk config table. "
+        ::= { jnxIfOtnOCh2 3 }
+
+jnxIfOtnOCh2ODUkCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnOCh2ODUkCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                 "A conceptual row that contains information about the 
+                  Otn ODUk config.
+                 "
+        INDEX   { jnxIfOtnOCh2ODUkCfgContIndx, jnxIfOtnOCh2ODUkCfgL1Index,
+                  jnxIfOtnOCh2ODUkCfgL2Index, jnxIfOtnOCh2ODUkCfgL3Index,
+                  jnxIfOtnOCh2ODUkCfgL4Index }
+        ::= { jnxIfOtnOCh2ODUkCfgTable 1 }
+
+JnxIfOtnOCh2ODUkCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnOCh2ODUkCfgContIndx
+                                  Integer32,
+            jnxIfOtnOCh2ODUkCfgL1Index
+                                  Integer32,
+            jnxIfOtnOCh2ODUkCfgL2Index
+                                  Integer32,
+            jnxIfOtnOCh2ODUkCfgL3Index
+                                  Integer32,
+            jnxIfOtnOCh2ODUkCfgL4Index
+                                  Integer32,
+            jnxIfOtnOCh2ODUkAPSPCC0
+                                  Integer32,
+            jnxIfOtnOCh2ODUkAPSPCC1
+                                  Integer32,
+            jnxIfOtnOCh2ODUkAPSPCC2
+                                  Integer32,
+            jnxIfOtnOCh2ODUkAPSPCC3
+                                  Integer32,
+            jnxIfOtnOCh2ODUkPayloadType
+                                  Integer32,
+            jnxIfOtnOCh2ODUkTIMActEnabled
+                                  TruthValue,
+            jnxIfOtnOCh2ODUkTxTTI
+                                  OCTET STRING,
+            jnxIfOtnOCh2ODUkRxTTI
+                                  OCTET STRING,
+            jnxIfOtnOCh2ODUkExpectedRxSapi
+                                  OCTET STRING,
+            jnxIfOtnOCh2ODUkExpectedRxDapi
+                                  OCTET STRING,
+            jnxIfOtnOCh2ODUkStatus
+                                  BITS,
+            jnxIfOtnOCh2ODUkRxPayloadType
+                                  Integer32
+     }
+
+    jnxIfOtnOCh2ODUkCfgContIndx OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+               "Container Index associated with the Object Instance. "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 1 }
+
+    jnxIfOtnOCh2ODUkCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+               "FPC slot number of the interface. "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 2 }
+
+    jnxIfOtnOCh2ODUkCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+               "PIC slot number of the interface. "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 3 }
+
+    jnxIfOtnOCh2ODUkCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+               "Port number of the interface. "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 4 }
+
+    jnxIfOtnOCh2ODUkCfgL4Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+               "Sub-Port number of the interface. "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 5 }
+
+     jnxIfOtnOCh2ODUkAPSPCC0 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 0 for this ODUk only.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 6 }
+
+     jnxIfOtnOCh2ODUkAPSPCC1 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 1 for this ODUk only.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 7 }
+
+     jnxIfOtnOCh2ODUkAPSPCC2 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 2 for this ODUk only.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 8 }
+
+     jnxIfOtnOCh2ODUkAPSPCC3 OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Read/Write APS PCC byte 3 for this ODUk only.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 9 }
+
+     jnxIfOtnOCh2ODUkPayloadType OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Read/Write Payload Type for ODUk only.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 10 }
+
+    jnxIfOtnOCh2ODUkTIMActEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                 Indicates whether the Trace Identifier Mismatch (TIM)
+                 Consequent Action function is enabled.
+                 The default value of this object is false(2).
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 11 }
+
+    jnxIfOtnOCh2ODUkTxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  The Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 12 }
+
+    jnxIfOtnOCh2ODUkRxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(64))
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  The Receive Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 13 }
+
+    jnxIfOtnOCh2ODUkExpectedRxSapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION     
+                "
+                  Expected receive SAPI for this layer.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 14 }
+
+    jnxIfOtnOCh2ODUkExpectedRxDapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Expected receive DAPI for this layer.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 15 }
+
+    jnxIfOtnOCh2ODUkStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            ais(0),
+                            bdi(1),
+                            iae(2),
+                            ttim(3),
+                            sf(4),
+                            sd(5),
+                            biae(6),
+                            tsf(7),
+                            ssf(8),
+                            csf(9),
+                            oci(10),
+                            lck(11),
+                            ltc(12),
+                            ptm(13)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The  status at the ODUk layer
+                 Only some of these alarms are valid for the TCM layer
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 16 }
+
+     jnxIfOtnOCh2ODUkRxPayloadType OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Receive  Payload Type for ODUk only.
+                "
+        ::= { jnxIfOtnOCh2ODUkCfgEntry 17 }
+
+--
+-- TCM Config Table
+--
+
+jnxIfOtnOCh2TcmCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxIfOtnOCh2TcmCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                "Table was for 48x10G/12x40G gingerALE PIC in 10G mode.
+                 It is not supported hence marked as obsolete.
+                 Information about the Otn TCM config table. "
+        ::= { jnxIfOtnOCh2 4 }
+
+jnxIfOtnOCh2TcmCfgEntry OBJECT-TYPE
+        SYNTAX     JnxIfOtnOCh2TcmCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     obsolete
+        DESCRIPTION
+                 "A conceptual row that contains information about the
+                  Otn Tcm config.
+                 "
+        INDEX   { jnxIfOtnOCh2TcmCfgContIndx, jnxIfOtnOCh2TcmCfgL1Index,
+                  jnxIfOtnOCh2TcmCfgL2Index, jnxIfOtnOCh2TcmCfgL3Index,
+                  jnxIfOtnOCh2TcmCfgL4Index, jnxIfOtnOCh2TcmCfgLevel }
+        ::= { jnxIfOtnOCh2TcmCfgTable 1 }
+
+
+JnxIfOtnOCh2TcmCfgEntry ::=
+    SEQUENCE {
+            jnxIfOtnOCh2TcmCfgContIndx
+                                  Integer32,
+            jnxIfOtnOCh2TcmCfgL1Index 
+                                  Integer32,             
+            jnxIfOtnOCh2TcmCfgL2Index 
+                                  Integer32,
+            jnxIfOtnOCh2TcmCfgL3Index 
+                                  Integer32,
+            jnxIfOtnOCh2TcmCfgL4Index 
+                                  Integer32,
+            jnxIfOtnOCh2TcmCfgLevel
+                                  Integer32,
+            jnxIfOtnOCh2TCMEnable
+                                  TruthValue,
+            jnxIfOtnOCh2TcmTxTTI
+                                  OCTET STRING,
+            jnxIfOtnOCh2TcmRxTTI
+                                  OCTET STRING,
+            jnxIfOtnOCh2TcmExpectedRxSapi
+                                  OCTET STRING,
+            jnxIfOtnOCh2TcmExpectedRxDapi
+                                  OCTET STRING,
+            jnxIfOtnOCh2TcmStatus
+                                  BITS
+     }
+
+    jnxIfOtnOCh2TcmCfgContIndx OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Container Index associated with the object."
+        ::= { jnxIfOtnOCh2TcmCfgEntry 1 }
+
+    jnxIfOtnOCh2TcmCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "FPC slot number of the interface."
+        ::= { jnxIfOtnOCh2TcmCfgEntry 2 }
+
+    jnxIfOtnOCh2TcmCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "PIC slot number of the interface."
+        ::= { jnxIfOtnOCh2TcmCfgEntry 3 }
+
+    jnxIfOtnOCh2TcmCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Port number of the interface."
+        ::= { jnxIfOtnOCh2TcmCfgEntry 4 }
+
+    jnxIfOtnOCh2TcmCfgL4Index OBJECT-TYPE
+        SYNTAX          Integer32(0..255)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "Sub-Port number of the interface."
+        ::= { jnxIfOtnOCh2TcmCfgEntry 5 }
+
+     jnxIfOtnOCh2TcmCfgLevel OBJECT-TYPE
+        SYNTAX          Integer32 (1..6)
+        MAX-ACCESS      not-accessible
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                    The TCM level for the Table
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 6 }
+
+     jnxIfOtnOCh2TCMEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                   Enable this TCM layer (only for TCM layers)
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 7 }
+
+
+    jnxIfOtnOCh2TcmTxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  The Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 8 }
+
+    jnxIfOtnOCh2TcmRxTTI OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(64))
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  The Receive Trace TTI  SAPI 0..15, DAPI 16..31
+                  32 ..63 user defined for this layer.
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 9 }
+
+
+    jnxIfOtnOCh2TcmExpectedRxSapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Expected receive SAPI for this layer.
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 10 }
+
+    jnxIfOtnOCh2TcmExpectedRxDapi OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                  Expected receive DAPI for this layer.
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 11 }
+
+
+    jnxIfOtnOCh2TcmStatus OBJECT-TYPE
+        SYNTAX          BITS {
+                            ais(0),
+                            bdi(1),
+                            iae(2),
+                            ttim(3),
+                            biae(6),
+                            tsf(7),
+                            ssf(8),
+                            ltc(9)
+                        }
+
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION
+                "
+                 The  status at the TCM layer.
+                "
+        ::= { jnxIfOtnOCh2TcmCfgEntry 12 }
+
+--
+-- Configuration Management Notifications
+--
+
+jnxIfOtnNotificationPrefix   OBJECT IDENTIFIER ::= { jnxIfOtnNotifications 0 }
+
+jnxIfOtnNotificationAdminStatus NOTIFICATION-TYPE
+        OBJECTS {
+                  ifDescr,
+                  jnxIfOtnAdminState
+                }
+        STATUS  current
+        DESCRIPTION
+                "Notification of the admin state of the otn interface."
+        ::= { jnxIfOtnNotificationPrefix 1 }
+
+jnxIfOtnNotificationOperStatus NOTIFICATION-TYPE
+        OBJECTS {
+                  ifDescr,
+                  jnxIfOtnOperState
+                }
+        STATUS  current
+        DESCRIPTION
+                "Notification of operational state of the otn interface"
+        ::= { jnxIfOtnNotificationPrefix 2 }
+
+END

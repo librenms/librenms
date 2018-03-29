@@ -1,0 +1,51 @@
+-- *****************************************************************
+-- NMS-ROUTING-MIB.my: NMS ROUTING MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-ROUTING-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    nmsMgmt                             FROM NMS-SMI;
+
+--definition of NMS device card related operations and trap related values
+
+               routing         OBJECT IDENTIFIER ::= { nmsMgmt 350 }
+               
+               
+               
+               nmsRtStaticNum OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of running static routing ."
+                   ::= { routing 1 }
+                   
+                   
+               nmsRtIgpRuningProto OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		none(0),
+                   		rip(1),
+                   		isis(2),
+                                eigrp(3),    
+                                ospf(4),
+                                bgp(5)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Specific running routing protocol ."
+                   ::= { routing 2 }
+                   
+END
+               

@@ -1,0 +1,51 @@
+
+	DASAN-GFAST-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			dasanEvents, dasanMgmt			
+				FROM DASAN-SMI			
+			ifIndex			
+				FROM IF-MIB			
+			IpAddress, Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+			NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+	
+	
+		gFastMIB MODULE-IDENTITY 
+			LAST-UPDATED "201507210000Z"		-- March 26, 2014 at 00:00 GMT
+			ORGANIZATION 
+				"Dasan Co., Ltd."
+			CONTACT-INFO 
+				"Dasan Co., Ltd."
+			DESCRIPTION 
+				"The MIB module to describe G-FAST."
+			::= { dasanMgmt 102 }
+
+		
+	
+	
+
+		gFastTestObj1 OBJECT IDENTIFIER ::= { gFastMIB 1 }
+
+		gFastTestObj1Temp1 OBJECT IDENTIFIER ::= { gFastTestObj1 1 }
+
+		gFastTestObj1Temp2 OBJECT IDENTIFIER ::= { gFastTestObj1 2 }
+
+		
+		gFastTestObj2 OBJECT IDENTIFIER ::= { gFastMIB 2 }
+
+		gFastTestObj2Temp1 OBJECT IDENTIFIER ::= { gFastTestObj2 1 }
+
+		gFastTestObj2Temp1Val1 OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"for Test"
+			::= { gFastTestObj2Temp1 1 }
+
+
+			
+	
+	END
+

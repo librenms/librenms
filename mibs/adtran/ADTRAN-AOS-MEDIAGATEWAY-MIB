@@ -1,0 +1,922 @@
+   ADTRAN-AOS-MEDIAGATEWAY-MIB   DEFINITIONS ::= BEGIN
+
+   IMPORTS
+         IpAddress, OBJECT-TYPE, MODULE-IDENTITY,
+         Integer32
+             FROM SNMPv2-SMI
+         MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+         DisplayString
+             FROM SNMPv2-TC
+         adShared, adIdentity
+             FROM ADTRAN-MIB
+         adGenAOSVoice
+           FROM ADTRAN-AOS;
+
+adGenAOSMediaGatewayMIB MODULE-IDENTITY
+        LAST-UPDATED "200504190000Z"
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "        Technical Support Dept.
+                        Postal: ADTRAN, Inc.
+                        901 Explorer Blvd.
+                        Huntsville, AL 35806
+
+                   Tel: +1 800 923 8726
+                   Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+        DESCRIPTION
+            "The MIB module for AdtranOS Media-gateway statistics."
+
+       REVISION "201208220000Z"  -- August 22, 2012 / YYYYMMDDHHMMZ
+       DESCRIPTION
+              "The following OIDs have been obsoleted and will no longer
+              be supported.
+				adGenAOSRtpSessionRxPacketsLost,
+				adGenAOSRtpSessionRxFrameLateDiscards,
+				adGenAOSRtpSessionRxFrameOverflows,
+				adGenAOSRtpSessionTotalsRxPacketsLost,
+				adGenAOSRtpSessionTotalsRxFrameLateDiscards,
+				adGenAOSRtpSessionTotalsRxFrameOverflows,
+				adGenAOSRtpChannelTotalRxPacketsLost,
+				adGenAOSRtpChannelTotalRxMaxDepth,
+			    adGenAOSRtpChannelTotalRxFrameLateDiscards,
+				adGenAOSRtpChannelTotalRxFrameOverflows"
+
+
+       ::= { adIdentity 10000 53 5 2 }
+adGenAOSMediaGateway                    OBJECT IDENTIFIER ::= { adGenAOSVoice 2 }
+adGenAOSMediaGatewayObjects             OBJECT IDENTIFIER ::= { adGenAOSMediaGateway 1 }
+adGenAOSMediaGatewayConformance         OBJECT IDENTIFIER ::= { adGenAOSMediaGateway 99 }
+
+adGenAOSMediaGatewayCompliances         OBJECT IDENTIFIER ::= { adGenAOSMediaGatewayConformance 1 }
+adGenAOSMediaGatewayMIBGroups           OBJECT IDENTIFIER ::= { adGenAOSMediaGatewayConformance 2 }
+
+--
+-- RTP Session Table
+--
+
+adGenAOSRtpSessionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSRtpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The AdtranOS RTP session table."
+    ::= { adGenAOSMediaGatewayObjects 1 }
+
+   adGenAOSRtpSessionEntry  OBJECT-TYPE
+    SYNTAX      AdGenAOSRtpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the AdtranOS RTP session table."
+    INDEX{ adGenAOSRtpSessionChannelId }
+    ::= { adGenAOSRtpSessionTable 1 }
+
+AdGenAOSRtpSessionEntry       ::= SEQUENCE
+{
+   adGenAOSRtpSessionChannelId                                INTEGER,
+   adGenAOSRtpSessionChannelIdName                            DisplayString,
+   adGenAOSRtpSessionStatus                                   INTEGER,
+   adGenAOSRtpSessionStartTime                                DisplayString,
+   adGenAOSRtpSessionDuration                                 DisplayString,
+   adGenAOSRtpSessionVocoder                                  INTEGER,
+   adGenAOSRtpSessionVAD                                      INTEGER,
+   adGenAOSRtpSessionTdmPortDescription                       DisplayString,
+   adGenAOSRtpSessionLocalIPAddress                           IpAddress,
+   adGenAOSRtpSessionLocalUdpPort                             INTEGER,
+   adGenAOSRtpSessionSIPPortDescription                       DisplayString,
+   adGenAOSRtpSessionRemoteIPAddress                          IpAddress,
+   adGenAOSRtpSessionRemoteUdpPort                            INTEGER,
+   adGenAOSRtpSessionTxFramesPerPacket                        INTEGER,
+   adGenAOSRtpSessionEchoCancellerEnabled                     INTEGER,
+   adGenAOSRtpSessionRxPackets                                INTEGER,
+   adGenAOSRtpSessionRxOctets                                 INTEGER,
+   adGenAOSRtpSessionRxPacketsLost                            INTEGER,     -- (obsolete)
+   adGenAOSRtpSessionRxPacketsUnknown                         INTEGER,
+   adGenAOSRtpSessionRxJitterBufferDepth                      INTEGER,
+   adGenAOSRtpSessionRxMaxJitterBufferDepth                   INTEGER,
+   adGenAOSRtpSessionRxFrameLateDiscards                      INTEGER,     -- (obsolete)
+   adGenAOSRtpSessionRxFrameOverflows                         INTEGER,     -- (obsolete)
+   adGenAOSRtpSessionRxFrameOutOfOrders                       INTEGER,
+   adGenAOSRtpSessionRxSyncSource                             INTEGER,
+   adGenAOSRtpSessionTxPackets                                INTEGER,
+   adGenAOSRtpSessionTxOctets                                 INTEGER,
+   adGenAOSRtpSessionTxSyncSource                             INTEGER
+}
+
+   adGenAOSRtpSessionChannelId OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Identifier value for the media-gateway channel
+               used by this RTP session."
+       ::= { adGenAOSRtpSessionEntry 1 }
+
+   adGenAOSRtpSessionChannelIdName OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Identifier name of the media-gateway channel used
+               by this RTP session."
+       ::= { adGenAOSRtpSessionEntry 2 }
+
+   adGenAOSRtpSessionStatus OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       {
+           unavailable(0),
+           available(1),
+           reserved (2),
+           allocated(3),
+           active(4),
+           interrupted(5)
+       }
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current status of the RTP session."
+       ::= { adGenAOSRtpSessionEntry 3 }
+
+   adGenAOSRtpSessionStartTime OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Start time of the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 4 }
+
+   adGenAOSRtpSessionDuration OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Duration of the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 5 }
+
+   adGenAOSRtpSessionVocoder OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       {
+           none(0),
+           g711ulaw(1),
+           gsm(2),
+           g723(3),
+           g711alaw(4),
+           g722(5),
+           g728(6),
+           g729a(7),
+           dynamic96(8),
+           dynamic97(9),
+           dynamic98(10),
+           dynamic99(11),
+           dynamic100(12),
+           dynamic101(13),
+           dynamic102(14),
+           dynamic103(15),
+           dynamic104(16),
+           dynamic105(17),
+           dynamic106(18),
+           dynamic107(19),
+           dynamic108(20),
+           dynamic109(21),
+           dynamic110(22),
+           dynamic111(23),
+           dynamic112(24),
+           dynamic113(25),
+           dynamic114(26),
+           dynamic115(27),
+           dynamic116(28),
+           dynamic117(29),
+           dynamic118(30),
+           dynamic119(31),
+           dynamic120(32),
+           dynamic121(33),
+           dynamic122(34),
+           dynamic123(35),
+           dynamic124(36),
+           dynamic125(37),
+           dynamic126(38),
+           dynamic127(39)
+       }
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Vocoder used in the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 6 }
+
+   adGenAOSRtpSessionVAD OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       {
+           disabled(0),
+           enabled(1)
+       }
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current status of the voice activity detector."
+       ::= { adGenAOSRtpSessionEntry 7 }
+
+   adGenAOSRtpSessionTdmPortDescription OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Description of the timed-division-multiplex resource
+               associated with this RTP session."
+       ::= { adGenAOSRtpSessionEntry 8 }
+
+   adGenAOSRtpSessionLocalIPAddress OBJECT-TYPE
+       SYNTAX     IpAddress
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Local Internet Protocol address used in current RTP session."
+       ::= { adGenAOSRtpSessionEntry 9 }
+
+   adGenAOSRtpSessionLocalUdpPort OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Local UDP address used in current RTP session."
+       ::= { adGenAOSRtpSessionEntry 10 }
+
+   adGenAOSRtpSessionSIPPortDescription OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Description String of the SIP resource associated with this RTP session."
+       ::= { adGenAOSRtpSessionEntry 11 }
+
+   adGenAOSRtpSessionRemoteIPAddress OBJECT-TYPE
+       SYNTAX     IpAddress
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Remote Internet Protocol address used in current RTP session."
+       ::= { adGenAOSRtpSessionEntry 12 }
+
+   adGenAOSRtpSessionRemoteUdpPort OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Remote UDP address used in current RTP session."
+       ::= { adGenAOSRtpSessionEntry 13 }
+
+   adGenAOSRtpSessionTxFramesPerPacket OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of sample frames packed into a given RTP packet."
+       ::= { adGenAOSRtpSessionEntry 14 }
+
+   adGenAOSRtpSessionEchoCancellerEnabled OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       {
+           disabled(0),
+           enabled(1)
+       }
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "State (enable or disabled) of the echo-canceller."
+       ::= { adGenAOSRtpSessionEntry 15 }
+
+   adGenAOSRtpSessionRxPackets OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of packets received in the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 22 }
+
+   adGenAOSRtpSessionRxOctets OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of bytes received in the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 23 }
+
+   adGenAOSRtpSessionRxPacketsLost OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS     obsolete
+       DESCRIPTION
+               "Number of packets lost in the current RTP session as
+                determined by missing sequence numbers."
+       ::= { adGenAOSRtpSessionEntry 24 }
+
+   adGenAOSRtpSessionRxPacketsUnknown OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of received packets with unknown payload type."
+       ::= { adGenAOSRtpSessionEntry 25 }
+
+   adGenAOSRtpSessionRxJitterBufferDepth OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current depth of jitter buffer in packets for this RTP
+                session."
+       ::= { adGenAOSRtpSessionEntry 26 }
+
+   adGenAOSRtpSessionRxMaxJitterBufferDepth OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Maximum depth of jitter buffer in packets for this RTP
+                session."
+       ::= { adGenAOSRtpSessionEntry 27 }
+
+   adGenAOSRtpSessionRxFrameLateDiscards OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS     obsolete
+       DESCRIPTION
+               "Number of received frames that have been discarded by the
+                jitter buffer for being late."
+       ::= { adGenAOSRtpSessionEntry 30 }
+
+   adGenAOSRtpSessionRxFrameOverflows OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS     obsolete
+       DESCRIPTION
+               "Number of received frames that overflow jitter buffer."
+       ::= { adGenAOSRtpSessionEntry 31 }
+
+   adGenAOSRtpSessionRxFrameOutOfOrders OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of received frames that are out of order."
+       ::= { adGenAOSRtpSessionEntry 33 }
+
+   adGenAOSRtpSessionRxSyncSource OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Sync source of the receiver."
+       ::= { adGenAOSRtpSessionEntry 34 }
+
+   adGenAOSRtpSessionTxPackets OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of packets transmitted in the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 35 }
+
+   adGenAOSRtpSessionTxOctets OBJECT-TYPE
+       SYNTAX 	INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of bytes transmitted in the current RTP session."
+       ::= { adGenAOSRtpSessionEntry 36 }
+
+   adGenAOSRtpSessionTxSyncSource OBJECT-TYPE
+       SYNTAX 	INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Sync source of the sender."
+       ::= { adGenAOSRtpSessionEntry 37 }
+
+--
+-- RTP Session Totals Table
+--
+
+adGenAOSRtpSessionTotalsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSRtpSessionTotalsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The AdtranOS RTP session totals table."
+    ::= { adGenAOSMediaGatewayObjects 2 }
+
+adGenAOSRtpSessionTotalsEntry  OBJECT-TYPE
+    SYNTAX      AdGenAOSRtpSessionTotalsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry in the AdtranOS RTP session totals table."
+    INDEX{ adGenAOSRtpSessionTotalsSessions }
+    ::= { adGenAOSRtpSessionTotalsTable 1 }
+
+AdGenAOSRtpSessionTotalsEntry       ::= SEQUENCE
+{
+    adGenAOSRtpSessionTotalsSessions                   INTEGER,
+    adGenAOSRtpSessionTotalsSessionDuration            DisplayString,
+    adGenAOSRtpSessionTotalsRxPackets                  INTEGER,
+    adGenAOSRtpSessionTotalsRxOctets                   INTEGER,
+    adGenAOSRtpSessionTotalsRxPacketsLost              INTEGER,     -- (obsolete)
+    adGenAOSRtpSessionTotalsRxPacketsUnknown           INTEGER,
+    adGenAOSRtpSessionTotalsTxPackets                  INTEGER,
+    adGenAOSRtpSessionTotalsTxOctets                   INTEGER,
+    adGenAOSRtpSessionTotalsRxFrameLateDiscards        INTEGER,     -- (obsolete)
+    adGenAOSRtpSessionTotalsRxFrameOverflows           INTEGER,     -- (obsolete)
+    adGenAOSRtpSessionTotalsRxFrameOutOfOrders         INTEGER,
+    adGenAOSRtpSessionTotalsClearCounters              INTEGER,
+    adGenAOSRtpSessionTotalsTimeSinceLastClearCounters DisplayString
+}
+
+    adGenAOSRtpSessionTotalsSessions OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "The totals number RTP sessions that have occured
+               including sessions still currently active."
+       ::= { adGenAOSRtpSessionTotalsEntry 1 }
+
+    adGenAOSRtpSessionTotalsSessionDuration OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Total duration for all RTP sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 2 }
+
+    adGenAOSRtpSessionTotalsRxPackets OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of packets recieved for all sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 3 }
+
+    adGenAOSRtpSessionTotalsRxOctets OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of octets recieved for all sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 4 }
+
+    adGenAOSRtpSessionTotalsRxPacketsLost OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS     obsolete
+       DESCRIPTION
+               "Number of recieve packets lost for all sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 5 }
+
+    adGenAOSRtpSessionTotalsRxPacketsUnknown OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of received packets with unknown payload type
+               during all sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 6 }
+
+    adGenAOSRtpSessionTotalsTxPackets OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of packets transmited for all sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 7 }
+
+    adGenAOSRtpSessionTotalsTxOctets OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of octets transmited for all sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 8 }
+
+    adGenAOSRtpSessionTotalsRxFrameLateDiscards OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS     obsolete
+       DESCRIPTION
+               "Number of frames received late and discarded by the jitter buffer."
+       ::= { adGenAOSRtpSessionTotalsEntry 9 }
+
+    adGenAOSRtpSessionTotalsRxFrameOverflows OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS     obsolete
+       DESCRIPTION
+       "Number of received frames that overflow the jitter buffer."
+       ::= { adGenAOSRtpSessionTotalsEntry 11 }
+
+    adGenAOSRtpSessionTotalsRxFrameOutOfOrders OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Number of received frames that are declared out-of-order
+               by the jitter buffer."
+       ::= { adGenAOSRtpSessionTotalsEntry 12 }
+
+    adGenAOSRtpSessionTotalsClearCounters OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-write
+       STATUS	  current
+       DESCRIPTION
+               "Clear the accumulated totals for all RTP sessions."
+       ::= { adGenAOSRtpSessionTotalsEntry 13 }
+
+    adGenAOSRtpSessionTotalsTimeSinceLastClearCounters OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Time elapsed since last clear counters for RTP session totals."
+       ::= { adGenAOSRtpSessionTotalsEntry 14 }
+
+--
+-- Media-gateway Informational
+--
+
+adGenAOSMediaGatewayInfoTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSMediaGatewayInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The AdtranOS media-gateway processor information table."
+    ::= { adGenAOSMediaGatewayObjects 3 }
+
+
+adGenAOSMediaGatewayInfoEntry OBJECT-TYPE
+    SYNTAX      AdGenAOSMediaGatewayInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry in the AdtranOS RTP session table."
+    INDEX{ adGenAOSMediaGatewayInfoIdentifier }
+    ::= { adGenAOSMediaGatewayInfoTable 1 }
+
+AdGenAOSMediaGatewayInfoEntry       ::= SEQUENCE
+{
+    adGenAOSMediaGatewayInfoIdentifier             INTEGER,
+    adGenAOSMediaGatewayInfoSoftwareVersion        DisplayString,
+    adGenAOSMediaGatewayInfoUtilization            INTEGER,
+    adGenAOSMediaGatewayInfoUtilizationMaximum     INTEGER,
+    adGenAOSMediaGatewayInfoFreePacketBuffers      INTEGER,
+    adGenAOSMediaGatewayInfoUptime                 DisplayString
+}
+
+    adGenAOSMediaGatewayInfoIdentifier OBJECT-TYPE
+       SYNTAX 	INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "The indentifier of the media-gateway processor."
+       ::= { adGenAOSMediaGatewayInfoEntry 1 }
+
+    adGenAOSMediaGatewayInfoSoftwareVersion OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "The software version running on the media-gateway processor."
+       ::= { adGenAOSMediaGatewayInfoEntry 2 }
+
+    adGenAOSMediaGatewayInfoUtilization OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current processor utilization of the media-gateway processor."
+       ::= { adGenAOSMediaGatewayInfoEntry 3 }
+
+    adGenAOSMediaGatewayInfoUtilizationMaximum OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current processor utilization of the media-gateway processor."
+       ::= { adGenAOSMediaGatewayInfoEntry 4 }
+
+    adGenAOSMediaGatewayInfoFreePacketBuffers OBJECT-TYPE
+       SYNTAX 	  INTEGER
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current number of free packet buffers on the media-gateway processor."
+       ::= { adGenAOSMediaGatewayInfoEntry 5 }
+
+    adGenAOSMediaGatewayInfoUptime OBJECT-TYPE
+       SYNTAX 	  DisplayString
+       MAX-ACCESS read-only
+       STATUS	  current
+       DESCRIPTION
+               "Current uptime of the media-gateway processor."
+       ::= { adGenAOSMediaGatewayInfoEntry 6 }
+
+--
+-- Rtp Channel Total Table
+--
+
+adGenAOSRtpChannelTotalTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSRtpChannelTotalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The AdtranOS Media-gateway channel totals table."
+    ::= { adGenAOSMediaGatewayObjects 4 }
+
+adGenAOSRtpChannelTotalEntry OBJECT-TYPE
+    SYNTAX      AdGenAOSRtpChannelTotalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the AdtranOS RTP session table."
+    INDEX{ adGenAOSRtpChannelTotalId }
+    ::= { adGenAOSRtpChannelTotalTable 1 }
+
+AdGenAOSRtpChannelTotalEntry       ::= SEQUENCE
+{
+       adGenAOSRtpChannelTotalId                           INTEGER,
+       adGenAOSRtpChannelTotalIdName                       DisplayString,
+       adGenAOSRtpChannelTotalSessions                     INTEGER,
+       adGenAOSRtpChannelTotalSessionDuration              DisplayString,
+       adGenAOSRtpChannelTotalRxPackets                    INTEGER,
+       adGenAOSRtpChannelTotalRxOctets                     INTEGER,
+       adGenAOSRtpChannelTotalRxPacketsLost                INTEGER,     -- (obsolete)
+       adGenAOSRtpChannelTotalRxPacketsUnknown             INTEGER,
+       adGenAOSRtpChannelTotalTxPackets                    INTEGER,
+       adGenAOSRtpChannelTotalTxOctets                     INTEGER,
+       adGenAOSRtpChannelTotalRxMaxDepth                   INTEGER,     -- (obsolete)
+       adGenAOSRtpChannelTotalRxFrameLateDiscards          INTEGER,     -- (obsolete)
+       adGenAOSRtpChannelTotalRxFrameOverflows             INTEGER,     -- (obsolete)
+       adGenAOSRtpChannelTotalRxFrameOutOfOrders           INTEGER,
+       adGenAOSRtpChannelClearCounters                     INTEGER,
+       adGenAOSRtpChannelTimeSinceLastClearCounters        DisplayString
+}
+
+
+adGenAOSRtpChannelTotalId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Identifier value for the channel on the media-gateway processor."
+    ::= { adGenAOSRtpChannelTotalEntry 1 }
+
+adGenAOSRtpChannelTotalIdName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Identifier name of the channel on the media-gateway processor."
+    ::= { adGenAOSRtpChannelTotalEntry 2 }
+
+adGenAOSRtpChannelTotalSessions OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of RTP sessions that have transpired on a given
+             media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 3 }
+
+adGenAOSRtpChannelTotalSessionDuration OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Duration of all RTP sessions for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 4 }
+
+adGenAOSRtpChannelTotalRxPackets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of received packets for all RTP sessions for a given
+            media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 5 }
+
+adGenAOSRtpChannelTotalRxOctets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of received octets for all RTP sessions for a given
+            media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 6 }
+
+adGenAOSRtpChannelTotalRxPacketsLost OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+       STATUS     obsolete
+    DESCRIPTION
+            "Number of receive packets declared lost for all RTP sessions
+            for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 7 }
+
+adGenAOSRtpChannelTotalRxPacketsUnknown OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of receive packets declared unknown for all RTP sessions
+             for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 8 }
+
+adGenAOSRtpChannelTotalTxPackets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of transmitted packets for all RTP sessions
+            for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 9 }
+
+adGenAOSRtpChannelTotalTxOctets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The duration of all RTP sessions for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 10 }
+
+adGenAOSRtpChannelTotalRxMaxDepth OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS     obsolete
+    DESCRIPTION
+            "Maximum depth fo jitter buffer in packets for this RTP
+            session."
+    ::= { adGenAOSRtpChannelTotalEntry 11 }
+
+adGenAOSRtpChannelTotalRxFrameLateDiscards OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS     obsolete
+    DESCRIPTION
+            "Number of late frames discarded for all RTP sessions for a given
+            media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 12 }
+
+adGenAOSRtpChannelTotalRxFrameOverflows OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS     obsolete
+    DESCRIPTION
+            "Number of received frames that overflow the jitter buffer for
+             all RTP sessions for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 14 }
+
+adGenAOSRtpChannelTotalRxFrameOutOfOrders OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of received frames that are declared out-of-order by the
+            jitter buffer for all RTP sessions for a given media-gateway channel."
+    ::= { adGenAOSRtpChannelTotalEntry 15 }
+
+adGenAOSRtpChannelClearCounters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Clear the accumulated channel totals for all RTP sessions."
+    ::= { adGenAOSRtpChannelTotalEntry 16 }
+
+adGenAOSRtpChannelTimeSinceLastClearCounters OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Time elapsed since last clear counters for RTP session totals."
+    ::= { adGenAOSRtpChannelTotalEntry 17 }
+
+--
+-- Conformance
+--
+
+adGenAOSMediaGatewayCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which implement
+        the adGenAOSMediaGateway MIB."
+
+    MODULE
+    MANDATORY-GROUPS
+    {
+        adGenAOSMediaGatewayRtpSessionGroup,
+        adGenAOSMediaGatewayRtpSessionTotalsGroup,
+        adGenAOSMediaGatewayInfoGroup,
+        adGenAOSMediaGatewayRtpChannelTotalsGroup
+    }
+    ::= { adGenAOSMediaGatewayCompliances 1 }
+
+adGenAOSMediaGatewayRtpSessionGroup OBJECT-GROUP
+    OBJECTS
+{
+   adGenAOSRtpSessionChannelId,
+   adGenAOSRtpSessionChannelIdName,
+   adGenAOSRtpSessionStatus,
+   adGenAOSRtpSessionStartTime,
+   adGenAOSRtpSessionDuration,
+   adGenAOSRtpSessionVocoder,
+   adGenAOSRtpSessionVAD,
+   adGenAOSRtpSessionTdmPortDescription,
+   adGenAOSRtpSessionLocalIPAddress,
+   adGenAOSRtpSessionLocalUdpPort,
+   adGenAOSRtpSessionSIPPortDescription,
+   adGenAOSRtpSessionRemoteIPAddress,
+   adGenAOSRtpSessionRemoteUdpPort,
+   adGenAOSRtpSessionTxFramesPerPacket,
+   adGenAOSRtpSessionEchoCancellerEnabled,
+   adGenAOSRtpSessionRxPackets,
+   adGenAOSRtpSessionRxOctets,
+   adGenAOSRtpSessionRxPacketsLost,            -- (obsolete)
+   adGenAOSRtpSessionRxPacketsUnknown,
+   adGenAOSRtpSessionRxJitterBufferDepth,
+   adGenAOSRtpSessionRxMaxJitterBufferDepth,
+   adGenAOSRtpSessionRxFrameLateDiscards,      -- (obsolete) 
+   adGenAOSRtpSessionRxFrameOverflows,         -- (obsolete) 
+   adGenAOSRtpSessionRxFrameOutOfOrders,
+   adGenAOSRtpSessionRxSyncSource,
+   adGenAOSRtpSessionTxPackets,
+   adGenAOSRtpSessionTxOctets,
+   adGenAOSRtpSessionTxSyncSource
+}
+    STATUS      current
+    DESCRIPTION
+        "The Media-Gateway Real-Time Protocol Session Group."
+    ::= { adGenAOSMediaGatewayMIBGroups 1 }
+
+adGenAOSMediaGatewayRtpSessionTotalsGroup OBJECT-GROUP
+OBJECTS
+{
+    adGenAOSRtpSessionTotalsSessions,
+    adGenAOSRtpSessionTotalsSessionDuration,
+    adGenAOSRtpSessionTotalsRxPackets,
+    adGenAOSRtpSessionTotalsRxOctets,
+    adGenAOSRtpSessionTotalsRxPacketsLost,       -- (obsolete) 
+    adGenAOSRtpSessionTotalsRxPacketsUnknown,
+    adGenAOSRtpSessionTotalsTxPackets,
+    adGenAOSRtpSessionTotalsTxOctets,
+    adGenAOSRtpSessionTotalsRxFrameLateDiscards, -- (obsolete)
+    adGenAOSRtpSessionTotalsRxFrameOverflows,    -- (obsolete)
+    adGenAOSRtpSessionTotalsRxFrameOutOfOrders,
+    adGenAOSRtpSessionTotalsClearCounters ,
+    adGenAOSRtpSessionTotalsTimeSinceLastClearCounters
+}
+    STATUS      current
+    DESCRIPTION
+        "The Media-Gateway Real-Time Protocol Session Totals Group."
+    ::= { adGenAOSMediaGatewayMIBGroups 2 }
+
+adGenAOSMediaGatewayInfoGroup OBJECT-GROUP
+OBJECTS
+{
+    adGenAOSMediaGatewayInfoIdentifier,
+    adGenAOSMediaGatewayInfoSoftwareVersion,
+    adGenAOSMediaGatewayInfoUtilization,
+    adGenAOSMediaGatewayInfoUtilizationMaximum,
+    adGenAOSMediaGatewayInfoFreePacketBuffers,
+    adGenAOSMediaGatewayInfoUptime
+}
+    STATUS      current
+    DESCRIPTION
+        "The Media-Gateway Information Group."
+    ::= { adGenAOSMediaGatewayMIBGroups 3 }
+
+
+adGenAOSMediaGatewayRtpChannelTotalsGroup OBJECT-GROUP
+OBJECTS
+{
+       adGenAOSRtpChannelTotalId,
+       adGenAOSRtpChannelTotalIdName,
+       adGenAOSRtpChannelTotalSessions,
+       adGenAOSRtpChannelTotalSessionDuration,
+       adGenAOSRtpChannelTotalRxPackets,
+       adGenAOSRtpChannelTotalRxOctets,
+       adGenAOSRtpChannelTotalRxPacketsLost,        -- (obsolete)
+       adGenAOSRtpChannelTotalRxPacketsUnknown,
+       adGenAOSRtpChannelTotalTxPackets,
+       adGenAOSRtpChannelTotalTxOctets,
+       adGenAOSRtpChannelTotalRxMaxDepth,           -- (obsolete) 
+       adGenAOSRtpChannelTotalRxFrameLateDiscards,  -- (obsolete)
+       adGenAOSRtpChannelTotalRxFrameOverflows,     -- (obsolete) 
+       adGenAOSRtpChannelTotalRxFrameOutOfOrders,
+       adGenAOSRtpChannelClearCounters,
+       adGenAOSRtpChannelTimeSinceLastClearCounters
+}
+    STATUS      current
+    DESCRIPTION
+        "The Media-Gateway Real-Time Protocol Channel Totals Group."
+    ::= { adGenAOSMediaGatewayMIBGroups 4 }
+
+    END

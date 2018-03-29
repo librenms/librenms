@@ -1,0 +1,90 @@
+CTRON-ROUTERS-INTERNAL-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-routers-internal-mib.txt
+--  Revision: 1.00.00
+--  Part Number:  
+--  Date: Feb 8, 1994
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Routing Services MIB.  This MIB contains
+--  objects which provide a high-level view of the routed and routing
+--  protocols for the Cabletron Router.  Essentially, this MIB
+--  allows for the dynamic "discovery" of routing services within
+--  Cabletron devices.
+
+--  This module will be extended, as needed.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specifications and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 92 Cabletron Systems
+
+
+
+IMPORTS
+        OBJECT-TYPE     
+                FROM RFC-1212
+        DisplayString
+                FROM RFC1213-MIB
+        enterprises, Counter, TimeTicks
+                FROM RFC1155-SMI;
+
+
+cabletron                       OBJECT IDENTIFIER ::= { enterprises 52 }
+
+mibs                            OBJECT IDENTIFIER ::= { cabletron 4 }
+                
+ctron                           OBJECT IDENTIFIER ::= { mibs 1 }
+
+ctronExp                        OBJECT IDENTIFIER ::= { mibs 2 }
+
+ctronRouterExp                  OBJECT IDENTIFIER ::= { ctronExp 2 }
+
+ctNetwork                       OBJECT IDENTIFIER ::= { ctron 3 }
+
+nwRouter                        OBJECT IDENTIFIER ::= { ctronRouterExp 2 }
+
+nwRtrTemp                       OBJECT IDENTIFIER ::= { nwRouter 99 }
+
+nwRtrTemp1                      OBJECT IDENTIFIER ::= { nwRtrTemp 2 }
+
+nwRtrTemp2                      OBJECT IDENTIFIER ::= { nwRtrTemp1 2 }
+
+--
+-- The Cabletron Routing Services Temp Area
+--
+
+
+nwRtrSoftReset  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        reset(0)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Executes a software reset of the device when reset(0)
+                        is written to this object. This reset does not reload 
+                        software from Flash EPROM." 
+                ::= { nwRtrTemp2 1 }
+
+END

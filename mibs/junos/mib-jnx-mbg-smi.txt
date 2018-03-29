@@ -1,0 +1,60 @@
+--
+-- Juniper Mobile Gateway Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2011-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MBG-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+       jnxMobileGatewayMibRoot, jnxJunosSpace FROM JUNIPER-SMI;
+
+--
+-- Object identifier added as the basis for
+-- identifying different Mobile Gateway nodes.
+-- 
+--
+-- This will be used as a root all the PDN-GW/GGSN MIBs.
+--
+jnxMobileGatewayPgwGgsn OBJECT IDENTIFIER
+    ::= { jnxMobileGatewayMibRoot 1 }
+--
+-- This will be used as a root all the Serving Gateway MIBs.
+--
+jnxMobileGatewaySgw OBJECT IDENTIFIER
+    ::= { jnxMobileGatewayMibRoot 2 }
+
+--
+-- This is the root of all EMS MIBs exposed for Mobility from Junos Space
+--
+jnxJunosSpaceMobility OBJECT IDENTIFIER ::= {jnxJunosSpace  2 }
+
+--
+-- This is the root of all EMS level Notifications for Mobility from Junos Space
+--
+jnxJunosSpaceMobilityNotifications OBJECT IDENTIFIER ::= {jnxJunosSpaceMobility  1 }
+
+--
+-- This is the root of all EMS level Objects for Mobility from Junos Space
+--
+jnxJunosSpaceMobilityObjects OBJECT IDENTIFIER ::= {jnxJunosSpaceMobility  2 }
+
+--
+-- Reserved OID for Mobility application Mobile Core Manager from Junos Space
+--
+jnxJunosSpaceMobilityMCM OBJECT IDENTIFIER ::= {jnxJunosSpaceMobility  3 }
+
+--
+-- Reserved OID for Mobility application Mobile Traffic Monitoring from Junos Space
+--
+jnxJunosSpaceMobilityMTM OBJECT IDENTIFIER ::= {jnxJunosSpaceMobility  4 }
+
+--
+-- This is the root of all EMS level Notification Vars for Mobility from Junos Space
+--
+jnxJunosSpaceMobilityNotificationvars OBJECT IDENTIFIER ::= { jnxJunosSpaceMobilityObjects 1 }
+   
+END 

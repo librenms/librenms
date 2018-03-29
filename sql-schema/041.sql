@@ -1,0 +1,9 @@
+ALTER TABLE  `devices_attribs` ADD INDEX (  `device_id` );
+ALTER TABLE  `device_graphs` ADD INDEX (  `device_id` );
+ALTER TABLE  `alert_log` ADD INDEX (  `rule_id` );
+ALTER TABLE  `alert_log` ADD INDEX (  `device_id` );
+ALTER TABLE  `alerts` ADD INDEX (  `rule_id` );
+ALTER TABLE  `alerts` ADD INDEX (  `device_id` );
+ALTER TABLE  `ciscoASA` ADD INDEX (  `device_id` );
+ALTER TABLE  `alert_schedule` ADD INDEX (  `device_id` );
+ALTER TABLE  `alert_rules` ADD INDEX (  `device_id` );

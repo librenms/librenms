@@ -1,0 +1,1010 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLDISK-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,enterprises, Counter32, Counter64
+            FROM SNMPv2-SMI        
+   TEXTUAL-CONVENTION,  DisplayString
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId
+            FROM EQLGROUP-MIB
+    eqlMemberIndex
+            FROM EQLMEMBER-MIB;      
+
+eqldiskModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Equallogic Inc Peer Storage Array disk table information 
+
+         Copyright (c) 2002-2009 by Dell, Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell, Inc.  This software embodies proprietary information
+         and trade secrets of Dell, Inc.
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "200209060000Z"         -- 02-Sep-06
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 3 }     
+
+eqldiskObjects OBJECT IDENTIFIER ::=  { eqldiskModule 1 }   
+eqldiskNotifications OBJECT IDENTIFIER ::= { eqldiskModule 2 }   
+eqldiskConformance OBJECT IDENTIFIER ::=  { eqldiskModule 3 } 
+     
+
+   ---------------------- Disk Table ------------------------- 
+eqlDiskTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDiskEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Disk Table. 
+                     This table contains disk status information. 
+                     One table entry per disk. It is indexed by disk slot number. 
+                     The number of entries is equal to the number of disks that are present in the system."  
+    ::=  {  eqldiskObjects 1 }    
+
+eqlDiskEntry OBJECT-TYPE      
+    SYNTAX          EqlDiskEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a list of disk status parameters."      
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlDiskIndex }    
+::=    { eqlDiskTable 1 }
+    
+EqlDiskEntry ::= 
+    SEQUENCE {     
+        eqlDiskIndex            Integer32,
+        eqlDiskType             DisplayString,
+        eqlDiskModelNumber      DisplayString,
+        eqlDiskRevisionNumber   DisplayString, 
+        eqlDiskSerialNumber     DisplayString,
+        eqlDiskSize             Integer32,
+        eqlDiskAdminStatus      INTEGER,
+        eqlDiskStatus           INTEGER,
+        eqlDiskErrors           Counter32,
+        eqlDiskId               Integer32,
+        eqlDiskSlot             Integer32,
+        eqlDiskTypeEnum         INTEGER,
+        eqlDiskRPM              Integer32,
+        eqlDiskSectorSize       INTEGER,
+        eqlDiskManufacturingInfo DisplayString,
+        eqlDiskPI               INTEGER,
+        eqlDiskHealth           INTEGER
+        } 
+
+eqlDiskIndex    OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the disk.
+                     It is equal to the disk slot number plus one." 
+    ::=  {  eqlDiskEntry 1 }
+
+eqlDiskType OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE(0..64) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk type."  
+    DEFVAL          {"unknown disk type"}
+    ::=  {  eqlDiskEntry 2 }
+
+eqlDiskModelNumber  OBJECT-TYPE      
+-- The ATA spec (section 8.15.8, rev 6.2b) shows "Model number" as 40 ASCII chars
+    SYNTAX          DisplayString( SIZE(0..40) ) 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk model."  
+    DEFVAL          {"unknown disk model"}
+    ::=  {  eqlDiskEntry 3 }
+
+eqlDiskRevisionNumber   OBJECT-TYPE      
+-- The ATA spec (section 8.15.8, rev 6.2b) shows "Firmware revision" as 8 ASCII chars
+    SYNTAX          DisplayString( SIZE(0..8) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk revision number."  
+    DEFVAL          {"?firmrev"}
+    ::=  {  eqlDiskEntry 4 }
+
+eqlDiskSerialNumber OBJECT-TYPE      
+-- The ATA spec (section 8.15.8, rev 6.2b) shows "Serial number" as 20 ASCII chars
+    SYNTAX          DisplayString( SIZE(0..20) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk serial number."  
+    DEFVAL          {"unknown serial#"}
+    ::=  {  eqlDiskEntry 5 }
+
+eqlDiskSize OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk size in MB."  
+    ::=  {  eqlDiskEntry 6 }
+
+eqlDiskAdminStatus OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        set-disk-on-line(1),
+                        set-disk-off-line (2),
+                        set-disk-spare(3)
+    }      
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "Command to take the disk off line or put it on line.
+                     This command is used in manual operation by the operator."  
+    ::=  {  eqlDiskEntry 7 }
+
+eqlDiskStatus   OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        on-line  (1),
+                        spare    (2),
+                        failed   (3),
+                        off-line (4),
+                        alt-sig  (5),
+                        too-small(6),
+                        history-of-failures(7),
+                        unsupported-version(8),
+                        unhealthy(9),
+                        replacement(10),
+                        encrypted(11),
+                        notApproved(12),
+                        preempt-failed(13)
+    }      
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Disk status will be on-line when the disk is being used in the raid set. 
+                     Disk status will be spare when the disk is not currently being used by raid configuration 
+                       but may be used when status of a currently on-line disk changes. 
+                     Disk status will be failed when either it is faulted or when there is no power. 
+                     Disk status will be offline when the disk doesn't fall into any of these other categories.
+                     Disk status will be alt-sig (foreign) when the disk belongs to a RAIDset from another
+                       EqualLogic system. The disk can be converted to a spare.
+                     Disk status will be too-small if drive is too small to be used. The drive cannot be converted to spare.
+                     Disk status will be history-of-failures if drive has a history of failures. The drive can be converted to spare.
+                     Disk status will be unsupported-version if drive label is from a later release. The drive can be converted to spare.
+                     Disk status will be unhealthy if drive is unhealthy.
+                     Disk status will be replacement if drive is a replacement drive.
+                     Disk status will be encrypted if the drive is encrypted and cannot be decrypted.
+                     Disk status will be notApproved if the drive is not DELL approved.
+                     Disk status will be preempt-failed if the drive is off-line due to excessive errors. "
+    ::=  {  eqlDiskEntry 8 }
+
+eqlDiskErrors   OBJECT-TYPE      
+    SYNTAX          Counter32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the number of disk errors since drive power on."  
+    ::=  {  eqlDiskEntry 9 }
+
+eqlDiskId   OBJECT-TYPE      
+    SYNTAX          Integer32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk id as specified by the subsystem."  
+    ::=  {  eqlDiskEntry 10 }   
+
+eqlDiskSlot OBJECT-TYPE      
+    SYNTAX          Integer32 (0..13)    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The zero-based slot number for the physical location of this disk, as marked on the back panel."  
+    ::=  {  eqlDiskEntry 11 }   
+
+eqlDiskTypeEnum OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                      unknown(0),
+                      sata(1),
+                      sas(2),
+                      sata-ssd(3),
+                      sas-ssd(4),
+                      sas-sed-hdd(5),
+                      sas-sed-ssd(6)
+                    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Type of this disk."  
+    ::=  {  eqlDiskEntry 12 }
+    
+eqlDiskRPM   OBJECT-TYPE      
+    SYNTAX          Integer32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk RPM(Revolutions per Minute) as specified by the manufacturer not measured.
+	              if 0, disk RPM is unknown,
+                      if 1, disk is non-rotating media - SSD(Solid State Disk)
+                      otherwise this is the disk RPM."  
+    ::=  {  eqlDiskEntry 13 }   
+
+eqlDiskSectorSize   OBJECT-TYPE      
+    SYNTAX          INTEGER   {
+                      sector-size-512-bytes(0),
+                      sector-size-4096-bytes(1),
+                      sector-size-unknown(2)
+    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the disk sector size as specified by the manufacturer.
+	              if 0, disk sector size is 512 bytes,
+                      if 1, disk sector size is 4096 bytes"  
+    ::=  {  eqlDiskEntry 14 }   
+
+eqlDiskManufacturingInfo  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE(0..20) )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This variable specifies manufacturing data for the drive."
+    DEFVAL          {"mfginfo?"}
+    ::=  {  eqlDiskEntry 15 }
+
+eqlDiskPI  OBJECT-TYPE
+    SYNTAX          INTEGER { pi-disabled(0),
+                              pi-enabled(1)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This variable specifies whether Protection Information (PI) is enabled on the drive."
+    ::=  {  eqlDiskEntry 16 }
+
+eqlDiskHealth   OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        smart-status-not-available(0),
+                        smart-ok(1),
+                        smart-tripped(2)
+    }      
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Disk status will be smart-status-not-available when the disk is offline or failed.
+                     Disk status will be smart-ok when the disk does not report itself to have exceeded its internal
+                       SMART threshold for errors.
+                     Disk status will be smart-tripped when the disk reports itself to have exceeded its internal
+                       SMART threshold for errors."
+    ::=  {  eqlDiskEntry 17 }
+
+   ---------------------- Disk Status Table ------------------------- 
+
+eqlDiskStatusTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDiskStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Disk Status Table. 
+                     This table contains disk status information. 
+                     One table entry per disk. It is indexed by disk slot number. 
+                     The number of entries is equal to the number of disks that are present in the system."  
+    ::=  {  eqldiskObjects 2 }    
+
+eqlDiskStatusEntry OBJECT-TYPE      
+    SYNTAX          EqlDiskStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a list of disk status parameters."
+    AUGMENTS        { eqlDiskEntry }
+::=    { eqlDiskStatusTable 1 }
+    
+EqlDiskStatusEntry ::= 
+    SEQUENCE {     
+        eqlDiskStatusXfers          Counter64,
+        eqlDiskStatusBytesRead      Counter64,
+        eqlDiskStatusBytesWritten   Counter64,
+        eqlDiskStatusBusyTime       Counter64,
+        eqlDiskStatusNumIOs         Counter32,
+        eqlDiskStatusFailXfers      Counter32,
+        eqlDiskStatusNumResets      Counter32,
+        eqlDiskStatusTotalQD        Counter64,
+        eqlDiskStatusLifetime       Integer32
+        } 
+
+eqlDiskStatusXfers  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Total number of succesfull transfers"
+    ::=  {  eqlDiskStatusEntry 1 }
+
+eqlDiskStatusBytesRead  OBJECT-TYPE      
+    SYNTAX              Counter64
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies total number of Mbytes read."
+    ::=  {  eqlDiskStatusEntry 2 }
+
+eqlDiskStatusBytesWritten  OBJECT-TYPE      
+    SYNTAX                 Counter64
+    MAX-ACCESS             read-only      
+    STATUS                 current      
+    DESCRIPTION            "This variable specifies total number of Mbytes written."
+    ::=  {  eqlDiskStatusEntry 3 }
+
+eqlDiskStatusBusyTime   OBJECT-TYPE      
+    SYNTAX              Counter64
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies total time in seconds spent busy."
+    ::=  {  eqlDiskStatusEntry 4 }
+
+eqlDiskStatusNumIOs  OBJECT-TYPE      
+    SYNTAX           Counter32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies number of IO operations
+                     currently outstanding."
+    ::=  {  eqlDiskStatusEntry 5 }
+
+eqlDiskStatusFailXfers  OBJECT-TYPE      
+    SYNTAX              Counter32
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies number of failed transfers."
+    ::=  {  eqlDiskStatusEntry 6 }
+
+eqlDiskStatusNumResets  OBJECT-TYPE      
+    SYNTAX              Counter32              
+    MAX-ACCESS          read-only
+    STATUS              current      
+    DESCRIPTION         "This variable specifies total SATA reset count."
+    ::=  {  eqlDiskStatusEntry 7 }
+
+eqlDiskStatusTotalQD  OBJECT-TYPE
+    SYNTAX            Counter64
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "This variable serves as a continuous counter for disk queue depth." 
+    ::=  {  eqlDiskStatusEntry 8 }
+
+eqlDiskStatusLifetime  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This variable specifies remaining life on SSD drives which report it."
+    ::=  {  eqlDiskStatusEntry 9 }    
+
+
+   ---------------------- Disk Error Table ------------------------- 
+
+eqlDiskErrorTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDiskErrorEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Disk Error Table. 
+                     This table contains disk error information. 
+                     One table entry per disk. It is indexed by disk slot number. 
+                     The number of entries is equal to the number of disks that are present in the system."
+    ::=  {  eqldiskObjects 3 }    
+
+eqlDiskErrorEntry OBJECT-TYPE      
+    SYNTAX          EqlDiskErrorEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a list of disk error parameters."
+    AUGMENTS        { eqlDiskEntry }
+::=    { eqlDiskErrorTable 1 }
+    
+EqlDiskErrorEntry ::= 
+    SEQUENCE {     
+        eqlDiskErrorPhyReady        Counter32,
+        eqlDiskErrorPhyInternal     Counter32,
+        eqlDiskErrorCommWake        Counter32,
+        eqlDiskErrorDecode10b8b     Counter32,
+        eqlDiskErrorDisparity       Counter32,
+        eqlDiskErrorCRC             Counter32,
+        eqlDiskErrorHandShake       Counter32,
+        eqlDiskErrorLinkSeq         Counter32,
+        eqlDiskErrorTransportState  Counter32,
+        eqlDiskErrorUnrecFIS        Counter32
+        } 
+
+eqlDiskErrorPhyReady OBJECT-TYPE      
+    SYNTAX           Counter32
+    MAX-ACCESS       read-only
+    STATUS           current      
+    DESCRIPTION      "PhyREady changed count."
+    ::=  {  eqlDiskErrorEntry 1 }
+
+eqlDiskErrorPhyInternal OBJECT-TYPE      
+    SYNTAX              Counter32
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies total number of Phy internal errors."
+    ::=  {  eqlDiskErrorEntry 2 }
+
+eqlDiskErrorCommWake    OBJECT-TYPE      
+    SYNTAX              Counter32
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies Comm wake count."
+    ::=  {  eqlDiskErrorEntry 3 }
+
+eqlDiskErrorDecode10b8b OBJECT-TYPE      
+    SYNTAX              Counter32
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies 10b to 8b decode error count."
+    ::=  {  eqlDiskErrorEntry 4 }
+
+eqlDiskErrorDisparity   OBJECT-TYPE      
+    SYNTAX              Counter32
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies disparity error count."
+    ::=  {  eqlDiskErrorEntry 5 }
+
+eqlDiskErrorCRC         OBJECT-TYPE      
+    SYNTAX              Counter32
+    MAX-ACCESS          read-only      
+    STATUS              current      
+    DESCRIPTION         "This variable specifies CRC error count."
+    ::=  {  eqlDiskErrorEntry 6 }
+
+eqlDiskErrorHandShake   OBJECT-TYPE
+    SYNTAX              Counter32              
+    MAX-ACCESS          read-only
+    STATUS              current      
+    DESCRIPTION         "This variable specifies handshake error count."
+    ::=  {  eqlDiskErrorEntry 7 }
+
+
+eqlDiskErrorLinkSeq     OBJECT-TYPE
+    SYNTAX              Counter32              
+    MAX-ACCESS          read-only
+    STATUS              current      
+    DESCRIPTION         "This variable specifies Link Sequence error count."
+    ::=  {  eqlDiskErrorEntry 8 }
+
+eqlDiskErrorTransportState OBJECT-TYPE
+    SYNTAX                 Counter32              
+    MAX-ACCESS             read-only
+    STATUS                 current      
+    DESCRIPTION            "This variable specifies Transport State Transitions error count."
+    ::=  {  eqlDiskErrorEntry 9 }
+
+eqlDiskErrorUnrecFIS    OBJECT-TYPE
+    SYNTAX              Counter32              
+    MAX-ACCESS          read-only
+    STATUS              current      
+    DESCRIPTION         "This variable specifies Unrecognised FIS type error count."
+    ::=  {  eqlDiskErrorEntry 10 }
+
+
+   ---------------------- Disk SMART Info Table ------------------------- 
+
+eqlDiskSmartInfoTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDiskSmartInfoEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Disk SMART Info Table. 
+                    This table contains the SMART info for each disk. It is indexed by disk 
+					slot number. The number of entries is equal to the number of disks that 
+					are present in the system."  
+    ::=  {  eqldiskObjects 4 }    
+
+eqlDiskSmartInfoEntry OBJECT-TYPE      
+    SYNTAX          EqlDiskSmartInfoEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a list of disk SMART info parameters."
+    AUGMENTS        { eqlDiskEntry }
+::=    { eqlDiskSmartInfoTable 1 }
+    
+EqlDiskSmartInfoEntry ::= 
+    SEQUENCE {     
+		eqlDiskSmartInfoRawReadErrorRate			Integer32,
+		eqlDiskSmartInfoRawReadErrorRateWorst		Integer32,
+		eqlDiskSmartInfoThroughputPerformance		Integer32,
+		eqlDiskSmartInfoThroughputPerformanceWorst	Integer32,
+		eqlDiskSmartInfoSpinUpTime					Integer32,
+		eqlDiskSmartInfoSpinUpTimeWorst				Integer32,
+		eqlDiskSmartInfoStartStopCount				Integer32,
+		eqlDiskSmartInfoStartStopCountWorst			Integer32,
+		eqlDiskSmartInfoReallocatedSectorCount		Integer32,
+		eqlDiskSmartInfoReallocatedSectorCountWorst	Integer32,
+		eqlDiskSmartInfoReadChannelMargin			Integer32,
+		eqlDiskSmartInfoReadChannelMarginWorst		Integer32,
+		eqlDiskSmartInfoSeekErrorRate				Integer32,
+		eqlDiskSmartInfoSeekErrorRateWorst			Integer32,
+		eqlDiskSmartInfoSeekPerformance				Integer32,
+		eqlDiskSmartInfoSeekPerformanceWorst		Integer32,
+		eqlDiskSmartInfoPowerOnHours				Integer32,
+		eqlDiskSmartInfoPowerOnHoursWorst			Integer32,
+		eqlDiskSmartInfoSpinupRetries				Integer32,
+		eqlDiskSmartInfoSpinupRetriesWorst			Integer32,
+		eqlDiskSmartInfoDriveRecalibRetryCount		Integer32,
+		eqlDiskSmartInfoDriveRecalibRetryCountWorst	Integer32,
+		eqlDiskSmartInfoPowerCycleCount				Integer32,
+		eqlDiskSmartInfoPowerCycleCountWorst		Integer32,
+		eqlDiskSmartInfoReadSoftErrorRate			Integer32,
+		eqlDiskSmartInfoReadSoftErrorRateWorst		Integer32,
+		eqlDiskSmartInfoEmergencyRetractCycles		Integer32,
+		eqlDiskSmartInfoEmergencyRetractCyclesWorst	Integer32,
+		eqlDiskSmartInfoLoadUnloadCycles			Integer32,
+		eqlDiskSmartInfoLoadUnloadCyclesWorst		Integer32,
+		eqlDiskSmartInfoHDDTemp						Integer32,
+		eqlDiskSmartInfoHDDTempWorst				Integer32,
+		eqlDiskSmartInfoOnTheFlyErrorRate			Integer32,
+		eqlDiskSmartInfoOnTheFlyErrorRateWorst		Integer32,
+		eqlDiskSmartInfoSelfTestReallocSectors		Integer32,
+		eqlDiskSmartInfoSelfTestReallocSectorsWorst	Integer32,
+		eqlDiskSmartInfoPendingDefects				Integer32,
+		eqlDiskSmartInfoPendingDefectsWorst			Integer32,
+		eqlDiskSmartInfoOfflineSurfaceScan			Integer32,
+		eqlDiskSmartInfoOfflineSurfaceScanWorst		Integer32,
+		eqlDiskSmartInfoUltraDMACRCErrorRate		Integer32,
+		eqlDiskSmartInfoUltraDMACRCErrorRateWorst	Integer32,
+		eqlDiskSmartInfoWritePreampErrors			Integer32,
+		eqlDiskSmartInfoWritePreampErrorsWorst		Integer32,
+		eqlDiskSmartInfoOffTrackErrors				Integer32,
+		eqlDiskSmartInfoOffTrackErrorsWorst			Integer32,
+		eqlDiskSmartInfoDAMErrorRate				Integer32,
+		eqlDiskSmartInfoDAMErrorRateWorst			Integer32,
+		eqlDiskSmartInfoECCErrors					Integer32,
+		eqlDiskSmartInfoECCErrorsWorst				Integer32,
+		eqlDiskSmartInfoSoftECCCorrection			Integer32,
+		eqlDiskSmartInfoSoftECCCorrectionWorst		Integer32,
+		eqlDiskSmartInfoThermalAsperityRate			Integer32,
+		eqlDiskSmartInfoThermalAsperityRateWorst	Integer32,
+		eqlDiskSmartInfoSpinHighCount				Integer32,
+		eqlDiskSmartInfoSpinHighCountWorst			Integer32,
+		eqlDiskSmartInfoSpinBuzz					Integer32,
+		eqlDiskSmartInfoSpinBuzzWorst				Integer32,
+		eqlDiskSmartInfoOfflineSeekPerformance		Integer32,
+		eqlDiskSmartInfoOfflineSeekPerformanceWorst	Integer32,
+		eqlDiskSmartInfoThresholdExceeded			Integer32
+        } 
+
+eqlDiskSmartInfoRawReadErrorRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 1 }
+
+eqlDiskSmartInfoRawReadErrorRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 2 }
+
+eqlDiskSmartInfoThroughputPerformance  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 3 }
+
+eqlDiskSmartInfoThroughputPerformanceWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 4 }
+
+eqlDiskSmartInfoSpinUpTime  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 5 }
+
+eqlDiskSmartInfoSpinUpTimeWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 6 }
+
+eqlDiskSmartInfoStartStopCount  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 7 }
+
+eqlDiskSmartInfoStartStopCountWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 8 }
+
+eqlDiskSmartInfoReallocatedSectorCount  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 9 }
+
+eqlDiskSmartInfoReallocatedSectorCountWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 10 }
+
+eqlDiskSmartInfoReadChannelMargin  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 11 }
+
+eqlDiskSmartInfoReadChannelMarginWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 12 }
+
+eqlDiskSmartInfoSeekErrorRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 13 }
+
+eqlDiskSmartInfoSeekErrorRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 14 }
+
+eqlDiskSmartInfoSeekPerformance  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 15 }
+
+eqlDiskSmartInfoSeekPerformanceWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 16 }
+
+eqlDiskSmartInfoPowerOnHours  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 17 }
+
+eqlDiskSmartInfoPowerOnHoursWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 18 }
+
+eqlDiskSmartInfoSpinupRetries  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 19 }
+
+eqlDiskSmartInfoSpinupRetriesWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 20 }
+
+eqlDiskSmartInfoDriveRecalibRetryCount  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 21 }
+
+eqlDiskSmartInfoDriveRecalibRetryCountWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 22 }
+
+eqlDiskSmartInfoPowerCycleCount  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 23 }
+
+eqlDiskSmartInfoPowerCycleCountWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 24 }
+
+eqlDiskSmartInfoReadSoftErrorRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 25 }
+
+eqlDiskSmartInfoReadSoftErrorRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 26 }
+
+eqlDiskSmartInfoEmergencyRetractCycles  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 27 }
+
+eqlDiskSmartInfoEmergencyRetractCyclesWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 28 }
+
+eqlDiskSmartInfoLoadUnloadCycles  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 29 }
+
+eqlDiskSmartInfoLoadUnloadCyclesWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 30 }
+
+eqlDiskSmartInfoHDDTemp  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 31 }
+
+eqlDiskSmartInfoHDDTempWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 32 }
+
+eqlDiskSmartInfoOnTheFlyErrorRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 33 }
+
+eqlDiskSmartInfoOnTheFlyErrorRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 34 }
+
+eqlDiskSmartInfoSelfTestReallocSectors  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 35 }
+
+eqlDiskSmartInfoSelfTestReallocSectorsWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 36 }
+
+eqlDiskSmartInfoPendingDefects  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 37 }
+
+eqlDiskSmartInfoPendingDefectsWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 38 }
+
+eqlDiskSmartInfoOfflineSurfaceScan  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 39 }
+
+eqlDiskSmartInfoOfflineSurfaceScanWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 40 }
+
+eqlDiskSmartInfoUltraDMACRCErrorRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 41 }
+
+eqlDiskSmartInfoUltraDMACRCErrorRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 42 }
+
+eqlDiskSmartInfoWritePreampErrors  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 43 }
+
+eqlDiskSmartInfoWritePreampErrorsWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 44 }
+
+eqlDiskSmartInfoOffTrackErrors  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 45 }
+
+eqlDiskSmartInfoOffTrackErrorsWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 46 }
+
+eqlDiskSmartInfoDAMErrorRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 47 }
+
+eqlDiskSmartInfoDAMErrorRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 48 }
+
+eqlDiskSmartInfoECCErrors  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 49 }
+
+eqlDiskSmartInfoECCErrorsWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 50 }
+
+eqlDiskSmartInfoSoftECCCorrection  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 51 }
+
+eqlDiskSmartInfoSoftECCCorrectionWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 52 }
+
+eqlDiskSmartInfoThermalAsperityRate  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 53 }
+
+eqlDiskSmartInfoThermalAsperityRateWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 54 }
+
+eqlDiskSmartInfoSpinHighCount  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 55 }
+
+eqlDiskSmartInfoSpinHighCountWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 56 }
+
+eqlDiskSmartInfoSpinBuzz  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 57 }
+
+eqlDiskSmartInfoSpinBuzzWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 58 }
+
+eqlDiskSmartInfoOfflineSeekPerformance  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 59 }
+
+eqlDiskSmartInfoOfflineSeekPerformanceWorst  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 60 }
+
+eqlDiskSmartInfoThresholdExceeded  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  {  eqlDiskSmartInfoEntry 61 }
+
+
+-- SNMP TRAPS
+
+eqldiskMgmtNotifications OBJECT IDENTIFIER ::= {eqldiskNotifications 1}
+
+-- traps related to disks
+
+eqlDiskStatusChange NOTIFICATION-TYPE
+   OBJECTS{
+        eqlDiskStatus,
+        eqlDiskSlot
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when eqlDiskStatus changes from one state to another state"
+::= { eqldiskMgmtNotifications 1 }
+
+END

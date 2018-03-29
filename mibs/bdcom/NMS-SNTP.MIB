@@ -1,0 +1,75 @@
+-- *****************************************************************
+-- NMS-SNTP.MIB:  NMS SNTP MIB file
+-- SEP 2011
+-- *****************************************************************
+--
+               NMS-SNTP DEFINITIONS ::= BEGIN
+
+               IMPORTS
+    		    MODULE-IDENTITY, OBJECT-TYPE, INTEGER,
+    		    Integer32, Unsigned32                       FROM SNMPv2-SMI
+		    nmsMgmt         			FROM NMS-SMI    
+		    RowStatus,DisplayString,IpAddress    	FROM SNMPv2-TC;
+		    
+
+               nmsSntp         OBJECT IDENTIFIER ::= { nmsMgmt 231 }
+               
+               
+               nmsSntpServerTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSSntpServerEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of SNTP server IP address."
+                   ::= { nmsSntp 1 }
+
+               nmsSntpServerEntry OBJECT-TYPE
+                   SYNTAX NMSSntpServerEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of SNTP server IP configuration information."
+                   INDEX { sntpServerIp }
+               ::= { nmsSntpServerTable 1 }
+
+               NMSSntpServerEntry ::=
+                   SEQUENCE {
+                       sntpServerIp
+                           IpAddress,
+                       sntpServerVersion
+                           INTEGER,
+                       sntpServerRowStatus
+                       	   RowStatus	
+		}
+				
+               sntpServerIp OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SNTP server IP address, the index of this table."
+                   ::= { nmsSntpServerEntry 1 } 
+
+               sntpServerVersion OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "."
+                   ::= { nmsSntpServerEntry 2 } 
+
+               sntpServerRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SNTP server IP address row status."
+                   ::= { nmsSntpServerEntry 3 } 
+
+               
+               
+               
+               
+               
+END
+

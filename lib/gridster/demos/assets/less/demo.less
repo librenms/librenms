@@ -1,0 +1,86 @@
+/*! gridster.js - v0.6.10 - 2015-05-31
+* https://dsmorse.github.io/gridster.js/
+* Copyright (c) 2015 ducksboard; Licensed MIT */
+
+@bg-color: #26941f;
+
+body {
+  background: @bg-color;
+  font-size: 16px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #ffffff;
+  margin: 0;
+}
+h1, h2, h3, p {
+  margin: 10px;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.demo {
+  margin: 3em 0;
+  padding: 7.5em 0 5.5em;
+  background: @bg-color;
+}
+.demo:hover {
+  .gridster {
+    margin: 0 auto;
+    opacity: .8;
+    -webkit-transition: opacity .6s;
+    -moz-transition: opacity .6s;
+    -o-transition: opacity .6s;
+    -ms-transition: opacity .6s;
+    transition: opacity .6s;
+  }
+}
+.content {
+  color: white;
+}
+.gridster {
+  .gs-w {
+    background: #61A9CF;
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+  .player {
+    -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    background: #BBB;
+  }
+  .gs-w.try {
+    background-image: url(../img/sprite.png);
+    background-repeat: no-repeat;
+    background-position: 37px -169px;
+  }
+  .preview-holder {
+    border: none !important;
+    border-radius: 0 !important;
+    background: red !important;
+  }
+  ul {
+    background-color: #EFEFEF;
+  }
+  li {
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    line-height: 100%;
+  }
+}
+ul {
+  list-style-type: none;
+}
+li {
+  list-style: none;
+  font-weight: bold;
+}
+.gridster-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.controls {
+  margin-bottom: 20px;
+}

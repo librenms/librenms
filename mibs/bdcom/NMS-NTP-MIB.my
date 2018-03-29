@@ -1,0 +1,54 @@
+-- *****************************************************************
+-- NMS-NTP-MIB.my: NMS NTP MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-NTP-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, INTEGER
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    nmsMgmt                             FROM NMS-SMI;
+
+--definition of NMS device card related operations and trap related values
+
+               ntp         OBJECT IDENTIFIER ::= { nmsMgmt 353 }
+
+               
+               nmsNtpStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    disable(0),
+                                    enable(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NTP service status. 1-enable,0-disable."
+                   ::= { ntp 1 }
+               
+               nmsNtpMasterServerAddr OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NTP master server address, that may be ip address or hostname."
+                   ::= { ntp 2 }
+               
+               nmsNtpBackupServerAddr OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NTP backup server address, that may be ip address or hostname."
+                   ::= { ntp 3 }
+               
+                   
+
+END

@@ -1,0 +1,11 @@
+os: moxa-nport
+text: Moxa
+type: appliance
+icon: moxa
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.8691.2.7

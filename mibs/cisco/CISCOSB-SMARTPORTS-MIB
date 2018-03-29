@@ -1,0 +1,349 @@
+CISCOSB-SMARTPORTS-MIB DEFINITIONS ::= BEGIN
+
+
+-- -------------------------------------------------------------
+-- Banner MIB
+-- Title:      Cisco Smart Ports Private MIB
+--             This Private MIB manages smart ports macros
+-- Version:    7.47
+-- Date:       30 July 2008
+--
+-- -------------------------------------------------------------
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    TEXTUAL-CONVENTION,DisplayString        FROM SNMPv2-TC
+    InterfaceIndexOrZero                    FROM IF-MIB
+    SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+    EnabledStatus                           FROM P-BRIDGE-MIB
+    RowStatus                               FROM SNMPv2-TC
+    OBJECT-TYPE                             FROM SNMPv2-SMI;
+
+
+ rlSmartPorts MODULE-IDENTITY
+          LAST-UPDATED "200807300000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition for Smart Ports -
+                  provide a convenient way to save and share common configurations.
+                  Smart Ports group a group of command to be applied on a port or a trunk
+                  OR on a global configuration context. In addition Smart port
+                  application provide a database per interface (or global configuration)
+                  to list applied macros.
+                  Each smart port macro can either a user-defined or pre-defined."
+          REVISION "200807300000Z"
+          DESCRIPTION
+                "Initial revision."
+          ::= { switch001 140 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+
+MacroType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Smart Ports macro type."
+    SYNTAX INTEGER {
+        rlSmartPortsMacroInterfaceVendorProvided(1),
+        rlSmartPortsMacroGloablVendorProvided(2),
+        rlSmartPortsMacroUserCreated(3)
+
+}
+
+RlSmartPortsMacroName  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Macro name."
+    SYNTAX DisplayString(SIZE(1..32))
+
+RlSmartPortsMacroNameOrZero  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Macro name."
+    SYNTAX DisplayString(SIZE(0..32))
+-- -------------------------------------------------------------
+-- ---------   Tables     --------------------------------------
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- ---------   rlSmartPortsMacroManageTable     ----------------
+-- -------------------------------------------------------------
+
+ rlSmartPortsMacroManageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlSmartPortsMacroManageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        " The table listing available smart ports macros,
+        holding:
+        macro name
+        macro type: user defined,
+                    CISCOSB provided per interface
+                    CISCOSB provided globally
+        and matches a macro index to be used as identifier in
+        rlSmartPortsMacroContentTable where the macro content really IS
+        Allow to add/remove user defined macros."
+    ::= {rlSmartPorts 1 }
+
+    rlSmartPortsMacroManageEntry  OBJECT-TYPE
+    SYNTAX      RlSmartPortsMacroManageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlSmartPortsMacroManageTable."
+    INDEX    { IMPLIED rlSmartPortsMacroName }
+    ::= {rlSmartPortsMacroManageTable  1 }
+
+    RlSmartPortsMacroManageEntry ::= SEQUENCE {
+    rlSmartPortsMacroName        RlSmartPortsMacroName,
+    rlSmartPortsMacroIndex       INTEGER,
+    rlSmartPortsMacroType        MacroType,
+    rlSmartPortsMacroStatus      RowStatus,
+    rlSmartPortsMacroKeywords    DisplayString,
+    rlSmartPortsMacroDesc1       DisplayString,
+    rlSmartPortsMacroDesc2       DisplayString
+    }
+
+    rlSmartPortsMacroName OBJECT-TYPE
+    SYNTAX RlSmartPortsMacroName
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Macro name."
+    ::= { rlSmartPortsMacroManageEntry 1 }
+
+      rlSmartPortsMacroIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the macro's index.
+        An arbitrary incremental Index used as identifier in
+        rlSmartPortsMacroContentTable where the macro content really IS."
+    ::= { rlSmartPortsMacroManageEntry 2 }
+
+    rlSmartPortsMacroType OBJECT-TYPE
+    SYNTAX      MacroType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the  macro type: user defined,
+                                                   CISCOSB provided per interface
+                                                   CISCOSB provided globally"
+    ::= { rlSmartPortsMacroManageEntry 3 }
+
+
+    rlSmartPortsMacroStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlSmartPortsMacroManageEntry 4 }
+
+
+    rlSmartPortsMacroKeywords OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..160))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "List of Macro Keywords. if there are"
+    ::= { rlSmartPortsMacroManageEntry 5 }
+
+    rlSmartPortsMacroDesc1 OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..160))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "List of Macro descriptions. if there are"
+    ::= { rlSmartPortsMacroManageEntry 6 }
+
+        rlSmartPortsMacroDesc2 OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..160))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "continue List of Macro descriptions. if there are"
+    ::= { rlSmartPortsMacroManageEntry 7 }
+
+
+
+-- -------------------------------------------------------------
+-- ---------   rlSmartPortsMacroContentTable     ----------------
+-- -------------------------------------------------------------
+
+ rlSmartPortsMacroContentTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlSmartPortsMacroContentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds smart ports macro's content.
+        Entries are allowed to be added ONLY on macro indexes that
+        1) has a corresponding entry in rlSmartPortsMacroManageTable
+        2) has rlSmartPortsMacroType = rlSmartPortsMacroUserCreated"
+    ::= {rlSmartPorts 2 }
+
+    rlSmartPortsMacroContentEntry  OBJECT-TYPE
+    SYNTAX      RlSmartPortsMacroContentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the elSmartPortsMacroManageTable."
+    INDEX    { rlSmartPortsMacroIndex,rlSmartPortsMacroOctetIndex}
+    ::= {rlSmartPortsMacroContentTable  1 }
+
+    RlSmartPortsMacroContentEntry ::= SEQUENCE {
+    rlSmartPortsMacroOctetIndex         INTEGER (1..19),
+    rlSmartPortsMacroText               SnmpAdminString
+
+    }
+
+    rlSmartPortsMacroOctetIndex OBJECT-TYPE
+    SYNTAX      INTEGER  (1..19)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the line number in the macro's content text.
+        To allow full macro size of 3k =  19 * 160 = 3040"
+    ::= { rlSmartPortsMacroContentEntry 1 }
+
+    rlSmartPortsMacroText OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Macro content."
+    ::= { rlSmartPortsMacroContentEntry 2 }
+
+-- -------------------------------------------------------------
+-- ---------   rlSmartPortsMacroDescriptionTable     ----------------
+-- -------------------------------------------------------------
+
+
+ rlSmartPortsMacroDescriptionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlSmartPortsMacroDescriptionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds smart ports macro's name
+        globally (rlSmartPortsMacroDescriptionIndex == 0)
+        interface (port or trunk)."
+    ::= {rlSmartPorts 3 }
+
+    rlSmartPortsMacroDescriptionEntry  OBJECT-TYPE
+    SYNTAX      RlSmartPortsMacroDescriptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlSmartPortsMacroInterfaceTable."
+    INDEX    { rlSmartPortsMacroDescriptionIndex}
+    ::= {rlSmartPortsMacroDescriptionTable  1 }
+
+    RlSmartPortsMacroDescriptionEntry ::= SEQUENCE {
+    rlSmartPortsMacroDescriptionIndex         InterfaceIndexOrZero,
+    rlSmartPortsMacroDescriptionText          SnmpAdminString,
+    rlSmartPortsMacroDescriptionStatus        RowStatus
+    }
+
+    rlSmartPortsMacroDescriptionIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies global configuration when equals 0 OR
+        local port or trunk on which the user saved Macro's name."
+    ::= { rlSmartPortsMacroDescriptionEntry 1 }
+
+    rlSmartPortsMacroDescriptionText OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Macro name."
+    ::= { rlSmartPortsMacroDescriptionEntry 2 }
+
+    rlSmartPortsMacroDescriptionStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlSmartPortsMacroDescriptionEntry 3 }
+-- -------------------------------------------------------------
+-- ---------   rlSmartPortsFreeIndexes     ----------------
+-- -------------------------------------------------------------
+ rlSmartPortsFreeIndexes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Returns free index to set in rlSmartPortsMacroIndex when macro is added."
+    ::= { rlSmartPorts 4 }
+
+-- -------------------------------------------------------------
+-- ---------   rlSmartPorts Diagnostics    ---------------------
+-- -------------------------------------------------------------
+ rlSmartPortsDiagMacroName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In case the last macro had failed you will get this name from the
+         specific terminal you had used ."
+    ::= { rlSmartPorts 5 }
+
+  rlSmartPortsDiagLineNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In case the last macro had failed you will get i'ts line number from
+         specific terminal you had used ."
+    ::= { rlSmartPorts 6 }
+
+  rlSmartPortsDiagCommandLine OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In case the last macro had failed you will get i'ts command line number
+         from specific terminal you had used ."
+    ::= { rlSmartPorts 7 }
+
+
+     rlSmartPortsCondenseMode OBJECT-TYPE
+       SYNTAX  INTEGER {
+           enabled  (1),
+           disabled (2)
+       }
+       MAX-ACCESS  read-write 
+       STATUS      current
+       DESCRIPTION
+           "disabled    - in macro description macro such as x no_x will be removed
+            enabled     - in macro description macro such as x no_x will not be removed
+            when condense mode is enabled (by default) each time a macro with the name
+            no_x is applied and prior to that a macro x was applied , they will be removed
+            from the list...
+
+             "
+
+       DEFVAL {enabled}
+    ::= { rlSmartPorts 8 }
+
+
+
+
+END

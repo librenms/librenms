@@ -1,0 +1,2099 @@
+
+-- *****************************************************************************
+-- Juniper-L2TP-Dialout-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Layer 2 Tunneling Protocol (L2TP) Dialout MIB
+--
+-- Copyright 2002 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-L2TP-Dialout-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Counter32, Unsigned32,
+    Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniL2tpDialoutMIB  MODULE-IDENTITY
+    LAST-UPDATED "200211142054Z"  -- 14-Nov-02 03:54 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Layer 2 Tunneling Protocol (L2TP) Dialout MIB for the Juniper
+        Networks enterprise."
+    -- Revision History
+    REVISION    "200211142054Z"  -- 14-Nov-02 03:54 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 62 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniL2tpDialoutDomainName  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "63a"
+    STATUS      current
+    DESCRIPTION
+        "The name of an Internet domain.  Represents textual information taken
+        from the NVT ASCII graphics character set (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(1..63))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutMIBNotifications OBJECT IDENTIFIER ::= { juniL2tpDialoutMIB 0 }
+juniL2tpDialoutMIBObjects       OBJECT IDENTIFIER ::= { juniL2tpDialoutMIB 1 }
+juniL2tpDialoutMIBConformance   OBJECT IDENTIFIER ::= { juniL2tpDialoutMIB 2 }
+
+-- Functional groups
+juniL2tpDialoutGeneral          OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutMIBObjects 1 }
+juniL2tpDialoutTarget           OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutMIBObjects 2 }
+juniL2tpDialoutTriggerBuffer    OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutMIBObjects 3 }
+juniL2tpDialoutSession          OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutMIBObjects 4 }
+juniL2tpDialoutVRouter          OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutMIBObjects 5 }
+juniL2tpDialoutSystem           OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutMIBObjects 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out chassis configuration
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutConnectingTimerValue OBJECT-TYPE
+    SYNTAX      Integer32 (30..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system-wide maximum connecting time in seconds."
+    ::= { juniL2tpDialoutGeneral 1 }
+
+juniL2tpDialoutDormantTimerValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system-wide maximum dormant time in seconds."
+    ::= { juniL2tpDialoutGeneral 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out target configuration
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutTargetConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutTargetConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent dialout target routes.  An IP
+        packet received which maps to a dialout route will initiate a dial-out
+        operation."
+    ::= { juniL2tpDialoutTarget 1 }
+
+juniL2tpDialoutTargetConfigEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutTargetConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A dialout target route by virtual router and target ID."
+    INDEX     { juniL2tpDialoutTargetRouterIndex,
+                juniL2tpDialoutTargetIpAddress,
+                juniL2tpDialoutTargetIpAddressMask }
+    ::= { juniL2tpDialoutTargetConfigTable 1 }
+
+JuniL2tpDialoutTargetConfigEntry ::= SEQUENCE {
+    juniL2tpDialoutTargetRouterIndex     Unsigned32,
+    juniL2tpDialoutTargetIpAddress       IpAddress,
+    juniL2tpDialoutTargetIpAddressMask   IpAddress,
+    juniL2tpDialoutTargetDomainName      JuniL2tpDialoutDomainName,
+    juniL2tpDialoutTargetProfileName     DisplayString,
+    juniL2tpDialoutTargetRowStatus       RowStatus }
+
+juniL2tpDialoutTargetRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router where this target is located.
+        The value of this object can be used to retrieve additional information
+        in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutTargetConfigEntry 1 }
+
+juniL2tpDialoutTargetIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The target IP address.  Applying the target IP address mask to
+        the target IP address results in the target route."
+    ::= { juniL2tpDialoutTargetConfigEntry 2 }
+
+juniL2tpDialoutTargetIpAddressMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask associated with the target IP address.  Applying this mask to
+        the target IP address results in the target route."
+    ::= { juniL2tpDialoutTargetConfigEntry 3 }
+
+juniL2tpDialoutTargetDomainName OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutDomainName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The domain name associated with this target route."
+    ::= { juniL2tpDialoutTargetConfigEntry 4 }
+
+juniL2tpDialoutTargetProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The profile name associated with this target route."
+    ::= { juniL2tpDialoutTargetConfigEntry 5 }
+
+juniL2tpDialoutTargetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table.  Only the values
+        'createAndGo' and 'destroy' may be SET.  All read-create objects
+        in this table can be configured at creation time only."
+    ::= { juniL2tpDialoutTargetConfigEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out target status
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutTargetStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutTargetStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent dialout target routes."
+    ::= { juniL2tpDialoutTarget 2 }
+
+juniL2tpDialoutTargetStatusEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutTargetStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A dialout target route by virtual router and target ID."
+    INDEX     { juniL2tpDialoutTargetStatusRouterIndex,
+                juniL2tpDialoutTargetStatusIpAddress,
+                juniL2tpDialoutTargetStatusIpAddressMask }
+    ::= { juniL2tpDialoutTargetStatusTable 1 }
+
+JuniL2tpDialoutTargetStatusEntry ::= SEQUENCE {
+    juniL2tpDialoutTargetStatusRouterIndex   Unsigned32,
+    juniL2tpDialoutTargetStatusIpAddress     IpAddress,
+    juniL2tpDialoutTargetStatusIpAddressMask IpAddress,
+    juniL2tpDialoutTargetStatus              INTEGER }
+
+juniL2tpDialoutTargetStatusRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutTargetStatusEntry 1 }
+
+juniL2tpDialoutTargetStatusIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The target IP address."
+    ::= { juniL2tpDialoutTargetStatusEntry 2 }
+
+juniL2tpDialoutTargetStatusIpAddressMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask associated with the target IP address."
+    ::= { juniL2tpDialoutTargetStatusEntry 3 }
+
+juniL2tpDialoutTargetStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down(0),
+                    inhibited(1),
+                    inService(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The target's operational state."
+    ::= { juniL2tpDialoutTargetStatusEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for target statistics.  These statistics have been aggregated
+-- across all virtual routers.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutTargetSystemStatistics  OBJECT IDENTIFIER
+     ::= { juniL2tpDialoutTarget 3 }
+
+juniL2tpDialoutTargetsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active targets."
+    ::= { juniL2tpDialoutTargetSystemStatistics 1 }
+
+juniL2tpDialoutTargetsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets created."
+    ::= { juniL2tpDialoutTargetSystemStatistics 2 }
+
+juniL2tpDialoutTargetsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets removed."
+    ::= { juniL2tpDialoutTargetSystemStatistics 3 }
+
+juniL2tpDialoutTargetsDown OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the down state."
+    ::= { juniL2tpDialoutTargetSystemStatistics 4 }
+
+juniL2tpDialoutTargetsInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the inhibited state."
+    ::= { juniL2tpDialoutTargetSystemStatistics 5 }
+
+juniL2tpDialoutTargetsInService OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the in-service state."
+    ::= { juniL2tpDialoutTargetSystemStatistics 6 }
+
+juniL2tpDialoutTargetTriggersDiscarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers discarded."
+    ::= { juniL2tpDialoutTargetSystemStatistics 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out per target statistics.  The session statistics
+-- are aggregated across a single target.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutTargetStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutTargetStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent dial-out target routes."
+    ::= { juniL2tpDialoutTarget 4 }
+
+juniL2tpDialoutTargetStatisticsEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutTargetStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A dialout target route by virtual router and target ID."
+    INDEX     { juniL2tpDialoutTargetStatisticsRouterIndex,
+                juniL2tpDialoutTargetStatisticsIpAddress,
+                juniL2tpDialoutTargetStatisticsIpAddressMask }
+    ::= { juniL2tpDialoutTargetStatisticsTable 1 }
+
+JuniL2tpDialoutTargetStatisticsEntry ::= SEQUENCE {
+    juniL2tpDialoutTargetStatisticsRouterIndex               Unsigned32,
+    juniL2tpDialoutTargetStatisticsIpAddress                 IpAddress,
+    juniL2tpDialoutTargetStatisticsIpAddressMask             IpAddress,
+    juniL2tpDialoutTargetStatisticsTargetsActive             Gauge32,
+    juniL2tpDialoutTargetStatisticsTargetsCreated            Counter32,
+    juniL2tpDialoutTargetStatisticsTargetsRemoved            Counter32,
+    juniL2tpDialoutTargetStatisticsTargetsDown               Gauge32,
+    juniL2tpDialoutTargetStatisticsTargetsInhibited          Gauge32,
+    juniL2tpDialoutTargetStatisticsTargetsInService          Gauge32,
+    juniL2tpDialoutTargetStatisticsSessionsActive            Gauge32,
+    juniL2tpDialoutTargetStatisticsSessionsCreated           Counter32,
+    juniL2tpDialoutTargetStatisticsSessionsRemoved           Counter32,
+    juniL2tpDialoutTargetStatisticsSessionsReset             Counter32,
+    juniL2tpDialoutTargetStatisticsTriggersReceived          Counter32,
+    juniL2tpDialoutTargetStatisticsTriggersEnqueued          Gauge32,
+    juniL2tpDialoutTargetStatisticsTriggersDiscarded         Counter32,
+    juniL2tpDialoutTargetStatisticsTriggersForwarded         Counter32,
+    juniL2tpDialoutTargetStatisticsTriggersMaxEnqueued       Gauge32,
+    juniL2tpDialoutTargetStatisticsAuthenticationRequests    Counter32,
+    juniL2tpDialoutTargetStatisticsAuthenticationNoResources Counter32,
+    juniL2tpDialoutTargetStatisticsAuthenticationGrants      Counter32,
+    juniL2tpDialoutTargetStatisticsAuthenticationDenies      Counter32,
+    juniL2tpDialoutTargetStatisticsDialoutsRequested         Counter32,
+    juniL2tpDialoutTargetStatisticsDialoutsRejected          Counter32,
+    juniL2tpDialoutTargetStatisticsDialoutsEstablished       Counter32,
+    juniL2tpDialoutTargetStatisticsDialoutsTimedout          Counter32,
+    juniL2tpDialoutTargetStatisticsDialoutsTornDown          Counter32 }
+
+juniL2tpDialoutTargetStatisticsRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutTargetStatisticsEntry 1 }
+
+juniL2tpDialoutTargetStatisticsIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The target IP address."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 2 }
+
+juniL2tpDialoutTargetStatisticsIpAddressMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask associated with the target IP address."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 3 }
+
+juniL2tpDialoutTargetStatisticsTargetsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active targets."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 4 }
+
+juniL2tpDialoutTargetStatisticsTargetsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets created."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 5 }
+
+juniL2tpDialoutTargetStatisticsTargetsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets removed."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 6 }
+
+juniL2tpDialoutTargetStatisticsTargetsDown OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the down state."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 7 }
+
+juniL2tpDialoutTargetStatisticsTargetsInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the inhibited state."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 8 }
+
+juniL2tpDialoutTargetStatisticsTargetsInService OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the in-service state."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 9 }
+
+juniL2tpDialoutTargetStatisticsSessionsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active sessions."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 10 }
+
+juniL2tpDialoutTargetStatisticsSessionsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions created."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 11 }
+
+juniL2tpDialoutTargetStatisticsSessionsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions removed."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 12 }
+
+juniL2tpDialoutTargetStatisticsSessionsReset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions reset."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 13 }
+
+juniL2tpDialoutTargetStatisticsTriggersReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers received."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 14 }
+
+juniL2tpDialoutTargetStatisticsTriggersEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers enqueued."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 15 }
+
+juniL2tpDialoutTargetStatisticsTriggersDiscarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers discarded."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 16 }
+
+juniL2tpDialoutTargetStatisticsTriggersForwarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers forwarded."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 17 }
+
+juniL2tpDialoutTargetStatisticsTriggersMaxEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of session triggers enqueued."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 18 }
+
+juniL2tpDialoutTargetStatisticsAuthenticationRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication requests."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 19 }
+
+juniL2tpDialoutTargetStatisticsAuthenticationNoResources OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times resources were not available to send an
+        authentication request."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 20 }
+
+juniL2tpDialoutTargetStatisticsAuthenticationGrants OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication grants."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 21 }
+
+juniL2tpDialoutTargetStatisticsAuthenticationDenies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication denies."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 22 }
+
+juniL2tpDialoutTargetStatisticsDialoutsRequested OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions requested."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 23 }
+
+juniL2tpDialoutTargetStatisticsDialoutsRejected OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions rejected."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 24 }
+
+juniL2tpDialoutTargetStatisticsDialoutsEstablished OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions established."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 25 }
+
+juniL2tpDialoutTargetStatisticsDialoutsTimedout OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions timed-out."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 26 }
+
+juniL2tpDialoutTargetStatisticsDialoutsTornDown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions torn down."
+    ::= { juniL2tpDialoutTargetStatisticsEntry 27 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out trigger buffer configuration
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutTriggerBufferTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutTriggerBufferEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent the maximum number of trigger
+        frames buffered within the specified virtual router."
+    ::= { juniL2tpDialoutTriggerBuffer 1 }
+
+juniL2tpDialoutTriggerBufferEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutTriggerBufferEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The maximum buffered trigger frames by virtual router ID."
+    INDEX     { juniL2tpDialoutTriggerBufferRouterIndex }
+    ::= { juniL2tpDialoutTriggerBufferTable 1 }
+
+JuniL2tpDialoutTriggerBufferEntry ::= SEQUENCE {
+    juniL2tpDialoutTriggerBufferRouterIndex  Unsigned32,
+    juniL2tpDialoutTriggerBufferCount        Gauge32 }
+
+juniL2tpDialoutTriggerBufferRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    ::= { juniL2tpDialoutTriggerBufferEntry 1 }
+
+juniL2tpDialoutTriggerBufferCount OBJECT-TYPE
+    SYNTAX      Gauge32  (0..50)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of trigger frames buffered on this router."
+    ::= { juniL2tpDialoutTriggerBufferEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out session control
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutSessionConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutSessionConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent dialout sessions within the
+        specified virtual router."
+    ::= { juniL2tpDialoutSession 1 }
+
+juniL2tpDialoutSessionConfigEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutSessionConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A dialout session by virtual router and session ID."
+    INDEX     { juniL2tpDialoutSessionConfigHandle,
+                juniL2tpDialoutSessionConfigTargetIpAddress,
+                juniL2tpDialoutSessionConfigTargetIpAddressMask,
+                juniL2tpDialoutSessionConfigRouterIndex }
+    ::= { juniL2tpDialoutSessionConfigTable 1 }
+
+JuniL2tpDialoutSessionConfigEntry ::= SEQUENCE {
+    juniL2tpDialoutSessionConfigHandle                IpAddress,
+    juniL2tpDialoutSessionConfigTargetIpAddress       IpAddress,
+    juniL2tpDialoutSessionConfigTargetIpAddressMask   IpAddress,
+    juniL2tpDialoutSessionConfigRouterIndex           Unsigned32,
+    juniL2tpDialoutSessionConfigControl               INTEGER,
+    juniL2tpDialoutSessionConfigRowStatus             RowStatus }
+
+juniL2tpDialoutSessionConfigHandle OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The trigger IP address."
+    ::= { juniL2tpDialoutSessionConfigEntry 1 }
+
+juniL2tpDialoutSessionConfigTargetIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The target IP address."
+    ::= { juniL2tpDialoutSessionConfigEntry 2 }
+
+juniL2tpDialoutSessionConfigTargetIpAddressMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask associated with the target IP address."
+    ::= { juniL2tpDialoutSessionConfigEntry 3 }
+
+juniL2tpDialoutSessionConfigRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    ::= { juniL2tpDialoutSessionConfigEntry 4 }
+
+juniL2tpDialoutSessionConfigControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    operational(0),
+                    reset(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Reset the session.  Reading this object will always show the session as
+        operational."
+    ::= { juniL2tpDialoutSessionConfigEntry 5 }
+
+juniL2tpDialoutSessionConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls deletion of entries in this table.  Only the value 'destroy'
+        may be SET."
+    ::= { juniL2tpDialoutSessionConfigEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out session status
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutSessionStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutSessionStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent dialout sessions."
+    ::= { juniL2tpDialoutSession 2 }
+
+juniL2tpDialoutSessionStatusEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutSessionStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A dialout session by virtual router and target ID."
+    INDEX     { juniL2tpDialoutSessionStatusHandle,
+                juniL2tpDialoutSessionStatusTargetIpAddress,
+                juniL2tpDialoutSessionStatusTargetIpAddressMask,
+                juniL2tpDialoutSessionStatusRouterIndex }
+    ::= { juniL2tpDialoutSessionStatusTable 1 }
+
+JuniL2tpDialoutSessionStatusEntry ::= SEQUENCE {
+    juniL2tpDialoutSessionStatusHandle                IpAddress,
+    juniL2tpDialoutSessionStatusTargetIpAddress       IpAddress,
+    juniL2tpDialoutSessionStatusTargetIpAddressMask   IpAddress,
+    juniL2tpDialoutSessionStatusRouterIndex           Unsigned32,
+    juniL2tpDialoutSessionStatus                      INTEGER }
+
+juniL2tpDialoutSessionStatusHandle OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The trigger IP address."
+    ::= { juniL2tpDialoutSessionStatusEntry 1 }
+
+juniL2tpDialoutSessionStatusTargetIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The target IP address."
+    ::= { juniL2tpDialoutSessionStatusEntry 2 }
+
+juniL2tpDialoutSessionStatusTargetIpAddressMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask associated with the target IP address."
+    ::= { juniL2tpDialoutSessionStatusEntry 3 }
+
+juniL2tpDialoutSessionStatusRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutSessionStatusEntry 4 }
+
+juniL2tpDialoutSessionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dormant(1),
+                    pending(2),
+                    authenticating(3),
+                    connecting(4),
+                    inService(5),
+                    inhibited(6),
+                    postInhibited(7),
+                    failed(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The session's operational state."
+    ::= { juniL2tpDialoutSessionStatusEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for session statistics.  These statistics have been
+-- aggregated across all virtual routers.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutSessionSystemStatistics  OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutSession 3 }
+
+juniL2tpDialoutSessionsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active sessions."
+    ::= { juniL2tpDialoutSessionSystemStatistics 1 }
+
+juniL2tpDialoutSessionsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions created."
+    ::= { juniL2tpDialoutSessionSystemStatistics 2 }
+
+juniL2tpDialoutSessionsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions removed."
+    ::= { juniL2tpDialoutSessionSystemStatistics 3 }
+
+juniL2tpDialoutSessionsReset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions reset."
+    ::= { juniL2tpDialoutSessionSystemStatistics 4 }
+
+juniL2tpDialoutSessionTriggersReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers received."
+    ::= { juniL2tpDialoutSessionSystemStatistics 5 }
+
+juniL2tpDialoutSessionTriggersEnqueued OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers enqueued."
+    ::= { juniL2tpDialoutSessionSystemStatistics 6 }
+
+juniL2tpDialoutSessionTriggersDiscarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers discarded."
+    ::= { juniL2tpDialoutSessionSystemStatistics 7 }
+
+juniL2tpDialoutSessionTriggersForwarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers forwarded."
+    ::= { juniL2tpDialoutSessionSystemStatistics 8 }
+
+juniL2tpDialoutSessionTriggersMaxEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of session triggers enqueued."
+    ::= { juniL2tpDialoutSessionSystemStatistics 9 }
+
+juniL2tpDialoutSessionAuthenticationRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication requests."
+    ::= { juniL2tpDialoutSessionSystemStatistics 10 }
+
+juniL2tpDialoutSessionAuthenticationNoResources OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times resources were not available to send an
+        authentication request."
+    ::= { juniL2tpDialoutSessionSystemStatistics 11 }
+
+juniL2tpDialoutSessionAuthenticationGrants OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication grants."
+    ::= { juniL2tpDialoutSessionSystemStatistics 12 }
+
+juniL2tpDialoutSessionAuthenticationDenies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication denies."
+    ::= { juniL2tpDialoutSessionSystemStatistics 13 }
+
+juniL2tpDialoutSessionDialoutsRequested OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions requested."
+    ::= { juniL2tpDialoutSessionSystemStatistics 14 }
+
+juniL2tpDialoutSessionDialoutsRejected OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions rejected."
+    ::= { juniL2tpDialoutSessionSystemStatistics 15 }
+
+juniL2tpDialoutSessionDialoutsEstablished OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions established."
+    ::= { juniL2tpDialoutSessionSystemStatistics 16 }
+
+juniL2tpDialoutSessionDialoutsTimedout OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions timed-out."
+    ::= { juniL2tpDialoutSessionSystemStatistics 17 }
+
+juniL2tpDialoutSessionDialoutsTornDown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions torn down."
+    ::= { juniL2tpDialoutSessionSystemStatistics 18 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out per session statistics.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutSessionStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutSessionStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent dial-out sessions."
+    ::= { juniL2tpDialoutSession 4 }
+
+juniL2tpDialoutSessionStatisticsEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutSessionStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A dialout target route by virtual router and session ID."
+    INDEX     { juniL2tpDialoutSessionStatisticsHandle,
+                juniL2tpDialoutSessionStatisticsTargetIpAddress,
+                juniL2tpDialoutSessionStatisticsTargetIpAddressMask,
+                juniL2tpDialoutSessionStatisticsRouterIndex }
+    ::= { juniL2tpDialoutSessionStatisticsTable 1 }
+
+JuniL2tpDialoutSessionStatisticsEntry ::= SEQUENCE {
+    juniL2tpDialoutSessionStatisticsHandle                       IpAddress,
+    juniL2tpDialoutSessionStatisticsTargetIpAddress              IpAddress,
+    juniL2tpDialoutSessionStatisticsTargetIpAddressMask          IpAddress,
+    juniL2tpDialoutSessionStatisticsRouterIndex                  Unsigned32,
+    juniL2tpDialoutSessionStatisticsSessionsActive               Gauge32,
+    juniL2tpDialoutSessionStatisticsSessionsCreated              Counter32,
+    juniL2tpDialoutSessionStatisticsSessionsRemoved              Counter32,
+    juniL2tpDialoutSessionStatisticsSessionsReset                Counter32,
+    juniL2tpDialoutSessionStatisticsTriggersReceived             Counter32,
+    juniL2tpDialoutSessionStatisticsTriggersEnqueued             Gauge32,
+    juniL2tpDialoutSessionStatisticsTriggersDiscarded            Counter32,
+    juniL2tpDialoutSessionStatisticsTriggersForwarded            Counter32,
+    juniL2tpDialoutSessionStatisticsTriggersMaxEnqueued          Gauge32,
+    juniL2tpDialoutSessionStatisticsAuthenticationRequests       Counter32,
+    juniL2tpDialoutSessionStatisticsAuthenticationNoResources    Counter32,
+    juniL2tpDialoutSessionStatisticsAuthenticationGrants         Counter32,
+    juniL2tpDialoutSessionStatisticsAuthenticationDenies         Counter32,
+    juniL2tpDialoutSessionStatisticsDialoutsRequested            Counter32,
+    juniL2tpDialoutSessionStatisticsDialoutsRejected             Counter32,
+    juniL2tpDialoutSessionStatisticsDialoutsEstablished          Counter32,
+    juniL2tpDialoutSessionStatisticsDialoutsTimedout             Counter32,
+    juniL2tpDialoutSessionStatisticsDialoutsTornDown             Counter32 }
+
+juniL2tpDialoutSessionStatisticsHandle OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The trigger IP address."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 1 }
+
+juniL2tpDialoutSessionStatisticsTargetIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The target IP address."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 2 }
+
+juniL2tpDialoutSessionStatisticsTargetIpAddressMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask associated with the target IP address."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 3 }
+
+juniL2tpDialoutSessionStatisticsRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutSessionStatisticsEntry 4 }
+
+juniL2tpDialoutSessionStatisticsSessionsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active sessions."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 5 }
+
+juniL2tpDialoutSessionStatisticsSessionsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions created."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 6 }
+
+juniL2tpDialoutSessionStatisticsSessionsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions removed."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 7 }
+
+juniL2tpDialoutSessionStatisticsSessionsReset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions reset."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 8 }
+
+juniL2tpDialoutSessionStatisticsTriggersReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers received."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 9 }
+
+juniL2tpDialoutSessionStatisticsTriggersEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers enqueued."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 10 }
+
+juniL2tpDialoutSessionStatisticsTriggersDiscarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers discarded."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 11 }
+
+juniL2tpDialoutSessionStatisticsTriggersForwarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers forwarded."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 12 }
+
+juniL2tpDialoutSessionStatisticsTriggersMaxEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of session triggers enqueued."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 13 }
+
+juniL2tpDialoutSessionStatisticsAuthenticationRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication requests."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 14 }
+
+juniL2tpDialoutSessionStatisticsAuthenticationNoResources OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times resources were not available to send an
+        authentication request."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 15 }
+
+juniL2tpDialoutSessionStatisticsAuthenticationGrants OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication grants."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 16 }
+
+juniL2tpDialoutSessionStatisticsAuthenticationDenies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication denies."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 17 }
+
+juniL2tpDialoutSessionStatisticsDialoutsRequested OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions requested."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 18 }
+
+juniL2tpDialoutSessionStatisticsDialoutsRejected OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions rejected."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 19 }
+
+juniL2tpDialoutSessionStatisticsDialoutsEstablished OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions established."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 20 }
+
+juniL2tpDialoutSessionStatisticsDialoutsTimedout OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions timed-out."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 21 }
+
+juniL2tpDialoutSessionStatisticsDialoutsTornDown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions torn down."
+    ::= { juniL2tpDialoutSessionStatisticsEntry 22 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out vrouter status
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutVRouterStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutVRouterStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent virtual routers."
+    ::= { juniL2tpDialoutVRouter 1 }
+
+juniL2tpDialoutVRouterStatusEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutVRouterStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A virtual router indexed by router ID."
+    INDEX     { juniL2tpDialoutVRouterStatusRouterIndex }
+    ::= { juniL2tpDialoutVRouterStatusTable 1 }
+
+JuniL2tpDialoutVRouterStatusEntry ::= SEQUENCE {
+    juniL2tpDialoutVRouterStatusRouterIndex  Unsigned32,
+    juniL2tpDialoutVRouterStatus             INTEGER }
+
+juniL2tpDialoutVRouterStatusRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutVRouterStatusEntry 1 }
+
+juniL2tpDialoutVRouterStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initPending(0),
+                    initFailed(1),
+                    down(2),
+                    inService(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The virtual router's operational state."
+    ::= { juniL2tpDialoutVRouterStatusEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for virtual router statistics.  These statistics have been
+-- aggregated across all virtual routers.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutVRouterSystemStatistics OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutVRouter 2 }
+
+juniL2tpDialoutVRoutersActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active virtual routers."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 1 }
+
+juniL2tpDialoutVRoutersCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of virtual routers created."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 2 }
+
+juniL2tpDialoutVRoutersRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of virtual routers removed."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 3 }
+
+juniL2tpDialoutVRoutersInitPending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of virtual routers in the init-pending state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 4 }
+
+juniL2tpDialoutVRoutersInitFailed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of virtual routers in the init-failed state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 5 }
+
+juniL2tpDialoutVRoutersDown OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of virtual routers in the down state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 6 }
+
+juniL2tpDialoutVRoutersInService OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of virtual routers in the in-service."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 7 }
+
+juniL2tpDialoutVRoutersTriggersMissed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers missed."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 8 }
+
+juniL2tpDialoutVRoutersTriggerRouteUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers received without a matching target route."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 9 }
+
+juniL2tpDialoutVRoutersSessionsDormant OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the dormant state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 10 }
+
+juniL2tpDialoutVRoutersSessionsPending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the pending state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 11 }
+
+juniL2tpDialoutVRoutersSessionsAuthenticating OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the authenticating state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 12 }
+
+juniL2tpDialoutVRoutersSessionsConnecting OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the connecting state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 13 }
+
+juniL2tpDialoutVRoutersSessionsInService OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the in-service state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 14 }
+
+juniL2tpDialoutVRoutersSessionsInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the inhibited state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 15 }
+
+juniL2tpDialoutVRoutersSessionsPostInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the post-inhibited state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 16 }
+
+juniL2tpDialoutVRoutersSessionsFailed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the failed state."
+    ::= { juniL2tpDialoutVRouterSystemStatistics 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for per virtual router statistics.  The target and session
+-- statistics are aggregated across a single virtual router.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutVRouterStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDialoutVRouterStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table represent virtual routers."
+    ::= { juniL2tpDialoutVRouter 3 }
+
+juniL2tpDialoutVRouterStatisticsEntry OBJECT-TYPE
+    SYNTAX      JuniL2tpDialoutVRouterStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A virtual router indexed by router ID."
+    INDEX     { juniL2tpDialoutVRouterStatisticsRouterIndex }
+    ::= { juniL2tpDialoutVRouterStatisticsTable 1 }
+
+JuniL2tpDialoutVRouterStatisticsEntry ::= SEQUENCE {
+    juniL2tpDialoutVRouterStatisticsRouterIndex                  Unsigned32,
+    juniL2tpDialoutVRouterStatisticsTriggersMissed               Counter32,
+    juniL2tpDialoutVRouterStatisticsTriggerRouteUnknown          Counter32,
+    juniL2tpDialoutVRouterStatisticsSessionStateDormant          Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStatePending          Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStateAuthenticating   Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStateConnecting       Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStateInService        Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStateInhibited        Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStatePostInhibited    Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionStateFailed           Gauge32,
+    juniL2tpDialoutVRouterStatisticsTargetsActive                Gauge32,
+    juniL2tpDialoutVRouterStatisticsTargetsCreated               Counter32,
+    juniL2tpDialoutVRouterStatisticsTargetsRemoved               Counter32,
+    juniL2tpDialoutVRouterStatisticsTargetsDown                  Gauge32,
+    juniL2tpDialoutVRouterStatisticsTargetsInhibited             Gauge32,
+    juniL2tpDialoutVRouterStatisticsTargetsInService             Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionsActive               Gauge32,
+    juniL2tpDialoutVRouterStatisticsSessionsCreated              Counter32,
+    juniL2tpDialoutVRouterStatisticsSessionsRemoved              Counter32,
+    juniL2tpDialoutVRouterStatisticsSessionsReset                Counter32,
+    juniL2tpDialoutVRouterStatisticsTriggersReceived             Counter32,
+    juniL2tpDialoutVRouterStatisticsTriggersEnqueued             Gauge32,
+    juniL2tpDialoutVRouterStatisticsTriggersDiscarded            Counter32,
+    juniL2tpDialoutVRouterStatisticsTriggersForwarded            Counter32,
+    juniL2tpDialoutVRouterStatisticsTriggersMaxEnqueued          Gauge32,
+    juniL2tpDialoutVRouterStatisticsAuthenticationRequests       Counter32,
+    juniL2tpDialoutVRouterStatisticsAuthenticationNoResources    Counter32,
+    juniL2tpDialoutVRouterStatisticsAuthenticationGrants         Counter32,
+    juniL2tpDialoutVRouterStatisticsAuthenticationDenies         Counter32,
+    juniL2tpDialoutVRouterStatisticsDialoutsRequested            Counter32,
+    juniL2tpDialoutVRouterStatisticsDialoutsRejected             Counter32,
+    juniL2tpDialoutVRouterStatisticsDialoutsEstablished          Counter32,
+    juniL2tpDialoutVRouterStatisticsDialoutsTimedout             Counter32,
+    juniL2tpDialoutVRouterStatisticsDialoutsTornDown             Counter32 }
+
+juniL2tpDialoutVRouterStatisticsRouterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 1 }
+
+juniL2tpDialoutVRouterStatisticsTriggersMissed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers missed."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 2 }
+
+juniL2tpDialoutVRouterStatisticsTriggerRouteUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers received without a matching target route."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 3 }
+
+juniL2tpDialoutVRouterStatisticsSessionStateDormant OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the dormant state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 4 }
+
+juniL2tpDialoutVRouterStatisticsSessionStatePending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the pending state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 5 }
+
+juniL2tpDialoutVRouterStatisticsSessionStateAuthenticating OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the authenticating state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 6 }
+
+juniL2tpDialoutVRouterStatisticsSessionStateConnecting OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the connecting state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 7 }
+
+juniL2tpDialoutVRouterStatisticsSessionStateInService OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the in-service state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 8 }
+
+juniL2tpDialoutVRouterStatisticsSessionStateInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the inhibited state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 9 }
+
+juniL2tpDialoutVRouterStatisticsSessionStatePostInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the post-inhibited state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 10 }
+
+juniL2tpDialoutVRouterStatisticsSessionStateFailed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions in the failed state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 11 }
+
+juniL2tpDialoutVRouterStatisticsTargetsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active targets."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 12 }
+
+juniL2tpDialoutVRouterStatisticsTargetsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets created."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 13 }
+
+juniL2tpDialoutVRouterStatisticsTargetsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets removed."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 14 }
+
+juniL2tpDialoutVRouterStatisticsTargetsDown OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the down state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 15 }
+
+juniL2tpDialoutVRouterStatisticsTargetsInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the inhibited state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 16 }
+
+juniL2tpDialoutVRouterStatisticsTargetsInService OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of targets in the in-service state."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 17 }
+
+juniL2tpDialoutVRouterStatisticsSessionsActive OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active sessions."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 18 }
+
+juniL2tpDialoutVRouterStatisticsSessionsCreated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions created."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 19 }
+
+juniL2tpDialoutVRouterStatisticsSessionsRemoved OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions removed."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 20 }
+
+juniL2tpDialoutVRouterStatisticsSessionsReset OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions reset."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 21 }
+
+juniL2tpDialoutVRouterStatisticsTriggersReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers received."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 22 }
+
+juniL2tpDialoutVRouterStatisticsTriggersEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers enqueued."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 23 }
+
+juniL2tpDialoutVRouterStatisticsTriggersDiscarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of triggers discarded."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 24 }
+
+juniL2tpDialoutVRouterStatisticsTriggersForwarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session triggers forwarded."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 25 }
+
+juniL2tpDialoutVRouterStatisticsTriggersMaxEnqueued OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of session triggers enqueued."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 26 }
+
+juniL2tpDialoutVRouterStatisticsAuthenticationRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication requests."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 27 }
+
+juniL2tpDialoutVRouterStatisticsAuthenticationNoResources OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times resources were not available to send an
+        authentication request."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 28 }
+
+juniL2tpDialoutVRouterStatisticsAuthenticationGrants OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication grants."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 29 }
+
+juniL2tpDialoutVRouterStatisticsAuthenticationDenies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of session authentication denies."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 30 }
+
+juniL2tpDialoutVRouterStatisticsDialoutsRequested OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions requested."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 31 }
+
+juniL2tpDialoutVRouterStatisticsDialoutsRejected OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions rejected."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 32 }
+
+juniL2tpDialoutVRouterStatisticsDialoutsEstablished OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions established."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 33 }
+
+juniL2tpDialoutVRouterStatisticsDialoutsTimedout OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions timed-out."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 34 }
+
+juniL2tpDialoutVRouterStatisticsDialoutsTornDown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of dial-out sessions torn down."
+    ::= { juniL2tpDialoutVRouterStatisticsEntry 35 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object for dial-out chassis status
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutSystemStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initIncomplete(0),
+                    inService(1),
+                    restricted(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The chassis' operational state"
+    ::= { juniL2tpDialoutSystem 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for dial-out chassis statistics.  Where applicable, the
+-- statistics have been aggregated across all virtual routers.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutSystemStatistics  OBJECT IDENTIFIER
+    ::= { juniL2tpDialoutSystem 2 }
+
+juniL2tpDialoutSystemCurrentSessions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of dial-out sessions in the system."
+    ::= { juniL2tpDialoutSystemStatistics 1 }
+
+juniL2tpDialoutSystemMaximumSessions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of dial-out sessions in the system."
+    ::= { juniL2tpDialoutSystemStatistics 2 }
+
+juniL2tpDialoutSystemSessionsConnecting OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of dial-out sessions in the process of connecting."
+    ::= { juniL2tpDialoutSystemStatistics 3 }
+
+juniL2tpDialoutSystemMaximumSessionsConnecting OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of dial-out sessions that can be in the process of
+        connecting at any one time."
+    ::= { juniL2tpDialoutSystemStatistics 4 }
+
+juniL2tpDialoutSystemSessionsPending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of pending dial-out sessions."
+    ::= { juniL2tpDialoutSystemStatistics 5 }
+
+juniL2tpDialoutSystemMaximumSessionsPending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of pending dial-out sessions."
+    ::= { juniL2tpDialoutSystemStatistics 6 }
+
+juniL2tpDialoutSystemTargetsInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of inhibited targets."
+    ::= { juniL2tpDialoutSystemStatistics 7 }
+
+juniL2tpDialoutSystemMaximumTargetsInhibited OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of inhibited targets."
+    ::= { juniL2tpDialoutSystemStatistics 8 }
+
+juniL2tpDialoutSystemAuthGrantNoSession OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions destroyed before getting an authentication
+        grant."
+    ::= { juniL2tpDialoutSystemStatistics 9 }
+
+juniL2tpDialoutSystemAuthDenyNoSession OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions destroyed before getting an authentication
+        deny."
+    ::= { juniL2tpDialoutSystemStatistics 10 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDialoutMIBCompliances
+    OBJECT IDENTIFIER ::= { juniL2tpDialoutMIBConformance 1 }
+juniL2tpDialoutMIBGroups
+    OBJECT IDENTIFIER ::= { juniL2tpDialoutMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniL2tpDialoutCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting L2TP dialout."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniL2tpDialoutTimersGroup,
+            juniL2tpDialoutTargetConfigGroup,
+            juniL2tpDialoutTriggerBuffersGroup,
+            juniL2tpDialoutSessionControlGroup,
+            juniL2tpDialoutStatusGroup,
+            juniL2tpDialoutSystemStatisticsGroup,
+            juniL2tpDialoutSystemWideVRouterStatisticsGroup,
+            juniL2tpDialoutSystemWideTargetStatisticsGroup,
+            juniL2tpDialoutSystemWideSessionStatisticsGroup,
+            juniL2tpDialoutVRouterStatisticsGroup,
+            juniL2tpDialoutTargetStatisticsGroup,
+            juniL2tpDialoutSessionStatisticsGroup }
+    ::= { juniL2tpDialoutMIBCompliances 1 }                        -- JUNOSe 5.0
+
+
+--
+-- units of conformance
+--
+juniL2tpDialoutTimersGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutConnectingTimerValue,
+        juniL2tpDialoutDormantTimerValue }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out timer
+        functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 1 }
+
+juniL2tpDialoutTargetConfigGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutTargetDomainName,
+        juniL2tpDialoutTargetProfileName,
+        juniL2tpDialoutTargetRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out target
+        functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 2 }
+
+juniL2tpDialoutTriggerBuffersGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutTriggerBufferCount }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out trigger
+        buffer functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 3 }
+
+juniL2tpDialoutSessionControlGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutSessionConfigControl,
+        juniL2tpDialoutSessionConfigRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out session
+        functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 4 }
+
+juniL2tpDialoutStatusGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutSystemStatus,
+        juniL2tpDialoutVRouterStatus,
+        juniL2tpDialoutTargetStatus,
+        juniL2tpDialoutSessionStatus }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out status
+        functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 5 }
+
+juniL2tpDialoutSystemStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutSystemCurrentSessions,
+        juniL2tpDialoutSystemMaximumSessions,
+        juniL2tpDialoutSystemSessionsConnecting,
+        juniL2tpDialoutSystemMaximumSessionsConnecting,
+        juniL2tpDialoutSystemSessionsPending,
+        juniL2tpDialoutSystemMaximumSessionsPending,
+        juniL2tpDialoutSystemTargetsInhibited,
+        juniL2tpDialoutSystemMaximumTargetsInhibited,
+        juniL2tpDialoutSystemAuthGrantNoSession,
+        juniL2tpDialoutSystemAuthDenyNoSession }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out system
+        statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 6 }
+
+juniL2tpDialoutSystemWideVRouterStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutVRoutersActive,
+        juniL2tpDialoutVRoutersCreated,
+        juniL2tpDialoutVRoutersRemoved,
+        juniL2tpDialoutVRoutersInitPending,
+        juniL2tpDialoutVRoutersInitFailed,
+        juniL2tpDialoutVRoutersDown,
+        juniL2tpDialoutVRoutersInService,
+        juniL2tpDialoutVRoutersTriggersMissed,
+        juniL2tpDialoutVRoutersTriggerRouteUnknown,
+        juniL2tpDialoutVRoutersSessionsDormant,
+        juniL2tpDialoutVRoutersSessionsPending,
+        juniL2tpDialoutVRoutersSessionsAuthenticating,
+        juniL2tpDialoutVRoutersSessionsConnecting,
+        juniL2tpDialoutVRoutersSessionsInService,
+        juniL2tpDialoutVRoutersSessionsInhibited,
+        juniL2tpDialoutVRoutersSessionsPostInhibited,
+        juniL2tpDialoutVRoutersSessionsFailed }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out system
+        wide virtual router statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 7 }
+
+juniL2tpDialoutSystemWideTargetStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutTargetsActive,
+        juniL2tpDialoutTargetsCreated,
+        juniL2tpDialoutTargetsRemoved,
+        juniL2tpDialoutTargetsDown,
+        juniL2tpDialoutTargetsInhibited,
+        juniL2tpDialoutTargetsInService,
+        juniL2tpDialoutTargetTriggersDiscarded }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out system
+        wide target statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 8 }
+
+juniL2tpDialoutSystemWideSessionStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutSessionsActive,
+        juniL2tpDialoutSessionsCreated,
+        juniL2tpDialoutSessionsRemoved,
+        juniL2tpDialoutSessionsReset,
+        juniL2tpDialoutSessionTriggersReceived,
+        juniL2tpDialoutSessionTriggersEnqueued,
+        juniL2tpDialoutSessionTriggersDiscarded,
+        juniL2tpDialoutSessionTriggersForwarded,
+        juniL2tpDialoutSessionTriggersMaxEnqueued,
+        juniL2tpDialoutSessionAuthenticationRequests,
+        juniL2tpDialoutSessionAuthenticationNoResources,
+        juniL2tpDialoutSessionAuthenticationGrants,
+        juniL2tpDialoutSessionAuthenticationDenies,
+        juniL2tpDialoutSessionDialoutsRequested,
+        juniL2tpDialoutSessionDialoutsRejected,
+        juniL2tpDialoutSessionDialoutsEstablished,
+        juniL2tpDialoutSessionDialoutsTimedout,
+        juniL2tpDialoutSessionDialoutsTornDown }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out system
+        wide session statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 9 }
+
+juniL2tpDialoutVRouterStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutVRouterStatisticsTriggersMissed,
+        juniL2tpDialoutVRouterStatisticsTriggerRouteUnknown,
+        juniL2tpDialoutVRouterStatisticsSessionStateDormant,
+        juniL2tpDialoutVRouterStatisticsSessionStatePending,
+        juniL2tpDialoutVRouterStatisticsSessionStateAuthenticating,
+        juniL2tpDialoutVRouterStatisticsSessionStateConnecting,
+        juniL2tpDialoutVRouterStatisticsSessionStateInService,
+        juniL2tpDialoutVRouterStatisticsSessionStateInhibited,
+        juniL2tpDialoutVRouterStatisticsSessionStatePostInhibited,
+        juniL2tpDialoutVRouterStatisticsSessionStateFailed,
+        juniL2tpDialoutVRouterStatisticsTargetsActive,
+        juniL2tpDialoutVRouterStatisticsTargetsCreated,
+        juniL2tpDialoutVRouterStatisticsTargetsRemoved,
+        juniL2tpDialoutVRouterStatisticsTargetsDown,
+        juniL2tpDialoutVRouterStatisticsTargetsInhibited,
+        juniL2tpDialoutVRouterStatisticsTargetsInService,
+        juniL2tpDialoutVRouterStatisticsSessionsActive,
+        juniL2tpDialoutVRouterStatisticsSessionsCreated,
+        juniL2tpDialoutVRouterStatisticsSessionsRemoved,
+        juniL2tpDialoutVRouterStatisticsSessionsReset,
+        juniL2tpDialoutVRouterStatisticsTriggersReceived,
+        juniL2tpDialoutVRouterStatisticsTriggersEnqueued,
+        juniL2tpDialoutVRouterStatisticsTriggersDiscarded,
+        juniL2tpDialoutVRouterStatisticsTriggersForwarded,
+        juniL2tpDialoutVRouterStatisticsTriggersMaxEnqueued,
+        juniL2tpDialoutVRouterStatisticsAuthenticationRequests,
+        juniL2tpDialoutVRouterStatisticsAuthenticationNoResources,
+        juniL2tpDialoutVRouterStatisticsAuthenticationGrants,
+        juniL2tpDialoutVRouterStatisticsAuthenticationDenies,
+        juniL2tpDialoutVRouterStatisticsDialoutsRequested,
+        juniL2tpDialoutVRouterStatisticsDialoutsRejected,
+        juniL2tpDialoutVRouterStatisticsDialoutsEstablished,
+        juniL2tpDialoutVRouterStatisticsDialoutsTimedout,
+        juniL2tpDialoutVRouterStatisticsDialoutsTornDown }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out virtual
+        router statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 10 }
+
+juniL2tpDialoutTargetStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutTargetStatisticsTargetsActive,
+        juniL2tpDialoutTargetStatisticsTargetsCreated,
+        juniL2tpDialoutTargetStatisticsTargetsRemoved,
+        juniL2tpDialoutTargetStatisticsTargetsDown,
+        juniL2tpDialoutTargetStatisticsTargetsInhibited,
+        juniL2tpDialoutTargetStatisticsTargetsInService,
+        juniL2tpDialoutTargetStatisticsSessionsActive,
+        juniL2tpDialoutTargetStatisticsSessionsCreated,
+        juniL2tpDialoutTargetStatisticsSessionsRemoved,
+        juniL2tpDialoutTargetStatisticsSessionsReset,
+        juniL2tpDialoutTargetStatisticsTriggersReceived,
+        juniL2tpDialoutTargetStatisticsTriggersEnqueued,
+        juniL2tpDialoutTargetStatisticsTriggersDiscarded,
+        juniL2tpDialoutTargetStatisticsTriggersForwarded,
+        juniL2tpDialoutTargetStatisticsTriggersMaxEnqueued,
+        juniL2tpDialoutTargetStatisticsAuthenticationRequests,
+        juniL2tpDialoutTargetStatisticsAuthenticationNoResources,
+        juniL2tpDialoutTargetStatisticsAuthenticationGrants,
+        juniL2tpDialoutTargetStatisticsAuthenticationDenies,
+        juniL2tpDialoutTargetStatisticsDialoutsRequested,
+        juniL2tpDialoutTargetStatisticsDialoutsRejected,
+        juniL2tpDialoutTargetStatisticsDialoutsEstablished,
+        juniL2tpDialoutTargetStatisticsDialoutsTimedout,
+        juniL2tpDialoutTargetStatisticsDialoutsTornDown }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out target
+        statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 11 }
+
+juniL2tpDialoutSessionStatisticsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDialoutSessionStatisticsSessionsActive,
+        juniL2tpDialoutSessionStatisticsSessionsCreated,
+        juniL2tpDialoutSessionStatisticsSessionsRemoved,
+        juniL2tpDialoutSessionStatisticsSessionsReset,
+        juniL2tpDialoutSessionStatisticsTriggersReceived,
+        juniL2tpDialoutSessionStatisticsTriggersEnqueued,
+        juniL2tpDialoutSessionStatisticsTriggersDiscarded,
+        juniL2tpDialoutSessionStatisticsTriggersForwarded,
+        juniL2tpDialoutSessionStatisticsTriggersMaxEnqueued,
+        juniL2tpDialoutSessionStatisticsAuthenticationRequests,
+        juniL2tpDialoutSessionStatisticsAuthenticationNoResources,
+        juniL2tpDialoutSessionStatisticsAuthenticationGrants,
+        juniL2tpDialoutSessionStatisticsAuthenticationDenies,
+        juniL2tpDialoutSessionStatisticsDialoutsRequested,
+        juniL2tpDialoutSessionStatisticsDialoutsRejected,
+        juniL2tpDialoutSessionStatisticsDialoutsEstablished,
+        juniL2tpDialoutSessionStatisticsDialoutsTimedout,
+        juniL2tpDialoutSessionStatisticsDialoutsTornDown }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects providing management of L2TP dial-out session
+        statistics functionality in a Juniper product."
+    ::= { juniL2tpDialoutMIBGroups 12 }
+
+END

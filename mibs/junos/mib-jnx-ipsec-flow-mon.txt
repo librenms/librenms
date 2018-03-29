@@ -1,0 +1,1098 @@
+-- *******************************************************************
+-- Juniper Networks IPSEC Generic Flow Monitoring object mibs 
+--
+-- Copyright (c) 2001-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, Counter32, 
+		 Counter64, Integer32, Unsigned32 
+           FROM SNMPv2-SMI
+         InetAddress, InetAddressType
+           FROM INET-ADDRESS-MIB
+        TEXTUAL-CONVENTION, DisplayString, TimeInterval
+           FROM SNMPv2-TC
+        jnxIpSecMibRoot  
+           FROM JUNIPER-SMI;
+
+
+    jnxIpSecFlowMonMIB  MODULE-IDENTITY
+        LAST-UPDATED "200705112153Z"     -- May 16, 2007 
+        ORGANIZATION "Juniper Networks, Inc."
+        CONTACT-INFO
+                     "Juniper Technical Assistance Center
+                      Juniper Networks, Inc.
+                      1194 N. Mathilda Avenue
+                      Sunnyvale, CA 94089
+                      E-mail: support@juniper.net"
+        DESCRIPTION
+            "This module defines the object used to monitor the
+	         entries pertaining to IPSec objects and the management
+	         of the IPSEC VPN functionalities.  
+             tables:
+                   - IKE tunnel table
+                   - IPSec tunnel table
+                   - IPSec security associations table.
+
+	         This mib module is based on JNX-IPSEC-MONITOR-MIB. 
+	         Building on the existing IKE infrastruature, the  
+	         security IKE implementation integrates the value-added 
+	         features for the security products"
+        REVISION    "200705160000Z" -- May 16, 2007
+        DESCRIPTION 
+            "Revised the MIB to exlude platform/product specific attributes"
+        ::= { jnxIpSecMibRoot 1 } 
+
+
+    --
+    -- Branch tree objects
+    -- 
+    jnxIpSecFlowMonNotifications OBJECT IDENTIFIER ::= { jnxIpSecFlowMonMIB 0 }
+    jnxIpSecFlowMonPhaseOne      OBJECT IDENTIFIER ::= { jnxIpSecFlowMonMIB 1 }
+    jnxIpSecFlowMonPhaseTwo      OBJECT IDENTIFIER ::= { jnxIpSecFlowMonMIB 2 }
+
+   
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++
+    -- Local Textual Conventions
+    -- +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    JnxIkePeerType ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The type of IPsec Phase-1 IKE peer identity.  It is the 
+             local IKE identify to send in the exchange. 
+             The IKE peer may be identified by one of the ID types 
+	         defined in IPSEC DOI.
+                 idIpv4Addr - IPv4 Address.   
+                 idIpv6Addr - IPv6 Address.   
+                 idUfqdn    - user fully qualified domain name (user@hostname).  
+                 idFqdn     - full qualified domain name 
+                 idDn       - distinquished name"
+         SYNTAX INTEGER {
+                   unknown              (0),    
+                   idIpv4Addr           (1),   
+                   idFqdn               (2),  
+                   idDn                 (3),
+                   idUfqdn              (4),  
+                   idIpv6Addr           (5)   
+         }
+
+    JnxIkeNegoMode ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The IPsec Phase-1 IKE negotiation mode.
+             Main Mode: A six-message Phase 1 exchange that provides identity
+                        protection.
+             Aggressive mode: a three-message phase 1 exchange that does 
+             not provide identity protection"
+         SYNTAX INTEGER {
+                   main         (1),
+                   aggressive   (2)
+         }
+
+    JnxIkeHashAlgo ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The hash algorithm used in IPsec Phase-1 IKE negotiations."
+         SYNTAX INTEGER {
+                   md5(1),
+                   sha(2),
+                   sha256(3)
+         }
+
+    JnxIkeAuthMethod ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The authentication method used in IPsec Phase-1 IKE
+             negotiations."
+         SYNTAX INTEGER {
+                   preSharedKey           (1),
+                   dssSignature           (2),
+                   rsaSignature           (3),
+                   rsaEncryption          (4),   
+                   revRsaEncryption       (5),   
+                   xauthPreSharedKey      (6),
+                   xauthDssSignature      (7),
+                   xauthRsaSignature      (8),
+                   xauthRsaEncryption     (9),
+                   xauthRevRsaEncryption  (10)
+         }
+
+    JnxIkePeerRole ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "Role of the local endpoint in negotiating the IPsec Phase-1 IKE
+             security association. It can be either Initiator or Responder."
+         SYNTAX INTEGER {
+                   initiator            (1),
+                   responder            (2)
+         }
+
+    JnxIkeTunStateType ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "State of the Phase-1 IKE negotiation."
+         SYNTAX INTEGER {
+                   up     (1),
+                   down   (2)
+         }
+
+
+    JnxDiffHellmanGrp ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The Diffie Hellman Group used in negotiations.
+                   modp768        -- 768-bit MODP
+                   modp1024       -- 1024-bit MODP
+                   modp1536       -- 1536-bit MODP; voyager only
+            "
+         SYNTAX INTEGER {
+                   unknown	(0),
+                   modp768	(1),
+                   modp1024	(2),
+                   modp1536     (5)
+         }
+
+    JnxKeyType    ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The type of key used by an IPsec Phase-2 Tunnel."
+         SYNTAX INTEGER{
+                  unknown               (0),
+                  keyIke                (1),
+                  keyManual             (2)
+         }
+
+    JnxEncapMode  ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The encapsulation mode used by an IPsec Phase-2 Tunnel."
+         SYNTAX INTEGER{
+                  unknown               (0),
+                  tunnel                (1),  
+                  transport             (2)
+         }
+
+    JnxEncryptAlgo   ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The encryption algorithm used in negotiations."
+         SYNTAX INTEGER {
+                   espDes               (1),
+                   esp3des              (2),
+                   espNull              (3),
+                   espAes128            (4),  
+                   espAes192            (5),
+                   espAes256            (6)
+         }
+
+    JnxAuthAlgo      ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The authentication algorithm used by a
+             security association of an IPsec Phase-2 Tunnel."
+         SYNTAX INTEGER{
+                   unknown            (0),
+                   hmacMd5            (1),
+                   hmacSha            (2),
+                   hmacSha256         (3)
+
+         }
+
+    JnxRemotePeerType  ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The type of the remote peer gateway (endpoint). It can be one
+             of the following two types:
+               - static (Remote peer whose IP address is known beforehand)
+               - dynamic (Remote peer whose IP address is not known
+                 beforehand).
+             "
+         SYNTAX INTEGER {
+                   unknown              (0),
+                   static               (1),
+                   dynamic              (2)
+         }
+
+    JnxSpiType  ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The type of the SPI associated with IPsec Phase-2 security
+             associations."
+         SYNTAX Unsigned32 (256..4294967295)
+
+
+    JnxSAType   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "SA Type manual or dynamic"
+        SYNTAX INTEGER {
+                   unknown   (0),
+                   manual    (1),
+                   dynamic   (2)
+        }
+
+
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	-- Number of IKE Tunnels currently active  
+    -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkeNumOfTunnels OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of IKE Tunnels (phase-1) actively negotiating between
+             peers.  The SA can be in either the up or down state.  
+             This attribute should detail the number of IKE tunnels 
+             in jnxIkeTunnelMonTable."
+        ::= {  jnxIpSecFlowMonPhaseOne 1 }
+
+
+   -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IPsec Phase-1 Internet Key Exchange Tunnel Table
+   --
+   -- Phase 1 is used to negotiate the parameter and key material required 
+   -- to establish an ISAKMP AS. 
+   -- 
+   -- The phase 1 IKE gateway key exchange: tunnel peer device.  Phase 1 
+   -- security association components include encryption algorithm, 
+   -- authentication, Diffie-Hellman group values and anthentication method
+   -- such as pre-shared keys or certificates.
+   -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIkeTunnelMonTable  OBJECT-TYPE
+         SYNTAX SEQUENCE OF JnxIkeTunnelMonEntry
+         MAX-ACCESS 	    not-accessible
+         STATUS 	    current
+         DESCRIPTION
+            "The IPsec Phase-1 Internet Key Exchange Tunnel Table.
+             There is one entry in this table for each active IPsec
+             Phase-1 IKE Tunnel."
+         ::= { jnxIpSecFlowMonPhaseOne 2 }
+
+    jnxIkeTunnelMonEntry OBJECT-TYPE
+         SYNTAX     JnxIkeTunnelMonEntry
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+             "Each entry contains the attributes associated with
+              an active IPsec Phase-1 IKE Tunnel."
+         INDEX { jnxIkeTunMonRemoteGwAddrType,
+                 jnxIkeTunMonRemoteGwAddr,
+                 jnxIkeTunMonIndex }
+         ::= { jnxIkeTunnelMonTable 1 }
+
+    JnxIkeTunnelMonEntry ::= SEQUENCE {
+         jnxIkeTunMonRemoteGwAddrType      InetAddressType,
+         jnxIkeTunMonRemoteGwAddr          InetAddress,
+         jnxIkeTunMonIndex                 Integer32,
+         jnxIkeTunMonLocalGwAddrType       InetAddressType,
+         jnxIkeTunMonLocalGwAddr           InetAddress,
+         jnxIkeTunMonState                 JnxIkeTunStateType,   
+         jnxIkeTunMonInitiatorCookie       DisplayString,
+         jnxIkeTunMonResponderCookie       DisplayString,
+         jnxIkeTunMonLocalRole             JnxIkePeerRole,  
+         jnxIkeTunMonLocalIdType           JnxIkePeerType,
+         jnxIkeTunMonLocalIdValue          DisplayString,
+         jnxIkeTunMonLocalCertName         DisplayString,
+         jnxIkeTunMonRemoteIdType          JnxIkePeerType,
+         jnxIkeTunMonRemoteIdValue         DisplayString,
+         jnxIkeTunMonNegoMode              JnxIkeNegoMode,
+         jnxIkeTunMonDiffHellmanGrp        JnxDiffHellmanGrp,
+         jnxIkeTunMonEncryptAlgo           JnxEncryptAlgo,
+         jnxIkeTunMonHashAlgo              JnxIkeHashAlgo,
+         jnxIkeTunMonAuthMethod            JnxIkeAuthMethod,
+         jnxIkeTunMonLifeTime              Integer32,
+         jnxIkeTunMonActiveTime            TimeInterval,
+         jnxIkeTunMonInOctets              Counter64,
+         jnxIkeTunMonInPkts                Counter32,
+         jnxIkeTunMonOutOctets             Counter64,
+         jnxIkeTunMonOutPkts               Counter32,
+         jnxIkeTunMonXAuthUserId           DisplayString, 
+         jnxIkeTunMonDPDDownCount          Counter32	
+      }
+
+
+      jnxIkeTunMonRemoteGwAddrType OBJECT-TYPE
+         SYNTAX 	InetAddressType
+         MAX-ACCESS     not-accessible
+         STATUS 	current
+         DESCRIPTION
+            "The IP address type of the remote gateway (endpoint) for the IPsec
+             Phase-1 IKE Tunnel."
+         ::= { jnxIkeTunnelMonEntry 1 }
+
+      jnxIkeTunMonRemoteGwAddr OBJECT-TYPE
+         SYNTAX 	InetAddress
+         MAX-ACCESS     not-accessible
+         STATUS 	current
+         DESCRIPTION
+            "The IP address of the remote gateway (endpoint) for the IPsec
+             Phase-1 IKE Tunnel."
+         ::= { jnxIkeTunnelMonEntry 2 }
+
+      jnxIkeTunMonIndex OBJECT-TYPE
+         SYNTAX 	Integer32 (1..2147483647)
+         MAX-ACCESS     not-accessible
+         STATUS 	current
+         DESCRIPTION
+            "The index of the IPsec Phase-1 IKE Tunnel Table.
+             The value of the index is a number which begins
+             at one and is incremented with each tunnel that
+             is created. The value of this object will
+             wrap at 2,147,483,647."
+         ::= { jnxIkeTunnelMonEntry 3 }
+
+      jnxIkeTunMonLocalGwAddr OBJECT-TYPE
+         SYNTAX         InetAddress
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The IP address of the local endpoint (gateway) for the IPsec
+             Phase-1 IKE Tunnel."
+         ::= { jnxIkeTunnelMonEntry 4 }
+
+      jnxIkeTunMonLocalGwAddrType OBJECT-TYPE
+         SYNTAX 	InetAddressType
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The IP address type of the local endpoint (gateway) for the IPsec
+             Phase-1 IKE Tunnel."
+         ::= { jnxIkeTunnelMonEntry 5 }
+
+      jnxIkeTunMonState OBJECT-TYPE
+         SYNTAX 	JnxIkeTunStateType
+         MAX-ACCESS     read-only 
+         STATUS 	current 
+         DESCRIPTION
+            "The state of the IKE tunnel, It can be: 
+			1. up - negotiation completed
+			2. down- being negotiated"
+         ::= { jnxIkeTunnelMonEntry 6 }
+		 
+      jnxIkeTunMonInitiatorCookie OBJECT-TYPE
+         SYNTAX 	DisplayString
+         MAX-ACCESS     read-only 
+         STATUS 	current 
+         DESCRIPTION
+            "Cookie as generated by the peer that initiated the IKE Phase-1
+             negotiation. This cookie is carried in the ISAKMP header."
+         ::= { jnxIkeTunnelMonEntry 7 }
+
+      jnxIkeTunMonResponderCookie OBJECT-TYPE
+         SYNTAX 	DisplayString
+         MAX-ACCESS     read-only 
+         STATUS		current 
+         DESCRIPTION
+            "Cookie as generated by the peer responding to the IKE Phase-1
+             negotiation initiated by the remote peer. This cookie is carried
+             in the ISAKMP header."
+         ::= { jnxIkeTunnelMonEntry 8 }
+		 
+      jnxIkeTunMonLocalRole OBJECT-TYPE
+         SYNTAX 	JnxIkePeerRole
+         MAX-ACCESS     read-only 
+         STATUS 	current 
+         DESCRIPTION
+            "The role of local peer identity.  The Role of the local peer can be:
+             1. initiator.
+             2. or responder."
+         ::= { jnxIkeTunnelMonEntry 9 }
+
+      jnxIkeTunMonLocalIdType OBJECT-TYPE
+         SYNTAX 	JnxIkePeerType
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The type of local peer identity.  The local
+            peer may be identified by:
+             1. an IP address, or
+             2. or a fully qualified domain name string.
+             3. or a distinguished name string."
+         ::= { jnxIkeTunnelMonEntry 10 }
+
+      jnxIkeTunMonLocalIdValue OBJECT-TYPE
+         SYNTAX 	DisplayString
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The value of the local peer identity.
+
+             If the local peer type is an IP Address, then this
+             is the IP Address used to identify the local peer.
+
+             If the local peer type is id_fqdn, then this is
+             the FQDN of the remote peer.
+
+             If the local peer type is a id_dn, then this is
+             the distinguished name string of the local peer."
+         ::= { jnxIkeTunnelMonEntry 11 }
+
+      jnxIkeTunMonLocalCertName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS current
+         DESCRIPTION
+            "Name of the certificate used for authentication of the local
+             tunnel endpoint. This object will have some valid value only
+             if negotiated IKE authentication method is other than pre-saherd
+             key. If the IKE negotiation do not use certificate based
+             authentication method, then the value of this object will be a
+             NULL string."  
+         ::= { jnxIkeTunnelMonEntry 12 }
+
+      jnxIkeTunMonRemoteIdType OBJECT-TYPE
+         SYNTAX         JnxIkePeerType
+         MAX-ACCESS     read-only
+         STATUS current
+         DESCRIPTION
+            "The type of remote peer identity.
+            The remote peer may be identified by:
+             1. an IP address, or
+             2. or a fully qualified domain name string.
+             3. or a distinguished name string."
+         ::= { jnxIkeTunnelMonEntry 13 }
+
+      jnxIkeTunMonRemoteIdValue OBJECT-TYPE
+         SYNTAX 	DisplayString
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The value of the remote peer identity.
+
+             If the remote peer type is an IP Address, then this
+             is the IP Address used to identify the remote peer.
+
+             If the remote peer type is id_fqdn, then this is
+             the FQDN of the remote peer.
+
+             If the remote peer type is a id_dn, then this is
+             the distinguished named string of the remote peer."
+         ::= { jnxIkeTunnelMonEntry 14 }
+
+      jnxIkeTunMonNegoMode OBJECT-TYPE
+         SYNTAX 	JnxIkeNegoMode
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The negotiation mode of the IPsec Phase-1 IKE Tunnel."
+         ::= { jnxIkeTunnelMonEntry 15 }
+
+      jnxIkeTunMonDiffHellmanGrp OBJECT-TYPE
+         SYNTAX 	JnxDiffHellmanGrp
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The Diffie Hellman Group used in IPsec Phase-1 IKE
+             negotiations."
+         ::= { jnxIkeTunnelMonEntry 16 }
+
+      jnxIkeTunMonEncryptAlgo OBJECT-TYPE
+         SYNTAX 	JnxEncryptAlgo
+         MAX-ACCESS     read-only
+         STATUS 	current
+         DESCRIPTION
+            "The encryption algorithm used in IPsec Phase-1 IKE negotiations."
+         ::= { jnxIkeTunnelMonEntry 17 }
+
+      jnxIkeTunMonHashAlgo OBJECT-TYPE
+         SYNTAX         JnxIkeHashAlgo
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The hash algorithm used in IPsec Phase-1 IKE negotiations."
+         ::= { jnxIkeTunnelMonEntry 18 }
+
+      jnxIkeTunMonAuthMethod OBJECT-TYPE
+         SYNTAX         JnxIkeAuthMethod
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The authentication method used in IPsec Phase-1 IKE
+             negotiations."
+         ::= { jnxIkeTunnelMonEntry 19 }
+
+      jnxIkeTunMonLifeTime OBJECT-TYPE
+         SYNTAX         Integer32 (1..2147483647)
+         UNITS          "seconds"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The negotiated LifeTime of the IPsec Phase-1 IKE Tunnel
+             in seconds."
+         ::= { jnxIkeTunnelMonEntry 20 }
+
+      jnxIkeTunMonActiveTime OBJECT-TYPE
+         SYNTAX         TimeInterval
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The length of time the IPsec Phase-1 IKE tunnel has been
+             active in hundredths of seconds."
+         ::= { jnxIkeTunnelMonEntry 21 }
+
+      jnxIkeTunMonInOctets OBJECT-TYPE
+         SYNTAX         Counter64
+         UNITS          "Octets"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The total number of octets received by this IPsec Phase-1 
+			 IKE security association."
+         ::= { jnxIkeTunnelMonEntry 22 }
+
+      jnxIkeTunMonInPkts OBJECT-TYPE
+         SYNTAX         Counter32
+         UNITS          "Packets"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The total number of packets received by this IPsec Phase-1 
+			 IKE security association."
+         ::= { jnxIkeTunnelMonEntry 23 }
+
+      jnxIkeTunMonOutOctets OBJECT-TYPE
+         SYNTAX 	Counter64
+         UNITS          "Octets"
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The total number of octets sent by this IPsec Phase-1
+             IKE security association."
+         ::= { jnxIkeTunnelMonEntry 24 }
+
+      jnxIkeTunMonOutPkts OBJECT-TYPE
+         SYNTAX     Counter32
+         UNITS      "Packets"
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+            "The total number of packets sent by this IPsec Phase-1
+             IKE security association."
+         ::= { jnxIkeTunnelMonEntry 25 }
+
+      jnxIkeTunMonXAuthUserId OBJECT-TYPE
+         SYNTAX         DisplayString 
+         MAX-ACCESS 	read-only
+         STATUS         current
+         DESCRIPTION
+            "The extended Authentication (XAuth) User Identifier, identifies the 
+             user associated with this IPSec Phase negotiation." 
+         ::= { jnxIkeTunnelMonEntry 26 }
+
+      jnxIkeTunMonDPDDownCount OBJECT-TYPE
+         SYNTAX         Counter32
+         UNITS          "Packets"
+         MAX-ACCESS     read-only
+         STATUS         obsolete 
+         DESCRIPTION
+            "The number of times that the remote peer is detected 
+             in a dead (or down) state. This attribute is obsolete"   
+         ::= { jnxIkeTunnelMonEntry 27 }
+
+
+
+   -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IPsec Phase-2 Tunnel Table
+   -- 
+   -- During this phase, IKE negotiates IPSEC SA parameters and setup 
+   -- matching IPSEC SA in the peers.
+   -- 
+   -- Phase 2 VPN: tunnel peer connection, associated with a specific policy
+   -- or a tunnel interface.  Phase 2 security association components include
+   -- encryption and authentication algorithms, proxy-IDs and optional DH 
+   -- group values.
+   -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    jnxIpSecNumOfTunnels  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of IPSEC VPN Tunnels.   
+             This attribute should detail the number of IPSEC VPN tunnel
+             in jnxIpSecTunnelTable."
+        ::= {  jnxIpSecFlowMonPhaseTwo 1 }
+
+
+     jnxIpSecTunnelMonTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF JnxIpSecTunnelMonEntry
+         MAX-ACCESS         not-accessible
+         STATUS             current
+         DESCRIPTION
+            "The IPsec Phase-2 Tunnel Table.
+            There is one entry in this table for each active IPsec Phase-2 
+            Tunnel.  If the tunnel is terminated, then the entry is no longer 
+            available after the table has been refreshed. "
+         ::= { jnxIpSecFlowMonPhaseTwo 2 }
+
+     jnxIpSecTunnelMonEntry OBJECT-TYPE
+         SYNTAX     JnxIpSecTunnelMonEntry
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+            "Each entry contains the attributes
+            associated with an active IPsec Phase-2 Tunnel."
+         INDEX { jnxIpSecTunMonRemoteGwAddrType,
+		 jnxIpSecTunMonRemoteGwAddr,
+                 jnxIpSecTunMonIndex}
+         ::= { jnxIpSecTunnelMonTable 1 }
+
+      JnxIpSecTunnelMonEntry ::= SEQUENCE {
+         jnxIpSecTunMonRemoteGwAddrType     InetAddressType,
+         jnxIpSecTunMonRemoteGwAddr         InetAddress,
+         jnxIpSecTunMonIndex                Integer32,
+         jnxIpSecTunMonLocalGwAddrType      InetAddressType,
+         jnxIpSecTunMonLocalGwAddr          InetAddress,
+         jnxIpSecTunMonLocalProxyId         DisplayString,
+         jnxIpSecTunMonRemoteProxyId        DisplayString,
+         jnxIpSecTunMonKeyType              JnxKeyType,
+         jnxIpSecTunMonRemotePeerType       JnxRemotePeerType,  
+         jnxIpSecTunMonOutEncryptedBytes    Counter64,
+         jnxIpSecTunMonOutEncryptedPkts     Counter64,
+         jnxIpSecTunMonInDecryptedBytes     Counter64,
+         jnxIpSecTunMonInDecryptedPkts      Counter64,
+         jnxIpSecTunMonAHInBytes            Counter64,
+         jnxIpSecTunMonAHInPkts             Counter64,
+         jnxIpSecTunMonAHOutBytes           Counter64,
+         jnxIpSecTunMonAHOutPkts            Counter64,
+         jnxIpSecTunMonReplayDropPkts       Counter64,
+         jnxIpSecTunMonAhAuthFails          Counter64,
+         jnxIpSecTunMonEspAuthFails         Counter64,
+         jnxIpSecTunMonDecryptFails         Counter64,
+         jnxIpSecTunMonBadHeaders           Counter64,
+         jnxIpSecTunMonBadTrailers          Counter64,
+         jnxIpSecTunMonDroppedPkts          Counter64   -- obsolete        
+      }											
+
+      jnxIpSecTunMonRemoteGwAddrType OBJECT-TYPE
+         SYNTAX        InetAddressType
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+            "The IP address type of the remote gateway (endpoint) for the IPsec
+             Phase-2 Tunnel."
+         ::= { jnxIpSecTunnelMonEntry 1 }
+
+      jnxIpSecTunMonRemoteGwAddr OBJECT-TYPE
+         SYNTAX        InetAddress
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+            "The IP address of the remote gateway (endpoint) for the IPsec
+             Phase-2 Tunnel."
+         ::= { jnxIpSecTunnelMonEntry 2 }
+
+     jnxIpSecTunMonIndex OBJECT-TYPE
+         SYNTAX 	Integer32 (1..2147483647)
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+            "The index of the IPsec Phase-2 Tunnel Table.
+             The value of the index is a number which begins at one and 
+	         is incremented with each tunnel that is created. The value of 
+	         this object will wrap at 2,147,483,647."
+         ::= { jnxIpSecTunnelMonEntry 3 }
+
+    jnxIpSecTunMonLocalGwAddrType OBJECT-TYPE
+         SYNTAX        InetAddressType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "The IP address type of the local gateway (endpoint) for the IPsec
+             Phase-2 Tunnel."
+         ::= { jnxIpSecTunnelMonEntry 4 }
+
+       jnxIpSecTunMonLocalGwAddr OBJECT-TYPE
+         SYNTAX        InetAddress
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "The IP address of the local gateway (endpoint) for the IPsec
+             Phase-2 Tunnel."
+         ::= { jnxIpSecTunnelMonEntry 5 }
+
+      jnxIpSecTunMonLocalProxyId OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Identifier for the local end."
+         ::= { jnxIpSecTunnelMonEntry 6 }
+
+      jnxIpSecTunMonRemoteProxyId OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Identifier for the remote end."
+         ::= { jnxIpSecTunnelMonEntry 7 }
+		 
+      jnxIpSecTunMonKeyType OBJECT-TYPE
+         SYNTAX        JnxKeyType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "The type of key used by the IPsec Phase-2 Tunnel. It can be
+             one of the following two types:
+               - IKE negotiated
+               - Manually installed"
+         ::= { jnxIpSecTunnelMonEntry 8 }
+
+      jnxIpSecTunMonRemotePeerType OBJECT-TYPE
+         SYNTAX        JnxRemotePeerType
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "The type of the remote peer gateway (endpoint). It can be one
+             of the following two types:
+               - static (Remote peer whose IP address is known beforehand)
+               - dynamic (Remote peer whose IP address is not known
+                          beforehand)"
+         ::= { jnxIpSecTunnelMonEntry 9 }
+
+      jnxIpSecTunMonOutEncryptedBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of bytes encrypted by this Phase-2 tunnel."
+         ::= { jnxIpSecTunnelMonEntry 10 }
+
+
+      jnxIpSecTunMonOutEncryptedPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets encrypted by this Phase-2 tunnel."
+         ::= { jnxIpSecTunnelMonEntry 11 }
+		 
+
+      jnxIpSecTunMonInDecryptedBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of bytes decrypted by this Phase-2 tunnel."
+         ::= { jnxIpSecTunnelMonEntry 12 }
+		 
+
+      jnxIpSecTunMonInDecryptedPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets decrypted by this Phase-2 tunnel."
+         ::= { jnxIpSecTunnelMonEntry 13 }
+		 
+
+      jnxIpSecTunMonAHInBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of incoming bytes authenticated using AH by this Phase-2
+             tunnel."
+         ::= { jnxIpSecTunnelMonEntry 14 }
+		 
+
+      jnxIpSecTunMonAHInPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of incoming packets authenticated using AH by this Phase-2
+             tunnel."
+         ::= { jnxIpSecTunnelMonEntry 15 }
+		 
+
+      jnxIpSecTunMonAHOutBytes OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of outgoing bytes applied AH by this Phase-2 tunnel."
+         ::= { jnxIpSecTunnelMonEntry 16 }
+		 
+
+      jnxIpSecTunMonAHOutPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of outgoing packets applied AH by this Phase-2 tunnel."
+         ::= { jnxIpSecTunnelMonEntry 17 }
+		 
+      jnxIpSecTunMonReplayDropPkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets dropped by this Phase-2 tunnel due to
+             anti replay check failure."
+         ::= { jnxIpSecTunnelMonEntry 18 }
+		 
+
+      jnxIpSecTunMonAhAuthFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets received by this Phase-2 tunnel that
+             failed AH authentication."
+         ::= { jnxIpSecTunnelMonEntry 19 }
+		 
+
+      jnxIpSecTunMonEspAuthFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets received by this Phase-2 tunnel that
+             failed ESP authentication."
+         ::= { jnxIpSecTunnelMonEntry 20 }
+		 
+
+      jnxIpSecTunMonDecryptFails OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets received by this Phase-2 tunnel that
+             failed decryption."
+         ::= { jnxIpSecTunnelMonEntry 21 }
+
+
+      jnxIpSecTunMonBadHeaders OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets received by this Phase-2 tunnel that
+             failed due to bad headers."
+         ::= { jnxIpSecTunnelMonEntry 22 }
+	
+	 
+      jnxIpSecTunMonBadTrailers OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only 
+         STATUS        current 
+         DESCRIPTION
+            "Number of packets received by this Phase-2 tunnel that
+             failed due to bad ESP trailers."
+         ::= { jnxIpSecTunnelMonEntry 23 }
+	
+	 
+      jnxIpSecTunMonDroppedPkts  OBJECT-TYPE
+         SYNTAX         Counter64
+         MAX-ACCESS 	read-only 
+         STATUS         obsolete
+         DESCRIPTION
+            "Total number of dropped packets for this Phase-2 tunnel. 
+             This attribute is obsolete."
+         ::= { jnxIpSecTunnelMonEntry 26 }
+
+
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   -- The IPsec Phase-2 Security Association (SA) Table
+   -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      jnxIpSecSaMonTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF JnxIpSecSaMonEntry
+         MAX-ACCESS         not-accessible
+         STATUS             current
+         DESCRIPTION
+            "The IPsec Phase-2 Security Association Table.
+            This table identifies the structure (in terms of
+            component SAs) of each active Phase-2 IPsec tunnel.
+            This table contains an entry for each active and
+            expiring security association and maps each entry
+            in the active Phase-2 tunnel table (ipSecTunTable)
+            into a number of entries in this table. 
+
+            SA contains the information negotiated by IKE. The SA 
+            is like a contract laying out the rules of the VPN 
+            connection for the duration of the SA. An SA is assigned 
+            a 32-bit number that, when used in conjunction with the 
+            destination IP address, uniquely identifies the SA. This 
+            number is called the Security Parameters Index or SPI.
+
+            IPSec SAs area unidirectional and they are unique in 
+            each security protocol. A set of SAs are needed for a 
+            protected data pipe, one per direction per protocol.  
+            "
+         ::= { jnxIpSecFlowMonPhaseTwo 3 }
+
+      jnxIpSecSaMonEntry OBJECT-TYPE
+         SYNTAX     JnxIpSecSaMonEntry
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+            "Each entry contains the attributes associated with
+             active and expiring IPsec Phase-2
+             security associations."
+         INDEX { jnxIpSecTunMonRemoteGwAddrType, -- From jnxIpSecTunnelTable 
+                 jnxIpSecTunMonRemoteGwAddr,     -- From jnxIpSecTunnelTable
+                 jnxIpSecTunMonIndex,            -- From jnxIpSecTunnelTable
+                 jnxIpSecSaMonIndex  }
+         ::= { jnxIpSecSaMonTable 1 }
+
+      JnxIpSecSaMonEntry ::= SEQUENCE {
+         jnxIpSecSaMonIndex                 Integer32,
+         jnxIpSecSaMonProtocol              INTEGER,	  
+         jnxIpSecSaMonInSpi                 JnxSpiType,		  
+         jnxIpSecSaMonOutSpi                JnxSpiType,		  
+         jnxIpSecSaMonType                  JnxSAType,
+         jnxIpSecSaMonEncapMode             JnxEncapMode,
+         jnxIpSecSaMonLifeSize              Integer32,
+         jnxIpSecSaMonLifeTime              Integer32,
+         jnxIpSecSaMonActiveTime            TimeInterval,
+         jnxIpSecSaMonLifeSizeThreshold     Integer32,  
+         jnxIpSecSaMonLifeTimeThreshold     Integer32, 
+         jnxIpSecSaMonEncryptAlgo           JnxEncryptAlgo,
+         jnxIpSecSaMonAuthAlgo              JnxAuthAlgo,	  
+         jnxIpSecSaMonState                 INTEGER
+      }
+
+      jnxIpSecSaMonIndex OBJECT-TYPE
+         SYNTAX      Integer32 (1..65535)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+            "The index, in the context of the IPsec tunnel ipSecTunIndex,
+            of the security association represented by this table entry.
+            The value of this index is a number which begins at one and
+            is incremented with each SPI associated with an IPsec Phase-2
+            Tunnel.  The value of this object will wrap at 65535."
+         ::= { jnxIpSecSaMonEntry 1 }
+
+      jnxIpSecSaMonProtocol OBJECT-TYPE
+         SYNTAX INTEGER{
+                   ah(1),
+                   esp(2)
+                }
+         MAX-ACCESS read-only 
+         STATUS     current
+         DESCRIPTION
+            "The index, represents the security protocol (AH, ESP or
+             IPComp) for which this security association was setup."
+         ::= { jnxIpSecSaMonEntry 2 }
+
+      jnxIpSecSaMonInSpi OBJECT-TYPE
+         SYNTAX     JnxSpiType
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+             "The value of the incoming SPI."
+         ::= { jnxIpSecSaMonEntry 3 }
+
+      jnxIpSecSaMonOutSpi OBJECT-TYPE
+         SYNTAX     JnxSpiType
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+             "The value of the outgoing SPI."
+         ::= { jnxIpSecSaMonEntry 4 }
+
+      jnxIpSecSaMonType OBJECT-TYPE
+         SYNTAX     JnxSAType
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+             "This field represents the type of security associations 
+			 which can be either manual or dynamic"
+         ::= { jnxIpSecSaMonEntry 5 }
+
+      jnxIpSecSaMonEncapMode OBJECT-TYPE
+         SYNTAX     JnxEncapMode
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+            "The encapsulation mode used by an IPsec Phase-2 Tunnel. "
+         ::= { jnxIpSecSaMonEntry 6 }
+
+      jnxIpSecSaMonLifeSize OBJECT-TYPE
+         SYNTAX     Integer32
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+            "The negotiated LifeSize of the IPsec Phase-2 Tunnel in kilobytes. "
+         ::= { jnxIpSecSaMonEntry 7 }
+
+      jnxIpSecSaMonLifeTime OBJECT-TYPE
+         SYNTAX     Integer32
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+            "The negotiated LifeTime of the IPsec Phase-2 Tunnel in seconds. "
+         ::= { jnxIpSecSaMonEntry 8 }
+
+      jnxIpSecSaMonActiveTime OBJECT-TYPE
+         SYNTAX     TimeInterval
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+            "The length of time the IPsec Phase-2 Tunnel has been active in 
+             hundredths of seconds. "
+         ::= { jnxIpSecSaMonEntry 9 }
+
+      jnxIpSecSaMonLifeSizeThreshold OBJECT-TYPE
+         SYNTAX     Integer32
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+            "The security association LifeSize refresh threshold in kilobytes. "
+         ::= { jnxIpSecSaMonEntry 10 }
+
+      jnxIpSecSaMonLifeTimeThreshold OBJECT-TYPE
+         SYNTAX     Integer32
+         MAX-ACCESS read-only 
+         STATUS     current 
+         DESCRIPTION
+            "The security association LifeTime refresh threshold in seconds. "
+         ::= { jnxIpSecSaMonEntry 11 }
+
+      jnxIpSecSaMonEncryptAlgo OBJECT-TYPE
+         SYNTAX     JnxEncryptAlgo
+         MAX-ACCESS read-only 
+         STATUS     current
+         DESCRIPTION
+            "The Encryption algorithm used to encrypt 
+			 the packets which can be either es-cbc or 3des-cbc. "
+         ::= { jnxIpSecSaMonEntry 12 }
+
+      jnxIpSecSaMonAuthAlgo OBJECT-TYPE
+         SYNTAX     JnxAuthAlgo
+         MAX-ACCESS read-only 
+         STATUS     current
+         DESCRIPTION
+            "The algorithm used for authentication of packets which
+			 can be hmac-md5-96 or hmac-sha1-96 or hmac-sha-256-128"
+         ::= { jnxIpSecSaMonEntry 13 }
+
+      jnxIpSecSaMonState OBJECT-TYPE
+         SYNTAX INTEGER{
+                   unknown  (0),
+                   active   (1),
+                   expiring (2)
+                }
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+            "This column represents the status of the security association
+            represented by this table entry. If the status of the SA is
+            'active', the SA is ready for active use. The status
+            'expiring' represents any of the various states that the
+            security association transitions through before being purged."
+         ::= { jnxIpSecSaMonEntry 14 }
+
+END
+

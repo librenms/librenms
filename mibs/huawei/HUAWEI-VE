@@ -1,0 +1,135 @@
+-- ==================================================================
+-- Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI VE (Virtual Ethernet) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2007-01-20 Created by liuxuezhan 51362       
+-- ==================================================================
+          
+    HUAWEI-VE-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI
+            DisplayString, RowStatus   
+              FROM SNMPv2-TC;
+                      
+          hwVe MODULE-IDENTITY 
+          LAST-UPDATED "200611221414Z"    
+          ORGANIZATION 
+              "Huawei Technologies Co.,Ltd."
+          CONTACT-INFO 
+              "VRP Team Huawei Technologies Co.,Ltd.
+              Huawei Bld.,NO.3 Xinxi Rd., 
+              Shang-Di Information Industry Base,
+              Hai-Dian District Beijing P.R. China
+              http://www.huawei.com
+              Zip:100085
+              "  
+          DESCRIPTION 
+              "The private mib file includes the general extent 
+              information of the device.hwDatacomm(146).hwVirtualEthernet"
+          ::= { hwDatacomm 146 }
+            
+      hwVirtualEthernetMibObjects OBJECT IDENTIFIER ::= { hwVe 1 }
+                                
+      hwVirtualEthernetTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwVirtualEthernetEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A binding relationship table of virutal Ethernet interfaces that use ID as the index."
+          ::= { hwVirtualEthernetMibObjects 1 }
+            
+      hwVirtualEthernetEntry OBJECT-TYPE
+          SYNTAX HwVirtualEthernetEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Binding entry of virutal Etherent interfaces that use ID as the index. Each entry has one 
+               Layer 2 virutal Ethernet interface and one Layer 3 virtual Ethernet interface." 
+          INDEX  { hwVirtualEthernetGroupId }    
+          ::= { hwVirtualEthernetTable 1 }           
+    
+      HwVirtualEthernetEntry  ::= 
+          SEQUENCE{
+              hwVirtualEthernetGroupId
+                  Integer32,   
+              hwL2VirtualEthernetName       
+                  DisplayString,
+              hwL3VirtualEthernetName       
+                  DisplayString,
+              hwVirtualEthernetGroupRowStatus      
+                  RowStatus
+          }
+          
+      hwVirtualEthernetGroupId OBJECT-TYPE
+         SYNTAX Integer32
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Binding index of virtual Ethernet interface. The value ranges from 1 K to 8 K. 
+               The maximum value 8 K can be adjusted by using the .paf file"
+          ::= { hwVirtualEthernetEntry 1 }
+
+      
+      hwL2VirtualEthernetName OBJECT-TYPE
+          SYNTAX DisplayString 
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+              "Name of a Layer 2 virtual Ethernet interface, such as Virtual-Ethernet 3/0/0."
+          ::= { hwVirtualEthernetEntry 11 }
+                                 
+      hwL3VirtualEthernetName OBJECT-TYPE
+          SYNTAX DisplayString
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+            "Name of a Layer 3 virtual Ethernet interface, such as Virtual-Ethernet 3/0/0."
+          ::= { hwVirtualEthernetEntry 12 }
+          
+      hwVirtualEthernetGroupRowStatus OBJECT-TYPE
+          SYNTAX RowStatus
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+              "Create a Layer 2 or Layer 3 virtual Ethernet interface."
+          ::= { hwVirtualEthernetEntry 51 }
+
+      hwVirtualEthernetConformance OBJECT IDENTIFIER ::= { hwVe 2 }
+    
+      hwVirtualEthernetCompliances OBJECT IDENTIFIER ::= { hwVirtualEthernetConformance 2 }
+    
+        
+      hwVirtualEthernetCompliance MODULE-COMPLIANCE
+          STATUS current
+          DESCRIPTION 
+              "The compliance statement for systems supporting 
+              the HUAWEI-VE-MIB."
+          MODULE 
+              MANDATORY-GROUPS { hwVirtualEthernetObjectGroup }
+          ::= { hwVirtualEthernetCompliances 1 }
+
+        
+      hwVirtualEthernetGroups OBJECT IDENTIFIER ::= { hwVirtualEthernetConformance 1 }
+
+        
+      hwVirtualEthernetObjectGroup OBJECT-GROUP
+          OBJECTS {hwL2VirtualEthernetName, hwL3VirtualEthernetName,hwVirtualEthernetGroupRowStatus }
+          STATUS current       
+          DESCRIPTION 
+              "The VirtualEthernet attribute group."
+          ::= { hwVirtualEthernetGroups 1 }
+              
+END
+
+--
+-- HUAWEI-VE-MIB.mib
+--      

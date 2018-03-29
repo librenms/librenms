@@ -1,0 +1,167 @@
+
+-- *****************************************************************************
+-- Juniper-QoS-Manager-CONF
+--
+-- SNMP Agent Capabilities definitions for the QoS Manager MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2004 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-QoS-Manager-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniQosManagerAgent  MODULE-IDENTITY
+    LAST-UPDATED "200401261443Z"  -- 26-Jan-04 09:43 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Quality of Service (QoS)
+        Manager component of the SNMP agent in the Juniper E-series family of
+        products."
+    -- Revision History
+    REVISION    "200401261443Z"  -- 26-Jan-04 09:43 AM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Added support for multiple traffic class groups."
+    REVISION    "200305081855Z"  -- 08-May-03 02:55 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added ATM VP UID, statistics profile list, scheduler profile assured
+        rate and QoS mode port support."
+    REVISION    "200209271803Z"  -- 27-Sep-02 02:03 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added drop profile list support."
+    REVISION    "200112061609Z"  -- 06-Dec-01 11:09 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 50 }
+
+
+-- *****************************************************************************
+-- QoS Manager SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniQosManagerAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the QoS Manager component of the JUNOSe SNMP agent.  This
+        version of the QoS Manager component was supported in JUNOSe 4.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the QoS Manager application in
+        JUNOSe.  These capabilities became obsolete when drop profile list
+        support was added."
+    SUPPORTS    Juniper-QoS-MIB
+        INCLUDES {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup }
+    ::= { juniQosManagerAgent 1 }
+
+juniQosManagerAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the QoS Manager component of the JUNOSe SNMP agent.  This
+        version of the QoS Manager component was supported in JUNOSe 5.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the QoS Manager application in
+        JUNOSe.  These capabilities became obsolete when ATM VP UID, statistics
+        profile list and QoS mode port support was added."
+    SUPPORTS    Juniper-QoS-MIB
+        INCLUDES {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup2,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup2,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup }
+    ::= { juniQosManagerAgent 2 }
+
+juniQosManagerAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the QoS Manager component of the JUNOSe SNMP agent.  This
+        version of the QoS Manager component was supported in JUNOSe 5.1 and
+        subsequent 5.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the QoS Manager application in
+        JUNOSe.  These capabilities became obsolete when multiple traffic class
+        group support was added."
+    SUPPORTS    Juniper-QoS-MIB
+        INCLUDES {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup3,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup2,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup3,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup,
+            juniQosAtmVpUidSupportGroup,
+            juniQosStatisticsProfileListGroup,
+            juniQosQosModePortGroup,
+            juniQosQosShapingModeGroup }
+    ::= { juniQosManagerAgent 3 }
+
+juniQosManagerAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the QoS Manager component of the JUNOSe SNMP agent.  This
+        version of the QoS Manager component is supported in JUNOSe 6.0 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the QoS Manager application in
+        JUNOSe."
+    SUPPORTS    Juniper-QoS-MIB
+        INCLUDES {
+            juniQosCapabilityGroup,
+            juniQosScalarGroup3,
+            juniQosTrafficClassListGroup,
+            juniQosTrafficClassGroupListGroup2,
+            juniQosQueueProfileListGroup,
+            juniQosSchedulerProfileListGroup2,
+            juniQosProfileListGroup,
+            juniQosProfileElementGroup3,
+            juniQosIfAttachGroup,
+            juniQosQosPortTypeProfileGroup,
+            juniQosQueueStatisticsGroup,
+            juniQosDropProfileListGroup,
+            juniQosAtmVpUidSupportGroup,
+            juniQosStatisticsProfileListGroup,
+            juniQosQosModePortGroup,
+            juniQosQosShapingModeGroup }
+    ::= { juniQosManagerAgent 4 }
+
+END

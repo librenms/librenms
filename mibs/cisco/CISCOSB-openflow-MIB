@@ -1,0 +1,101 @@
+
+CISCOSB-openflow-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB open flow Configuration
+-- Version:    7.50.00.00
+-- Date:       24-November-2010
+-- E-mail:     yahal@CISCOSB.com
+--
+
+IMPORTS
+    TruthValue, TEXTUAL-CONVENTION, TimeStamp,
+    DisplayString, DateAndTime, RowStatus                FROM SNMPv2-TC
+    TimeTicks, IpAddress, NOTIFICATION-TYPE,
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32             FROM SNMPv2-SMI
+    switch001                                            FROM CISCOSB-MIB;
+
+
+rlOpenFlow  OBJECT IDENTIFIER ::= { switch001 319 }
+
+
+-------------------------------------------------------------------------------
+rlOpenFlowSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Open Flow support in the switch."
+    ::= { rlOpenFlow 1 }
+
+-------------------------------------------------------------------------------
+rlOpenFlowTcpPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Open Flow TCP port."
+    DEFVAL { 6633 }
+    ::= { rlOpenFlow 2 }
+
+-------------------------------------------------------------------------------
+rlOpenFlowServerIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Open Flow server IP address."
+    DEFVAL {'00000000'H}
+    ::= { rlOpenFlow 3 }
+
+
+-------------------------------------------------------------------------------
+rlOpenFlowProtocolType OBJECT-TYPE
+    SYNTAX          INTEGER {
+        tcp(0),
+        tls(1)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "OpenFlow protocol. tls or tcp.
+                     The default value is tcp."
+    DEFVAL{ tcp }
+    ::= { rlOpenFlow 4 }
+
+
+-------------------------------------------------------------------------------
+rlOpenFlowDefaultForwardAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+        forward(0),
+        drop(1),
+        toController(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "OpenFlow Forward Action to controller.
+                     forward, drop or toController.
+                     The default value is forward."
+    DEFVAL{ forward }
+    ::= { rlOpenFlow 5 }
+
+-------------------------------------------------------------------------------
+rlOpenFlowEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OpenFlow global enable mode."
+    ::= { rlOpenFlow 6 }
+
+-------------------------------------------------------------------------------
+rlOpenFlowEnableAfterReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "OpenFlow global enable mode after reset."
+    DEFVAL { false }
+    ::= { rlOpenFlow 7 }
+
+
+END
+

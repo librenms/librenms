@@ -1,0 +1,653 @@
+-- *****************************************************************
+-- NMS-HAL-IF-MIB.my:  
+-- FEB 2012
+-- author jeff liu
+-- *****************************************************************
+--
+
+NMS-HAL-IF-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,IpAddress
+            FROM SNMPv2-SMI
+        
+     	Gauge,TimeTicks
+      		FROM RFC1155-SMI
+        DisplayString
+			FROM RFC1213-MIB
+        nmsMgmt
+            FROM NMS-SMI 
+        PhysAddress,MacAddress
+            FROM SNMPv2-TC
+        nmsIfObjects
+            FROM NMS-IF-MIB
+        ipv6InterfaceIdentifier
+            FROM IP-MIB;
+            
+            
+
+          physicalIfConfigTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PhysicalIfConfigEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of physical interface configuration entries."
+              ::= { nmsIfObjects 3 }
+
+          physicalIfConfigEntry OBJECT-TYPE
+              SYNTAX  PhysicalIfConfigEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface configuration entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifConfigIndex }
+              ::= { physicalIfConfigTable 1 }
+
+          PhysicalIfConfigEntry ::=
+              SEQUENCE {
+                  ifConfigIndex
+                      INTEGER,
+                  keepalive
+                      INTEGER,
+                  speed
+                      INTEGER,
+                  duplex
+                      INTEGER,
+                  medium
+                      INTEGER,
+                  fiberAutoConfig
+                      INTEGER,
+                  flowControl
+                      INTEGER,
+                  errorFrameCheck
+                      INTEGER,
+                  phyIfType
+                      INTEGER
+                  
+              }
+
+          ifConfigIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { physicalIfConfigEntry 1 }
+
+          keepalive OBJECT-TYPE
+              SYNTAX  INTEGER(0..32767)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Loopback detect of interface. The range is 0-32767. 0 means disable. Default is 0(disable)."
+              ::= { physicalIfConfigEntry 2 }
+
+          speed OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              auto(1),
+                              speed-10M(2),
+                              speed-100M(3),
+                              speed-1000M(4),
+                              speed-10000M(5)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface speed. Only valid for non-PON interface. 1-auto, 2-10M, 3-100M, 4-1000M, 5-10000M. Default is auto."
+              ::= { physicalIfConfigEntry 3 }
+
+          duplex OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              auto(1),
+                              full(2),
+                              half(3)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface duplex. Only valid for non-PON interface. 1-auto, 2-full, 3-half. Default is auto."
+              ::= { physicalIfConfigEntry 4 }
+
+          medium OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              auto(1),
+                              copper(2),
+                              fiber(3)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface medium. Only valid for non-PON interface. 1-auto, 2-copper, 3-fiber. Default is auto."
+              ::= { physicalIfConfigEntry 5 }
+
+          fiberAutoConfig OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Fiber port auto config mode, include speed and duplex. 1-enable, 2-disable. Default is disable."
+              ::= { physicalIfConfigEntry 6 }
+
+          flowControl OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              on(1),
+                              off(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Interface flow control config. 1-on, 2-off. Default is off."
+              ::= { physicalIfConfigEntry 7 }
+
+          errorFrameCheck OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Error frame check config. 1-enable, 2-disable. Default is disable."
+              ::= { physicalIfConfigEntry 8 }
+
+          phyIfType OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              copper(1),
+                              fiber(2),
+                              combo(3),
+                              other(4)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Port initial type. 1-copper, 2-fiber, 3-combo, 4-other."
+              ::= { physicalIfConfigEntry 9 }
+
+
+
+
+
+          physicalIfBlockTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PhysicalIfBlockEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of physical interface Block entries."
+              ::= { nmsIfObjects 4 }
+
+          physicalIfBlockEntry OBJECT-TYPE
+              SYNTAX  PhysicalIfBlockEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface Block entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifBlockIndex }
+              ::= { physicalIfBlockTable 1 }
+
+          PhysicalIfBlockEntry ::=
+              SEQUENCE {
+                  ifBlockIndex
+                      INTEGER,
+                  broadcastBlock
+                      INTEGER,
+                  multicastBlock
+                      INTEGER,
+                  unicastBlock
+                      INTEGER
+              }
+
+
+          ifBlockIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { physicalIfBlockEntry 1 }
+
+          broadcastBlock OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Broadcast block config. 1-enable, 2-disable. Default is disable."
+              ::= { physicalIfBlockEntry 2 }
+
+          multicastBlock OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Multicast block config. 1-enable, 2-disable. Default is disable."
+              ::= { physicalIfBlockEntry 3 }
+
+          unicastBlock OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              enable(1),
+                              disable(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Unknown unicast block config. 1-enable, 2-disable. Default is disable."
+              ::= { physicalIfBlockEntry 4 }
+
+
+        ifSecurity   OBJECT IDENTIFIER ::= { nmsIfObjects 5 }  
+
+--portSecurityTable
+
+          portSecurityTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PortSecurityEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface security entries."
+              ::= { ifSecurity 1 }
+
+          portSecurityEntry OBJECT-TYPE
+              SYNTAX  PortSecurityEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface security entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifSecurityIndex }
+              ::= { portSecurityTable 1 }
+
+          PortSecurityEntry ::=
+              SEQUENCE {
+                  ifSecurityIndex
+                      INTEGER,
+                  mode
+                      INTEGER,
+                  maxMacAddressNum
+                      INTEGER,
+                  maxMacAddressNumCapability
+                      INTEGER
+              }
+
+          ifSecurityIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Index of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { portSecurityEntry 1 }
+
+          mode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              dynamic(1),
+                              static-accept(2),
+                              static-reject(3),
+                              none(4)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Port security mode. 1-dynamic, 2-static accept, 3-static reject, 4-none. 
+                      LLID interface only support dynamic mode. PON and PSG interface don't 
+                      support any mode. Default is none mode(4)."
+              ::= { portSecurityEntry 2 }
+
+          maxMacAddressNum OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Max mac address number that interface is allowed learning. Min num is 1. 
+                      Max num is different for different device. Default is 1."
+              ::= { portSecurityEntry 3 }
+
+          maxMacAddressNumCapability OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Capability of mac address learning limitation. "
+              ::= { portSecurityEntry 4 }
+
+--portSecurityStaticMacAddressEntryTable
+
+          portSecurityStaticMacAddressTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PortSecurityStaticMacAddressEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface security static MAC address entries."
+              ::= { ifSecurity 2 }
+
+          portSecurityStaticMacAddressEntry OBJECT-TYPE
+              SYNTAX  PortSecurityStaticMacAddressEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface security static mac address entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifSecurityStaticMacAddrIndex,ifMacAddress }
+              ::= { portSecurityStaticMacAddressTable 1 }
+
+          PortSecurityStaticMacAddressEntry ::=
+              SEQUENCE {
+                  ifSecurityStaticMacAddrIndex
+                      INTEGER,
+                  ifMacAddress
+                      MacAddress,
+                  operation
+                      INTEGER
+              }
+
+          ifSecurityStaticMacAddrIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { portSecurityStaticMacAddressEntry 1 }
+
+          ifMacAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. Static mac address of port security."
+              ::= { portSecurityStaticMacAddressEntry 2 }
+
+          operation OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              add(1),
+                              delete(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The operation of static mac address. 1-add, 2-delete."
+              ::= { portSecurityStaticMacAddressEntry 3 }
+
+--portSecurityBindBlockEntry
+
+          portSecurityBindBlockTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PortSecurityBindBlockEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface security binding block entries."
+              ::= { ifSecurity 3 }
+
+          portSecurityBindBlockEntry OBJECT-TYPE
+              SYNTAX  PortSecurityBindBlockEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface security binding block entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifSecurityBindBlockIndex,ifBindBlockMacAddress,ifBindBlockIPAddress,ifBindBlockIPV6Address }
+              ::= { portSecurityBindBlockTable 1 }
+
+          PortSecurityBindBlockEntry ::=
+              SEQUENCE {
+                  ifSecurityBindBlockIndex
+                      INTEGER,
+                  ifBindBlockMacAddress
+                      MacAddress,
+                  ifBindBlockIPAddress
+                      IpAddress,
+                  ifBindBlockIPV6Address
+                       OCTET STRING,
+                  mode
+                      INTEGER 
+              }
+
+          ifSecurityBindBlockIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { portSecurityBindBlockEntry 1 }
+
+          ifBindBlockMacAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. MAC address. If not care mac address, the value should be set to FFFFFF."
+              ::= { portSecurityBindBlockEntry 2 }
+
+          ifBindBlockIPAddress OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. Ip address. If not care ip address, the value should be set to 255.255.255.255 ."
+              ::= { portSecurityBindBlockEntry 3 }
+
+          ifBindBlockIPV6Address OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. Ipv6 address. If not care ipv6 address, all bit value should be set to 1."
+              ::= { portSecurityBindBlockEntry 4 }
+
+          mode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              bind-mac(1),
+                              bind-ip(2),
+                              bind-arp(3),
+                              bind-arp-ip(4),
+                              bind-ip-mac(5),
+                              bind-arp-mac(6),
+                              bind-arp-ip-mac(7),
+                              bind-ipv6(8),
+                              bind-ipv6-mac(9),
+                              block-mac(10),
+                              block-ip(11),
+                              block-arp(12),
+                              block-arp-ip(13),
+                              block-ip-mac(14),
+                              block-arp-mac(15),
+                              block-arp-ip-mac(16),
+                              block-ipv6(17),
+                              block-ipv6-mac(18)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The config mode.0:del,1:bind mac,2:bind ip,3:bind arp,4:bind arp ip,5:bind ip mac,6:bind arp mac,
+                      7:bind arp ip mac,8:bind ipv6,9:bind ipv6 mac,10:block mac,11:block ip ,12:block arp,13:block arp ip,
+                      14:block ip mac,15:block arp mac,16:block arp ip mac,17:block ipv6,18:block ipv6 mac"
+              ::= { portSecurityBindBlockEntry 5 }
+
+
+--vlanSecurityEntry
+
+          vlanSecurityTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF VlanSecurityEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of VLAN security entries."
+              ::= { ifSecurity 4 }
+
+          vlanSecurityEntry OBJECT-TYPE
+              SYNTAX  VlanSecurityEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface VLAN security entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { securityVlanID }
+              ::= { vlanSecurityTable 1 }
+
+          VlanSecurityEntry ::=
+              SEQUENCE {
+                  securityVlanID
+                      INTEGER,
+                  dynamicMacAddress
+                      INTEGER
+              }
+
+
+          securityVlanID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4094)
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "VlanID to config. The range is 1-4094"
+              ::= { vlanSecurityEntry 1 }
+
+          dynamicMacAddress OBJECT-TYPE
+              SYNTAX  INTEGER(0..32768)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The max number of mac address to be learned. The range is 1-32768. 0 means disable. Default is disable."
+              ::= { vlanSecurityEntry 2 }
+
+
+--portProtectTable
+
+        ifProtect   OBJECT IDENTIFIER ::= { nmsIfObjects 6 }  
+	
+--portProtectGroupTable
+
+          portProtectGroupTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PortProtectGroupEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of port Protect Group entries."
+              ::= { ifProtect 1 }
+
+          portProtectGroupEntry OBJECT-TYPE
+              SYNTAX  PortProtectGroupEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface port Protect Group entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { groupID }
+              ::= { portProtectGroupTable 1 }
+
+          PortProtectGroupEntry ::=
+              SEQUENCE {
+                  groupID
+                      INTEGER,
+                  ifProtectGroupOperation
+                      INTEGER
+              }
+
+          groupID OBJECT-TYPE
+              SYNTAX  INTEGER(1..32)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The groupID of port protect. The range is 1-32."
+              ::= { portProtectGroupEntry 1 }
+
+          ifProtectGroupOperation OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              add(1),
+                              delete(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The operation of group. 1-add, 2-delete."
+              ::= { portProtectGroupEntry 2 }
+
+
+
+--portProtectAppTable
+
+          portProtectAppTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PortProtectAppEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of port Protect Application entries."
+              ::= { ifProtect 2 }
+
+          portProtectAppEntry OBJECT-TYPE
+              SYNTAX  PortProtectAppEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface port Protect Application entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifProtectAppIndex }
+              ::= { portProtectAppTable 1 }
+
+          PortProtectAppEntry ::=
+              SEQUENCE {
+                  ifProtectAppIndex
+                      INTEGER,
+                  ifGroupIDApp
+                      INTEGER
+              }
+
+
+          ifProtectAppIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { portProtectAppEntry 1 }
+
+          ifGroupIDApp OBJECT-TYPE
+              SYNTAX  INTEGER(1..32)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The groupID of port protect. The range is 1-32. The same value as groupID in portProtectGroupEntry."
+              ::= { portProtectAppEntry 2 }
+
+
+     END
+            
+            

@@ -1,0 +1,2083 @@
+CTRON-SFPS-RESOLVE-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-resolve-mib.txt
+--  Revision: 0.0.08
+--  
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+        Counter, 
+-- Gauge, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsResolveStats,
+        sfpsMobilityStats, sfpsUnresolve, sfpsBlockResolve,
+        sfpsISPResolve, sfpsTableResolve, sfpsSubnetResolve,
+        sfpsRelayAgentResolve,  sfpsSubnetResolveStats,
+        sfpsSubnetResolveAPI, sfpsSubnetResolveNvram, sfpsTableResolveAPI,
+        sfpsBlockResolveStats, sfpsBlockResolveAPI, sfpsUnresolveTableAPI,
+        sfpsUnresolveTableStats, sfpsSwitchResolve, sfpsRelayAgentResolveStats
+        
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+
+--
+
+
+-- RESOLVE
+
+
+sfpsServiceCenterResolveTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsServiceCenterResolveEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table gives resolve semantics to call processing."
+        ::= { sfpsISPResolve 1 }
+
+sfpsServiceCenterResolveEntry    OBJECT-TYPE
+        SYNTAX  SfpsServiceCenterResolveEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the configuration of the Resolve Entry."
+        INDEX   { sfpsServiceCenterResolveHashLeaf } 
+        ::= { sfpsServiceCenterResolveTable 1 }
+
+SfpsServiceCenterResolveEntry ::=
+        SEQUENCE {
+                sfpsServiceCenterResolveHashLeaf        HexInteger,  
+                sfpsServiceCenterResolveMetric          INTEGER,  
+                sfpsServiceCenterResolveName            DisplayString,  
+                sfpsServiceCenterResolveOperStatus      INTEGER,  
+                sfpsServiceCenterResolveAdminStatus     INTEGER,
+                sfpsServiceCenterResolveStatusTime      TimeTicks,
+                sfpsServiceCenterResolveRequests        INTEGER,
+                sfpsServiceCenterResolveResponses       INTEGER
+                  
+         }  
+
+sfpsServiceCenterResolveHashLeaf   OBJECT-TYPE
+        SYNTAX  HexInteger  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server hash, part of instance key."
+        ::= { sfpsServiceCenterResolveEntry 1 }
+
+sfpsServiceCenterResolveMetric   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines order servers are called low to high."
+        ::= { sfpsServiceCenterResolveEntry 2 }
+
+sfpsServiceCenterResolveName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server name."
+        ::= { sfpsServiceCenterResolveEntry 3 }
+
+sfpsServiceCenterResolveOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of entry."
+        ::= { sfpsServiceCenterResolveEntry 4 }
+
+sfpsServiceCenterResolveAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER       {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3)               -- Go
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative State of Entry."
+        ::= { sfpsServiceCenterResolveEntry 5 }
+
+sfpsServiceCenterResolveStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time Tick of last operStatus change."
+        ::= { sfpsServiceCenterResolveEntry 6 }
+
+sfpsServiceCenterResolveRequests   OBJECT-TYPE
+        SYNTAX   INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Requests made to server."
+        ::= { sfpsServiceCenterResolveEntry 7 }
+
+sfpsServiceCenterResolveResponses   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "GOOD replies by server."
+        ::= { sfpsServiceCenterResolveEntry 8 }
+
+
+-- SFPS Switch Resolve Statistics Group
+--
+-- This group contains the objects that mainatain resolve statisics.
+
+sfpsResolveStatsRequests   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 1 }
+
+sfpsResolveStatsResponses   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 2 }
+
+sfpsResolveStatsAcks   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 3 }
+
+sfpsResolveStatsNaks   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 4 }
+
+sfpsResolveStatsUnknowns   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 5 }
+
+sfpsResolveStatsNoAnswer   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 6 }
+
+sfpsResolveStatsTimeout   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 7 }
+
+sfpsResolveStatsAvgResponseTime   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 8 }
+
+sfpsResolveStatsTableSize   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 9 }
+
+sfpsResolveStatsTableHigh   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 10 }
+
+sfpsResolveStatsErrorCount   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 11 }
+
+sfpsResolveStatsStaleCount   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 12 }
+
+sfpsResolveStatsDupMsgCount   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 13 }
+
+sfpsResolveStatsReqRcvd   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 14 }
+
+sfpsResolveStatsRespAcksSent   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 15 }
+
+sfpsResolveStatsRespNaksSent   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 16 }
+
+sfpsResolveStatsRespUnknownsSent   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 17 }
+
+sfpsResolveStatsRespRecvd   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 18 }
+
+
+sfpsResolveStatsResolveMask   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 19 }
+
+sfpsResolveStatsINBMask   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 20}
+
+sfpsResolveStatsFloodMask   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 21 }
+
+sfpsResolveStatsChangeCount   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 22 }
+
+sfpsResolveStatsChangeTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 23 }
+
+sfpsResolveStatsResetStats   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 24 }
+
+sfpsResolveStatsAnswerUnknown   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 25 }
+
+sfpsResolveStatsDisableProxy   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 26 }
+
+sfpsResolveStatsDisableLayer3   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 27 }
+
+sfpsResolveStatsCSPDaveMalPkts   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 28 }
+
+sfpsResolveStatsStaleTimeOut   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 29 }
+
+sfpsResolveStatsMaxResponseTime   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 30 }
+
+sfpsResolveStatsStaleEntryLost   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 31 }
+
+sfpsResolveStatsDaveEntryLost   OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsResolveStats 32 }
+
+
+
+-- SFPS New User Statistics Group
+--
+-- This group contains the objects that maintain new user statisics.
+
+sfpsMobilityStatsOrigSendCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 1 }
+
+sfpsMobilityStatsOrigReceiveCount       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 2 }
+
+sfpsMobilityStatsOrigNUSendCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 3 }
+
+sfpsMobilityStatsOrigNASendCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 4 }
+
+sfpsMobilityStatsOrigNUASendReqCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 5 }
+
+sfpsMobilityStatsOrigRetrySendCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 6 }
+
+sfpsMobilityStatsOrigLocalMoveCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 7 }
+
+sfpsMobilityStatsOrigUnknownCount       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 8 }
+
+sfpsMobilityStatsOrigAckCount   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 9 }
+
+sfpsMobilityStatsOrigNakNodeCount       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 10 }
+
+sfpsMobilityStatsOrigNakAliasCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 11 }
+
+sfpsMobilityStatsErrorCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 12 }
+
+sfpsMobilityStatsGenRecCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 13 }
+
+sfpsMobilityStatsGenSendCount   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 14 }
+
+sfpsMobilityStatsGenReqRecCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 15 }
+
+sfpsMobilityStatsGenReqRetryCount       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 16 }
+
+sfpsMobilityStatsGenReqForwardCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 17 }
+
+sfpsMobilityStatsGenRespRecCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 18 }
+
+sfpsMobilityStatsGenRespSendCount       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 19 }
+
+sfpsMobilityStatsNUReqRecCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 20 }
+
+sfpsMobilityStatsNURespSendCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 21 }
+
+sfpsMobilityStatsNAReqRecCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 22 }
+
+sfpsMobilityStatsNARespSendCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 23 }
+
+sfpsMobilityStatsNUARespRecUnknownCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 24 }
+
+sfpsMobilityStatsNURespRecAckCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 25 }
+
+sfpsMobilityStatsNUARespRecAliasNakCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 26 }
+
+sfpsMobilityStatsNUARespRecNodeNakCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 27 }
+
+sfpsMobilityStatsNURespAliasNakSendCount        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 28 }
+
+sfpsMobilityStatsNURespNodeNakSendCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 29 }
+
+sfpsMobilityStatsNURespAckSendCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 30 }
+
+sfpsMobilityStatsNURespUnknownSendCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 31 }
+
+sfpsMobilityStatsInterNUARespRecCount   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 32 }
+
+sfpsMobilityStatsInterNUARespSendCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 33 }
+
+sfpsMobilityStatsInterNewUserRespRecCount       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 34 }
+
+sfpsMobilityStatsInterNewAliasRespRecCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 35 }
+
+sfpsMobilityStatsInterNewUserRespSendCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 36 }
+
+sfpsMobilityStatsInterNewAliasRespSendCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 37 }
+
+sfpsMobilityStatsInterRespNakNodeSendCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 38 }
+
+sfpsMobilityStatsInterRespNakAliasSendCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 39 }
+
+sfpsMobilityStatsInterRespUnknownSendCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 40 }
+
+sfpsMobilityStatsInterRespAckSendCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 41 }
+
+sfpsMobilityStatsAliasOnOfSwitch        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 42 }
+
+sfpsMobilityStatsResetCounters  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 43 }
+
+sfpsMobilityStatsRetryCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 44 }
+
+sfpsMobilityStatsRetryDrops     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 45 }
+
+sfpsMobilityStatsMaxRetryReached        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 46 }
+
+sfpsMobilityStatsNewUserRetryTime       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 47 }
+
+
+sfpsMobilityStatsMaxNewUserRetries      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMobilityStats 48 }
+
+
+sfpsMobilityStatsNewUserStaleTimeout    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "(1/10) Seconds)"
+        ::= { sfpsMobilityStats 49 }
+
+
+sfpsMobilityStatsAvgResponseTime        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "(msec)"
+        ::= { sfpsMobilityStats 50 }
+
+
+sfpsMobilityStatsMaxResponeTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "(msec)"
+        ::= { sfpsMobilityStats 51 }
+
+
+
+-- UnResolve Table
+
+sfpsUnresolveTable      OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsUnresolveTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table of address objects which went unresolved at
+                 some point in time."
+         ::= { sfpsUnresolve 1 }
+
+sfpsUnresolveTableEntry OBJECT-TYPE
+        SYNTAX  SfpsUnresolveTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsUnresolveTableHash, sfpsUnresolveTableHashIndex }
+         ::= { sfpsUnresolveTable 1 }
+
+SfpsUnresolveTableEntry  ::=
+        SEQUENCE {
+                sfpsUnresolveTableHash                  INTEGER,
+                sfpsUnresolveTableHashIndex             INTEGER,
+                sfpsUnresolveTableAOType                INTEGER,
+                sfpsUnresolveTableAOValue               DisplayString,
+                sfpsUnresolveTableNumMisses             INTEGER,
+                sfpsUnresolveTableLastMissTime          TimeTicks,
+                sfpsUnresolveTableLastCallProc          INTEGER,
+                sfpsUnresolveTableSrcMAC                SfpsAddress,
+                sfpsUnresolveTableAvgPeriod             INTEGER,
+                sfpsUnresolveTableBlockFlag             INTEGER
+                }
+
+sfpsUnresolveTableHash  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "A hash of the address object value contained in
+                 this entry's sfpsUnresolveTableAOValue"
+         ::= { sfpsUnresolveTableEntry 1 }
+
+sfpsUnresolveTableHashIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "An index into the hash bucket."
+         ::= { sfpsUnresolveTableEntry 2 }
+
+sfpsUnresolveTableAOType        OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                aoMacDX (1),
+                aoIpxSap (2),
+                aoIpxRIP (3),
+                aoInetYP (4),
+                aoInetUDP (5),
+                aoIpxIpx (6),
+                aoInetIP (7),
+                aoInetRPC (8),
+                aoInetRIP (9),
+                aoMacDXMcast (10),
+                aoAtDDP (11),
+                aoEmpty (12),
+                aoVlan (13),
+                aoHostName (14),
+                aoNetBiosName (15),
+                aoNBT (16),
+                aoInetIPMask (17),
+                aoIpxSap8022 (18),
+                aoIpxSapSnap (19),
+                aoIpxSapEnet (20),
+                aoDHCPXID (21),
+                aoipxRip8022 (22),
+                aoipxRipSnap (23),
+                aoipxRipEnet (24)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The address object type of this entry"
+         ::= { sfpsUnresolveTableEntry 3 }
+
+sfpsUnresolveTableAOValue       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The address object value of the entry."
+         ::= { sfpsUnresolveTableEntry 4 }
+
+sfpsUnresolveTableNumMisses     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of times an resolve request for this address object
+                 went unresolved."
+         ::= { sfpsUnresolveTableEntry 5 }
+
+sfpsUnresolveTableLastMissTime  OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The value of sysUpTime when the most recent resolve request for
+                 this address object went unresolved."
+         ::= { sfpsUnresolveTableEntry 6 }
+
+sfpsUnresolveTableLastCallProc  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "."
+         ::= { sfpsUnresolveTableEntry 7 }
+
+sfpsUnresolveTableSrcMAC        OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The MAC address of the most recent originator of a packet
+                 attempting to reach the address."
+         ::= { sfpsUnresolveTableEntry 8 }
+
+sfpsUnresolveTableAvgPeriod     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The average number of seconds between resolve requests for
+                 this address object that went unresolved."
+         ::= { sfpsUnresolveTableEntry 9 }
+
+sfpsUnresolveTableBlockFlag     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                true (1),
+                false (2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "A flag indicating whether this address object was put in the
+                 Block Resolve Server's block table."
+         ::= { sfpsUnresolveTableEntry 10 }
+
+
+
+-- sfpsUnresolveTableAPI
+
+sfpsUnresolveTableAPIVerb       OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                set-parameter (1),
+                reset (2),
+                other (3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "When set, the corresponding action is taken. For set-parameter,
+                 the most recent set to sfpsUnresolveTableAPIAgeOutTime takes
+                 affect. For reset, all entries in sfpsUnresolveTable are deleted."
+         ::= { sfpsUnresolveTableAPI 1 }
+
+sfpsUnresolveTableAPIAgeOutTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The age out time in minutes in which entries in the
+                 sfpsUnresolveTable are deleted. Any entry in which sysUpTime
+                 minus last miss time is greater than this value is
+                 deleted from the table."
+         ::= { sfpsUnresolveTableAPI 2 }
+
+sfpsUnresolveTableAPIBlockHoldDown      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                disabled (2),
+                enabled (3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsUnresolveTableAPI 3 }
+
+
+
+-- sfpsUnresolveTableStats
+
+
+sfpsUnresolveTableStatsNumEntries       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of entries currently in sfpsUnresolveTable."
+         ::= { sfpsUnresolveTableStats 1 }
+
+sfpsUnresolveTableStatsTableSize        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The maximum number of entries allowed in sfpsUnresolveTable"
+         ::= { sfpsUnresolveTableStats 2 }
+
+sfpsUnresolveTableStatsTableFullCount   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of times an attempt to add an entry to the
+                 sfpsUnresolveTable failed because the table was full."
+         ::= { sfpsUnresolveTableStats 3 }
+
+sfpsUnresolveTableStatsTotalReqSeen     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The total number of requests seen by the Unresolve Server.
+                 This does not include inter-switch resolve requests."
+         ::= { sfpsUnresolveTableStats 4 }
+
+sfpsUnresolveTableStatsAvgReqTime       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The average time in 10 msec units between unresolved requests
+                 seen by the server."
+         ::= { sfpsUnresolveTableStats 5 }
+
+
+-- sfpsBlockResolveTable
+ 
+sfpsBlockResolveTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsBlockResolveTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains a list of address objects whose resolve
+                 requests are being blocked for a given time period by the
+                 Block Resolve Server. The Block Resolve Server is actually
+                 a 'leaky bucket' server that will slow down high frequency
+                 resolve requests for addresses that remain unresolved. 
+                 Resolve requests are sent through the system at a slower
+                 user configurable rate."
+         ::= { sfpsBlockResolve 1 }
+
+sfpsBlockResolveTableEntry      OBJECT-TYPE
+        SYNTAX  SfpsBlockResolveTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsBlockResolveTableHash, sfpsBlockResolveTableHashIndex }
+         ::= { sfpsBlockResolveTable 1 }
+
+SfpsBlockResolveTableEntry  ::=
+        SEQUENCE {
+                sfpsBlockResolveTableHash                       INTEGER,
+                sfpsBlockResolveTableHashIndex          INTEGER,
+                sfpsBlockResolveTableAOType                     INTEGER,
+                sfpsBlockResolveTableAOValue            DisplayString,
+                sfpsBlockResolveTableStartTime          TimeTicks,
+                sfpsBlockResolveTableNumBlocked         Counter,
+                sfpsBlockResolveTableNumSent            Counter,
+                sfpsBlockResolveTableLastSeen           TimeTicks,
+                sfpsBlockResolveTableAvgPeriod          INTEGER
+                }
+
+sfpsBlockResolveTableHash       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "A hash of the address object value contained in
+                 this entry's sfpsBlockResolveTableAOValue"
+         ::= { sfpsBlockResolveTableEntry 1 }
+
+sfpsBlockResolveTableHashIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "An index into the hash bucket"
+         ::= { sfpsBlockResolveTableEntry 2 }
+
+sfpsBlockResolveTableAOType     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                aoMacDX (1),
+                aoIpxSap (2),
+                aoIpxRIP (3),
+                aoInetYP (4),
+                aoInetUDP (5),
+                aoIpxIpx (6),
+                aoInetIP (7),
+                aoInetRPC (8),
+                aoInetRIP (9),
+                aoMacDXMcast (10),
+                aoAtDDP (11),
+                aoEmpty (12),
+                aoVlan (13),
+                aoHostName (14),
+                aoNetBiosName (15),
+                aoInetIPMask (16)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The address object type of this entry"
+         ::= { sfpsBlockResolveTableEntry 3 }
+
+sfpsBlockResolveTableAOValue    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The address object value of the entry."
+         ::= { sfpsBlockResolveTableEntry 4 }
+
+sfpsBlockResolveTableStartTime  OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The value of sysUpTime when blocking of this request object
+                 was started."
+         ::= { sfpsBlockResolveTableEntry 5 }
+
+sfpsBlockResolveTableNumBlocked OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of times a resolve request for this address object
+                 was blocked resulting in the deletion of the call."
+         ::= { sfpsBlockResolveTableEntry 6 }
+
+sfpsBlockResolveTableNumSent    OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of times a resolve request for this address object
+                 was sent through the system."
+         ::= { sfpsBlockResolveTableEntry 7 }
+
+sfpsBlockResolveTableLastSeen   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The value of sysUpTime when the most recent resolve request
+                 was seen by the Block Resolve Server."
+         ::= { sfpsBlockResolveTableEntry 8 }
+
+sfpsBlockResolveTableAvgPeriod  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The average period in seconds between resolve requests for this
+                 address object since sfpsBlockResolveTableStartTime"
+         ::= { sfpsBlockResolveTableEntry 9 }
+
+
+
+-- sfpsBlockResolveAPI
+ 
+
+sfpsBlockResolveAPIVerb OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                other (1),
+                add-entry (2),
+                del-entry (3),
+                set-parameter (4),
+                reset (5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "When set, the corresponding action is taken.
+                 For add-entry, an entry is added to sfpsBlockResolveTable
+                 for the given sfpsBlockResolveAPIAOType and
+                 sfpsBlockResolveAPIAOValue. For del-entry, an entry is
+                 deleted from the sfpsBlockResolveTable. For set-parameter,
+                 the most recent sets of sfpsBlockResolveAPITestCount,
+                 sfpsBlockResolveAPIThreshold, sfpsBlockResolveAPISendPeriod
+                 are applied."
+         ::= { sfpsBlockResolveAPI 1 }
+
+sfpsBlockResolveAPIAOType       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The address object type specified by a well-known string
+                 to be used in the next Verb action."
+         ::= { sfpsBlockResolveAPI 2 }
+
+sfpsBlockResolveAPIAOValue      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The address object value to be used in the next Verb action."
+         ::= { sfpsBlockResolveAPI 3 }
+
+sfpsBlockResolveAPITestCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of unknown resolve requests seen before a test
+                 is made to determine whether further resolve requests should
+                 be blocked or not. Block tests are made on address objects
+                 every 'N' resolve requests that fail where 'N' equals
+                 the value of this object."
+         ::= { sfpsBlockResolveAPI 4 }
+
+sfpsBlockResolveAPIThreshold    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The average number of seconds per resolve request for a given
+                 address object that will trigger a block. This value is used
+                 in conjunction with sfpsBlockResolveAPITestCount to perform
+                 block tests on unresolved address objects. If the period between
+                 unresolved requests is less than or equal to this value, then
+                 the resolve request is blocked."
+         ::= { sfpsBlockResolveAPI 5 }
+
+sfpsBlockResolveAPISendPeriod   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of seconds between resolve requests that will
+                 be sent through the system. "
+         ::= { sfpsBlockResolveAPI 6 }
+
+
+-- sfpsBlockResolveStats
+ 
+
+sfpsBlockResolveStatsNumEntries OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of entries in sfpsBlockResolveTable."
+         ::= { sfpsBlockResolveStats 1 }
+
+sfpsBlockResolveStatsTableSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The maximum number of entries allowed in 
+                 sfpsBlockResolveTable."
+         ::= { sfpsBlockResolveStats 2 }
+
+sfpsBlockResolveStatsTotalReqSeen       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The total number of resolve requests the Block Resolve
+                 Server has seen. This value does not include inter-switch
+                 resolves."
+         ::= { sfpsBlockResolveStats 3 }
+
+sfpsBlockResolveStatsTotalBlocked       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The total number of resolve requests that have been blocked
+                 by the server."
+         ::= { sfpsBlockResolveStats 4 }
+
+sfpsBlockResolveStatsTotalSent  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The total number of requests sent through the system for
+                 address objects that are being blocked."
+         ::= { sfpsBlockResolveStats 5 }
+
+sfpsBlockResolveStatsAvgReqTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The average time in 10 msec units between resolve requests
+                 seen by the server. It is computed by dividing sysUpTime by
+                 sfpsBlockResolveStatsTotalReqSeen."
+         ::= { sfpsBlockResolveStats 6 }
+
+--  Table Resolve Table
+
+sfpsTableResolveTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsTableResolveTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+         ::= { sfpsTableResolve 1 }
+
+sfpsTableResolveTableEntry      OBJECT-TYPE
+        SYNTAX  SfpsTableResolveTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsTableResolveTag, sfpsTableResolveHash, sfpsTableResolveHashIndex }
+         ::= { sfpsTableResolveTable 1 }
+
+SfpsTableResolveTableEntry  ::=
+        SEQUENCE {
+                sfpsTableResolveTag                     INTEGER,
+                sfpsTableResolveHash            INTEGER,
+                sfpsTableResolveHashIndex       INTEGER,
+                sfpsTableResolveSrcType         DisplayString,
+                sfpsTableResolveSrcLoad         DisplayString,
+                sfpsTableResolveTrgType         DisplayString,
+                sfpsTableResolveTrgLoad         DisplayString
+                }
+
+sfpsTableResolveTag     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 1 }
+
+sfpsTableResolveHash    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 2 }
+
+sfpsTableResolveHashIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 3 }
+
+sfpsTableResolveSrcType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 4 }
+
+sfpsTableResolveSrcLoad OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 5 }
+
+sfpsTableResolveTrgType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 6 }
+
+sfpsTableResolveTrgLoad OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveTableEntry 7 }
+
+-- Table Resolve API
+
+
+sfpsTableResolveAPIVerb OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                other (1),
+                add (2),
+                delete (3),
+                modify (4),
+                clearTable (5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Action take as a result of setting this leaf"
+         ::= { sfpsTableResolveAPI 1 }
+
+sfpsTableResolveAPISrcAOType    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Source's type"
+         ::= { sfpsTableResolveAPI 2 }
+
+sfpsTableResolveAPISrcAOLoad    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Source's load"
+         ::= { sfpsTableResolveAPI 3 }
+
+sfpsTableResolveAPITrgAOType    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Destination's type"
+         ::= { sfpsTableResolveAPI 4 }
+
+sfpsTableResolveAPITrgAOLoad    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Destination's load "
+         ::= { sfpsTableResolveAPI 5 }
+
+sfpsTableResolveAPIVlanAOLoad   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Vlan's load "
+         ::= { sfpsTableResolveAPI 6 }
+
+sfpsTableResolveAPIDestSwMac    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveAPI 7 }
+
+sfpsTableResolveAPIScopeToVlan  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveAPI 8 }
+
+sfpsTableResolveAPINVRAMEntry   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveAPI 9 }
+
+sfpsTableResolveAPIMask OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveAPI 10 }
+
+sfpsTableResolveAPIResolveOption        OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ack(1),
+                        nak(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveAPI 11 }
+
+sfpsTableResolveAPIAdminStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsTableResolveAPI 12 }
+
+--  Subnet Resolve Stats Table
+
+
+sfpsSubnetResolveStatsRequests  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 1 }
+
+sfpsSubnetResolveStatsAcks      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 2 }
+
+sfpsSubnetResolveStatsUnknowns  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 3 }
+
+sfpsSubnetResolveStatsInternalUnknowns  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 4 }
+
+sfpsSubnetResolveStatsGatewayAcks       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 5 }
+
+sfpsSubnetResolveStatsErrors    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 6 }
+
+sfpsSubnetResolveStatsMaxTblSize        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 7 }
+
+sfpsSubnetResolveStatsTableSize OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveStats 8 }
+
+--  Subnet Resolve Stats Table
+
+ 
+sfpsSubnetResolveAPIVerb        OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                add(2),
+                delete(3),
+                updateMask(4),
+                setDefGateway(5),
+                clearDefGateway(6),
+                clearTable(7)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies the action to be initiated as a result of setting this leaf."
+         ::= { sfpsSubnetResolveAPI 1 }
+
+sfpsSubnetResolveAPISrcAOType   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies the source's desire AO type."
+         ::= { sfpsSubnetResolveAPI 2 }
+
+sfpsSubnetResolveAPISrcAPLoad   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies the source's load."
+         ::= { sfpsSubnetResolveAPI 3 }
+
+sfpsSubnetResolveAPITrgAOType   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies the destination's desired AO type."
+         ::= { sfpsSubnetResolveAPI 4 }
+
+sfpsSubnetResolveAPITrgAOLoad   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies the desination's load."
+         ::= { sfpsSubnetResolveAPI 5 }
+
+sfpsSubnetResolveAPIRouteType   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                external(1),
+                internal(2),
+                invalid(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies whether the route is internal/external to the cloud."
+         ::= { sfpsSubnetResolveAPI 6 }
+
+sfpsSubnetResolveAPINVRAMEntry  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies whether to store the entry in NVRAM."
+         ::= { sfpsSubnetResolveAPI 7 }
+
+sfpsSubnetResolveAPIAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies whether this entry should be used or not.  This allows the entry
+                 to remain in the table but be disabled."
+         ::= { sfpsSubnetResolveAPI 8 }
+
+sfpsSubnetResolveAPIDefGateway  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specified the router mac address to resolve any request if there is no internal or
+                 external mapping."
+         ::= { sfpsSubnetResolveAPI 9 }
+
+sfpsSubnetResolveAPISubnetMask  OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Specifies the subnet mask."
+         ::= { sfpsSubnetResolveAPI 10 }
+
+--  Subnet Resolve Table
+
+sfpsSubnetResolveTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsSubnetResolveEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+         ::= { sfpsSubnetResolve 3 }
+
+sfpsSubnetResolveEntry  OBJECT-TYPE
+        SYNTAX  SfpsSubnetResolveEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsSubnetResolveTargetTag, sfpsSubnetResolveSourceHash, sfpsSubnetResolveHashIndex }
+         ::= { sfpsSubnetResolveTable 1 }
+
+SfpsSubnetResolveEntry  ::=
+        SEQUENCE {
+                sfpsSubnetResolveTargetTag                      INTEGER,
+                sfpsSubnetResolveSourceHash             INTEGER,
+                sfpsSubnetResolveHashIndex      INTEGER,
+                sfpsSubnetResolveSrcType                DisplayString,
+                sfpsSubnetResolveSrcLoad                DisplayString,
+                sfpsSubnetResolveTrgType                DisplayString,
+                sfpsSubnetResolveTrgLoad                DisplayString,
+                sfpsSubnetResolveRouteType              INTEGER,
+                sfpsSubnetResolveRelativeCnt    INTEGER,
+                sfpsSubnetResolveAbsoluteCnt    INTEGER,
+                sfpsSubnetResolveNVRAMEntry     INTEGER,
+                sfpsSubnetResolveAdminStatus    INTEGER,
+                sfpsSubnetResolveOperStatus             INTEGER
+                }
+
+sfpsSubnetResolveTargetTag      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 1 }
+
+sfpsSubnetResolveSourceHash     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 2 }
+
+sfpsSubnetResolveHashIndex      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 3 }
+
+sfpsSubnetResolveSrcType        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 4 }
+
+sfpsSubnetResolveSrcLoad        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 5 }
+
+sfpsSubnetResolveTrgType        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 6 }
+
+sfpsSubnetResolveTrgLoad        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 7 }
+
+sfpsSubnetResolveRouteType      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                external(1),
+                internal(2),
+                invalid(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 8 }
+
+sfpsSubnetResolveRelativeCnt    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 9 }
+
+sfpsSubnetResolveAbsoluteCnt    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 10 }
+
+sfpsSubnetResolveNVRAMEntry     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 11 }
+
+sfpsSubnetResolveAdminStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 12 }
+
+sfpsSubnetResolveOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                running(1),
+                halted(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSubnetResolveEntry 13 }
+
+---  Relay Agent Resolve
+
+sfpsRelayAgentResolveVlanName   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsRelayAgentResolve 1 }
+
+sfpsRelayAgentResolveRelayAgent OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsRelayAgentResolve 2 }
+
+--
+
+sfpsSubnetResolveNvramMaskEntries       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsSubnetResolveNvram 1 }
+
+sfpsSubnetResolveNvramMacEntries        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsSubnetResolveNvram 2 }
+
+sfpsSubnetResolveNvramIpEntries OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsSubnetResolveNvram 3 }
+
+sfpsSubnetResolveNvramNvramUsed OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsSubnetResolveNvram 4 }
+
+---  Relay Agent Resolve Stats
+
+sfpsRelayAgentResolveStatsTableSize     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsRelayAgentResolveStats 1 }
+
+sfpsRelayAgentResolveStatsNumEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "
+         ::= { sfpsRelayAgentResolveStats 2 }
+
+sfpsRelayAgentResolveStatsHighWater     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsRelayAgentResolveStats 3 }
+
+--  Switch Resolve Table
+
+sfpsSwitchResolveTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsSwitchResolveEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+         ::= { sfpsSwitchResolve 1 }
+
+sfpsSwitchResolveEntry  OBJECT-TYPE
+        SYNTAX  SfpsSwitchResolveEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsSwitchResolveSwitch, sfpsSwitchResolveCallTag }
+         ::= { sfpsSwitchResolveTable 1 }
+
+SfpsSwitchResolveEntry  ::=
+        SEQUENCE {
+                sfpsSwitchResolveSwitch         OCTET STRING,
+                sfpsSwitchResolveCallTag        INTEGER,
+                sfpsSwitchResolvePortNum        INTEGER,
+                sfpsSwitchResolveNeighborSw     OCTET STRING,
+                sfpsSwitchResolveRequestCount   INTEGER,
+                sfpsSwitchResolveResponseCount  INTEGER,
+                sfpsSwitchResolveMobilityRetry  INTEGER,
+                sfpsSwitchResolveEventId        INTEGER
+}
+
+sfpsSwitchResolveSwitch OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 1 }
+
+
+sfpsSwitchResolveCallTag        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 2 }
+
+sfpsSwitchResolvePortNum        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 3 }
+
+sfpsSwitchResolveNeighborSw     OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 4 }
+
+sfpsSwitchResolveRequestCount   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 5 }
+
+sfpsSwitchResolveResponseCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 6 }
+
+sfpsSwitchResolveMobilityRetry  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 7 }
+
+sfpsSwitchResolveEventId        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSwitchResolveEntry 8 }
+
+END

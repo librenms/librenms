@@ -1,0 +1,1677 @@
+CTRON-BDG-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-bdg-mib.txt
+        --  Part Number: 2170561-01
+        --  Revision: 1.01.01
+        --  Date: June 22, 1996
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific common MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+        IMPORTS
+                OBJECT-TYPE     FROM RFC-1212
+                bridge, layerMgmt
+                        FROM IRM-OIDS
+                Counter     FROM RFC1155-SMI;
+
+
+bridgeRev1  OBJECT IDENTIFIER ::= { bridge 1 }
+bdgdevice      OBJECT IDENTIFIER ::= { bridgeRev1 1 }
+
+bdgPort        OBJECT IDENTIFIER ::= { bridgeRev1 2 }
+
+filterDB    OBJECT IDENTIFIER ::= { bridgeRev1 3 }
+
+trapTypes   OBJECT IDENTIFIER ::= { bridgeRev1 4 }
+
+bdgTables   OBJECT IDENTIFIER ::= { bridgeRev1 5 }
+
+acqDB       OBJECT IDENTIFIER ::= { filterDB 1 }
+
+permDB      OBJECT IDENTIFIER ::= { filterDB 2 }
+
+specialDB   OBJECT IDENTIFIER ::= { filterDB 3 }
+
+acqStats    OBJECT IDENTIFIER ::= { acqDB 1 }
+
+acqOptions  OBJECT IDENTIFIER ::= { acqDB 2 }
+
+permStats   OBJECT IDENTIFIER ::= { permDB 1 }
+
+permOptions OBJECT IDENTIFIER ::= { permDB 2 }
+
+specStats   OBJECT IDENTIFIER ::= { specialDB 1 }
+
+specFilters OBJECT IDENTIFIER ::= { specialDB 2 }
+
+
+-- Device Object Definitions
+--
+--      This section defines the objects under the Device node.
+--
+-- Instance Identifiers for Device Objects
+--
+--      There is only one instance of a Device object, thus the Instance
+--      Identifier is 0.
+--
+-- Device Objects
+
+
+bdgdeviceDisableBdg OBJECT-TYPE 
+SYNTAX INTEGER 
+     {
+          disableBridge (0),
+          enableBridge  (1)
+     }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+     "Indicates if the bridge will be disabled."
+::= { bdgdevice 1 }
+
+
+bdgdeviceRestoreSettings OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                restoreSettings (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Restore the following settings to their default values:
+                Bridge Name to ETHERNET_BRIDGE,
+                Location to LOCAL,
+                Port 1 Name to PORT_1,
+                Port 2 Name to PORT_2,
+                Port 1 Network Name to LAN_1,
+                Port 2 Network Name to LAN_2,
+                Ageing Time for Acquired Database to 300 seconds,
+                Erase the acquired database,
+                Erase the permanent database,
+                Place sixteen default multicast addresses into
+                the permanent and acquired databases,
+                Type of Spanning Tree to 802.1,
+                Type of Filtering to IEEE 802.1,
+                Bridge Max Age to 20 seconds,
+                Bridge Forward Delay to 15 seconds,
+                Bridge Hello Time to 2 seconds,
+                Bridge Priority to 8000,
+                Port 1 Priority to 80,
+                Port 2 Priority to 80,
+                Port 1 Path Cost to 100,
+                Port 2 Path Cost to 100,
+                Restart the bridge."
+::= { bdgdevice 2 }
+
+
+bdgdeviceBdgName OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The user-defined name (up to 32 characters long) of the bridge.
+        The default bridge name is ETHERNET_BRIDGE."
+::=     { bdgdevice 4 }
+
+
+bdgdeviceNumPorts OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of ports present on the bridge."
+::= { bdgdevice 5 }
+
+
+bdgdeviceType OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The type of bridge, NB25E, IRBM, or NB20E."
+::= { bdgdevice 6 }
+
+
+bdgdeviceVersion OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The release version of the firmware installed in the bridge."
+::= { bdgdevice 7 }
+
+
+bdgdeviceLocation OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The user-defined name to indicate the location of the bridge on
+        the network. The default location name is LOCAL."
+::= { bdgdevice 8 }
+
+
+bdgdeviceStatus OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The status of the bridge, ON-LINE, STAND BY or DISABLED."
+::= { bdgdevice 9 }
+
+
+bdgdeviceRestartBdg OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                restartBridge (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Force the bridge to undergo a software reset."
+::= { bdgdevice 10 }
+
+
+bdgdeviceFrFwd OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames forwarded by the bridge."
+::= { bdgdevice 11 }
+
+
+bdgdeviceFrRx OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames received by the bridge."
+::= { bdgdevice 12 }
+
+
+bdgdeviceFrFlt OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames filtered by the bridge."
+::= { bdgdevice 13 }
+
+
+bdgdeviceErr OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The total number of network errors that have occurred."
+::= { bdgdevice 14 }
+
+
+bdgdeviceSwitchSetting OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "Indicates the current switch settings read from the bridge
+        hardware."
+::= { bdgdevice 15 }
+
+
+bdgdeviceNumRestarts OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of times the bridge has been powered up or restarted."
+::= { bdgdevice 16 }
+
+
+bdgdeviceTypeFiltering OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                ieee8021 (0),
+                specialDB (1),
+                both      (2)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The type of filtering to be performed by the bridge. The default
+        is IEEE 802.1."
+::= { bdgdevice 17 }
+
+
+bdgdeviceSTAProtocol OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                ieee8021 (0),
+                dec   (1),
+                none  (2)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The spanning tree algorithm under which the bridge is operating.
+        The selections are as follows:
+                - IEEE 802.1 compliant spanning tree algorithm
+                  environment (802.1)
+                - DEC LAN Bridge 100 environment (DEC)
+                - Without the spanning tree algorithm enabled (NONE)
+        The default is 802.1."
+::= { bdgdevice 18 }
+
+
+bdgdeviceBridgeID OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The unique identifier of the bridge. The first two bytes of the
+        identifier are the bridge priority and the last six bytes are the
+        Ethernet address."
+::= { bdgdevice 19 }
+
+
+bdgdeviceTopChgCnt OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of times the bridge's Topology Change Flag has been
+        changed since the bridge was powered up or initialized."
+::= { bdgdevice 20 }
+
+
+bdgdeviceRootCost OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The cost of the path to the root from this bridge."
+::= { bdgdevice 21 }
+
+
+bdgdeviceRootPort OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The port identifier for the port which offers the lowest cost
+        path to the root, i.e. that port for which the sum of the values
+        of the designated cost and path cost parameters held for the port
+        is lowest."
+::= { bdgdevice 22 }
+
+
+bdgdeviceHelloTime OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The time interval between the transmission of Configuration
+        BPDU's by a bridge which is attempting to become the root or is
+        the root."
+::= { bdgdevice 23 }
+
+
+bdgdeviceBdgMaxAge OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The value of the Max Age parameter when the bridge is the root
+        or is attempting to become the root. A time of 6 to 40 seconds is
+        allowed. The default is 20 seconds."
+::= { bdgdevice 24 }
+
+
+bdgdeviceBdgFwdDly OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The value of the forward delay parameter when the bridge is the
+        root or is attempting to become the root. A time of 4 to 30
+        seconds is allowed."
+::= { bdgdevice 25 }
+
+
+bdgdeviceTimeTopChg OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The time in seconds that has elapsed since the bridge's Topology
+        Change Flag last recorded the value of a topology change."
+::= { bdgdevice 26 }
+
+
+bdgdeviceTopChg OBJECT-TYPE
+SYNTAX INTEGER 
+{
+        noTopologyChangeInProgress (0),
+        topologyChangeInProgress   (1)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "Indicates if a bridge topology change is in progress."
+::= { bdgdevice 27 }
+
+
+bdgdeviceDesigRoot OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The unique identifier of the bridge recorded as the root."
+::= { bdgdevice 28 }
+
+
+bdgdeviceMaxAge OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The maximum age of received protocol information before it is
+        discarded."
+::= { bdgdevice 29 }
+
+
+bdgdeviceHoldTime OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The minimum time period elapsing between the transmission of
+        configuration BPDU's through a given bridge port."
+::= { bdgdevice 30 }
+
+
+bdgdeviceFwdDly OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The time spent in the listening state while moving from the
+        blocking state to the learning state, or the time spent in the
+        learning state while moving from the listening state to the
+        forwarding state."
+::= { bdgdevice 31 }
+
+
+bdgdeviceBdgHello OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The value of the Hello Time parameter when the bridge is the
+        root or is attempting to become the root. A time of 1 to 10
+        seconds is allowed. The default is 2 seconds."
+::= { bdgdevice 32 }
+
+
+bdgdeviceBdgPriority OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The part of the bridge address that contains the identifier used
+        in the spanning tree for priority comparisons. Allowed range is 0
+        through FFFF. The default is 8000."
+::= { bdgdevice 33 }
+
+
+bdgdeviceResetCounts OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                resetCounts (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Reset all counters to zero."
+::= { bdgdevice 34 }
+
+
+bdgdeviceUptime OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The time, in seconds, that has elapsed since the bridge was last
+        reset or initialized."
+::= { bdgdevice 35 }
+
+
+bdgdeviceTrapType OBJECT-TYPE
+SYNTAX OBJECT IDENTIFIER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "Contains the object identifier of the first VarBinding in the
+        last trap generated by the bridge."
+::= { bdgdevice 36 }
+
+
+-- Port Object Definitions
+--
+--      This section defines the objects under the Port node.
+--
+-- Instance Identifiers for Port Objects
+--
+--      The Instance Identifier for port objects is the number of the port on
+--      the bridge. Valid instance identifiers for the ports on the IRBM,
+--      NB25E, and NB20E bridges are 1 and 2.
+--
+-- Port Objects
+
+
+bdgPortAddress OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The Ethernet address of the port."
+::= { bdgPort 1 }
+
+bdgPortName OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The user-defined name assigned to the port. The default port 1
+        name is PORT_1 and the default Port 2 name is PORT_2."
+::= { bdgPort 2 }
+
+bdgPortType OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The IEEE specification the port meets, e.g. 802.3."
+::= { bdgPort 3 }
+
+bdgPortStatus OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The status in which the port is operating. The status messages
+        for Ports 1 and 2 are:
+
+                OFF - The port is off, due to a failed network interface
+                chip associated with that port.
+
+                OK/SQE ON - The port is communicating with the network
+                and the transceiver making the connection to the network
+                has SQE enabled.
+
+                OK/SQE OFF - The port is communicating with the network
+                and the transceiver making the connection to the network
+                has SQE disabled.
+
+                CARRIER LOST - Communication with the network has not
+                been established or has been lost."
+::= { bdgPort 4 }
+
+bdgPortNetName OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The user-defined name assigned to a network segment connected to
+        the port. The default network name for Port 1 is LAN_1 and the
+        default network name for Port 2 is LAN_2."
+::= { bdgPort 5 }
+
+bdgPortFrRx OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames received at the specified port."
+::= { bdgPort 6 }
+
+bdgPortDisInb OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The total number of valid frames that were received at the port
+        but then discarded by the bridge in the forwarding process."
+::= { bdgPort 7 }
+
+bdgPortFwdOutb OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames forwarded successfully to the appropriate
+        port."
+::= { bdgPort 8 }
+
+bdgPortDisLOB OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of packets that were discarded by the bridge because
+        of a lack of buffer space to maintain the data."
+::= { bdgPort 9 }
+
+bdgPortDisTDE OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames that were intended for forwarding but were
+        discarded when the maximum time period set for transmission was
+        exceeded before forwarding was possible."
+::= { bdgPort 10 }
+
+bdgPortDisErr OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames that could not be transmitted because the
+        frame was too large for the attached network (1526 bytes,
+        including preamble, for 802.3 networks)."
+::= { bdgPort 11 }
+
+bdgPortColl OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of collisions that have occurred on the network at
+        the specified port."
+::= { bdgPort 12 }
+
+bdgPortTxAbrt OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of transmissions that have been aborted due to
+        excessive collisions (over 16 attempts to transmit the same
+        packet)."
+::= { bdgPort 13 }
+
+bdgPortOowColl OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of collisions out of the standard collision window
+        (51.2 uS). This indicates a network problem."
+::= { bdgPort 14 }
+
+bdgPortCRCErr OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of packets detected with Cyclical Redundancy Check
+        failures."
+::= { bdgPort 15 }
+
+bdgPortFrAlErr OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of errors due to misaligned packets."
+::= { bdgPort 16 }
+
+bdgPortPriority OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The part of the port identifier which is used with the spanning
+        tree algorithm when determining which port in a LAN segment has
+        priority. The default is 80."
+::= { bdgPort 17 }
+
+bdgPortState OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The current state of the port, DISABLED, LISTENING, LEARNING,
+        FORWARDING or BLOCKING."
+::= { bdgPort 18 }
+
+bdgPortPathCost OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The contributory cost of the applicable port to the overall cost
+        of the path when the specified port is the root port. Allowable
+        range is 1 to 65535. The default is 100."
+::= { bdgPort 19 }
+
+bdgPortDesigCost OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The cost of the path of this port to the root bridge on the
+        network."
+::= { bdgPort 20 }
+
+bdgPortDesigBrdg OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The network address of the bridge that is assumed to be the root
+        bridge on the network."
+::= { bdgPort 21 }
+
+bdgPortDesigPort OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The port identifier of the bridge port believed to be the
+        designated port for the LAN associated with the port."
+::= { bdgPort 22 }
+
+bdgPortTopChgAck OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                noTopologyChangeIsOccurring (0),
+                topologyChangeIsOccurring   (1)
+        }
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The value of the topology change acknowledgement flag in the
+        next configuration BPDU to be transmitted on the associated port."
+::= { bdgPort 23 }
+
+bdgPortDesigRoot OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The unique bridge identifier of the bridge that is assumed to be
+        the root bridge on the network."
+::= { bdgPort 24 }
+
+bdgPortRuntPackets OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of packets received at the indicated bdgPort that were
+        less than the IEEE 802.3 minimum Ethernet frame size of 64 bytes."
+::= { bdgPort 25 }
+
+bdgPortOversizePackets OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of packets received at the indicated port that were
+        greater than the IEEE 802.3 maximum Ethernet frame size of 1518
+        bytes."
+::= { bdgPort 26 }
+
+bdgPortFrFilt OBJECT-TYPE
+SYNTAX Counter
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of frames received at the indicated port that were
+        filtered by the bridge."
+::= { bdgPort 27 }
+
+
+-- Acquired Database Statistical Object Definitions
+--
+--      This section defines the objects under the Acquired Database
+--      Statistics node.
+--
+-- Instance Identifiers for Acquired Database Statistical Objects
+--
+--      There is only one instance of an Acquired Database Statistical object,
+--      thus the Instance Identifier is 0.
+--
+--  Acquired Database Statistical Objects
+
+
+acqTotalEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The total number of entries in the acquired database."
+::= { acqStats 1 }
+
+acqMaxEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The maximum number of entries allowed in the acquired database."
+::= { acqStats 2 }
+
+acqStaticEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The number of addresses added to the Acquired database by the
+        user or network manager."
+::= { acqStats 3 }
+
+acqStaticAgeTime OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The length of time allowed for a static entry in the Acquired
+        database to be inactive before it is dropped from the database.
+        This time is fixed at zero."
+::= { acqStats 4 }
+
+acqDynEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of entries that have been accumulated in the Acquired
+        database through the bridge's learning process."
+::= { acqStats 5 }
+
+acqDynAgeTime OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "The length of time allowed for a dynamic entry in the acquired
+        database to be inactive before it is dropped from the database. A
+        time from 10 - 1,000,000 seconds is allowed. The default is 300
+        seconds."
+::= { acqStats 6 }
+
+acqEraseDatabase OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                eraseAcquiredDatabase (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set to zero to erase all entries in the acquired database."
+::= { acqStats 7 }
+
+
+-- Acquired Database Option Object Definitions
+--
+--      This section defines the objects under the Acquired Database
+--      Option node.
+--
+-- Instance Identifiers for Acquired Database Option Objects
+--
+--      The instance identifier for the acquired database option objects is
+--      the 6-byte Ethernet address of the device to be added, deleted or
+--      displayed to/from the acquired database.
+--
+--  Acquired Database Option Objects
+
+
+acqCreate00 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createAcquiredEntryFilterPort1FilterPort2  (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the acquired database to filter packets entering
+        ports 1 and 2 if those packets are destined for the specified
+        address."
+::= { acqOptions 1 }
+
+acqCreate20 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createAcquiredEntryForwardPort1FilterPort2  (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the acquired database to forward packets
+        entering port1 to port2 and filter packets entering port2 if
+        those packets are destined for the specified address."
+::= { acqOptions 2 }
+
+acqCreate01 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createAcquiredEntryFilterPort1ForwardPort2  (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the acquired database to filter packets entering
+        port 1 and forward packets entering port 2 to port 1 if those
+        packets are destined for the specified address."
+::= { acqOptions 3 }
+
+acqCreate21 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createAcquiredEntryForwardPort1ForwardPort2 (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the acquired database to forward packets
+        entering port 1 to port 2 and to forward packets entering port 2
+        to port 1 if those packets are destined for the specified
+        address."
+::= { acqOptions 4 }
+
+acqDelete OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                deleteAcquiredEntry (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Delete an entry from the acquired database."
+::= { acqOptions 5 }
+
+acqDispType OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "Display the entry type, STATIC or DYNAMIC."
+::= { acqOptions 6 }
+
+acqDispOutp1 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                filter (0),
+                relay  (2)
+        }
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The outbound port for packets entering port 1."
+::= { acqOptions 7 }
+
+acqDispOutp2 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                filter (0),
+                relay  (1)
+        }
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The outbound port for packets entering port 2."
+::= { acqOptions 8 }
+
+acqSrcAddress OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The source address of this acquired database entry, i.e. the
+        instance."
+::= { acqOptions 9 }
+
+-- Permanent Database Statistical Object Definitions
+--
+--      This section defines the objects under the Permanent Database
+--      Statistics node.
+--
+-- Instance Identifiers for Permanent Database Statistical Objects
+--
+--      There is only one instance of an Permanent Database Statistical
+--      object, thus the Instance Identifier is 0.
+--
+--  Permanent Database Statistical Objects
+
+
+permMaxEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The maximum number of entries allowed in the permanent database."
+::= { permStats 1 }
+
+permCurrEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of entries currently recorded in the bridge's
+        permanent database."
+::= { permStats 2 }
+
+permEraseDatabase OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                erasePermanentDatabase (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Erase all entries in the permanent database."
+::= { permStats 3 }
+
+-- Permanent Database Option Object Definitions
+--
+--      This section defines the objects under the Permanent Database
+--      Option node.
+--
+-- Instance Identifiers for Permanent Database Option Objects
+--
+--      The instance identifier for the permanent database option objects is
+--      the 6-byte Ethernet address of the device to be added, deleted or
+--      displayed to/from the permanent database.
+--
+--  Permanent Database Option Objects
+
+permCreate00 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createPermanentEntryFilterPort1FilterPort2 (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the permanent database to filter packets
+        entering ports 1 and 2 if those packets are destined for the
+        specified address."
+::= { permOptions 1 }
+
+permCreate20 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createPermanentEntryForwardPort1FilterPort2 (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the permanent database to forward packets
+        entering port 1 and filter packets entering port 2 if those
+        packets are destined for the specified address."
+::= { permOptions 2 }
+
+permCreate01 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                createPermanentEntryFilterPort1ForwardPort2 (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the permanent database to filter packets
+        entering port 1 and forward packets entering port 2 if those
+        packets are destined for the specified address."
+::= { permOptions 3 }
+
+permCreate21 OBJECT-TYPE
+SYNTAX INTEGER
+        {
+                createPermanentEntryForwardPort1ForwardPort2 (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Add an entry to the permanent database to forward packets
+        entering ports 1 and 2 if those packets are destined for the
+        specified address."
+::= { permOptions 4 }
+
+permDelete OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                deletePermanentEntry (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Delete an entry from the permanent database."
+::= { permOptions 5 }
+
+permDispType OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "Display the entry type, STATIC or DYNAMIC."
+::= { permOptions 6 }
+
+permDispOutp1 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                filter (0),
+                relay  (2)
+        }
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The outbound port for packets entering port 1."
+::= { permOptions 7 }
+
+permDispOutp2 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                filter (0),
+                relay  (1)
+        }
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The outbound port for packets entering port 2."
+::= { permOptions 8 }
+
+permSrcAddress OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The source address in this permanent database entry, i.e. the
+        instance."
+::= { permOptions 9 }
+
+-- Special Database Statistical Object Definitions
+--
+--      This section defines the objects under the Special Database
+--      Statistical node.
+--
+-- Instance Identifiers for Special Database Statistical Objects
+--
+--      There is only one instance of a Special Database Statistical object,
+--      thus the Instance Identifier is 0.
+--
+-- Special Database Statistical Objects
+
+specNumEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of filters in the special database."
+::= { specStats 1 }
+
+specMaxEntries OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The maximum number of filters the special database can contain."
+::= { specStats 2 }
+
+specNextFilterNum OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+        "The number of the next available filter that can be added to the
+        special database."
+::= { specStats 3 }
+
+-- Special Database Filter Object Definitions
+--
+--      This section defines the objects under the Special Database
+--      Filter node.
+--
+-- Instance Identifiers for Special Database Filter Objects
+--
+--      The instance identifier of the special database filter objects
+--      is the filter number, values from 1 through 10 are allowed.
+--
+-- Special Database Filter Objects
+
+specEnable OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                disableFilter (0),
+                enableFilter  (1)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Enable or disable the filter."
+::= { specFilters 1 }
+
+specPort1 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                filter (0),
+                relay  (2)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set port 1 to filter or forward packets."
+::= { specFilters 2 }
+
+specPort2 OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                filter (0),
+                relay  (1)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set port 2 to filter or forward packets."
+::= { specFilters 3 }
+
+specDestAddress OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set the special database to filter packets with a specific
+        destination address."
+::= { specFilters 4 }
+
+specSrcAddress OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set the special database to filter packets with a specific
+        source address."
+::= { specFilters 5 }
+
+specType OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set the special database to filter packets with a specific type
+        field."
+::= { specFilters 6 }
+
+specDataField OBJECT-TYPE
+SYNTAX OCTET STRING
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Set the special database to filter packets based on the first
+        sixteen bytes of data in the packet."
+::= { specFilters 7 }
+
+specDeleteFilter OBJECT-TYPE
+SYNTAX INTEGER 
+        {
+                deleteFilter (0)
+        }
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+        "Delete a filter from the special database."
+::= { specFilters 8 }
+
+
+-- TRAP TYPES OBJECT DEFINITIONS
+--
+-- This section describes the trap types that the bridge can generate. These
+-- are not objects, but Object Identifiers used to indicate the specific trap.
+-- They are taken from the object space and are thus documented here.
+--
+-- The SNMP trap messages are composed of two user definable areas: 
+--     a) the specific trap type and 
+--     b) the VarBindings (e.g. the interesting information)
+--
+-- The specific trap type is an integer that is used to determine the
+-- specific trap which has occurred. The "interesting information" contains
+-- a group of object identifiers and their values that provide information
+-- about the trap.
+--
+-- Trap Decription
+--
+--      BridgeStatus
+--
+--      Specific Trap Type Code - 0x0301
+--
+--      When the bridge status changes, a trap will be generated. The
+--   interesting information includes the current status of the bridge.
+--
+--
+-- Trap Description
+--
+--      AcqDbaseFull
+--
+--      Specific Trap Type Code - 0x0302
+--
+--      When the acquired portion of the bridge's filtering database is full, a
+--   trap is generated. The interesting information included with this trap
+--   is the number of entries in the acquired database.
+          
+-- Formal definition of the Layer Management MIB. (e.g. PC cards )
+
+     lmcommon         OBJECT IDENTIFIER ::= { layerMgmt 1 }
+          
+     mAC            OBJECT IDENTIFIER ::= { layerMgmt 2 }          
+
+     ieee8023      OBJECT IDENTIFIER ::= {  mAC 1 }
+          
+     pcIF           OBJECT IDENTIFIER ::= { ieee8023 1 }
+
+     pcIfRev        OBJECT IDENTIFIER ::= { pcIF 1 }
+
+          
+                        
+pcDeviceName OBJECT-TYPE   
+          
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+    "Name of the PC device"
+::= { pcIfRev 1 }
+
+
+pcBoardType   OBJECT-TYPE
+
+SYNTAX OBJECT IDENTIFIER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "An object  Identifier that  indicates the  type of  the  PC
+     board. This will include MAC type and Media type."
+
+
+::= { pcIfRev 2  }
+
+pcOwnerName    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The owner of this PC."
+
+
+::= { pcIfRev 3 }
+
+pcLocation    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "A text description of the location of this PC."
+
+::= { pcIfRev 4 }
+
+pcMMACAddr    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The MAC address of the MMAC that this PC is connected to."
+
+
+::= { pcIfRev 5 }
+
+pcMMACBoard    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The slot  number of  the board  in the MMAC that this PC is
+connected to."
+
+
+::= { pcIfRev 6  }
+
+pcMMACPort    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of the  port on the board of the MMAC that this
+PC is connected to."
+::= { pcIfRev 7 }
+
+pcApplication    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "A text  description of  the network  application running on
+this PC."
+
+
+::= { pcIfRev 8 }
+
+pcDriverRev    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The revision of the LAN card driver."
+::= { pcIfRev 9 }
+
+pcOnboardMemory    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of Kilobytes  of memory  (eg. a 16K board would
+reply 16)"
+
+::= { pcIfRev 10 }
+
+pcComment    OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "A user-defined character string."
+
+
+::= { pcIfRev 11 }
+ 
+pcMACAddr   OBJECT-TYPE
+
+SYNTAX OCTET STRING
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The MAC address of the PC card."
+
+
+::= { pcIfRev 12  }
+
+pcFramesXmit   OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of MAC frames transmitted by this PC card."
+
+
+::= { pcIfRev 13  }
+
+pcBytesXmit    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number bytes transmitted by this PC card."
+
+
+::= { pcIfRev 14 }
+
+pcMcastXmit    OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of multicasted frames sent by this PC card."
+
+::= { pcIfRev 15 }
+
+pcBcastXmit    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of broadcast frames from this PC card."
+
+
+::= { pcIfRev 16 }
+
+pcDeferXmit    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of transmit  packets that  were deferred due to
+busy media."
+
+::= { pcIfRev 17 }
+
+pcSglColl     OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The  number   of  transmit  packet  experiencing  a  single
+collision."
+
+::= { pcIfRev 18 }
+
+pcMultiColl    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The  number  of  transmit  packets  that  have  experienced
+multiple collisions."
+
+::= { pcIfRev 19 }
+
+pcTotXmitErrs    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The total number of transmit errors."
+
+::= { pcIfRev 20 }
+
+pcLateColls   OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The  number  of  transmit  packets  that  experienced  late
+collisions."
+
+
+::= { pcIfRev 21 }
+
+pcXcessColls    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of  transmit  packets  aborted  due  to  excess
+collisions."
+
+::= { pcIfRev 22 }
+
+pcCarrErr   OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of transmit  packets  that  experience  carrier
+sense errors (ie. lose carrier during transmission)."
+
+::= { pcIfRev 23 }
+
+pcFramesRec   OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of frames received."
+
+::= { pcIfRev 24 }
+
+pcBytesRec    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of bytes received by this station."
+
+
+::= { pcIfRev 25 }
+
+pcMcastRec    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of multicasted frames received."
+
+::= { pcIfRev 26 }
+
+pcBcastRec    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of broadcast packets received."
+
+::= { pcIfRev 27 }
+
+pcTotRecErrs    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The total number of receive errors."
+
+::= { pcIfRev 28 }
+
+pcTooLong   OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of packets received that are too long (over 1518
+bytes)."
+
+::= { pcIfRev 29 }
+
+pcTooShort    OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of packets  that are too short. (under 64 bytes
+long)."
+
+::= { pcIfRev 30 }
+
+pcAlignErrs    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of alignment errors in receive packets."
+
+
+::= { pcIfRev 31 }
+
+pcCRCErrs     OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of receive packets with CRC errors."
+
+::= { pcIfRev 32  }
+
+pcLenErrs    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of packets  whose length  is not  equal to  the
+number of bytes received."
+
+::= { pcIfRev 33 }
+
+pcIntRecErr    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number  of receive  packets that  experienced  internal
+errors (eg. no receive buffers)."
+
+::= { pcIfRev 34 }
+
+pcSqeErr    OBJECT-TYPE
+
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+     "The number of SQE errors."
+
+::= { pcIfRev 35 }
+
+END

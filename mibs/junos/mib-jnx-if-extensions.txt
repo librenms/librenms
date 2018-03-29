@@ -1,0 +1,947 @@
+--
+-- Juniper Enterprise Specific MIB: Interface MIB Extension
+-- 
+-- Copyright (c) 1999-2012, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    Gauge32, Integer32, Counter64, Counter32
+        FROM SNMPv2-SMI
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    ifEntry,ifIndex
+        FROM IF-MIB
+    TimeStamp
+        FROM SNMPv2-TC    
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+ifJnx MODULE-IDENTITY
+    LAST-UPDATED "201109221523Z" -- Thu Sept 22 15:23:51 2011 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The MIB modules extends the ifTable as
+             defined in IF-MIB." 
+    REVISION     "201105100000Z"       -- 10 May, 2011
+    DESCRIPTION
+            "New Layer2 Policer Counters Added to ifJnxTable for MX Series only"     
+    REVISION      "201109220000Z"
+    DESCRIPTION
+               "Added new OIDs Crc and Fcs Erros.
+                Added new Trap ifJnxErrors"
+    REVISION     "200706050000Z"       -- 05 June, 2007
+    DESCRIPTION
+            "New Time Domain Reflectometery Added" 
+    REVISION     "200210310000Z"         -- 31 Oct, 2002
+    DESCRIPTION
+            "New error counters added to ifJnxTable" 
+    REVISION     "200106210000Z"         -- 21 June, 2001
+    DESCRIPTION
+            "New objects ifHCIn1SecRate and 
+             ifHCOut1SecRate added" 
+    REVISION     "200103150000Z"         -- 15 March, 2001 
+    DESCRIPTION
+            "New objects ifHCIn1SecOctets and 
+             ifHCOut1SecOctets added" 
+    REVISION     "201510150000Z"         -- 14 Oct, 2015
+    DESCRIPTION
+            "Initial Version"
+            
+            
+    ::= { jnxMibs 3 }
+
+
+
+
+--
+-- This table augments ifTable
+--
+    ifJnxTable      OBJECT-TYPE
+	SYNTAX      SEQUENCE OF IfJnxEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of Juniper's extension to the interface entries.
+		The number of entries is given by the value of ifNumber.
+		This table contains additional objects for the interface
+		table."
+
+
+	::= { ifJnx 1 }
+
+    ifJnxEntry      OBJECT-TYPE
+	SYNTAX      IfJnxEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing additional management information
+		applicable to a particular interface."
+	AUGMENTS    { ifEntry }
+	::= { ifJnxTable 1 }
+
+    IfJnxEntry ::=
+	SEQUENCE {
+	    ifIn1SecRate	   Gauge32,
+	    ifIn1SecOctets	   Gauge32,
+	    ifIn1SecPkts	   Gauge32,
+	    ifOut1SecRate	   Gauge32,
+	    ifOut1SecOctets	   Gauge32,
+	    ifOut1SecPkts	   Gauge32,
+	    ifHCIn1SecRate	   CounterBasedGauge64,
+	    ifHCOut1SecRate	   CounterBasedGauge64,
+        ifJnxInErrors          Counter64,
+        ifJnxInFrameErrors     Counter64,
+        ifJnxInQDrops          Counter64,
+        ifJnxInRunts           Counter64,
+        ifJnxInGiants          Counter64,
+        ifJnxInDiscards        Counter64,
+        ifJnxInHslCrcErrors    Counter64,
+        ifJnxInHslFifoOverFlows Counter64,
+        ifJnxInL3Incompletes   Counter64,
+        ifJnxInL2ChanErrors    Counter64,
+        ifJnxInL2MismatchTimeouts Counter64,
+        ifJnxInInvalidVCs      Counter64,
+        ifJnxInFifoErrors      Counter32,
+        ifJnxBucketDrops       Counter64,
+        ifJnxSramErrors        Counter32,
+        ifJnxOutErrors         Counter64,
+        ifJnxCollisions        Counter64,
+        ifJnxCarrierTrans      Counter64,
+        ifJnxOutQDrops         Counter64,
+        ifJnxOutAgedErrors     Counter64,
+        ifJnxOutFifoErrors     Counter32,
+        ifJnxOutHslFifoUnderFlows Counter64,
+        ifJnxOutHslCrcErrors   Counter32,
+        ifJnxCrcErrors         Counter64,
+        ifJnxFcsErrors         Counter64,
+	    ifHCIn1SecOctets	   CounterBasedGauge64,
+	    ifHCOut1SecOctets	   CounterBasedGauge64
+	}
+
+    ifIn1SecRate OBJECT-TYPE
+	SYNTAX      Gauge32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bits per second (bps), delivered by 
+		this (sub-)layer to its next higher (sub-)layer."
+	::= { ifJnxEntry 1 }
+
+    ifIn1SecOctets OBJECT-TYPE
+	SYNTAX      Gauge32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of octets per second (Bps, Bytes per 
+		second), delivered by this (sub-)layer to its next
+		higher (sub-)layer."
+	::= { ifJnxEntry 2 }
+
+    ifIn1SecPkts OBJECT-TYPE
+	SYNTAX      Gauge32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of packets per second (pps), delivered
+		by this (sub-)layer to its next higher (sub-)layer."
+	::= { ifJnxEntry 3 }
+
+    ifOut1SecRate OBJECT-TYPE
+	SYNTAX      Gauge32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bits per second (bps), delivered by
+		this (sub-)layer to its next lower (sub-)layer."
+	::= { ifJnxEntry 4 }
+
+    ifOut1SecOctets OBJECT-TYPE
+	SYNTAX      Gauge32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of octets per second (Bps, Bytes per
+		second), delivered by this (sub-)layer to its next
+		lower (sub-)layer."
+	::= { ifJnxEntry 5 }
+
+    ifOut1SecPkts OBJECT-TYPE
+	SYNTAX      Gauge32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of packets per second (pps), delivered
+		by this (sub-)layer to its next lower (sub-)layer."
+	::= { ifJnxEntry 6 }
+	
+    ifHCIn1SecRate OBJECT-TYPE
+	SYNTAX      CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bits per second (bps), delivered by 
+		this (sub-)layer to its next higher (sub-)layer.
+		This object is a 64 bit version of ifIn1SecRate."
+	::= { ifJnxEntry 7 }
+
+    ifHCOut1SecRate OBJECT-TYPE
+	SYNTAX      CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bits per second (bps), delivered by
+		this (sub-)layer to its next lower (sub-)layer.
+		This object is a 64 bit version of ifOut1SecRate."
+	::= { ifJnxEntry 8 }
+
+    ifJnxInErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Errors: The sum of the incoming frame aborts and FCS errors."
+    ::= { ifJnxEntry 9 }
+
+    ifJnxInFrameErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Framing Errors: The number of input packets which were 
+                misaligned."
+    ::= { ifJnxEntry 10 }
+
+    ifJnxInQDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Drops: The number of packets dropped by the input queue of 
+                the I/O Manager ASIC."
+    ::= { ifJnxEntry 11 }
+
+    ifJnxInRunts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Runts: Frames received that are smaller than the runt 
+                threshold."
+    ::= { ifJnxEntry 12 }
+
+    ifJnxInGiants OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Giants: Frames received that are larger than the giant 
+                threshold."
+    ::= { ifJnxEntry 13 }
+
+    ifJnxInDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Policed Discards: Frames that the incoming packet match code 
+                discarded because they were not recognized or of interest."
+    ::= { ifJnxEntry 14 }
+
+    ifJnxInHslCrcErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "HS Link CRC Errors: The number of CRC errors on the 
+                high-speed links between the ASICs responsible for handling 
+                the router interfaces while receiving packets."
+    ::= { ifJnxEntry 15 }
+
+    ifJnxInHslFifoOverFlows OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "HS link FIFO overflows: The number of FIFO overflows on the
+                high-speed links between the ASICs responsible for handling
+                the router interfaces."
+    ::= { ifJnxEntry 16 }
+
+    ifJnxInL3Incompletes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "L3 incompletes: The number of incoming packets that fail
+                Layer 3 sanity checks of the header."
+    ::= { ifJnxEntry 17 }
+
+    ifJnxInL2ChanErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "L2 channel errors: the number of incoming packets for which 
+                the sofware could not find a valid logical interface."
+    ::= { ifJnxEntry 18 }
+
+    ifJnxInL2MismatchTimeouts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "L2 mismatch timeouts: The count of malformed or short packets
+                that cause the incoming packet handler to discard the frame
+                as unreadable."
+    ::= { ifJnxEntry 19 }
+
+    ifJnxInInvalidVCs OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Invalid VCs: Number of cells that arrived for a nonexistent
+                virtual circuit."
+    ::= { ifJnxEntry 20 }
+
+    ifJnxInFifoErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "FIFO errors: The number of FIFO errors in the receive
+                direction as reported by the ASIC on the PIC."
+    ::= { ifJnxEntry 21 }
+
+    ifJnxBucketDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Bucket drops: Drops due to traffic load exceeding the
+                interface transmit/receive leaky bucket configuration."
+    ::= { ifJnxEntry 22 }
+
+    ifJnxSramErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "SRAM errors: This counter increments when a hardware error
+                has occurred in the SRAM on the PIC."
+    ::= { ifJnxEntry 23 }
+
+    ifJnxOutErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Errors: The sum of the outgoing frame aborts and FCS errors."
+    ::= { ifJnxEntry 24 }
+
+    ifJnxCollisions OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Collisions: The number of output collisions detected on this
+                interface."
+    ::= { ifJnxEntry 25 }
+
+    ifJnxCarrierTrans OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Carrier transitions: The number of times the interface saw
+                the carrier signal transition."
+    ::= { ifJnxEntry 26 }
+
+    ifJnxOutQDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Drops: The number of packets dropped by the output queue of
+                the I/O Manager ASIC."
+    ::= { ifJnxEntry 27 }
+
+    ifJnxOutAgedErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Aged packets: The number of packets that remained in shared
+                packet SDRAM for so long that the system automatically purged
+                them."
+    ::= { ifJnxEntry 28 }
+
+    ifJnxOutFifoErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "FIFO errors: The number of FIFO errors in the transmit
+                direction as reported by the ASIC on the PIC."
+    ::= { ifJnxEntry 29 }
+
+    ifJnxOutHslFifoUnderFlows OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "HS link FIFO underflows: The number of FIFO underflows on the
+                high-speed links between the ASICs responsible for handling
+                the router interfaces."
+    ::= { ifJnxEntry 30 }
+
+    ifJnxOutHslCrcErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "HS Link CRC Errors: The number of CRC errors on the 
+                high-speed links between the ASICs responsible for handling 
+                the router interfaces while transmitting packets."
+    ::= { ifJnxEntry 31 }
+
+    ifJnxCrcErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "CRC Errors: The number of CRC errors" 
+    ::= { ifJnxEntry 32 }
+
+    ifJnxFcsErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "FCS Errors: The number of FCS errors" 
+    ::= { ifJnxEntry 33 }
+    
+    ifHCIn1SecOctets OBJECT-TYPE
+	SYNTAX      CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes per second (Bps), delivered by 
+		this (sub-)layer to its next higher (sub-)layer.
+		This object is a 64 bit version of ifIn1SecOctets."
+	::= { ifJnxEntry 34 }
+
+    ifHCOut1SecOctets OBJECT-TYPE
+	SYNTAX      CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes per second (Bps), delivered by
+		this (sub-)layer to its next lower (sub-)layer.
+		This object is a 64 bit version of ifOut1SecOctets."
+	::= { ifJnxEntry 35 }
+
+
+--
+-- This table augments ifTable to map to Chassis MIB tables
+--
+    ifChassisTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF IfChassisEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of Juniper's extension to the interface entries.
+		The number of entries is given by the value of ifNumber.
+		This table contains additional objects for the interface
+		table to facilitate the identification of interfaces and
+		its mapping into the Chassis MIB tables."
+
+
+	::= { ifJnx 2 }
+
+    ifChassisEntry OBJECT-TYPE
+	SYNTAX      IfChassisEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing additional management information
+		applicable to a particular interface."
+	AUGMENTS    { ifEntry }
+	::= { ifChassisTable 1 }
+
+    IfChassisEntry ::=
+	SEQUENCE {
+	    ifChassisFpc   	   Integer32,
+	    ifChassisPic   	   Integer32,
+	    ifChassisPort  	   Integer32,
+	    ifChassisChannel       Integer32,
+	    ifChassisLogicalUnit   Integer32,
+	    ifChassisPicIndex	   OCTET STRING
+	}
+
+    ifChassisFpc OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of the FPC card on which the interface
+		is located in the chassis.  It is the chassis slot 
+		in which the FPC card is installed for the specified 
+		interface.  
+
+		Although the number is labeled from 0 and up in the 
+		chassis, the return value for this object always starts
+		from 1 according to Network Management convention.
+		Therefore, a value of zero means there is no real or
+		physical FPC associated with the specified interface."
+	::= { ifChassisEntry 1 }
+
+    ifChassisPic OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of the PIC card on which the interface
+		is located in the chassis.  It is the PIC location 
+		on the FPC card for the specified interface.
+
+		Although the number is labeled from 0 and up in the 
+		chassis, the return value for this object always starts
+		from 1 according to Network Management convention.
+		Therefore, a value of zero means there is no real or
+		physical PIC associated with the specified interface."
+	::= { ifChassisEntry 2 }
+
+    ifChassisPort OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of the port on the PIC card on which the 
+		interface is located in the chassis.  It is the port 
+		number on the PIC card for the specified interface.
+
+		Although the number is labeled from 0 and up in the 
+		chassis, the return value for this object always starts
+		from 1 according to Network Management convention.
+		Therefore, a value of zero means there is no real or
+		physical port associated with the specified interface."
+	::= { ifChassisEntry 3 }
+
+    ifChassisChannel OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The channel identifier for the specified interface
+		if and only if it is part of a channelized interface.
+		
+		Although the channel is numbered from 0 and up in the 
+		interface naming, the return value for this object 
+		always starts from 1 according to Network Management 
+		convention.  For the interface which could not be 
+		channelized, this object returns zero."
+	::= { ifChassisEntry 4 }
+
+
+    ifChassisLogicalUnit OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The logical unit number of the specified interface.
+		It is the logical part of the interface that is 
+		configured on the physical or channel part if any.
+
+		Although the logical unit number is numbered from 0 and
+		up in the interface naming, the return value for this 
+		object always starts from 1 according to Network 
+		Management convention.  For the interface which is 
+		really a physical device, this value returns zero."
+	::= { ifChassisEntry 5 }
+
+    ifChassisPicIndex OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The index or indices for the Chassis MIB tables.
+		This is the instance index which keys into the 
+		jnxContentsTable in Chassis MIB.
+
+		For example, it could return an octet string of
+		'8.1.2.0' - meaning a PIC ('8', first digit) 
+		at FPC slot 0 ('1-1', second digit minus one if nonzero)
+		PIC number 1 ('2-1', third digit minus one if nonzero)
+		port number whatever (fourth digit currently unused)
+		- which in turn could be plugged in by NMS directly
+		after any MIB objects in the jnxContentsTable, say
+		'jnxContentsDescr.8.1.2.0', so NMS could get that
+		PIC object for the specified interface.
+
+		This object is valid only for those interfaces having 
+		real and physical PIC cards.  Otherwise, it returns 
+		an octet string	of four zeros '0.0.0.0.'"
+	::= { ifChassisEntry 6 }
+
+    --
+    -- This branch contains all Interface Level PFE Notifications data.
+    --
+    ifJnxNotification   OBJECT IDENTIFIER ::= { ifJnx 3 }
+
+    ifJnxNotificationPrefix OBJECT IDENTIFIER ::= { ifJnxNotification 0}
+
+    ifJnxErrors NOTIFICATION-TYPE
+    OBJECTS {
+         ifJnxCrcErrors,
+         ifJnxFcsErrors
+    }
+    STATUS current
+    DESCRIPTION
+         "A ifJnxErrors notification is sent when the value
+         of ifJnxCrcErrors or ifJnxFcsErrors increases."
+
+    ::= { ifJnxNotificationPrefix 1 } 
+      
+--
+-- This table augments ifTable
+--
+    ifJnxPolTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IfJnxPolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A list of Juniper's extension to the interface entries.
+                The number of entries is given by the value of ifNumber.
+                This table contains additional objects for the interface
+                table."
+
+
+        ::= { ifJnx 4 }
+
+    ifJnxPolEntry      OBJECT-TYPE
+        SYNTAX      IfJnxPolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An entry containing additional management information
+                applicable to a particular interface."
+        INDEX  { ifIndex }
+        ::= { ifJnxPolTable 1 }
+
+    IfJnxPolEntry ::=
+        SEQUENCE {
+
+        ifJnxInPolLowOctets         Counter64,
+        ifJnxInPolLowPkts           Counter64,
+        ifJnxInPolLow1SecRate       Counter64,
+        ifJnxInPolMLowOctets        Counter64,
+        ifJnxInPolMLowPkts          Counter64,
+        ifJnxInPolMLow1SecRate      Counter64,
+        ifJnxInPolMHighOctets       Counter64,
+        ifJnxInPolMHighPkts         Counter64,
+        ifJnxInPolMHigh1SecRate     Counter64,
+        ifJnxInPolHighOctets        Counter64,
+        ifJnxInPolHighPkts          Counter64,
+        ifJnxInPolHigh1SecRate      Counter64,
+        ifJnxInPolDropOctets        Counter64,
+        ifJnxInPolDropPkts          Counter64,
+        ifJnxInPolDrop1SecRate      Counter64,
+        ifJnxOutPolLowOctets        Counter64,
+        ifJnxOutPolLowPkts          Counter64,
+        ifJnxOutPolLow1SecRate      Counter64,
+        ifJnxOutPolMLowOctets       Counter64,
+        ifJnxOutPolMLowPkts         Counter64,
+        ifJnxOutPolMLow1SecRate     Counter64,
+        ifJnxOutPolMHighOctets      Counter64,
+        ifJnxOutPolMHighPkts        Counter64,
+        ifJnxOutPolMHigh1SecRate    Counter64,
+        ifJnxOutPolHighOctets       Counter64,
+        ifJnxOutPolHighPkts         Counter64,
+        ifJnxOutPolHigh1SecRate     Counter64,
+        ifJnxOutPolDropOctets       Counter64,
+        ifJnxOutPolDropPkts         Counter64,
+        ifJnxOutPolDrop1SecRate     Counter64
+
+        }
+
+    ifJnxInPolLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Low Bytes"
+    ::= { ifJnxPolEntry 1 }
+
+
+    ifJnxInPolLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Low Pkts"
+    ::= { ifJnxPolEntry 2 }
+
+
+    ifJnxInPolLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 3 }
+
+
+    ifJnxInPolMLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low Bytes"
+    ::= { ifJnxPolEntry 4 }
+
+
+    ifJnxInPolMLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low Pkts"
+    ::= { ifJnxPolEntry 5 }
+
+
+    ifJnxInPolMLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 6 }
+
+
+    ifJnxInPolMHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium High Bytes"
+    ::= { ifJnxPolEntry 7 }
+
+
+    ifJnxInPolMHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium High Pkts"
+    ::= { ifJnxPolEntry 8 }
+
+
+    ifJnxInPolMHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium High 1 Sec Rate"
+    ::= { ifJnxPolEntry 9 }
+
+
+    ifJnxInPolHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input High Bytes"
+    ::= { ifJnxPolEntry 10 }
+
+
+    ifJnxInPolHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input High Pkts"
+    ::= { ifJnxPolEntry 11 }
+
+
+    ifJnxInPolHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input High 1 Sec Rate"
+    ::= { ifJnxPolEntry 12 }
+
+    ifJnxInPolDropOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Drop Bytes"
+    ::= { ifJnxPolEntry 13 }
+
+
+    ifJnxInPolDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Drop Pkts"
+    ::= { ifJnxPolEntry 14 }
+
+
+    ifJnxInPolDrop1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Drop 1 Sec Rate"
+    ::= { ifJnxPolEntry 15 }
+
+    ifJnxOutPolLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Low Bytes"
+    ::= { ifJnxPolEntry 16 }
+
+
+    ifJnxOutPolLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Low Pkts"
+    ::= { ifJnxPolEntry 17 }
+
+
+    ifJnxOutPolLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 18 }
+
+
+    ifJnxOutPolMLowOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium Low Bytes"
+    ::= { ifJnxPolEntry 19 }
+
+
+    ifJnxOutPolMLowPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Input Medium Low Pkts"
+    ::= { ifJnxPolEntry 20 }
+
+
+    ifJnxOutPolMLow1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium Low 1 Sec Rate"
+    ::= { ifJnxPolEntry 21 }
+
+
+    ifJnxOutPolMHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium High Bytes"
+    ::= { ifJnxPolEntry 22 }
+
+
+    ifJnxOutPolMHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium High Pkts"
+    ::= { ifJnxPolEntry 23 }
+
+
+    ifJnxOutPolMHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Medium High 1 Sec Rate"
+    ::= { ifJnxPolEntry 24 }
+
+
+    ifJnxOutPolHighOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output High Bytes"
+    ::= { ifJnxPolEntry 25 }
+
+
+    ifJnxOutPolHighPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output High Pkts"
+    ::= { ifJnxPolEntry 26 }
+
+
+    ifJnxOutPolHigh1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output High 1 Sec Rate"
+    ::= { ifJnxPolEntry 27 }
+
+
+    ifJnxOutPolDropOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Drop Bytes"
+    ::= { ifJnxPolEntry 28 }
+
+    ifJnxOutPolDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Drop Pkts"
+    ::= { ifJnxPolEntry 29 }
+
+
+    ifJnxOutPolDrop1SecRate OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Logical Interface Policer Output Drop 1 Sec Rate"
+    ::= { ifJnxPolEntry 30 }
+
+END

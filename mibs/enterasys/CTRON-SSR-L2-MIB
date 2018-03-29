@@ -1,0 +1,1064 @@
+CTRON-SSR-L2-MIB DEFINITIONS ::= BEGIN
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+ 
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific schema to access SSR Layer 2 processing subsystem..
+--
+--  This module will be extended, as required.
+--
+ 
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+ 
+--  Copyright June 1998 Cabletron Systems
+ 
+
+IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Counter32, TimeTicks
+       FROM SNMPv2-SMI
+       PhysAddress  
+       FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP
+       FROM SNMPv2-CONF
+       ssrMibs 
+       FROM CTRON-SSR-SMI-MIB;
+
+l2MIB MODULE-IDENTITY
+   LAST-UPDATED
+     "9802090000Z"
+   ORGANIZATION
+     "Cabletron Systems, Inc."
+   CONTACT-INFO
+    "Cabletron Systems, Inc.
+     35 Industrial Way, P.O. Box 5005
+     Rochester, NH 03867-0505
+     (603) 332-9400
+     support@ctron.com
+     http://www.ctron.com"
+ 
+   DESCRIPTION
+     "This module defines a schema to access SSR Layer 2 processing subsystem.
+      This mib is no longer supported on ssr platforms. features of this 
+      mib now exist in standard mibs. RMON I RFC 1757 provides 
+      Layer 2 information and ctron-ssr-policy mib to program filter tables."
+
+   REVISION "9909220000Z"
+   DESCRIPTION "Firmware release 3.0 introduces full rmon I and II. this
+                enterprise mib is now obsolete."
+   ::= { ssrMibs 500 }
+ 
+
+-- The L2 Information Group
+l2Group        OBJECT IDENTIFIER ::= { ssrMibs 2 }
+   
+
+   l2LearnedEntryDiscards  OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The total number of Forwarding Database entries,
+        which have been or would have been learned, but
+        have been discarded due to a lack of space to
+        store them in the Forwarding Database.  If this
+        counter is increasing, it indicates that the
+        Forwarding Database is regularly becoming full (a
+        condition which has unpleasant performance effects
+        on the subnetwork).  If this counter has a
+        significant value but is not presently increasing,
+        it indicates that the problem has been occurring
+        but is not persistent."
+       REFERENCE
+        "RFC 1493 dot1dTp group dot1dTpLearnedEntryDiscards"
+       ::= { l2Group 1 }
+
+   l2LearnedMacEntries  OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The total number of MAC entries. The total number
+        is equal to the number of unique VLAN id and MAC
+        address pairs on the switch." 
+       ::= { l2Group 2 }
+
+   l2LearnedFlowEntries  OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The total number of Flow entries. The total number
+        is equal to the number of unique VLAN id, source MAC
+        address and destination MAC address 3-tuple on the switch." 
+       ::= { l2Group 3 }
+
+   -- The L2-Flow and Forward Database Table
+   -- This L2 table contains information on all the layer 2 
+   -- flows the switch is obsoletely processing.
+
+   l2ForwardTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF L2ForwardEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A list of L2 flow entries."
+       ::= { l2Group 4 }
+
+   l2ForwardEntry OBJECT-TYPE
+       SYNTAX      L2ForwardEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "An entry containing the L2 flow"
+       INDEX   { l2ForwardFilterId, 
+                 l2ForwardDstMacAddr, 
+                 l2ForwardSrcMacAddr,
+                 l2ForwardVlanId
+                 }
+       ::= { l2ForwardTable 1 }
+
+   L2ForwardEntry ::=
+       SEQUENCE {
+           l2ForwardFilterId     INTEGER,
+           l2ForwardDstMacAddr   PhysAddress,
+           l2ForwardSrcMacAddr   PhysAddress,
+           l2ForwardVlanId       INTEGER,
+           l2ForwardDstPort      INTEGER,
+           l2ForwardInPorts      OCTET STRING
+       }
+
+   l2ForwardFilterId  OBJECT-TYPE
+       SYNTAX      INTEGER  (0..14) 
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "A filter number which is used to get the next row from the 
+        L2 Forwarding table. A zero implies no filter. When a number
+        is used, the index(s) specified in the first GET_NEXT 
+        is used as a filter for future GET_NEXT's using the same
+        FilterId."
+       -- DEFVAL  { 0 }
+       ::= { l2ForwardEntry 1 }
+
+   l2ForwardDstMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The destination MAC address which has been learned."
+       ::= { l2ForwardEntry 2 }
+
+   l2ForwardSrcMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The source MAC address, which is present in case
+        of a Flow, that has been learned by the switch."
+       ::= { l2ForwardEntry 3 }
+
+   l2ForwardVlanId  OBJECT-TYPE
+       SYNTAX      INTEGER (0..4095)
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The VLAN the destination MAC address belongs to."
+       ::= { l2ForwardEntry 4 }
+
+   l2ForwardDstPort  OBJECT-TYPE
+       SYNTAX      INTEGER  (0..1024) 
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The physical port number in the shelf/Chassis to which the 
+        frame will be forwarded.
+        A zero implies that the frame destined to this destination
+        MAC address will be forwarded to multiple ports. This
+        implies a Multicast or unknown Unicast frame."
+        ::= { l2ForwardEntry 5 }
+
+   l2ForwardInPorts  OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..64))
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+             "The set of physical ports to which this entry is contained in
+              the L2 tables.  Each octet within the value of this 
+              object specifies a set of eight ports. 
+              The first octet specifying ports 1 through 8, 
+              the second octet specifying ports 9 through 16, etc.  
+
+              Within each octet, the least
+              significant bit represents the lowest numbered
+              port and the most significant bit represents the
+              highest numbered port.  Thus, each port of the
+              bridge is represented by a single bit within the
+              value of this object.  If that bit has a value of
+              '1' then that port is included in the set of
+              ports; the port is not included if its bit has a
+              value of '0'.  (Note that the setting of the bit
+              corresponding to the port from which a frame is
+              received is irrelevant.)  The default value of
+              this object is a string of zeroes of appropriate
+              length. The maximum number of ports/card-module 
+              is sysHwModuleNumPorts."
+       ::= { l2ForwardEntry 6 }
+
+-- The L2-Flow Priority Table
+-- This L2 table contains information on all the layer 2 
+-- flow priorities/Quality of Service.
+
+   l2PriorityTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF L2PriorityEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A list of L2 flow entries."
+       ::= { l2Group 5 }
+
+   l2PriorityEntry OBJECT-TYPE
+       SYNTAX      L2PriorityEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "An entry containing the L2 flow."
+       INDEX   { l2PriorityIndex }
+       ::= { l2PriorityTable 1 }
+
+   L2PriorityEntry ::=
+       SEQUENCE {
+           l2PriorityIndex        INTEGER,
+           l2PriorityDesc         OCTET STRING,
+           l2PriorityDstMacAddr   PhysAddress,
+           l2PrioritySrcMacAddr   PhysAddress,
+           l2PriorityVlanId       INTEGER,
+           l2PriorityInPorts      OCTET STRING,
+           l2Priority             INTEGER
+       }
+
+   l2PriorityIndex  OBJECT-TYPE
+       SYNTAX      INTEGER (0..65535) -- TODO verify this
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "A unique index into the L2 priority table."
+       ::= { l2PriorityEntry 1 }
+
+
+   l2PriorityDesc  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..25))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "A string used to identify the flow by name."
+       ::= { l2PriorityEntry 2 }
+
+   l2PriorityDstMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The destination MAC address which has been learned."
+       ::= { l2PriorityEntry 3 }
+
+   l2PrioritySrcMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The source MAC address, which is present in case
+        of a Flow, that has been learned by the switch."
+       ::= { l2PriorityEntry 4 }
+
+   l2PriorityVlanId  OBJECT-TYPE
+       SYNTAX      INTEGER (0..4095)
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The VLAN the destination MAC address belongs to."
+       ::= { l2PriorityEntry 5 }
+
+   l2PriorityInPorts  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..64))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The set of physical ports which allow this source MAC address.
+        Each octet within the value of this object specifies 
+        a set of eight ports, with the first octet specifying 
+        ports 1 through 8, the second octet specifying ports 9
+        through 16, etc.  Within each octet, the least
+        significant bit represents the lowest numbered
+        port, and the most significant bit represents the
+        highest numbered port.  Thus, each port of the
+        bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that port is included in the set of
+        ports; the port is not included if its bit has a
+        value of '0'.  (Note that the setting of the bit
+        corresponding to the port from which a frame is
+        received is irrelevant.)  The default value of
+        this object is a string of zeroes of appropriate
+        length. The maximum number of ports per Module/Card
+        is sysHwModuleNumPorts."
+       ::= { l2PriorityEntry 6 }
+
+   l2Priority  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                   low(1),
+                   medium(2),
+                   high(3),
+                   control(4)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The priority for this L2 flow. There are four 
+        priority levels: low, medium, high and control. 
+        The highest priority class is reserved for router control traffic, 
+        which leaves three classes, high, medium, and low for normal
+        data flows. Buffered traffic in higher priority classes is sent ahead 
+        of pending traffic in lower priority classes, which allows latency 
+        and throughput demands to be maintained for the higher priority traffic. 
+        To prevent low priority traffic from waiting indefinitely as higher 
+        priority traffic fills the wire, a weighted fair queuing mechanism provides 
+        adjustable minimum bandwidth guarantees at each output port, thereby ensuring 
+        that some traffic from each priority class always gets through."
+       ::= { l2PriorityEntry 7 }
+
+
+-- The L2 Filter Table
+-- This L2 table contains information on all the layer 2 
+-- address filters, static entries & address locks
+
+   l2FilterTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF L2FilterEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+               "A list of L2 filters."
+       ::= { l2Group 6 }
+
+   l2FilterEntry OBJECT-TYPE
+       SYNTAX      L2FilterEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+               "An entry containing the L2 filter."
+       INDEX   { l2FilterIndex }
+       ::= { l2FilterTable 1 }
+
+   L2FilterEntry ::=
+       SEQUENCE {
+           l2FilterIndex        INTEGER,
+           l2FilterDesc         OCTET STRING,
+           l2FilterType         INTEGER,
+           l2FilterRestrictions INTEGER,
+           l2FilterDstMacAddr   PhysAddress,
+           l2FilterSrcMacAddr   PhysAddress,
+           l2FilterVlanId       INTEGER,
+           l2FilterInPorts      OCTET STRING,
+           l2FilterOutPorts     OCTET STRING
+       }
+
+   l2FilterIndex  OBJECT-TYPE
+       SYNTAX      INTEGER (0..7) -- TODO verify this
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+         "A unique index into the table."
+       ::= { l2FilterEntry 1 }
+
+   l2FilterDesc  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..25))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+         "A string used to identify the filter by an name."
+       ::= { l2FilterEntry 2 }
+
+   l2FilterType  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                   staticEntry(1),
+                   addressFilter(2),
+                   addressLock(3)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+          "The types of filters, as explained below.
+
+           static-entry
+ 
+               Based on the restrictions and the presence of
+               source, destination MAC address they can be of 
+               three types :
+
+               source-static-entry - All frames with a source
+               address equal to srcMAC, coming through any of 
+               the inPorts will be allowed/disallowed to go 
+               to any port that is a member of the outPorts
+               list.
+
+               destination-static-entry - All frames with a 
+               destination address equal to dstMAC, coming 
+               through any of the inPorts  will be allowed/
+               disallowed/forced to go to any port that is a 
+               member of the outPorts list.
+
+               flow-static-entry - All frames with a source
+               address equal to srcMAC and a destination address
+               equal to dstMAC, coming through any of the inPorts 
+               list will be allowed/disallowed to go to any port 
+               that is a member of the outPorts list.
+
+           address-filter
+ 
+               Based on the restrictions and the presence of
+               source, destination MAC address they can be of 
+               three types :
+
+               source-address-filter - All frames with a source
+               address equal to srcMAC, coming through any of 
+               the inPorts will be filtered out.
+
+               destination-address-filter - All frames with a 
+               destination address equal to dstMAC, coming through 
+               any of the inPorts will be filtered out.
+
+               flow-filter - All frames with a source address equal 
+               to srcMAC and a destination address equal to dstMAC, 
+               coming through any of the inPorts list will be 
+               filtered out.
+
+           address-lock
+
+               This locks a source address to a port. It allows 
+               learning of srcMAC addresses only on any of the ports
+               in inPorts."
+       ::= { l2FilterEntry 3 }
+
+   l2FilterRestrictions  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                   allow(1),
+                   disallow(2),
+                   force(3),
+                   none(4)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+          "The restrictions which are applied when the filterType 
+          is static-entry."
+       ::= { l2FilterEntry 4 }
+
+   l2FilterSrcMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+               "The source MAC address, which is present in case
+                of a Flow, that has been learned by the switch."
+       ::= { l2FilterEntry 5 }
+
+   l2FilterDstMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+               "The destination MAC address which has been learned."
+       ::= { l2FilterEntry 6 }
+
+   l2FilterVlanId  OBJECT-TYPE
+       SYNTAX      INTEGER (0..4095)
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+               "The VLAN the destination MAC address belongs to."
+       ::= { l2FilterEntry 7 }
+
+   l2FilterInPorts  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..64))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The set of physical ports which allow this source MAC address.
+        Each octet within the value of this object specifies 
+        a set of eight ports, with the first octet specifying 
+        ports 1 through 8, the second octet specifying ports 9
+        through 16, etc.  Within each octet, the least
+        significant bit represents the lowest numbered
+        port, and the most significant bit represents the
+        highest numbered port.  Thus, each port of the
+        bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that port is included in the set of
+        ports; the port is not included if its bit has a
+        value of '0'.  (Note that the setting of the bit
+        corresponding to the port from which a frame is
+        received is irrelevant.)  The default value of
+        this object is a string of zeroes of appropriate
+        length.  The maximum number of ports/card-module
+        is sysHwModuleNumPorts."
+       ::= { l2FilterEntry 8 }
+
+   l2FilterOutPorts  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..64))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The set of ports which allow this destination MAC address.
+        Each octet within the value of this object specifies 
+        a set of eight ports, with the first octet specifying 
+        ports 1 through 8, the second octet specifying ports 9
+        through 16, etc.  Within each octet, the most
+        significant bit represents the lowest numbered
+        port, and the least significant bit represents the
+        highest numbered port.  Thus, each port of the
+        bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that port is included in the set of
+        ports; the port is not included if its bit has a
+        value of '0'.  (Note that the setting of the bit
+        corresponding to the port from which a frame is
+        received is irrelevant.)  The default value of
+        this object is a string of zeroes of appropriate
+        length."
+       ::= { l2FilterEntry 9 }
+
+   -- The L2 Port Security Table
+   -- This L2 table contains information on all the layer 2 
+   -- port security filters.
+
+   l2PortSecurityTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF L2PortSecurityEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A list of L2 port security filters."
+       ::= { l2Group 7 }
+
+   l2PortSecurityEntry OBJECT-TYPE
+       SYNTAX      L2PortSecurityEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "An entry containing the L2 filter."
+       INDEX   { l2PortSecurityIndex }
+       ::= { l2PortSecurityTable 1 }
+
+   L2PortSecurityEntry ::=
+       SEQUENCE {
+           l2PortSecurityIndex        INTEGER,
+           l2PortSecurityDesc         OCTET STRING,
+           l2PortSecurityType         INTEGER,
+           l2PortSecurityVlanId       INTEGER,
+           l2PortSecurityInPorts      OCTET STRING
+       }
+
+   l2PortSecurityIndex  OBJECT-TYPE
+       SYNTAX      INTEGER (0..65535) -- TODO: verify this
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "A unique index into the table."
+       ::= { l2PortSecurityEntry 1 }
+   
+   l2PortSecurityDesc  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..25))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "A string used to identify the filter by a name."
+       ::= { l2PortSecurityEntry 2 }
+
+   l2PortSecurityType  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                   sourceSecure(1),
+                   destinationSecure(2)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The security filters are of two types :
+                
+                source-secure 
+                   For all the ports in inPorts forward only those
+                   frames that match source-static-entry filter from
+                   the l2FilterTable.
+                
+                destination-secure 
+                   For all the ports in inPorts forward only those
+                   frames that match destination-static-entry filter from
+                   the l2FilterTable."
+       ::= { l2PortSecurityEntry 3 }
+
+   l2PortSecurityVlanId  OBJECT-TYPE
+       SYNTAX      INTEGER (0..4095)
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The VLAN the destination MAC address belongs to."
+       ::= { l2PortSecurityEntry 4 }
+
+   l2PortSecurityInPorts  OBJECT-TYPE
+       SYNTAX      OCTET STRING  (SIZE (0..64))
+       MAX-ACCESS  read-write
+       STATUS      obsolete
+       DESCRIPTION
+        "The set of physical ports which allow this source MAC address.
+        Each octet within the value of this object specifies 
+        a set of eight ports, with the first octet specifying 
+        ports 1 through 8, the second octet specifying ports 9
+        through 16, etc.  Within each octet, the least
+        significant bit represents the lowest numbered
+        port, and the most significant bit represents the
+        highest numbered port.  Thus, each port of the
+        bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that port is included in the set of
+        ports; the port is not included if its bit has a
+        value of '0'.  (Note that the setting of the bit
+        corresponding to the port from which a frame is
+        received is irrelevant.)  The default value of
+        this object is a string of zeroes of appropriate
+        length."
+       ::= { l2PortSecurityEntry 5 }
+
+   -- Port Table
+
+   l2PortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF L2PortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A table that contains information about every
+        physical port that is associated with this transparent
+        bridge."
+       ::= { l2Group 8 }
+
+   l2PortEntry OBJECT-TYPE
+       SYNTAX      L2PortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A list of information for each physical port."
+       INDEX   { l2Port }
+       ::= { l2PortTable 1 }
+
+   L2PortEntry ::=
+       SEQUENCE {
+           l2Port                     INTEGER,
+           l2PortAgingStatus          INTEGER,
+           l2PortAgingTime            INTEGER,
+           l2PortDemandAgeHiBound     INTEGER,
+           l2PortDemandAgeLowBound    INTEGER,
+           l2PortDemandAgeCount       Counter32,
+           l2PortLearnedEntryDiscards Counter32,
+           l2PortSrcEntries           Counter32,
+           l2PortDstEntries           Counter32,
+           l2PortMgmtEntries          Counter32,
+           l2PortMaxInfo              INTEGER,
+           l2PortInFrames             Counter32,
+           l2PortOutFrames            Counter32
+       }
+   
+   l2Port OBJECT-TYPE
+           SYNTAX  INTEGER (1..65535)
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+           DESCRIPTION
+        "The port number of the port for which this entry
+        contains Transparent bridging management information."
+       ::= { l2PortEntry 1 }
+ 
+   l2PortAgingStatus OBJECT-TYPE
+           SYNTAX  INTEGER { 
+                  enabled(1), 
+                  disabled (2) 
+               }
+           MAX-ACCESS  read-write
+           STATUS  obsolete
+           DESCRIPTION
+        "Whether aging is enabled or not on this port."
+       ::= { l2PortEntry 2 }
+ 
+   l2PortAgingTime OBJECT-TYPE
+           SYNTAX  INTEGER (5..1000000)
+           MAX-ACCESS  read-write
+           STATUS  obsolete
+       DESCRIPTION
+        "The time-out period in seconds for aging out
+        dynamically learned forwarding information.
+        802.1D-1990 recommends a default of 300 seconds."
+       REFERENCE
+           "IEEE 802.1D-1990: Section 6.7.1.1.3"
+       ::= { l2PortEntry 3 }
+ 
+   l2PortDemandAgeHiBound OBJECT-TYPE
+           SYNTAX  INTEGER (0..100)
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "When the number of MAC entries on a physical port's L2 table reaches
+        the l2PortDemandAgeHiBound (95% full), a number of MAC entries
+        based on l2PortDemandAgeLowBound percentage will be removed 
+        (aged-out) from the table."
+       ::= { l2PortEntry 4 }
+ 
+   l2PortDemandAgeLowBound OBJECT-TYPE
+           SYNTAX  INTEGER (0..100)
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "The l2PortDemandAgeLowBound value determines how many MAC
+        entries need to be aged-out. See l2PortDemandAgeHiBound. Default
+        value is 85%.
+        Example: if - L2 table capacity        = 10,000 entries 
+                    - l2PortDemandAgeHiBound   = 95%
+                    - l2PortDemandAgeLowBound  = 85%
+
+    When the L2 table reaches 95% capacity (9500 MAC entries), 
+    10% of the entries will be aged-out."
+       ::= { l2PortEntry 5 }
+
+   l2PortDemandAgeCount OBJECT-TYPE
+           SYNTAX  Counter32 
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "The number of times demand aging has taken
+        place on this physical port."
+       ::= { l2PortEntry 6 }
+
+   l2PortLearnedEntryDiscards OBJECT-TYPE
+           SYNTAX  Counter32 
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "The total number of L2 Port table entries,
+        which have been or would have been learned, but
+        have been discarded due to a lack of space to
+        store them in the Forwarding Database.  If this
+        counter is increasing, it indicates that the
+        L2 port table  is regularly becoming full (a
+        condition which has unpleasant performance effects
+        on the subnetwork).  If this counter has a
+        significant value but is not presently increasing,
+        it indicates that the problem has been occurring
+        but is not persistent."
+       ::= { l2PortEntry 7 }
+
+   l2PortSrcEntries OBJECT-TYPE
+           SYNTAX  Counter32 
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "The number of MAC addresses/Flow entries that
+        reside on this ports L2 table as a source (i.e. for
+        a flow entry the source and destination MAC address's
+        lie on the same LAN segment)."
+        ::= { l2PortEntry 8 }
+
+   l2PortDstEntries OBJECT-TYPE
+           SYNTAX  Counter32 
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "The number of MAC addresses/Flow entries that
+        reside on this ports L2 table as a destination (i.e. for
+        a flow entry the destination MAC address was not learned
+        as a source)."
+       ::= { l2PortEntry 9 }
+
+   l2PortMgmtEntries OBJECT-TYPE
+           SYNTAX  Counter32 
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+               "The number of user configured entries, including
+               filters, bridge management addresses etc."
+       ::= { l2PortEntry 10 }
+
+   l2PortMaxInfo OBJECT-TYPE
+           SYNTAX  INTEGER  (0..65535) 
+           MAX-ACCESS  read-only
+           STATUS  obsolete
+       DESCRIPTION
+        "The maximum size of the info/data (non-MAC) field that
+        this port will receive or transmit. See RFC 1493
+        for similar OID called dot1dTpPortMaxInfo."
+       ::= { l2PortEntry 11 }
+
+   l2PortInFrames OBJECT-TYPE
+        SYNTAX  Counter32 
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+        "The number of frames that have been received by
+        this port from its segment. Note that a frame
+        received on the interface corresponding to this
+        port is only counted by this object if and only if
+        it is for a protocol being processed by the local
+        bridging function, including bridge management
+        frames."
+        REFERENCE
+                "IEEE 802.1D-1990: Section 6.6.1.1.3"
+       ::= { l2PortEntry 12 }
+
+   l2PortOutFrames OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+        "The number of frames that have been transmitted
+        by this port to its segment.  Note that a frame
+        transmitted on the interface corresponding to this
+        port is only counted by this object if and only if
+        it is for a protocol being processed by the local
+        bridging function, including bridge management
+        frames."
+        REFERENCE
+                "IEEE 802.1D-1990: Section 6.6.1.1.3"
+       ::= { l2PortEntry 13 }
+
+-- Port L2 Forward Table
+
+   l2PortForwardTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF L2PortForwardEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A table that contains information about the
+        Forward/Flow Table that is associated with this 
+        port."
+       ::= { l2Group 9 }
+
+   l2PortForwardEntry OBJECT-TYPE
+       SYNTAX      L2PortForwardEntry
+       MAX-ACCESS  not-accessible
+       STATUS      obsolete
+       DESCRIPTION
+        "A list of Flow/Forward information for this port."
+       INDEX   { l2PortForwardPort, l2PortForwardIndex }
+       ::= { l2PortForwardTable 1 }
+
+   L2PortForwardEntry ::=
+       SEQUENCE {
+           l2PortForwardPort                   INTEGER,
+           l2PortForwardIndex                  INTEGER,
+           l2PortForwardDstMacAddr             PhysAddress,
+           l2PortForwardSrcMacAddr             PhysAddress,
+           l2PortForwardVlanId                 INTEGER,
+           l2PortForwardDstPort                INTEGER,
+           l2PortForwardStatus                 INTEGER,
+           l2PortForwardLastDetectedTime       TimeTicks 
+       }
+   
+   l2PortForwardPort OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+        "The port number of the port for which this entry
+        contains Transparent bridging management
+        information."
+       ::= { l2PortForwardEntry 1 }
+ 
+   l2PortForwardIndex  OBJECT-TYPE
+       SYNTAX      INTEGER (0..65535)
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "A unique index into the Flow/Forward database table."
+       ::= { l2PortForwardEntry 2 }
+
+   l2PortForwardDstMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The destination MAC address which has been learned."
+       ::= { l2PortForwardEntry 3 }
+
+   l2PortForwardSrcMacAddr  OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The source MAC address, which is present in case
+        of a Flow, that has been learned by the switch."
+       ::= { l2PortForwardEntry 4 }
+
+   l2PortForwardVlanId  OBJECT-TYPE
+       SYNTAX      INTEGER (0..4095)
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The VLAN the destination MAC address belongs to."
+       ::= { l2PortForwardEntry 5 }
+
+   l2PortForwardDstPort  OBJECT-TYPE
+       SYNTAX      INTEGER  (0..1024) 
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The physical port number to which the frame will be forwarded.
+        A zero implies that the frame destined to this destination
+        MAC address will be forwarded to multiple ports. This
+        implies a Multicast or unknown Unicast frame."
+       ::= { l2PortForwardEntry 6 }
+
+   l2PortForwardStatus  OBJECT-TYPE
+       SYNTAX      INTEGER { 
+                          other(1),
+                          invalid(2),
+                          learned(3),
+                          self(4),
+                          mgmt(5)
+                      }
+ 
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+                     "The status of this entry.  The meanings of the
+                      values are:
+
+                        other(1)   : none of the following.  This would
+                                     include the case where some other
+                                     MIB object (not the corresponding
+                                     instance of dot1dTpFdbPort, nor an
+                                     entry in the dot1dStaticTable) is
+                                     being used to determine if and how
+                                     frames addressed to the value of
+                                     the corresponding instance of
+                                     dot1dTpFdbAddress are being
+                                     forwarded.
+
+                        invalid(2) : this entry is not longer valid
+                                     (e.g., it was learned but has since
+                                     aged-out), but has not yet been
+                                     flushed from the table.
+
+                        learned(3) : the value of the corresponding
+                                     instance of dot1dTpFdbPort was
+                                     learned, and is being used.
+
+                        self(4)    : the value of the corresponding
+                                     instance of dot1dTpFdbAddress
+                                     represents one of the bridge's
+                                     addresses.  The corresponding
+                                     instance of dot1dTpFdbPort
+                                     indicates which of the bridge's
+                                     ports has this address.
+
+                        mgmt(5)    : the value of the corresponding
+                                     instance of dot1dTpFdbAddress is
+                                     also the value of an existing
+                                     instance of dot1dStaticAddress."
+       ::= { l2PortForwardEntry 7 }
+
+   l2PortForwardLastDetectedTime  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      obsolete
+       DESCRIPTION
+        "The time (in hundredths of a second) since the
+        last time this MAC address was detected by this
+        port."
+       ::= { l2PortForwardEntry 8 }
+
+
+
+-- ### Compliance ###
+ 
+l2Conformance OBJECT IDENTIFIER ::= { l2MIB 2 }
+l2Compliances OBJECT IDENTIFIER ::= { l2Conformance 1 }
+l2Groups OBJECT IDENTIFIER ::= { l2Conformance 2 }
+ 
+l2ComplianceV10 MODULE-COMPLIANCE
+    STATUS obsolete
+    DESCRIPTION
+            "The compliance statement for the SSR-L2-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { l2ConfGroupV10 }
+    ::= { l2ConfGroupV10 1 }
+ 
+l2ConfGroupV10  OBJECT-GROUP
+   OBJECTS {
+        l2LearnedEntryDiscards,
+        l2LearnedMacEntries,
+        l2LearnedFlowEntries,
+        l2ForwardFilterId,
+        l2ForwardDstMacAddr,
+        l2ForwardSrcMacAddr,
+        l2ForwardVlanId,
+        l2ForwardDstPort,
+        l2ForwardInPorts,
+        l2PriorityIndex,
+        l2PriorityDesc,
+        l2PriorityDstMacAddr,
+        l2PrioritySrcMacAddr,
+        l2PriorityVlanId,
+        l2PriorityInPorts,
+        l2Priority,
+        l2FilterIndex,
+        l2FilterDesc,
+        l2FilterType,
+        l2FilterRestrictions,
+        l2FilterSrcMacAddr,
+        l2FilterDstMacAddr,
+        l2FilterVlanId,
+        l2FilterInPorts,
+        l2FilterOutPorts,
+        l2PortSecurityIndex,
+        l2PortSecurityDesc,
+        l2PortSecurityType,
+        l2PortSecurityVlanId,
+        l2PortSecurityInPorts,
+        l2Port,
+        l2PortAgingStatus,
+        l2PortAgingTime,
+        l2PortDemandAgeHiBound,
+        l2PortDemandAgeLowBound,
+        l2PortDemandAgeCount,
+        l2PortLearnedEntryDiscards,
+        l2PortSrcEntries,
+        l2PortDstEntries,
+        l2PortMgmtEntries,
+        l2PortMaxInfo,
+        l2PortInFrames,
+        l2PortOutFrames,
+        l2PortForwardPort,
+        l2PortForwardIndex,
+        l2PortForwardDstMacAddr,
+        l2PortForwardSrcMacAddr,
+        l2PortForwardVlanId,
+        l2PortForwardDstPort,
+        l2PortForwardStatus,
+        l2PortForwardLastDetectedTime
+}
+STATUS obsolete
+DESCRIPTION
+  "A set of managed objects that make up version 1.0 of the SSR Layer 2 mib."
+   ::= { l2Groups 1 }
+
+END

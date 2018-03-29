@@ -1,0 +1,14 @@
+os: nitro
+text: 'McAfee SIEM Nitro'
+type: appliance
+icon: mcafee
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.23128.1000.1.1
+        - .1.3.6.1.4.1.23128.1000.3.1
+        - .1.3.6.1.4.1.23128.1000.7.1
+        - .1.3.6.1.4.1.23128.1000.11.1

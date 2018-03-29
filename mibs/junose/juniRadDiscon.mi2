@@ -1,0 +1,331 @@
+
+-- *****************************************************************************
+-- Juniper-RADIUS-Disconnect-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   RADIUS Disconnect MIB
+--
+-- Copyright 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-RADIUS-Disconnect-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniRadiusDisconnectMIB  MODULE-IDENTITY
+     LAST-UPDATED "200406091357Z"  -- 09-Jun-04 09:57 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The RADIUS Disconnect MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200406091357Z"  -- 09-Jun-04 09:57 AM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Obsoleted the MIB."
+    REVISION    "200301132050Z"  -- 13-Jan-03 03:50 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Initial version of this MIB module, derived from IETF Internet Drafts
+        of RADIUS Disconnect."
+    ::= { juniMibs 67 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No textual conventions are defined in this MIB
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusDisconnectObjects  OBJECT IDENTIFIER
+    ::= { juniRadiusDisconnectMIB 1 }
+juniRadiusDisconnect  OBJECT IDENTIFIER
+    ::= { juniRadiusDisconnectObjects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for RADIUS Disconnect
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusDisconnectInvalidClientAddresses  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS disconnect packets received from unknown
+        addresses."
+    ::= { juniRadiusDisconnect 1 }
+
+--
+-- Statistics for RADIUS disconnsct clients
+--
+juniRadiusDisconnectClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRadiusDisconnectClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS authentication servers with
+        which the disconnect shares a secret."
+    ::= { juniRadiusDisconnect 2 }
+
+juniRadiusDisconnectClientEntry  OBJECT-TYPE
+    SYNTAX      JuniRadiusDisconnectClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS disconnect client with
+        which the server shares a secret."
+    INDEX     { juniRadiusDisconnectClientAddress }
+    ::= { juniRadiusDisconnectClientTable 1 }
+
+JuniRadiusDisconnectClientEntry ::= SEQUENCE {
+    juniRadiusDisconnectClientAddress       IpAddress,
+    juniRadiusDisconnectClientPortNumber    Integer32,
+    juniRadiusDisconnectRequests            Counter32,
+    juniRadiusDisconnectAccepts             Counter32,
+    juniRadiusDisconnectRejects             Counter32,
+    juniRadiusDisconnectNoSecret            Counter32,
+    juniRadiusDisconnectNoSessionIds        Counter32,
+    juniRadiusDisconnectBadAuthenticators   Counter32,
+    juniRadiusDisconnectUnknownTypes        Counter32,
+    juniRadiusDisconnectPacketsDropped      Counter32 }
+
+juniRadiusDisconnectClientAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the RADIUS client referred to in this table entry.  A
+        value of 0.0.0.0 indicates this entry is not in use."
+    ::= { juniRadiusDisconnectClientEntry 1 }
+
+juniRadiusDisconnectClientPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The UDP port the server is listening on to recieve disconnect requests
+        from this client."
+    ::= { juniRadiusDisconnectClientEntry 2 }
+
+--
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Requests + UnknownTypes
+--
+-- TotalIncomingPackets - NoSecret - BadAuthenticators - NoSessionIds
+-- UnknownPackets - PacketsDropped = Successfully received
+--
+juniRadiusDisconnectRequests  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS Disconnect packets received from this client."
+    ::= { juniRadiusDisconnectClientEntry 3 }
+
+juniRadiusDisconnectAccepts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS Disconnects that were succesful."
+    ::= { juniRadiusDisconnectClientEntry 4 }
+
+juniRadiusDisconnectRejects  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS Disconnects not successful."
+    ::= { juniRadiusDisconnectClientEntry 5 }
+
+juniRadiusDisconnectNoSecret  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS Disconnect requests recieved from this client
+        while no secret is set."
+    ::= { juniRadiusDisconnectClientEntry 6 }
+
+juniRadiusDisconnectNoSessionIds  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS Disconnect requests recieved from this client with
+        no session-id present."
+    ::= { juniRadiusDisconnectClientEntry 7 }
+
+juniRadiusDisconnectBadAuthenticators  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS disconnect packets containing invalid
+        authenticators received from this client."
+    ::= { juniRadiusDisconnectClientEntry 8 }
+
+juniRadiusDisconnectUnknownTypes  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS packets of unknown type which were received from
+        this client on the authentication port."
+    ::= { juniRadiusDisconnectClientEntry  9 }
+
+juniRadiusDisconnectPacketsDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of RADIUS packets of which were received from this client on
+        the authentication port and dropped for some other reason."
+    ::= { juniRadiusDisconnectClientEntry  10 }
+
+
+--
+-- Configuration of RADIUS disconnect clients
+--
+juniRadiusDisconnectCfgClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRadiusDisconnectCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS disconnect clients with which
+        the server shares a secret."
+    ::= { juniRadiusDisconnect 3 }
+
+juniRadiusDisconnectCfgClientEntry  OBJECT-TYPE
+    SYNTAX      JuniRadiusDisconnectCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS authentication server
+        with which the disconnect shares a secret."
+    INDEX     { juniRadiusDisconnectCfgClientAddress }
+    ::= { juniRadiusDisconnectCfgClientTable 1 }
+
+JuniRadiusDisconnectCfgClientEntry ::= SEQUENCE {
+    juniRadiusDisconnectCfgClientAddress        IpAddress,
+    juniRadiusDisconnectCfgClientPortNumber     Integer32,
+    juniRadiusDisconnectCfgKey                  DisplayString,
+    juniRadiusDisconnectCfgRowStatus            RowStatus }
+
+juniRadiusDisconnectCfgClientAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the RADIUS disconnect client referred to in this
+        table entry."
+    ::= { juniRadiusDisconnectCfgClientEntry 1 }
+
+juniRadiusDisconnectCfgClientPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The UDP port the server is listening on to recieve disconnect requests
+        from this client."
+    DEFVAL    { 1700 }
+    ::= { juniRadiusDisconnectCfgClientEntry 2 }
+
+juniRadiusDisconnectCfgKey  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The secret (RADIUS authenticator) used by the serevr during exchanges
+        with this client.  The default is a zero-length string, indicating no
+        authenticator is used."
+    DEFVAL    { ''H }
+    ::= { juniRadiusDisconnectCfgClientEntry 3 }
+
+juniRadiusDisconnectCfgRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniRadiusDisconnectCfgClientEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniRadiusDisconnectTrapControl  OBJECT IDENTIFIER
+--     ::= { juniRadiusDisconnectMIB 2 }
+-- juniRadiusDisconnectTraps  OBJECT IDENTIFIER
+--     ::= { juniRadiusDisconnectMIB 3 }
+-- juniRadiusDisconnectTrapPrefix  OBJECT IDENTIFIER
+--     ::= { juniRadiusDisconnectTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusDisconnectMIBConformance  OBJECT IDENTIFIER
+    ::= { juniRadiusDisconnectMIB 2 }
+juniRadiusDisconnectMIBCompliances  OBJECT IDENTIFIER
+    ::= { juniRadiusDisconnectMIBConformance 1 }
+juniRadiusDisconnectMIBGroups  OBJECT IDENTIFIER
+    ::= { juniRadiusDisconnectMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniRadiusAuthDisconnectCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        RADIUS Disconnect MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRadiusDisconnectGroup }
+    ::= { juniRadiusDisconnectMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+juniRadiusDisconnectGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRadiusDisconnectInvalidClientAddresses,
+
+        juniRadiusDisconnectClientPortNumber,
+        juniRadiusDisconnectRequests,
+        juniRadiusDisconnectAccepts,
+        juniRadiusDisconnectRejects,
+        juniRadiusDisconnectNoSecret,
+        juniRadiusDisconnectNoSessionIds,
+        juniRadiusDisconnectBadAuthenticators,
+        juniRadiusDisconnectUnknownTypes,
+        juniRadiusDisconnectPacketsDropped,
+
+        juniRadiusDisconnectCfgClientPortNumber,
+        juniRadiusDisconnectCfgKey,
+        juniRadiusDisconnectCfgRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "The basic collection of objects providing management of RADIUS
+        Disconnect."
+    ::= { juniRadiusDisconnectMIBGroups 1 }
+
+END

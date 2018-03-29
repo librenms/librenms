@@ -1,0 +1,265 @@
+-- *****************************************************************
+-- CISCO-IMAGE-TC.my
+--
+-- January 2005, Adithya R Sesani
+--
+-- Copyright (c) 2004-2005 by cisco Systems, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+CISCO-IMAGE-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        ciscoMgmt
+                FROM CISCO-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+ciscoImageTc   MODULE-IDENTITY
+        LAST-UPDATED    "200501120000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO
+                        "Cisco Systems
+                        Customer Service
+
+                        Postal: 170 W Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                        Tel: +1 800 553-NETS
+
+                        E-mail: cs-core-mibs@cisco.com"
+        DESCRIPTION
+                "This MIB module defines the textual conventions 
+                 used in the enhanced image MIB.
+
+                 Glossary:
+
+                 Base Image 
+                      Essential part of the operating system,
+                      which forms base functionality on top of 
+                      which patches can be added. 
+
+                 MBI (Minimum bootable image) 
+                      A small image which contains the smallest 
+                      possible amount of functionality required to 
+                      bootstrap and load a full image.  This image 
+                      typically contains the kernel, the file system
+                      drivers, and some hardware initialization code.
+                      It is executed at boot-up, and initializes just
+                      enough to access the rest of the code, and 
+                      run it.
+
+                 Modular operating system 
+                      An operating system that exhibits runtime 
+                      modularity characteristics, such as multiple 
+                      address spaces, fault isolation between 
+                      processes, and modularity delivery and 
+                      replacement of image components.
+
+                 Patch/Package/SMU (software maintenance upgrade)
+                      A modular replacement for some piece of on-box 
+                      content, such as a binary shared object, or a 
+                      text file.  This entity is meant to replace or 
+                      augment something that is already part of the 
+                      base image.
+
+                 Composite package 
+                      Group of packages delivered as a bundle.  It is
+                      meant to be loaded on MBI.
+
+                 Script
+                      A non-binary piece of on-box content, typically
+                      a TCL script for use by the TCL interpreter, or
+                      some other form of interpreted router content.
+
+                 Installable 
+                      An installable can be a patch, package, composite
+                      package, SMU or script.  It is a piece of 
+                      software which can be loaded on to the base 
+                      image on a system.
+                "
+        REVISION "200501120000Z"
+        DESCRIPTION
+                "Initial draft version."
+        ::= { ciscoMgmt 455 }
+
+
+CeImageInstallableStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Current state of the installable :
+
+                                |
+                                | install
+                                |
+                                \/
+                        +-----------------+
+                        | 'pendingInstall'|
+                        +-----------------+
+                                |          
+                                | activate
+                                |
+                                \/   (needs reload)
+                      -----------------------
+                     |                       |
+                     |                       |
+                     |                       \/
+                     |            +----------------------+
+                     |            |'installPendingReload'|
+                     |            +----------------------+
+                     |                       |
+                     \/                      |
+                 +--------+                  \/
+                 |'active'|  <----------------
+                 +--------+          (reload)
+                     |
+                     |
+                     |
+                     | rollback
+                     |
+                     \/
+              +----------------+
+              |'pendingRemoval'|
+              +----------------+
+                     |
+                     | activate
+                     |
+                     \/    (needs reload)
+             ---------------------
+             |                   |
+             |                   |
+             \/                  \/
+                       +----------------------+
+          (removed)    |'removedPendingReload'|
+                       +----------------------+
+                                 |
+                                 | (reload)
+                                 |
+                              (removed)
+
+
+         'active'               Installable is active in the system.
+                                It has been activated and currently
+                                is running in the system.
+
+         'pendingInstall'       Installable is installed on the system,
+                                but it needs to be activated by issuing
+                                activate command before it becomes
+                                active on the system.
+
+         'pendingRemoval'       Rollback command has been issued on the
+                                installable to remove it from the 
+                                system, but it is not yet removed from
+                                the system.  For the rollback to take 
+                                effect and remove the installable from 
+                                the system, it has to be confirmed with
+                                activate command.
+
+         'installPendingReload' Installable is activated, but is not yet
+                                running on the system because system
+                                needs a reload to run this installable.
+                                On the next reload, it will become 
+                                'active'.
+
+         'removedPendingReload' The removal of this installable has been
+                                committed, but it has not yet taken 
+                                effect.  This typically means that it 
+                                is pending a reload, so it is not 
+                                actually removed yet.  On the next 
+                                reload this installable is removed 
+                                completely from the system.
+
+         'installPendingReloadPendingRemoval' 
+                                Installable is both pending a reload 
+                                and also pending removal. It means 
+                                installable has been installed but it
+                                needs reload, before reload is done
+                                installable is removed. If an activate
+                                is done on the installable both the 
+                                conditions cancel each other and 
+                                installable will become 'active'. If a
+                                reload is done then installable will 
+                                go into 'pendingReload' state.
+
+         'removedPendingReloadPendingInstall' 
+                                Installable is both pending a reload 
+                                and also pending install. It means 
+                                installable has been removed but it
+                                needs reload, before reload is done
+                                installable is installed again. If 
+                                an activate is done on the 
+                                installable both the conditions 
+                                cancel each other and installable 
+                                will become 'active'. If a reload is 
+                                done then installable will go into 
+                                'pendingInstall' state.
+
+         'pruned'               Installable is in pruned state. When a
+                                tag is removed from the system and a 
+                                installable under the tag is not in 
+                                running state it is put in pruned state.
+                                This represents a temporary state and 
+                                the installable will be removed from 
+                                the system.
+
+         'inactive'             Loaded but is not currently active.
+        "
+    SYNTAX      INTEGER { 
+                    active(1), 
+                    pendingInstall(2), 
+                    pendingRemoval(3), 
+                    installPendingReload(4), 
+                    removedPendingReload(5), 
+                    installPendingReloadPendingRemoval(6),
+                    removedPendingReloadPendingInstall(7),
+                    pruned(8), 
+                    inactive(9)
+                }
+
+CeImageInstallableType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of software.  Modular Operating Systems can have
+         different type of software loaded like base image or 
+         minimum bootable image(MBI), a patch, a package or a 
+         script.  This TC will describe what type of software 
+         is loaded.
+
+         'base'
+            Base image or minimum bootable image
+
+         'patch'
+            Piece of software which can be loaded on to base 
+            image, usually to fix bugs in base image
+
+         'script'
+            A user written program which can be loaded on the base
+            image, usually to monitor and notify system activities
+
+         'package'
+            Piece of software which can be loaded on minimum bootable
+            image, used by some operating systems to provide new 
+            features.
+
+         'compositePackage'  
+            Collection of Packages bundled together
+
+         'softwareMaintenanceUpgrade'  
+             SMU, Same as Patch used to provide point fixes 
+             for bugs.
+        "
+
+    SYNTAX      INTEGER { 
+                    base(1),
+                    patch(2), 
+                    script(3),
+                    package(4),
+                    compositePackage(5),
+                    softwareMaintenanceUpgrade(6)
+                }
+
+END

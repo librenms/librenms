@@ -1,0 +1,520 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-ZD-AP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusZDWLANModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusZDAPMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus ZD WLAN Configuration mib"
+    ::= { ruckusZDWLANModule 4 }
+
+ruckusZDAPObjects OBJECT IDENTIFIER     ::= { ruckusZDAPMIB 1 }
+
+ruckusZDAPConfig OBJECT IDENTIFIER    ::= { ruckusZDAPObjects 1 }
+
+
+ruckusZDAPConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDAPConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD AP table."
+    ::= { ruckusZDAPConfig 1 }
+
+ruckusZDAPConfigEntry OBJECT-TYPE
+    SYNTAX  RuckusZDAPConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies a ZoneDirector AP configuration per entry."
+    INDEX {
+        ruckusZDAPConfigID }
+    ::= { ruckusZDAPConfigTable 1 }
+
+RuckusZDAPConfigEntry ::= SEQUENCE {
+  ruckusZDAPConfigID                        INTEGER,
+  ruckusZDAPConfigMacAddress                MacAddress,
+  ruckusZDAPConfigAPModel                   OCTET STRING,
+  ruckusZDAPConfigDeviceName                OCTET STRING,
+  ruckusZDAPConfigDescription               OCTET STRING,
+  ruckusZDAPConfigLocation                  OCTET STRING, 
+  ruckusZDAPConfigGpsLatitude               OCTET STRING,
+  ruckusZDAPConfigGpsLongitude              OCTET STRING,
+
+  ruckusZDAPConfigIPVersion                 INTEGER,
+  ruckusZDAPConfigIpAddressSettingMode      INTEGER,
+  ruckusZDAPConfigIpAddress                 IpAddress,
+  ruckusZDAPConfigIpAddressMask             IpAddress,
+  ruckusZDAPConfigGatewayIpAddress          IpAddress,
+  ruckusZDAPConfigPrimaryDnsIpAddress       IpAddress,
+  ruckusZDAPConfigSecondaryDnsIpAddress     IpAddress,
+  
+  ruckusZDAPConfigIpV6AddressSettingMode    INTEGER,
+  ruckusZDAPConfigIpV6Address               OCTET STRING,
+  ruckusZDAPConfigIpV6PrefixLen             INTEGER,
+  ruckusZDAPConfigGatewayIpV6Address        OCTET STRING,
+  ruckusZDAPConfigPrimaryDnsIpV6Address     OCTET STRING,
+  ruckusZDAPConfigSecondaryDnsV6IpAddress   OCTET STRING,
+
+  ruckusZDAPConfigRadioType                 INTEGER, 
+
+  ruckusZDAPConfigRadioChannel24            Integer32,
+  ruckusZDAPConfigRadioTxPowerLevel24       INTEGER,
+  ruckusZDAPConfigRadioWlanGroup24          OCTET STRING,
+  ruckusZDAPConfigRadioEnableWlanService24  INTEGER,
+
+  ruckusZDAPConfigRadioChannel5             Integer32,
+  ruckusZDAPConfigRadioTxPowerLevel5        INTEGER,
+  ruckusZDAPConfigRadioWlanGroup5           OCTET STRING,
+  ruckusZDAPConfigRadioEnableWlanService5   INTEGER,
+ 
+  ruckusZDAPConfigMeshConfigurationMode     INTEGER,
+  ruckusZDAPConfigUplinkSelectionMode       INTEGER,
+  ruckusZDAPConfigApproveMode               INTEGER,
+  ruckusZDAPConfigManagementAdmin           INTEGER,
+  ruckusZDAPConfigRebootNow                 INTEGER
+}
+
+ruckusZDAPConfigID OBJECT-TYPE
+    SYNTAX  INTEGER (1..5000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "AP ID.Max value:for zd1000,50;for zd1100,100;for zd3000,500;zd5000,1000"
+    ::= { ruckusZDAPConfigEntry 1 }
+
+ruckusZDAPConfigMacAddress OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP MAC Address."
+    ::= { ruckusZDAPConfigEntry 2 }
+    
+ruckusZDAPConfigAPModel OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..64)) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP Model."
+    ::= { ruckusZDAPConfigEntry 4 }    
+
+ruckusZDAPConfigDeviceName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..64)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP Name."
+    ::= { ruckusZDAPConfigEntry 5 }
+
+ruckusZDAPConfigDescription OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..64)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP Description."
+    ::= { ruckusZDAPConfigEntry 6 }
+
+ruckusZDAPConfigLocation OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..64)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP Location."
+    ::= { ruckusZDAPConfigEntry 7 }
+
+ruckusZDAPConfigGpsLatitude OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..16)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP GPS location measured. the range is '-90,90'."
+    ::= { ruckusZDAPConfigEntry 10 }
+
+ruckusZDAPConfigGpsLongitude OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..16)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP GPS location measured. the range is '-180,180'."
+    ::= { ruckusZDAPConfigEntry 11 }
+    
+ruckusZDAPConfigIPVersion OBJECT-TYPE
+    SYNTAX  INTEGER { ipv4(1), ipv6(2), dualstack(3),  useparentsetting(4)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IP version "
+    ::= { ruckusZDAPConfigEntry 14 }        
+
+ruckusZDAPConfigIpAddressSettingMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            admin-by-zd(1),
+            admin-by-dhcp(2),
+            admin-by-ap(3) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IP address configuration setting control.
+        admin-by-zd: ap ipv4 address is set in static model by zd;
+        admin-by-dhcp: ap ipv4 address is set in dhcp model by zd;
+        admin-by-ap: ap ipv4 address is gotten by itself in ap."
+    ::= { ruckusZDAPConfigEntry 15 }
+
+ruckusZDAPConfigIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IP address."
+    ::= { ruckusZDAPConfigEntry 16 }
+
+
+ruckusZDAPConfigIpAddressMask OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IP address mask."
+    ::= { ruckusZDAPConfigEntry 17 }
+    
+ruckusZDAPConfigGatewayIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Gateway IP Address."
+    ::= { ruckusZDAPConfigEntry 20 }
+    
+ruckusZDAPConfigIpV6AddressSettingMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            admin-by-zd(1),
+            admin-by-autoconfig(2),
+            admin-by-ap(3) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IPV6 address configuration setting control.
+        admin-by-zd: ap ipv6 address is set in manual model by zd;
+        admin-by-autoconfig: ap ipv6 address is set in autoconfig(from route server or dhcpv6 server) model by zd;
+        admin-by-ap: ap ipv6 address is gotten by itself in ap."
+    ::= { ruckusZDAPConfigEntry 21 }    
+    
+ruckusZDAPConfigIpV6Address OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IPV6 address."
+    ::= { ruckusZDAPConfigEntry 22 }
+
+
+ruckusZDAPConfigIpV6PrefixLen OBJECT-TYPE
+    SYNTAX  INTEGER (3..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP IPV6 prefix length."
+    ::= { ruckusZDAPConfigEntry 23 }   
+    
+ruckusZDAPConfigGatewayIpV6Address OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))  
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Gateway IPV6 Address."
+    ::= { ruckusZDAPConfigEntry 24 }     
+
+ruckusZDAPConfigPrimaryDnsIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Primary DNS IP Address."
+    ::= { ruckusZDAPConfigEntry 25 }
+
+ruckusZDAPConfigSecondaryDnsIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Secondary DNS IP Address."
+    ::= { ruckusZDAPConfigEntry 26 }
+    
+ruckusZDAPConfigPrimaryDnsIpV6Address OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))  
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Primary DNS IPV6 Address."
+    ::= { ruckusZDAPConfigEntry 27 }
+
+ruckusZDAPConfigSecondaryDnsV6IpAddress OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))   
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Secondary DNS IPV6 Address."
+    ::= { ruckusZDAPConfigEntry 28 }    
+
+ruckusZDAPConfigRadioType OBJECT-TYPE
+    SYNTAX  INTEGER {
+            ieee80211bg(1),
+            ieee80211na(2),
+            ieee80211a(3),
+	    	ieee80211n(4),
+            ieee80211ng(5),
+            ieee80211ac(6) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The AP Wireless type."
+    ::= { ruckusZDAPConfigEntry 30 }
+
+ruckusZDAPConfigRadioChannel24 OBJECT-TYPE
+    SYNTAX  Integer32 (0..11) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Channel selection on the 2.4 GHz radio.
+         The AP radio channel, selectable 0, 1-11, 
+         0    : auto channel selection,
+         1-11 : specific channel selection."
+    ::= { ruckusZDAPConfigEntry 31 }
+
+ruckusZDAPConfigRadioTxPowerLevel24 OBJECT-TYPE
+    SYNTAX  INTEGER (0..25)
+    UNITS   "dB"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Tx Power level selection on the 2.4 GHz radio, auto(25) | 0 to 24 corresponding to 0 to -24dB from max power.
+         Now to be compatible with web, if txpower is more than 10, txpower will be set to 24(Min)."
+    ::= { ruckusZDAPConfigEntry 32 }
+
+ruckusZDAPConfigRadioWlanGroup24 OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..63)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP WLAN group (name) selection on the 2.4 GHz radio."
+    ::= { ruckusZDAPConfigEntry 33 }
+    
+ruckusZDAPConfigRadioEnableWlanService24 OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP enable wlan service flag on the 2.4 GHz radio."
+    ::= { ruckusZDAPConfigEntry 34 }    
+
+ruckusZDAPConfigRadioChannel5 OBJECT-TYPE
+    SYNTAX  Integer32 (0 | 36..165) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Channel selection on the 5 GHz radio.
+         The AP radio channel, selectable 0, 36-165, 
+	       0    : auto channel selection,
+         36-165 : specific channel selection. It is ruled by country code.Please consult the MAP of channel for each country."
+    ::= { ruckusZDAPConfigEntry 40 }
+
+ruckusZDAPConfigRadioTxPowerLevel5 OBJECT-TYPE
+    SYNTAX  INTEGER (0..25)
+    UNITS   "dB"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Tx Power level selection on the 5 GHz radio, auto(25) | 0 to 24 corresponding to 0 to -24dB from max power.
+         Now to be compatible with web, if txpower is more than 10, txpower will be set to 24(Min)."
+    ::= { ruckusZDAPConfigEntry 41 }
+
+ruckusZDAPConfigRadioWlanGroup5 OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..63)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP WLAN group (name) selection on the 5 GHz radio."
+    ::= { ruckusZDAPConfigEntry 42 }
+    
+ruckusZDAPConfigRadioEnableWlanService5 OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP enable wlan service flag on the 5 GHz radio."
+    ::= { ruckusZDAPConfigEntry 43 }     
+
+ruckusZDAPConfigMeshConfigurationMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            auto(1),
+            root-ap(2),
+            mesh-ap(3),       
+	    disabled(4) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP Mesh network configuration mode."
+    ::= { ruckusZDAPConfigEntry 50 }
+
+ruckusZDAPConfigUplinkSelectionMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            smart(1),
+	    manual(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The AP network uplink selection mode.
+         For manual,now 'set' is not supported"
+    ::= { ruckusZDAPConfigEntry 51 }
+
+ruckusZDAPConfigApproveMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            approved(1),
+            not-approved(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP approval state.
+         For not-approved,'set' is not supported."
+    ::= { ruckusZDAPConfigEntry 52 }
+
+ruckusZDAPConfigManagementAdmin OBJECT-TYPE
+    SYNTAX  INTEGER {
+            delete(1),
+            associated(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Admin action to remove this AP from the ZD management."
+    ::= { ruckusZDAPConfigEntry 60 }
+    
+ruckusZDAPConfigRebootNow OBJECT-TYPE
+    SYNTAX  INTEGER {
+            reboot(1) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AP reboot right now."
+    ::= { ruckusZDAPConfigEntry 64 }
+ruckusZDAPLBSInfo OBJECT IDENTIFIER    ::= { ruckusZDAPObjects 2 }    
+ruckusZDAPLBSVenueTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDAPLBSVenueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD AP LBS venue table."
+    ::= { ruckusZDAPLBSInfo 1 }
+ruckusZDAPLBSVenueEntry OBJECT-TYPE
+    SYNTAX  RuckusZDAPLBSVenueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies a LBS venue info per entry."
+    INDEX {
+        ruckusZDAPLBSAPGroupID }
+    ::= { ruckusZDAPLBSVenueTable 1 }
+RuckusZDAPLBSVenueEntry ::= SEQUENCE {
+  ruckusZDAPLBSAPGroupID                    INTEGER,
+  ruckusZDAPLBSVenueName                    OCTET STRING,
+  ruckusZDAPLBSVenueAPGrpName               OCTET STRING,
+  ruckusZDAPLBSVenueLSConnection            INTEGER,
+  ruckusZDAPLBSVenue24GMode                 INTEGER,
+  ruckusZDAPLBSVenue5GMode                  INTEGER,
+}
+ruckusZDAPLBSAPGroupID OBJECT-TYPE
+    SYNTAX  INTEGER (1..1000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "LBS the ID of AP group reference venue. Max value:for zd1000,8;for 
+        zd1100,32;for zd3000,256;zd5000,512."
+    ::= { ruckusZDAPLBSVenueEntry 1 }
+ruckusZDAPLBSVenueName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Vneue name"
+    ::= { ruckusZDAPLBSVenueEntry 2 }
+ruckusZDAPLBSVenueAPGrpName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP group name has referenced this venue"
+    ::= { ruckusZDAPLBSVenueEntry 3 }
+ruckusZDAPLBSVenueLSConnection OBJECT-TYPE
+    SYNTAX  INTEGER {
+            down(0), up(1) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "LS connection status"
+    DEFVAL{down}
+    ::= { ruckusZDAPLBSVenueEntry 4 }    
+ruckusZDAPLBSVenue24GMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            disable(0), footfall(1), calibration(2) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "2.4G band mode"
+    DEFVAL{disable}    
+    ::= { ruckusZDAPLBSVenueEntry 5 }   
+ruckusZDAPLBSVenue5GMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            disable(0), footfall(1), calibration(2) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "5G band mode"
+    DEFVAL{disable}
+    ::= { ruckusZDAPLBSVenueEntry 6 }    
+    
+END

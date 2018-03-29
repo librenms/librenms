@@ -1,0 +1,127 @@
+CISCOSB-LBD-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB LBD Configuration
+-- Version:    7.45.00.00
+-- Date:       24-Oct-2007
+--
+
+IMPORTS
+    TruthValue,TEXTUAL-CONVENTION                        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE                         FROM SNMPv2-SMI
+    ifIndex                                              FROM IF-MIB
+    switch001                                            FROM CISCOSB-MIB;
+
+
+
+rlLbd  MODULE-IDENTITY
+       LAST-UPDATED "200711070000Z"
+                       ORGANIZATION "Cisco Systems, Inc."
+
+                       CONTACT-INFO
+                       "Postal: 170 West Tasman Drive
+                       San Jose , CA 95134-1706
+                       USA
+
+                       
+                       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+       DESCRIPTION
+                "The private MIB module definition for Loopback Detection MIB."
+       REVISION "200711070000Z"
+       DESCRIPTION
+                "Initial version of this MIB."
+           ::= { switch001 127 }
+
+
+-------------------------------------------------------------------------------
+rlLbdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable Loopback Detection in the switch."
+    ::= { rlLbd 1 }
+
+
+-------------------------------------------------------------------------------
+rlLbdDetectionInterval OBJECT-TYPE
+    SYNTAX      INTEGER(10..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds that should pass between unicast LBD packets."
+    ::= { rlLbd 2 }
+
+
+-------------------------------------------------------------------------------
+
+rlLbdMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        source-mac-addr (1),
+        base-mac-addr (2),
+        broadcast-mac-addr (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback detection mode."
+    ::= { rlLbd 3 }
+
+-------------------------------------------------------------------------------
+
+rlLbdPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLbdPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The table contains Admin configuration and operational status per port."
+    ::= { rlLbd 4 }
+
+
+rlLbdPortEntry OBJECT-TYPE
+    SYNTAX      RlLbdPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Each entry represent a port.
+             Per port contains LBD Admin configuration (SET) and status (GET),
+             LBD Operational status and LBD Vlan configuration (SET) and status (GET)."
+
+    INDEX   { ifIndex }
+    ::= { rlLbdPortTable 1 }
+
+RlLbdPortEntry ::= SEQUENCE {
+    rlLbdPortAdminStatus            INTEGER,
+    rlLbdPortOperStatus             INTEGER
+}
+
+rlLbdPortAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled (1),
+                disabled (2)
+            }
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "Enable/Disable Loopback Detection on port"
+    DEFVAL { disabled }
+    ::= { rlLbdPortEntry 1 }
+
+rlLbdPortOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                inactive (1),
+                active (2),
+                loopDetected (3)
+            }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Indicates Loopback Detection operational status on port.
+         'inactive' means that the port is not working in loop-detected operational state;
+         'active' means that the port is Up and working in state of loop-detecting;
+         'loop-detected' means that the system has detected loop on the port."
+    DEFVAL { inactive }
+    ::= { rlLbdPortEntry 2 }
+
+
+END

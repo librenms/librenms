@@ -1,0 +1,90 @@
+-- extracted from rfc3595.txt
+-- at Fri Sep 12 06:15:26 2003
+
+   IPV6-FLOW-LABEL-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+
+       MODULE-IDENTITY, mib-2, Integer32           FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
+
+   ipv6FlowLabelMIB   MODULE-IDENTITY
+
+       LAST-UPDATED  "200308280000Z"  -- 28 August 2003
+       ORGANIZATION  "IETF Operations and Management Area"
+       CONTACT-INFO  "Bert Wijnen (Editor)
+                      Lucent Technologies
+                      Schagen 33
+                      3461 GL Linschoten
+                      Netherlands
+                      Phone: +31 348-407-775
+                      EMail: bwijnen@lucent.com
+
+                      Send comments to <mibs@ops.ietf.org>.
+                     "
+       DESCRIPTION   "This MIB module provides commonly used textual
+                      conventions for IPv6 Flow Labels.
+
+                      Copyright (C) The Internet Society (2003).  This
+                      version of this MIB module is part of RFC 3595,
+                      see the RFC itself for full legal notices.
+                     "
+       -- Revision History
+
+       REVISION      "200308280000Z"  -- 28 August 2003
+       DESCRIPTION   "Initial version, published as RFC 3595."
+
+       ::= { mib-2 103 }
+
+   IPv6FlowLabel      ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT  "d"
+       STATUS         current
+       DESCRIPTION   "The flow identifier or Flow Label in an IPv6
+                      packet header that may be used to discriminate
+                      traffic flows.
+                     "
+       REFERENCE     "Internet Protocol, Version 6 (IPv6) specification,
+                      section 6.  RFC 2460.
+                     "
+       SYNTAX         Integer32 (0..1048575)
+
+   IPv6FlowLabelOrAny ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT  "d"
+       STATUS         current
+       DESCRIPTION   "The flow identifier or Flow Label in an IPv6
+                      packet header that may be used to discriminate
+                      traffic flows.  The value of -1 is used to
+                      indicate a wildcard, i.e. any value.
+                     "
+       SYNTAX         Integer32 (-1 | 0..1048575)
+
+   END
+
+-- 
+--    Copyright (C) The Internet Society (2003).  All Rights Reserved.
+-- 
+--    This document and translations of it may be copied and furnished to
+--    others, and derivative works that comment on or otherwise explain it
+--    or assist in its implementation may be prepared, copied, published
+--    and distributed, in whole or in part, without restriction of any
+--    kind, provided that the above copyright notice and this paragraph are
+--    included on all such copies and derivative works.  However, this
+--    document itself may not be modified in any way, such as by removing
+--    the copyright notice or references to the Internet Society or other
+--    Internet organizations, except as needed for the purpose of
+--    developing Internet standards in which case the procedures for
+--    copyrights defined in the Internet Standards process must be
+--    followed, or as required to translate it into languages other than
+--    English.
+-- 
+--    The limited permissions granted above are perpetual and will not be
+--    revoked by the Internet Society or its successors or assignees.
+-- 
+--    This document and the information contained herein is provided on an
+--    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+--    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+--    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+--    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+--    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+

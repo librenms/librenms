@@ -1,0 +1,1887 @@
+ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                RowStatus, MacAddress                                    FROM SNMPv2-TC
+                MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+                IpAddress, Unsigned32, NOTIFICATION-TYPE                 FROM SNMPv2-SMI
+                MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP      FROM SNMPv2-CONF
+                softentIND1GroupMobility, groupmobilityTraps             FROM ALCATEL-IND1-BASE;
+
+        alcatelIND1GroupMobilityMIB MODULE-IDENTITY
+                LAST-UPDATED "200704030000Z"
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Group Mobility for dynamic vlan assignment to source learning
+                                 entries and ports.
+
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+                ::= { softentIND1GroupMobility 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- Setting group mobility rules:  Since there is no such thing as a default
+-- rule with default values for any rule type, the values for group mobility
+-- rules must be set before the row status is finally set to create-and-go.
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+
+        alcatelIND1GroupMobilityMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Group Mobility
+            Subsystem Managed Objects."
+        ::= { alcatelIND1GroupMobilityMIB 1 }
+
+
+    alcatelIND1GroupMobilityMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Group Mobility
+            Subsystem Conformance Information."
+        ::= { alcatelIND1GroupMobilityMIB 2 }
+
+
+    alcatelIND1GroupMobilityMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Group Mobility
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1GroupMobilityMIBConformance 1 }
+
+
+    alcatelIND1GroupMobilityMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Group Mobility
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1GroupMobilityMIBConformance 2 }
+
+
+
+        groupMobilityRule  OBJECT IDENTIFIER ::= { alcatelIND1GroupMobilityMIBObjects 1 }
+
+
+        --  Group Mobility Group
+        --  Implementation Mandatory
+        -- These are the rules defining dynamic VLAN classification of traffic sources.
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- IP network address rule  ***
+
+        vIpNetRuleTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF VIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of IP network address rules."
+            ::= { groupMobilityRule 1 }
+
+        vIpNetRuleEntry  OBJECT-TYPE
+            SYNTAX  VIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "An IP network address rule entry."
+            INDEX { vIpNetRuleAddr, vIpNetRuleMask }
+            ::= { vIpNetRuleTable 1 }
+
+
+
+        VIpNetRuleEntry ::= SEQUENCE {
+                vIpNetRuleAddr
+                        IpAddress,
+                vIpNetRuleMask
+                        IpAddress,
+                vIpNetRuleVlanId
+                        INTEGER,
+                vIpNetRuleStatus
+                        RowStatus
+                }
+
+        vIpNetRuleAddr  OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The IP network address used for VLAN classification."
+            ::= { vIpNetRuleEntry 1 }
+
+        vIpNetRuleMask  OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The IP network mask applying to the IP network address."
+            ::= { vIpNetRuleEntry 2 }
+
+        vIpNetRuleVlanId  OBJECT-TYPE
+            SYNTAX  INTEGER (1..4094)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The VLAN number identifying this instance. Valid
+                  range from 1 to 4094."
+            ::= { vIpNetRuleEntry 3 }
+
+        vIpNetRuleStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Row Status for creating/deleting rules."
+            ::= { vIpNetRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- IPX network address rule  ***
+
+        vIpxNetRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VIpxNetRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of IPX network address rules."
+                ::= { groupMobilityRule 2 }
+
+        vIpxNetRuleEntry  OBJECT-TYPE
+            SYNTAX  VIpxNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "An IPX network address rule entry."
+            INDEX {vIpxNetRuleAddr }
+            ::= { vIpxNetRuleTable 1 }
+
+        VIpxNetRuleEntry ::= SEQUENCE {
+                vIpxNetRuleAddr
+                        Unsigned32,
+                vIpxNetRuleEncap
+                        INTEGER,
+                vIpxNetRuleVlanId
+                        INTEGER,
+                vIpxNetRuleStatus
+                        RowStatus
+                }
+
+        vIpxNetRuleAddr  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1..4294967294)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The IPX network address used for VLAN classification."
+                ::= { vIpxNetRuleEntry 1 }
+
+        vIpxNetRuleEncap  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ethernet2 (1),
+                        novellraw (2),
+                        llc (3),
+                        snap (4)
+                }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "IPX frame encapsulation."
+                DEFVAL { ethernet2 }
+                ::= { vIpxNetRuleEntry 2 }
+
+        vIpxNetRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vIpxNetRuleEntry 3 }
+
+        vIpxNetRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vIpxNetRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- MAC address rule  ***
+
+        vMacRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMacRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC address rules."
+                ::= { groupMobilityRule 3 }
+
+        vMacRuleEntry  OBJECT-TYPE
+            SYNTAX  VMacRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC rule entry."
+            INDEX {vMacRuleAddr }
+            ::= { vMacRuleTable 1 }
+
+        VMacRuleEntry ::= SEQUENCE {
+                vMacRuleAddr
+                        MacAddress,
+                vMacRuleVlanId
+                        INTEGER,
+                vMacRuleStatus
+                        RowStatus
+                }
+
+        vMacRuleAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for VLAN classification."
+                ::= { vMacRuleEntry 1 }
+
+        vMacRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vMacRuleEntry 2 }
+
+        vMacRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vMacRuleEntry 3 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- MAC range rule  ***
+
+        vMacRangeRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMacRangeRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC range rules."
+                ::= { groupMobilityRule 4 }
+
+        vMacRangeRuleEntry  OBJECT-TYPE
+            SYNTAX  VMacRangeRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC range rule entry."
+            INDEX {vMacRangeRuleLoAddr }
+            ::= { vMacRangeRuleTable 1 }
+
+        VMacRangeRuleEntry ::= SEQUENCE {
+                vMacRangeRuleLoAddr
+                        MacAddress,
+                vMacRangeRuleHiAddr
+                        MacAddress,
+                vMacRangeRuleVlanId
+                        INTEGER,
+                vMacRangeRuleStatus
+                        RowStatus
+                }
+
+        vMacRangeRuleLoAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The lower bound of  MAC address range used for VLAN classification."
+                ::= { vMacRangeRuleEntry 1 }
+
+        vMacRangeRuleHiAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The upper bound of MAC address range used for VLAN classification."
+                ::= { vMacRangeRuleEntry 2 }
+
+        vMacRangeRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vMacRangeRuleEntry 3 }
+
+        vMacRangeRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vMacRangeRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- MAC-Port-IP binding rule  ***
+
+        vMacPortIpBRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMacPortIpBRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC-Port-Ip binding rules."
+                ::= { groupMobilityRule 5 }
+
+        vMacPortIpBRuleEntry  OBJECT-TYPE
+            SYNTAX  VMacPortIpBRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC-Port-IP binding rule entry."
+            INDEX {vMacPortIpBRuleMac }
+            ::= { vMacPortIpBRuleTable 1 }
+
+        VMacPortIpBRuleEntry ::= SEQUENCE {
+                vMacPortIpBRuleMac
+                        MacAddress,
+                vMacPortIpBRuleIfIndex
+                        Unsigned32,
+                vMacPortIpBRuleIp
+                        IpAddress,
+                vMacPortIpBRuleVlanId
+                        INTEGER,
+                vMacPortIpBRuleStatus
+                        RowStatus
+                }
+
+        vMacPortIpBRuleMac  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for binding VLAN classification."
+                ::= { vMacPortIpBRuleEntry 1 }
+
+        vMacPortIpBRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vMacPortIpBRuleEntry 2 }
+
+        vMacPortIpBRuleIp  OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The IP address used for binding VLAN classification."
+                ::= { vMacPortIpBRuleEntry 3 }
+
+        vMacPortIpBRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vMacPortIpBRuleEntry 4 }
+
+        vMacPortIpBRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vMacPortIpBRuleEntry 5 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- Port-IP binding rule  ***
+
+        vPortIpBRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VPortIpBRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Port-Ip binding rules."
+                ::= { groupMobilityRule 6 }
+
+        vPortIpBRuleEntry  OBJECT-TYPE
+            SYNTAX  VPortIpBRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Port-IP binding rule entry."
+            INDEX {vPortIpBRuleIp }
+            ::= { vPortIpBRuleTable 1 }
+
+        VPortIpBRuleEntry ::= SEQUENCE {
+                vPortIpBRuleIp
+                        IpAddress,
+                vPortIpBRuleIfIndex
+                        Unsigned32,
+                vPortIpBRuleVlanId
+                        INTEGER,
+                vPortIpBRuleStatus
+                        RowStatus
+                }
+
+        vPortIpBRuleIp  OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The IP address used for binding VLAN classification."
+                ::= { vPortIpBRuleEntry 1 }
+
+        vPortIpBRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vPortIpBRuleEntry 2 }
+
+
+        vPortIpBRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vPortIpBRuleEntry 3 }
+
+        vPortIpBRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vPortIpBRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- MAC-IP binding rule  ***
+
+        vMacIpBRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMacIpBRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Mac-Ip binding rules."
+                ::= { groupMobilityRule 7 }
+
+        vMacIpBRuleEntry  OBJECT-TYPE
+            SYNTAX  VMacIpBRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Mac-IP binding rule entry."
+            INDEX {vMacIpBRuleMac }
+            ::= { vMacIpBRuleTable 1 }
+
+        VMacIpBRuleEntry ::= SEQUENCE {
+                vMacIpBRuleMac
+                        MacAddress,
+                vMacIpBRuleIp
+                        IpAddress,
+                vMacIpBRuleVlanId
+                        INTEGER,
+                vMacIpBRuleStatus
+                        RowStatus
+                }
+
+        vMacIpBRuleMac  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for binding VLAN classification."
+                ::= { vMacIpBRuleEntry 1 }
+
+        vMacIpBRuleIp  OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The IP address used for binding VLAN classification."
+                ::= { vMacIpBRuleEntry 2 }
+
+        vMacIpBRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vMacIpBRuleEntry 3 }
+
+        vMacIpBRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vMacIpBRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- MAC-Port binding rule  ***
+
+        vMacPortBRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMacPortBRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC-Port binding rules."
+                ::= { groupMobilityRule 8 }
+
+        vMacPortBRuleEntry  OBJECT-TYPE
+            SYNTAX  VMacPortBRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC-Port binding rule entry."
+            INDEX {vMacPortBRuleMac }
+            ::= { vMacPortBRuleTable 1 }
+
+        VMacPortBRuleEntry ::= SEQUENCE {
+                vMacPortBRuleMac
+                        MacAddress,
+                vMacPortBRuleIfIndex
+                        Unsigned32,
+                vMacPortBRuleVlanId
+                        INTEGER,
+                vMacPortBRuleStatus
+                        RowStatus
+                }
+
+        vMacPortBRuleMac  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for binding VLAN classification."
+                ::= { vMacPortBRuleEntry 1 }
+
+        vMacPortBRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vMacPortBRuleEntry 2 }
+
+
+        vMacPortBRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vMacPortBRuleEntry 3 }
+
+        vMacPortBRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vMacPortBRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- MAC-Port-Proto binding rule  ***
+
+        vMacPortProtoBRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMacPortProtoBRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC-Port binding rules."
+                ::= { groupMobilityRule 9 }
+
+        vMacPortProtoBRuleEntry  OBJECT-TYPE
+            SYNTAX  VMacPortProtoBRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC-Port binding rule entry."
+            INDEX {vMacPortProtoBRuleMacAddr,  vMacPortProtoBRuleProtoClass,
+                                vMacPortProtoBRuleEthertype, vMacPortProtoBRuleDsapSsap}
+            ::= { vMacPortProtoBRuleTable 1 }
+
+        VMacPortProtoBRuleEntry ::= SEQUENCE {
+                vMacPortProtoBRuleMacAddr
+                        MacAddress,
+                vMacPortProtoBRuleIfIndex
+                        Unsigned32,
+                vMacPortProtoBRuleProtoClass
+                        INTEGER,
+                vMacPortProtoBRuleEthertype
+                        INTEGER,
+                vMacPortProtoBRuleDsapSsap
+                        INTEGER,
+                vMacPortProtoBRuleVlanId
+                        INTEGER,
+                vMacPortProtoBRuleStatus
+                        RowStatus
+                }
+
+        vMacPortProtoBRuleMacAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for binding VLAN classification."
+                ::= { vMacPortProtoBRuleEntry 1 }
+
+        vMacPortProtoBRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vMacPortProtoBRuleEntry 2 }
+
+        vMacPortProtoBRuleProtoClass  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ipE2 (1),
+                        ipSnap (2),
+                        ipxE2(3),
+                        ipxNov(4),
+                        ipxLlc(5),
+                        ipxSnap(6),
+                        decnet(7),
+                        appletalk(8),
+                        ethertypeE2(9),
+                        dsapSsap(10),
+                        ethertypeSnap(11)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The encoded protocol number used for binding VLAN classification."
+                ::= { vMacPortProtoBRuleEntry 3 }
+
+        vMacPortProtoBRuleEthertype  OBJECT-TYPE
+                SYNTAX  INTEGER (1536..65535)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Ethertype value for generic ethertype or snap rule.
+                 This value has no meaning for vMacPortProtoBRuleProtoClass
+                 set to values other than 9 or 11."
+                ::= { vMacPortProtoBRuleEntry 4 }
+
+        vMacPortProtoBRuleDsapSsap  OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "DSAP and SSAP values for generic DSAP/SSAP and SNAP rules.
+                 This value has no meaning for vMacPortProtoBRuleProtoClass
+                 set to values other than 10."
+                ::= { vMacPortProtoBRuleEntry 5 }
+
+        vMacPortProtoBRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vMacPortProtoBRuleEntry 6 }
+
+        vMacPortProtoBRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vMacPortProtoBRuleEntry 7 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- Port-Proto binding rule  ***
+
+        vPortProtoBRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VPortProtoBRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Port-Protocol binding rules."
+                ::= { groupMobilityRule 10 }
+
+        vPortProtoBRuleEntry  OBJECT-TYPE
+            SYNTAX  VPortProtoBRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Port-Protocol binding rule entry."
+            INDEX {vPortProtoBRuleIfIndex, vPortProtoBRuleProtoClass,
+                vPortProtoBRuleEthertype, vPortProtoBRuleDsapSsap}
+            ::= { vPortProtoBRuleTable 1 }
+
+        VPortProtoBRuleEntry ::= SEQUENCE {
+                vPortProtoBRuleIfIndex
+                        Unsigned32,
+                vPortProtoBRuleProtoClass
+                        INTEGER,
+                vPortProtoBRuleEthertype
+                        INTEGER,
+                vPortProtoBRuleDsapSsap
+                        INTEGER,
+                vPortProtoBRuleVlanId
+                        INTEGER,
+                vPortProtoBRuleStatus
+                        RowStatus
+                }
+
+        vPortProtoBRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vPortProtoBRuleEntry 1 }
+
+        vPortProtoBRuleProtoClass  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ipE2 (1),
+                        ipSnap (2),
+                        ipxE2(3),
+                        ipxNov(4),
+                        ipxLlc(5),
+                        ipxSnap(6),
+                        decnet(7),
+                        appletalk(8),
+                        ethertypeE2(9),
+                        dsapSsap(10),
+                        ethertypeSnap(11),
+                        ipv6(12)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The encoded protocol number used for binding VLAN classification."
+                ::= { vPortProtoBRuleEntry 2 }
+
+        vPortProtoBRuleEthertype  OBJECT-TYPE
+                SYNTAX  INTEGER (0 | 1536..65535)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Ethertype value for generic ethertype or snap rule.
+                 This value has no meaning for vPortProtoBRuleProtoClass
+                 set to values other than 9 or 11. The value 0 will be
+                 used for this index when vPortProtoBRuleProtoClass has 
+                 values other than 9 and 11."
+                ::= { vPortProtoBRuleEntry 3 }
+
+        vPortProtoBRuleDsapSsap  OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "DSAP and SSAP values for generic DSAP/SSAP and SNAP rules.
+                 This value has no meaning for vPortProtoBRuleProtoClass
+                 set to values other than 10."
+                ::= { vPortProtoBRuleEntry 4 }
+
+        vPortProtoBRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vPortProtoBRuleEntry 5 }
+
+        vPortProtoBRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vPortProtoBRuleEntry 6 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- DHCP MAC address rule  ***
+
+        vDhcpMacRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VDhcpMacRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of DHCP MAC address rules."
+                ::= { groupMobilityRule 11 }
+
+        vDhcpMacRuleEntry  OBJECT-TYPE
+            SYNTAX  VDhcpMacRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A DHCP MAC rule entry."
+            INDEX {vDhcpMacRuleAddr }
+            ::= { vDhcpMacRuleTable 1 }
+
+        VDhcpMacRuleEntry ::= SEQUENCE {
+                vDhcpMacRuleAddr
+                        MacAddress,
+                vDhcpMacRuleVlanId
+                        INTEGER,
+                vDhcpMacRuleStatus
+                        RowStatus
+                }
+
+        vDhcpMacRuleAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The DHCP MAC address used for VLAN classification."
+                ::= { vDhcpMacRuleEntry 1 }
+
+        vDhcpMacRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vDhcpMacRuleEntry 2 }
+
+        vDhcpMacRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vDhcpMacRuleEntry 3 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- DHCP Port address rule  ***
+
+        vDhcpPortRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VDhcpPortRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of DHCP port rules."
+                ::= { groupMobilityRule 12 }
+
+        vDhcpPortRuleEntry  OBJECT-TYPE
+            SYNTAX  VDhcpPortRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC rule entry."
+            INDEX {vDhcpPortRuleIfIndex }
+            ::= { vDhcpPortRuleTable 1 }
+
+        VDhcpPortRuleEntry ::= SEQUENCE {
+                vDhcpPortRuleIfIndex
+                        Unsigned32,
+                vDhcpPortRuleVlanId
+                        INTEGER,
+                vDhcpPortRuleStatus
+                        RowStatus
+                }
+
+        vDhcpPortRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vDhcpPortRuleEntry 1 }
+
+        vDhcpPortRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vDhcpPortRuleEntry 2 }
+
+        vDhcpPortRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vDhcpPortRuleEntry 3 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- DHCP Generic rule  ***
+
+        vDhcpGenericRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VDhcpGenericRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The generic port rule -- in table for uniformity's sake."
+                ::= { groupMobilityRule 13 }
+
+        vDhcpGenericRuleEntry  OBJECT-TYPE
+            SYNTAX  VDhcpGenericRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The DHCP generic rule entry -- there is at most one."
+            INDEX {vDhcpGenericRuleVlanId }
+            ::= { vDhcpGenericRuleTable 1 }
+
+        VDhcpGenericRuleEntry ::= SEQUENCE {
+                vDhcpGenericRuleVlanId
+                        INTEGER,
+                vDhcpGenericRuleStatus
+                        RowStatus
+                }
+
+        vDhcpGenericRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vDhcpGenericRuleEntry 1 }
+
+        vDhcpGenericRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vDhcpGenericRuleEntry 2 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- Protocol rule  ***
+
+        vProtoRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VProtoRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Protocol rules."
+                ::= { groupMobilityRule 14 }
+
+        vProtoRuleEntry  OBJECT-TYPE
+            SYNTAX  VProtoRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Protocol rule entry."
+            INDEX {vProtoRuleProtoClass, vProtoRuleEthertype,
+                vProtoRuleDsapSsap}
+            ::= { vProtoRuleTable 1 }
+
+        VProtoRuleEntry ::= SEQUENCE {
+                vProtoRuleProtoClass
+                        INTEGER,
+                vProtoRuleEthertype
+                        INTEGER,
+                vProtoRuleDsapSsap
+                        INTEGER,
+                vProtoRuleVlanId
+                        INTEGER,
+                vProtoRuleStatus
+                        RowStatus
+                }
+
+        vProtoRuleProtoClass  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ipE2 (1),
+                        ipSnap (2),
+                        ipxE2(3),
+                        ipxNov(4),
+                        ipxLlc(5),
+                        ipxSnap(6),
+                        decnet(7),
+                        appletalk(8),
+                        ethertypeE2(9),
+                        dsapSsap(10),
+                        ethertypeSnap(11),
+                        ipv6(12)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The encoded protocol number used for binding VLAN classification."
+                ::= { vProtoRuleEntry 1 }
+
+        vProtoRuleEthertype  OBJECT-TYPE
+                SYNTAX  INTEGER (1536..65535)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Ethertype value for generic ethertype or snap rule.
+                 This value has no meaning for vProtoRuleProtoClass
+                 set to values other than 9 or 11."
+                ::= { vProtoRuleEntry 2 }
+
+        vProtoRuleDsapSsap  OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "DSAP and SSAP values for generic DSAP/SSAP and SNAP rules.
+                 This value has no meaning for vProtoRuleProtoClass
+                 set to values other than 10."
+                ::= { vProtoRuleEntry 3 }
+
+        vProtoRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vProtoRuleEntry 4 }
+
+        vProtoRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vProtoRuleEntry 5 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- Custom rule  ***
+
+        vCustomRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VCustomRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Custom rules."
+                ::= { groupMobilityRule 15 }
+
+        vCustomRuleEntry  OBJECT-TYPE
+            SYNTAX  VCustomRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Custom rule entry."
+            INDEX {vCustomRuleOffset, vCustomRuleValue}
+            ::= { vCustomRuleTable 1 }
+
+        VCustomRuleEntry ::= SEQUENCE {
+                vCustomRuleValue
+                        Unsigned32,
+                vCustomRuleMask
+                        Unsigned32,
+                vCustomRuleOffset
+                        INTEGER,
+                vCustomRuleVlanId
+                        INTEGER,
+                vCustomRuleStatus
+                        RowStatus
+                }
+
+        vCustomRuleValue  OBJECT-TYPE
+                SYNTAX  Unsigned32 (0..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The value to match for VLAN classification."
+                ::= { vCustomRuleEntry 1 }
+
+        vCustomRuleMask  OBJECT-TYPE
+                SYNTAX  Unsigned32 (0..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Mask applied to value for rule matching."
+                DEFVAL { 4294967295 }
+                ::= { vCustomRuleEntry 2 }
+
+        vCustomRuleOffset  OBJECT-TYPE
+                SYNTAX  INTEGER  (0..72)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Location of value to be matched relative to start of frame."
+                ::= { vCustomRuleEntry 3 }
+
+        vCustomRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vCustomRuleEntry 4 }
+
+        vCustomRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vCustomRuleEntry 5 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- Port rule  ***
+
+        vPortRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VPortRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Port rules."
+                ::= { groupMobilityRule 16 }
+
+        vPortRuleEntry  OBJECT-TYPE
+            SYNTAX  VPortRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Port rule entry."
+            INDEX {vPortRuleIfIndex, vPortRuleVlanId}
+            ::= { vPortRuleTable 1 }
+
+        VPortRuleEntry ::= SEQUENCE {
+                vPortRuleIfIndex
+                        Unsigned32,
+                vPortRuleVlanId
+                        INTEGER,
+                vPortRuleStatus
+                        RowStatus
+                }
+
+        vPortRuleIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port."
+                ::= { vPortRuleEntry 1 }
+
+        vPortRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vPortRuleEntry 2 }
+
+        vPortRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vPortRuleEntry 3 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        -- DHCP MAC Range address rule  ***
+
+        vDhcpMacRangeRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VDhcpMacRangeRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of DHCP MAC Range address rules."
+                ::= { groupMobilityRule 17 }
+
+        vDhcpMacRangeRuleEntry  OBJECT-TYPE
+            SYNTAX  VDhcpMacRangeRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A DHCP MAC Range rule entry."
+            INDEX {vDhcpMacRangeRuleLoAddr }
+            ::= { vDhcpMacRangeRuleTable 1 }
+
+        VDhcpMacRangeRuleEntry ::= SEQUENCE {
+                vDhcpMacRangeRuleLoAddr
+                        MacAddress,
+                vDhcpMacRangeRuleHiAddr
+                        MacAddress,
+                vDhcpMacRangeRuleVlanId
+                        INTEGER,
+                vDhcpMacRangeRuleStatus
+                        RowStatus
+                }
+
+        vDhcpMacRangeRuleLoAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The lower bound of  MAC address range used for DHCP VLAN classification."
+                ::= { vDhcpMacRangeRuleEntry 1 }
+
+        vDhcpMacRangeRuleHiAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The higher bound of MAC address range used for DHCP VLAN classification."
+                ::= { vDhcpMacRangeRuleEntry 2 }
+
+        vDhcpMacRangeRuleVlanId  OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The VLAN number identifying this instance. Valid
+                range from 1 to 4094."
+                ::= { vDhcpMacRangeRuleEntry 3 }
+
+        vDhcpMacRangeRuleStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { vDhcpMacRangeRuleEntry 4 }
+
+        -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        groupMobilityPort  OBJECT IDENTIFIER ::= { alcatelIND1GroupMobilityMIBObjects 2 }
+
+        -- mobile port properties  ***
+
+        vMobilePortTable OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VMobilePortEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "Controls and reports the mobility status of a port.
+                 Also controls and reports other mobility related
+                 properties:  default vlan permanance, restoration,
+                 and enabling; also whether to ignore BPDUs or change
+                 the port mode to fixed upon receiving BPDUs; also
+                 whether a mobile port is an authentication port."
+                ::= { groupMobilityPort 1 }
+
+        vMobilePortEntry OBJECT-TYPE
+                SYNTAX  VMobilePortEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "On a given port indicates mobility related properties."
+                INDEX  { vMobilePortIfIndex }
+                ::= { vMobilePortTable 1 }
+
+        VMobilePortEntry ::= SEQUENCE {
+                vMobilePortIfIndex
+                        Unsigned32,
+                vMobilePortMobility
+                        INTEGER,
+                vMobilePortDefVlanRestore
+                        INTEGER,
+                vMobilePortDefVlanEnable
+                        INTEGER,
+                vMobilePortIgnoreBPDU
+                        INTEGER,
+                vMobilePortAuthenticate
+                        INTEGER,
+                vMobilePortCfgDefVlan
+                        INTEGER,
+                vMobilePortIngressFiltering
+                        INTEGER
+                }
+
+        vMobilePortIfIndex OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to a potentially mobile port.
+                 Mobile and Fixed ports are potentially mobile ports (of
+                 course in the Mobile case, the potential has been realized).
+                 Tagged, Aggregable, and Mirroring ports are not
+                 potentially mobile ports."
+                ::= { vMobilePortEntry 1 }
+
+        vMobilePortMobility OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Indicates whether port is mobile (has mobility property).
+                 All potentially mobile ports have this property (potentially
+                 mobile ports includes both mobile ports and non-mobile fixed
+                 ports)."
+                DEFVAL  { disable }
+                ::= { vMobilePortEntry 2 }
+
+        vMobilePortDefVlanRestore  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2),
+                        notApplicable(3)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Indicates default vlan restore state.  There has been a major change to
+                 the usage of this element:  it now controls whether or not dynamic VPAs
+                 will be aged on a mobile port.  Restore = enable means that aging is
+                 activated; restore = disable means that no VPA aging will occur on this port.
+                 Aging is accomplished by determining that there are no longer any corresponding
+                 layer two source entries for the port.
+                 Non-mobile ports that are potentially mobile do not have this property - a get
+                 returns notApplicable."
+                DEFVAL  { enable }
+                 ::= { vMobilePortEntry 3 }
+
+        vMobilePortDefVlanEnable  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2),
+                        notApplicable(3)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Indicates default vlan enable state.  When enabled, the port is not prevented
+                 from forwarding and receiving frames in the default vlan as appropriate.
+                 When disabled, the port is prevented from forwarding and receiving frames
+                 in the default vlan.
+                 Non-mobile ports that are potentially mobile do not have this property - a get
+                 returns notApplicable."
+                 DEFVAL  { enable }
+                 ::= { vMobilePortEntry 4 }
+
+        vMobilePortIgnoreBPDU OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2),
+                        notApplicable(3)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Indicates whether BPDUs should be ignored on port.  This is normally
+                 disabled -- BPDUs are not ignored but cause the port to lose its mobility
+                 property (it becomes a fixed port instead).
+                 Non-mobile ports that are potentially mobile do not have this property - a get
+                 returns notApplicable."
+                 DEFVAL  { disable }
+                ::= { vMobilePortEntry 5 }
+
+        vMobilePortAuthenticate OBJECT-TYPE
+                SYNTAX INTEGER {
+                        enableAvlan(1),
+                        disable(2),
+                        notApplicable(3),
+                        enable8021x(4)
+                        }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                "Identifies a mobile port as being an authenticated port also.
+                 A non-mobile port cannot be an authenticated port at this point.
+                 Non-mobile ports that are potentially mobile do not have this property - a get
+                 returns notApplicable."
+                 DEFVAL  { disable }
+                ::= { vMobilePortEntry 6 }
+
+        vMobilePortCfgDefVlan  OBJECT-TYPE
+                SYNTAX INTEGER (1..4094)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The configured default vlan on this port."
+                ::= { vMobilePortEntry 7 }
+
+
+        vMobilePortIngressFiltering  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Indicates the ingress filtering status of the port.
+
+                 If the ingress filtering is enabled and Vlan Port Membership
+                 (VPM) check fails, then the packet is silently dropped.
+                 Ingress filtering is enabled for all non-mobile ports.
+
+                 If the ingress filtering is disabled and VPM check fails,
+                 then the packet is sent to the CPU for software vlan classification.
+                 Ingress filtering is disabled for all mobile ports.
+
+                 The default setting is 'enable' as all ports are set to non-mobile ports
+                 initially."
+                 DEFVAL  { enable }
+                ::= { vMobilePortEntry 8 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Traps
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        groupmobilityTrapsDesc OBJECT IDENTIFIER ::= { groupmobilityTraps 1 }
+        groupmobilityTrapsObj  OBJECT IDENTIFIER ::= { groupmobilityTraps 2 }
+
+        gmBindRuleViolation NOTIFICATION-TYPE
+            OBJECTS {
+                   gmBindRuleType, gmBindRuleVlanId, gmBindRuleIPAddress,
+                   gmBindRuleMacAddress, gmBindRulePortIfIndex, gmBindRuleProtoClass,
+                   gmBindRuleEthertype, gmBindRuleDsapSsap
+                   }
+            STATUS       current
+            DESCRIPTION
+                "A bind-violation trap occurs whenever
+                 a binding rule which has been configured gets violated."
+           ::= { groupmobilityTrapsDesc 0 1 }
+
+        gmHwVlanRuleTableOverloadAlert NOTIFICATION-TYPE
+            OBJECTS {
+                   gmOverloadRuleTable, gmOverloadRuleType,
+                   gmOverloadRuleVlanId, gmOverloadRuleMacAddress,
+                   gmOverloadRuleIpAddress, gmOverloadRuleProtocol,
+                   gmOverloadRuleIpxNetwork
+                   }
+            STATUS       current
+            DESCRIPTION
+                "An overload trap occurs whenever
+                 a new entry to the HW vlan rule table gets dropped
+                 due to the overload of the table."
+           ::= { groupmobilityTrapsDesc 0 2 }
+
+        gmHwMixModeSubnetRuleTableOverloadAlert NOTIFICATION-TYPE
+            OBJECTS {
+                   gmSubnetRuleTable, gmOverloadRuleSlice
+                   }
+            STATUS       current
+            DESCRIPTION
+                "An subnet overload trap occurs in mixed mode whenever
+                 a new entry to the HW subnet rule table gets dropped
+                 in OS6800 due to the overload of the table."
+           ::= { groupmobilityTrapsDesc 0 3 }
+        --
+        -- Trap objects
+        --
+
+
+        -- Bind Rule Type
+        gmBindRuleType        OBJECT-TYPE
+            SYNTAX             INTEGER
+                               {
+                                   macPortIp (9),
+                                   portIp (10),
+                                   macIp (11),
+                                   macPort (12),
+                                   macPortProto (13)
+                               }
+            MAX-ACCESS         read-only
+            STATUS             current
+            DESCRIPTION        "Type of binding rule for which trap sent."
+            ::= { groupmobilityTrapsObj 1 }
+
+        -- Bind Rule VLAN Id
+        gmBindRuleVlanId        OBJECT-TYPE
+            SYNTAX             Unsigned32
+            MAX-ACCESS         accessible-for-notify
+            STATUS             current
+            DESCRIPTION        "Binding Rule VLAN Id."
+            ::= { groupmobilityTrapsObj 2 }
+
+        -- Bind Rule IP
+        gmBindRuleIPAddress       OBJECT-TYPE
+            SYNTAX               IpAddress
+            MAX-ACCESS           accessible-for-notify
+            STATUS               current
+            DESCRIPTION          "Binding Rule IP address."
+            ::= { groupmobilityTrapsObj 3 }
+
+        -- Bind Rule Mac
+        gmBindRuleMacAddress     OBJECT-TYPE
+                SYNTAX          MacAddress
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION     "Binding Rule Mac Address"
+        ::= { groupmobilityTrapsObj 4 }
+
+        -- Bind Rule Port
+        gmBindRulePortIfIndex  OBJECT-TYPE
+                SYNTAX  Unsigned32 (1001..4294967295)
+                MAX-ACCESS  accessible-for-notify
+                STATUS  current
+                DESCRIPTION
+                "The ifIndex corresponding to the mobile port on which binding rule violation occured."
+                ::= { groupmobilityTrapsObj 5 }
+
+        -- Bind Rule protocol
+        gmBindRuleProtoClass  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        ipE2 (1),
+                        ipSnap (2),
+                        ipxE2(3),
+                        ipxNov(4),
+                        ipxLlc(5),
+                        ipxSnap(6),
+                        decnet(7),
+                        appletalk(8),
+                        ethertypeE2(9),
+                        dsapSsap(10),
+                        ethertypeSnap(11),
+                        ipv6(12)
+                        }
+                MAX-ACCESS  accessible-for-notify
+                STATUS  current
+                DESCRIPTION
+                "The encoded protocol number used for binding VLAN classification."
+                ::= { groupmobilityTrapsObj 6 }
+
+        -- Bind Rule ether type
+        gmBindRuleEthertype  OBJECT-TYPE
+                SYNTAX  INTEGER (1536..65535)
+                MAX-ACCESS  accessible-for-notify
+                STATUS  current
+                DESCRIPTION
+                "Ethertype value for generic ethertype or snap rule.
+                 This value has no meaning for vProtoRuleProtoClass
+                 set to values other than 9 or 11."
+                ::= { groupmobilityTrapsObj 7 }
+
+        -- Bind Rule dsap ssap
+        gmBindRuleDsapSsap  OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  accessible-for-notify
+                STATUS  current
+                DESCRIPTION
+                "DSAP and SSAP values for generic DSAP/SSAP and SNAP rules.
+                 This value has no meaning for vProtoRuleProtoClass
+                 set to values other than 10."
+                ::= { groupmobilityTrapsObj 8 }
+
+        -- Overloaded HW vlan rule table
+        gmOverloadRuleTable OBJECT-TYPE
+            SYNTAX  INTEGER
+	            {
+                    macVlanTable (1),
+                    subnetVlanTable (2),
+                    protocolVlanTable (3)
+                    }
+            MAX-ACCESS  accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+                "Overloaded HW vlan rule table."
+                ::= { groupmobilityTrapsObj 9 }
+
+        -- Overloaded vlan rule types
+        gmOverloadRuleType OBJECT-TYPE
+            SYNTAX  INTEGER
+	            {
+                    macPortIpBinding (1),
+                    macPortBinding (2),
+                    portProtocolBinding (3),
+                    macRule (4),
+                    macRangeRule (5),
+                    avlan (6),
+                    dot1x (7),
+                    ipSubnetRule (8),
+                    ipxNetworkRule (9),
+                    protocolRule (10)
+                    }
+            MAX-ACCESS  accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+                "Vlan rule types that are not configured
+                 due to the overload of the HW vlan rule table."
+                ::= { groupmobilityTrapsObj 10 }
+
+        -- Dropped VLAN Id due to the overload
+        gmOverloadRuleVlanId OBJECT-TYPE
+            SYNTAX             Unsigned32
+            MAX-ACCESS         accessible-for-notify
+            STATUS             current
+            DESCRIPTION
+                "Overloaded VLAN Id."
+                ::= { groupmobilityTrapsObj 11 }
+
+        -- Dropped Mac Address due to the overload
+        gmOverloadRuleMacAddress OBJECT-TYPE
+            SYNTAX          MacAddress
+            MAX-ACCESS      accessible-for-notify
+            STATUS          current
+            DESCRIPTION
+                "Overloaded Mac Address."
+                  ::= { groupmobilityTrapsObj 12 }
+
+        -- Dropped IP Address due to the overload
+        gmOverloadRuleIpAddress OBJECT-TYPE
+            SYNTAX          IpAddress
+            MAX-ACCESS      accessible-for-notify
+            STATUS          current
+            DESCRIPTION
+                "Overloaded IP Address."
+                  ::= { groupmobilityTrapsObj 13 }
+
+        -- Dropped Protocol type due to the overload
+        gmOverloadRuleProtocol OBJECT-TYPE
+            SYNTAX  INTEGER
+	            {
+                   ipE2 (1),
+                   ipSnap (2),
+                   ipxE2(3),
+                   ipxNov(4),
+                   ipxLlc(5),
+                   ipxSnap(6),
+                   decnet(7),
+                   appletalk(8),
+                   ethertypeE2(9),
+                   dsapSsap(10),
+                   ethertypeSnap(11),
+                   ipv6(12)
+                   }
+            MAX-ACCESS      accessible-for-notify
+            STATUS          current
+            DESCRIPTION
+                "Overloaded Protocol type."
+                  ::= { groupmobilityTrapsObj 14 }
+
+        -- Dropped Ipx network address due to the overload
+        gmOverloadRuleIpxNetwork OBJECT-TYPE
+            SYNTAX  Unsigned32 (1..4294967294)
+            MAX-ACCESS      accessible-for-notify
+            STATUS          current
+            DESCRIPTION
+                "Overloaded Ipx network address."
+                  ::= { groupmobilityTrapsObj 15 }
+
+        -- Overloaded subnet table
+        gmSubnetRuleTable      OBJECT-TYPE
+            SYNTAX      INTEGER  (1..2147483646)
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "Overloaded HW subnet rule table."
+                ::= { groupmobilityTrapsObj 16 }
+
+        -- Slot number that is overloaded
+	gmOverloadRuleSlice    OBJECT-TYPE
+            SYNTAX             Unsigned32
+            MAX-ACCESS         accessible-for-notify
+            STATUS             current
+            DESCRIPTION
+                "Overloaded slot Id."
+                ::= { groupmobilityTrapsObj 17 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1GroupMobilityMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             Group Mobility."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                groupMobilityRuleGroup,
+                groupMobilityPortGroup,
+                groupMobilityTrapGroup
+            }
+
+        ::= { alcatelIND1GroupMobilityMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    groupMobilityRuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        vIpNetRuleAddr,         -- ip net rule table
+                        vIpNetRuleMask,
+                        vIpNetRuleVlanId,
+                        vIpNetRuleStatus,
+
+                        vIpxNetRuleAddr,        -- ipx net rule table
+                        vIpxNetRuleEncap,
+                        vIpxNetRuleVlanId,
+                        vIpxNetRuleStatus,
+
+                        vMacRuleAddr,           -- mac address rule table
+                        vMacRuleVlanId,
+                        vMacRuleStatus,
+
+                        vMacRangeRuleLoAddr, -- mac range rule table
+                        vMacRangeRuleHiAddr,
+                        vMacRangeRuleVlanId,
+                        vMacRangeRuleStatus,
+
+                        vMacPortIpBRuleMac,       -- mac-ip-port binding rule
+                        vMacPortIpBRuleIfIndex,
+                        vMacPortIpBRuleIp,
+                        vMacPortIpBRuleVlanId,
+                        vMacPortIpBRuleStatus,
+
+                        vPortIpBRuleIp,           -- ip-port binding rule
+                        vPortIpBRuleIfIndex,
+                        vPortIpBRuleVlanId,
+                        vPortIpBRuleStatus,
+
+                        vMacIpBRuleMac,           -- mac-ip binding rule
+                        vMacIpBRuleIp,
+                        vMacIpBRuleVlanId,
+                        vMacIpBRuleStatus,
+
+                        vMacPortBRuleMac,         -- mac-port binding rule
+                        vMacPortBRuleIfIndex,
+                        vMacPortBRuleVlanId,
+                        vMacPortBRuleStatus,
+
+                        vMacPortProtoBRuleMacAddr,  -- mac-port-protocol binding rule
+                        vMacPortProtoBRuleIfIndex,
+                        vMacPortProtoBRuleProtoClass,
+                        vMacPortProtoBRuleEthertype,
+                        vMacPortProtoBRuleDsapSsap,
+                        vMacPortProtoBRuleVlanId,
+                        vMacPortProtoBRuleStatus,
+
+                        vPortProtoBRuleIfIndex,         -- port-protocol binding rule
+                        vPortProtoBRuleProtoClass,
+                        vPortProtoBRuleEthertype,
+                        vPortProtoBRuleDsapSsap,
+                        vPortProtoBRuleVlanId,
+                        vPortProtoBRuleStatus,
+
+                        vDhcpMacRuleAddr,                       -- dhcp mac rule
+                        vDhcpMacRuleVlanId,
+                        vDhcpMacRuleStatus,
+
+                        vDhcpPortRuleIfIndex,           -- dhcp port rule
+                        vDhcpPortRuleVlanId,
+                        vDhcpPortRuleStatus,
+
+                        vDhcpGenericRuleVlanId,         -- dhcp generic rule
+                        vDhcpGenericRuleStatus,
+
+                        vProtoRuleProtoClass,           -- protocol rule
+                        vProtoRuleEthertype,
+                        vProtoRuleDsapSsap,
+                        vProtoRuleVlanId,
+                        vProtoRuleStatus,
+
+                        vCustomRuleValue,                       -- custom (user) rule
+                        vCustomRuleMask,
+                        vCustomRuleOffset,
+                        vCustomRuleVlanId,
+                        vCustomRuleStatus,
+
+                        vPortRuleIfIndex,                       -- port rule
+                        vPortRuleVlanId,
+                        vPortRuleStatus,
+
+                        vDhcpMacRangeRuleLoAddr,                -- dhcp mac range rule
+                        vDhcpMacRangeRuleHiAddr,
+                        vDhcpMacRangeRuleVlanId,
+                        vDhcpMacRangeRuleStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Group Mobility vlan classification rules."
+        ::= { alcatelIND1GroupMobilityMIBGroups 1 }
+
+
+    groupMobilityPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        vMobilePortIfIndex,                     -- mobile port table
+                        vMobilePortMobility,
+                        vMobilePortDefVlanRestore,
+                        vMobilePortDefVlanEnable,
+                        vMobilePortIgnoreBPDU,
+                        vMobilePortAuthenticate,
+                        vMobilePortCfgDefVlan,
+                        vMobilePortIngressFiltering
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Mobile Ports."
+        ::= { alcatelIND1GroupMobilityMIBGroups 2 }
+
+    groupMobilityTrapGroup NOTIFICATION-GROUP
+       NOTIFICATIONS
+       {
+         gmBindRuleViolation,
+         gmHwVlanRuleTableOverloadAlert,
+         gmHwMixModeSubnetRuleTableOverloadAlert
+       }
+       STATUS  current
+       DESCRIPTION
+            "Collection of notifications for learned port security."
+       ::= { alcatelIND1GroupMobilityMIBGroups 4 }
+
+
+
+        END
+

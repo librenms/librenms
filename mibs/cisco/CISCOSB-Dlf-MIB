@@ -1,0 +1,39 @@
+CISCOSB-Dlf-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Cisco Switch Interfaces Private
+-- Version:    7.47
+-- Date:       15 Sep 2008
+
+IMPORTS
+    OBJECT-TYPE                                     FROM SNMPv2-SMI
+    PortList                                        FROM Q-BRIDGE-MIB
+    switch001                                       FROM CISCOSB-MIB;
+
+rlDlf MODULE-IDENTITY
+        LAST-UPDATED "200809151234Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+            "The private MIB module definition for DLF Ports MIB.
+             unknown unicast egress filtering "
+        ::= { switch001 135 }
+
+--rlDlfPortList
+rlDlfPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A port bitmap containing entries of unknown unicas egress filtering"
+    ::= { rlDlf 1 }
+
+END
+

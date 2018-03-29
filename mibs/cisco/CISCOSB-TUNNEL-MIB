@@ -1,0 +1,389 @@
+CISCOSB-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001           FROM CISCOSB-MIB
+    OBJECT-TYPE,Unsigned32, IpAddress,
+    MODULE-IDENTITY     FROM SNMPv2-SMI
+    RowStatus           FROM SNMPv2-TC
+    IANAtunnelType      FROM IANAifType-MIB
+    DnsName             FROM DNS-SERVER-MIB
+    tunnelIfEntry       FROM TUNNEL-MIB
+    ifIndex             FROM IF-MIB;
+
+
+rlTunnel MODULE-IDENTITY
+         LAST-UPDATED "201109120000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "The private MIB module definition for Tunneling."
+         REVISION "201205210000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { switch001 122 }
+
+
+--- Deprecated implementation of ISATAP
+--- Deprecated implementation of ISATAP
+--- Deprecated implementation of ISATAP
+
+rlTunnelIsatapStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The ISATAP status."
+    DEFVAL  { disable }
+    ::= { rlTunnel 1 }
+
+
+rlTunnelIsatapRobustness  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1 .. 20)
+--  UNITS   "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies how many DNS Querys and Router Solicitations
+         should be sent to get the corresponding reply."
+    DEFVAL  { 3 }
+    ::= { rlTunnel 2 }
+
+
+rlTunnelIsatapDnsHostName OBJECT-TYPE
+    SYNTAX      DnsName
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The domain name for ISATAP."
+    ::= { rlTunnel 3 }
+
+rlTunnelIsatapQueryInterval OBJECT-TYPE
+    SYNTAX  Unsigned32 (10 .. 3600)
+--  UNITS   "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies the time interval between sending of
+         DNS Queries before receiving the first reply from the DNS Server."
+    DEFVAL  { 10 }
+    ::= { rlTunnel 4 }
+
+rlTunnelIsatapRSInterval OBJECT-TYPE
+    SYNTAX  Unsigned32 (10 .. 3600)
+--  UNITS   "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies the time interval between sending of Router
+         Solicitations before receiving the first reply from the ISATAP Router."
+    DEFVAL  { 10 }
+    ::= { rlTunnel 5 }
+
+rlTunnelIsatapMinQueryInterval OBJECT-TYPE
+    SYNTAX  Unsigned32 (0 .. 3600)
+--  UNITS   "seconds"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies the minimum time interval between between successive queries
+         of same advertising ISATAP interface."
+    DEFVAL  { 0 }
+    ::= { rlTunnel 6 }
+
+rlTunnelIsatapMinRSInterval OBJECT-TYPE
+    SYNTAX  Unsigned32 (0 .. 3600)
+--  UNITS   "seconds"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies the minimum time between successive solicitations of the
+         same advertising ISATAP interface."
+    DEFVAL  { 0 }
+    ::= { rlTunnel 7 }
+
+rlTunnelIsatapRouterAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies the IPv4 address of ISATAP Router."
+    DEFVAL  { 0 }
+    ::= { rlTunnel 8 }
+
+rlTunnelIsatapLocalIPv4Address OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "specifies the IPv4 address currently used as IPv4 source address
+         for ISATAP Tunnel."
+    DEFVAL  { 0 }
+    ::= { rlTunnel 9 }
+
+--- End of deprecated implementation of ISATAP
+--- End of deprecated implementation of ISATAP
+--- End of deprecated implementation of ISATAP
+
+
+
+--- rlTunnelGeneral & rlTunnelTypeSpecific
+
+rlTunnelGeneral OBJECT IDENTIFIER ::= { rlTunnel 11 }
+
+
+
+--- tunnelIfTable augmentation
+
+rlTunnelIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlTunnelIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parallel to tunnelIfTable, and is used to
+            add/delete tunnel entries to/from that table.
+            In addition it contains private objects."
+    ::= { rlTunnelGeneral 1 }
+
+rlTunnelIfEntry OBJECT-TYPE
+    SYNTAX     RlTunnelIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional configuration parameters for a tunnel interface."
+    AUGMENTS { tunnelIfEntry }
+    ::= { rlTunnelIfTable 1 }
+
+RlTunnelIfEntry ::= SEQUENCE {
+        rlTunnelIfEncapsMethod                  IANAtunnelType,
+        rlTunnelIfLocalAddressSource            INTEGER,
+        rlTunnelIfLocalAddressInterfaceId       Unsigned32,
+        rlTunnelIfLocalIPv4Address              IpAddress,
+        rlTunnelIfStatus                        RowStatus
+    }
+
+rlTunnelIfEncapsMethod OBJECT-TYPE
+       SYNTAX     IANAtunnelType
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "The encapsulation method used by the tunnel.
+                This field added since it is read-only in standard MIB."
+       ::= { rlTunnelIfEntry 1 }
+
+rlTunnelIfLocalAddressSource OBJECT-TYPE
+    SYNTAX  INTEGER {
+        configured(1),
+        auto(2),
+        interface(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the method of obtaining Local address for
+         the tunnel interface.
+         Configured - configured by user.
+         Automatic - minimum IP address of the device.
+         Interface - minimum IP address on user specified interface."
+    DEFVAL { configured }
+    ::=  { rlTunnelIfEntry 2 }
+
+rlTunnelIfLocalAddressInterfaceId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Interface ID, used to determine Local address for tunnel interface
+            if rlTunnelIfLocalAddressSource set to interface."
+    DEFVAL { 0 }
+    ::= { rlTunnelIfEntry 3 }
+
+rlTunnelIfLocalIPv4Address OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the IPv4 address currently used as IPv4 Local address
+         for IPv6 over IPv4 Tunnel."
+    DEFVAL  { 0 }
+    ::= { rlTunnelIfEntry 4 }
+
+rlTunnelIfStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+         created, or old entries deleted from this table."
+    ::= { rlTunnelIfEntry 5 }
+
+--- End of <tunnelIfTable augmentation>
+
+
+
+--- rlTunnelTypeSpecific
+
+rlTunnelTypeSpecific OBJECT IDENTIFIER ::= { rlTunnel 12 }
+
+
+--- rlTunnelIsatap
+
+rlTunnelIsatap OBJECT IDENTIFIER ::= { rlTunnelTypeSpecific 1 }
+
+
+
+--- rlTunnelIsatapConfTable
+
+rlTunnelIsatapConfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlTunnelIsatapConfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains ISATAP-specific configuration."
+    ::= { rlTunnelIsatap 1 }
+
+rlTunnelIsatapConfEntry OBJECT-TYPE
+    SYNTAX     RlTunnelIsatapConfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional configuration parameters for a tunnel interface."
+    INDEX      { ifIndex }
+    ::= { rlTunnelIsatapConfTable 1 }
+
+RlTunnelIsatapConfEntry ::= SEQUENCE {
+    rlTunnelIsatapConfDnsName      OCTET STRING,
+    rlTunnelIsatapConfRowStatus    RowStatus
+}
+
+rlTunnelIsatapConfDnsName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS name."
+    DEFVAL { "ISATAP" }
+    ::= { rlTunnelIsatapConfEntry 1 }
+
+rlTunnelIsatapConfRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+         created, or old entries deleted from this table."
+    ::= { rlTunnelIsatapConfEntry 2 }
+
+--- End of <rlTunnelIsatapConfTable>
+
+
+
+--- rlTunnelIsatapPrlTable
+
+rlTunnelIsatapPrlTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlTunnelIsatapPrlEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains ISATAP-specific configuration."
+    ::= { rlTunnelIsatap 2 }
+
+rlTunnelIsatapPrlEntry OBJECT-TYPE
+    SYNTAX     RlTunnelIsatapPrlEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional configuration parameters for a tunnel interface."
+    INDEX      { rlTunnelIsatapPrlIfIndex, rlTunnelIsatapPrlPriority }
+    ::= { rlTunnelIsatapPrlTable 1 }
+
+RlTunnelIsatapPrlEntry ::= SEQUENCE {
+    rlTunnelIsatapPrlIfIndex Unsigned32,
+    rlTunnelIsatapPrlPriority Unsigned32,
+    rlTunnelIsatapPrlAddress IpAddress,
+    rlTunnelIsatapPrlIsActive INTEGER
+}
+
+rlTunnelIsatapPrlIfIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the interface to which this PRL entry belongs."
+    ::= { rlTunnelIsatapPrlEntry 1 }
+
+rlTunnelIsatapPrlPriority OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The priority of the entry. Lower value - higher priority."
+    ::= { rlTunnelIsatapPrlEntry 2 }
+
+rlTunnelIsatapPrlAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv4 address of the potential router."
+    ::= { rlTunnelIsatapPrlEntry 3 }
+
+rlTunnelIsatapPrlIsActive OBJECT-TYPE
+    SYNTAX INTEGER {
+       true(1),
+       false(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the PRL entry is active (meaning it has an up to date RA)."
+    ::= { rlTunnelIsatapPrlEntry 4 }
+
+--- End of rlTunnelIsatapPrlTable
+
+
+
+rlTunnelIsatapConfRSInterval OBJECT-TYPE
+    SYNTAX  Unsigned32 (10 .. 3600)
+--  UNITS   "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the time interval between Router Solicitations prior to
+         receiving the first reply from the ISATAP router."
+    DEFVAL  { 10 }
+    ::= { rlTunnelIsatap 11 }
+
+rlTunnelIsatapConfRobustness  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1 .. 20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "After a Router Advertisement was received, Router Solicitation
+         messages are sent every Lifetime / (1 + Robustness) seconds, where
+         Lifetime is the Lifetime advertised in the RA."
+    DEFVAL  { 3 }
+    ::= { rlTunnelIsatap 12 }
+
+
+rlTunnelIPv6EndConfig  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to indicate end of snmp configuration for IPv6. Can be removed,
+         if mechanism for indicating end config per mib is added to SNMP."
+    DEFVAL  { 1 }
+    ::= { rlTunnelTypeSpecific 2 }
+
+END

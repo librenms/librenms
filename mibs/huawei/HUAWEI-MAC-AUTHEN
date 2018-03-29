@@ -1,0 +1,274 @@
+-- =================================================================
+-- Copyright (C) 2008 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:HUAWEI MAC AUTHEN MIB
+-- Reference:
+-- Version: V1.00
+-- History:
+--    V1.0 2008-07-02, publish
+-- =================================================================
+    
+    HUAWEI-MAC-AUTHEN-MIB DEFINITIONS ::= BEGIN
+     
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            MODULE-IDENTITY, IpAddress, OBJECT-TYPE        
+                FROM SNMPv2-SMI    
+            InterfaceIndexOrZero, ifDescr
+                FROM IF-MIB
+                        VlanIdOrNone     
+                FROM Q-BRIDGE-MIB
+            EnabledStatus
+                FROM P-BRIDGE-MIB                                             
+            RowStatus,MacAddress,DisplayString            
+                FROM SNMPv2-TC;
+                
+    
+--
+-- Module Identifier                
+--
+    hwMacAuthenMIB MODULE-IDENTITY 
+        LAST-UPDATED "200807021800Z"            -- June 02th, 2008 at 14:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co., Ltd."
+        CONTACT-INFO 
+            " R&D NanJing, Huawei Technologies co.,Ltd.
+            Huihong Bld.,NO.91 Baixia Rd., 
+            Bai-Xia District NanJing P.R. China
+            Zip:210001 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+            "This MIB describes objects used for mac-authentication,including
+            configuring mac-authentication."
+        REVISION "200807021800Z"            -- July 02th, 2008 at 14:00 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hwDatacomm 171 }
+    
+--
+-- Objects Identifier
+--
+
+    hwMacAuthenObjects OBJECT IDENTIFIER ::= { hwMacAuthenMIB 1 }
+
+--
+-- Nodes Identifier
+--
+    
+    hwMacAuthenGlobalEnable  OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Global MAC authenticate. Enable this before you want to enable
+             other interfaces MAC authentication. "
+        DEFVAL { disable }
+        ::= { hwMacAuthenObjects 1 }
+    
+            
+    hwMacAuthenModeUsername OBJECT-TYPE
+            SYNTAX     INTEGER
+            {
+             macAddressWithoutHyphen(1),
+             macAddressWithHyphen(2),
+             fixed(3)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify MAC authentication mode config."
+        DEFVAL { macAddressWithoutHyphen }
+        ::= { hwMacAuthenObjects 2 }
+    
+            
+    hwMacAuthenPassword OBJECT-TYPE
+                SYNTAX     DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Special the fixed password. "
+        ::= { hwMacAuthenObjects 3 }
+    
+    
+    hwMacAuthenUsername OBJECT-TYPE
+                SYNTAX     DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Special the fixed username.  "
+        ::= { hwMacAuthenObjects 4 }        
+    
+    
+    hwMacAuthenDomain OBJECT-TYPE
+                SYNTAX     DisplayString
+                MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify domain server configuration. "
+        ::= { hwMacAuthenObjects 5 }        
+    
+    
+    hwMacAuthenTimerOfflineDetect OBJECT-TYPE
+        SYNTAX     Integer32(30..7200)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify timer configuration."
+        DEFVAL { 300 }
+        ::= { hwMacAuthenObjects 6 }
+    
+            
+    hwMacAuthenTimerQuiet OBJECT-TYPE
+        SYNTAX     Integer32(10..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify timer configuration."
+        DEFVAL { 60 }
+        ::= { hwMacAuthenObjects 7 }    
+       
+        
+    hwMacAuthenTimerServerTimeout OBJECT-TYPE
+        SYNTAX     Integer32(1..120)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify timer configuration."
+        DEFVAL { 30 }
+        ::= { hwMacAuthenObjects 8 }    
+    
+    
+    hwMacAuthenReauthInterval OBJECT-TYPE
+        SYNTAX     Integer32(1..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify timer configuration of guest vlan reauthentication. "
+        DEFVAL { 30 }
+        ::= { hwMacAuthenObjects 9 }
+        
+            
+    hwMacAuthenCfgTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMacAuthenCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MAC authentication configuration table."
+            ::= { hwMacAuthenObjects 10 }
+    
+           
+    hwMacAuthenCfgEntry OBJECT-TYPE
+            SYNTAX HwMacAuthenCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the MAC authentication configuration table."
+            INDEX { hwMacAuthenPortIndex }
+            ::= { hwMacAuthenCfgTable 1 }
+            
+    HwMacAuthenCfgEntry ::=
+            SEQUENCE {
+                hwMacAuthenPortIndex         Integer32,
+                hwMacAuthenPortEnable         EnabledStatus,
+                hwMacAuthenGuestVlan                VlanIdOrNone,
+                hwMacAuthenMaxUserNum             Integer32                
+                }
+    
+    hwMacAuthenPortIndex OBJECT-TYPE
+            SYNTAX  Integer32 (1..512)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The Index of L2-Switch Interface."
+            ::= { hwMacAuthenCfgEntry 1 }
+           
+    hwMacAuthenPortEnable OBJECT-TYPE
+            SYNTAX  EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION " Whether to enable MAC authentication on this interface."
+            DEFVAL { disable }            
+            ::= { hwMacAuthenCfgEntry 2 } 
+    
+    hwMacAuthenGuestVlan OBJECT-TYPE
+        SYNTAX VlanIdOrNone
+               MAX-ACCESS read-create
+               STATUS current
+               DESCRIPTION 
+                   " Specify guest vlan configuration information for ports."
+               ::= { hwMacAuthenCfgEntry 3 }         
+            
+    hwMacAuthenMaxUserNum OBJECT-TYPE
+            SYNTAX  Integer32(1..256)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "The max number of users. "
+            DEFVAL { 256 }    
+            ::= { hwMacAuthenCfgEntry 4 }
+    
+    
+--
+-- Traps Identifier
+--
+        hwMacAuthenMibTraps OBJECT IDENTIFIER ::= { hwMacAuthenMIB 2 }
+        
+            hwMacAuthenMaxUserAlarm NOTIFICATION-TYPE
+                   OBJECTS { ifDescr } 
+                   STATUS current     
+                   DESCRIPTION 
+                           "The number of ahthenticate users is reached the max number. "
+                   ::= { hwMacAuthenMibTraps 1 }
+        
+            
+     --  ============== conformance information ==============
+    hwMacAuthenConformance OBJECT IDENTIFIER ::= { hwMacAuthenMIB 3 }
+    
+    hwMacAuthenCompliances OBJECT IDENTIFIER ::= { hwMacAuthenConformance 1 }
+    hwMacAuthenCompliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION
+            "The compliance statement for systems supporting this module."
+        
+           MODULE      -- this module
+           MANDATORY-GROUPS
+               {
+                   hwMacAuthenCfgGroup
+               }  
+                                           
+        ::= { hwMacAuthenCompliances 1 }  
+        
+        --  ============== groups ==============  
+    
+    hwMacAuthenCfgGroups OBJECT IDENTIFIER ::= { hwMacAuthenConformance 2 }
+    
+    hwMacAuthenCfgGroup OBJECT-GROUP
+            OBJECTS { 
+                      hwMacAuthenGlobalEnable, 
+                      hwMacAuthenModeUsername, 
+                      hwMacAuthenPassword, 
+                      hwMacAuthenUsername, 
+                      hwMacAuthenDomain, 
+                      hwMacAuthenTimerOfflineDetect,
+                      hwMacAuthenTimerQuiet, 
+                      hwMacAuthenTimerServerTimeout, 
+                      hwMacAuthenReauthInterval, 
+                      hwMacAuthenPortEnable, 
+                      hwMacAuthenGuestVlan, 
+                      hwMacAuthenMaxUserNum
+                    }
+             STATUS current
+            DESCRIPTION 
+                "The mac-authen's Configuration group."
+            ::= { hwMacAuthenCfgGroups 1 }    
+            
+    hwMacAuthenTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMacAuthenMaxUserAlarm }
+            STATUS current
+            DESCRIPTION 
+                "The mac-authen's Notification group."
+            ::= { hwMacAuthenCfgGroups 2 } 
+                                                                       
+        --  ============== conformance information define end ==============
+        END

@@ -1,0 +1,195 @@
+-- *******************************************************************
+-- Juniper enterprise specific Access Authentication objects MIB.
+--
+-- Copyright (c) 2001-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    JUNIPER-JS-AUTH-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter64, IpAddress, Integer32,
+        NOTIFICATION-TYPE, MODULE-IDENTITY, 
+        OBJECT-TYPE	
+            FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC 
+
+        jnxJsAuth 
+            FROM JUNIPER-JS-SMI;
+
+
+    jnxJsAuthMIB  MODULE-IDENTITY
+        LAST-UPDATED  "200705142022Z"
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "Firewall and security features restrict the accessing of protected 
+             resources (ideally on different zones) behind a firewall based 
+             on their source ip and other credentials.
+
+             This module defines the objects pertain to access authentication."
+    	REVISION      "200705140000Z"
+    	DESCRIPTION   "Creation Date"
+    	::= { jnxJsAuth 1 }   
+
+
+    jnxJsAuthNotifications OBJECT IDENTIFIER ::= { jnxJsAuthMIB 0 }
+    jnxJsAuthObjects       OBJECT IDENTIFIER ::= { jnxJsAuthMIB 1 }
+
+
+    -- ***************************************************************
+    --  Next Branch node. 
+    -- ***************************************************************
+
+    jnxJsFwAuthStats       OBJECT IDENTIFIER ::= { jnxJsAuthObjects 1 }
+    jnxJsAuthTrapVars      OBJECT IDENTIFIER ::= { jnxJsAuthObjects 2 }
+
+
+    -- ***************************************************************
+    -- Firewall Authentication Statistics 
+    -- ***************************************************************
+
+    jnxJsFwAuthNumPendingUsers  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Number of users currently waiting to be authenticated by 
+              the firewall user authentication mechanism."
+        ::= { jnxJsFwAuthStats 1 }
+	
+    jnxJsFwAuthNumSuccUsers OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of users currently allowed access by the firewall 
+             user authentication mechanism."
+        ::= { jnxJsFwAuthStats 2 }
+	
+    jnxJsFwAuthNumFailedUsers OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of users currently failed to be authenticated by 
+             the firewall user authentication mechanism."
+        ::= { jnxJsFwAuthStats 3 }
+	
+    jnxJsFwAuthTotalUsers OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of users that are accessing or attempting 
+             to access resources managed by the firewall user 
+             authentication mechanism."
+        ::= { jnxJsFwAuthStats 4 }
+	
+
+	-- ********************************************************************
+	-- Objects used for the FW authentication traps 
+	-- ********************************************************************
+
+	jnxJsFwAuthUserName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The name of the user who is attempting or has been authenticated."
+        ::= { jnxJsAuthTrapVars 1 }	
+
+	jnxJsFwAuthServiceDesc OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The service or application name that the enthentication 
+             is performed for: telnet, ftp, http."
+        ::= { jnxJsAuthTrapVars 2 }	
+
+	jnxJsFwAuthReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The reason for the trap being generated: authentication 
+             failure due to: timeout, invalid password, invalid username, etc."
+        ::= { jnxJsAuthTrapVars 3 }	
+
+	jnxJsFwAuthClientIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The authentication client's IP Address."
+        ::= { jnxJsAuthTrapVars 4 }	
+
+    -- ***************************************************************
+	-- definition of Firewall user authentication related traps.
+    -- ***************************************************************
+	
+	--
+	-- Firewall User Authentication failed. 
+	-- 
+	jnxJsFwAuthFailure	NOTIFICATION-TYPE
+        OBJECTS         { jnxJsFwAuthUserName, 
+						  jnxJsFwAuthClientIpAddr,
+						  jnxJsFwAuthServiceDesc,
+						  jnxJsFwAuthReason }
+        STATUS          current
+        DESCRIPTION
+            "A firewall user authentication status trap signifies whether a user
+             using the pass-through firewall authentication mechanism 
+             has been rejected due to reason specified in the trap. 
+
+             jnxJsFwAuthUserName is the user.
+             jnxClientIPAddress is the ip address the user came from.
+             jnxJsFwAuthServiceDesc specifies the application by 
+             which the authentication was performed. 
+             jnxJsFwAuthReason indicates the reason for failure."
+        ::= { jnxJsAuthNotifications 1 }
+
+	--
+	-- Firewall user authentication Service is up 
+	-- 
+	jnxJsFwAuthServiceUp NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "Firewall user authentication service has started."
+        ::= { jnxJsAuthNotifications 2 }
+
+	--
+	-- Firewall user authentication Service is up 
+	-- 
+	jnxJsFwAuthServiceDown NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "Firewall user authentication service has stopped."
+        ::= { jnxJsAuthNotifications 3 }
+
+	--
+	-- Firewall user authentication maximum capacity exceeded.
+	-- 
+	jnxJsFwAuthCapacityExceeded 	NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "Firewall user authentication maximum capacity has been exceeded. 
+
+             jnxJsFwAuthTotalUsers indicates the total number of users 
+             being authenticated.  And it has exceeds the maximum allowable
+             users. "
+        ::= { jnxJsAuthNotifications 4 }
+
+END

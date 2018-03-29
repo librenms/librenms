@@ -1,0 +1,288 @@
+--========================================================
+--
+-- MIB      : AV-SME-PLATFORM-PROD  Avaya Inc.
+--
+-- Version  : 0.14.00   30 May 2014
+--
+--========================================================
+--
+-- Copyright (c) 2010 - 2012 Avaya Inc.
+-- All Rights Reserved.
+--
+--========================================================
+AV-SME-PLATFORM-PROD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    products
+        FROM AVAYAGEN-MIB;
+
+avSMEPlatformProdMIB MODULE-IDENTITY
+    LAST-UPDATED        "201405301200Z" -- 30 May 2014
+    ORGANIZATION 	"Avaya Inc."
+    CONTACT-INFO
+        "Avaya Customer Services
+         Postal: Avaya, Inc.
+                 211 Mt Airy Rd.
+                 Basking Ridge, NJ 07920
+                 USA
+         Tel:    +1 908 953 6000
+
+         WWW:    http://www.avaya.com"
+    DESCRIPTION
+        "Avaya IP Office Products OID tree.
+
+         This MIB module defines the product/sysObjectID values for
+         use with Avaya IP Office family of telephone switches."
+
+    REVISION     "201405301200Z" -- 30 May 2014
+    DESCRIPTION
+        "Rev 0.14.00
+         Added configuration 11, 12, 13 for IP Office Server Edition Primary,
+         IP Office Server Edition Secondary and
+         IP Office Server Edition Expansion System (L) Select Mode"
+    REVISION     "201404031200Z" -- 03 April 2014
+    DESCRIPTION
+        "Rev 0.13.00
+         Updated service vendor values
+         Added Contact Recorder service"
+    REVISION     "201301231600Z" -- 23 January 2013
+    DESCRIPTION
+        "Rev 0.12.00
+         Updated branding for configuration 1 and 10"
+    REVISION     "201211291200Z" -- 29 November 2012
+    DESCRIPTION
+        "Rev 0.11.00
+         Updated branding for configuration 1.
+         Added configuration 10."
+    REVISION     "201205101235Z" -- 10 May 2012
+    DESCRIPTION
+        "Rev 0.10.00
+        Updated branding for configurations 7, 8 and 9."
+    REVISION     "201204091025Z" -- 09 Apr 2012
+    DESCRIPTION
+        "Rev 0.09.00
+        Updated branding for configurations 7, 8 and 9."
+    REVISION     "201203051005Z" -- 05 Mar 2012
+    DESCRIPTION
+        "Rev 0.08.00
+        Updated configurations 7, 8 and 9."
+    REVISION     "201112161330Z" -- 16 Dec 2011
+    DESCRIPTION
+        "Rev 0.07.01
+        Updated configuration 6."
+    REVISION     "201112141535Z" -- 14 Dec 2011
+    DESCRIPTION
+        "Rev 0.07.00
+        Added configuration 9, updated configurations 7 and 8."
+    REVISION     "201112071410Z" -- 07 Dec 2011
+    DESCRIPTION
+        "Rev 0.06.00
+        Added configurations 7 and 8."
+    REVISION     "201105031330Z" -- 03 May 2011
+    DESCRIPTION
+        "Rev 0.05.00
+        Added configuration 6."
+    REVISION     "201103300922Z" -- 30 March 2011
+    DESCRIPTION
+        "Rev 0.04.00
+        Added configuration 4 and 5."
+    REVISION     "201007071350Z" -- 07 July 2010
+    DESCRIPTION
+        "Rev 0.03.00
+        Simplified the structure."
+    REVISION     "201007061345Z" -- 06 July 2010
+    DESCRIPTION
+        "Rev 0.02.00
+        Corrected base OID to one properly allocated in Avaya tree."
+    REVISION     "201007021506Z" -- 02 July 2010
+    DESCRIPTION
+        "Rev 0.01.00
+        The first rough draft of this MIB module."
+    ::= { products 48 }
+
+-- Product Groups
+
+smepProdVariants      OBJECT IDENTIFIER ::= { avSMEPlatformProdMIB 1 }
+smepProdServices      OBJECT IDENTIFIER ::= { avSMEPlatformProdMIB 2 }
+smepProdPorts         OBJECT IDENTIFIER ::= { avSMEPlatformProdMIB 3 }
+smepProdDongleModules OBJECT IDENTIFIER ::= { avSMEPlatformProdMIB 4 }
+
+-- Configuration 1
+
+smepCfg1    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 1
+	of the SME Embedded Platform.
+        Configuration 1 = IP Office Application Server on Linux PC"
+    ::= { smepProdVariants 1 }
+
+-- Configuration 2
+
+smepCfg2   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 2
+	of the SME Embedded Platform.
+        Configuration 2 = IP Office on PC."
+    ::= { smepProdVariants 2 }
+
+-- Configuration 3
+
+smepCfg3   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 3
+	of the SME Embedded Platform.
+        Configuration 3 = IP Office on HP ProCurve"
+    ::= { smepProdVariants 3 }
+
+-- Configuration 4
+
+smepCfg4   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 4
+	of the SME Embedded Platform.
+        Configuration 4 = IP Office on Dell"
+    ::= { smepProdVariants 4 }
+
+-- Configuration 5
+
+smepCfg5   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 5
+	of the SME Embedded Platform.
+        Configuration 5 = Branch installations"
+    ::= { smepProdVariants 5 }
+
+-- Configuration 6
+
+smepCfg6   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 6
+	of the SME Embedded Platform.
+        Configuration 6 = Standalone Voice Mail"
+    ::= { smepProdVariants 6 }
+
+-- Configuration 7
+
+smepCfg7   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 7
+	of the SME Embedded Platform.
+        Configuration 7 = IP Office Server Edition Primary"
+    ::= { smepProdVariants 7 }
+
+-- Configuration 8
+
+smepCfg8   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 8
+	of the SME Embedded Platform.
+        Configuration 8 = IP Office Server Edition Secondary"
+    ::= { smepProdVariants 8 }
+
+-- Configuration 9
+
+smepCfg9   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Configuration 9
+	of the SME Embedded Platform.
+        Configuration 9 = IP Office Server Edition Expansion System (L)"
+    ::= { smepProdVariants 9 }
+
+-- Configuration 10
+
+smepCfg10 OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Configuration 10
+        of the SME Embedded Platform.
+        Configuration 10 = IP Office Application Server on UCM"
+    ::= { smepProdVariants 10 }
+
+-- Configuration 11
+
+smepCfg11 OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Configuration 11
+        of the SME Embedded Platform.
+        Configuration 11 = IP Office Server Edition Primary Select Mode"
+    ::= { smepProdVariants 11 }
+
+-- Configuration 12
+
+smepCfg12 OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Configuration 12
+        of the SME Embedded Platform.
+        Configuration 12 = IP Office Server Edition Secondary Select Mode"
+    ::= { smepProdVariants 12 }
+
+-- Configuration 13
+
+smepCfg13 OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Configuration 13
+        of the SME Embedded Platform.
+        Configuration 13 = IP Office Server Edition Expansion System (L) Select Mode"
+    ::= { smepProdVariants 13 }
+
+-- Application Services Groups
+
+smepProdServiceOneXPortal   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Avaya one-X Portal service
+         resident on Avaya IP Office on Linux server."
+    ::= { smepProdServices 1 }
+
+smepProdServiceVoicemailPro   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Avaya Voicemail Pro service
+        resident on Avaya IP Office on Linux server."
+    ::= { smepProdServices 2 }
+
+smepProdServiceContactRecorder   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Avaya Contact Recorder service
+        resident on Avaya IP Office on Linux server."
+    ::= { smepProdServices 3 }
+
+
+-- Ports
+
+smepProdPortLAN  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Avaya IP Office LAN
+        (10BASE-T/100BASE-TX) Ports"
+    ::= { smepProdPorts 1 }
+
+
+-- Dongle
+
+smepProdGenericDongle    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for the Avaya IP Office License
+        Dongle - A single representation for three dongle types,
+        Parallel, Serial and USB. The Parallel and USB ones not truly
+        connected directly to the IP Office but the managing PC."
+    ::= { smepProdDongleModules 1 }
+
+
+END

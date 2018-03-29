@@ -1,0 +1,183 @@
+--
+--defines ROOMALERT3E-MIB for SNMP agent extension of Room Alert 3E
+--Contents:	Global Registration Module
+--		Room Alert OIDs - Enterprise 20916
+--Version:	1.0.1
+--Date:		WEB_RELEASE_DATE_PLACEHOLDER
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) COPYRIGHT_YEAR_PLACEHOLDER AVTECH Software, Inc.
+--
+
+ROOMALERT3E-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+avtech			OBJECT IDENTIFIER ::= { enterprises 20916 }
+products		OBJECT IDENTIFIER ::= { avtech 1 }
+ROOMALERT3E		OBJECT IDENTIFIER ::= { products 9 }
+sensors			OBJECT IDENTIFIER ::= { ROOMALERT3E 1 }
+signaltower		OBJECT IDENTIFIER ::= { ROOMALERT3E 2 }
+traps			OBJECT IDENTIFIER ::= { ROOMALERT3E 3 }
+digital			OBJECT IDENTIFIER ::= { sensors 1 }
+digital-sen1	OBJECT IDENTIFIER ::= { digital 1 }
+digital-sen2	OBJECT IDENTIFIER ::= { digital 2 }
+switch			OBJECT IDENTIFIER ::= { sensors 2 }
+
+
+-- Room Alert 3E MIB
+-- Parameters
+
+digital-sen1-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature reading in Celsius of the Internal Temperature Sensor."
+::= { digital-sen1 1 }
+
+digital-sen1-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature reading in Fahrenheit of the Internal Temperature Sensor."
+::= { digital-sen1 2 }
+
+digital-sen1-label OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label of this sensor"
+::= {digital-sen1 3}
+
+digital-sen2-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius."
+::= { digital-sen2 1 }
+
+digital-sen2-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen2 2 }
+
+digital-sen2-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity."
+::= { digital-sen2 3 }
+
+digital-sen2-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit."
+::= { digital-sen2 4 }
+
+digital-sen2-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen2 5 }
+
+digital-sen2-label OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label of this sensor"
+::= {digital-sen2 6}
+
+switch-sen1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for the switch sensor (0 = OPEN, 1 = CLOSED)."
+::= { switch 1 }
+
+switch-label OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for the switch sensor"
+::= { switch 2 }
+
+red-led OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 1 }
+
+amber-led OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 2 }
+
+green-led OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 3 }
+
+blue-led OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 4 }
+
+white-led OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 5 }
+
+alarm1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 6 }
+
+alarm2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The status of this Signal Tower element (0 = OFF, 1 = ON)."
+::= { signaltower 7 }
+
+alarmmessage OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last Alarm Message"
+::= { traps 1 }
+
+
+-- ROOMALERT3E TRAPS
+
+room-alert-3e-snmp-trap TRAP-TYPE
+	ENTERPRISE	ROOMALERT3E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A room-alert-3e-snmp-trap indicates that an alarm
+			condition has occurred on the sensor indicated
+			by the alarmmessage variable."
+::= 2
+END

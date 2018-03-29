@@ -1,0 +1,988 @@
+--
+-- Juniper Enterprise Specifics MIB
+-- 
+-- Copyright (c) 2003-2004, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-Services-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Gauge32
+        FROM SNMPv2-SMI
+    ifIndex
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxServicesInfoMib  	MODULE-IDENTITY
+    LAST-UPDATED 	"200307182154Z" -- Fri Jul 18 21:54:00 2003 UTC
+    ORGANIZATION 	"Juniper Networks, Inc."
+    CONTACT-INFO
+            		"Juniper Technical Assistance Center
+			Juniper Networks, Inc.
+			1194 N. Mathilda Avenue
+			Sunnyvale, CA 94089
+			E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for monitoring services properties"
+
+    -- revision history -- 
+    
+	REVISION "200401300000Z"    -- 30 January, 2004
+	DESCRIPTION
+		"Initial version."
+
+    ::= { jnxMibs 27 }
+
+
+--
+-- Flow table aggregate statistics information
+--
+-- These statistics concern the basic flow table functionality 
+-- available on both AS PICs and GGSN-I PICs
+--
+
+
+jnxSvcFlowTableAggStatsTable	OBJECT-TYPE
+    SYNTAX       		SEQUENCE OF JnxSvcFlowTableAggStatsEntry
+    MAX-ACCESS   		not-accessible
+    STATUS       		current
+    DESCRIPTION
+	"Aggregated statistics information about all flow tables on 
+	 the service PIC interface."
+    ::= { jnxServicesInfoMib 1 }
+
+jnxSvcFlowTableAggStatsEntry	OBJECT-TYPE
+    SYNTAX			JnxSvcFlowTableAggStatsEntry
+    MAX-ACCESS			not-accessible
+    STATUS			current
+    DESCRIPTION
+	"An entry containing aggregated statistics for all 
+	 flow tables for a particular service pic interface."
+    INDEX   		{ ifIndex }
+    ::= { jnxSvcFlowTableAggStatsTable 1 }
+
+JnxSvcFlowTableAggStatsEntry ::= SEQUENCE {
+
+    --- flow creation, cleanup, counts
+    
+    jnxSvcAggFlow			Gauge32,
+    jnxSvcAggFlowMaximum		Gauge32,
+    jnxSvcAggFlowCreated		Counter64,
+    jnxSvcAggFlowFreed			Counter64,
+    jnxSvcAggFlowIdleFreed		Counter64,
+
+    --- TCP flows (all types)
+
+    jnxSvcAggFlowTcp			Gauge32,
+    jnxSvcAggFlowTcpMaximum		Gauge32,
+    jnxSvcAggFlowTcpCreated		Counter64,
+    jnxSvcAggFlowTcpFreed		Counter64,
+    jnxSvcAggFlowTcpIdleFreed		Counter64,
+
+    --- UDP flows (all types)
+
+    jnxSvcAggFlowUdp			Gauge32,
+    jnxSvcAggFlowUdpMaximum		Gauge32,
+    jnxSvcAggFlowUdpCreated		Counter64,
+    jnxSvcAggFlowUdpFreed		Counter64,
+    jnxSvcAggFlowUdpIdleFreed		Counter64,
+
+    -- general counters for packets 
+
+    jnxSvcAggFlowPkt			Counter64, -- total
+    jnxSvcAggFlowPktErr		Counter64,
+    jnxSvcAggFlowByte			Counter64, -- total 
+    jnxSvcAggFlowByteErr		Counter64,
+
+    -- ICMP packets are a special case
+    
+    jnxSvcAggFlowIcmpPkt		Counter64, -- total
+    jnxSvcAggFlowIcmpPktErr		Counter64,
+    jnxSvcAggFlowIcmpPktErrBadFlow	Counter64,
+    jnxSvcAggFlowIcmpByte		Counter64, -- total
+    jnxSvcAggFlowIcmpByteErr	Counter64,
+    
+    -- TCP packets overall statistics
+    
+    jnxSvcAggFlowTcpPkt			Counter64, -- total 
+    jnxSvcAggFlowTcpPktErr		Counter64,
+    jnxSvcAggFlowTcpPktErrBadFlow	Counter64,
+    jnxSvcAggFlowTcpByte		Counter64, -- total
+    jnxSvcAggFlowTcpByteErr	Counter64,
+    
+    -- UDP packets overall statistics
+
+    jnxSvcAggFlowUdpPkt			Counter64, -- total 
+    jnxSvcAggFlowUdpPktErr		Counter64,
+    jnxSvcAggFlowUdpPktErrBadFlow	Counter64, 
+    jnxSvcAggFlowUdpByte		Counter64, -- total
+    jnxSvcAggFlowUdpByteErr	Counter64
+}
+
+jnxSvcAggFlow		OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of flows of any kind in the flow table."
+    ::= { jnxSvcFlowTableAggStatsEntry 1 }
+    
+jnxSvcAggFlowMaximum	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Maximum number of flows of any kind in the flow table
+    	 (high water mark)."
+    ::= { jnxSvcFlowTableAggStatsEntry 2 }
+    
+jnxSvcAggFlowCreated	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of flows of any kind that have been
+    	 created in the flow table."
+    ::= { jnxSvcFlowTableAggStatsEntry 3 }
+    
+jnxSvcAggFlowFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of flows of any kind that have been
+    	 freed from the flow table for any reason."
+    ::= { jnxSvcFlowTableAggStatsEntry 4 }
+    
+jnxSvcAggFlowIdleFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of flows of any kind that have been
+    	 freed from the flow table by idle flow detection."
+    ::= { jnxSvcFlowTableAggStatsEntry 5 }
+    
+jnxSvcAggFlowTcp	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP flows in the flow table."
+    ::= { jnxSvcFlowTableAggStatsEntry 6 }
+    
+jnxSvcAggFlowTcpMaximum	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Maximum number of TCP flows in the flow table
+    	 (high water mark)."
+    ::= { jnxSvcFlowTableAggStatsEntry 7 }
+    
+jnxSvcAggFlowTcpCreated	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP flows that have been
+    	 created in the flow table."
+    ::= { jnxSvcFlowTableAggStatsEntry 8 }
+    
+jnxSvcAggFlowTcpFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP flows that have been
+    	 freed from the flow table for any reason."
+    ::= { jnxSvcFlowTableAggStatsEntry 9 }
+    
+jnxSvcAggFlowTcpIdleFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP flows that have been
+    	 freed from the flow table by idle flow detection."
+    ::= { jnxSvcFlowTableAggStatsEntry 10 }
+    
+jnxSvcAggFlowUdp	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of UDP flows in the flow table."
+    ::= { jnxSvcFlowTableAggStatsEntry 11 }
+    
+jnxSvcAggFlowUdpMaximum	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Maximum number of TCP flows in the flow table
+    	 (high water mark)."
+    ::= { jnxSvcFlowTableAggStatsEntry 12 }
+    
+jnxSvcAggFlowUdpCreated	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP flows that have been
+    	 created in the flow table."
+    ::= { jnxSvcFlowTableAggStatsEntry 13 }
+    
+jnxSvcAggFlowUdpFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of UDP flows that have been
+    	 freed from the flow table for any reason."
+    ::= { jnxSvcFlowTableAggStatsEntry 14 }
+    
+jnxSvcAggFlowUdpIdleFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP flows that have been
+    	 freed from the flow table by idle flow detection."
+    ::= { jnxSvcFlowTableAggStatsEntry 15 }
+    
+jnxSvcAggFlowPkt	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of packets processed by all flows."
+    ::= { jnxSvcFlowTableAggStatsEntry 16 }
+    
+jnxSvcAggFlowPktErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of packets 
+    	 found to be in invalid  in processing by all flows."
+    ::= { jnxSvcFlowTableAggStatsEntry 17 }
+    
+jnxSvcAggFlowByte	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for packets processed by all flows."
+    ::= { jnxSvcFlowTableAggStatsEntry 18 }
+    
+jnxSvcAggFlowByteErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for packets
+    	found to be in invalid in processing by all flows."
+    ::= { jnxSvcFlowTableAggStatsEntry 19 }
+    
+jnxSvcAggFlowIcmpPkt	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of ICMP packets processed."
+    ::= { jnxSvcFlowTableAggStatsEntry 20 }
+    
+jnxSvcAggFlowIcmpPktErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of ICMP packets 
+    	found to be in invalid for any reason."
+    ::= { jnxSvcFlowTableAggStatsEntry 21 }
+    
+jnxSvcAggFlowIcmpPktErrBadFlow	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of ICMP packets 
+    	 found to be in invalid because the flow was invalid."
+    ::= { jnxSvcFlowTableAggStatsEntry 22 }
+    
+jnxSvcAggFlowIcmpByte	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for all ICMP packets processed."
+    ::= { jnxSvcFlowTableAggStatsEntry 23 }
+    
+jnxSvcAggFlowIcmpByteErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for all 
+    	ICMP packets found to be in invalid."
+    ::= { jnxSvcFlowTableAggStatsEntry 24 }
+    
+jnxSvcAggFlowTcpPkt	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP packets processed."
+    ::= { jnxSvcFlowTableAggStatsEntry 25 }
+    
+jnxSvcAggFlowTcpPktErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP packets found to be in invalid 
+    	 for any reason."
+    ::= { jnxSvcFlowTableAggStatsEntry 26 }
+    
+jnxSvcAggFlowTcpPktErrBadFlow	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of TCP packets found to be in invalid 
+    	 because the flow was invalid."
+    ::= { jnxSvcFlowTableAggStatsEntry 27 }
+    
+jnxSvcAggFlowTcpByte	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for all TCP packets processed."
+    ::= { jnxSvcFlowTableAggStatsEntry 28 }
+    
+jnxSvcAggFlowTcpByteErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for all TCP packets found to be in invalid"
+    ::= { jnxSvcFlowTableAggStatsEntry 29 }
+    
+jnxSvcAggFlowUdpPkt	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of UDP packets processed."
+    ::= { jnxSvcFlowTableAggStatsEntry 30 }
+    
+jnxSvcAggFlowUdpPktErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of UDP packets found to be in invalid 
+    	 for any reason."
+    ::= { jnxSvcFlowTableAggStatsEntry 31 }
+    
+jnxSvcAggFlowUdpPktErrBadFlow	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of UDP packets 
+    	 found to be in invalid because the flow
+    	 was invalid."
+    ::= { jnxSvcFlowTableAggStatsEntry 32 }
+    
+jnxSvcAggFlowUdpByte	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for all UDP packets processed."
+    ::= { jnxSvcFlowTableAggStatsEntry 33 }
+    
+jnxSvcAggFlowUdpByteErr	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+    	"Total number of bytes for all TCP packets
+    	found to be in invalid."
+    ::= { jnxSvcFlowTableAggStatsEntry 34 }
+
+
+--
+-- Service Identification Service Statistics
+--
+-- Service Indentification is supported only by the GGSN-I 
+-- PIC.
+--
+
+
+jnxSvcServIdTable		OBJECT-TYPE
+    SYNTAX       		SEQUENCE OF JnxSvcServIdTableEntry
+    MAX-ACCESS   		not-accessible
+    STATUS       		current
+    DESCRIPTION
+	"Information about the service-identification service for
+	 the service PIC interface."
+    ::= { jnxServicesInfoMib 2 }
+
+jnxSvcServIdTableEntry	OBJECT-TYPE
+    SYNTAX			JnxSvcServIdTableEntry
+    MAX-ACCESS			not-accessible
+    STATUS			current
+    DESCRIPTION
+	"An entry containing aggregate Service Identification service
+	 information applicable to particular service pic interfaces."
+    INDEX   		{ ifIndex }
+    ::= { jnxSvcServIdTable 1 }
+
+JnxSvcServIdTableEntry ::= SEQUENCE {
+    -- packet statistics for the service
+    jnxSvcServIdPkt				Counter64,
+    jnxSvcServIdByte				Counter64,
+    jnxSvcServIdErrPkt			Counter64,
+    jnxSvcServIdErrByte			Counter64,
+   
+    -- header examination functionality statistics
+    jnxSvcServIdHeadExPkt			Counter64,
+    jnxSvcServIdHeadExByte			Counter64,
+    jnxSvcServIdHeadExFlow			Counter64,
+    jnxSvcServIdHeadExFlowMtch			Counter64,
+    jnxSvcServIdHeadExProtoReq			Counter64,
+    jnxSvcServIdHeadExHttpProtoReq		Counter64,
+    jnxSvcServIdHeadExWapProtoReq		Counter64,
+
+    -- protocol identification and URI extraction 
+    jnxSvcServIdProtFlow			Gauge32,
+    jnxSvcServIdProtInsPkt			Counter64,
+    jnxSvcServIdProtInsByte			Counter64,
+    jnxSvcServIdProtInsFlowInsp			Counter64,
+    jnxSvcServIdProtInsFlowProtIdent		Counter64,
+    
+    -- URI matching
+    jnxSvcServIdProtInsHttpUri			Counter64,
+    jnxSvcServIdProtInsHttpUriMtch		Counter64,
+    jnxSvcServIdProtInsWapUri			Counter64,
+    jnxSvcServIdProtInsWapUriMtch		Counter64,
+
+    -- Detailed packet drop-or-in-error information
+    jnxSvcServIdPktTcpMalform			Counter64,
+    jnxSvcServIdWAPInvalidTxn			Counter64,
+    jnxSvcServIdErrWAPTxn			Counter64,
+    jnxSvcServIdErrHTTPTxn			Counter64,
+
+    -- Configuration-related Error counters    
+    jnxSvcServIdHeadExFailCfgState		Counter64,
+    jnxSvcServIdProtInsFailCfgState		Counter64,
+    
+    -- Transaction counters
+    jnxSvcTransactionWapCreated			Counter64,
+    jnxSvcTransactionWapMaximum			Gauge32,
+    jnxSvcTransactionWapFreed			Counter64,
+    jnxSvcTransactionWapIdleFreed		Counter64,
+    jnxSvcTransactionHttpCreated		Counter64,
+    jnxSvcTransactionHttpMaximum		Gauge32,
+    jnxSvcTransactionHttpFreed			Counter64,
+    jnxSvcTransactionHttpIdleFreed		Counter64,
+
+    -- Transaction error counters
+    jnxSvcServidProtInsUriErrProcess		Counter64,
+    jnxSvcServidProtInsUriErrTooLong		Counter64,
+    jnxSvcServidProtInsErrParseTx		Counter64,
+    jnxSvcServidProtInsUriErrNoRes		Counter64
+}
+
+jnxSvcServIdPkt	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Total count for all packets processed by service."
+    ::= { jnxSvcServIdTableEntry 1 }
+
+jnxSvcServIdByte	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Total bytes for all packets processed by service."
+    ::= { jnxSvcServIdTableEntry 2 }
+
+jnxSvcServIdErrPkt	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Total number of all packets 
+	     found to be in invalid by this service 
+	     during or as a result of processing."
+    ::= { jnxSvcServIdTableEntry 3 }
+
+jnxSvcServIdErrByte	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Total butes for all packets 
+	     found to be in invalid by this service 
+	     during or as a result of processing."
+    ::= { jnxSvcServIdTableEntry 4 }
+
+jnxSvcServIdHeadExPkt	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Packets processed by the service header 
+	     examination function.  This is the first 
+	     packet for a flow for any service set 
+	     specifying a header inspection rule set."
+    ::= { jnxSvcServIdTableEntry 5 }
+
+jnxSvcServIdHeadExByte	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Bytes for all packets processed by the service header 
+	     examination function.  This is the first 
+	     packet for a flow for any service set 
+	     specifying a header inspection rule set."
+    ::= { jnxSvcServIdTableEntry 6 }
+
+jnxSvcServIdHeadExFlow	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Packets processed by the service header 
+	     examination function.  This is the first 
+	     packet for a flow for any service set 
+	     specifying a header inspection rule set and
+	     only includes processing of packets that result
+	     in the creation of a flow."
+    ::= { jnxSvcServIdTableEntry 7 }
+
+jnxSvcServIdHeadExFlowMtch	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Flows that matched any rule configured for the  
+	     header examination function for the service set
+	     associated with the flow."
+    ::= { jnxSvcServIdTableEntry 8 }
+
+jnxSvcServIdHeadExProtoReq	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Flows identified as requiring protocol 
+	     inspection and URI extraction as a result of 
+	     the header examination function."
+    ::= { jnxSvcServIdTableEntry 13 }
+
+jnxSvcServIdHeadExHttpProtoReq	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Flows identified by header examination function as 
+	     potentially requiring HTTP protocol inspection and 
+	     URI extraction."
+    ::= { jnxSvcServIdTableEntry 14 }
+
+jnxSvcServIdHeadExWapProtoReq	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Flows identified by header examination function as 
+	     potentially requiring WAP protocol inspection and 
+	     URI extraction."
+    ::= { jnxSvcServIdTableEntry 15 }
+
+
+jnxSvcServIdProtFlow	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Flows currently undergoing protocol inspection and
+	     URI extraction. Does not include flows that have been
+	     marked as no longer requiring inspection or flows
+	     that are in an error state."
+    ::= { jnxSvcServIdTableEntry 16 }
+
+jnxSvcServIdProtInsPkt	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Total number of packets processed by protocol 
+	     inspection function while attempting to parse a 
+	     transaction and extract URIs."
+    ::= { jnxSvcServIdTableEntry 17 }
+
+jnxSvcServIdProtInsByte	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Total bytes for all packets processed by protocol 
+	     inspection function while attempting to parse a 
+	     transaction and extract URIs."
+    ::= { jnxSvcServIdTableEntry 18 }
+
+
+jnxSvcServIdProtInsFlowInsp	OBJECT-TYPE
+    SYNTAX 		Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+      	    "Total number of flows that have been inspected or 
+      	     are at present being inspected by the protocol 
+      	     inspection and identification function."
+    ::= { jnxSvcServIdTableEntry 19 }
+
+jnxSvcServIdProtInsFlowProtIdent	OBJECT-TYPE
+    SYNTAX 		Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+      	    "Flows for which the protocol inspection and 
+      	     identification function has determined the 
+      	     protocol in use and begun transaction processing."
+    ::= { jnxSvcServIdTableEntry 20 }
+
+jnxSvcServIdProtInsHttpUri	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Number of HTTP transactions that have successfully
+	     extracted a URI."
+    ::= { jnxSvcServIdTableEntry 24 }
+
+jnxSvcServIdProtInsHttpUriMtch	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Number of HTTP transaction URIs that were matched
+	     by a URI rule configured for the active service set."
+    ::= { jnxSvcServIdTableEntry 25 }
+
+jnxSvcServIdProtInsWapUri	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Number of WAP transactions that have successfully
+	     extracted a URI."
+    ::= { jnxSvcServIdTableEntry 26 }
+
+jnxSvcServIdProtInsWapUriMtch	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+	    "Number of WAP transaction URIs that were matched
+	     by a URI rule configured for the active service set."
+    ::= { jnxSvcServIdTableEntry 27 }
+
+jnxSvcServIdPktTcpMalform	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of TCP packets found to be in invalid due 
+	     to being malformed, for an incorrect sequence 
+	     number, or other reason."
+    ::= { jnxSvcServIdTableEntry 28 }
+
+jnxSvcServIdWAPInvalidTxn	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Numbee of packets found to be in invalid 
+	     due to invalid WAP transaction identifier."
+    ::= { jnxSvcServIdTableEntry 29 }
+
+jnxSvcServIdErrWAPTxn	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of packets found to be in invalid 
+	    because the WAP transaction 
+	    or flow was in an error state."
+    ::= { jnxSvcServIdTableEntry 30 }
+
+jnxSvcServIdErrHTTPTxn	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of packets found to be in invalid 
+	     because the HTTP transaction or flow was 
+	     in an error state."
+    ::= { jnxSvcServIdTableEntry 31 }
+
+jnxSvcServIdHeadExFailCfgState	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of header inspections that failed due to 
+	     internal configuration state."
+    ::= { jnxSvcServIdTableEntry 32 }
+
+jnxSvcServIdProtInsFailCfgState	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of URI inspections that failed due to 
+	    internal configuration state. "
+    ::= { jnxSvcServIdTableEntry 33 }
+
+jnxSvcTransactionWapCreated	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of WAP transaction sessions created."
+    ::= { jnxSvcServIdTableEntry 34 }
+
+jnxSvcTransactionWapMaximum	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Peak number of simultaneous of WAP transaction 
+	    sessions since start."
+    ::= { jnxSvcServIdTableEntry 35 }
+	
+jnxSvcTransactionWapFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of WAP transaction sessions freed."
+    ::= { jnxSvcServIdTableEntry 36 }
+	
+jnxSvcTransactionWapIdleFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of WAP transaction sessions freed by idle clean-up."
+    ::= { jnxSvcServIdTableEntry 37 }
+	
+jnxSvcTransactionHttpCreated	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of HTTP transaction sessions created."
+    ::= { jnxSvcServIdTableEntry 38 }
+
+jnxSvcTransactionHttpMaximum	OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Peak number of simultaneous of HTTP 
+	     transaction sessions since start."
+    ::= { jnxSvcServIdTableEntry 39 }
+	
+jnxSvcTransactionHttpFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of WAP transaction sessions freed."
+    ::= { jnxSvcServIdTableEntry 40 }
+	
+jnxSvcTransactionHttpIdleFreed	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of WAP transaction sessions freed by idle clean-up."
+    ::= { jnxSvcServIdTableEntry 41 }
+
+jnxSvcServidProtInsUriErrProcess	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of URIs that failed to process due to 
+	     internal processing error."
+    ::= { jnxSvcServIdTableEntry 42 }
+
+jnxSvcServidProtInsUriErrTooLong	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of URIs that were not processed because 
+	     they exceeded the maximum supported URI length."
+    ::= { jnxSvcServIdTableEntry 43 }
+	
+jnxSvcServidProtInsErrParseTx	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of flows which experienced a transaction 
+	     parse error or any kind that prevented URI extraction.
+	     This does not include length limitations or 
+	     processing errors."
+    ::= { jnxSvcServIdTableEntry 44 }
+
+jnxSvcServidProtInsUriErrNoRes	OBJECT-TYPE
+    SYNTAX		Counter64
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+	    "Number of URIs that were not processed due to lack 
+	     of system resources."
+    ::= { jnxSvcServIdTableEntry 45 }
+
+--
+-- Conformance & compliance (lint hush.. )
+--
+
+jnxSvcMIBConformance
+         OBJECT IDENTIFIER ::= { jnxServicesInfoMib 20 }
+jnxSvcMIBCompliances
+         OBJECT IDENTIFIER ::= { jnxSvcMIBConformance 1 }
+jnxSvcMIBGroups
+         OBJECT IDENTIFIER ::= { jnxSvcMIBConformance 2 }
+
+jnxSvcMIBCompliance		MODULE-COMPLIANCE
+   STATUS			current
+   DESCRIPTION 
+         "Compliance statement for the Juniper enterprise-specific
+          service PIC interface service information MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+	jnxSvcFlowTableAggStatsGroup,
+	jnxSvcServIdiceGroup
+   }
+   ::= { jnxSvcMIBCompliances 1 }
+
+
+jnxSvcFlowTableAggStatsGroup 	OBJECT-GROUP
+   OBJECTS { 
+	jnxSvcAggFlow,
+	jnxSvcAggFlowMaximum,
+	jnxSvcAggFlowCreated,
+	jnxSvcAggFlowFreed,
+	jnxSvcAggFlowIdleFreed,
+	jnxSvcAggFlowTcp,
+	jnxSvcAggFlowTcpMaximum,
+	jnxSvcAggFlowTcpCreated,
+	jnxSvcAggFlowTcpFreed,
+	jnxSvcAggFlowTcpIdleFreed,
+	jnxSvcAggFlowUdp,
+	jnxSvcAggFlowUdpMaximum,
+	jnxSvcAggFlowUdpCreated,
+	jnxSvcAggFlowUdpFreed,
+	jnxSvcAggFlowUdpIdleFreed,
+	jnxSvcAggFlowPkt,
+	jnxSvcAggFlowPktErr,
+	jnxSvcAggFlowByte,
+	jnxSvcAggFlowByteErr,
+	jnxSvcAggFlowIcmpPkt,
+	jnxSvcAggFlowIcmpPktErr,
+	jnxSvcAggFlowIcmpPktErrBadFlow,
+	jnxSvcAggFlowIcmpByte,
+	jnxSvcAggFlowIcmpByteErr,
+	jnxSvcAggFlowTcpPkt,
+	jnxSvcAggFlowTcpPktErr,
+	jnxSvcAggFlowTcpPktErrBadFlow,
+	jnxSvcAggFlowTcpByte,
+	jnxSvcAggFlowTcpByteErr,
+	jnxSvcAggFlowUdpPkt,
+	jnxSvcAggFlowUdpPktErr,
+	jnxSvcAggFlowUdpPktErrBadFlow,
+	jnxSvcAggFlowUdpByte,
+	jnxSvcAggFlowUdpByteErr
+   }
+   STATUS current
+   DESCRIPTION
+         "Basic aggregate statistics for flow table activity."
+   ::= { jnxSvcMIBGroups 1 }
+
+
+jnxSvcServIdiceGroup 	OBJECT-GROUP
+   OBJECTS { 
+	jnxSvcServIdPkt,
+	jnxSvcServIdByte,
+	jnxSvcServIdErrPkt,
+	jnxSvcServIdErrByte,
+	jnxSvcServIdHeadExPkt,
+	jnxSvcServIdHeadExByte,
+	jnxSvcServIdHeadExFlow,
+	jnxSvcServIdHeadExFlowMtch,
+	jnxSvcServIdHeadExProtoReq,
+	jnxSvcServIdHeadExHttpProtoReq,
+	jnxSvcServIdHeadExWapProtoReq,
+	jnxSvcServIdProtFlow,
+	jnxSvcServIdProtInsPkt,
+	jnxSvcServIdProtInsByte,
+	jnxSvcServIdProtInsFlowInsp,
+	jnxSvcServIdProtInsFlowProtIdent,
+	jnxSvcServIdProtInsHttpUri,
+	jnxSvcServIdProtInsHttpUriMtch,
+	jnxSvcServIdProtInsWapUri,
+	jnxSvcServIdProtInsWapUriMtch,
+	jnxSvcServIdPktTcpMalform,
+	jnxSvcServIdWAPInvalidTxn,
+	jnxSvcServIdErrWAPTxn,
+	jnxSvcServIdErrHTTPTxn,
+	jnxSvcServIdHeadExFailCfgState,
+	jnxSvcServIdProtInsFailCfgState,
+	jnxSvcTransactionWapCreated,
+	jnxSvcTransactionWapMaximum,
+	jnxSvcTransactionWapFreed,
+	jnxSvcTransactionWapIdleFreed,
+	jnxSvcTransactionHttpCreated,
+	jnxSvcTransactionHttpMaximum,
+	jnxSvcTransactionHttpFreed,
+	jnxSvcTransactionHttpIdleFreed,
+	jnxSvcServidProtInsUriErrProcess,
+	jnxSvcServidProtInsUriErrTooLong,
+	jnxSvcServidProtInsErrParseTx,
+	jnxSvcServidProtInsUriErrNoRes
+   }
+   STATUS current
+   DESCRIPTION
+         "Basic aggregate statistics for the Service Identification 
+          service."
+   ::= { jnxSvcMIBGroups 2 }
+
+
+
+END
+
+

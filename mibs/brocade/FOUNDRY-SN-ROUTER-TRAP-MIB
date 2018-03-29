@@ -1,0 +1,439 @@
+FOUNDRY-SN-ROUTER-TRAP-MIB DEFINITIONS ::= BEGIN
+
+-- Router Trap MIB Release 1.0.0
+-- Revision 01/24/03
+
+-- Copyright 1996-1997 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry SNMP Management Information Base Specification
+-- (Specification) embodies Foundry's confidential and
+-- proprietary intellectual property. Foundry retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+
+
+-- Imports
+
+
+IMPORTS
+   TRAP-TYPE              FROM RFC-1215
+   foundry                FROM FOUNDRY-SN-ROOT-MIB
+   snOspfRouterId,
+   snOspfIfStatusIpAddress,
+   snOspfIfStatusState,
+   snOspfVirtIfStatusAreaID,
+   snOspfVirtIfStatusNeighbor,
+   snOspfVirtIfStatusState,
+   snOspfNbrIpAddr,
+   snOspfNbrRtrId,
+   snOspfNbrState,
+   snOspfVirtNbrArea,
+   snOspfVirtNbrRtrId, 
+   snOspfVirtNbrState, 
+   snOspfPacketSrc,
+   snOspfConfigErrorType,
+   snOspfPacketType,
+   snOspfLsdbAreaId,
+   snOspfLsdbType,
+   snOspfLsdbLsId,
+   snOspfLsdbRouterId,
+   snOspfExtLsdbLimit	  FROM FOUNDRY-SN-OSPF-GROUP-MIB;
+
+-- Textual Conventions
+
+-- Groups
+
+-- SECTION 2: MIB Objects
+
+
+-- Trap Information
+
+-- These definitions use the TRAP-TYPE macro as defined in RFC 1215.
+
+-- Foundry Networks, Inc. Specific Traps
+
+snTrapOspfIfStateChange TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfIfStatusState   -- The new state
+              }
+   DESCRIPTION
+      "An ospfIfStateChange trap signifies that there
+      has been a change in the state of a non-virtual
+      OSPF interface. This trap should  be  generated
+      when  the interface state regresses (e.g., goes
+      from Dr to Down) or progresses  to  a  terminal
+      state  (i.e.,  Point-to-Point, DR Other, Dr, or
+      Backup)."
+	--#TYPE "Foundry Trap: OSPF Interface State Change"
+	--#SUMMARY "OSPF router id %s, interface %s state changed to %d."
+	--#ARGUMENTS { 0, 1, 2 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 3
+
+snTrapOspfVirtIfStateChange TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfVirtIfStatusState  -- The new state
+              }
+   DESCRIPTION
+      "An ospfIfStateChange trap signifies that there
+      has  been a change in the state of an OSPF vir-
+      tual interface.
+      This trap should be generated when  the  inter-
+      face  state  regresses  (e.g., goes from Point-
+      to-Point to Down) or progresses to  a  terminal
+      state (i.e., Point-to-Point)."
+	--#TYPE "Foundry Trap: OSPF Virtual Interface State Change"
+	--#SUMMARY "OSPF router id %s, virtual interface area id %s  neighbor %s state changed to %d."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 4
+
+
+snOspfNbrStateChange TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfNbrIpAddr,
+                snOspfNbrRtrId,
+                snOspfNbrState  -- The new state
+              }
+    DESCRIPTION
+       "An  ospfNbrStateChange  trap  signifies   that
+       there  has been a change in the state of a non-
+       virtual OSPF neighbor.   This  trap  should  be
+       generated  when  the  neighbor  state regresses
+       (e.g., goes from Attempt or Full  to  1-Way  or
+       Down)  or progresses to a terminal state (e.g.,
+       2-Way or Full).  When an  neighbor  transitions
+       from  or  to Full on non-broadcast multi-access
+       and broadcast networks, the trap should be gen-
+       erated  by the designated router.  A designated
+       router transitioning to Down will be  noted  by
+       ospfIfStateChange."
+	--#TYPE "Foundry Trap: OSPF Neighbour State Change"
+	--#SUMMARY "OSPF  router id %s neighbor area %s, neighbor router id  %s state changed to %d."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 5
+
+
+snOspfVirtNbrStateChange TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtNbrArea,
+                snOspfVirtNbrRtrId,
+                snOspfVirtNbrState  -- The new state
+              }
+    DESCRIPTION
+       "An ospfIfStateChange trap signifies that there
+       has  been a change in the state of an OSPF vir-
+       tual neighbor.  This trap should  be  generated
+       when  the  neighbor state regresses (e.g., goes
+       from Attempt or  Full  to  1-Way  or  Down)  or
+       progresses to a terminal state (e.g., Full)."
+	--#TYPE "Foundry Trap: OSPF Virtual Neighbour State Change"
+	--#SUMMARY "OSPF router id %s virtual neighbor area %s, virtual neighbor router id  %s state changed to %d."
+	--#ARGUMENTS { 0, 1, 2, 3 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 6
+
+
+
+snOspfIfConfigError TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfPacketSrc,  -- The source IP address
+                snOspfConfigErrorType, -- Type of error
+                snOspfPacketType
+              }
+    DESCRIPTION
+       "An ospfIfConfigError  trap  signifies  that  a
+       packet  has  been received on a non-virtual in-
+       terface  from  a  router  whose   configuration
+       parameters  conflict  with this router's confi-
+       guration parameters.  Note that the  event  op-
+       tionMismatch  should  cause  a  trap only if it
+       prevents an adjacency from forming."
+	--#TYPE "Foundry Trap: OSPF Interface Configuration Error"
+	--#SUMMARY "configuration error type %d with  packet type %d has been received on interface %s, router id %s from  %s."
+	--#ARGUMENTS { 3, 4, 1, 0, 2 }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 7
+
+
+snOspfVirtIfConfigError TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfConfigErrorType, -- Type of error
+                snOspfPacketType
+              }
+    DESCRIPTION
+       "An ospfConfigError trap signifies that a pack-
+       et  has  been  received  on a virtual interface
+       from a router  whose  configuration  parameters
+       conflict   with   this  router's  configuration
+       parameters.  Note that the event optionMismatch
+       should  cause a trap only if it prevents an ad-
+       jacency from forming."
+	--#TYPE "Foundry Trap: OSPF Virtual Interface Configuration Error"
+	--#SUMMARY "configuration error type %d with  packet type %d has been received on virtual interface area id %s, router id %s from neighbor %s."
+	--#ARGUMENTS { 3, 4, 1, 0, 2 }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 8
+
+
+snOspfIfAuthFailure TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfPacketSrc,  -- The source IP address
+                snOspfConfigErrorType, -- authTypeMismatch or
+                                     -- authFailure
+                snOspfPacketType
+              }
+    DESCRIPTION
+       "An ospfIfAuthFailure  trap  signifies  that  a
+       packet  has  been received on a non-virtual in-
+       terface from a router whose authentication  key
+       or  authentication  type  conflicts  with  this
+       router's authentication key  or  authentication
+       type."
+	--#TYPE "Foundry Trap: OSPF Interface Authentication Failure"
+	--#SUMMARY "OSPF authentication failed. Router ID %s,Interface %s, packet src %s, error type %d and packet type %d."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 9
+
+
+snOspfVirtIfAuthFailure TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfConfigErrorType, -- authTypeMismatch or
+                                     -- authFailure
+                snOspfPacketType
+              }
+    DESCRIPTION
+       "An ospfVirtIfAuthFailure trap signifies that a
+       packet has been received on a virtual interface
+       from a router whose authentication key  or  au-
+       thentication  type conflicts with this router's
+       authentication key or authentication type."
+	--#TYPE "Foundry Trap: OSPF Virtual Interface Authentication Failure"
+	--#SUMMARY "OSPF authentication failed. Router ID %s,virtual interface %s, Neigbor %s, Error type %d and packet type %d."
+	--#ARGUMENTS { 0, 1, 2, 3, 4 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 10
+
+
+snOspfIfRxBadPacket TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfPacketSrc,  -- The source IP address
+                snOspfPacketType
+              }
+    DESCRIPTION
+       "An ospfIfRxBadPacket trap  signifies  that  an
+       OSPF  packet has been received on a non-virtual
+       interface that cannot be parsed."
+	--#TYPE "Foundry Trap: OSPF Interface Receive Bad Packet"
+	--#SUMMARY "OSPF Router Id %s, interface %s  receive bad packet (type %d) from %s."
+	--#ARGUMENTS { 0, 1, 3, 2 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 11
+
+
+snOspfVirtIfRxBadPacket TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfPacketType
+              }
+    DESCRIPTION
+       "An ospfRxBadPacket trap signifies that an OSPF
+       packet has been received on a virtual interface
+       that cannot be parsed."
+	--#TYPE "Foundry Trap: OSPF Virt Interface Receive Bad Packet"
+	--#SUMMARY "OSPF router id %s, virtual interface %s received bad packet (type %d) from neighbor %s."
+	--#ARGUMENTS { 0, 1, 3, 2 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 12
+
+
+snOspfTxRetransmit TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfIfStatusIpAddress,
+                snOspfNbrRtrId, -- Destination
+                snOspfPacketType,
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+    DESCRIPTION
+       "An ospfTxRetransmit  trap  signifies  than  an
+       OSPF  packet  has  been retransmitted on a non-
+       virtual interface.  All packets that may be re-
+       transmitted  are associated with an LSDB entry.
+       The LS type, LS ID, and Router ID are  used  to
+       identify the LSDB entry."
+	--#TYPE "Foundry Trap: OSPF Retransmit"
+	--#SUMMARY "OSPF router id %s, interface %s retransmited packet type %d,LSDB type %d, LSDB LS ID %s and LSDB router id %s to neightbor router id %s."
+	--#ARGUMENTS { 0, 1, 3, 4, 5, 6, 2 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 13
+
+
+ospfVirtIfTxRetransmit TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfVirtIfStatusAreaID,
+                snOspfVirtIfStatusNeighbor,
+                snOspfPacketType,
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+
+    DESCRIPTION
+       "An ospfTxRetransmit  trap  signifies  than  an
+       OSPF packet has been retransmitted on a virtual
+       interface.  All packets that may be retransmit-
+       ted  are  associated with an LSDB entry. The LS
+       type, LS ID, and Router ID are used to identify
+       the LSDB entry."
+	--#TYPE "Foundry Trap: OSPF Virt Interface Retransmit"
+	--#SUMMARY "OSPF router id %s, virtual interface area id %s retransmited packet type %d,LSDB type %d, LSDB LS ID %s and LSDB router id %s to neightbor %s."
+	--#ARGUMENTS { 0, 1, 3, 4, 5, 6, 2 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 14
+
+
+snOspfOriginateLsa TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+    DESCRIPTION
+       "An ospfOriginateLsa trap signifies that a  new
+       LSA  has  been originated by this router.  This
+       trap should not be invoked for simple refreshes
+       of  LSAs  (which happesn every 30 minutes), but
+       instead will only be invoked  when  an  LSA  is
+       (re)originated due to a topology change.  Addi-
+       tionally, this trap does not include LSAs  that
+       are  being  flushed  because  they have reached
+       MaxAge."
+	--#TYPE "Foundry Trap: OSPF Originate LSA"
+	--#SUMMARY "New LSA (area id %s, type %d, LS Id %s and router id %s) has been originated by router id %s."
+	--#ARGUMENTS { 1, 2, 3, 4, 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 15
+
+
+snOspfMaxAgeLsa TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                snOspfLsdbType,
+                snOspfLsdbLsId,
+                snOspfLsdbRouterId
+              }
+    DESCRIPTION
+       "An ospfMaxAgeLsa trap signifies  that  one  of
+       the LSA in the router's link-state database has
+       aged to MaxAge."
+	--#TYPE "Foundry Trap: OSPF MaxAge LSA"
+	--#SUMMARY "The LSA (area id %s, type %d, LS Id %s and router id %s) in router id %s link-state database has aged to maximum age."
+	--#ARGUMENTS { 1, 2, 3, 4, 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 16
+
+
+
+snOspfLsdbOverflow TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfExtLsdbLimit
+              }
+    DESCRIPTION
+       "An ospfLsdbOverflow trap  signifies  that  the
+       number of LSAs in the router's link-state data-
+       base has exceeded ospfExtLsdbLimit."
+	--#TYPE "Foundry Trap: OSPF LS DB Overflow"
+	--#SUMMARY "The number of LSAs in the OSPF router id %s link-state database has exceeded %d."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 17
+
+
+snOspfLsdbApproachingOverflow TRAP-TYPE
+   ENTERPRISE foundry
+   VARIABLES {
+                snOspfRouterId, -- The originator of the trap
+                snOspfExtLsdbLimit
+              }
+    DESCRIPTION
+       "An ospfLsdbApproachingOverflow trap  signifies
+       that  the  number of LSAs in the router's link-
+       state database has exceeded ninety  percent  of
+       ospfExtLsdbLimit."
+	--#TYPE "Foundry Trap: OSPF LS DB Near Full"
+	--#SUMMARY "The number of LSAs in the OSPF router id %s link-state database has exceeded ninety percent of  %d."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 18
+
+END
+
+

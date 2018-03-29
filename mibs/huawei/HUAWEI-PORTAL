@@ -1,0 +1,817 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:The HUAWEI-PORTAL-MIB  provides information about portal server
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+    HUAWEI-PORTAL-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            huaweiMgmt            
+                FROM HUAWEI-MIB
+            InterfaceIndex                  
+                                FROM IF-MIB
+            IpAddress, Integer32, Counter64, OBJECT-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString, DateAndTime, RowStatus, MacAddress, TruthValue
+                FROM SNMPv2-TC
+            mplsVpnVrfName
+                                FROM MPLS-VPN-MIB;
+    
+    
+        hwPortal MODULE-IDENTITY 
+            LAST-UPDATED "200303280900Z"
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd.
+                "
+            CONTACT-INFO 
+                    "
+                    NanJing Institute,Huawei Technologies Co.,Ltd.
+                    HuiHong Mansion,No.91 BaiXia Rd.
+                    NanJing, P.R. of China
+                    Zipcode:210001
+                     
+                    Http://www.huawei.com                                       
+                    E-mail:support@huawei.com "
+            
+            DESCRIPTION 
+                "The MIB contains objects of module PORTAL."
+            ::= { huaweiMgmt 4 }
+    
+
+        hwPortalMibObjects OBJECT IDENTIFIER ::= { hwPortal 1 }
+
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+
+
+    --  ============== hwPortalConfigPara  define beginning ==============
+    
+        hwPortalConfigPara OBJECT IDENTIFIER ::= { hwPortalMibObjects 1 }
+        
+        hwPortalConfigVersionSupport OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                v2(2),
+                both(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " 
+                The version of supported protocol."
+            DEFVAL { both }
+            ::= { hwPortalConfigPara 1 }
+        
+        hwPortalConfigTextInfoSwitch OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Changed to transparent transmission information.
+                The source of transparent transmission information, 'true' means transparent transmission the information of PORTAL server,
+                        'false' means no transparent transmission the information of PORTAL server, the default is no transparent transmission.
+                "
+            DEFVAL { false }
+            ::= { hwPortalConfigPara 2 }
+
+        hwPortalConfigServerUdpReceivePort OBJECT-TYPE
+            SYNTAX Integer32 (1024..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The receiving UDP port of server. "
+            DEFVAL { 2000 }
+            ::= { hwPortalConfigPara 3 }
+
+        hwPortalConfigServerUdpSendPort OBJECT-TYPE
+            SYNTAX Integer32 (1024..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The sending UDP port of server.   "
+            DEFVAL { 2000 }
+            ::= { hwPortalConfigPara 4 }
+
+        hwPortalConfigTrapUdpPort OBJECT-TYPE
+            SYNTAX Integer32 (1024..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The trap sending UDP port of server, used to send the message that user has been forced to leave.  
+                "
+            DEFVAL { 50100 }
+            ::= { hwPortalConfigPara 5 }
+            
+        hwPortalConfigSourecIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The source interface of sending PORTAL packet.
+                "
+            ::= { hwPortalConfigPara 6 }    
+
+    --  ============== hwPortalConfigPara  define end ==============         
+                
+    --  ============== hwPortalPacketStatisticsPara  define beginning ==============
+        
+        hwPortalPacketStatisticsPara OBJECT IDENTIFIER ::= { hwPortalMibObjects 2 }
+        
+        hwPortalStatisticsBeginTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time of system startup time, statistics of start time.
+                 When clear the statistics data, it will be reset.
+                 If power off, the data would not be saved.
+                "
+            ::= { hwPortalPacketStatisticsPara 1 }
+        
+        hwPortalPacketStatisticsAuthenticatorError OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total packet number of validate failure.
+                 "
+            ::= { hwPortalPacketStatisticsPara 2 }
+        
+        hwPortalPacketStatisticsAccessReqError OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The total number of access request error packet."
+            ::= { hwPortalPacketStatisticsPara 3 }
+        
+        hwPortalPacketStatisticsLogoutReqError OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The total number of logout request error packet."
+            ::= { hwPortalPacketStatisticsPara 4 }
+        
+        hwPortalPacketStatisticsInquiryReqError OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of inquiry request error packet.
+                "
+            ::= { hwPortalPacketStatisticsPara 5 }
+        
+        hwPortalPacketStatisticsLoginConfirmError OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of login confirm error packet.
+                "
+            ::= { hwPortalPacketStatisticsPara 6 }
+        
+        hwPortalPacketStatisticsAccessReqReceived OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received access request packet.
+                "
+            ::= { hwPortalPacketStatisticsPara 7 }
+        
+        hwPortalPacketStatisticsLoginReqReceived OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received login request packet.
+                "
+            ::= { hwPortalPacketStatisticsPara 8 }
+        
+        hwPortalPacketStatisticsLogoutReqReceived OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received logout request packet.
+                "
+            ::= { hwPortalPacketStatisticsPara 9 }
+        
+        hwPortalPacketStatisticsInquiryReqReceived OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received inquiry request packet. "
+            ::= { hwPortalPacketStatisticsPara 10 }
+        
+        hwPortalPacketStatisticsLoginConfirmReceived OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received login confirm packet. "
+            ::= { hwPortalPacketStatisticsPara 11 }
+        
+        hwPortalPacketStatisticsAccessACKFailed OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of access ack failure packet.  "
+            ::= { hwPortalPacketStatisticsPara 12 }
+        
+        hwPortalPacketStatisticsLoginACKFailed OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of login ack failure packet. "
+            ::= { hwPortalPacketStatisticsPara 13 }
+        
+        hwPortalPacketStatisticsLogoutACKFailed OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of logout ack failure packet.  "
+            ::= { hwPortalPacketStatisticsPara 14 }
+        
+        hwPortalPacketStatisticsInquiryACKFailed OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of inquiry ack failure packet.  "
+            ::= { hwPortalPacketStatisticsPara 15 }
+        
+        hwPortalPacketStatisticsAccessAckSent OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of sending access ack packet. "
+            ::= { hwPortalPacketStatisticsPara 16 }
+        
+        hwPortalPacketStatisticsLoginAckSent OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of sending login ack packet. "
+            ::= { hwPortalPacketStatisticsPara 17 }
+        
+        hwPortalPacketStatisticsLogoutAckSent OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of sending logout ack packet.  "
+            ::= { hwPortalPacketStatisticsPara 18 }
+        
+        hwPortalPacketStatisticsInquiryAckSent OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of sending inquiry ack packet.  "
+            ::= { hwPortalPacketStatisticsPara 19 }
+        
+    --  ============== hwPortalPacketStatisticsPara  define end ==============         
+                
+    --  ============== hwPortalConfigSecretKeyTable  define beginning ==============
+        
+        hwPortalConfigSecretKeyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortalConfigSecretKeyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The shared secret key table, realizing the config of shared secret key.
+                "
+            ::= { hwPortalMibObjects 3 }
+        
+        hwPortalConfigSecretKeyEntry OBJECT-TYPE
+            SYNTAX HwPortalConfigSecretKeyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of shared secret key table. "
+            INDEX { mplsVpnVrfName, hwPortalConfigPortalServerIpAddress }
+            ::= { hwPortalConfigSecretKeyTable 1 }
+        
+        HwPortalConfigSecretKeyEntry ::=
+            SEQUENCE { 
+                hwPortalConfigPortalServerIpAddress
+                    IpAddress,
+                hwPortalConfigPortalServerIpMask
+                    IpAddress,
+                hwPortalConfigSecretKey
+                    DisplayString,
+                hwPortalConfigPortalServerPort
+                        Integer32,
+                hwPortalConfigPortalServerNasip   
+                        TruthValue,                
+                hwPortalConfigStatus
+                    RowStatus
+             }
+
+        hwPortalConfigPortalServerIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of PORTAL server. "
+            ::= { hwPortalConfigSecretKeyEntry 1 }
+        
+        hwPortalConfigPortalServerIpMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The IP mask of PORTAL server. "
+            ::= { hwPortalConfigSecretKeyEntry 2 }
+
+        hwPortalConfigSecretKey OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The secret key of PORTAL server.
+                "
+            ::= { hwPortalConfigSecretKeyEntry 3 }
+        
+        hwPortalConfigPortalServerPort OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The port of PORTAL server."
+            ::= { hwPortalConfigSecretKeyEntry 4 }
+
+        hwPortalConfigPortalServerNasip OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether transport the NAS IP address.
+                "
+            DEFVAL { false }
+            ::= { hwPortalConfigSecretKeyEntry 5 }    
+            
+        hwPortalConfigStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The row status."
+            ::= { hwPortalConfigSecretKeyEntry 6 }
+        
+    --  ============== hwPortalConfigSecretKeyTable  define end ==============         
+                
+    --  ============== hwPortalServerTable  define beginning ==============
+        
+        hwPortalServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortalServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The statistics table of PORTAL server, used to inquire total number of every access user on PORTAL server.
+                "
+            ::= { hwPortalMibObjects 4 }
+        
+        hwPortalServerEntry OBJECT-TYPE
+            SYNTAX HwPortalServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of statistics table of PORTAL server."
+            INDEX { mplsVpnVrfName, hwPortalServerIpAddress }
+            ::= { hwPortalServerTable 1 }
+        
+        HwPortalServerEntry ::=
+            SEQUENCE { 
+                hwPortalServerIpAddress
+                    IpAddress,
+                hwPortalServerUserNum    
+                    Integer32
+             }
+
+        hwPortalServerIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of PORTAL server."
+            ::= { hwPortalServerEntry 1 }
+        
+        hwPortalServerUserNum     OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The total number of access users on PORTAL server.
+                "
+            ::= { hwPortalServerEntry 2 }
+
+    --  ============== hwPortalServerTable  define end ==============         
+                
+    --  ============== hwPortalUserTable  define beginning ==============
+        
+        hwPortalUserTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortalUserEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The PORTAL user table, used to inquire the attribute of PORTAL users.
+                "
+            ::= { hwPortalMibObjects 5 }
+        
+        hwPortalUserEntry OBJECT-TYPE
+            SYNTAX HwPortalUserEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of PORTAL user table."
+            INDEX { hwPortalUserMACAddress }
+            ::= { hwPortalUserTable 1 }
+        
+        HwPortalUserEntry ::=
+            SEQUENCE { 
+                hwPortalUserMACAddress
+                    MacAddress,
+                hwPortalUserIpAddress
+                    IpAddress,
+                hwPortalUserPort
+                    OCTET STRING,
+                hwPortalUserUpFlow
+                    Integer32,
+                hwPortalUserDownFlow
+                    Counter64,
+                hwPortalUserName
+                    OCTET STRING,
+                hwPortalUserLoginTime
+                    Integer32,
+                hwPortalUserServerIpAddress
+                    IpAddress                    
+             }
+
+        hwPortalUserMACAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The MAC address of users.
+                "
+            ::= { hwPortalUserEntry 1 }
+        
+        hwPortalUserIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The IP address of users.
+                "
+            ::= { hwPortalUserEntry 2 }
+
+        hwPortalUserPort OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The port number of users.
+                "
+            ::= { hwPortalUserEntry 3 }
+
+        hwPortalUserUpFlow OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The upstream flow, unit is bytes.
+                "
+            ::= { hwPortalUserEntry 4 }
+
+        hwPortalUserDownFlow OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The downstream flow, unit is bytes.
+                "
+            ::= { hwPortalUserEntry 5 }
+
+        hwPortalUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..253))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The username.
+                "
+            ::= { hwPortalUserEntry 6 }
+
+        hwPortalUserLoginTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The login time of user.
+                "
+            ::= { hwPortalUserEntry 7 }
+
+        hwPortalUserServerIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of PORTAL server."
+            ::= { hwPortalUserEntry 8 }
+
+    --  ============== hwPortalUserTable  define end ==============         
+    --  ============== hwPortalConfigSecretKeyTableV2  define beginning ==============
+        
+        hwPortalConfigSecretKeyTableV2 OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortalConfigSecretKeyEntryV2
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The shared secret key table, realizing the config of shared secret key.
+                "
+            ::= { hwPortalMibObjects 6 }
+        
+        hwPortalConfigSecretKeyEntryV2 OBJECT-TYPE
+            SYNTAX HwPortalConfigSecretKeyEntryV2
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of shared secret key table.(V2)"
+            INDEX { hwPortalVrfNameV2, hwPortalConfigPortalServerIpAddressV2 }
+            ::= { hwPortalConfigSecretKeyTableV2 1 }
+        
+        HwPortalConfigSecretKeyEntryV2 ::=
+            SEQUENCE { 
+                hwPortalConfigPortalServerIpAddressV2
+                    IpAddress,
+                hwPortalConfigPortalServerIpMaskV2
+                    IpAddress,
+                hwPortalConfigSecretKeyV2
+                    DisplayString,
+                hwPortalConfigPortalServerPortV2
+                    Integer32,
+                hwPortalConfigPortalServerNasipV2   
+                    TruthValue,
+                hwPortalConfigStatusV2
+                    RowStatus,
+                hwPortalVrfNameV2
+                    DisplayString            
+             }
+
+        hwPortalConfigPortalServerIpAddressV2 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of PORTAL server.(V2) "
+            ::= { hwPortalConfigSecretKeyEntryV2 1 }
+        
+        hwPortalConfigPortalServerIpMaskV2 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The IP mask of PORTAL server.(V2) "
+            ::= { hwPortalConfigSecretKeyEntryV2 2 }
+
+        hwPortalConfigSecretKeyV2 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The secret key of PORTAL server.(V2)"
+            ::= { hwPortalConfigSecretKeyEntryV2 3 }
+        
+        hwPortalConfigPortalServerPortV2 OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The port of PORTAL server.(V2)"
+            ::= { hwPortalConfigSecretKeyEntryV2 4 }
+
+        hwPortalConfigPortalServerNasipV2 OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether transport the NAS IP address.(V2)"
+            DEFVAL { false }
+            ::= { hwPortalConfigSecretKeyEntryV2 5 }
+            
+        hwPortalConfigStatusV2 OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The row status.(V2)"
+            ::= { hwPortalConfigSecretKeyEntryV2 6 }          
+            
+      hwPortalVrfNameV2 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VPN instance name of portal server (V2)"
+            ::= { hwPortalConfigSecretKeyEntryV2 7 }   
+                     
+  
+            
+
+    --  ============== hwPortalConfigSecretKeyTableV2  define end ==============         
+                
+    --  ============== hwPortalServerTableV2  define beginning ==============
+        
+        hwPortalServerTableV2 OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortalServerEntryV2
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The statistics table of PORTAL server, used to inquire total number of every access user on PORTAL server.(V2)"
+            ::= { hwPortalMibObjects 7 }
+        
+        hwPortalServerEntryV2 OBJECT-TYPE
+            SYNTAX HwPortalServerEntryV2
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of statistics table of PORTAL server.(V2)"
+            INDEX { hwPortalVrfNameV2, hwPortalServerIpAddressV2 }
+            ::= { hwPortalServerTableV2 1 }
+        
+        HwPortalServerEntryV2 ::=
+            SEQUENCE { 
+                hwPortalServerIpAddressV2
+                    IpAddress,
+                hwPortalServerUserNumV2    
+                    Integer32
+             }
+
+        hwPortalServerIpAddressV2 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of PORTAL server.(V2)"
+            ::= { hwPortalServerEntryV2 1 }
+        
+        hwPortalServerUserNumV2     OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of access users on PORTAL server.(V2)"
+            ::= { hwPortalServerEntryV2 2 }
+    --  ============== hwPortalServerTableV2  define end ==============         
+
+    --  ============== conformance information ==============
+        hwPortalConformance OBJECT IDENTIFIER ::= { hwPortal 3 }
+        
+        hwPortalCompliances OBJECT IDENTIFIER ::= { hwPortalConformance 1 }
+        hwPortalCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwPortalConfigParaObjectGroup, 
+                                    hwPortalPacketStatisticsParaObjectGroup,
+                                    hwPortalConfigSecretKeyObjectGroup, 
+                                    hwPortalServerObjectGroup, 
+                                    hwPortalUserObjectGroup,
+                                    hwPortalConfigSecretKeyV2ObjectGroup,
+                                    hwPortalServerV2ObjectGroup }  
+                                               
+              ::= { hwPortalCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwPortalObjectGroups OBJECT IDENTIFIER ::= { hwPortalConformance 2 } 
+            
+        hwPortalConfigParaObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalConfigVersionSupport, 
+                      hwPortalConfigTextInfoSwitch,
+                      hwPortalConfigServerUdpReceivePort,
+                      hwPortalConfigServerUdpSendPort, 
+                      hwPortalConfigTrapUdpPort, 
+                      hwPortalConfigSourecIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "The config parameter group."
+            ::= { hwPortalObjectGroups 1 }
+
+        hwPortalPacketStatisticsParaObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalStatisticsBeginTime, 
+                      hwPortalPacketStatisticsAuthenticatorError, 
+                      hwPortalPacketStatisticsAccessReqError, 
+                      hwPortalPacketStatisticsLogoutReqError,
+                      hwPortalPacketStatisticsInquiryReqError, 
+                      hwPortalPacketStatisticsLoginConfirmError,
+                      hwPortalPacketStatisticsAccessReqReceived, 
+                      hwPortalPacketStatisticsLoginReqReceived,
+                      hwPortalPacketStatisticsLogoutReqReceived, 
+                      hwPortalPacketStatisticsInquiryReqReceived,
+                      hwPortalPacketStatisticsLoginConfirmReceived,
+                      hwPortalPacketStatisticsAccessACKFailed,
+                      hwPortalPacketStatisticsLoginACKFailed, 
+                      hwPortalPacketStatisticsLogoutACKFailed,
+                      hwPortalPacketStatisticsInquiryACKFailed, 
+                      hwPortalPacketStatisticsAccessAckSent,
+                      hwPortalPacketStatisticsLoginAckSent, 
+                      hwPortalPacketStatisticsLogoutAckSent,
+                      hwPortalPacketStatisticsInquiryAckSent }
+            STATUS current
+            DESCRIPTION 
+                "The pachet statistics parameter group."
+            ::= { hwPortalObjectGroups 2 }
+        
+        hwPortalConfigSecretKeyObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalConfigPortalServerIpAddress, 
+                      hwPortalConfigPortalServerIpMask, 
+                      hwPortalConfigSecretKey,
+                      hwPortalConfigPortalServerPort, 
+                      hwPortalConfigPortalServerNasip, 
+                      hwPortalConfigStatus }
+            STATUS current
+            DESCRIPTION 
+                "The config secret key group."
+            ::= { hwPortalObjectGroups 3 }
+        
+        hwPortalServerObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalServerIpAddress, 
+                      hwPortalServerUserNum}
+            STATUS current
+            DESCRIPTION 
+                "The PORTAL server group."
+            ::= { hwPortalObjectGroups 4 }
+        
+        hwPortalUserObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalUserMACAddress, 
+                      hwPortalUserIpAddress, 
+                      hwPortalUserPort,
+                      hwPortalUserUpFlow, 
+                      hwPortalUserDownFlow, 
+                      hwPortalUserName,
+                      hwPortalUserLoginTime, 
+                      hwPortalUserServerIpAddress}
+            STATUS current
+            DESCRIPTION 
+                "The PORTAL user group."
+            ::= { hwPortalObjectGroups 5 }
+            
+        hwPortalConfigSecretKeyV2ObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalConfigPortalServerIpAddressV2, 
+                      hwPortalConfigPortalServerIpMaskV2, 
+                      hwPortalConfigSecretKeyV2,
+                      hwPortalConfigPortalServerPortV2, 
+                      hwPortalConfigPortalServerNasipV2,
+                      hwPortalConfigStatusV2, 
+                      hwPortalVrfNameV2}
+            STATUS current
+            DESCRIPTION 
+                "The config secret key group.(V2)"
+            ::= { hwPortalObjectGroups 6 }        
+                
+        hwPortalServerV2ObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortalServerIpAddressV2, 
+                      hwPortalServerUserNumV2}
+            STATUS current
+            DESCRIPTION 
+                "The PORTAL server group.(V2)"
+            ::= { hwPortalObjectGroups 7 }    
+                    
+        --  ============== conformance information define end ==============            
+                
+    
+    END
+

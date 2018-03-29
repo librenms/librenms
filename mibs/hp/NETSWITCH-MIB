@@ -1,0 +1,487 @@
+-- HP Enterprise Switch MIB 
+
+
+NETSWITCH-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter
+            FROM RFC1155-SMI
+        OBJECT-TYPE
+            FROM RFC-1212
+        DisplayString
+            FROM RFC1213-MIB
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    -- Icf Switch Specific
+
+    hpOpSystem    OBJECT IDENTIFIER ::= { hpSwitch 1 }
+
+    MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address
+                                              -- in the
+                                              -- "canonical"
+                                              -- order
+
+    -- HP Buffer group
+
+    -- The buffers group contains variables that describe the switch's use
+    -- of two types of global memory buffers: message buffers, which
+    -- facilitate internal process-to-process communication, and packet 
+    -- buffers, which facilitate external communications by temporarily
+    -- storing incoming or outgoing data packets.
+
+    hpBuf       OBJECT IDENTIFIER ::= { hpOpSystem 1 }
+    hpMsgBuf    OBJECT IDENTIFIER ::= { hpBuf 1 }
+    hpPktBuf    OBJECT IDENTIFIER ::= { hpBuf 2 }
+
+    hpMsgBufTable OBJECT-TYPE
+        SYNTAX    SEQUENCE OF HpMsgBufEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "A table that contains information on all the 
+                Message buffers for each slot."
+        ::= { hpMsgBuf 1 }
+
+    hpMsgBufEntry OBJECT-TYPE
+        SYNTAX    HpMsgBufEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "Information about a slot in a chassis"
+        INDEX      { hpMsgBufSlotIndex }
+        ::= { hpMsgBufTable 1 }
+          
+    HpMsgBufEntry ::=
+        SEQUENCE {
+            hpMsgBufSlotIndex                  INTEGER,
+            hpMsgBufInit                       INTEGER,
+            hpMsgBufFree                       INTEGER,
+            hpMsgBufMin                        INTEGER,
+            hpMsgBufMiss                       Counter,
+            hpMsgBufSize                       INTEGER,
+            hpMsgBufCorrupted                  Counter
+        }
+
+    hpMsgBufSlotIndex OBJECT-TYPE
+        SYNTAX    INTEGER (1..16)
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The slot number within the box for which this 
+                entry contains information."
+        ::= { hpMsgBufEntry 1 }
+          
+    hpMsgBufCorrupted OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of times a corrupted buffer was deleted."
+        ::= { hpMsgBufEntry 2 }
+
+    hpMsgBufFree OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of message buffers available for
+                internal VME transfers or external transfers,
+                respectively. Because switch operations and application
+                software modules impose some overhead on global memory
+                buffers, the number of buffers available for data
+                transfers is less than the total number of buffers
+                allocated when the switch boots."
+        ::= { hpMsgBufEntry 3 }
+
+    hpMsgBufInit OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of message buffers allocated when
+                the switch booted." 
+        ::= { hpMsgBufEntry 4 }
+
+    hpMsgBufMin OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The smallest number of message buffers
+                available since the switch booted."
+        ::= { hpMsgBufEntry 5 }
+
+    hpMsgBufMiss OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of times that the switch was unable to obtain
+                a message buffer. Failure to obtain a buffer indicates
+                that buffers were busy. This parameter is directly
+                related to hpMsgBufMin. If hpMsgBufMiss is greater than 0,
+                hpMsgBufMin must equal 0. Conversely, if hpMsgBufMiss
+                equals 0, then hpMsgBufMin must be greater than 0."
+        ::= { hpMsgBufEntry 6 }
+
+    hpMsgBufSize OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The size of the message buffer in bytes."
+        ::= { hpMsgBufEntry 7 }
+
+    hpPktBufTable OBJECT-TYPE
+        SYNTAX    SEQUENCE OF HpPktBufEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "A table that contains information on all the 
+                Packet buffers for each slot."
+        ::= { hpPktBuf 1 }
+
+    hpPktBufEntry OBJECT-TYPE
+        SYNTAX    HpPktBufEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "Information about a slot in a chassis"
+        INDEX      { hpPktBufSlotIndex }
+        ::= { hpPktBufTable 1 }
+          
+    HpPktBufEntry ::=
+        SEQUENCE {
+            hpPktBufSlotIndex                  INTEGER,
+            hpPktBufInit                       INTEGER,
+            hpPktBufFree                       INTEGER,
+            hpPktBufMin                        INTEGER,
+            hpPktBufMiss                       Counter,
+            hpPktBufSize                       INTEGER,
+            hpPktBufCorrupted                  Counter
+        }
+          
+    hpPktBufSlotIndex OBJECT-TYPE
+        SYNTAX    INTEGER (1..16)
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The slot number within the box for which this 
+                entry contains information."
+        ::= { hpPktBufEntry 1 }
+
+    hpPktBufCorrupted OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of times a corrupted buffer was deleted."
+        ::= { hpPktBufEntry 2 }
+
+    hpPktBufFree OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of packet buffers available for
+                internal VME transfers or external transfers,
+                respectively. Because switch operations and application
+                software modules impose some overhead on global memory
+                buffers, the number of buffers available for data
+                transfers is less than the total number of buffers
+                allocated when the switch boots."
+        ::= { hpPktBufEntry 3 }
+
+    hpPktBufInit OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of packet buffers allocated when
+                the switch booted." 
+        ::= { hpPktBufEntry 4 }
+
+    hpPktBufMin OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The smallest number of packet buffers
+                available since the switch booted."
+        ::= { hpPktBufEntry 5 }
+
+    hpPktBufMiss OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of times that the switch was unable to obtain
+                a packet buffer. Failure to obtain a buffer indicates
+                that buffers were busy. This parameter is directly
+                related to hpPktBufMin. If hpPktBufMiss is greater than 0,
+                hpPktBufMin must equal 0. Conversely, if hpPktBufMiss
+                equals 0, then hpPktBufMin must be greater than 0."
+        ::= { hpPktBufEntry 6 }
+
+    hpPktBufSize OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The size of the packet buffer in bytes."
+        ::= { hpPktBufEntry 7 }
+
+    -- HP Memory group
+
+    -- The memory group contains variables that describe the switch's use
+    -- of two types of memory : local memory and global memory.  Depending
+    -- on the hardware platform these can have different meanings.
+    -- Typically local memory can be accessed by the network interface
+    -- chips and the main processor, while global memory can be accessed
+    -- by one or more main processors.
+
+    hpMem       OBJECT IDENTIFIER ::= { hpOpSystem 2 }
+    hpLocalMem  OBJECT IDENTIFIER ::= { hpMem 1 }
+    hpGlobalMem OBJECT IDENTIFIER ::= { hpMem 2 }
+ 
+    hpLocalMemTable OBJECT-TYPE
+        SYNTAX    SEQUENCE OF HpLocalMemEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "A table that contains information on all the 
+                local memory for each slot."
+        ::= { hpLocalMem 1 }
+
+    hpLocalMemEntry OBJECT-TYPE
+        SYNTAX    HpLocalMemEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "Information about a slot in a chassis"
+        INDEX      { hpLocalMemSlotIndex }
+        ::= { hpLocalMemTable 1 }
+          
+    HpLocalMemEntry ::=
+        SEQUENCE {
+            hpLocalMemSlotIndex                INTEGER,
+            hpLocalMemSlabCnt                  Counter,
+            hpLocalMemFreeSegCnt               Counter,
+            hpLocalMemAllocSegCnt              Counter,
+            hpLocalMemTotalBytes               INTEGER,
+            hpLocalMemFreeBytes                INTEGER,
+            hpLocalMemAllocBytes               INTEGER
+        }
+
+    hpLocalMemSlotIndex OBJECT-TYPE
+        SYNTAX    INTEGER (1..16)
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The slot number within the box for which this 
+                entry contains information."
+        ::= { hpLocalMemEntry 1 }
+          
+    hpLocalMemSlabCnt OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The current number of discretely managed memory areas.
+                Each slab is further broken down into smaller contiguous
+                areas called segments."
+        ::= { hpLocalMemEntry 2 }
+
+    hpLocalMemFreeSegCnt OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The current number of free memory segments. A free memory
+                segment is an unused contiguous memory block of greater
+                than 16 bytes.  Generally, an increase in the number of
+                free memory segments indicates an increase in memory
+                fragmentation."
+        ::= { hpLocalMemEntry 3 }
+
+    hpLocalMemAllocSegCnt OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of currently allocated memory segments."
+        ::= { hpLocalMemEntry 4 }
+
+    hpLocalMemTotalBytes OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of currently installed bytes."
+        ::= { hpLocalMemEntry 5 }
+
+    hpLocalMemFreeBytes OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of available (unallocated) bytes."
+        ::= { hpLocalMemEntry 6 }
+
+    hpLocalMemAllocBytes OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of currently allocated bytes."
+        ::= { hpLocalMemEntry 7 }
+
+    hpGlobalMemTable OBJECT-TYPE
+        SYNTAX    SEQUENCE OF HpGlobalMemEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "A table that contains information on all the 
+                local memory for each slot."
+        ::= { hpGlobalMem 1 }
+
+    hpGlobalMemEntry OBJECT-TYPE
+        SYNTAX    HpGlobalMemEntry
+        ACCESS    not-accessible
+        STATUS    mandatory
+        DESCRIPTION
+                "Information about a slot in a chassis"
+        INDEX      { hpGlobalMemSlotIndex }
+        ::= { hpGlobalMemTable 1 }
+          
+    HpGlobalMemEntry ::=
+        SEQUENCE {
+            hpGlobalMemSlotIndex                INTEGER,
+            hpGlobalMemSlabCnt                  Counter,
+            hpGlobalMemFreeSegCnt               Counter,
+            hpGlobalMemAllocSegCnt              Counter,
+            hpGlobalMemTotalBytes               INTEGER,
+            hpGlobalMemFreeBytes                INTEGER,
+            hpGlobalMemAllocBytes               INTEGER
+        }
+
+    hpGlobalMemSlotIndex OBJECT-TYPE
+        SYNTAX    INTEGER (1..16)
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The slot number within the box for which this 
+                entry contains information."
+        ::= { hpGlobalMemEntry 1 }
+          
+    hpGlobalMemSlabCnt OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The current number of discretely managed memory areas.
+                Each slab is further broken down into smaller contiguous
+                areas called segments."
+        ::= { hpGlobalMemEntry 2 }
+
+    hpGlobalMemFreeSegCnt OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The current number of free memory segments. A free memory
+                segment is an unused contiguous memory block of greater
+                than 16 bytes.  Generally, an increase in the number of
+                free memory segments indicates an increase in memory
+                fragmentation."
+        ::= { hpGlobalMemEntry 3 }
+
+    hpGlobalMemAllocSegCnt OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of currently allocated memory segments."
+        ::= { hpGlobalMemEntry 4 }
+
+    hpGlobalMemTotalBytes OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of currently installed bytes."
+        ::= { hpGlobalMemEntry 5 }
+
+    hpGlobalMemFreeBytes OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of available (unallocated) bytes."
+        ::= { hpGlobalMemEntry 6 }
+
+    hpGlobalMemAllocBytes OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The number of currently allocated bytes."
+        ::= { hpGlobalMemEntry 7 }
+
+
+
+
+
+    hpSwitchOsVersion OBJECT-TYPE
+        SYNTAX    DisplayString
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "Contains the operating code version number (also
+                known as software or firmware). For example, a
+                software version such as A.08.01 is described as
+                follows:
+                    A    the function set available in your router
+                    08   the common release number
+                    01   updates to the current common release"
+        ::= { hpOpSystem 3 }
+
+    hpSwitchRomVersion OBJECT-TYPE
+        SYNTAX    DisplayString
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "Contains the ROM version number (such as A.08.01
+                is described as follows:
+                    A    the function set available in your router
+                    08   the common release number
+                    01   updates to the current common release"
+        ::= { hpOpSystem 4 }
+
+    hpSwitchSmartCardType OBJECT-TYPE
+        SYNTAX    INTEGER {
+                      none(1),
+                      fddi(2),
+                      atm(3),
+                      fddiAndATM(4),
+                      other(5)
+                  }
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "Return the type of Smart Cards in the system. 
+                Some system may contains more than one types
+                of smart cards, such as FDDI and ATM"  
+        ::= { hpOpSystem 5 }
+
+    hpSwitchBaseMACAddress OBJECT-TYPE
+        SYNTAX    MacAddress
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "Return the base MAC address of the switch.  This is
+                also the MAC address of the default vlan. "
+        ::= { hpOpSystem 6 }
+
+END

@@ -1,0 +1,2536 @@
+ALCATEL-IND1-DRCTM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    routingIND1Tm
+        FROM ALCATEL-IND1-BASE;
+
+alcatelIND1DrcTmMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200705241500Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of the Task Manager's global configuration 
+             parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Tm 1 }
+
+alcatelIND1DrcTmMIBObjects    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIB 1 }
+alaDrcTmConfig    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 1 }
+alaDrcTmDebug     OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 2 }
+alaDrcTmRipDebug    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 3 }
+alaDrcTmOspfDebug   OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 4 }
+alaDrcTmBgpDebug    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 5 }
+alaDrcTmDvmrpDebug  OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 6 }
+alaDrcTmPimDebug    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 7 }
+alaDrcTmRipngDebug  OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 8 }
+alaDrcTmIprmDebug   OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 9 }
+alaDrcTmIpmrmDebug  OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 10 }
+alaDrcTmOspf3Debug  OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 11 }
+alaDrcTmLogDestination  OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 12 }
+alaDrcTmIsisDebug   OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 13 }
+
+
+alaDrcTmIPRouterPrimaryAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Defines the Primary IP Address of this Router."
+    ::= {alaDrcTmConfig 1 }
+
+alaDrcTmIPRouterId    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Defines the Router-id for this Router."
+    ::= {alaDrcTmConfig 2 }
+
+alaDrcTmIPRipStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of RIP on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 3 }
+
+alaDrcTmIPOspfStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of OSPF on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 4 }
+
+alaDrcTmIPBgpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of BGP on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 5 }
+
+alaDrcTmIPDvmrpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of DVMRP on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 6 }
+
+alaDrcTmIPPimStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of PIM on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 7 }
+
+alaDrcTmIPMsdpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of MSDP on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 8 }
+
+alaDrcTmIPRipngStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of Ripng on this router.
+		 Loaded(1) is the only valid Set value."
+
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 9 }
+
+alaDrcTmIPOspf3Status     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of OSPFv3 on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 10 }
+
+alaDrcTmIPIsisStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+		"Controls the load status of ISIS on this router.
+		 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaDrcTmConfig 11 }
+
+
+-- ************************************************************************
+--  DRC log Configuration
+-- ************************************************************************
+
+alaDrcTmLogToSysFacility    OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   printf(1),
+                   session(2),
+                   swLog(3),
+                   sysTrace(4),
+                   sysLog(5),
+                   truncBuffer(6),
+                   ringBuffer(7)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Logs the DRC log messages to one of the System's Facility"
+    DEFVAL     { printf }
+    ::= {alaDrcTmLogDestination 1}
+
+alaDrcTmLogToSessionId   OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Session Id of Switch's telnet/ssh session where DRC log messages
+                shall be logged.
+                Default is console."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmLogDestination 2 }
+
+alaDrcTmLogBufferSize   OBJECT-TYPE
+    SYNTAX     Integer32 (0..10000)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Size of the Buffer in Kbytes where DRC log messages shall be logged."
+    DEFVAL     { 100 }
+    ::= {alaDrcTmLogDestination 3 }
+
+alaDrcTmLogBufferDumpfile   OBJECT-TYPE
+    SYNTAX     DisplayString ( SIZE( 0..32 ) )
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Redirect/Dump Log Buffer to the specified File.
+                If filename is left null, Buffer is dumped to Console." 
+    ::= {alaDrcTmLogDestination 4 }
+
+alaDrcTmLogCriticalBufferDumpfile   OBJECT-TYPE
+    SYNTAX     DisplayString ( SIZE( 0..32 ) )
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Redirect/Dump Critical Ring Buffer to the specified File.
+                If filename is left null, Buffer is dumped to Console." 
+    ::= {alaDrcTmLogDestination 5 }
+
+
+alaDrcTmLogShowTask     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "enables/disables showing of Task Names in DRC log
+                messages." 
+    DEFVAL     { enable }
+    ::= {alaDrcTmLogDestination 6 }
+
+alaDrcTmLogShowFunction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "enables/disables showing of Function Names in DRC log
+                messages." 
+    DEFVAL     { enable }
+    ::= {alaDrcTmLogDestination 7 }
+
+alaDrcTmLogShowLine   OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "enables/disables showing of Line Numbers in DRC log
+                messages." 
+    DEFVAL     { disable }
+    ::= {alaDrcTmLogDestination 8 }
+
+alaDrcTmLogShowDate    OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "enables/disables showing of Date in TimeStamp of DRC log
+                messages." 
+    DEFVAL     { disable }
+    ::= {alaDrcTmLogDestination 9 }
+
+alaDrcTmLogShowTime    OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "enables/disables showing of Seconds in TimeStamp of DRC log
+                messages." 
+    DEFVAL     { disable }
+    ::= {alaDrcTmLogDestination 10 }
+
+alaDrcTmLogClearBuffer   OBJECT-TYPE
+    SYNTAX     INTEGER {
+		   			buffer (1),
+					criticalbuffer(2)
+			   }	
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+               "clears the buffer/critical buffer contents"
+    DEFVAL     { buffer }
+    ::= {alaDrcTmLogDestination 11 }
+
+
+-- ************************************************************************
+--  DRC TM Debug Configuration
+-- ************************************************************************
+
+alaDrcTmDebugLevel     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "Sets the level of Debugging for the DRC TM on
+                this router.  A level of 0 indicates no debugging.
+                This object is currently not used"
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 1}
+
+
+alaDrcTmDebugError     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for DRC TM Error messages"
+    DEFVAL     { 1 }
+    ::= {alaDrcTmDebug 2}
+
+
+alaDrcTmDebugUnusedA     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for UnusedA messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 3}
+
+alaDrcTmDebugTaskInfo     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for DRC TM Task Info messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 4}
+
+alaDrcTmDebugEvents     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for DRC TM Event messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 5}
+
+alaDrcTmDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for DRC TM MIP processing (including CLI/SNMP)"
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 6}
+
+alaDrcTmDebugUnusedB     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for UnusedB messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 7}
+
+alaDrcTmDebugMisc     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for Misc DRC TM messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 8}
+
+alaDrcTmDebugUnused1     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for Unused1 messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 9}
+
+alaDrcTmDebugUnused2     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for Unused2 messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 10}
+
+alaDrcTmDebugUnused3     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for Unused3 messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 11}
+
+alaDrcTmDebugUnused4     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for Unused4 messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 12}
+
+alaDrcTmDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the debug level for debugging of all DRC TM messages" 
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDebug 13}
+
+-- ************************************************************************
+--  DRC TM OSPF Debug Configuration
+-- ************************************************************************
+
+alaDrcTmOspfDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 1}
+
+alaDrcTmOspfDebugWarning OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF Warning Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 2}
+
+alaDrcTmOspfDebugState     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF-State Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 3}
+
+alaDrcTmOspfDebugRecv     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the Packets received by OSPF
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 4}
+
+
+alaDrcTmOspfDebugSend     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the Packets sent by OSPF from
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 5}
+
+
+alaDrcTmOspfDebugFlood     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the flooding of LSAs in OSPF
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 6}
+
+alaDrcTmOspfDebugSPF     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's SPF calculations on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 7}
+
+alaDrcTmOspfDebugLsdb     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's LSDB-related operations
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 8}
+
+alaDrcTmOspfDebugRdb     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's RDB-relate operation on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 9}
+
+alaDrcTmOspfDebugAge     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's Aging process of LSA's on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 10}
+
+alaDrcTmOspfDebugVlink     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's virtual linkoperations on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 11}
+
+alaDrcTmOspfDebugRedist     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's route redistribution process
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 12}
+
+alaDrcTmOspfDebugSummary     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's all summarizations on this
+                router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 13}
+
+alaDrcTmOspfDebugDbexch     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's Neighbors' database exchange
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 14}
+
+alaDrcTmOspfDebugHello     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's hello handshaking process on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 15}
+
+alaDrcTmOspfDebugAuth     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's authentication process on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 16}
+
+alaDrcTmOspfDebugArea     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's area events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 17}
+
+alaDrcTmOspfDebugIntf     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's interface operations on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 18}
+
+alaDrcTmOspfDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the MIP processing of OSPF's specific commands
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 19}
+
+alaDrcTmOspfDebugInfo     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's Information on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 20}
+
+alaDrcTmOspfDebugSetup     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's Initialization setup on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 21}
+
+alaDrcTmOspfDebugTime     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's Time related events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 22}
+
+alaDrcTmOspfDebugTm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the OSPF's Task Manager communication events
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 23}
+	
+alaDrcTmOspfDebugRestart OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for debugging of
+	        	OSPF Graceful Restart events and information."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 24}
+
+alaDrcTmOspfDebugHelper OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for debugging of
+	        	OSPF Graceful Restart Helper mode events and information."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 25}
+
+
+alaDrcTmOspfDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of OSPF debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspfDebug 26}
+
+
+-- ************************************************************************
+--  DRC TM BGP Debug Configuration
+-- ************************************************************************
+
+alaDrcTmBgpDebugDamp OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Damp Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 1}
+
+alaDrcTmBgpDebugFsm OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP FSM Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 2}
+
+alaDrcTmBgpDebugRecvUpd OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP route update messages
+               received from the neighbor. A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 3}
+
+alaDrcTmBgpDebugSendUpd OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP route update messages
+                sent to the neighbor.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 4}
+
+alaDrcTmBgpDebugOpen OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Open messages exchanged with
+               the neighbor.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 5}
+
+alaDrcTmBgpDebugKeepAlive OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP KeepAlive messages exchanged 
+                with the neighbor.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 6}
+
+alaDrcTmBgpDebugNotify OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Notify Messages exchanged with
+                the neighbor.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 7}
+
+alaDrcTmBgpDebugPolicy OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP policy Messages exchanged with
+                the neighbor.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 8}
+
+alaDrcTmBgpDebugRoute OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Route messages on this router.
+               A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 9}
+
+alaDrcTmBgpDebugSync OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Synchronization messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 10}
+
+alaDrcTmBgpDebugAggr OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Aggregation related messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 11}
+
+alaDrcTmBgpDebugTcp OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP tcp connection messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 12}
+
+alaDrcTmBgpDebugWarnings OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Warning messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 13}
+
+alaDrcTmBgpDebugErrors OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Error messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 14}
+
+alaDrcTmBgpDebugRedist OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Redistribute messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 15}
+
+alaDrcTmBgpDebugPeer OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP peer messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 16}
+
+alaDrcTmBgpDebugLocal OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP local messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 17}
+
+alaDrcTmBgpDebugMip OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP MIP messages (including
+                CLI/SNMP) on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 18}
+
+alaDrcTmBgpDebugTm OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP and Task Manager Interaction
+                messages on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 19}
+
+alaDrcTmBgpDebugInfo OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Information messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 20}
+
+alaDrcTmBgpDebugRestart OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP Graceful Restart messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 21}
+
+alaDrcTmBgpDebugAll OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of BGP debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 22}
+
+alaDrcTmBgpDebugPeer6 OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the BGP IPv6 Peer messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 23}
+
+alaDrcTmBgpDebugRoute6 OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for BGP IPv6 route messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmBgpDebug 24}
+
+
+-- ************************************************************************
+--  DRC TM RIP Debug Configuration
+-- ************************************************************************
+
+alaDrcTmRipDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the RIP Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 1}
+
+alaDrcTmRipDebugWarning OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the RIP Warning Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 2}
+
+alaDrcTmRipDebugRecv     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the Packets received by RIP
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 3}
+
+
+alaDrcTmRipDebugSend     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the Packets sent by RIP from
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 4}
+
+alaDrcTmRipDebugRdb     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's Routing Database on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 5}
+
+alaDrcTmRipDebugAge     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's Aging messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 6}
+
+
+alaDrcTmRipDebugConfig  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's Configuration messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 7}
+
+alaDrcTmRipDebugRedist     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's route redistribution messages
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 8}
+
+alaDrcTmRipDebugInfo     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's Information on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 9}
+
+alaDrcTmRipDebugSetup     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's Initialization setup on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 10}
+
+alaDrcTmRipDebugTime     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIP's Time related events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 11}
+
+alaDrcTmRipDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of RIP debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipDebug 12}
+
+-- ************************************************************************
+--  DRC TM IPMRM Debug Configuration
+-- ************************************************************************
+
+alaDrcTmIpmrmDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the IPMRM Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 1 }
+    ::= {alaDrcTmIpmrmDebug 1}
+
+alaDrcTmIpmrmDebugFib OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM FIB processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 2}
+
+alaDrcTmIpmrmDebugAging   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM's Aging messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 3}
+
+
+alaDrcTmIpmrmDebugProtos  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM's protos processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 4}
+
+alaDrcTmIpmrmDebugIpms     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM/IPMS processing
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 5}
+
+alaDrcTmIpmrmDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM's MIP processing (including CLI/SNMP)
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 6}
+
+alaDrcTmIpmrmDebugInit     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM's Initialization setup on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 7}
+
+alaDrcTmIpmrmDebugTm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM and Task managerinteraction on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 8}
+
+alaDrcTmIpmrmDebugMisc     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPMRM's Miscellaneous messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 9}
+
+alaDrcTmIpmrmDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of IPMRM debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIpmrmDebug 10}
+
+-- ************************************************************************
+--  DRC TM IPRM Debug Configuration
+-- ************************************************************************
+
+alaDrcTmIprmDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the IPRM Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 1 }
+    ::= {alaDrcTmIprmDebug 1}
+
+alaDrcTmIprmDebugAccesslist OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM AccessList handling on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 2}
+
+alaDrcTmIprmDebugIntf     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM Interface handling
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 3}
+
+alaDrcTmIprmDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the IPRM's MIP processing (including CLI/SNMP)
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 4}
+
+alaDrcTmIprmDebugMisc     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for Miscellaneous IPRM issues.
+                A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 5}
+
+alaDrcTmIprmDebugNhs     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's NextHopSync handling
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 6}
+
+alaDrcTmIprmDebugPrefix   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's Prefix registration code 
+               on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 7}
+
+alaDrcTmIprmDebugRedist     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's Redistribution code
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 8}
+
+alaDrcTmIprmDebugRoute4   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's handling of IPv4 routes
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 9}
+
+alaDrcTmIprmDebugRoute6     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's handling of IPv6 routes
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 10}
+
+alaDrcTmIprmDebugRoutemap     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's RouteMap handling
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 11}
+
+alaDrcTmIprmDebugRoutepref     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's RoutePreference code
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 12}
+
+alaDrcTmIprmDebugStatic     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's Static route handling
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 13}
+
+alaDrcTmIprmDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of IPRM debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 14}
+
+alaDrcTmIprmDebugBfd     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for IPRM's BFD support on this
+                router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIprmDebug 15}
+
+
+-- ************************************************************************
+--  DRC TM RIPNG Debug Configuration
+-- ************************************************************************
+
+alaDrcTmRipngDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the RIPng Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 1 }
+    ::= {alaDrcTmRipngDebug 1}
+
+alaDrcTmRipngDebugWarning OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the RIPng Warning Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 2}
+
+alaDrcTmRipngDebugRecv     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the Packets received by RIPng
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 3}
+
+
+alaDrcTmRipngDebugSend     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the Packets sent by RIPng from
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 4}
+
+alaDrcTmRipngDebugRdb     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Routing Database on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 5}
+
+alaDrcTmRipngDebugAge     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Aging messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 6}
+
+alaDrcTmRipngDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's MIP messages
+                on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 7}
+
+alaDrcTmRipngDebugInfo     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Information on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 8}
+
+alaDrcTmRipngDebugSetup     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Initialization setup on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 9}
+
+alaDrcTmRipngDebugTime     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Timer related events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 10}
+
+alaDrcTmRipngDebugTm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng/Task Manager Interaction 
+                messages on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 11}
+
+alaDrcTmRipngDebugRouteFilter     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Route Filter messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 12}
+
+alaDrcTmRipngDebugNexthopFilter     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Nexthop Filter messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 13}
+
+alaDrcTmRipngDebugSummary     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the RIPng's Summarization messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 14}
+
+alaDrcTmRipngDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of RIPng debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 15}
+
+alaDrcTmRipngDebugRedist     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for RIPng redistribution messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmRipngDebug 16}
+
+
+-- ************************************************************************
+--  DRC TM PIM Debug Configuration
+-- ************************************************************************
+
+-- ************************************************************************
+--  DRC TM PIMSM & PIMDM Debug Configuration
+-- ************************************************************************
+
+alaDrcTmPimDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the PIM Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 1 }
+    ::= {alaDrcTmPimDebug 1}
+
+alaDrcTmPimDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIM's MIP processing 
+                 (including CLI/SNMP) on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 2}
+
+alaDrcTmPimDebugInit     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIM's Initialization setup on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 3}
+
+alaDrcTmPimDebugBootstrap  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for PIMSM bootstrap messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 4}
+
+alaDrcTmPimDebugCRP     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for PIMSM CRP processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 5}
+
+alaDrcTmPimDebugTime     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM's Timer related events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 6}
+
+alaDrcTmPimDebugSpt     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM's SPT related events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 7}
+	
+alaDrcTmPimDebugSmNbr OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the PIMSM Neighbor processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 8}
+
+
+alaDrcTmPimDebugSmHello OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the PIMSM Hello Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 9}
+
+
+alaDrcTmPimDebugSmRoute   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM's Route Processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 10}
+
+alaDrcTmPimDebugSmJoinPrune     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM Join/Prune processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 11}
+
+
+alaDrcTmPimDebugSmAssert  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM's Assert processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 12}
+
+
+alaDrcTmPimDebugSmIgmp     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM Igmp processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 13}
+
+alaDrcTmPimDebugSmIpmrm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM IPMRM Interaction on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 14}
+
+alaDrcTmPimDebugSmMisc     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMSM's Miscellaneous 
+			    processing on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 15}
+
+alaDrcTmPimDebugDmNbr OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the PIMDM Neighbor processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 16}
+
+
+alaDrcTmPimDebugDmHello OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the PIMDM Hello Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 17}
+
+
+alaDrcTmPimDebugDmRoute   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM's Route Processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 18}
+
+alaDrcTmPimDebugDmJoinPrune     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM Join/Prune processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 19}
+
+
+alaDrcTmPimDebugDmAssert  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM's Assert processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 20}
+
+
+alaDrcTmPimDebugDmIgmp     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM Igmp processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 21}
+
+alaDrcTmPimDebugDmIpmrm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM IPMRM Interaction on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 22}
+
+alaDrcTmPimDebugDmMisc     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM's Miscellaneous 
+			    processing on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 23}
+
+alaDrcTmPimDebugGraft     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM's Graft processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 24}
+
+alaDrcTmPimDebugStateRefresh     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the PIMDM's State Refresh Processing 
+			    on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 25}
+
+alaDrcTmPimDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of PIM debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmPimDebug 26}
+
+-- ************************************************************************
+--  DRC TM DVMRP Debug Configuration
+-- ************************************************************************
+
+alaDrcTmDvmrpDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the DVMRP Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 1 }
+    ::= {alaDrcTmDvmrpDebug 1}
+
+alaDrcTmDvmrpDebugNbr OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the DVMRP Neighbor processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 2}
+
+alaDrcTmDvmrpDebugRoutes  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for DVMRP Route messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 3}
+
+alaDrcTmDvmrpDebugProbes     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for DVMRP Probes processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 4}
+
+alaDrcTmDvmrpDebugPrunes   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP Prunes Processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 5}
+
+alaDrcTmDvmrpDebugGrafts     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP Grafts processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 6}
+
+alaDrcTmDvmrpDebugTime     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP's Timer related events on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 7}
+
+alaDrcTmDvmrpDebugIgmp     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP Igmp processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 8}
+
+alaDrcTmDvmrpDebugFlash     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP's flash processing on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 9}
+
+alaDrcTmDvmrpDebugMip     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP's MIP processing 
+                 (including CLI/SNMP) on this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 10}
+
+alaDrcTmDvmrpDebugInit     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP's Initialization setup on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 11}
+
+alaDrcTmDvmrpDebugTm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP Task Manager Interaction on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 12}
+
+alaDrcTmDvmrpDebugIpmrm     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP IPMRM Interaction on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 13}
+
+alaDrcTmDvmrpDebugMisc     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debug messages for the DVMRP's Miscellaneous on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 14}
+
+alaDrcTmDvmrpDebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of DVMRP debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmDvmrpDebug 15}
+
+-- ************************************************************************
+--  DRC TM OSPF3 Debug Configuration
+-- ************************************************************************
+
+alaDrcTmOspf3DebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 1 }
+    ::= {alaDrcTmOspf3Debug 1}
+
+alaDrcTmOspf3DebugInfo OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Info Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 2}
+
+alaDrcTmOspf3DebugIntf OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Interface Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 3}
+
+alaDrcTmOspf3DebugRecv OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Recv Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 4}
+
+alaDrcTmOspf3DebugSend OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Send Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 5}
+
+alaDrcTmOspf3DebugNbr OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Nbr Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 6}
+
+alaDrcTmOspf3DebugState OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 State Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 7}
+
+alaDrcTmOspf3DebugArea OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Area Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 8}
+
+alaDrcTmOspf3DebugLsa OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Lsa Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 9}
+
+alaDrcTmOspf3DebugFlood OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Flood Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 10}
+
+alaDrcTmOspf3DebugSpf OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Spf Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 11}
+
+alaDrcTmOspf3DebugRdb OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Rdb Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 12}
+
+alaDrcTmOspf3DebugVlink OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Vlink Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 13}
+
+alaDrcTmOspf3DebugMip OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the OSPF3 Mip Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 14}
+
+alaDrcTmOspf3DebugAll     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for all types of OSPF3 debug messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmOspf3Debug 15}
+
+-- ************************************************************************
+--  DRC TM ISIS Debug Configuration
+-- ************************************************************************
+
+alaDrcTmIsisDebugError OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Error Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 1}
+
+alaDrcTmIsisDebugWarn OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Warning Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 2}
+
+alaDrcTmIsisDebugPkt OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Packet Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 3}
+
+alaDrcTmIsisDebugAdj OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Adjacency Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 4}
+
+alaDrcTmIsisDebugCkt OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Circuit Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 5}
+
+alaDrcTmIsisDebugSpf OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Spf Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 6}
+
+alaDrcTmIsisDebugLsp OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Lsp Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 7}
+
+alaDrcTmIsisDebugFlood OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Flood Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 8}
+
+alaDrcTmIsisDebugIntf OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Interface Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 9}
+
+alaDrcTmIsisDebugIprm  OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Iprm Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 10}
+
+alaDrcTmIsisDebugMip OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Mip Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 11}
+
+alaDrcTmIsisDebugMsg OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 12}
+
+alaDrcTmIsisDebugLeak OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Leak Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 13}
+
+alaDrcTmIsisDebugSummary OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Summary Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 14}
+
+alaDrcTmIsisDebugRestart OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the ISIS Restart Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 15}
+
+alaDrcTmIsisDebugAll OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the level of Debugging for the All ISIS Messages on
+                this router.  A level of 0 indicates no debugging."
+    DEFVAL     { 0 }
+    ::= {alaDrcTmIsisDebug 16}
+
+-- conformance information
+
+alcatelIND1DrcTmMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIB 2 }
+alcatelIND1DrcTmMIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1DrcTmMIBConformance 1 }
+alcatelIND1DrcTmMIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1DrcTmMIBConformance 2 }
+
+-- compliance statements
+
+alaDrcTmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running DRC Task
+            Manager (TM) and implementing the ALCATEL-IND1-DRCTM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaDrcTmConfigMIBGroup, alaDrcTmDebugMIBGroup,
+                           alaDrcTmRipDebugMIBGroup, alaDrcTmOspfDebugMIBGroup,
+                           alaDrcTmBgpDebugMIBGroup, alaDrcTmDvmrpDebugMIBGroup,
+                           alaDrcTmPimDebugMIBGroup, alaDrcTmRipngDebugMIBGroup,
+                           alaDrcTmIprmDebugMIBGroup, alaDrcTmIpmrmDebugMIBGroup,
+                           alaDrcTmOspf3DebugMIBGroup, alaDrcTmLogDestination,
+				   alaDrcTmIsisDebugMIBGroup
+                         } 
+
+    ::= { alcatelIND1DrcTmMIBCompliances 1 }
+
+-- units of conformance
+
+alaDrcTmConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmIPRouterPrimaryAddress,
+              alaDrcTmIPRouterId, alaDrcTmIPRipStatus, 
+              alaDrcTmIPOspfStatus, alaDrcTmIPBgpStatus, 
+              alaDrcTmIPDvmrpStatus, alaDrcTmIPPimStatus, 
+              alaDrcTmIPMsdpStatus, alaDrcTmIPRipngStatus,
+              alaDrcTmIPOspf3Status, alaDrcTmIPIsisStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of DRC
+            Task Manager."
+    ::= { alcatelIND1DrcTmMIBGroups 1 }
+
+alaDrcTmDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmDebugError, alaDrcTmDebugTaskInfo, alaDrcTmDebugEvents,
+              alaDrcTmDebugMip, alaDrcTmDebugMisc, alaDrcTmDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 2 }
+
+
+alaDrcTmRipDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmRipDebugError, alaDrcTmRipDebugWarning,
+              alaDrcTmRipDebugRecv, alaDrcTmRipDebugSend,
+              alaDrcTmRipDebugRdb, alaDrcTmRipDebugAge,
+              alaDrcTmRipDebugConfig, alaDrcTmRipDebugRedist,
+              alaDrcTmRipDebugInfo, alaDrcTmRipDebugSetup,
+              alaDrcTmRipDebugTime, alaDrcTmRipDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of RIP DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 3 }
+
+alaDrcTmOspfDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmOspfDebugError, alaDrcTmOspfDebugWarning,
+              alaDrcTmOspfDebugState, alaDrcTmOspfDebugRecv,
+              alaDrcTmOspfDebugSend, alaDrcTmOspfDebugFlood,
+              alaDrcTmOspfDebugSPF, alaDrcTmOspfDebugLsdb,
+              alaDrcTmOspfDebugRdb, alaDrcTmOspfDebugAge,
+              alaDrcTmOspfDebugVlink, alaDrcTmOspfDebugRedist,
+              alaDrcTmOspfDebugSummary, alaDrcTmOspfDebugDbexch,
+              alaDrcTmOspfDebugHello, alaDrcTmOspfDebugAuth,
+              alaDrcTmOspfDebugArea, alaDrcTmOspfDebugIntf,
+              alaDrcTmOspfDebugMip, alaDrcTmOspfDebugInfo,
+              alaDrcTmOspfDebugSetup, alaDrcTmOspfDebugTime,
+              alaDrcTmOspfDebugTm, alaDrcTmOspfDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of OSPF DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 4 }
+
+alaDrcTmBgpDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmBgpDebugDamp, alaDrcTmBgpDebugFsm,
+              alaDrcTmBgpDebugRecvUpd, alaDrcTmBgpDebugSendUpd,
+              alaDrcTmBgpDebugOpen, alaDrcTmBgpDebugKeepAlive,
+              alaDrcTmBgpDebugNotify, alaDrcTmBgpDebugPolicy,
+              alaDrcTmBgpDebugRoute, alaDrcTmBgpDebugSync,
+              alaDrcTmBgpDebugAggr, alaDrcTmBgpDebugTcp,
+              alaDrcTmBgpDebugWarnings, alaDrcTmBgpDebugErrors,
+              alaDrcTmBgpDebugRedist, alaDrcTmBgpDebugPeer,
+              alaDrcTmBgpDebugLocal, alaDrcTmBgpDebugMip,
+              alaDrcTmBgpDebugTm, alaDrcTmBgpDebugInfo,
+              alaDrcTmBgpDebugRestart, alaDrcTmBgpDebugAll,
+              alaDrcTmBgpDebugPeer6, alaDrcTmBgpDebugRoute6
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of BGP DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 5 }
+
+alaDrcTmDvmrpDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmDvmrpDebugError, alaDrcTmDvmrpDebugNbr,
+              alaDrcTmDvmrpDebugRoutes, alaDrcTmDvmrpDebugProbes,
+              alaDrcTmDvmrpDebugPrunes, alaDrcTmDvmrpDebugGrafts,
+              alaDrcTmDvmrpDebugTime, alaDrcTmDvmrpDebugIgmp,
+              alaDrcTmDvmrpDebugFlash, alaDrcTmDvmrpDebugMip,
+              alaDrcTmDvmrpDebugInit, alaDrcTmDvmrpDebugTm,
+              alaDrcTmDvmrpDebugIpmrm, alaDrcTmDvmrpDebugMisc,
+              alaDrcTmDvmrpDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of DVMRP DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 6 }
+
+alaDrcTmPimDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmPimDebugError, 		alaDrcTmPimDebugMip, 
+			  alaDrcTmPimDebugInit,  		alaDrcTmPimDebugBootstrap, 
+			  alaDrcTmPimDebugCRP, 			alaDrcTmPimDebugTime, 
+			  alaDrcTmPimDebugSpt, 			alaDrcTmPimDebugSmNbr, 
+			  alaDrcTmPimDebugSmHello, 		alaDrcTmPimDebugSmRoute, 
+			  alaDrcTmPimDebugSmJoinPrune, 	alaDrcTmPimDebugSmAssert, 
+			  alaDrcTmPimDebugSmIgmp, 		alaDrcTmPimDebugSmIpmrm, 
+			  alaDrcTmPimDebugSmMisc, 		alaDrcTmPimDebugDmNbr,
+			  alaDrcTmPimDebugDmHello, 		alaDrcTmPimDebugDmRoute, 
+			  alaDrcTmPimDebugDmJoinPrune, 	alaDrcTmPimDebugDmAssert,
+			  alaDrcTmPimDebugDmIgmp, 		alaDrcTmPimDebugDmIpmrm,
+			  alaDrcTmPimDebugDmMisc,		alaDrcTmPimDebugGraft,
+			  alaDrcTmPimDebugStateRefresh, alaDrcTmPimDebugAll     
+			}
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of PIM DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 7 }
+
+alaDrcTmRipngDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmRipngDebugError, alaDrcTmRipngDebugWarning,
+              alaDrcTmRipngDebugRecv, alaDrcTmRipngDebugSend,
+              alaDrcTmRipngDebugRdb, alaDrcTmRipngDebugAge,
+              alaDrcTmRipngDebugMip, alaDrcTmRipngDebugInfo,
+              alaDrcTmRipngDebugSetup, alaDrcTmRipngDebugTime,
+              alaDrcTmRipngDebugTm, alaDrcTmRipngDebugRouteFilter,
+              alaDrcTmRipngDebugNexthopFilter, alaDrcTmRipngDebugSummary,
+              alaDrcTmRipngDebugAll, alaDrcTmRipngDebugRedist
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of RIPNG DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 8 }
+
+alaDrcTmIprmDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmIprmDebugError, alaDrcTmIprmDebugAccesslist,
+              alaDrcTmIprmDebugIntf, alaDrcTmIprmDebugMip,
+              alaDrcTmIprmDebugMisc, alaDrcTmIprmDebugNhs,
+              alaDrcTmIprmDebugPrefix, alaDrcTmIprmDebugRedist,
+              alaDrcTmIprmDebugRoute4, alaDrcTmIprmDebugRoute6,
+              alaDrcTmIprmDebugRoutemap, alaDrcTmIprmDebugRoutepref,
+              alaDrcTmIprmDebugStatic, alaDrcTmIprmDebugBfd,
+              alaDrcTmIprmDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of IPRM DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 9 }
+
+alaDrcTmIpmrmDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmIpmrmDebugError, alaDrcTmIpmrmDebugFib,
+              alaDrcTmIpmrmDebugAging, alaDrcTmIpmrmDebugProtos, 
+			  alaDrcTmIpmrmDebugIpms, alaDrcTmIpmrmDebugMip, 
+			  alaDrcTmIpmrmDebugInit, alaDrcTmIpmrmDebugTm, 
+			  alaDrcTmIpmrmDebugMisc, alaDrcTmIpmrmDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of IPMRM DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 10 }
+
+
+alaDrcTmOspf3DebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmOspf3DebugError, alaDrcTmOspf3DebugInfo ,
+			alaDrcTmOspf3DebugIntf, alaDrcTmOspf3DebugRecv ,
+			alaDrcTmOspf3DebugSend, alaDrcTmOspf3DebugNbr ,
+			alaDrcTmOspf3DebugState , alaDrcTmOspf3DebugArea ,
+			alaDrcTmOspf3DebugLsa , alaDrcTmOspf3DebugFlood ,
+			alaDrcTmOspf3DebugSpf, alaDrcTmOspf3DebugRdb,
+			alaDrcTmOspf3DebugVlink,  alaDrcTmOspf3DebugMip ,
+			alaDrcTmOspf3DebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of OSPF3 DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 11 }
+
+alaDrcTmLogDestinationMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmLogToSysFacility, alaDrcTmLogToSessionId,
+              alaDrcTmLogBufferSize
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of DRC TM LOG DESTINATION."
+    ::= { alcatelIND1DrcTmMIBGroups 12 }
+
+alaDrcTmIsisDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDrcTmIsisDebugError,alaDrcTmIsisDebugWarn,
+              alaDrcTmIsisDebugPkt,alaDrcTmIsisDebugAdj,
+              alaDrcTmIsisDebugCkt,alaDrcTmIsisDebugSpf,
+              alaDrcTmIsisDebugLsp,alaDrcTmIsisDebugFlood,
+              alaDrcTmIsisDebugIntf,alaDrcTmIsisDebugIprm,
+              alaDrcTmIsisDebugMip,alaDrcTmIsisDebugMsg,
+              alaDrcTmIsisDebugLeak,alaDrcTmIsisDebugSummary,
+              alaDrcTmIsisDebugRestart,alaDrcTmIsisDebugAll   
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of ISIS DRC TM."
+    ::= { alcatelIND1DrcTmMIBGroups 13 }
+END
+
+

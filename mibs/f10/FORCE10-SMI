@@ -1,0 +1,92 @@
+	FORCE10-SMI DEFINITIONS ::= BEGIN 
+
+	--  Force10 Networks, Inc.
+	--  1440 McCarthy Blvd
+	--  Milpitas, CA 95035-7438
+
+	--  This module provides authoritative 
+	--  definitions for Force10 enterprise MIB.
+	--
+	--  This module will be extended, as needed.
+	--
+	IMPORTS
+		MODULE-IDENTITY,enterprises,
+		OBJECT-IDENTITY 
+			FROM SNMPv2-SMI; 
+
+	force10  MODULE-IDENTITY
+
+	LAST-UPDATED "200706151200Z"   -- June 15, 2007 12:00:00 GMT
+	ORGANIZATION
+	  "Force10 Networks, Inc."
+	CONTACT-INFO
+	  "Force10 Networks, Inc
+	   1440 McCarthy Blvd
+	   Milpitas, CA 95035
+	   (408) 571-3500
+	   support@force10networks.com
+	   http://www.force10networks.com"
+
+	DESCRIPTION
+	   "The Structure of Management Information for
+	    the Force10 enterprise."
+
+	-- Revision history.
+	REVISION     "200706151200Z"   -- June 15, 2007 12:00:00 GMT
+	DESCRIPTION
+		"Added f10Modules."
+
+	REVISION     "0010100000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { enterprises 6027 }	-- assigned by IANA
+
+
+	f10Products OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Force10 Products' OID."
+		::= { force10 1 }
+
+	f10Common OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"All Force10 shared TEXTTUAL-CONVENTION 
+			 definitions"
+		::= { force10 2 }
+
+	f10Mgmt OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"f10Mgmt is the main subtree for Force10
+			 mib development."
+		::= { force10 3 }
+
+	f10Modules OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"f10Modules provides a root object identifier
+			 from which MODULE-IDENTITY values may be based."
+		::= { force10 4 }
+
+	f10Experiment OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"f10Experiment provides a root object identifier
+			from which experimental mibs may be temporarily
+			based.  mibs are typicially based here if they
+			fall in one of two categories
+			1) are IETF work-in-process mibs which have not
+			been assigned a permanent object identifier by
+			the IANA.
+			2) are force10 work-in-process which has not been
+			assigned a permanent object identifier by the
+			force10 assigned number authority, typicially because
+			the mib is not ready for deployment.
+
+			NOTE WELL:  support for mibs in the f10Experiment
+			subtree will be deleted when a permanent object
+			identifier assignment is made."
+		::= { force10 20 }
+
+	END

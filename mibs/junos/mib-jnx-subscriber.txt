@@ -1,0 +1,823 @@
+-- *****************************************************************************
+-- JUNIPER-SUBSCRIBER-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Subscriber MIB
+--
+-- Copyright (c) 2010-2013, Juniper Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************************
+
+JUNIPER-SUBSCRIBER-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Unsigned32 
+                                        FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, DisplayString, MacAddress
+                                        FROM SNMPv2-TC
+       InterfaceIndex
+                                        FROM IF-MIB
+       CounterBasedGauge64               -- RFC 2856
+                                        FROM HCNUM-TC
+       jnxSubscriberMibRoot
+                                        FROM JUNIPER-SMI;
+
+
+jnxSubscriberMIB  MODULE-IDENTITY
+       LAST-UPDATED "201312130000Z"  -- 20-Dec-13
+       ORGANIZATION "Juniper Networks, Inc."
+       CONTACT-INFO
+             " Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+       DESCRIPTION
+             "The Subscriber MIB for the Juniper Networks enterprise."
+       -- Revision History
+       REVISION    "201005110000Z"  -- 11-May-10
+       DESCRIPTION
+             "Initial version of jnxSubscriberMIB module."
+       REVISION    "201205020000Z"  -- 02-May-12
+       DESCRIPTION
+             "Updated related to subscriber accounting session id."
+       REVISION    "201312130000Z"  -- 20-Dec-13
+       DESCRIPTION
+             "Added jnxSubscriberAccountingTable MIB."
+       REVISION    "201411030000Z"  -- 03-Nov-14
+       DESCRIPTION
+             "Added jnxSubscriberPicCountTable and jnxSubscriberSlotCountTable."
+       ::= { jnxSubscriberMibRoot  1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+JnxSubscriberState  ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+             "The set of possible AAA subscriber states, expressed as a bit map:
+                init                 INIT state only
+                configured           CONFIGURED state only
+                active               ACTIVE state only
+                terminated           TERMINATED state only
+                terminating          TERMINATING state only
+                unknown              Unknown state "
+       SYNTAX      INTEGER {
+             init(0),
+             configured(1),
+             active(2),
+             terminating(3),
+             terminated(4),
+             unknown(5) }
+
+JnxSubscriberClientType  ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+             "The set of possible AAA subscriber client types:
+                none                None of the following
+                dhcp                DHCP clients only
+                l2tp                L2TP clients only
+                ppp                 PPP clients only
+                pppoe               PPPoE clients only
+                vlan                VLAN clients only
+                generic             Generic clients only
+                mobileIp            Mobile Ip clients only
+                vplsPw              VPLS pseudowires only
+                static              Static clients only
+                mlppp               MLPPP clients only "
+       SYNTAX      BITS {
+             none(0),
+             dhcp(1),
+             vlan(2),
+             generic(3),
+             mobileIp(4),
+             vplsPw(5),
+             ppp(6),
+             ppppoe(7),
+             l2tp(8),
+             static(9),
+             mlppp(10) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jnxSubscriberObjects                OBJECT IDENTIFIER ::= {jnxSubscriberMIB 1}
+jnxSubscriberGeneral                OBJECT IDENTIFIER ::= {jnxSubscriberObjects 1}
+jnxSubscriberLogicalSystemObjects   OBJECT IDENTIFIER ::= {jnxSubscriberObjects 2}
+jnxSubscriberRoutingInstanceObjects OBJECT IDENTIFIER ::= {jnxSubscriberObjects 3}
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Subscriber functions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jnxSubscriberTotalCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "Total number of subscribers."
+       ::= { jnxSubscriberGeneral 1 }
+
+jnxSubscriberActiveCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "Number of active subscribers."
+       ::= { jnxSubscriberGeneral 2 }
+
+jnxSubscriberTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The entries in this table represent subscribers."
+       ::= { jnxSubscriberGeneral 3 }
+
+jnxSubscriberInterfaceHardwareIndexTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberInterfaceHardwareIndexEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The entries in this table represent subscribers Interface Hardware Index."
+       ::= { jnxSubscriberGeneral 4 }
+
+jnxSubscriberPortCountTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberPortCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             " The entries in this table represent each port.
+               Each entry contains the port name and the number
+               of active subscribers present on that port."
+       ::= { jnxSubscriberGeneral 5 }
+
+jnxSubscriberAccountingTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberAccountingEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The entries in this table represent subscribers with accounting."
+       ::= { jnxSubscriberGeneral 6 }
+
+jnxSubscriberAccountingTotalCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "Total number of subscribers with accounting."
+       ::= { jnxSubscriberGeneral 7 }
+
+jnxSubscriberPicCountTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberPicCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             " The entries in this table represent each PIC.
+               Each entry contains the PIC name and the number
+               of active subscribers present on that PIC."
+       ::= { jnxSubscriberGeneral 8 }
+
+jnxSubscriberSlotCountTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberSlotCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             " The entries in this table represent each slot.
+               Each entry contains the slot name and the number
+               of active subscribers present on that slot."
+       ::= { jnxSubscriberGeneral 9 }
+
+jnxSubscriberInterfaceHardwareIndexEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberInterfaceHardwareIndexEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of subscribers."
+       INDEX     { jnxSubscriberInterfaceHardwareIndexHandleHiWord, jnxSubscriberInterfaceHardwareIndexHandleLoWord }
+       ::= { jnxSubscriberInterfaceHardwareIndexTable 1 }
+
+JnxSubscriberInterfaceHardwareIndexEntry ::= SEQUENCE {
+       jnxSubscriberInterfaceHardwareIndexHandleHiWord         Unsigned32,
+       jnxSubscriberInterfaceHardwareIndexHandleLoWord         Unsigned32,
+       jnxSubscriberInterfaceHardwareIndex     Unsigned32 }
+
+jnxSubscriberInterfaceHardwareIndexHandleHiWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+             
+             This object is equal to the most significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberInterfaceHardwareIndexEntry 1 }
+
+jnxSubscriberInterfaceHardwareIndexHandleLoWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+
+             This object is equal to the least significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberInterfaceHardwareIndexEntry 2}
+
+jnxSubscriberInterfaceHardwareIndex OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "The subscriber interface hardware index."
+       ::= { jnxSubscriberInterfaceHardwareIndexEntry 3}
+
+jnxSubscriberEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of subscribers."
+       INDEX     { jnxSubscriberHandleHiWord, jnxSubscriberHandleLoWord }
+       ::= { jnxSubscriberTable 1 }
+
+
+JnxSubscriberEntry ::= SEQUENCE {
+       jnxSubscriberHandleHiWord         Unsigned32,
+       jnxSubscriberHandleLoWord         Unsigned32,
+       jnxSubscriberUserName             DisplayString,
+       jnxSubscriberClientType           JnxSubscriberClientType,
+       jnxSubscriberIpAddress            IpAddress,
+       jnxSubscriberIpAddressMask        IpAddress,
+       jnxSubscriberLogicalSystem        OCTET STRING,
+       jnxSubscriberRoutingInstance      OCTET STRING,
+       jnxSubscriberInterface            DisplayString,
+       jnxSubscriberInterfaceType        INTEGER,
+       jnxSubscriberMacAddress           MacAddress,
+       jnxSubscriberState                JnxSubscriberState,
+       jnxSubscriberLoginTime            DisplayString,
+       jnxSubscriberAcctSessionId        DisplayString }
+
+jnxSubscriberHandleHiWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+             
+             This object is equal to the most significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberEntry 1 }
+
+jnxSubscriberHandleLoWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+
+             This object is equal to the least significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberEntry 2}
+
+jnxSubscriberUserName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The userName associated with this subscriber."
+       ::= { jnxSubscriberEntry 3 }
+
+jnxSubscriberClientType OBJECT-TYPE
+       SYNTAX      JnxSubscriberClientType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The client type for this subscriber."
+       ::= { jnxSubscriberEntry 4 }
+
+jnxSubscriberIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The client IP Address assigned to this subscriber."
+       ::= { jnxSubscriberEntry 5 }
+
+jnxSubscriberIpAddressMask OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The client IP Address Mask assigned to this subscriber."
+       ::= { jnxSubscriberEntry 6 }
+
+jnxSubscriberLogicalSystem OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..63))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The logical system associated with this subscriber."
+       ::= { jnxSubscriberEntry 7 }
+
+jnxSubscriberRoutingInstance OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..128))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The routing instance associated with this subscriber."
+    ::= { jnxSubscriberEntry 8 }
+
+jnxSubscriberInterface OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The textual name of the interface associated with this subscriber."
+    ::= { jnxSubscriberEntry 9 }
+
+jnxSubscriberInterfaceType OBJECT-TYPE
+       SYNTAX      INTEGER {
+             none(0),
+             static(1),
+             dynamic(2) }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The type of the interface associated with this subscriber."
+       ::= { jnxSubscriberEntry 10 }
+
+jnxSubscriberMacAddress OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The MAC address of the interface associated with this subscriber."
+       ::= { jnxSubscriberEntry 11 }
+
+jnxSubscriberState OBJECT-TYPE
+       SYNTAX      JnxSubscriberState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The state of this subscriber."
+       ::= { jnxSubscriberEntry 12 }
+
+jnxSubscriberLoginTime OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The time this subscriber logged in to the server."
+       ::= { jnxSubscriberEntry 13 }
+
+jnxSubscriberAcctSessionId OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The accounting session id associated with this subscriber."
+       ::= { jnxSubscriberEntry 14 }
+
+
+jnxSubscriberPortCountEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberPortCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of Port containing the port name 
+              and the number of active subscribers on that port"
+       INDEX       { jnxSubscriberPort }
+       ::= { jnxSubscriberPortCountTable 1 }
+
+JnxSubscriberPortCountEntry ::= SEQUENCE {
+       jnxSubscriberPort                  DisplayString,
+       jnxSubscriberPortTunneledCounter  CounterBasedGauge64, 
+       jnxSubscriberPortTerminatedCounter  CounterBasedGauge64 }
+
+jnxSubscriberPort  OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(1..32))
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+             "Name of the port in string"
+       ::= { jnxSubscriberPortCountEntry 1  }
+
+
+jnxSubscriberPortTunneledCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of active Tunneled subscribers present on the port"
+       ::= { jnxSubscriberPortCountEntry 2  }
+
+jnxSubscriberPortTerminatedCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of active Tunneled subscribers present on the port"
+       ::= { jnxSubscriberPortCountEntry 3  }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Subscriber information by logical system
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jnxSubscriberLogicalSystemTotalCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The number of total subscribers on the logical system."
+       ::= { jnxSubscriberLogicalSystemObjects 1 }
+
+jnxSubscriberLogicalSystemActiveCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The number of active subscribers on the logical system."
+       ::= { jnxSubscriberLogicalSystemObjects 2 }
+
+jnxSubscriberLogicalSystemTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberLogicalSystemEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The entries in this table sort subscribers within the logical system.
+             
+             The logical system name must be provided in the SNMP query. The
+             logical system will be identified by either the context field in V3
+             requests, or it will be encoded in the community string in V1 or
+             V2c requests.
+
+             User can query for logical-system/routing-instance specific data by
+             prefixing the community string with
+             <logical-system>/<routing-instance>@, where '@' acts as a separator
+             between community name and routing-instance name.
+
+             If no logical system is specified, this table shows data for the
+             default logical system. The name of the routing instance is ignored
+             for this table."
+       ::= { jnxSubscriberLogicalSystemObjects 3 }
+
+jnxSubscriberLogicalSystemEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberLogicalSystemEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of subscribers within the logical system."
+       INDEX     { jnxSubscriberLogicalSystemHandleHiWord, jnxSubscriberLogicalSystemHandleLoWord }
+       ::= { jnxSubscriberLogicalSystemTable 1 }
+
+JnxSubscriberLogicalSystemEntry ::= SEQUENCE {
+       jnxSubscriberLogicalSystemHandleHiWord   Unsigned32,
+       jnxSubscriberLogicalSystemHandleLoWord   Unsigned32,
+       jnxSubscriberLogicalSystemState          JnxSubscriberState }
+
+jnxSubscriberLogicalSystemHandleHiWord  OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+
+             This object is equal to the most significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberLogicalSystemEntry 1 }
+
+jnxSubscriberLogicalSystemHandleLoWord  OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+
+             This object is equal to the least significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberLogicalSystemEntry 2 }
+
+jnxSubscriberLogicalSystemState OBJECT-TYPE
+       SYNTAX      JnxSubscriberState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The state of this subscriber."
+       ::= { jnxSubscriberLogicalSystemEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Subscriber information by routing instance
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jnxSubscriberRoutingInstanceTotalCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The number of total subscribers on the routing instance."
+       ::= { jnxSubscriberRoutingInstanceObjects 1 }
+
+jnxSubscriberRoutingInstanceActiveCount OBJECT-TYPE
+       SYNTAX      CounterBasedGauge64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The number of active subscribers on the routing instance."
+       ::= { jnxSubscriberRoutingInstanceObjects 2 }
+
+jnxSubscriberRoutingInstanceTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF JnxSubscriberRoutingInstanceEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The entries in this table sort subscribers within routing instance.
+             
+             The routing instance name must be provided in the SNMP query. The
+             routing instance will be identified by either the context field in V3
+             requests, or it will be encoded in the community string in V1 or
+             V2c requests.
+
+             User can query for logical-system/routing-instance specific data by
+             prefixing the community string with
+             <logical-system>/<routing-instance>@, where '@' acts as a separator
+             between community name and routing-instance name.
+
+             If no routing instance is specified, this table shows data for the
+             default routing instance. The name of the logical system is ignored
+             for this table."
+       ::= { jnxSubscriberRoutingInstanceObjects 3 }
+
+jnxSubscriberRoutingInstanceEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberRoutingInstanceEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of subscribers within routing instance."
+       INDEX     { jnxSubscriberRoutingInstanceHandleHiWord, jnxSubscriberRoutingInstanceHandleLoWord }
+       ::= { jnxSubscriberRoutingInstanceTable 1 }
+
+JnxSubscriberRoutingInstanceEntry ::= SEQUENCE {
+       jnxSubscriberRoutingInstanceHandleHiWord Unsigned32,
+       jnxSubscriberRoutingInstanceHandleLoWord Unsigned32,
+       jnxSubscriberRoutingInstanceState        JnxSubscriberState }
+
+jnxSubscriberRoutingInstanceHandleHiWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+             
+             This object is equal to the most significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberRoutingInstanceEntry 1 }
+
+jnxSubscriberRoutingInstanceHandleLoWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+
+             This object is equal to the least significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberRoutingInstanceEntry 2 }
+
+jnxSubscriberRoutingInstanceState OBJECT-TYPE
+       SYNTAX      JnxSubscriberState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The state of this subscriber."
+       ::= { jnxSubscriberRoutingInstanceEntry 3 }
+
+jnxSubscriberAccountingEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberAccountingEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of subscribers with Accounting."
+       INDEX     { jnxSubscriberAccountingHandleHiWord, jnxSubscriberAccountingHandleLoWord }
+       ::= { jnxSubscriberAccountingTable 1 }
+
+
+JnxSubscriberAccountingEntry ::= SEQUENCE {
+       jnxSubscriberAccountingHandleHiWord         Unsigned32,
+       jnxSubscriberAccountingHandleLoWord         Unsigned32,
+       jnxSubscriberAccountingUserName             DisplayString,
+       jnxSubscriberAccountingClientType           JnxSubscriberClientType,
+       jnxSubscriberAccountingIpAddress            IpAddress,
+       jnxSubscriberAccountingIpAddressMask        IpAddress,
+       jnxSubscriberAccountingLogicalSystem        OCTET STRING,
+       jnxSubscriberAccountingRoutingInstance      OCTET STRING,
+       jnxSubscriberAccountingInterface            DisplayString,
+       jnxSubscriberAccountingInterfaceType        INTEGER,
+       jnxSubscriberAccountingMacAddress           MacAddress,
+       jnxSubscriberAccountingState                JnxSubscriberState,
+       jnxSubscriberAccountingLoginTime            DisplayString,
+       jnxSubscriberAccountingAcctSessionId        DisplayString }
+
+jnxSubscriberAccountingHandleHiWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+             
+             This object is equal to the most significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberAccountingEntry 1 }
+
+jnxSubscriberAccountingHandleLoWord OBJECT-TYPE
+       SYNTAX      Unsigned32(0..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The subscriber handle associated with this subscriber. A
+             subscriber handle is a monotonically increasing number.
+
+             This object is equal to the least significant 32 bit of the 64 bit
+             subscriber id."
+       ::= { jnxSubscriberAccountingEntry 2}
+
+jnxSubscriberAccountingUserName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The userName associated with this subscriber."
+       ::= { jnxSubscriberAccountingEntry 3 }
+
+jnxSubscriberAccountingClientType OBJECT-TYPE
+       SYNTAX      JnxSubscriberClientType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The client type for this subscriber."
+       ::= { jnxSubscriberAccountingEntry 4 }
+
+jnxSubscriberAccountingIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The client IP Address assigned to this subscriber."
+       ::= { jnxSubscriberAccountingEntry 5 }
+
+jnxSubscriberAccountingIpAddressMask OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The client IP Address Mask assigned to this subscriber."
+       ::= { jnxSubscriberAccountingEntry 6 }
+
+jnxSubscriberAccountingLogicalSystem OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..63))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The logical system associated with this subscriber."
+       ::= { jnxSubscriberAccountingEntry 7 }
+
+jnxSubscriberAccountingRoutingInstance OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..128))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The routing instance associated with this subscriber."
+    ::= { jnxSubscriberAccountingEntry 8 }
+
+jnxSubscriberAccountingInterface OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The textual name of the interface associated with this subscriber."
+    ::= { jnxSubscriberAccountingEntry 9 }
+
+jnxSubscriberAccountingInterfaceType OBJECT-TYPE
+       SYNTAX      INTEGER {
+             none(0),
+             static(1),
+             dynamic(2) }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The type of the interface associated with this subscriber."
+       ::= { jnxSubscriberAccountingEntry 10 }
+
+jnxSubscriberAccountingMacAddress OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The MAC address of the interface associated with this subscriber."
+       ::= { jnxSubscriberAccountingEntry 11 }
+
+jnxSubscriberAccountingState OBJECT-TYPE
+       SYNTAX      JnxSubscriberState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The state of this subscriber."
+       ::= { jnxSubscriberAccountingEntry 12 }
+
+jnxSubscriberAccountingLoginTime OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The time this subscriber logged in to the server."
+       ::= { jnxSubscriberAccountingEntry 13 }
+
+jnxSubscriberAccountingAcctSessionId OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The accounting session id associated with this subscriber."
+       ::= { jnxSubscriberAccountingEntry 14 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- PIC Count Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jnxSubscriberPicCountEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberPicCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of Pic containing the PIC name 
+              and the number of active subscribers on that PIC"
+       INDEX       { jnxSubscriberPic }
+       ::= { jnxSubscriberPicCountTable 1 }
+
+JnxSubscriberPicCountEntry ::= SEQUENCE {
+       jnxSubscriberPic                  DisplayString,
+       jnxSubscriberPicTotalCounter  CounterBasedGauge64 }
+
+jnxSubscriberPic  OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(1..32))
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+             "Name of the PIC in string"
+       ::= { jnxSubscriberPicCountEntry 1  }
+
+jnxSubscriberPicTotalCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of active subscribers present on the PIC"
+       ::= { jnxSubscriberPicCountEntry 2  }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Slot Count Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jnxSubscriberSlotCountEntry OBJECT-TYPE
+       SYNTAX      JnxSubscriberSlotCountEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "A specification of Slot containing the slot name 
+              and the number of active subscribers on that slot"
+       INDEX       { jnxSubscriberSlot }
+       ::= { jnxSubscriberSlotCountTable 1 }
+
+JnxSubscriberSlotCountEntry ::= SEQUENCE {
+       jnxSubscriberSlot                  DisplayString,
+       jnxSubscriberSlotTotalCounter      CounterBasedGauge64 }
+
+jnxSubscriberSlot  OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(1..32))
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+             "Name of the slot in string"
+       ::= { jnxSubscriberSlotCountEntry 1  }
+
+jnxSubscriberSlotTotalCounter OBJECT-TYPE
+       SYNTAX       CounterBasedGauge64
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+             "Number of active subscribers present on the slot"
+       ::= { jnxSubscriberSlotCountEntry 2  }
+
+END

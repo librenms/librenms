@@ -1,0 +1,1066 @@
+-- *****************************************************************************
+-- Juniper-DOS-PROTECTION-PLATFORM-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DOS Protection MIB (platform)
+--
+-- Copyright (c) 2005-2006 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+Juniper-DOS-PROTECTION-PLATFORM-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,  Counter32,  
+		Unsigned32, Integer32
+        FROM SNMPv2-SMI
+	JuniEnable
+		FROM Juniper-TC
+    TEXTUAL-CONVENTION, TruthValue, MacAddress, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+	JuniDosProtectionProtocolType, JuniDosProtectionPriorityType, JuniDosProtectionProtocolState, 
+		JuniDosProtectionScfdsTableOverflowState
+		FROM Juniper-DOS-PROTECTION-MIB;
+
+
+juniDosProtectionPlatformMIB  MODULE-IDENTITY
+    LAST-UPDATED "200607010000Z"  -- 01-Jul-2006 00:00
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION 
+		"The DOS Protection MIB for the Juniper E-Series product family. 
+		This MIB contains managed objects for the DOS Protection 
+		application, which are platform specific. Management objects are 
+		provided to control and monitor the DOS protection application."
+	REVISION   "200607010000Z"  -- 01-Jul-2006 00:00   JUNOSe -.-
+    DESCRIPTION
+        "Added dos-protection-group support and added MAC address	
+		to flow traps."	
+	REVISION   "200601010000Z"  -- 01-Jan-2006 00:00   JUNOSe 7.3
+    DESCRIPTION
+        "Initial version of this MIB module."	
+    ::= { juniMibs 81 }                  
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniDosProtectionPlatformObjects    	OBJECT IDENTIFIER ::= { juniDosProtectionPlatformMIB 1 }
+juniDosProtectionPlatformScfdsGroup 	OBJECT IDENTIFIER ::= { juniDosProtectionPlatformObjects 1 }
+juniDosProtectionPlatformDpgGroup		OBJECT IDENTIFIER ::= { juniDosProtectionPlatformObjects 2 }
+--
+-- slot based table for protocol state
+--
+
+juniDosProtectionScfdsSlotProtocolTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JuniDosProtectionScfdsSlotProtocolEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The information for the DOS protection control protocols 
+		for a specific slot."
+
+	::= { juniDosProtectionPlatformScfdsGroup 1 } 
+
+juniDosProtectionScfdsSlotProtocolEntry OBJECT-TYPE
+	SYNTAX		JuniDosProtectionScfdsSlotProtocolEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The information for an individual control protocol on
+		a specific slot."
+
+	INDEX	{  juniDosProtectionScfdsSlotProtocolSlot,
+	          juniDosProtectionScfdsSlotProtocolIndex }
+
+	::= { juniDosProtectionScfdsSlotProtocolTable 1 } 
+	
+JuniDosProtectionScfdsSlotProtocolEntry ::= SEQUENCE {
+    juniDosProtectionScfdsSlotProtocolSlot 	Unsigned32,
+	juniDosProtectionScfdsSlotProtocolIndex 	JuniDosProtectionProtocolType,
+	juniDosProtectionScfdsSlotProtocolState 	JuniDosProtectionProtocolState,
+	juniDosProtectionScfdsSlotProtocolTransitions 	Counter32}
+
+juniDosProtectionScfdsSlotProtocolSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The slot value for the entry."
+
+    ::= { juniDosProtectionScfdsSlotProtocolEntry 1 }
+
+juniDosProtectionScfdsSlotProtocolIndex OBJECT-TYPE
+    SYNTAX      JuniDosProtectionProtocolType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The control protocol value for the entry."
+
+    ::= { juniDosProtectionScfdsSlotProtocolEntry 2 }
+
+juniDosProtectionScfdsSlotProtocolState OBJECT-TYPE
+	SYNTAX		JuniDosProtectionProtocolState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The current state of the protocol.  This object will return inTrouble(2)
+		if the specific slot referenced is reporting that the protocol is currently
+		being watched for suspicious flows. If the module is not reporting that 
+		this protocol is being watched this object will return ok(1). 
+
+		A protocol is in trouble for a slot when the sum of the rate of all flows 
+		for the protocol is over the limit for that protocol."
+
+    ::= { juniDosProtectionScfdsSlotProtocolEntry 3 }
+
+juniDosProtectionScfdsSlotProtocolTransitions OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of transitions to 'inTrouble' that this control protocol 
+		has made for this slot."
+
+    ::= { juniDosProtectionScfdsSlotProtocolEntry 4 }
+
+
+--
+-- slot based flow table
+--
+
+juniDosProtectionScfdsSlotFlowTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JuniDosProtectionScfdsSlotFlowEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		obsolete
+	DESCRIPTION 
+		"Information about suspicious control flows."
+
+	::= { juniDosProtectionPlatformScfdsGroup 2 } 
+
+juniDosProtectionScfdsSlotFlowEntry	OBJECT-TYPE
+	SYNTAX		JuniDosProtectionScfdsSlotFlowEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		obsolete
+	DESCRIPTION
+		"Information about a suspicious control flow."
+
+	INDEX	{ juniDosProtectionScfdsSlotFlowSlot,
+			  juniDosProtectionScfdsSlotFlowIfIndex,
+			  juniDosProtectionScfdsSlotFlowGroupId,
+	          juniDosProtectionScfdsSlotFlowProtocol }
+
+	::= { juniDosProtectionScfdsSlotFlowTable 1 } 
+	
+JuniDosProtectionScfdsSlotFlowEntry ::= SEQUENCE {
+	juniDosProtectionScfdsSlotFlowSlot		Unsigned32,
+	juniDosProtectionScfdsSlotFlowIfIndex		InterfaceIndex,
+	juniDosProtectionScfdsSlotFlowGroupId     Unsigned32,
+	juniDosProtectionScfdsSlotFlowProtocol	JuniDosProtectionProtocolType,
+	juniDosProtectionScfdsSlotFlowRate		Unsigned32,
+	juniDosProtectionScfdsSlotFlowPeakRate	Unsigned32,
+	juniDosProtectionScfdsSlotFlowTimeFlagged	Unsigned32,
+	juniDosProtectionScfdsSlotFlowIngressSlot	Integer32,
+	juniDosProtectionScfdsSlotFlowGroup       TruthValue,
+	juniDosProtectionScfdsSlotFlowClearEntry	INTEGER}
+
+juniDosProtectionScfdsSlotFlowSlot	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		obsolete
+	DESCRIPTION 
+		"The slot value for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 1 }
+
+juniDosProtectionScfdsSlotFlowIfIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	not-accessible
+	STATUS		obsolete
+	DESCRIPTION 
+		"The ifIndex value for the flow. For group flows, this value
+		will be zero."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 2 }
+
+juniDosProtectionScfdsSlotFlowGroupId	OBJECT-TYPE
+	SYNTAX		Unsigned32(0..15)
+	MAX-ACCESS	not-accessible
+	STATUS		obsolete
+	DESCRIPTION 
+		"The group id for the flow. The group id will be zero for an individual 
+		flow. It is non-zero when the entry represents a group of flows."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 3 }
+
+juniDosProtectionScfdsSlotFlowProtocol OBJECT-TYPE
+	SYNTAX		JuniDosProtectionProtocolType
+	MAX-ACCESS	not-accessible
+	STATUS		obsolete
+	DESCRIPTION 
+		"The control protocol for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 4 }
+
+juniDosProtectionScfdsSlotFlowRate OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION 
+		"The current rate in packets per second for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 5 }
+
+juniDosProtectionScfdsSlotFlowPeakRate OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION 
+		"The peak rate in packets per second for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 6 }
+
+juniDosProtectionScfdsSlotFlowTimeFlagged	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION 
+		"The sysUpTime value for the time when the flow was
+		determined to be suspicious."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 7 }
+
+juniDosProtectionScfdsSlotFlowIngressSlot	OBJECT-TYPE
+	SYNTAX 	   Integer32
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION
+		"For control flow that are monitored on the egress 
+		processor in the forwarding path, this value will 
+		indicate the possible ingress slot for data stream that
+		is possibly causing this suspicious flow control. This 
+		object will report -1 when it is undefined"
+	
+    ::= { juniDosProtectionScfdsSlotFlowEntry 8 }
+
+juniDosProtectionScfdsSlotFlowGroup       OBJECT-TYPE 
+	SYNTAX 	   TruthValue
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION
+		"Indicates whether the flow is a group flow or not. A value of
+		true(1) indicates that the flow represents a group of flows. 
+		A value of false(2) indicates that the flow is an individual flow."
+	
+    ::= { juniDosProtectionScfdsSlotFlowEntry 9 }
+
+juniDosProtectionScfdsSlotFlowClearEntry OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    ok(0),
+                    clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "When set to clear(1), the suspicious control flow
+        is removed from the suspicious control flow table.  When set to 
+		ok(0), there is no effect and the suspicious control flow 
+		is unchanged.
+
+        When read, always returns a value of ok(0)."
+
+    ::= { juniDosProtectionScfdsSlotFlowEntry 10 }
+
+--
+-- slot based flow table (with MAC address)
+--
+
+juniDosProtectionScfdsSlotFlowMacTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JuniDosProtectionScfdsSlotFlowMacEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"Information about suspicious control flows."
+
+	::= { juniDosProtectionPlatformScfdsGroup 4 } 
+
+juniDosProtectionScfdsSlotFlowMacEntry	OBJECT-TYPE
+	SYNTAX		JuniDosProtectionScfdsSlotFlowMacEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Information about a suspicious control flow."
+
+	INDEX	{ juniDosProtectionScfdsSlotFlowMacSlot,
+			  juniDosProtectionScfdsSlotFlowMacIfIndex,
+			  juniDosProtectionScfdsSlotFlowMacGroupId,
+	          juniDosProtectionScfdsSlotFlowMacProtocol,
+			  juniDosProtectionScfdsSlotFlowMacSrcMac}
+
+	::= { juniDosProtectionScfdsSlotFlowMacTable 1 } 
+	
+JuniDosProtectionScfdsSlotFlowMacEntry ::= SEQUENCE {
+	juniDosProtectionScfdsSlotFlowMacSlot		Unsigned32,
+	juniDosProtectionScfdsSlotFlowMacIfIndex	InterfaceIndex,
+	juniDosProtectionScfdsSlotFlowMacGroupId    Unsigned32,
+	juniDosProtectionScfdsSlotFlowMacProtocol	JuniDosProtectionProtocolType,
+	juniDosProtectionScfdsSlotFlowMacSrcMac		MacAddress,
+	juniDosProtectionScfdsSlotFlowMacRate		Unsigned32,
+	juniDosProtectionScfdsSlotFlowMacPeakRate	Unsigned32,
+	juniDosProtectionScfdsSlotFlowMacTimeFlagged	Unsigned32,
+	juniDosProtectionScfdsSlotFlowMacIngressSlot	Integer32,
+	juniDosProtectionScfdsSlotFlowMacGroup      TruthValue,
+	juniDosProtectionScfdsSlotFlowMacClearEntry	INTEGER}
+
+juniDosProtectionScfdsSlotFlowMacSlot	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The slot value for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 1 }
+
+juniDosProtectionScfdsSlotFlowMacIfIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The ifIndex value for the flow. For group flows, this value
+		will be zero."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 2 }
+
+juniDosProtectionScfdsSlotFlowMacGroupId	OBJECT-TYPE
+	SYNTAX		Unsigned32(0..15)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The group id for the flow. The group id will be zero for an individual 
+		flow. It is non-zero when the entry represents a group of flows."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 3 }
+
+juniDosProtectionScfdsSlotFlowMacProtocol OBJECT-TYPE
+	SYNTAX		JuniDosProtectionProtocolType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The control protocol for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 4 }
+
+juniDosProtectionScfdsSlotFlowMacSrcMac OBJECT-TYPE
+	SYNTAX	   	MacAddress
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The source MAC address for the flow. A null
+		source MAC address indicates that no source
+		physical address was available."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 5 }
+
+juniDosProtectionScfdsSlotFlowMacRate OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The current rate in packets per second for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 6 }
+
+juniDosProtectionScfdsSlotFlowMacPeakRate OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The peak rate in packets per second for the flow."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 7 }
+
+juniDosProtectionScfdsSlotFlowMacTimeFlagged	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The sysUpTime value for the time when the flow was
+		determined to be suspicious."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 8 }
+
+juniDosProtectionScfdsSlotFlowMacIngressSlot	OBJECT-TYPE
+	SYNTAX 	   Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"For control flow that are monitored on the egress 
+		processor in the forwarding path, this value will 
+		indicate the possible ingress slot for data stream that
+		is possibly causing this suspicious flow control. This 
+		object will report -1 when it is undefined"
+	
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 9 }
+
+juniDosProtectionScfdsSlotFlowMacGroup       OBJECT-TYPE 
+	SYNTAX 	   TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Indicates whether the flow is a group flow or not. A value of
+		true(1) indicates that the flow represents a group of flows. 
+		A value of false(0) indicates that the flow is an individual flow."
+	
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 10 }
+
+juniDosProtectionScfdsSlotFlowMacClearEntry OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    ok(0),
+                    clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to clear(1), the suspicious control flow
+        is removed from the suspicious control flow table.  When set to 
+		ok(0), there is no effect and the suspicious control flow 
+		is unchanged.
+
+        When read, always returns a value of ok(0)."
+
+    ::= { juniDosProtectionScfdsSlotFlowMacEntry 11 }
+
+
+--
+-- per slot information
+--
+
+juniDosProtectionScfdsSlotTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JuniDosProtectionScfdsSlotEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The suspicious control flow information for each slot."
+
+	::= { juniDosProtectionPlatformScfdsGroup 3 } 
+
+juniDosProtectionScfdsSlotEntry	OBJECT-TYPE
+	SYNTAX		JuniDosProtectionScfdsSlotEntry
+	MAX-ACCESS 	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The information for a specific slot."
+
+	INDEX	{ juniDosProtectionScfdsSlotFlowSlot }
+
+
+	::= { juniDosProtectionScfdsSlotTable 1 } 
+	
+JuniDosProtectionScfdsSlotEntry ::= SEQUENCE {
+	juniDosProtectionScfdsSlotSlot				Unsigned32,
+	juniDosProtectionScfdsSlotClearAll			INTEGER,	
+	juniDosProtectionScfdsSlotDiscontinuityTime	Unsigned32,
+	juniDosProtectionScfdsSlotTableOverflowState  
+			JuniDosProtectionScfdsTableOverflowState,
+	juniDosProtectionScfdsSlotCurrentSuspiciousFlows	Counter32,
+	juniDosProtectionScfdsSlotNumberSuspiciousFlows	Counter32,
+	juniDosProtectionScfdsSlotCurrentSuspiciousFlowGroups	Counter32,
+	juniDosProtectionScfdsSlotNumberSuspiciousFlowGroups	Counter32,
+	juniDosProtectionScfdsSlotCurrentFalseNegativeFlows	Counter32,
+	juniDosProtectionScfdsSlotNumberFalseNegativeFlows	Counter32,
+	juniDosProtectionScfdsSlotOverflows				Counter32}
+
+juniDosProtectionScfdsSlotSlot	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The slot value for this entry."
+
+    ::= { juniDosProtectionScfdsSlotEntry 1 }
+
+juniDosProtectionScfdsSlotClearAll OBJECT-TYPE
+    SYNTAX      INTEGER {
+					ok(0),
+                    clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to clear(1), the suspicious control flow detection system
+        is cleared for this slot.  When set to ok(0), there is no effect and the 
+		suspicious control flow detection system is unchanged.
+		
+		By clearing the suspicious control flow detection system all flows 
+		on the slot are removed from the suspicious flow table.
+
+        When read, always returns a value of ok(0)."
+
+	::= { juniDosProtectionScfdsSlotEntry 2 }
+
+
+juniDosProtectionScfdsSlotDiscontinuityTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the counters were re-adjusted due to 
+		slot restart."
+
+	::= { juniDosProtectionScfdsSlotEntry 3 }
+
+juniDosProtectionScfdsSlotTableOverflowState	OBJECT-TYPE
+	SYNTAX		JuniDosProtectionScfdsTableOverflowState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Indicates whether this slot is under a resource 
+		shortage situation. A value of notOverflowingOrGrouping(1) indicates
+		that there is no resource shortage on the slot. A value of 
+		grouping(2) or overflowing(3) indicates that this module 
+		is suffering from a resource shortage and has acted according to the
+		state of the juniDosProtectionScfdsGlobalGrouping object."
+
+	::= { juniDosProtectionScfdsSlotEntry 4 }
+
+juniDosProtectionScfdsSlotCurrentSuspiciousFlows	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of flows currently marked as suspicious for this slot."
+
+	::= { juniDosProtectionScfdsSlotEntry 5 } 
+
+juniDosProtectionScfdsSlotNumberSuspiciousFlows	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of suspicious flows seen on this slot, since slot restart"
+
+	::= { juniDosProtectionScfdsSlotEntry 6 } 
+
+juniDosProtectionScfdsSlotNumberSuspiciousFlowGroups	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of suspicius flow groups seen on this slot since slot
+		restart."
+
+	::= { juniDosProtectionScfdsSlotEntry 7 } 
+
+juniDosProtectionScfdsSlotCurrentSuspiciousFlowGroups	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of flows currently falsely considered suspicious for
+		this slot."
+
+	::= { juniDosProtectionScfdsSlotEntry 8 } 
+
+juniDosProtectionScfdsSlotCurrentFalseNegativeFlows	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of flows currently falsely considered suspicious on
+		this slot."
+
+
+	::= { juniDosProtectionScfdsSlotEntry 9 } 
+
+juniDosProtectionScfdsSlotNumberFalseNegativeFlows	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of suspicious flows seen on this slot, since this 
+		slot restart."
+
+	::= { juniDosProtectionScfdsSlotEntry 10 } 
+
+
+juniDosProtectionScfdsSlotOverflows	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The number of times this slot has had a table overflow."
+
+
+	::= { juniDosProtectionScfdsSlotEntry 11 } 
+
+
+--
+-- dos protection group slot info
+--
+juniDosProtectionDpgSlotRateTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JuniDosProtectionDpgSlotRateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table provides information about the calculated minimum
+		rates (as well as the maximum rates) for each dos-protection-group 
+		control protocol for each line module."
+
+	::= { juniDosProtectionPlatformDpgGroup 1 }
+
+juniDosProtectionDpgSlotRateEntry OBJECT-TYPE
+	SYNTAX 		JuniDosProtectionDpgSlotRateEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The rates for an individual dos-protection-group on an line
+		module for a control protocol."
+
+	INDEX		{	juniDosProtectionDpgSlotRateSlot,
+	                juniDosProtectionDpgSlotRateDpgName,
+					juniDosProtectionDpgSlotRateProtocol}
+
+	::= { juniDosProtectionDpgSlotRateTable 1 }
+
+JuniDosProtectionDpgSlotRateEntry ::= SEQUENCE {
+	juniDosProtectionDpgSlotRateSlot				Unsigned32,
+	juniDosProtectionDpgSlotRateDpgName			DisplayString,
+	juniDosProtectionDpgSlotRateProtocol			JuniDosProtectionProtocolType,
+	juniDosProtectionDpgSlotRateMinRate			Unsigned32,
+	juniDosProtectionDpgSlotRateMaxRate			Unsigned32,
+	juniDosProtectionDpgSlotRateMinBurst			Unsigned32,
+	juniDosProtectionDpgSlotRateMaxBurst			Unsigned32}
+
+juniDosProtectionDpgSlotRateSlot	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The slot value for this entry."
+
+    ::= { juniDosProtectionDpgSlotRateEntry 1 }
+
+juniDosProtectionDpgSlotRateDpgName	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(1..32))
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"The dos-protection-group name for this entry."
+
+    ::= { juniDosProtectionDpgSlotRateEntry 2 }
+
+juniDosProtectionDpgSlotRateProtocol OBJECT-TYPE
+	SYNTAX		JuniDosProtectionProtocolType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The control protocol for this entry."
+
+    ::= { juniDosProtectionDpgSlotRateEntry 3 }
+
+juniDosProtectionDpgSlotRateMinRate	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The minimum rate for this control protocol on this slot for this 
+		dos-protection-group. This value is calculated based on the
+		priority rate and oversubscription as well as the control protocol 
+		weight"
+
+    ::= { juniDosProtectionDpgSlotRateEntry 4 }
+
+juniDosProtectionDpgSlotRateMaxRate	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The maximum rate for this protocol on this slot for this 
+		dos-protection-group. This is equivalent to the configured
+		rate for the dos-protection-group"
+
+    ::= { juniDosProtectionDpgSlotRateEntry 5 }
+
+juniDosProtectionDpgSlotRateMinBurst	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The minimum burst for this control protocol on this slot for this 
+		dos-protection-group. This value is calculated based on the
+		priority burst and oversubscription as well as the control protocol 
+		weight"
+
+    ::= { juniDosProtectionDpgSlotRateEntry 6 }
+
+juniDosProtectionDpgSlotRateMaxBurst	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The maximum burst for this protocol on this slot for this 
+		dos-protection-group. This is equivalent to the configured
+		burst for the dos-protection-group"
+
+    ::= { juniDosProtectionDpgSlotRateEntry 7 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniDosProtectionPlatformTraps OBJECT IDENTIFIER ::= { juniDosProtectionPlatformMIB 0 }
+juniDosProtectionPlatformTrapControl OBJECT IDENTIFIER ::= { juniDosProtectionPlatformMIB 2 }
+juniDosProtectionPlatformScfdsTraps OBJECT IDENTIFIER ::= { juniDosProtectionPlatformTraps 0 }
+
+
+juniDosProtectionScfdsSlot OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The slot value."
+
+	::= { juniDosProtectionPlatformTrapControl 1 }
+
+juniDosProtectionPriority OBJECT-TYPE
+	SYNTAX JuniDosProtectionPriorityType
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The control priority value."
+
+	::= { juniDosProtectionPlatformTrapControl 2 }
+
+juniDosProtectionProtocol OBJECT-TYPE
+	SYNTAX JuniDosProtectionProtocolType
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The control protocol value."
+
+	::= { juniDosProtectionPlatformTrapControl 3 }
+
+juniDosProtectionIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The ifIndex value."
+
+	::= { juniDosProtectionPlatformTrapControl 4 }
+
+juniDosProtectionGroupId OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The group id value."
+
+	::= { juniDosProtectionPlatformTrapControl 5 }
+
+juniDosProtectionSrcPhysAddr OBJECT-TYPE
+	SYNTAX MacAddress (SIZE(6))
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The source physical MAC address."
+
+	::= { juniDosProtectionPlatformTrapControl 6 }
+
+juniDosProtectionScfdsFlowRate OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION 
+		"The flow rate at the creation time."
+
+	::= { juniDosProtectionPlatformTrapControl 7 }
+
+---
+--- traps
+---
+
+juniDosProtectionScfdsSuspiciousControlFlow NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionIfIndex,
+			  juniDosProtectionProtocol }
+	STATUS 	obsolete
+	DESCRIPTION 
+		"This trap will be generated when a control flow becomes 
+		suspicious."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 1 }
+
+juniDosProtectionScfdsNonSuspiciousControlFlow NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionIfIndex,
+			  juniDosProtectionProtocol }
+	STATUS 	obsolete
+	DESCRIPTION 
+		"This trap will be generated when a control flow becomes 
+		no longer suspicious"
+	
+	::= { juniDosProtectionPlatformScfdsTraps 2 }
+
+juniDosProtectionScfdsSuspiciousControlFlowGroup NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionScfdsSlot,
+			  juniDosProtectionGroupId,
+			  juniDosProtectionProtocol }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control flow that
+		represents a group becomes suspicious."
+
+	
+	::= { juniDosProtectionPlatformScfdsTraps 3 }
+
+juniDosProtectionScfdsNonSuspiciousControlFlowGroup NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionScfdsSlot,
+			  juniDosProtectionGroupId,
+			  juniDosProtectionProtocol }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control flow that
+		represents a group becomes no longer suspicious."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 4 }
+
+juniDosProtectionScfdsTableFull NOTIFICATION-TYPE
+	OBJECTS {  juniDosProtectionScfdsSlot }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when the suspicious flow
+		control table becomes full on a slot."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 5 }
+
+juniDosProtectionScfdsTableNotFull NOTIFICATION-TYPE
+	OBJECTS {  juniDosProtectionScfdsSlot }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when the suspicious flow
+		control table is no longer full on a slot."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 6 }
+
+juniDosProtectionScfdsGroupingInUse NOTIFICATION-TYPE
+	OBJECTS {  juniDosProtectionScfdsSlot }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when the suspicious flow
+		control system begins to group flow controls on a slot, 
+		due to the suspicious flow control table being full."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 7 }
+
+juniDosProtectionScfdsSuspiciousProtocol NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionScfdsSlot,
+			 juniDosProtectionProtocol }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control protocol
+		becomes suspicious on a slot, and therefore the suspicious
+		control flow system begins to watch flows of this 
+		control protocol type."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 8 }
+
+juniDosProtectionScfdsNonSuspiciousProtocol NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionScfdsSlot,
+			 juniDosProtectionProtocol }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control protocol
+		becomes no longer suspicious on a slot, and therefore the suspicious
+		control flow system will no longer watch flows of this 
+		control protocol type."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 9 }
+
+
+juniDosProtectionScfdsSuspiciousPriority NOTIFICATION-TYPE
+	OBJECTS {juniDosProtectionScfdsSlot,
+			 juniDosProtectionPriority }
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control priority
+		becomes suspicious on a slot."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 10 }
+
+juniDosProtectionScfdsNonSuspiciousPriority NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionScfdsSlot,
+			  juniDosProtectionPriority }
+
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control priority
+		becomes no longer suspicious on a slot."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 11 }
+
+juniDosProtectionScfdsSuspiciousControlFlowMac NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionIfIndex,
+			  juniDosProtectionProtocol,
+			  juniDosProtectionSrcPhysAddr,
+			  juniDosProtectionScfdsFlowRate}
+	STATUS 	current
+	DESCRIPTION 
+		"This trap will be generated when a control flow becomes 
+		suspicious."
+	
+	::= { juniDosProtectionPlatformScfdsTraps 12 }
+
+juniDosProtectionScfdsNonSuspiciousControlFlowMac NOTIFICATION-TYPE
+	OBJECTS { juniDosProtectionIfIndex,
+			  juniDosProtectionProtocol,
+			  juniDosProtectionSrcPhysAddr}
+	STATUS 	obsolete
+	DESCRIPTION 
+		"This trap will be generated when a control flow becomes 
+		no longer suspicious"
+	
+	::= { juniDosProtectionPlatformScfdsTraps 13 }
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniDosProtectionPlatformMIBConformance  OBJECT IDENTIFIER ::= { juniDosProtectionPlatformMIB 4 }
+juniDosProtectionPlatformMIBCompliances  OBJECT IDENTIFIER ::= { juniDosProtectionPlatformMIBConformance 1 }
+juniDosProtectionPlatformMIBGroups       OBJECT IDENTIFIER ::= { juniDosProtectionPlatformMIBConformance 2 }
+
+
+juniDosProtectionCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+		"The compliance statement for entities which implement the Juniper Dos
+		Protection Platform specific MIB. Obsoleted with the addition of 
+		dos-protection groups."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDosProtectionPlatformGroup,
+            juniDosProtectionPlatformNotificationGroup }
+    ::= { juniDosProtectionPlatformMIBCompliances 1 }  
+
+juniDosProtectionCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+		"The compliance statement for entities which implement the Juniper Dos
+		Protection Platform specific MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDosProtectionPlatformGroup1,
+            juniDosProtectionPlatformNotificationGroup1 }
+    ::= { juniDosProtectionPlatformMIBCompliances 2 }  
+
+--
+-- units of conformance
+--
+juniDosProtectionGroup OBJECT-GROUP
+	OBJECTS {juniDosProtectionScfdsSlotProtocolState, 
+			juniDosProtectionScfdsSlotProtocolTransitions, 
+			juniDosProtectionScfdsSlotFlowRate, 
+			juniDosProtectionScfdsSlotFlowPeakRate, 
+			juniDosProtectionScfdsSlotFlowTimeFlagged,	
+			juniDosProtectionScfdsSlotFlowClearEntry, 
+			juniDosProtectionScfdsSlotFlowIngressSlot,
+			juniDosProtectionScfdsSlotFlowGroup,
+			juniDosProtectionScfdsSlotDiscontinuityTime, 
+			juniDosProtectionScfdsSlotTableOverflowState,	
+			juniDosProtectionScfdsSlotCurrentSuspiciousFlows,	
+			juniDosProtectionScfdsSlotNumberSuspiciousFlows,	
+			juniDosProtectionScfdsSlotNumberSuspiciousFlowGroups,	
+			juniDosProtectionScfdsSlotCurrentSuspiciousFlowGroups,	
+			juniDosProtectionScfdsSlotCurrentFalseNegativeFlows,	
+			juniDosProtectionScfdsSlotNumberFalseNegativeFlows,	
+			juniDosProtectionScfdsSlotOverflows	}
+    STATUS current
+	DESCRIPTION 
+		"A collection of objects providing management of platform 
+		specific aspects of the DOS protection application in a 
+		Juniper product. This became obsolete with the addition
+		of MAC address in the flow table and the addition of 
+		dos-protection-groups."
+
+	::= { juniDosProtectionPlatformMIBGroups 1 }
+
+
+juniDosProtectionNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+			juniDosProtectionScfdsSuspiciousControlFlow,
+			juniDosProtectionScfdsNonSuspiciousControlFlow,
+			juniDosProtectionScfdsSuspiciousControlFlowGroup,
+			juniDosProtectionScfdsNonSuspiciousControlFlowGroup,
+			juniDosProtectionScfdsTableFull,
+			juniDosProtectionScfdsTableNotFull,
+			juniDosProtectionScfdsGroupingInUse,
+			juniDosProtectionScfdsSuspiciousProtocol,
+			juniDosProtectionScfdsNonSuspiciousProtocol,
+			juniDosProtectionScfdsSuspiciousPriority,
+			juniDosProtectionScfdsNonSuspiciousPriority }
+    STATUS current
+	DESCRIPTION 
+		"Collection of objects for DOS protection application 
+		notifications in a Juniper product.This became obsolete with the 
+		addition of MAC address in flow traps."
+
+	::= { juniDosProtectionPlatformMIBGroups 2 }
+
+juniDosProtectionGroup1 OBJECT-GROUP
+	OBJECTS {juniDosProtectionScfdsSlotProtocolState, 
+			juniDosProtectionScfdsSlotProtocolTransitions, 
+			juniDosProtectionScfdsSlotFlowMacRate, 
+			juniDosProtectionScfdsSlotFlowMacPeakRate, 
+			juniDosProtectionScfdsSlotFlowMacTimeFlagged,	
+			juniDosProtectionScfdsSlotFlowMacClearEntry, 
+			juniDosProtectionScfdsSlotFlowMacIngressSlot,
+			juniDosProtectionScfdsSlotFlowMacGroup,
+			juniDosProtectionScfdsSlotDiscontinuityTime, 
+			juniDosProtectionScfdsSlotTableOverflowState,	
+			juniDosProtectionScfdsSlotCurrentSuspiciousFlows,	
+			juniDosProtectionScfdsSlotNumberSuspiciousFlows,	
+			juniDosProtectionScfdsSlotNumberSuspiciousFlowGroups,	
+			juniDosProtectionScfdsSlotCurrentSuspiciousFlowGroups,	
+			juniDosProtectionScfdsSlotCurrentFalseNegativeFlows,	
+			juniDosProtectionScfdsSlotNumberFalseNegativeFlows,	
+			juniDosProtectionScfdsSlotOverflows,	
+			juniDosProtectionDpgSlotRateMinRate,
+			juniDosProtectionDpgSlotRateMaxRate,
+			juniDosProtectionDpgSlotRateMinBurst,
+			juniDosProtectionDpgSlotRateMaxBurst }
+
+    STATUS current
+	DESCRIPTION 
+		"A collection of objects providing management of platform 
+		specific aspects of the DOS protection application in a 
+		Juniper product."
+
+	::= { juniDosProtectionPlatformMIBGroups 3 }
+
+juniDosProtectionNotificationGroup1 NOTIFICATION-GROUP
+	NOTIFICATIONS {
+			juniDosProtectionScfdsSuspiciousControlFlowMac,
+			juniDosProtectionScfdsNonSuspiciousControlFlowMac,
+			juniDosProtectionScfdsSuspiciousControlFlowGroup,
+			juniDosProtectionScfdsNonSuspiciousControlFlowGroup,
+			juniDosProtectionScfdsTableFull,
+			juniDosProtectionScfdsTableNotFull,
+			juniDosProtectionScfdsGroupingInUse,
+			juniDosProtectionScfdsSuspiciousProtocol,
+			juniDosProtectionScfdsNonSuspiciousProtocol,
+			juniDosProtectionScfdsSuspiciousPriority,
+			juniDosProtectionScfdsNonSuspiciousPriority }
+    STATUS current
+	DESCRIPTION 
+		"Collection of objects for DOS protection application 
+		notifications in a Juniper product."
+
+	::= { juniDosProtectionPlatformMIBGroups 4 }
+END

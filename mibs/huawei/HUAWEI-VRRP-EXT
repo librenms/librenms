@@ -1,0 +1,657 @@
+-- ================================================================
+-- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved
+--
+-- Description:The mib file is for management of VRRP extension
+-- Reference:
+-- Version: V1.0
+-- History:
+-- 2006.6.20, publish
+-- ================================================================
+
+    HUAWEI-VRRP-EXT-MIB DEFINITIONS ::= BEGIN
+		IMPORTS
+                   hwDatacomm
+                     FROM HUAWEI-MIB
+                   Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY                  
+                     FROM SNMPv2-SMI
+                   RowStatus, DisplayString
+                     FROM SNMPv2-TC
+                   InterfaceIndex
+                     FROM IF-MIB
+                   VrId
+                     FROM VRRP-MIB
+                   EnabledStatus
+                     FROM P-BRIDGE-MIB;
+                     
+                    
+    hwVrrpExt MODULE-IDENTITY
+        LAST-UPDATED "200705200000Z"        -- 
+        ORGANIZATION
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO
+            "R&D Beijing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com                                      
+            E-mail:support@huawei.com"
+        DESCRIPTION
+            "It supplies for VRRP tracking function."
+        ::= { hwDatacomm 127 }
+
+    hwVrrpExtGlobal      OBJECT IDENTIFIER ::= { hwVrrpExt 1 }
+
+    hwVrrpExtFreeArpInterval OBJECT-TYPE
+	SYNTAX Integer32 (30..1200)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"An interval of sending gratuitous-ARP."	
+	::= { hwVrrpExtGlobal 1 }
+
+    hwVrrpExtVIPPingCtr OBJECT-TYPE
+	SYNTAX 	INTEGER
+		{
+		enable(1),
+		disable(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A switch decides whether the system responds to a request message or not, 
+		 which is sent to virtual ip address. "
+	DEFVAL { disable }
+	::= { hwVrrpExtGlobal 2 }
+	    
+    hwVrrpExtSsTimer OBJECT-TYPE
+	SYNTAX Integer32 (0..255)
+	UNITS "seconds"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A switch decides whether the system enable VRRP SS function and set the size of VRRP SS timer or not,
+		 which decide the VRRP packet advertisement interval during slave switchover."	
+	DEFVAL { 100 }
+	::= { hwVrrpExtGlobal 3 }
+    
+    hwVrrpExtLearnAdvIntervalFlag OBJECT-TYPE
+	SYNTAX EnabledStatus	
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A switch decides whether the system learn VRRP packet advertisement interval or not,
+		 which is sended from the master router in one virtual router standby. "
+	DEFVAL { enabled }
+	::= { hwVrrpExtGlobal 4 }
+
+        vrrpExtOperations      OBJECT IDENTIFIER ::= { hwVrrpExt 2 }
+				
+                hwVrrpTrackInterTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVrrpTrackInterEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The VRRP tracking interface table, it can accomodate eight rows at most."
+                        ::= { vrrpExtOperations 1 }
+               
+                hwVrrpTrackInterEntry OBJECT-TYPE
+                        SYNTAX HWVrrpTrackInterEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the VRRP tracking interface table."
+                        INDEX { hwVrrpTrackInterVRID,hwVrrpTrackInterStandByIfnet,hwVrrpTrackInterIfnet }
+                        ::= { hwVrrpTrackInterTable 1 }
+                
+                HWVrrpTrackInterEntry ::=
+                        SEQUENCE { 
+                                hwVrrpTrackInterVRID
+                                        VrId,
+                                hwVrrpTrackInterStandByIfnet
+                                        InterfaceIndex,        
+                                hwVrrpTrackInterIfnet
+                                        InterfaceIndex,                                
+                                hwVrrpTrackInterPriReduce
+                                        Integer32,                               
+                                hwVrrpTrackInterOperRowStatus
+                                        RowStatus,
+                                hwVrrpTrackInterPriIncrease
+                                        Integer32                                         
+                         }
+                hwVrrpTrackInterVRID OBJECT-TYPE
+                        SYNTAX VrId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the VRRP tracking interface table, it identifies the standby's ID."
+                        ::= { hwVrrpTrackInterEntry 1 }
+
+                hwVrrpTrackInterStandByIfnet OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the VRRP tracking interface table, it identifies the standby's interface index."
+                        ::= { hwVrrpTrackInterEntry 2 }
+
+                hwVrrpTrackInterIfnet OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the VRRP tracking interface table, it identifies the tracked interface index."
+                        ::= { hwVrrpTrackInterEntry 3 }                
+           
+                hwVrrpTrackInterPriReduce OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "If the tracked interface is down, priority of standby will reduce this value. '0' 
+                                 specifies this attribute hasn't been configured. The minimum availability value is '1'."
+                        ::= { hwVrrpTrackInterEntry 4 } 
+                        
+                hwVrrpTrackInterOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable. "
+                        ::= { hwVrrpTrackInterEntry 5 }                    
+                        
+                hwVrrpTrackInterPriIncrease OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "If the tracked interface is down, this value will be added to the priority of standby.
+                                '0' specifies this attribute hasn't been configured. The minimum availability value is '1'."
+                        ::= { hwVrrpTrackInterEntry 6 } 
+                        
+                                                
+                hwVrrpTrackBfdTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVrrpTrackBfdEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The VRRP tracking BFD table, it can append eight rows at most."
+                        ::= { vrrpExtOperations 2 }
+               
+                hwVrrpTrackBfdEntry OBJECT-TYPE
+                        SYNTAX HWVrrpTrackBfdEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the VRRP tracking BFD table."
+                        INDEX { hwVrrpTrackInterVRID,hwVrrpTrackInterStandByIfnet,hwVrrpTrackBfdId }
+                        ::= { hwVrrpTrackBfdTable 1 }
+                
+                HWVrrpTrackBfdEntry ::=
+                        SEQUENCE {                                 
+                                hwVrrpTrackBfdId
+                                        Integer32,                                        
+                                hwVrrpTrackBfdPriReduce
+                                        Integer32,                                                               
+                                hwVrrpTrackBfdOperRowStatus
+                                        RowStatus,
+                                hwVrrpTrackBfdPriIncrease
+                                        Integer32,  
+                                hwVrrpTrackBfdType
+                                        INTEGER                                      
+                         }
+
+                hwVrrpTrackBfdId OBJECT-TYPE
+                        SYNTAX Integer32 (1..8191)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the table, it only identifies BFD link."
+                        ::= { hwVrrpTrackBfdEntry 1 }
+
+                hwVrrpTrackBfdPriReduce OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "If the tracked BFD is down, the priority of standby will reduce this value.
+                                '0' specifies this attribute hasn't been configured. 
+                                The minimum availability value is '1'."
+                        ::= { hwVrrpTrackBfdEntry 2 } 
+                        
+                hwVrrpTrackBfdOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable. "
+                        ::= { hwVrrpTrackBfdEntry 3 }  
+                                                         
+                hwVrrpTrackBfdPriIncrease OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "If the tracked BFD is down, this value will be added to the priority of standby.
+                                '0' specifies this attribute hasn't been configured. 
+                                The minimum availability value is '1'."
+                        ::= { hwVrrpTrackBfdEntry 4 }   
+                        
+                hwVrrpTrackBfdType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                link(1),
+                                peer(2),
+                                normal(3)   
+                        }
+
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The bfd type that vrrp tracks,including Normal, Link, Peer. 
+                                The attribute cannot be modified after created.                                
+                                "      
+                        DEFVAL { normal }
+                        ::= { hwVrrpTrackBfdEntry 5 }                 
+                                                                      
+                                            
+				hwAdminVrrpCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWAdminVrrpCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's configure table."
+                        ::= { vrrpExtOperations 3 }
+               
+                hwAdminVrrpCfgEntry OBJECT-TYPE
+                        SYNTAX HWAdminVrrpCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's configure entry."
+                        INDEX { hwAdminVrrpCfgIfIndex, hwAdminVrrpCfgVRID}
+                        ::= { hwAdminVrrpCfgTable 1 }
+                
+                HWAdminVrrpCfgEntry ::=
+                        SEQUENCE {    
+                        	hwAdminVrrpCfgIfIndex
+                                        InterfaceIndex,                             
+                                hwAdminVrrpCfgVRID
+                                        VrId,                                                                                       
+                                hwAdminVrrpCfgOperRowStatus
+                                        RowStatus                                                                    
+                         }
+                         
+                hwAdminVrrpCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's configure interface index."
+                        ::= { hwAdminVrrpCfgEntry 1 } 
+
+                hwAdminVrrpCfgVRID OBJECT-TYPE
+                        SYNTAX VrId 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's configure VRID."
+                        ::= { hwAdminVrrpCfgEntry 2 }
+
+
+                        
+                hwAdminVrrpCfgOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable. "
+                        ::= { hwAdminVrrpCfgEntry 3 }                                                   
+                                                         
+                                                
+				hwAdminVrrpMemberTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWAdminVrrpMemberEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's configure table."
+                        ::= { vrrpExtOperations 4 }
+               
+                hwAdminVrrpMemberEntry OBJECT-TYPE
+                        SYNTAX HWAdminVrrpMemberEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's configure entry."
+                        INDEX { hwAdminVrrpCfgIfIndex,hwAdminVrrpCfgVRID,hwAdminVrrpMemberIfIndex,hwAdminVrrpMemberVRID}
+                        ::= { hwAdminVrrpMemberTable 1 }
+                
+                HWAdminVrrpMemberEntry ::=
+                        SEQUENCE {        
+                        
+                                hwAdminVrrpMemberIfIndex
+                                       InterfaceIndex,                          
+                                hwAdminVrrpMemberVRID
+                                        VrId,                                        
+                                hwAdminVrrpMemberDiscardPkts
+                                        Counter32,                                                                       
+                                hwAdminVrrpMemberOperRowStatus
+                                        RowStatus,     
+                                hwAdminVrrpMemberFlowdownMode
+                                		EnabledStatus                                                                       
+                         }   
+
+                hwAdminVrrpMemberIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's member interface index."
+                        ::= { hwAdminVrrpMemberEntry 1 } 
+                        
+                hwAdminVrrpMemberVRID OBJECT-TYPE
+                        SYNTAX VrId 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's member VRID."
+                        ::= { hwAdminVrrpMemberEntry 2 }                     
+
+
+                        
+                hwAdminVrrpMemberDiscardPkts OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The admin-vrrp's member discarded packets."
+                        ::= { hwAdminVrrpMemberEntry 3 }          
+                hwAdminVrrpMemberOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable. "
+                        ::= { hwAdminVrrpMemberEntry 4 }                
+                hwAdminVrrpMemberFlowdownMode OBJECT-TYPE
+                        SYNTAX 	EnabledStatus	
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The mode of flowdown interface. "    
+                        DEFVAL { enabled } 
+
+                        ::= { hwAdminVrrpMemberEntry 5 }  
+                                                         
+                                          
+				hwVrrpStatResetTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVrrpStatResetEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp statistics reset Table."
+                        ::= { vrrpExtOperations 5 }
+               
+                hwVrrpStatResetEntry OBJECT-TYPE
+                        SYNTAX HWVrrpStatResetEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp statistics reset entry."
+                        INDEX { hwVrrpStatResetIfIndex,hwVrrpStatResetVRID}
+                        ::= { hwVrrpStatResetTable 1 }
+                
+                HWVrrpStatResetEntry ::=
+                        SEQUENCE {       
+                        
+                                hwVrrpStatResetIfIndex
+                                        InterfaceIndex,                           
+                                hwVrrpStatResetVRID
+                                        VrId,                                                                                                      
+                                hwVrrpStatResetFlag
+                                        INTEGER                                                                    
+                         }
+
+                hwVrrpStatResetIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp's configure interface index."
+                        ::= { hwVrrpStatResetEntry 1 } 
+                        
+                        
+                hwVrrpStatResetVRID OBJECT-TYPE
+                        SYNTAX VrId 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The vrrp vrid."
+                        ::= { hwVrrpStatResetEntry 2 }
+
+
+                        
+                hwVrrpStatResetFlag OBJECT-TYPE
+                        SYNTAX 	INTEGER	
+                        {
+							enable(1),
+							disable(2)
+						}
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "A reset signal of vrrp statistics. "    
+                        DEFVAL { disable } 
+
+                        ::= { hwVrrpStatResetEntry 3 }  
+                                                  
+                                
+				hwAdminVrrpTrackIfTable OBJECT-TYPE
+						SYNTAX SEQUENCE OF HwAdminVrrpTrackIfEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION 
+							"The interface bound to VRRP table."
+						::= { vrrpExtOperations  6 }
+		        
+				hwAdminVrrpTrackIfEntry  OBJECT-TYPE
+						SYNTAX HwAdminVrrpTrackIfEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION 
+							"Entries of the interface bound to VRRP table."
+						INDEX{ hwAdminVrrpTrackIfIndex }
+						::= { hwAdminVrrpTrackIfTable 1}
+		
+				HwAdminVrrpTrackIfEntry  ::=
+						SEQUENCE {
+						hwAdminVrrpTrackIfIndex
+							InterfaceIndex,  
+						hwAdminVrrpIfIndex
+							InterfaceIndex,						                        
+						hwAdminVrrpVrid
+							VrId,	        		
+						hwAdminVrrpTrackIfRowStatus     
+							RowStatus          
+							}
+		
+				hwAdminVrrpTrackIfIndex  OBJECT-TYPE
+						SYNTAX  InterfaceIndex
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION 
+							"The number of the interface."
+						::= { hwAdminVrrpTrackIfEntry 1 }  
+				        
+				hwAdminVrrpIfIndex  OBJECT-TYPE
+						SYNTAX  InterfaceIndex
+						MAX-ACCESS read-create
+						STATUS current
+						DESCRIPTION 
+							"The administrator VRRP's configure interface index."
+						::= { hwAdminVrrpTrackIfEntry 2 }
+				          
+		
+				hwAdminVrrpVrid  OBJECT-TYPE
+						SYNTAX  VrId
+						MAX-ACCESS read-create
+						STATUS current
+						DESCRIPTION 
+							"The administrator VRRP vrid."
+						::= { hwAdminVrrpTrackIfEntry 3 }
+				
+				hwAdminVrrpTrackIfRowStatus  OBJECT-TYPE
+						SYNTAX  RowStatus
+						MAX-ACCESS read-create
+						STATUS current
+						DESCRIPTION 
+							"Current operation status of the row."
+						::= { hwAdminVrrpTrackIfEntry 4 }   
+						
+						
+					                       
+                                                                                  
+			hwVrrpTrackEfmTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HWVrrpTrackEfmEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The VRRP tracking EFM table."
+                        ::= { vrrpExtOperations 7 }
+               
+             hwVrrpTrackEfmEntry OBJECT-TYPE
+                        SYNTAX HWVrrpTrackEfmEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "An entry in the VRRP tracking EFM table."
+                        INDEX { hwVrrpTrackEfmIfIndex,hwVrrpTrackEfmVRID,hwVrrpTrackEfmIndex }
+                        ::= { hwVrrpTrackEfmTable 1 }
+                
+             HWVrrpTrackEfmEntry ::=
+                        SEQUENCE {                                 
+                                hwVrrpTrackEfmIfIndex
+                                        InterfaceIndex,  
+                                hwVrrpTrackEfmIfName
+                                        DisplayString,                                               
+                                hwVrrpTrackEfmVRID
+                                        VrId,                                                             
+                                hwVrrpTrackEfmIndex   
+                                        InterfaceIndex, 
+                                hwVrrpTrackEfmName
+                                        DisplayString,            
+                                hwVrrpTrackEfmOperRowStatus
+                                        RowStatus
+                                       
+                         }
+
+             hwVrrpTrackEfmIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the table, it identifies vrrp's interface index."
+                        ::= { hwVrrpTrackEfmEntry 1 }         
+                        
+             hwVrrpTrackEfmIfName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (0..255))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A textual string containing information about the interface of vrrp."
+                        ::= { hwVrrpTrackEfmEntry 2 }
+           
+
+             hwVrrpTrackEfmVRID OBJECT-TYPE
+                        SYNTAX VrId 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the table, it identifies vrrp's vrid."
+                        ::= { hwVrrpTrackEfmEntry 3 } 
+                
+             hwVrrpTrackEfmIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex 
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the table, it identifies EFM's interface index."
+                        ::= { hwVrrpTrackEfmEntry 4 }     
+            hwVrrpTrackEfmName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (0..255))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A textual string containing information about the interface of efm."
+                        ::= { hwVrrpTrackEfmEntry 5 }
+            
+                        
+             hwVrrpTrackEfmOperRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The row status variable. "
+                        ::= { hwVrrpTrackEfmEntry 6 }  
+                                                         
+                         
+                                                                        
+        	vrrpExtConformance     OBJECT IDENTIFIER ::= { hwVrrpExt 3 }   
+                        
+                hwvrrpExtCompliances OBJECT IDENTIFIER ::= { vrrpExtConformance 1 }
+                
+                hwvrrpExtGroups OBJECT IDENTIFIER ::= { hwvrrpExtCompliances 1 }     
+                                
+                hwvrrpExtGlobalGroup OBJECT-GROUP
+                        OBJECTS { hwVrrpExtFreeArpInterval, hwVrrpExtVIPPingCtr, hwVrrpExtSsTimer, hwVrrpExtLearnAdvIntervalFlag }
+                        STATUS current
+                        DESCRIPTION 
+                                "The VRRP global attributes."
+                        ::= { hwvrrpExtGroups 1 }                  
+                                        
+                hwvrrpExtTrackInterGroup OBJECT-GROUP
+                        OBJECTS { hwVrrpTrackInterPriReduce, hwVrrpTrackInterOperRowStatus, hwVrrpTrackInterPriIncrease }
+                        STATUS current
+                        DESCRIPTION 
+                                "The VRRP tracking inter attributes."
+                        ::= { hwvrrpExtGroups 2 }       
+                                                
+                hwvrrpExtTrackBFDGroup OBJECT-GROUP
+                        OBJECTS { hwVrrpTrackBfdPriReduce, hwVrrpTrackBfdOperRowStatus, hwVrrpTrackBfdPriIncrease,hwVrrpTrackBfdType }
+                        STATUS current
+                        DESCRIPTION 
+                                "The VRRP tracking BFD attributes."
+                        ::= { hwvrrpExtGroups 3 }  
+                hwAdminVrrpCfgGroup OBJECT-GROUP
+                        OBJECTS {  hwAdminVrrpCfgOperRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "The AdminVrrpCfg attributes."
+                        ::= { hwvrrpExtGroups 4 }    
+                hwAdminVrrpMemberGroup OBJECT-GROUP
+                        OBJECTS { hwAdminVrrpMemberDiscardPkts,hwAdminVrrpMemberOperRowStatus,hwAdminVrrpMemberFlowdownMode}
+                        STATUS current
+                        DESCRIPTION 
+                                "The AdminVrrpMember attributes."
+                        ::= { hwvrrpExtGroups 5 }   
+                hwVrrpStatResetGroup OBJECT-GROUP
+                        OBJECTS { hwVrrpStatResetFlag}
+                        STATUS current
+                        DESCRIPTION 
+                                "The VrrpStatReset attributes."
+                        ::= { hwvrrpExtGroups 6 }         
+                hwAdminVrrpTrackIfGroup OBJECT-GROUP
+                        OBJECTS { hwAdminVrrpIfIndex,hwAdminVrrpVrid,hwAdminVrrpTrackIfRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "The AdminVrrpTrackIf attributes."
+                        ::= { hwvrrpExtGroups 7 }      
+                        
+                hwVrrpTrackEfmGroup OBJECT-GROUP
+                        OBJECTS {hwVrrpTrackEfmIfName,hwVrrpTrackEfmName,hwVrrpTrackEfmOperRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "The VrrpTrackEfm attributes."
+                        ::= { hwvrrpExtGroups 8 }                                                                                                                                                  
+END

@@ -1,0 +1,292 @@
+
+-- *****************************************************************************
+-- Juniper-DS1-CONF
+--
+-- SNMP Agent Capabilities definitions for the DS1 MIBs.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-DS1-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniDs1Agent  MODULE-IDENTITY
+    LAST-UPDATED "200309251523Z"  -- 25-Sep-03 11:23 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the DS1 component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200309251523Z"  -- 25-Sep-03 11:23 AM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "DS1-MIB:
+         Replaced SMIv1 'groups' (RFC1406-MIB) with SMIv2 conformance groups
+         (DS1-MIB)."
+    REVISION    "200301311715Z"  -- 31-Jan-03 12:15 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-DS1-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200301311637Z"  -- 31-Jan-03 11:37 AM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Juniper-DS1-MIB:
+         Added support for FDL transmit mode, remote FDL strings and far end FDL
+         carrier."
+    REVISION    "200205131634Z"  -- 13-May-02 12:34 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "DS1-MIB:
+         Added far end statistics support.
+         Juniper-DS1-MIB:
+         Added far end statistics support.
+         Added FDL support."
+    REVISION    "200103292036Z"  -- 29-Mar-01 03:36 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 10 }
+
+
+-- *****************************************************************************
+-- DS1 SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniDs1AgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the DS1 component of the JUNOSe SNMP agent.  This version
+        of the DS1 component was supported in JUNOSe 1.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS1 application in JUNOSe.
+        This version became obsolete when new objects were added to the
+        Juniper-DS1-MIB."
+    SUPPORTS    DS1-MIB
+        INCLUDES {
+            ds1NearEndConfigGroup,
+            ds1NearEndStatisticsGroup,
+            ds1DeprecatedGroup }
+        VARIATION   dsx1InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Ds1ChannelNumber
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS1-MIB
+        INCLUDES {
+            juniDs1Group }
+    ::= { juniDs1Agent 1 }
+
+juniDs1AgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the DS1 component of the JUNOSe SNMP agent.  This version
+        of the DS1 component was supported in JUNOSe 1.1 thru JUNOSe 2.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS1 application in JUNOSe.
+        This version became obsolete when dynamic DS1 interface support was
+        added to the Juniper-DS1-MIB."
+    SUPPORTS    DS1-MIB
+        INCLUDES {
+            ds1NearEndConfigGroup,
+            ds1NearEndStatisticsGroup,
+            ds1DeprecatedGroup }
+        VARIATION   dsx1InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Ds1ChannelNumber
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS1-MIB
+        INCLUDES {
+            juniDs1Group2 }
+    ::= { juniDs1Agent 2 }
+
+juniDs1AgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the DS1 component of the JUNOSe SNMP agent.  This version
+        of the DS1 component was supported in JUNOSe 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS1 application in JUNOSe.
+        This version became obsolete when far end statistics support was added
+        and FDL support was added to the Juniper-DS1-MIB."
+    SUPPORTS    DS1-MIB
+        INCLUDES {
+            ds1NearEndConfigGroup,
+            ds1NearEndStatisticsGroup,
+            ds1DeprecatedGroup }
+        VARIATION   dsx1InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Ds1ChannelNumber
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS1-MIB
+        INCLUDES {
+            juniDs1Group3 }
+    ::= { juniDs1Agent 3 }
+
+juniDs1AgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the DS1 component of the JUNOSe SNMP agent.  This version
+        of the DS1 component was supported in JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS1 application in JUNOSe.
+        This version became obsolete when more FDL support was added to the
+        Juniper-DS1-MIB."
+    SUPPORTS    DS1-MIB
+        INCLUDES {
+            ds1NearEndConfigGroup,
+            ds1NearEndStatisticsGroup,
+            ds1FarEndGroup,
+            ds1DeprecatedGroup }
+        VARIATION   dsx1InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Ds1ChannelNumber
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1FarEndInvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS1-MIB
+        INCLUDES  {
+            juniDs1Group4 }
+    ::= { juniDs1Agent 4 }
+
+juniDs1AgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the DS1 component of the JUNOSe SNMP agent.  This version
+        of the DS1 component is supported in JUNOSe 4.1 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS1 application in
+        JUNOSe."
+    SUPPORTS    DS1-MIB
+        INCLUDES {
+            ds1NearEndConfigGroup,
+            ds1NearEndStatisticsGroup,
+            ds1FarEndGroup,
+            ds1DeprecatedGroup }
+        VARIATION   dsx1InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Ds1ChannelNumber
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx1FarEndInvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS1-MIB
+        INCLUDES  {
+            juniDs1Group5 }
+    ::= { juniDs1Agent 5 }
+
+END

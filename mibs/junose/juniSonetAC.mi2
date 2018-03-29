@@ -1,0 +1,483 @@
+
+-- *****************************************************************************
+-- Juniper-SONET-CONF
+--
+-- SNMP Agent Capabilities definitions for the SONET MIBs.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-SONET-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniSonetAgent  MODULE-IDENTITY
+    LAST-UPDATED "200509152026Z"  -- 15-Sep-05 04:26 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the SONET component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200509152026Z"  -- 15-Sep-05 04:26 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "APS-MIB - mib added."
+    REVISION    "200307161722Z"  -- 16-Jul-03 01:22 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Juniper-UNI-SONET-MIB:
+         Added path event status and notification support."
+    REVISION    "200301312009Z"  -- 31-Jan-03 03:09 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-UNI-SONET-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200204092344Z"  -- 09-Apr-02 06:44 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "APS-MIB-JUNI:
+         Added support for IETF draft-ietf-atommib-sonetaps-mib-05 as a Juniper
+         experimental MIB."
+    REVISION    "200202042135Z"  -- 04-Feb-02 04:35 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Separate out the SONET VT support."
+    REVISION    "200104032235Z"  -- 03-Apr-01 06:35 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 40 }
+
+
+-- *****************************************************************************
+-- SONET general SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniSonetAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the SONET component of the JUNOSe SNMP agent.  This
+        version of the SONET component was supported in JUNOSe 1.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SONET application in
+        JUNOSe.  These capabilities became obsolete when support for the
+        standard VT group was added."
+    SUPPORTS    SONET-MIB  -- RFC 1595
+        INCLUDES {
+            sonetMediumStuff,
+            sonetSectionStuff,
+            sonetLineStuff,
+            sonetPathStuff }
+        VARIATION   sonetMediumTimeElapsed
+            DESCRIPTION
+                "Returns zero."
+        VARIATION   sonetMediumValidIntervals
+            DESCRIPTION
+                "Returns zero."
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup }
+    ::= { juniSonetAgent 1 }
+
+juniSonetAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the SONET component of the JUNOSe SNMP agent.  This
+        version of the SONET component was supported in JUNOSe 2.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SONET application in
+        JUNOSe.  These capabilities became obsolete when support for the
+        proprietary path and VT groups were added."
+    SUPPORTS    SONET-MIB  -- RFC 1595
+        INCLUDES {
+            sonetMediumStuff,
+            sonetSectionStuff,
+            sonetLineStuff,
+            sonetPathStuff,
+            sonetVTStuff }
+        VARIATION   sonetMediumTimeElapsed
+            DESCRIPTION
+                "Returns zero."
+        VARIATION   sonetMediumValidIntervals
+            DESCRIPTION
+                "Returns zero."
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup }
+    ::= { juniSonetAgent 2 }
+
+juniSonetAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the SONET component of the JUNOSe SNMP agent.  This
+        version of the SONET component was supported in JUNOSe 3.0 and 3.1
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SONET application in
+        JUNOSe.  These capabilities became obsolete when support for the
+        RFC-2558 version of the SONET-MIB and far-end statistics were added."
+    SUPPORTS    SONET-MIB  -- RFC 1595
+        INCLUDES {
+            sonetMediumStuff,
+            sonetSectionStuff,
+            sonetLineStuff,
+            sonetPathStuff,
+            sonetVTStuff }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup,
+            juniSonetPathGroup,
+            juniSonetVirtualTributaryGroup }
+    ::= { juniSonetAgent 3 }
+
+juniSonetAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the SONET component of the JUNOSe SNMP agent.  This
+        version of the SONET component was supported in JUNOSe 3.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SONET application in
+        JUNOSe.  These capabilities became obsolete when Virtual Tributary (VT)
+        support was searated out into a separate capabilities statement."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetMediumStuff2,
+            sonetSectionStuff2,
+            sonetLineStuff2,
+            sonetFarEndLineStuff2,
+            sonetPathStuff2,
+            sonetFarEndPathStuff2,
+            sonetVTStuff2,
+            sonetFarEndVTStuff2 }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+        VARIATION   sonetMediumLoopbackConfig
+            DESCRIPTION
+                "Only supports setting one loopback state at a time; a value
+                with more than one bit set will be rejected.  Setting
+                sonetOtherLoop (bit 3) is also not a valid operation."
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup,
+            juniSonetPathGroup,
+            juniSonetVirtualTributaryGroup }
+    ::= { juniSonetAgent 4 }
+
+
+-- *****************************************************************************
+-- SONET basic agent capabilities
+-- *****************************************************************************
+juniSonetBasicAgent  OBJECT IDENTIFIER ::= { juniSonetAgent 5 }
+
+juniSonetBasicAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the basic SONET component of the JUNOSe SNMP agent.  It
+        does not include Virtual Tributary (VT) support.  This version of the
+        basic SONET component was supported in JUNOSe 3.3 and subsequent 3.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB conformance groups supported by the SNMP agent for the SONET
+        application in JUNOSe.  These capabilities became obsolete when support
+        was added for the Internet draft of the APS MIB."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetMediumStuff2,
+            sonetSectionStuff2,
+            sonetLineStuff2,
+            sonetFarEndLineStuff2,
+            sonetPathStuff2,
+            sonetFarEndPathStuff2 }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+        VARIATION   sonetMediumLoopbackConfig
+            DESCRIPTION
+                "Only supports setting one loopback state at a time; a value
+                with more than one bit set will be rejected.  Setting
+                sonetOtherLoop (bit 3) is also not a valid operation."
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup2,
+            juniSonetPathGroup,
+            juniSonetDeprecatedMediumGroup }
+    ::= { juniSonetBasicAgent 1 }
+
+juniSonetBasicAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the basic SONET component of the JUNOSe SNMP agent.  It
+        does not include Virtual Tributary (VT) support.  This version of the
+        basic SONET component was supported in JUNOSe 4.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB conformance groups supported by the SNMP agent for the SONET
+        application in JUNOSe.  These capabilities became obsolete when new
+        medium and path controls were added."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetMediumStuff2,
+            sonetSectionStuff2,
+            sonetLineStuff2,
+            sonetFarEndLineStuff2,
+            sonetPathStuff2,
+            sonetFarEndPathStuff2 }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+        VARIATION   sonetMediumLoopbackConfig
+            DESCRIPTION
+                "Only supports setting one loopback state at a time; a value
+                with more than one bit set will be rejected.  Setting
+                sonetOtherLoop (bit 3) is also not a valid operation."
+    SUPPORTS    APS-MIB-JUNI
+        INCLUDES {
+            junidApsConfigGeneral,
+            junidApsStatusGeneral,
+            junidApsChanGeneral,
+            junidApsConfigWtr,
+            junidApsCommandOnePlusOne,
+            junidApsCommandOneToN,
+            junidApsChanOneToN,
+            junidApsTotalsGroup,
+            junidApsMapGroup }
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup3,
+            juniSonetPathGroup2,
+            juniSonetDeprecatedMediumGroup }
+    ::= { juniSonetBasicAgent 2 }
+
+juniSonetBasicAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the basic SONET component of the JUNOSe SNMP agent.  It
+        does not include Virtual Tributary (VT) support.  This version of the
+        basic SONET component was supported in JUNOSe 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB conformance groups supported by the SNMP agent for the SONET
+        application in JUNOSe.  These capabilities became obsolete when path
+        event status and notification support was added."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetMediumStuff2,
+            sonetSectionStuff2,
+            sonetLineStuff2,
+            sonetFarEndLineStuff2,
+            sonetPathStuff2,
+            sonetFarEndPathStuff2 }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+        VARIATION   sonetMediumLoopbackConfig
+            DESCRIPTION
+                "Only supports setting one loopback state at a time; a value
+                with more than one bit set will be rejected.  Setting
+                sonetOtherLoop (bit 3) is also not a valid operation."
+    SUPPORTS    APS-MIB-JUNI
+        INCLUDES {
+            junidApsConfigGeneral,
+            junidApsStatusGeneral,
+            junidApsChanGeneral,
+            junidApsConfigWtr,
+            junidApsCommandOnePlusOne,
+            junidApsCommandOneToN,
+            junidApsChanOneToN,
+            junidApsTotalsGroup,
+            junidApsMapGroup }
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup3,
+            juniSonetPathGroup2,
+            juniSonetDeprecatedMediumGroup }
+    ::= { juniSonetBasicAgent 3 }
+
+juniSonetBasicAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the basic SONET component of the JUNOSe SNMP agent.  It
+        does not include Virtual Tributary (VT) support.  This version of the
+        basic SONET component is supported in JUNOSe 5.1 and subsequent system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB conformance groups supported by the SNMP agent for the SONET
+        application in JUNOSe."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetMediumStuff2,
+            sonetSectionStuff2,
+            sonetLineStuff2,
+            sonetFarEndLineStuff2,
+            sonetPathStuff2,
+            sonetFarEndPathStuff2 }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+        VARIATION   sonetMediumLoopbackConfig
+            DESCRIPTION
+                "Only supports setting one loopback state at a time; a value
+                with more than one bit set will be rejected.  Setting
+                sonetOtherLoop (bit 3) is also not a valid operation."
+    SUPPORTS    APS-MIB-JUNI
+        INCLUDES {
+            junidApsConfigGeneral,
+            junidApsStatusGeneral,
+            junidApsChanGeneral,
+            junidApsConfigWtr,
+            junidApsCommandOnePlusOne,
+            junidApsCommandOneToN,
+            junidApsChanOneToN,
+            junidApsTotalsGroup,
+            junidApsMapGroup }
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup3,
+            juniSonetPathGroup3,
+            juniSonetPathNotificationGroup,
+            juniSonetDeprecatedMediumGroup }
+    ::= { juniSonetBasicAgent 4 }
+
+juniSonetBasicAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the basic SONET component of the JUNOSe SNMP agent.  It
+        does not include Virtual Tributary (VT) support.  This version of the
+        basic SONET component is supported in JUNOSe 7.2 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB conformance groups supported by the SNMP agent for the SONET
+        application in JUNOSe."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetMediumStuff2,
+            sonetSectionStuff2,
+            sonetLineStuff2,
+            sonetFarEndLineStuff2,
+            sonetPathStuff2,
+            sonetFarEndPathStuff2 }
+        VARIATION   sonetMediumLineCoding
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports NRZ (4)."
+        VARIATION   sonetMediumLineType
+            ACCESS      read-only
+            DESCRIPTION
+                "Only supports Multi-Mode (4)."
+        VARIATION   sonetMediumLoopbackConfig
+            DESCRIPTION
+                "Only supports setting one loopback state at a time; a value
+                with more than one bit set will be rejected.  Setting
+                sonetOtherLoop (bit 3) is also not a valid operation."
+    SUPPORTS    APS-MIB -- RFC 3498
+        INCLUDES {
+            apsConfigGeneral,
+            apsConfigWtr,
+            apsCommandOnePlusOne,
+            apsStatusGeneral,
+            apsChanGeneral,
+            apsTotalsGroup,
+            apsMapGroup,
+            apsEventGroup }
+    SUPPORTS    APS-MIB-JUNI
+        INCLUDES {
+            junidApsConfigGeneral,
+            junidApsStatusGeneral,
+            junidApsChanGeneral,
+            junidApsConfigWtr,
+            junidApsCommandOnePlusOne,
+            junidApsTotalsGroup,
+            junidApsMapGroup }
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetGroup3,
+            juniSonetPathGroup3,
+            juniSonetPathNotificationGroup,
+            juniSonetDeprecatedMediumGroup }
+    ::= { juniSonetBasicAgent 5 }
+
+
+-- *****************************************************************************
+-- SONET Virtual Tributary (VT) agent capabilities
+-- *****************************************************************************
+juniSonetVTAgent  OBJECT IDENTIFIER ::= { juniSonetAgent 6 }
+
+juniSonetVTAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the SONET VT component of the JUNOSe SNMP agent.  This
+        version of the SONET component is supported in JUNOSe 3.3 and subsequent
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB conformance groups supported by the SNMP agent for the SONET
+        application in JUNOSe."
+    SUPPORTS    SONET-MIB  -- RFC 2558
+        INCLUDES {
+            sonetVTStuff2,
+            sonetFarEndVTStuff2 }
+    SUPPORTS    Juniper-UNI-SONET-MIB
+        INCLUDES {
+            juniSonetVirtualTributaryGroup2,
+            juniSonetDeprecatedVTGroup }
+    ::= { juniSonetVTAgent 1 }
+
+END

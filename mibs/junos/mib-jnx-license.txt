@@ -1,0 +1,260 @@
+--
+-- Juniper Enterprise Specific MIB: License MIB
+--
+-- Copyright (c) 2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, TimeTicks, IpAddress,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    jnxLicenseMibRoot
+        FROM JUNIPER-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+jnxLicenseMIB       MODULE-IDENTITY
+    LAST-UPDATED    "201007090000Z"
+    ORGANIZATION    "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+        "Implementation of enterprise specific MIB
+         for license commands and configuration."
+    REVISION    "201007090000Z"    -- Jul 09, 2010
+    DESCRIPTION
+             "Initial version."
+    ::=  {  jnxLicenseMibRoot  1  }
+
+jnxLicenseNotifications     OBJECT IDENTIFIER ::=  {  jnxLicenseMIB  0  }
+jnxLicenseObjects           OBJECT IDENTIFIER ::=  {  jnxLicenseMIB  1  }
+
+jnxLicenseInstallObjects      OBJECT IDENTIFIER ::=  { jnxLicenseObjects 1 }
+jnxLicenseSettings            OBJECT IDENTIFIER ::=  { jnxLicenseObjects 2 }
+
+-- ****************************************************************
+-- License table for installed licenses
+-- ****************************************************************
+
+jnxLicenseInstallTable   OBJECT-TYPE
+    SYNTAX            SEQUENCE  OF  JnxLicenseInstallEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "This table contains installed feature license information."
+    ::=  { jnxLicenseInstallObjects 1 }
+
+jnxLicenseInstallEntry   OBJECT-TYPE
+    SYNTAX            JnxLicenseInstallEntry 
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "A row of giving installed feature license information."
+    INDEX             {  IMPLIED jnxLicenseId  }
+    ::=  { jnxLicenseInstallTable 1 }
+
+JnxLicenseInstallEntry  ::=  SEQUENCE {
+    jnxLicenseId              DisplayString,
+    jnxLicenseVersion         INTEGER,
+    jnxLicenseDeviceId        DisplayString,
+    jnxLicenseType            INTEGER,
+    jnxLicenseKeys            OCTET STRING
+    }
+
+jnxLicenseId OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Installed feature licenses Id."
+    ::=  {  jnxLicenseInstallEntry 1  }
+
+jnxLicenseVersion OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Version information"
+    ::=  {  jnxLicenseInstallEntry 2  }
+
+jnxLicenseDeviceId OBJECT-TYPE
+    SYNTAX          DisplayString 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Device Id "
+    ::=  {  jnxLicenseInstallEntry 3  }
+
+jnxLicenseType OBJECT-TYPE
+    SYNTAX          INTEGER { invalid(0), count-down(1), date-based(2),permanent(3) } 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License type information"
+    ::=  {  jnxLicenseInstallEntry 4  }
+
+jnxLicenseKeys      OBJECT-TYPE
+    SYNTAX          OCTET STRING 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "License Keys"
+    ::=  {  jnxLicenseInstallEntry 5  }
+
+-- Feature Listing Table 
+
+jnxLicenseFeatureListTable OBJECT-TYPE
+    SYNTAX          SEQUENCE  OF  JnxLicenseFeatureListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "list of features supporting Licensing."
+    ::=  { jnxLicenseInstallObjects  2 }
+
+jnxLicenseFeatureListEntry OBJECT-TYPE
+    SYNTAX          JnxLicenseFeatureListEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row of licensed features."
+    INDEX           {  jnxLicenseFeatureId  }
+    ::=  { jnxLicenseFeatureListTable 1 }
+
+JnxLicenseFeatureListEntry ::=  SEQUENCE {
+    jnxLicenseFeatureId              INTEGER,
+    jnxLicenseFeatureName            DisplayString,
+    jnxLicenseFeatureDescr           DisplayString,
+    jnxLicenseFeatureLicenseId       DisplayString,
+    jnxLicenseFeatureLicenseUsed            INTEGER,
+    jnxLicenseFeatureLicenseInstalled       INTEGER,
+    jnxLicenseFeatureLicenseNeeded          INTEGER
+    }
+
+jnxLicenseFeatureId OBJECT-TYPE
+    SYNTAX              INTEGER 
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "Feature Id to point an entry in this table"
+    ::=  { jnxLicenseFeatureListEntry 1 }
+
+jnxLicenseFeatureName OBJECT-TYPE
+    SYNTAX                 DisplayString 
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Feature Name"
+    ::=  {  jnxLicenseFeatureListEntry 2  } 
+
+jnxLicenseFeatureDescr OBJECT-TYPE
+    SYNTAX                 DisplayString
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Feature Name"
+    ::=  {  jnxLicenseFeatureListEntry 3  }
+
+jnxLicenseFeatureLicenseId OBJECT-TYPE
+    SYNTAX                 DisplayString 
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION            "Feature License Id"
+    ::=  {  jnxLicenseFeatureListEntry 4  } 
+
+jnxLicenseFeatureLicenseUsed      OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Licenses Used"
+    ::=  {  jnxLicenseFeatureListEntry 5  }
+
+jnxLicenseFeatureLicenseInstalled OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Licenses Installed"
+    ::=  {  jnxLicenseFeatureListEntry 6  }
+
+jnxLicenseFeatureLicenseNeeded    OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Licenses Needed"
+    ::=  {  jnxLicenseFeatureListEntry 7  }
+
+
+-- ****************************************************************
+-- License configuration parameters
+-- ****************************************************************
+
+jnxLicenseRenewBeforExpiration  OBJECT-TYPE
+    SYNTAX                      INTEGER
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+        "License renew lead time before expiration in days."
+    ::= { jnxLicenseSettings  1 }
+
+jnxLicenseRenewInterval  OBJECT-TYPE
+    SYNTAX               INTEGER
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "License checking interval in hours."
+    ::= { jnxLicenseSettings  2 }
+
+jnxLicenseAutoUpdate    OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "License auto update URL of a license server."
+    ::= { jnxLicenseSettings  3 }
+
+
+
+-- ********************************************************************
+-- define branches for jnx license traps
+-- ********************************************************************
+
+jnxLicenseGraceExpired NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license grace period for
+         feature identified by jnxLicenseFeatureName is expired"
+    ::= { jnxLicenseNotifications 1 }
+
+jnxLicenseGraceAboutToExpire NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license grace period for
+         feature identified by jnxLicenseFeatureName is about to expire"
+    ::= { jnxLicenseNotifications 2 }
+
+jnxLicenseAboutToExpire NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license period for
+         feature identified by jnxLicenseFeatureName is about to expire"
+    ::= { jnxLicenseNotifications 3 }
+
+jnxLicenseInfringeCumulative NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the feature is used more
+         times than as specified in number of licenses allowed for feature
+         as identified by jnxLicenseFeatureName"
+    ::= { jnxLicenseNotifications 4 }
+
+jnxLicenseInfringeSingle NOTIFICATION-TYPE
+    OBJECTS  { jnxLicenseFeatureName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the license for feature
+         identified by jnxLicenseFeatureName is not valid i.e. either expired or
+         not available."
+    ::= { jnxLicenseNotifications 5 }
+
+
+END

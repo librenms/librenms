@@ -1,0 +1,467 @@
+ADTRAN-AOSCPU DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, 
+    Unsigned32, NOTIFICATION-TYPE, OBJECT-IDENTITY
+        FROM SNMPv2-SMI 
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    sysName
+        FROM SNMPv2-MIB
+    adIdentityShared
+        FROM ADTRAN-MIB
+    adGenAOSCommon, adGenAOSConformance
+        FROM ADTRAN-AOS;
+
+adGenAOSCpuUtilMib MODULE-IDENTITY
+    LAST-UPDATED "200904300000Z"  -- April 30, 2009
+    ORGANIZATION "ADTRAN, Inc."
+    CONTACT-INFO
+        "Technical Support Dept.
+        Postal: ADTRAN, Inc.
+        901 Explorer Blvd.
+        Huntsville, AL 35806
+
+        Tel: +1 800 726-8663
+        Fax: +1 256 963 6217
+        E-mail: support@adtran.com"
+
+    DESCRIPTION
+        "This MIB contains information regarding CPU utilization, Memory usage
+         and system process status."
+
+    REVISION    "200410040000Z"  -- October 24, 2004
+    DESCRIPTION
+        "Initial version of this MIB module."
+
+    REVISION    "200904300000Z"  -- April 30, 2009
+    DESCRIPTION
+        "Added resource utilization OIDs for traps and tables."
+
+    REVISION    "200908130000Z"  -- August 13, 2009
+    DESCRIPTION
+        "Added sysName to adGenAOSResUtilThreshAlarm and 
+         adGenAOSResUtilThreshNormal."
+
+    ::= { adIdentityShared 4 }
+
+adGenAOSCpuUtil    OBJECT IDENTIFIER ::= {  adGenAOSCommon 4 }
+
+--
+--  Unit CPU and Memory Utilization Group
+--
+
+--  Trap OID
+adGenAOSResUtilThreshTraps OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION	
+        "These traps indicate that a resource's utilization status has changed 
+        respective of a set threshold value. There are two types of traps,
+        Alarm and Normal. The traps will return the adGenAOSResUtilThreshTable 
+        indices and the number of seconds since epoch as a timestamp 
+        indicating when the utilization status changed. The timestamp value is
+        indicative of when the utilization status changed an not when the trap 
+        was sent."
+    ::= { adGenAOSCpuUtil 0 }
+
+adGenAOSCurrentCpuUtil OBJECT-TYPE
+    SYNTAX      Gauge32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU utilization over the last second."
+    ::= { adGenAOSCpuUtil 1 }
+
+adGenAOSClearUtilizationStats OBJECT-TYPE
+    SYNTAX      INTEGER {
+        reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set value to 1 to clear CPU utilization statistics."
+    ::= { adGenAOSCpuUtil 2 }
+
+adGenAOS1MinCpuUtil OBJECT-TYPE
+    SYNTAX      Gauge32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU utilization over the last minute."
+    ::= { adGenAOSCpuUtil 3 }
+
+adGenAOS5MinCpuUtil OBJECT-TYPE
+    SYNTAX      Gauge32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU utilization over the last 5 minutes."
+    ::= { adGenAOSCpuUtil 4 }
+
+adGenAOSMaxCpuUtil OBJECT-TYPE
+    SYNTAX      Gauge32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum CPU utilization since last system reboot or
+         statistics reset."
+    ::= { adGenAOSCpuUtil 5 }
+
+adGenAOSMemPool OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total memory pool available."
+    ::= { adGenAOSCpuUtil 6 }
+
+adGenAOSHeapSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total Heap size. This is the amount of memory available after the
+         code is decompressed and packet buffers are allocated."
+    ::= { adGenAOSCpuUtil 7 }
+
+adGenAOSHeapFree OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current amount of heap available for use."
+    ::= { adGenAOSCpuUtil 8 }
+
+--
+-- System Process Table
+--
+adGenAOSProcessTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table reporting the current run state of all current processes."
+    ::= { adGenAOSCpuUtil 9 }
+
+adGenAOSProcessEntry OBJECT-TYPE
+    SYNTAX      AdGenAOSProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the list is a current system process."
+    INDEX   { adGenAOSProcID }
+    ::= { adGenAOSProcessTable 1 }
+
+AdGenAOSProcessEntry ::=
+    SEQUENCE {
+        adGenAOSProcID           Integer32,
+        adGenAOSProcName         DisplayString,
+        adGenAOSProcPriority     Integer32,
+        adGenAOSProcState        INTEGER,
+        adGenAOSProcCount        Gauge32,
+        adGenAOSProcExecTime     Gauge32,
+        adGenAOSProcRunTime      Gauge32,
+        adGenAOSProc1SecLd       Gauge32
+    }
+
+adGenAOSProcID  OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique indentifier for the process."
+    ::= { adGenAOSProcessEntry 1 }
+
+adGenAOSProcName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System process name."
+    ::= { adGenAOSProcessEntry 2 }
+
+adGenAOSProcPriority  OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current system process priority."
+    ::= { adGenAOSProcessEntry 3 }
+
+adGenAOSProcState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        running(1),
+        ready(2),
+        wait(3)
+    }
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Current system process state."
+    ::= { adGenAOSProcessEntry  4 }
+
+adGenAOSProcCount  OBJECT-TYPE
+    SYNTAX      Gauge32(0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current number of times the process has been invoked."
+    ::= { adGenAOSProcessEntry 5 }
+
+adGenAOSProcExecTime  OBJECT-TYPE
+    SYNTAX      Gauge32(0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total amount of time spent executing this process. Result is
+         in usec."
+    ::= { adGenAOSProcessEntry 6 }
+
+adGenAOSProcRunTime  OBJECT-TYPE
+    SYNTAX      Gauge32(0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total amount of time spent executing this process.  Result is
+         in usec."
+    ::= { adGenAOSProcessEntry 7 }
+
+adGenAOSProc1SecLd  OBJECT-TYPE
+    SYNTAX      Gauge32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percent system utilization for the process."
+    ::= { adGenAOSProcessEntry 8 }
+
+--
+-- Resource Utilization Threshold Table
+--
+adGenAOSResUtilThreshTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSResUtilThreshEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table reporting the current resource utilization threshold traps
+         with abilities to configure the traps. The table supports create and
+         destroy. To prevent abuse, the table will not support row creation
+         once 20 or more entries exist within the table."
+    ::= { adGenAOSCpuUtil 10 }
+
+adGenAOSResUtilThreshEntry OBJECT-TYPE
+    SYNTAX      AdGenAOSResUtilThreshEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the table represents a current resource utilization
+         threshold notification. The entry is composed of an enumerated
+         integer representing the resource type, the numerical threshold and
+         time interval settings. All entries are immutable and all columns are
+         required for create."
+    INDEX   {
+        adGenAOSResType,
+        adGenAOSResUtilThresh,
+        adGenAOSResUtilTimeInterval
+    }
+    ::= { adGenAOSResUtilThreshTable 1 }
+
+AdGenAOSResUtilThreshEntry ::=
+    SEQUENCE {		
+        adGenAOSResType                   INTEGER,
+        adGenAOSResUtilThresh             Gauge32,
+        adGenAOSResUtilTimeInterval       Gauge32,
+        adGenAOSResUtilThreshRowStatus    RowStatus
+    }
+
+adGenAOSResType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        cpu(1),
+        heap(2)
+    }    
+    MAX-ACCESS  read-create	
+    STATUS      current
+    DESCRIPTION
+        "Indentifier specifying the resource type.
+         Resource notes:
+         (2) Heap - The heap resource will only display a time interval value
+         of 1. Setting the value to a valid time interval value will always
+         result in the inherent default value of 1. A heap notification will
+         occur whenever the threshold is exceeded."
+    ::= { adGenAOSResUtilThreshEntry 1 }
+
+adGenAOSResUtilThresh  OBJECT-TYPE
+    SYNTAX      Gauge32(1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The utilization threshold value expressed as a whole number 
+         percentage."
+    ::= { adGenAOSResUtilThreshEntry 2 }
+
+adGenAOSResUtilTimeInterval  OBJECT-TYPE
+    SYNTAX      Gauge32(1..86400)	-- 86400 seconds = 1 day
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Time interval in seconds for actual to exceed threshold."
+    ::= { adGenAOSResUtilThreshEntry 3 }
+
+adGenAOSResUtilThreshRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus column for this table. Since each entry is immutable the
+         only acceptable RowStatus values (for set) are createAndGo(4) and
+         destroy(6). The only acceptable RowStatus value for get is
+         active(1)."
+    ::= { adGenAOSResUtilThreshEntry  4 }
+
+adGenAOSResUtilThreshTimestamp  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time (seconds since epoch) that a resource utilization
+         threshold trap condition occurred and not necessarily the when
+         the trap was sent."
+    ::= { adGenAOSCpuUtil  11 }
+
+-- Traps
+adGenAOSResUtilThreshAlarm     NOTIFICATION-TYPE
+    OBJECTS {
+        adGenAOSResType,
+        adGenAOSResUtilThresh,
+        adGenAOSResUtilTimeInterval, 
+        adGenAOSResUtilThreshTimestamp,
+        sysName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates the resource utilization exceeded the set
+         threshold value for the entirety of the set time interval. The
+         specific resource utilization is specified via the indexes
+         adGenAOSResType, adGenAOSResUtilThresh, and
+         adGenAOSResUtilTimeInterval. The adGenAOSResUtilThreshTimestamp
+         indicates when this condition occurred and not necessarily when the
+         trap was sent. The sysName is the exact same as defined in
+         SNMPv2-MIB."
+    ::= { adGenAOSResUtilThreshTraps 1 }
+
+adGenAOSResUtilThreshNormal NOTIFICATION-TYPE
+    OBJECTS {
+        adGenAOSResType,
+        adGenAOSResUtilThresh,
+        adGenAOSResUtilTimeInterval,
+        adGenAOSResUtilThreshTimestamp,
+        sysName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates the resource utilization has been in a normal
+         (non-alarm) state for at least 5 seconds. This condition can only
+         occur after the alarm state has been triggered. The specific
+         resource utilization is specified via the indexes adGenAOSResType,
+         adGenAOSResUtilThresh, and adGenAOSResUtilTimeInterval. The
+         adGenAOSResUtilThreshTimestamp indicates when this condition
+         occurred and not necessarily when the trap was sent.The sysName is
+         the exact same as defined in SNMPv2-MIB."
+    ::= { adGenAOSResUtilThreshTraps 2 }
+
+-- conformance information
+
+adGenAOSCpuConformance
+    OBJECT IDENTIFIER ::= { adGenAOSConformance 4 }
+
+adAOSCpuCompliances
+    OBJECT IDENTIFIER ::= { adGenAOSCpuConformance 1 }
+
+adAOSCpuGroups
+    OBJECT IDENTIFIER ::= { adGenAOSCpuConformance 2 }
+
+-- compliance statements
+adAOSCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which
+         implement the adAosCPU.mib"
+
+    MODULE
+    MANDATORY-GROUPS {
+        adGenAOSCpuGroup
+    }
+    GROUP       adGenAOSProcessGroup
+    DESCRIPTION
+        "This optional group is used to report the current run state of
+        all processes."
+
+    GROUP       adGenAOSThresholdGroup
+    DESCRIPTION
+        "This optional group is used to configure the trap thresholds."
+
+    GROUP       adGenAOSThresholdTrapGroup
+    DESCRIPTION
+        "This optional group is used for the management of notifications."
+    ::= { adAOSCpuCompliances 1 }
+
+-- units of conformance
+adGenAOSCpuGroup OBJECT-GROUP
+    OBJECTS {
+        adGenAOSCurrentCpuUtil,
+        adGenAOSClearUtilizationStats,
+        adGenAOS1MinCpuUtil,
+        adGenAOS5MinCpuUtil,
+        adGenAOSMaxCpuUtil,
+        adGenAOSMemPool,
+        adGenAOSHeapSize,
+        adGenAOSHeapFree
+    }
+    STATUS      current
+    DESCRIPTION
+        "The Unit SNMP Config Group."
+    ::= { adAOSCpuGroups 1 }
+
+adGenAOSProcessGroup OBJECT-GROUP
+    OBJECTS {
+        adGenAOSProcName,
+        adGenAOSProcPriority,
+        adGenAOSProcState,
+        adGenAOSProcCount,
+        adGenAOSProcExecTime,
+        adGenAOSProcRunTime,
+        adGenAOSProc1SecLd
+    }
+    STATUS      current
+    DESCRIPTION
+        "This group is used to report the status of current processes."
+    ::= { adAOSCpuGroups 2 }
+
+adGenAOSThresholdGroup OBJECT-GROUP
+    OBJECTS {
+        adGenAOSResType,
+        adGenAOSResUtilThresh,
+        adGenAOSResUtilTimeInterval,
+        adGenAOSResUtilThreshRowStatus,
+        adGenAOSResUtilThreshTimestamp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The threshold config group. Contains objects to set and get
+         the threshold and time interval to trigger a trap."
+    ::= { adAOSCpuGroups 3 }
+
+adGenAOSThresholdTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        adGenAOSResUtilThreshAlarm,
+        adGenAOSResUtilThreshNormal
+    }
+    STATUS      current
+    DESCRIPTION
+        "Traps which may be used to enhance event driven management of
+         the CPU."
+    ::= { adAOSCpuGroups 4 }
+
+END
+

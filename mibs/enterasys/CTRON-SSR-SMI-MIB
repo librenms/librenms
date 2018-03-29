@@ -1,0 +1,68 @@
+CTRON-SSR-SMI-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific Smart Switch Router specific mib branches.
+--
+--  This module will be extended, as required.
+ 
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+ 
+--  Copyright 1998-2000 Cabletron Systems
+ 
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+        cabletron
+        FROM CTRON-OIDS; 
+
+ssr MODULE-IDENTITY   
+    LAST-UPDATED "200007150000Z"  -- July 15, 2000
+    ORGANIZATION "Cabletron Systems, Inc"
+    CONTACT-INFO
+    "Enterasys Networks
+     35 Industrial Way, P.O. Box 5005
+     Rochester, NH 03867-0505
+     (603) 332-9400
+     support@enterasys.com
+     http://www.enterasys.com"
+    DESCRIPTION
+        "This mib module defines enterprise MIBs under Cabletron
+         enterprise OID that manage Enterasys SmartSwitch Routers 
+         and Riverstone Networks RS product Line."
+
+    REVISION     "200007150000Z"
+    DESCRIPTION
+         "Update contact information for Riverstone Networks as this mib
+          is found on the Riverstione RS product line and Enterasys SSR product line."
+
+         ::= { cabletron 2501 }  
+
+ssrMibs OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "All Smart Switch Router (SSR) enterprise MIBs are defined under mibs"
+        ::= { ssr 1 }
+ 
+ssrTraps OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+           "All enterprise traps are defined under this branch."
+        ::= { ssr 10 }
+
+END

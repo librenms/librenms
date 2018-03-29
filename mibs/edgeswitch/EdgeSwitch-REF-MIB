@@ -1,0 +1,75 @@
+EdgeSwitch-REF-MIB DEFINITIONS ::= BEGIN
+
+-- Ubiquiti Fastpath  Reference MIB
+-- Copyright Broadcom Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Broadcom Inc confidential and proprietary
+-- intellectual property.  Broadcom Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+-- This MIBs were modified from Broadcom Reference MIBs to match UBNT
+-- MIB names.
+
+
+IMPORTS
+    MODULE-IDENTITY                     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                  FROM SNMPv2-TC
+    enterprises                         FROM RFC1155-SMI;
+    
+    broadcom MODULE-IDENTITY
+        LAST-UPDATED "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        ORGANIZATION "Broadcom Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          ""
+           
+        -- Revision history.      
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Ubiquiti branding related changes."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200302061200Z" -- 6 February 2003 12:00:00 GMT
+        DESCRIPTION
+          "Updated for release"
+          
+    ::= {  enterprises 4413 }
+
+ broadcomProducts         OBJECT IDENTIFIER ::= { broadcom 1 }
+ fastPath                 OBJECT IDENTIFIER ::= { broadcomProducts 1 }
+    
+-- New Textual Conventions
+AgentPortMask ::= TEXTUAL-CONVENTION
+   STATUS  current
+   DESCRIPTION
+       "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'
+             
+        When setting this value, the system will ignore 
+        configuration for ports not between the first and last 
+        valid ports.  Configuration of any port numbers between 
+        this range that are not valid ports return a failure 
+        message, but will still apply configuration for valid 
+        ports."
+   SYNTAX  OCTET STRING
+
+
+END

@@ -1,0 +1,14 @@
+os: procurve
+text: 'HP ProCurve'
+type: network
+icon: hpe
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - hp
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.11.2.3.7.8.5.
+        - .1.3.6.1.4.1.11.2.3.7.11.

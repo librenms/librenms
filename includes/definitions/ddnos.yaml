@@ -1,0 +1,15 @@
+os: ddnos
+text: 'DDN Storage'
+type: storage
+icon: ddn
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: SFA-INFO::systemName.0
+          op: '!='
+          value: false

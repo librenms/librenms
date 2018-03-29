@@ -1,0 +1,623 @@
+ALCATEL-IND1-UDLD-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		Counter32, Unsigned32, MODULE-IDENTITY, OBJECT-IDENTITY, 
+		NOTIFICATION-TYPE, OBJECT-TYPE 		
+					FROM SNMPv2-SMI
+		InterfaceIndex		FROM IF-MIB
+		MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+					FROM SNMPv2-CONF
+		DisplayString, MacAddress		FROM SNMPv2-TC
+     		softentIND1Udld		FROM ALCATEL-IND1-BASE;
+
+
+	alcatelIND1UDLDMIB MODULE-IDENTITY
+		LAST-UPDATED "200702140000Z"
+		ORGANIZATION "Alcatel - Architects Of An Internet World"
+		CONTACT-INFO
+		"Please consult with Customer Service to insure the most appropriate
+		version of this document is used with the products in question:
+
+			Alcatel Internetworking, Incorporated
+			(Division 1, Formerly XYLAN Corporation)
+			26801 West Agoura Road
+			Agoura Hills, CA  91301-5122
+			United States Of America
+
+			Telephone:	North America  +1 800 995 2696
+					Latin America  +1 877 919 9526
+					Europe         +31 23 556 0100
+					Asia           +65 394 7933
+					All Other      +1 818 878 4507
+
+		Electronic Mail:         support@ind.alcatel.com
+		World Wide Web:          http://www.ind.alcatel.com
+		File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+			Network Management Protocol (SNMP) Management Information Base (MIB):
+
+			For the Birds Of Prey Product Line
+			UDLD for detection and disabling unidirectional links.
+
+
+			The right to make changes in specification and other information
+			contained in this document without prior notice is reserved.
+
+			No liability shall be assumed for any incidental, indirect, special, or
+			consequential damages whatsoever arising from or related to this
+			document or the information contained herein.
+
+			Vendors, end-users, and other interested parties are granted
+			non-exclusive license to use this specification in connection with
+			management of the products for which it is intended to be used.
+
+			Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+			ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200702140000Z"
+		DESCRIPTION
+		"The UDLD MIB defines a set of UDLD related management objects for ports 
+		that support UniDirectional Link Detection (UDLD) Protocol. UDLD as a 
+		protocol provides mechanisms to detect and disable unidirectional links 
+		caused for instance by mis-wiring of fiber strands, interface malfunctions,
+		media converters' faults, etc. It operates at Layer 2 in conjunction
+		with IEEE 802.3's existing Layer 1 fault detection mechanisms. 
+
+		This MIB comprises proprietary managed objects as well the objects required 
+		for conforming to the protocol."
+		::= { softentIND1Udld 1}
+
+-- --------------------------------------------------------------
+		alcatelIND1UDLDMIBObjects OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		    "Branch For UDLD
+		    Subsystem Managed Objects."
+		::= { alcatelIND1UDLDMIB 1 }
+
+		alcatelIND1UDLDMIBConformance OBJECT-IDENTITY
+		STATUS  current
+		DESCRIPTION
+		    "Branch for UDLD Module MIB Subsystem Conformance Information."
+		::= { alcatelIND1UDLDMIB 2 }
+
+		alcatelIND1UDLDMIBGroups OBJECT-IDENTITY
+		STATUS  current
+		DESCRIPTION
+		    "Branch for UDLD Module MIB Subsystem Units of Conformance."
+		::= { alcatelIND1UDLDMIBConformance 1 }
+
+		alcatelIND1UDLDMIBCompliances OBJECT-IDENTITY
+		STATUS  current
+		DESCRIPTION
+		    "Branch for UDLD Module MIB Subsystem Compliance Statements."
+		::= { alcatelIND1UDLDMIBConformance 2 }
+
+-- --------------------------------------------------------------
+       
+-- --------------------------------------------------------------
+-- UDLD MIB
+-- --------------------------------------------------------------
+
+	alaUdldGlobalStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+				enable(1),
+				disable(2)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This variable is used to enable or diable UDLD on the switch.
+			The value enable (1) indicates that UDLD should be enabled on 
+			the switch. The value disable (2) is used to disable UDLD on 
+			the switch. By default, UDLD is disabled on the switch."
+		DEFVAL  { disable }
+		::= { alcatelIND1UDLDMIBObjects 1 }
+
+	alaUdldGlobalClearStats OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Defines the global clear statistics control for UDLD.
+                        The value reset (1) indicates that UDLD should clear all 
+			statistic counters related to all ports in the system. 
+			By default, this object contains a zero value."
+                DEFVAL  { default }
+                ::= { alcatelIND1UDLDMIBObjects 2 }
+    
+
+           alaUdldGlobalConfigUdldMode  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			normal (1),
+			aggressive (2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Defines the mode of operation of the UDLD protocol on the interface.
+		normal - The UDLD state machines participates normally in UDLD protocol 
+			exchanges. The protocol determination at the end of detection 
+			process is always based upon information received in UDLD messages.
+		aggressive - UDLD will shut down all port even in case it loses bidirectional 
+			connectivity with the neighbor for a defined period of time."
+		DEFVAL  { normal }
+		::= { alcatelIND1UDLDMIBObjects 3 }
+	    
+	    
+	    alaUdldGlobalConfigUdldProbeIntervalTimer OBJECT-TYPE
+		SYNTAX  Unsigned32  ( 7 .. 90 ) 
+		UNITS	"seconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Maximum period of time after which the Probe message is expected 
+		from the neighbor. The range supported is 7-90 seconds."
+		DEFVAL  { 15 }
+		::= { alcatelIND1UDLDMIBObjects 4 }
+	
+	    alaUdldGlobalConfigUdldDetectionPeriodTimer OBJECT-TYPE
+		SYNTAX  Unsigned32 (4 .. 15)
+		UNITS	"seconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Maximum period of time before which detection of neighbor is expected.
+		If Reply to the Sent Echo message/(s) is not received before, the 
+		timer for detection period expires, the link is detected as faulty and the 
+		associated port state is marked Undetermined/Shutdown (depending upon the 
+		UDLD operation-mode is Normal/Aggressive)."
+		DEFVAL  { 8 }
+		::= { alcatelIND1UDLDMIBObjects 5 }
+
+
+-- -------------------------------------------------------------
+-- UDLD Port Config Table
+-- -------------------------------------------------------------
+        
+--      DESCRIPTION:
+--                      "Port configuration information
+--   			 data for the UDLD Module.
+--			 Implementation of this group is mandantory"
+
+		
+	udldPortConfig  OBJECT IDENTIFIER ::= { alcatelIND1UDLDMIBObjects 6 }
+       
+        
+        alaUdldPortConfigTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaUdldPortConfigEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table containing UDLD port configuration information."
+            ::= { udldPortConfig 1 }
+            
+        alaUdldPortConfigEntry  OBJECT-TYPE
+            SYNTAX  AlaUdldPortConfigEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A UDLD port configuration entry."
+            INDEX { alaUdldPortConfigIfIndex }
+            ::= { alaUdldPortConfigTable 1 }
+
+        AlaUdldPortConfigEntry ::= SEQUENCE {
+	    alaUdldPortConfigIfIndex		InterfaceIndex,
+	    alaUdldPortConfigUdldStatus		INTEGER,
+	    alaUdldPortConfigUdldMode		INTEGER,
+	    alaUdldPortConfigUdldProbeIntervalTimer	Unsigned32,
+	    alaUdldPortConfigUdldDetectionPeriodTimer	Unsigned32,
+	    alaUdldPortConfigUdldOperationalStatus	INTEGER
+	    }
+	    
+	    alaUdldPortConfigIfIndex  OBJECT-TYPE
+	    SYNTAX  InterfaceIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "The ifindex of the port on which UDLD is running"
+	    ::= { alaUdldPortConfigEntry 1 }
+	    
+	    alaUdldPortConfigUdldStatus  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"This variable is used to enable or diable UDLD on the interface.
+		The value enable (1) indicates that UDLD should be enabled on 
+		the interface. The value disable (2) is used to disable UDLD on 
+		the interface. By default, UDLD is disabled on the interface."
+		DEFVAL  { disable }
+		::= { alaUdldPortConfigEntry 2 }
+	    
+	    
+	    alaUdldPortConfigUdldMode  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			normal (1),
+			aggressive (2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Defines the mode of operation of the UDLD protocol on the interface.
+		normal - The UDLD state machines participates normally in UDLD protocol 
+			exchanges. The protocol determination at the end of detection 
+			process is always based upon information received in UDLD messages.
+		aggressive - UDLD will shut down a port even in case it loses bidirectional 
+			connectivity with the neighbor for a defined period of time."
+		DEFVAL  { normal }
+		::= { alaUdldPortConfigEntry 3 }
+	    
+	    
+	    alaUdldPortConfigUdldProbeIntervalTimer OBJECT-TYPE
+		SYNTAX  Unsigned32  ( 7 .. 90 ) 
+		UNITS	"seconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Maximum period of time after which the Probe message is expected 
+		from the neighbor. The range supported is 7-90 seconds."
+		DEFVAL  { 15 }
+		::= { alaUdldPortConfigEntry 4 }
+	
+	    alaUdldPortConfigUdldDetectionPeriodTimer OBJECT-TYPE
+		SYNTAX  Unsigned32 (4 .. 15)
+		UNITS	"seconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Maximum period of time before which detection of neighbor is expected.
+		If Reply to the Sent Echo message/(s) is not received before, the 
+		timer for detection period expires, the link is detected as faulty and the 
+		associated port state is marked Undetermined/Shutdown (depending upon the 
+		UDLD operation-mode is Normal/Aggressive)."
+		DEFVAL  { 8 }
+		::= { alaUdldPortConfigEntry 5 }
+	
+	    alaUdldPortConfigUdldOperationalStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			notapplicable (0),
+			shutdown (1),
+			undetermined (2),
+			bidirectional (3) 
+			}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		"The state of the interface as determined by UDLD operation."
+		::= { alaUdldPortConfigEntry 6 }
+
+
+
+-- -------------------------------------------------------------
+-- UDLD Statistics Table
+-- -------------------------------------------------------------
+        
+--      DESCRIPTION:
+--                      "Statistics parameters information
+--   			 data for the UDLD Module.
+--			 Implementation of this group is mandantory"
+
+		
+	udldPortStats  OBJECT IDENTIFIER ::= { alcatelIND1UDLDMIBObjects 7 }
+        
+        alaUdldPortStatsTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaUdldPortStatsEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table containing UDLD statistics information."
+            ::= { udldPortStats 1 }
+            
+        alaUdldPortStatsEntry  OBJECT-TYPE
+            SYNTAX  AlaUdldPortStatsEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A UDLD Statistics entry (per port)."
+            INDEX { alaUdldPortStatsIfIndex }
+            ::= { alaUdldPortStatsTable 1 }
+
+        AlaUdldPortStatsEntry ::= SEQUENCE {
+	    alaUdldPortStatsIfIndex		InterfaceIndex,
+	    alaUdldNumUDLDNeighbors		Unsigned32,
+	    alaUdldPortStatsClear 		INTEGER,
+            alaUdldPortNumProbeSent             Counter32 ,
+            alaUdldPortNumEchoSent              Counter32,
+            alaUdldPortNumInvalidRcvd           Counter32,
+	    alaUdldPortNumFlushRcvd             Counter32
+	    }
+
+	alaUdldPortStatsIfIndex  OBJECT-TYPE
+	    SYNTAX  InterfaceIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "The ifindex of the port on which UDLD is running"
+	    ::= { alaUdldPortStatsEntry 1 }
+	    
+	alaUdldNumUDLDNeighbors OBJECT-TYPE
+	    SYNTAX  Unsigned32 ( 0 .. 128 )
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    "This object gives the number of neighbors for the interface."
+	    ::= { alaUdldPortStatsEntry 2 }
+
+	alaUdldPortStatsClear    OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    default(0),
+                    reset(1)
+                }
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION
+            "Reset all statistics parameters corresponding to this port.
+             By default, this objects contains a zero value."
+            DEFVAL  { default }
+            ::= { alaUdldPortStatsEntry 3}
+ 
+            alaUdldPortNumProbeSent OBJECT-TYPE
+              SYNTAX   Counter32 
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+              "Number of Probe message sent by a port."
+             ::= {alaUdldPortStatsEntry 4}
+
+           alaUdldPortNumEchoSent OBJECT-TYPE
+           SYNTAX   Counter32 
+           MAX-ACCESS  read-only
+           STATUS  current
+           DESCRIPTION 
+           "Number of Echo message sent by a port."
+           ::= {alaUdldPortStatsEntry 5}
+
+           alaUdldPortNumInvalidRcvd OBJECT-TYPE
+           SYNTAX  Counter32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION 
+           "Number of Invalid message received by a port."
+           ::= {alaUdldPortStatsEntry 6}
+
+	   alaUdldPortNumFlushRcvd OBJECT-TYPE
+	   SYNTAX  Counter32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+           "Number of UDLD-Flush message received by a port."
+           ::= {alaUdldPortStatsEntry 7}
+
+	udldPortNeighborStats  OBJECT IDENTIFIER ::= { alcatelIND1UDLDMIBObjects 8 }
+
+        alaUdldPortNeighborStatsTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaUdldPortNeighborStatsEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "UDLD port's PDU related statistics for a neighbor."
+            ::= { udldPortNeighborStats 1 }
+
+        alaUdldPortNeighborStatsEntry  OBJECT-TYPE
+            SYNTAX  AlaUdldPortNeighborStatsEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A UDLD Statistics entry (per port, per neighbor)."
+            INDEX { alaUdldPortNeighborStatsIfIndex, alaUdldNeighborIfIndex }
+            ::= { alaUdldPortNeighborStatsTable 1 }
+
+	AlaUdldPortNeighborStatsEntry ::= SEQUENCE {
+	    alaUdldPortNeighborStatsIfIndex	InterfaceIndex,
+	    alaUdldNeighborIfIndex	MacAddress,
+            alaUdldNeighborName         DisplayString,
+	    alaUdldNumHelloRcvd		Counter32,
+	    alaUdldNumEchoRcvd		Counter32
+	    }
+
+	alaUdldPortNeighborStatsIfIndex  OBJECT-TYPE
+	    SYNTAX  InterfaceIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "The ifindex of the port on which UDLD is running"
+	    ::= { alaUdldPortNeighborStatsEntry 1 }
+	    
+	alaUdldNeighborIfIndex  OBJECT-TYPE
+	    SYNTAX  MacAddress 
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "The index of the neighbor to which the Statistics belong"
+	    ::= { alaUdldPortNeighborStatsEntry 2 }
+
+	alaUdldNeighborName OBJECT-TYPE
+	    SYNTAX	DisplayString	(SIZE (0..255))
+	    MAX-ACCESS	read-only
+	    STATUS		current
+    	    DESCRIPTION
+	    "The name of the neighbor"
+	    DEFVAL	{ "" }
+	    ::=	{alaUdldPortNeighborStatsEntry 3}
+
+	alaUdldNumHelloRcvd OBJECT-TYPE
+	    SYNTAX  Counter32 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+    	    "This object gives the number of hello messages recieved from the neighbor for this interface."
+	    ::= { alaUdldPortNeighborStatsEntry 4 }
+
+	alaUdldNumEchoRcvd OBJECT-TYPE
+	    SYNTAX  Counter32 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+	    "This object gives the number of echo messages received from the neighbor for this interface."
+	    ::= { alaUdldPortNeighborStatsEntry 5 }
+
+
+
+
+-- --------------------------------------------------------------
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity, whenever the UDLD-state
+-- of a port gets changed -
+-- whenever UDLD state of any port changes from BIDIRECTIONAL to UNDETERMINED
+-- whenever UDLD state of any port changes from BIDIRECTIONAL to SHUTDOWN
+-- whenever UDLD state of any port changes from UNDETERMINED to SHUTDOWN
+-- whenever UDLD state of any port changes from UNDETERMINED to BIDIRECTIONAL 
+-- whenever UDLD state of any port changes from SHUTDOWN to BIDIRECTIONAL
+-- --------------------------------------------------------------
+ 
+	alaUdldPrevState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		notapplicable (0),
+		shutdown (1),
+		undetermined (2),
+		bidirectional (3) 
+	    }
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS  current
+	    DESCRIPTION
+	    "The previous UDLD state of the Port."
+	    ::= { alcatelIND1UDLDMIBObjects 9 }
+
+	alaUdldCurrentState OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		notapplicable (0),
+		shutdown (1),
+		undetermined (2),
+		bidirectional (3) 
+	    }
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS  current
+	    DESCRIPTION
+	    "The current UDLD state of the Port."
+	    ::= { alcatelIND1UDLDMIBObjects 10 }
+
+	alaUdldPortIfIndex  OBJECT-TYPE
+	    SYNTAX  InterfaceIndex
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS  current
+	    DESCRIPTION
+		 "The ifindex of the port on which UDLD trap is raised"
+	    ::= { alcatelIND1UDLDMIBObjects 11 }
+
+	alaUdldEvents OBJECT IDENTIFIER ::= { alcatelIND1UDLDMIB 3 }
+ 
+	udldStateChange NOTIFICATION-TYPE
+	OBJECTS  {  
+		alaUdldPortIfIndex,
+		alaUdldPrevState,
+		alaUdldCurrentState	
+	}
+        STATUS   current
+        DESCRIPTION
+                "The UDLD-state of port has changed. Notify the user by
+                 raising the Trap. Notify the Management Entity the previous 
+		 UDLD-state and UDLD-Current." 
+	::= { alaUdldEvents 0 1 }
+
+-- -------------------------------------------------------------
+	  
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+
+udldPortBaseGroup   OBJECT-GROUP
+   OBJECTS
+   {
+	alaUdldGlobalStatus,
+	alaUdldGlobalClearStats,
+	alaUdldPrevState,
+	alaUdldCurrentState,
+	alaUdldPortIfIndex
+   }
+  STATUS  current
+  DESCRIPTION
+  "Collection of objects for management of UDLD Base Group."
+  ::= { alcatelIND1UDLDMIBGroups 1 }
+
+udldPortConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+	alaUdldPortConfigUdldStatus,
+	alaUdldPortConfigUdldMode,
+	alaUdldPortConfigUdldProbeIntervalTimer,
+	alaUdldPortConfigUdldDetectionPeriodTimer,
+	alaUdldPortConfigUdldOperationalStatus
+   }
+   STATUS  current
+   DESCRIPTION
+	"Collection of objects for management of UDLD Port Configuration Table."
+   ::= { alcatelIND1UDLDMIBGroups 2 }
+
+udldPortStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaUdldNumUDLDNeighbors,
+        alaUdldPortStatsClear,
+        alaUdldPortNumProbeSent, 
+        alaUdldPortNumEchoSent,
+        alaUdldPortNumInvalidRcvd,
+	alaUdldPortNumFlushRcvd
+   }
+   STATUS  current
+   DESCRIPTION
+	"Collection of objects for management of UDLD Port Statistics Table."
+   ::= { alcatelIND1UDLDMIBGroups 3 }
+
+udldPortNeighborStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+	alaUdldNeighborName,
+	alaUdldNumHelloRcvd,
+	alaUdldNumEchoRcvd
+   }
+   STATUS  current
+   DESCRIPTION
+	"Collection of objects for management of UDLD Port Neighbor Statistics Table."
+   ::= { alcatelIND1UDLDMIBGroups 4 }
+
+udldPortTrapGroup NOTIFICATION-GROUP
+   NOTIFICATIONS
+   {
+	udldStateChange
+   }
+   STATUS  current
+   DESCRIPTION
+	"Collection of objects for UDLD Traps."
+   ::= { alcatelIND1UDLDMIBGroups 5 }
+
+-- ------------------------------------------------------------- 
+
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+alcatelIND1UDLDMIBCompliance MODULE-COMPLIANCE
+   STATUS    current
+   DESCRIPTION
+	"Compliance statement for UDLD."
+   MODULE
+	MANDATORY-GROUPS
+	{
+		udldPortBaseGroup,
+		udldPortConfigGroup,
+		udldPortStatsGroup,
+		udldPortNeighborStatsGroup,
+            udldPortTrapGroup
+	}
+   ::= { alcatelIND1UDLDMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+END

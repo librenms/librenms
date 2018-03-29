@@ -1,0 +1,1047 @@
+--
+-- Juniper Multi-Protocol Label Switched Paths MIB
+--
+-- Copyright (c) 1998-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- 
+
+MPLS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Counter32, Counter64, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+
+mpls MODULE-IDENTITY
+    LAST-UPDATED "200902231445Z" -- Mon Feb 23 14:45:55 2009 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+    DESCRIPTION
+        "The MIB module for Multi-Protocol Label Switched Paths."
+    REVISION
+        "200902231445Z"  -- Feb 23, 2009
+    DESCRIPTION
+        "Second revision; Deprecated mplsLspList, mplsLspEntry and all objects 
+         in that SEQUENCE. Introduced new table mplsLspInfoList, mplsLspInfoEntry 
+         to support LSP names greater than 32 characters"
+    ::= { jnxMibs 2 }
+
+-- For now, the MPLS MIB is an enterprise (Juniper Inc.) private MIB.
+
+mplsInfo   OBJECT IDENTIFIER ::= { mpls 1 }
+
+mplsVersion OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "MPLS version number."
+    ::= { mplsInfo 1 }
+
+mplsSignalingProto OBJECT-TYPE
+    SYNTAX     INTEGER {
+        none(1),
+        other(2),
+        rsvp(3),
+        ldp(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "MPLS signaling protocol."
+    ::= { mplsInfo 2 }
+
+mplsConfiguredLsps OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Number of configured LSPs."
+    ::= { mplsInfo 3 }
+
+mplsActiveLsps OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Number of active LSPs."
+    ::= { mplsInfo 4 }
+
+
+mplsTEInfo OBJECT IDENTIFIER ::= { mpls 2 }
+
+mplsTEDistProtocol OBJECT-TYPE
+    SYNTAX     INTEGER {
+               none(1),
+               isis(2),
+               ospf(3),
+               isis-ospf(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current  
+    DESCRIPTION
+        "IGP used to distribute Traffic Engineering
+         information and topology to each LSR for the
+         purpose of automatic path computation."
+    ::= { mplsTEInfo 1 }
+
+mplsAdminGroupList OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MplsAdminGroup
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "List of configured administrative groups.
+         Administrative groups are used to label links in
+         the Traffic Engineering topology in order to place
+         constraints (include and exclude) on LSP paths."
+
+    ::= { mplsTEInfo 2 }
+
+mplsAdminGroup OBJECT-TYPE
+    SYNTAX     MplsAdminGroup
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A mapping between a configured group number and its
+         human-readable name.  The group number should be
+         between 0 and 31, inclusive."
+    INDEX { mplsAdminGroupNumber }
+    ::= { mplsAdminGroupList 1 }
+
+MplsAdminGroup ::=
+    SEQUENCE {
+        mplsAdminGroupNumber    INTEGER,
+        mplsAdminGroupName      DisplayString
+    }
+
+mplsAdminGroupNumber OBJECT-TYPE
+    SYNTAX     INTEGER (0..31)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Index of the administrative group."
+    ::= { mplsAdminGroup 1 }
+
+mplsAdminGroupName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Name of the administrative group."
+    ::= { mplsAdminGroup 2 }
+
+
+mplsLspList OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MplsLspEntry
+    MAX-ACCESS not-accessible
+    STATUS     deprecated
+    DESCRIPTION 
+        "******* Deprecated Object ******
+        List of Configured Label Switched Paths. This object
+        has been deprecated and replaced by mplsLspInfoList"
+
+    ::= { mpls 3 }
+
+mplsLspEntry OBJECT-TYPE
+    SYNTAX     MplsLspEntry
+    MAX-ACCESS not-accessible
+    STATUS     deprecated
+    DESCRIPTION
+        "******* Deprecated Object ******
+        Entry containing information about a particular
+        Label Switched Path. This object has been deprecated 
+        and replaced by mplsLspInfoEntry"
+    INDEX { mplsLspName }
+    ::= { mplsLspList 1 }
+
+MplsLspEntry ::=
+    SEQUENCE {
+        mplsLspName             DisplayString,
+        mplsLspState            INTEGER,
+        mplsLspOctets           Counter64,
+        mplsLspPackets          Counter64,
+        mplsLspAge              TimeStamp,
+        mplsLspTimeUp           TimeStamp,
+        mplsLspPrimaryTimeUp    TimeStamp,
+        mplsLspTransitions      Counter32,
+        mplsLspLastTransition   TimeStamp,
+        mplsLspPathChanges      Counter32,
+        mplsLspLastPathChange   TimeStamp,
+        mplsLspConfiguredPaths  Integer32,
+        mplsLspStandbyPaths     Integer32,
+        mplsLspOperationalPaths Integer32,
+        mplsLspFrom             IpAddress,
+        mplsLspTo               IpAddress,
+        mplsPathName            DisplayString,
+        mplsPathType		INTEGER,
+        mplsPathExplicitRoute   OCTET STRING,
+        mplsPathRecordRoute     OCTET STRING,
+        mplsPathBandwidth       Integer32,
+        mplsPathCOS             INTEGER,
+        mplsPathInclude         Integer32,
+        mplsPathExclude         Integer32,
+        mplsPathSetupPriority   INTEGER,
+        mplsPathHoldPriority    INTEGER,
+        mplsPathProperties      INTEGER
+    }
+
+mplsLspName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (32))
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION 
+        "******* Deprecated Object ******
+         Name of the Label Switched Path.
+         This object has been deprecated and replaced by 
+         mplsLspInfoName"
+    ::= { mplsLspEntry 1 }
+
+mplsLspState OBJECT-TYPE
+    SYNTAX     INTEGER {
+               unknown(1),
+               up(2),
+               down(3),
+               notInService(4),
+               backupActive(5)
+    }
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION "The operational state of the LSP."
+    ::= { mplsLspEntry 2 }
+
+mplsLspOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The number of octets that have been forwarded
+         over current LSP active path. The number reported
+         is not realtime, may subject to several minutes
+         delay.  The delay is controllable by mpls statistics
+         gathering interval, which by default is once every
+         5 minutes.  If mpls statistics gathering is not
+         enabled, this number will not increment."
+    ::= { mplsLspEntry 3 }
+
+mplsLspPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The number of packets that have been forwarded
+         over current LSP active path. The number reported
+         is not realtime, may subject to several minutes
+         delay.  The delay is controllable by mpls statistics
+         gathering interval, which by default is once every
+         5 minutes.  If mpls statistics gathering is not
+         enabled, this number will not increment."
+    ::= { mplsLspEntry 4 }
+
+mplsLspAge OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The age (i.e., time from creation till now) of
+         this LSP in 10-millisecond periods."
+    ::= { mplsLspEntry 5 }
+
+mplsLspTimeUp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The total time in 10-millisecond units that this
+         LSP has been operational.  For example, the
+         percentage up time can be determined by computing
+         (mplsLspTimeUp/mplsLspAge * 100 %)."
+    ::= { mplsLspEntry 6 }
+
+mplsLspPrimaryTimeUp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The total time in 10-millisecond units that this
+         LSP's primary path has been operational.  For
+         example, the percentage contribution of the primary
+         path to the operational time is given by
+         (mplsLspPrimaryTimeUp/mplsLspTimeUp * 100) %."
+    ::= { mplsLspEntry 7 }
+
+mplsLspTransitions OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     deprecated 
+    DESCRIPTION
+        "The number of state transitions (up -> down and
+         down -> up) this LSP has undergone."
+    ::= { mplsLspEntry 8 }
+
+mplsLspLastTransition OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The time in 10-millisecond units since the last
+         transition occurred on this LSP."
+    ::= { mplsLspEntry 9 }
+
+mplsLspPathChanges OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The number of path changes this LSP has had. For
+	every path change (path down, path up, path change),
+	a corresponding syslog/trap (if enabled) is generated 
+	for it."
+    ::= { mplsLspEntry 10 }
+
+mplsLspLastPathChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The time in 10-millisecond units since the last
+         change occurred on this LSP."
+    ::= { mplsLspEntry 11 }
+
+mplsLspConfiguredPaths OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The number of paths configured for this LSP."
+    ::= { mplsLspEntry 12 }
+
+mplsLspStandbyPaths OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The number of standby paths configured for
+         this LSP."
+    ::= { mplsLspEntry 13 }
+
+mplsLspOperationalPaths OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The number of operational paths for this LSP.
+         This includes the path currently active, as
+         well as operational standby paths."
+    ::= { mplsLspEntry 14 }
+
+mplsLspFrom OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "Source IP address of this LSP."
+    ::= { mplsLspEntry 15 }
+
+mplsLspTo OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "Destination IP address of this LSP."
+    ::= { mplsLspEntry 16 }
+
+mplsPathName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..16))
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The name of the active path for this LSP, if
+         any.  If there is none, the name should be
+         empty; in that case, the rest of the fields
+         in mplsLspEntry are meaningless."
+    ::= { mplsLspEntry 17 }
+
+mplsPathType OBJECT-TYPE
+    SYNTAX     INTEGER {
+        other(1),
+        primary(2),
+        standby(3),
+        secondary(4),
+        bypass(5)
+    }
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The type of path that is active, i.e., a
+         primary path, a standby path, a generic
+         secondary path, or a bypass path.
+         The value other, primary, standby and
+         secondary apply to data LSPs, and are
+         meaningful only if mplsPathName is not
+         empty. The value bypass applies to
+         bypass tunnels. A bypass tunnel
+         may have an empty mplsPathName."
+    ::= { mplsLspEntry 18 }
+
+mplsPathExplicitRoute OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The explicit route used to set up this LSP.
+         This may either be the route configured by
+         the user, or a route automatically computed
+         to satisfy constraints set by the user. 
+	 This field is a displayable string in the
+	 format of XXX.XXX.XXX.XXX <space> S/L <newline>
+	 repeated for each explicit address. The S/L character
+	 stands for Strict/Loose route.
+	 This field is meaningless unless mplsPathName 
+	 is not empty"
+    ::= { mplsLspEntry 19 }
+
+mplsPathRecordRoute OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The route actually used for this path, as
+         recorded by the signaling protocol. 
+	 This field is a displayable string in the
+	 format of XXX.XXX.XXX.XXX <space> 
+	 repeated for each address. 
+	 This field is meaningless unless mplsPathName is 
+	 not empty"
+    ::= { mplsLspEntry 20 }
+
+mplsPathBandwidth OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The configured bandwidth for this LSP, in units
+         of thousands of bits per second (Kbps). This 
+	 field is meaningless unless mplsPathName is not empty"
+    ::= { mplsLspEntry 21 }
+
+mplsPathCOS OBJECT-TYPE
+    SYNTAX     INTEGER (0..7 | 255)
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The configured Class Of Service on this path.  If
+         the value is between 0 and 7 inclusive, this value
+         will be inserted in the 3 bit COS field in the
+         label.  If the value is 255, the value in the COS
+         field of the label will depend on other factors. 
+	 This field is meaningless unless mplsPathName is not empty"
+    ::= { mplsLspEntry 22 }
+
+mplsPathInclude OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "This is a configured set of colors (administrative
+         groups) specified as a bit vector (i.e., bit n is 1
+         if color n is in the set, where n = 0 is the LSB).
+         For each link that this path goes through, the
+         link MUST have colors associated with it, and
+         the intersection of the link's colors and the
+         'include' set MUST be non-null. This field is meaningless
+	 unless mplsPathName is not empty"
+    ::= { mplsLspEntry 23 }
+
+mplsPathExclude OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "This is a configured set of colors (administrative
+         groups) specified as a bit vector (i.e., bit n is 1
+         if color n is in the set, where n = 0 is the LSB).
+         For each link that this path goes through, the
+         link MUST have colors associated with it, and
+         the intersection of the link's colors and the
+         'exclude' set MUST be null. This field is meaningless
+	 unless mplsPathName is not empty"
+    ::= { mplsLspEntry 24 }
+
+mplsPathSetupPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The setup priority configured for this path. This 
+	field is meaningless unless mplsPathName is not empty"
+    ::= { mplsLspEntry 25 }
+
+mplsPathHoldPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The hold priority configured for this path. This 
+	field is meaningless unless mplsPathName is not empty"
+    ::= { mplsLspEntry 26 }
+
+mplsPathProperties OBJECT-TYPE
+    SYNTAX     INTEGER {
+               record-route(1),
+               adaptive(2),
+               cspf(4),
+               mergeable(8),
+               preemptable(16),
+               preemptive(32),
+               fast-reroute(64)
+    }
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+        "The set of configured properties for this path,
+         expressed as a bit map.  For example, if the path
+         is an adaptive path, the bit corresponding to bit
+         value xxx is set. This field is meaningless
+	 unless mplsPathName is not empty"
+    ::= { mplsLspEntry 27 }
+
+--
+-- New MIB table for handling LSP names > 32 characters
+--
+
+mplsLspInfoList OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MplsLspInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "List of Configured Label Switched Paths."
+
+    ::= { mpls 5 }
+
+mplsLspInfoEntry OBJECT-TYPE
+    SYNTAX     MplsLspInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Entry containing information about a particular
+         Label Switched Path."
+    INDEX { IMPLIED mplsLspInfoName }
+    ::= { mplsLspInfoList 1 }
+
+MplsLspInfoEntry ::=
+    SEQUENCE {
+        mplsLspInfoName             DisplayString,
+        mplsLspInfoState            INTEGER,
+        mplsLspInfoOctets           Counter64,
+        mplsLspInfoPackets          Counter64,
+        mplsLspInfoAge              TimeStamp,
+        mplsLspInfoTimeUp           TimeStamp,
+        mplsLspInfoPrimaryTimeUp    TimeStamp,
+        mplsLspInfoTransitions      Counter32,
+        mplsLspInfoLastTransition   TimeStamp,
+        mplsLspInfoPathChanges      Counter32,
+        mplsLspInfoLastPathChange   TimeStamp,
+        mplsLspInfoConfiguredPaths  Integer32,
+        mplsLspInfoStandbyPaths     Integer32,
+        mplsLspInfoOperationalPaths Integer32,
+        mplsLspInfoFrom             IpAddress,
+        mplsLspInfoTo               IpAddress,
+        mplsPathInfoName            DisplayString,
+        mplsPathInfoType            INTEGER,
+        mplsPathInfoExplicitRoute   OCTET STRING,
+        mplsPathInfoRecordRoute     OCTET STRING,
+        mplsPathInfoBandwidth       Integer32,
+        mplsPathInfoCOS             INTEGER,
+        mplsPathInfoInclude         Integer32,
+        mplsPathInfoExclude         Integer32,
+        mplsPathInfoSetupPriority   INTEGER,
+        mplsPathInfoHoldPriority    INTEGER,
+        mplsPathInfoProperties      INTEGER,
+        mplsLspInfoAggrOctets       Counter64,
+        mplsLspInfoAggrPackets      Counter64,
+        mplsPathInfoRecordRouteWithLabels     OCTET STRING
+    }
+
+mplsLspInfoName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION 
+         "Name of the Label Switched Path."
+    ::= { mplsLspInfoEntry 1 }
+
+mplsLspInfoState OBJECT-TYPE
+    SYNTAX     INTEGER {
+               unknown(1),
+               up(2),
+               down(3),
+               notInService(4),
+               backupActive(5)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The operational state of the LSP."
+    ::= { mplsLspInfoEntry 2 }
+
+mplsLspInfoOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have been forwarded
+         over current LSP active path. The number reported
+         is not realtime, may subject to several minutes
+         delay.  The delay is controllable by mpls statistics
+         gathering interval, which by default is once every
+         5 minutes.  If mpls statistics gathering is not
+         enabled, this number will not increment."
+    ::= { mplsLspInfoEntry 3 }
+
+mplsLspInfoPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been forwarded
+         over current LSP active path. The number reported
+         is not realtime, may subject to several minutes
+         delay.  The delay is controllable by mpls statistics
+         gathering interval, which by default is once every
+         5 minutes.  If mpls statistics gathering is not
+         enabled, this number will not increment."
+    ::= { mplsLspInfoEntry 4 }
+
+mplsLspInfoAge OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The age (i.e., time from creation till now) of
+         this LSP in 10-millisecond periods."
+    ::= { mplsLspInfoEntry 5 }
+
+mplsLspInfoTimeUp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this
+         LSP has been operational.  For example, the
+         percentage up time can be determined by computing
+         (mplsLspInfoTimeUp/mplsLspInfoAge * 100 %)."
+    ::= { mplsLspInfoEntry 6 }
+
+mplsLspInfoPrimaryTimeUp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this
+         LSP's primary path has been operational.  For
+         example, the percentage contribution of the primary
+         path to the operational time is given by
+         (mplsLspInfoPrimaryTimeUp/mplsLspInfoTimeUp * 100) %."
+    ::= { mplsLspInfoEntry 7 }
+
+mplsLspInfoTransitions OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of state transitions (up -> down and
+         down -> up) this LSP has undergone."
+    ::= { mplsLspInfoEntry 8 }
+
+mplsLspInfoLastTransition OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The time in 10-millisecond units since the last
+         transition occurred on this LSP."
+    ::= { mplsLspInfoEntry 9 }
+
+mplsLspInfoPathChanges OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of path changes this LSP has had. For
+	every path change (path down, path up, path change),
+	a corresponding syslog/trap (if enabled) is generated 
+	for it."
+    ::= { mplsLspInfoEntry 10 }
+
+mplsLspInfoLastPathChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The time in 10-millisecond units since the last
+         change occurred on this LSP."
+    ::= { mplsLspInfoEntry 11 }
+
+mplsLspInfoConfiguredPaths OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of paths configured for this LSP."
+    ::= { mplsLspInfoEntry 12 }
+
+mplsLspInfoStandbyPaths OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of standby paths configured for
+         this LSP."
+    ::= { mplsLspInfoEntry 13 }
+
+mplsLspInfoOperationalPaths OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of operational paths for this LSP.
+         This includes the path currently active, as
+         well as operational standby paths."
+    ::= { mplsLspInfoEntry 14 }
+
+mplsLspInfoFrom OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Source IP address of this LSP."
+    ::= { mplsLspInfoEntry 15 }
+
+mplsLspInfoTo OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Destination IP address of this LSP."
+    ::= { mplsLspInfoEntry 16 }
+
+mplsPathInfoName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The name of the active path for this LSP, if
+         any.  If there is none, the name should be
+         empty; in that case, the rest of the fields
+         in mplsLspInfoEntry are meaningless."
+    ::= { mplsLspInfoEntry 17 }
+
+mplsPathInfoType OBJECT-TYPE
+    SYNTAX     INTEGER {
+        other(1),
+        primary(2),
+        standby(3),
+        secondary(4),
+        bypass(5)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of path that is active, i.e., a
+         primary path, a standby path, a generic
+         secondary path, or a bypass path.
+         The value other, primary, standby and
+         secondary apply to data LSPs, and are
+         meaningful only if mplsPathInfoName is not
+         empty. The value bypass applies to
+         bypass tunnels. A bypass tunnel
+         may have an empty mplsPathInfoName."
+    ::= { mplsLspInfoEntry 18 }
+
+mplsPathInfoExplicitRoute OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The explicit route used to set up this LSP.
+         This may either be the route configured by
+         the user, or a route automatically computed
+         to satisfy constraints set by the user. 
+	 This field is a displayable string in the
+	 format of XXX.XXX.XXX.XXX <space> S/L <newline>
+	 repeated for each explicit address. The S/L character
+	 stands for Strict/Loose route.
+	 This field is meaningless unless mplsPathInfoName 
+	 is not empty"
+    ::= { mplsLspInfoEntry 19 }
+
+mplsPathInfoRecordRoute OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The route actually used for this path, as
+         recorded by the signaling protocol. 
+	 This field is a displayable string in the
+	 format of XXX.XXX.XXX.XXX <space> 
+	 repeated for each address. 
+	 This field is meaningless unless mplsPathInfoName is 
+	 not empty"
+    ::= { mplsLspInfoEntry 20 }
+
+mplsPathInfoBandwidth OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The configured bandwidth for this LSP, in units
+         of thousands of bits per second (Kbps). This 
+	 field is meaningless unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 21 }
+
+mplsPathInfoCOS OBJECT-TYPE
+    SYNTAX     INTEGER (0..7 | 255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The configured Class Of Service on this path.  If
+         the value is between 0 and 7 inclusive, this value
+         will be inserted in the 3 bit COS field in the
+         label.  If the value is 255, the value in the COS
+         field of the label will depend on other factors. 
+	 This field is meaningless unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 22 }
+
+mplsPathInfoInclude OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This is a configured set of colors (administrative
+         groups) specified as a bit vector (i.e., bit n is 1
+         if color n is in the set, where n = 0 is the LSB).
+         For each link that this path goes through, the
+         link MUST have colors associated with it, and
+         the intersection of the link's colors and the
+         'include' set MUST be non-null. This field is meaningless
+	 unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 23 }
+
+mplsPathInfoExclude OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This is a configured set of colors (administrative
+         groups) specified as a bit vector (i.e., bit n is 1
+         if color n is in the set, where n = 0 is the LSB).
+         For each link that this path goes through, the
+         link MUST have colors associated with it, and
+         the intersection of the link's colors and the
+         'exclude' set MUST be null. This field is meaningless
+	 unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 24 }
+
+mplsPathInfoSetupPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The setup priority configured for this path. This 
+	field is meaningless unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 25 }
+
+mplsPathInfoHoldPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The hold priority configured for this path. This 
+	field is meaningless unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 26 }
+
+mplsPathInfoProperties OBJECT-TYPE
+    SYNTAX     INTEGER {
+               record-route(1),
+               adaptive(2),
+               cspf(4),
+               mergeable(8),
+               preemptable(16),
+               preemptive(32),
+               fast-reroute(64)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The set of configured properties for this path,
+         expressed as a bit map.  For example, if the path
+         is an adaptive path, the bit corresponding to bit
+         value xxx is set. This field is meaningless
+	 unless mplsPathInfoName is not empty"
+    ::= { mplsLspInfoEntry 27 }
+
+mplsLspInfoAggrOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets that have beeen forwarded over
+         current LSP. This is an aggregate count of octets
+         forwarded over all LSP instances from the time
+         LSP was up. The number reported is not realtime, may
+         be subject to several minutes delay.  The delay is
+         controllable by mpls statistics gathering interval,
+         which by default is once every 5 minutes.  If mpls
+         statistics gathering is not enabled, this number will
+         not increment."
+    ::= { mplsLspInfoEntry 28 }
+
+mplsLspInfoAggrPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets that have been forwarded over
+         current LSP. This is an aggregate count of packets
+         forwarded over all LSP instances from the time
+         LSP was up. The number reported is not realtime, may
+         be subject to several minutes delay. The delay is
+         controllable by mpls statistics gathering interval,
+         which by default is once every 5 minutes. If mpls
+         statistics gathering is not enabled, this number will
+         not increment."
+    ::= { mplsLspInfoEntry 29 }
+
+mplsPathInfoRecordRouteWithLabels OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The route actually used for this path, as
+         recorded by the signaling protocol.
+         This field is a displayable string in the
+         format of XXX.XXX.XXX.XXX <flag/label> <space>
+         repeated for each address.
+         This field is meaningless unless mplsPathInfoName is
+         not empty"
+   ::= { mplsLspInfoEntry 30 }
+
+--
+-- definition of MPLS traps
+--
+    mplsTraps OBJECT IDENTIFIER ::= { mpls 4 }
+
+    mplsLspUp NOTIFICATION-TYPE
+        OBJECTS         { mplsLspName,
+                          mplsPathName }  -- LspPath
+        STATUS          deprecated
+        DESCRIPTION
+                "An mplsLspUp trap signifies that the 
+		specified LSP is up. The current active
+                path for the LSP is mplsPathName."
+        ::= { mplsTraps 1 }
+    
+    mplsLspDown NOTIFICATION-TYPE
+        OBJECTS         { mplsLspName,
+                          mplsPathName }  -- LspPath
+        STATUS          deprecated
+        DESCRIPTION
+                "An mplsLspDown trap signifies that the 
+		specified LSP is down, because the current
+                active path mplsPathName went down."
+        ::= { mplsTraps 2 } 
+    
+    mplsLspChange NOTIFICATION-TYPE
+        OBJECTS         { mplsLspName,
+                          mplsPathName }  -- toLspPath
+        STATUS          deprecated
+        DESCRIPTION
+                "An mplsLspChange trap signifies that the
+                the specified LSP has switched traffic to 
+		the new active path 'toLspPath'. The LSP maintains
+		up state before and after the switch over" 
+        ::= { mplsTraps 3 }
+
+    mplsLspPathDown NOTIFICATION-TYPE
+        OBJECTS         { mplsLspName,
+                          mplsPathName }  -- LspPath
+        STATUS          deprecated
+        DESCRIPTION
+                "An mplsLspPathDown trap signifies that the 
+		specified path mplsPathName for the specified
+		LSP mplsLspName went down"
+        ::= { mplsTraps 4 } 
+
+    mplsLspPathUp NOTIFICATION-TYPE
+        OBJECTS         { mplsLspName,
+                          mplsPathName }  -- LspPath
+        STATUS          deprecated
+        DESCRIPTION
+                "An mplsLspPathUp trap signifies that the 
+		specified path mplsPathName for the specified
+		LSP mplsLspName came up"
+        ::= { mplsTraps 5 }
+
+--
+-- definition of MPLS traps based on mplsLspInfoName
+--
+
+    mplsLspTraps OBJECT IDENTIFIER ::= { mpls 0 }
+
+    mplsLspInfoUp NOTIFICATION-TYPE
+        OBJECTS         { mplsLspInfoName,
+                          mplsPathInfoName }  -- LspPath
+        STATUS          current
+        DESCRIPTION
+                "An mplsLspInfoUp trap signifies that the 
+		specified LSP is up. The current active
+                path for the LSP is mplsPathInfoName."
+        ::= { mplsLspTraps 1 }
+    
+    mplsLspInfoDown NOTIFICATION-TYPE
+        OBJECTS         { mplsLspInfoName,
+                          mplsPathInfoName }  -- LspPath
+        STATUS          current
+        DESCRIPTION
+                "An mplsLspInfoDown trap signifies that the 
+		specified LSP is down, because the current
+                active path mplsPathInfoName went down."
+        ::= { mplsLspTraps 2 } 
+    
+    mplsLspInfoChange NOTIFICATION-TYPE
+        OBJECTS         { mplsLspInfoName,
+                          mplsPathInfoName }  -- toLspPath
+        STATUS          current
+        DESCRIPTION
+                "An mplsLspInfoChange trap signifies that the
+                the specified LSP has switched traffic to 
+		the new active path 'toLspPath'. The LSP maintains
+		up state before and after the switch over" 
+        ::= { mplsLspTraps 3 }
+
+    mplsLspInfoPathDown NOTIFICATION-TYPE
+        OBJECTS         { mplsLspInfoName,
+                          mplsPathInfoName }  -- LspPath
+        STATUS          current
+        DESCRIPTION
+                "An mplsLspInfoPathDown trap signifies that the 
+		specified path mplsPathName for the specified
+		LSP mplsLspInfoName went down"
+        ::= { mplsLspTraps 4 } 
+
+    mplsLspInfoPathUp NOTIFICATION-TYPE
+        OBJECTS         { mplsLspInfoName,
+                          mplsPathInfoName }  -- LspPath
+        STATUS          current
+        DESCRIPTION
+                "An mplsLspInfoPathUp trap signifies that the 
+		specified path mplsPathName for the specified
+		LSP mplsLspInfoName came up"
+        ::= { mplsLspTraps 5 }
+
+END
+

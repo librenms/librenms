@@ -1,0 +1,1120 @@
+-- *****************************************************************
+-- CISCO-OPTICAL-MONITOR-MIB.my
+--
+-- May 2002, Sonal Maheshwari, Mickey Spiegel
+--
+-- Copyright (c) 2002 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+CISCO-OPTICAL-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Unsigned32,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    TimeStamp                           FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+    ifIndex                             FROM IF-MIB
+    ciscoMgmt                           FROM CISCO-SMI
+;
+
+ciscoOpticalMonitorMIB MODULE-IDENTITY
+    LAST-UPDATED   "200205100000Z"
+    ORGANIZATION   "Cisco Systems, Inc."
+    CONTACT-INFO   "Cisco Systems
+                    Customer Service
+
+                    Postal: 170 W Tasman Drive
+                    San Jose, CA 95134
+
+                    Tel: +1 800 553-NETS
+
+                    E-mail: cs-dwdm@cisco.com"
+    DESCRIPTION
+        "This MIB module defines objects to monitor optical
+        characteristics and set corresponding thresholds on the
+        optical interfaces in a network element.
+        "
+        REVISION   "200205100000Z"
+        DESCRIPTION
+            "The initial revision of this MIB."
+        ::={ ciscoMgmt 264 }
+
+
+-- Textual Conventions
+
+OpticalParameterType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the optical parameter that is
+        being monitored. Valid values are -
+
+        power (1)          : Optical Power (AC + DC) in 1/10ths of dBm
+        acPower (2)        : Optical AC Power in 1/10ths of dBm
+        ambientTemp (3)    : Ambient Temperature in 1/10ths of degrees
+                             centigrade
+        laserTemp (4)      : Laser Temperature in 1/10ths of degrees
+                             centigrade
+        biasCurrent (5)    : Laser bias current in 100s of microamperes
+        peltierCurrent (6) : Laser peltier current in milliamperes
+        xcvrVoltage (7)    : Transceiver voltage in millivolts
+        "
+    SYNTAX    INTEGER {
+                  power(1),
+                  acPower(2),
+                  ambientTemp(3),
+                  laserTemp(4),
+                  biasCurrent(5),
+                  peltierCurrent(6),
+                  xcvrVoltage(7)
+              }
+
+
+OpticalParameterValue ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "The value of the optical parameter that is being monitored.
+
+        The range of values varies depending on the type of optical
+        parameter being monitored, as identified by a corresponding
+        object with syntax OpticalParameterType.
+
+        When the optical parameter being monitored is 'power' or
+        'acPower', the supported range is from -400 to 250, in
+        1/10ths of dBm.
+        Example: A value of -300 represents a power level of -30.0 dBm.
+
+        When the optical parameter being monitored is 'laserTemp' or
+        'ambientTemp', the supported range is from -500 to 850, in
+        1/10ths of degrees centigrade.
+        Example: A value of 235 represents a temperature reading of
+        23.5 degrees C.
+
+        When the optical parameter being monitored is 'biasCurrent',
+        the supported range is from 0 to 10000, in 100s of
+        microamperes.
+        Example: A value of 500 represents a bias current reading of
+        50,000 microamperes.
+
+        When the optical parameter being monitored is 'peltierCurrent',
+        the supported range is from -10000 to 10000, in milliamperes.
+
+        When the optical parameter being monitored is 'xcvrVoltage',
+        the supported range is from 0 to 10000, in millivolts.
+
+        The distinguished value of '-1000000' indicates that the object
+        has not yet been initialized or does not apply.
+        "
+    SYNTAX    Integer32 ( -1000000..1000000 )
+
+
+OpticalIfDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value indicates the direction being monitored at
+        the optical interface.
+        "
+    SYNTAX      INTEGER {
+                    receive(1),
+                    transmit(2),
+                    notApplicable(3)
+                }
+
+
+OpticalIfMonLocation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value applies when there are multiple points
+        at which optical characteristics can be measured, in the
+        given direction, at an interface. It indicates whether the
+        optical characteristics are measured before or after
+        adjustment (e.g. optical amplification or attenuation).
+
+        The codepoint 'notApplicable' should be used if no
+        amplifier/attenuator exists at an interface.
+        "
+    SYNTAX      INTEGER {
+                    beforeAdjustment(1),
+                    afterAdjustment(2),
+                    notApplicable(3)
+                }
+
+
+OpticalAlarmStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A bitmap that indicates the current status of thresholds
+        on an interface. The bit is set to 1 if the threshold is
+        currently being exceeded on the interface and will be set to 0
+        otherwise.
+
+        (MSB)                (LSB)
+          7  6  5  4  3  2  1  0
+         +----------------------+
+         |                      |
+         +----------------------+
+                      |  |  |  |
+                      |  |  |  +-- High alarm threshold
+                      |  |  +----- High warning threshold
+                      |  +-------- Low alarm threshold
+                      +----------- Low warning threshold
+
+        To minimize the probability of prematurely reacting to
+        momentary signal variations, a soak time may be incorporated
+        into the status indications in the following manner.
+        The indication is set when the threshold violation persists
+        for a period of time that exceeds the set soak interval.
+        The indication is cleared  when no threshold violation occurs
+        for a period of time which exceeds the clear soak interval.
+        In GR-2918-CORE, the recommended set soak interval is 2.5
+        seconds (plus/minus 0.5 seconds), and the recommended clear
+        soak interval is 10 seconds (plus/minus 0.5 seconds).
+        "
+    REFERENCE   "Telcordia Technologies Generic Requirements
+                GR-2918-CORE, Issue 4, December 1999, Section 8.11"
+    SYNTAX      OCTET STRING (SIZE(1))
+
+
+OpticalAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The severity of a trouble condition. A smaller enumerated
+        integer value indicates that the condition is more severe.
+
+        The severities are defined as follows:
+
+        'critical'    An alarm used to indicate a severe,
+                      service-affecting condition has occurred and that
+                      immediate corrective action is imperative,
+                      regardless of the time of day or day of the week.
+
+        'major'       An alarm used for hardware or software conditions
+                      that indicate a serious disruption of service or
+                      malfunctioning or failure of important hardware.
+                      These troubles require the immediate attention and
+                      response of a technician to restore or maintain
+                      system capability. The urgency is less than in
+                      critical situations because of a lesser immediate
+                      or impending effect on service or system
+                      performance.
+
+        'minor'       An alarm used for troubles that do not have a
+                      serious effect on service to customers or for
+                      troubles in hardware that are not essential to
+                      the operation of the system.
+
+        'notAlarmed'  An event used for troubles that do not require
+                      action, for troubles that are reported as a
+                      result of manually initiated diagnostics, or for
+                      transient events such as crossing warning
+                      thresholds.  This event can also be used to
+                      raise attention to a condition that could
+                      possibly be an impending problem.
+
+        'notReported' An event used for troubles similar to those
+                      described under 'notAlarmed', and that
+                      do not cause notifications to be generated. The
+                      information for these events is retrievable from
+                      the network element.
+
+        'cleared'     This value indicates that a previously
+                      occuring alarm condition has been cleared, or
+                      that no trouble condition is present.
+
+        "
+    REFERENCE   "Telcordia Technologies Generic Requirements
+                GR-474-CORE, Issue 1, December 1997, Section 2.2"
+    SYNTAX      INTEGER {
+                    critical(1),
+                    major(2),
+                    minor(3),
+                    notAlarmed(4),
+                    notReported(5),
+                    cleared(6)
+                }
+
+
+OpticalAlarmSeverityOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value of either '0' or a valid optical alarm severity."
+    SYNTAX      INTEGER (0..6)
+
+
+OpticalPMPeriod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value indicates the time period over which performance
+        monitoring data has been collected."
+    SYNTAX      INTEGER {
+                    fifteenMin(1),
+                    twentyFourHour(2)
+                }
+
+-- MIB Object Definitions
+
+cOpticalMonitorMIBObjects        OBJECT IDENTIFIER ::=
+                                        {ciscoOpticalMonitorMIB 1 }
+
+-- groups in this MIB module
+
+cOpticalMonGroup                OBJECT IDENTIFIER ::=
+                                        {cOpticalMonitorMIBObjects 1 }
+
+cOpticalPMGroup                 OBJECT IDENTIFIER ::=
+                                        {cOpticalMonitorMIBObjects 2 }
+
+-- cOpticalMonTable
+
+cOpticalMonTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF COpticalMonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides objects to monitor optical
+        parameters in a network element. It also provides
+        objects for setting high and low threshold levels, with
+        configurable severities, on these monitored parameters."
+    ::={ cOpticalMonGroup 1 }
+
+cOpticalMonEntry OBJECT-TYPE
+    SYNTAX      COpticalMonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the cOpticalMonTable provides objects to
+        monitor an optical parameter and set threshold levels
+        on that parameter, at an optical interface.
+
+        Note that the set of monitored optical parameters may vary
+        based on interface type, direction, and monitoring location.
+
+        Examples of interfaces that can have an entry in this table
+        include optical transceivers, interfaces before and after
+        optical amplifiers, and interfaces before and after optical
+        attenuators."
+    INDEX        { ifIndex, cOpticalMonDirection,
+                   cOpticalMonLocation, cOpticalMonParameterType }
+    ::={ cOpticalMonTable 1 }
+
+
+COpticalMonEntry ::= SEQUENCE {
+    cOpticalMonDirection                OpticalIfDirection,
+    cOpticalMonLocation                 OpticalIfMonLocation,
+    cOpticalMonParameterType            OpticalParameterType,
+    cOpticalParameterValue              OpticalParameterValue,
+    cOpticalParamHighAlarmThresh        OpticalParameterValue,
+    cOpticalParamHighAlarmSev           OpticalAlarmSeverity,
+    cOpticalParamHighWarningThresh      OpticalParameterValue,
+    cOpticalParamHighWarningSev         OpticalAlarmSeverity,
+    cOpticalParamLowAlarmThresh         OpticalParameterValue,
+    cOpticalParamLowAlarmSev            OpticalAlarmSeverity,
+    cOpticalParamLowWarningThresh       OpticalParameterValue,
+    cOpticalParamLowWarningSev          OpticalAlarmSeverity,
+    cOpticalParamAlarmStatus            OpticalAlarmStatus,
+    cOpticalParamAlarmCurMaxThresh      OpticalParameterValue,
+    cOpticalParamAlarmCurMaxSev         OpticalAlarmSeverity,
+    cOpticalParamAlarmLastChange        TimeStamp,
+    cOpticalMon15MinValidIntervals      Unsigned32,
+    cOpticalMon24HrValidIntervals       Unsigned32
+}
+
+cOpticalMonDirection OBJECT-TYPE
+    SYNTAX      OpticalIfDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the direction monitored for the
+        optical interface, in this entry."
+    ::={ cOpticalMonEntry 1 }
+
+cOpticalMonLocation OBJECT-TYPE
+    SYNTAX      OpticalIfMonLocation
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical characteristics are
+        measured before or after adjustment (e.g. optical amplification
+        or attenuation), at this interface."
+    ::={ cOpticalMonEntry 2 }
+
+cOpticalMonParameterType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored in this entry."
+    ::={ cOpticalMonEntry 3 }
+
+cOpticalParameterValue OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the value measured for the particular
+        optical parameter specified by the cOpticalMonParameterType
+        object."
+    ::={ cOpticalMonEntry 4 }
+
+cOpticalParamHighAlarmThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a high alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        cOpticalParameterValue goes from below the value configured in
+        this object to above the value configured in this object, or if
+        the initial value of cOpticalParameterValue exceeds the value
+        configured in this object. For network elements that
+        incorporate a soak time in the status indications, this alarm
+        will be indicated in the cOpticalParamAlarmStatus object only
+        after it persists for a period of time that equals the set soak
+        interval.
+
+        The severity level of the alarm is specified by the
+        cOpticalParamHighAlarmSev object.
+
+        When the cOpticalMonParameterType object is set to 'power'
+        for the receive direction at a transceiver, this object
+        specifies the receiver saturation level."
+    ::={ cOpticalMonEntry 5 }
+
+cOpticalParamHighAlarmSev OBJECT-TYPE
+    SYNTAX      OpticalAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to specify a severity level associated
+        with the high alarm threshold given by the
+        cOpticalParamHighAlarmThresh object. The values 'notAlarmed',
+        'notReported', and 'cleared' do not apply.
+
+        The severity level configured in this object must be higher
+        than the level configured in the cOpticalParamHighWarningSev
+        object."
+    ::={ cOpticalMonEntry 6 }
+
+cOpticalParamHighWarningThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a high warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by cOpticalParameterValue goes from below the value
+        configured in this object to above the value configured in this
+        object, or if the initial value of cOpticalParameterValue
+        exceeds the value configured in this object. For network
+        elements that incorporate a soak time in the status
+        indications, this threshold violation will be indicated in the
+        cOpticalParamAlarmStatus object only after it persists for
+        a period of time that equals the set soak interval.
+
+        This threshold crossing may or may not be alarmed or
+        reported, based on the severity level specified by the
+        cOpticalParamHighWarningSev object."
+    ::={ cOpticalMonEntry 7 }
+
+cOpticalParamHighWarningSev OBJECT-TYPE
+    SYNTAX      OpticalAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to specify a severity level associated
+        with the high warning threshold given by the
+        cOpticalParamHighWarningThresh object. The values 'critical',
+        'major', and 'cleared' do not apply.
+
+        The severity level configured in this object must be lower
+        than the level configured in the cOpticalParamHighAlarmSev
+        object.
+
+        If this object is set to 'notReported', no notifications will
+        be generated when this threshold is exceeded, irrespective
+        of the value configured in the cOpticalNotifyEnable object."
+    ::={ cOpticalMonEntry 8 }
+
+cOpticalParamLowAlarmThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        cOpticalParameterValue goes from above the value configured in
+        this object to below the value configured in this object, or if
+        the initial value of cOpticalParameterValue is lower than the
+        value configured in this object. For network elements that
+        incorporate a soak time in the status indications, this alarm
+        will be indicated in the cOpticalParamAlarmStatus object only
+        after it persists for a period of time that equals the set soak
+        interval.
+
+        The severity level of this alarm is specified by the
+        cOpticalParamLowAlarmSev object.
+
+        When the cOpticalMonParameterType object is set to 'power'
+        for the receive direction and when the interface supports
+        alarms based on loss of light, this object specifies the
+        optical power threshold for declaring loss of light. Also,
+        when optical amplifiers are present in the network, in the
+        receive direction, this value may need to be configured,
+        since the noise floor may be higher than the minimum
+        sensitivity of the receiver."
+    ::={ cOpticalMonEntry 9 }
+
+cOpticalParamLowAlarmSev OBJECT-TYPE
+    SYNTAX      OpticalAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to specify a severity level associated
+        with the low alarm threshold given by the
+        cOpticalParamLowAlarmThresh object. The values 'notAlarmed',
+        'notReported', and 'cleared' do not apply.
+
+        The severity level configured in this object must be higher
+        than the level configured in the cOpticalParamLowWarningSev
+        object."
+    ::={ cOpticalMonEntry 10 }
+
+cOpticalParamLowWarningThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by cOpticalParameterValue goes from above the value
+        configured in this object to below the value configured in this
+        object, or if the initial value of cOpticalParameterValue
+        object is lower than the value configured in this object. For
+        network elements that incorporate a soak time in the status
+        indications, this threshold violation will be indicated in the
+        cOpticalParamAlarmStatus object only after it persists for
+        a period of time that equals the set soak interval.
+
+        This threshold crossing may or may not be alarmed or
+        reported, based on the severity level specified by the
+        cOpticalParamLowWarningSev object."
+    ::={ cOpticalMonEntry 11 }
+
+cOpticalParamLowWarningSev OBJECT-TYPE
+    SYNTAX      OpticalAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to specify a severity level associated
+        with the low warning threshold given by the
+        cOpticalParamLowWarningThresh object. The values 'critical',
+        'major', and 'cleared' do not apply.
+
+        The severity level configured in this object must be lower
+        than the level configured in the cOpticalParamLowAlarmSev
+        object.
+
+        If this object is set to 'notReported', no notifications will
+        be generated when this threshold is exceeded, irrespective
+        of the value configured in the cOpticalNotifyEnable object."
+    ::={ cOpticalMonEntry 12 }
+
+cOpticalParamAlarmStatus OBJECT-TYPE
+    SYNTAX      OpticalAlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to indicate the current status of
+        the thresholds for the monitored optical parameter
+        on the interface.
+
+        If a threshold is currently being exceeded on the
+        interface, the corresponding bit in this object will be set
+        to 1. Otherwise, the bit will be set to 0."
+    ::={ cOpticalMonEntry 13 }
+
+cOpticalParamAlarmCurMaxThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the threshold value of the highest
+        severity threshold that is currently being exceeded
+        on the interface, for the optical parameter.
+        If no threshold value is currently being
+        exceeded, then the value '-1000000' is returned."
+    ::={ cOpticalMonEntry 14 }
+
+cOpticalParamAlarmCurMaxSev OBJECT-TYPE
+    SYNTAX      OpticalAlarmSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the maximum severity of any thresholds
+        that are currently being exceeded on the interface, for the
+        optical parameter."
+    ::={ cOpticalMonEntry 15 }
+
+cOpticalParamAlarmLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        a threshold related to a particular optical parameter was
+        exceeded or cleared on the interface."
+    ::={ cOpticalMonEntry 16 }
+
+cOpticalMon15MinValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 15 minute
+        intervals for which valid performance monitoring data
+        has been stored on the interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface),
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of previous 15 minute intervals for which the agent
+        has some data."
+    ::={ cOpticalMonEntry 17 }
+
+cOpticalMon24HrValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 24 hour
+        intervals for which valid performance monitoring data
+        has been stored on the interface.
+
+        The value of this object will be 0 if the measurement
+        was (re-)started within the last 24 hours, or 1 otherwise."
+    ::={ cOpticalMonEntry 18 }
+
+-- Notification related objects
+
+cOpticalNotifyEnable OBJECT-TYPE
+    SYNTAX      OpticalAlarmSeverityOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the minimum severity threshold governing
+        the generation of cOpticalMonParameterStatus notifications.
+
+        For example, if the value of this object is
+        set to 'major', then the agent generates these notifications
+        if and only if the severity of the alarm being indicated is
+        'major' or 'critical'.
+
+        The values of 'notReported', and 'cleared' do not apply.
+        The value of '0' disables the generation of notifications."
+    DEFVAL { 0 }
+    ::={ cOpticalMonGroup 2 }
+
+
+-- cOpticalPMCurrent Table
+
+cOpticalPMCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF COpticalPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains performance monitoring data for the
+        various optical parameters, collected over the current 15
+        minute or the current 24 hour interval."
+    ::={ cOpticalPMGroup 1 }
+
+cOpticalPMCurrentEntry OBJECT-TYPE
+    SYNTAX      COpticalPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the cOpticalPMCurrentTable. It contains
+        performance monitoring data for a monitored optical
+        parameter at an interface, collected over the current 15
+        minute or the current 24 hour interval.
+
+        Note that the set of monitored optical parameters may vary
+        based on interface type, direction, and monitoring location.
+
+        Examples of interfaces that can have an entry in this table
+        include optical transceivers, interfaces before and after
+        optical amplifiers, and interfaces before and after optical
+        attenuators."
+    INDEX       { cOpticalPMCurrentPeriod,
+                  ifIndex,
+                  cOpticalPMCurrentDirection,
+                  cOpticalPMCurrentLocation,
+                  cOpticalPMCurrentParamType }
+    ::={ cOpticalPMCurrentTable 1 }
+
+COpticalPMCurrentEntry ::= SEQUENCE {
+    cOpticalPMCurrentPeriod             OpticalPMPeriod,
+    cOpticalPMCurrentDirection          OpticalIfDirection,
+    cOpticalPMCurrentLocation           OpticalIfMonLocation,
+    cOpticalPMCurrentParamType          OpticalParameterType,
+    cOpticalPMCurrentMaxParam           OpticalParameterValue,
+    cOpticalPMCurrentMinParam           OpticalParameterValue,
+    cOpticalPMCurrentMeanParam          OpticalParameterValue,
+    cOpticalPMCurrentUnavailSecs        Integer32
+}
+
+cOpticalPMCurrentPeriod OBJECT-TYPE
+    SYNTAX      OpticalPMPeriod
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical parameter values
+        given in this entry are collected over the current 15 minute or
+        the current 24 hour interval."
+    ::={ cOpticalPMCurrentEntry 1 }
+
+cOpticalPMCurrentDirection OBJECT-TYPE
+    SYNTAX      OpticalIfDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the direction monitored for the optical
+        interface, in this entry."
+    ::={ cOpticalPMCurrentEntry 2 }
+
+cOpticalPMCurrentLocation OBJECT-TYPE
+    SYNTAX      OpticalIfMonLocation
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical characteristics are
+        measured before or after adjustment (e.g. optical amplification
+        or attenuation), at this interface."
+    ::={ cOpticalPMCurrentEntry 3 }
+
+cOpticalPMCurrentParamType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored, in this entry."
+    ::={ cOpticalPMCurrentEntry 4 }
+
+cOpticalPMCurrentMaxParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval."
+    ::={ cOpticalPMCurrentEntry 5 }
+
+cOpticalPMCurrentMinParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval."
+    ::={ cOpticalPMCurrentEntry 6 }
+
+cOpticalPMCurrentMeanParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval."
+    ::={ cOpticalPMCurrentEntry 7 }
+
+cOpticalPMCurrentUnavailSecs OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to indicate the number of seconds,
+        in the current 15 minute or the current 24 hour interval, for
+        which the optical performance data is not accounted for.
+
+        In the receive direction, the performance data could be
+        unavailable during these periods for multiple reasons
+        like the interface being administratively down or if there
+        is a Loss of Light alarm on the interface. In the transmit
+        direction, performance data could be unavailable when
+        the laser is shutdown."
+    ::={ cOpticalPMCurrentEntry 8 }
+
+-- cOpticalPMInterval Table
+
+cOpticalPMIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF COpticalPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores performance monitoring data for the
+        various optical parameters, collected over previous
+        intervals.
+
+        This table can have entries for one complete 24 hour
+        interval and up to 96 complete 15 minute
+        intervals. A system is required to store at least
+        4 completed 15 minute intervals. The number of valid
+        15 minute intervals in this table is indicated by the
+        cOpticalMon15MinValidIntervals object and the number of
+        valid 24 hour intervals is indicated by the
+        cOpticalMon24HrValidIntervals object."
+    ::={ cOpticalPMGroup 2 }
+
+cOpticalPMIntervalEntry OBJECT-TYPE
+    SYNTAX      COpticalPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the cOpticalPMIntervalTable. It contains
+        performance monitoring data for an optical parameter,
+        collected over a previous interval.
+
+        Note that the set of monitored optical parameters may vary
+        based on interface type, direction, and monitoring location.
+
+        Examples of interfaces that can have an entry in this table
+        include optical transceivers, interfaces before and after
+        optical amplifiers, and interfaces before and after optical
+        attenuators."
+    INDEX      { cOpticalPMIntervalPeriod,
+                 cOpticalPMIntervalNumber,
+                 ifIndex,
+                 cOpticalPMIntervalDirection,
+                 cOpticalPMIntervalLocation,
+                 cOpticalPMIntervalParamType }
+    ::={ cOpticalPMIntervalTable 1 }
+
+COpticalPMIntervalEntry ::= SEQUENCE {
+    cOpticalPMIntervalPeriod            OpticalPMPeriod,
+    cOpticalPMIntervalNumber            Integer32,
+    cOpticalPMIntervalDirection         OpticalIfDirection,
+    cOpticalPMIntervalLocation          OpticalIfMonLocation,
+    cOpticalPMIntervalParamType         OpticalParameterType,
+    cOpticalPMIntervalMaxParam          OpticalParameterValue,
+    cOpticalPMIntervalMinParam          OpticalParameterValue,
+    cOpticalPMIntervalMeanParam         OpticalParameterValue,
+    cOpticalPMIntervalUnavailSecs       Integer32
+}
+
+cOpticalPMIntervalPeriod OBJECT-TYPE
+    SYNTAX      OpticalPMPeriod
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical parameter values,
+        given in this entry, are collected over a period of 15 minutes
+        or 24 hours."
+    ::={ cOpticalPMIntervalEntry 1 }
+
+cOpticalPMIntervalNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number between 1 and 96, which identifies the
+         interval for which the set of optical parameter values is
+         available. The interval identified by 1 is the most recently
+         completed 15 minute or 24 hour interval, and the interval
+         identified by N is the interval immediately preceding the one
+         identified by N-1."
+    ::={ cOpticalPMIntervalEntry 2 }
+
+cOpticalPMIntervalDirection OBJECT-TYPE
+    SYNTAX      OpticalIfDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the direction monitored for the optical
+        interface, in this entry."
+    ::={ cOpticalPMIntervalEntry 3 }
+
+cOpticalPMIntervalLocation OBJECT-TYPE
+    SYNTAX      OpticalIfMonLocation
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical characteristics
+        are measured before or after adjustment (e.g.
+        optical amplification or attenuation), at this interface."
+    ::={ cOpticalPMIntervalEntry 4 }
+
+cOpticalPMIntervalParamType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored, in this entry."
+    ::={ cOpticalPMIntervalEntry 5 }
+
+cOpticalPMIntervalMaxParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval."
+    ::={ cOpticalPMIntervalEntry 6 }
+
+cOpticalPMIntervalMinParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval."
+    ::={ cOpticalPMIntervalEntry 7 }
+
+cOpticalPMIntervalMeanParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the measured optical
+        parameter, in a particular 15 minute or 24 hour interval."
+    ::={ cOpticalPMIntervalEntry 8 }
+
+cOpticalPMIntervalUnavailSecs OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to indicate the number of seconds,
+        in the particular 15 minute or 24 hour interval, for which the
+        optical performance data is not accounted for.
+
+        In the receive direction, the performance data could be
+        unavailable during these periods for multiple reasons
+        like the interface being administratively down or if there
+        is a Loss of Light alarm on the interface. In the transmit
+        direction, performance data could be unavailable when
+        the laser is shutdown."
+    ::={ cOpticalPMIntervalEntry 9 }
+
+
+-- Notifications
+
+cOpticalMonitorMIBNotifications OBJECT IDENTIFIER ::=
+                                 { ciscoOpticalMonitorMIB 2 }
+
+cOpticalMonNotificationPrefix OBJECT IDENTIFIER ::=
+                                 { cOpticalMonitorMIBNotifications 0 }
+
+cOpticalMonParameterStatus NOTIFICATION-TYPE
+    OBJECTS     { cOpticalParameterValue,
+                  cOpticalParamAlarmStatus,
+                  cOpticalParamAlarmCurMaxThresh,
+                  cOpticalParamAlarmCurMaxSev,
+                  cOpticalParamAlarmLastChange
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when any threshold related to an
+        optical parameter is exceeded or cleared on an interface.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the cOpticalNotifyEnable object,
+          or
+        - if the severity of the threshold as specified by
+          the cOpticalParamHighWarningSev or
+          cOpticalParamLowWarningSev object is 'notReported'.
+        "
+    ::={ cOpticalMonNotificationPrefix 1 }
+
+-- MIB Conformance Statements
+
+cOpticalMonitorMIBConformance  OBJECT IDENTIFIER ::=
+                                { ciscoOpticalMonitorMIB 3 }
+
+cOpticalMonitorMIBCompliances  OBJECT IDENTIFIER ::=
+                                { cOpticalMonitorMIBConformance 1 }
+
+cOpticalMonitorMIBGroups       OBJECT IDENTIFIER ::=
+                                { cOpticalMonitorMIBConformance 2 }
+
+
+cOpticalMonitorMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for network elements that
+        monitor optical characteristics and set thresholds on the
+        optical interfaces in a network element."
+    MODULE      -- this module
+        MANDATORY-GROUPS { cOpticalMIBMonGroup }
+
+    GROUP cOpticalMIBThresholdGroup
+    DESCRIPTION
+        "This group is required for network elements that support
+        thresholds on optical parameters."
+
+    GROUP cOpticalMIBSeverityGroup
+    DESCRIPTION
+        "This group is required for network elements that support
+        severities for thresholds on optical parameters."
+
+    GROUP cOpticalMIBPMGroup
+    DESCRIPTION
+        "This group is required for network elements that
+        support collection of optical performance monitoring
+        data for 15 minute or 24 hour intervals."
+
+    GROUP cOpticalMIBNotifyEnableGroup
+    DESCRIPTION
+        "This group is required for network elements that
+        support the cOpticalMIBNotifGroup."
+
+    GROUP cOpticalMIBNotifGroup
+    DESCRIPTION
+        "This group is required for network elements that
+        generate notifications when a threshold is exceeded or
+        cleared on an interface."
+
+    OBJECT     cOpticalParamHighAlarmThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamHighWarningThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamLowAlarmThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamLowWarningThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamHighAlarmSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamHighWarningSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamLowAlarmSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamLowWarningSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    ::={ cOpticalMonitorMIBCompliances 1 }
+
+-- Units of Conformance
+
+cOpticalMIBMonGroup OBJECT-GROUP
+    OBJECTS {
+        cOpticalParameterValue
+    }
+    STATUS        current
+    DESCRIPTION
+        "A mandatory object that provides monitoring of optical
+        characteristics."
+    ::={ cOpticalMonitorMIBGroups 1 }
+
+cOpticalMIBThresholdGroup OBJECT-GROUP
+    OBJECTS {
+        cOpticalParamHighAlarmThresh,
+        cOpticalParamHighWarningThresh,
+        cOpticalParamLowAlarmThresh,
+        cOpticalParamLowWarningThresh,
+        cOpticalParamAlarmStatus,
+        cOpticalParamAlarmCurMaxThresh,
+        cOpticalParamAlarmLastChange
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects that support thresholds on optical
+        parameters and provide status information when the thresholds
+        are exceeded or cleared."
+    ::={ cOpticalMonitorMIBGroups 2 }
+
+cOpticalMIBSeverityGroup OBJECT-GROUP
+    OBJECTS {
+        cOpticalParamHighAlarmSev,
+        cOpticalParamHighWarningSev,
+        cOpticalParamLowAlarmSev,
+        cOpticalParamLowWarningSev,
+        cOpticalParamAlarmCurMaxSev
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects that support severities for thresholds
+        on optical parameters."
+    ::={ cOpticalMonitorMIBGroups 3 }
+
+cOpticalMIBPMGroup OBJECT-GROUP
+    OBJECTS {
+        cOpticalMon15MinValidIntervals,
+        cOpticalMon24HrValidIntervals,
+        cOpticalPMCurrentMaxParam,
+        cOpticalPMCurrentMinParam,
+        cOpticalPMCurrentMeanParam,
+        cOpticalPMCurrentUnavailSecs,
+        cOpticalPMIntervalMaxParam,
+        cOpticalPMIntervalMinParam,
+        cOpticalPMIntervalMeanParam,
+        cOpticalPMIntervalUnavailSecs
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects that provide optical performance
+        monitoring data for 15 minute and 24 hour intervals."
+    ::={ cOpticalMonitorMIBGroups 4 }
+
+cOpticalMIBNotifyEnableGroup OBJECT-GROUP
+    OBJECTS {
+        cOpticalNotifyEnable
+    }
+    STATUS        current
+    DESCRIPTION
+        "An object to control the generation of notifications."
+    ::={ cOpticalMonitorMIBGroups 5 }
+
+cOpticalMIBNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cOpticalMonParameterStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A notification generated when a threshold on an optical
+         parameter is exceeded or cleared."
+    ::={ cOpticalMonitorMIBGroups 6 }
+
+END

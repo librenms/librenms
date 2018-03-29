@@ -1,0 +1,661 @@
+CTRON-ETHERNET-PARAMETERS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-ethernet-parameters.txt
+--  Revision: 01.00.04
+--  Part Number:
+--  Date: November 11, 1998
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific Ethernet Parameters MIB.
+--
+--  This module will be extended, as needed.
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright November 1998 Cabletron Systems
+
+IMPORTS
+
+      OBJECT-TYPE
+            FROM RFC-1212
+      Counter
+            FROM RFC1155-SMI
+      ctEthernetCtlParameters
+            FROM CTRON-MIB-NAMES
+      ctIfPortIfNumber, ctIfPortPortNumber
+            FROM CTIF-EXT-MIB;
+
+-- The ctEthernetCtlParameters MIB is used to manage Cabletron interfaces 
+-- that comply to IEEE Std 802.3, 1998 Edition.  This MIB supercedes the 
+-- ctFastEthernet MIB.
+
+ctAutoNegCtl  OBJECT IDENTIFIER ::= { ctEthernetCtlParameters 1 }
+
+-- The ctAutoNegCtl group provides configuration for Cabletron 
+-- interfaces that comply to IEEE Std 802.3, 1998 Edition.
+--
+-- The implementation of this group is MANDATORY.
+
+ctAutoNegCtlTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtAutoNegCtlEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "Provides a list of definitions and control objects over any 10BASE-T,
+        100BASE-TX, or 1000BASE-X Cabletron interface that supports 
+        auto-negotiation as described by the aforementioned standards." 
+     ::= { ctAutoNegCtl 1 }
+
+
+ctAutoNegCtlEntry  OBJECT-TYPE
+    SYNTAX CtAutoNegCtlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       definition and control over interfaces supporting Auto-Negotiation."
+    INDEX { ctIfPortIfNumber, ctIfPortPortNumber }
+    ::= { ctAutoNegCtlTable 1 }
+
+CtAutoNegCtlEntry ::= SEQUENCE {
+      ctAutoNegAdminStatus
+            INTEGER,
+      ctAutoNegRemoteSignalling
+            INTEGER,
+      ctAutoNegAutoConfig
+            INTEGER,
+      ctAutoNegLocalTechnologyAbility        
+            INTEGER, 
+      ctAutoNegAdvertisedTechnologyAbility       
+            INTEGER,
+      ctAutoNegReceivedTechnologyAbility            
+            INTEGER
+}
+
+ctAutoNegAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+      }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "This object controls whether Auto-Negotiation is enabled 
+       for the specified port.  If Auto-Negotiation is disabled the port will
+       revert to the speed, duplex and flow control settings specified by
+       their associated leaves in the ctEtherManualConfig and
+       ctFlowControl groups."
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition 30.6.1.1.2"
+    DEFVAL { enable }
+    ::= { ctAutoNegCtlEntry 1 }
+
+ctAutoNegRemoteSignalling OBJECT-TYPE
+    SYNTAX INTEGER {
+      detected(1),
+      notdetected(2)
+      }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This object indicates whether the remote end of the link is operating
+       Auto-Negotiation signalling or not."
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition 30.6.1.1.3"
+    ::= { ctAutoNegCtlEntry 2 }
+
+ctAutoNegAutoConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      other(1),
+      configuring(2),
+      complete(3),
+      disabled(4),
+      paralleldetectfailed(5)
+      }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This object indicates whether Auto-Negotiation signalling is in
+       progress or has completed."
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition 30.6.1.1.4"
+    ::= { ctAutoNegCtlEntry 3 }
+
+ctAutoNegLocalTechnologyAbility OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This indicates the technology ability of the local hardware.
+    
+       The value is a sum.  This sum initially takes the value zero. Then, for
+       each technology, T, that the port supports, 2 raised to (T - 1) is added 
+       to the sum.  For example, a port that supports 1000BASE-TFD (T = 18) and 
+       1000BASE-T (T = 17) would return a value of 196608
+       ((2 ^ (18 - 1)) + (2 ^ (17 - 1))).
+
+       For ports supporting Auto-Negotiation, values should be calculated
+       as follows:
+
+          T   Technology           Description
+         --   -----------     ------------------------------------------------
+          1   global          Reserved for future use.
+          2   other           None of the following.
+          3   unknown         Initializing, true state or type not yet known
+          4   10BASE-T        10BASE-T Half Duplex
+          5   10BASE-TFD      10BASE-T Full Duplex
+          6   100BASE-T4      100BASE-T4 Half Duplex
+          7   100BASE-TX      100BASE-TX Half Duplex
+          8   100BASE-TXFD    100BASE-TX Full Duplex
+          9   FDX PAUSE       Full Duplex Flow Control
+         10   FDX APAUSE      Full Duplex Asymmetric Flow Control
+         11   FDX SPAUSE      Full Duplex Symmetric Flow Control
+         12   FDX BPAUSE      Full Duplex Asymmetric and Symmetric Flow Control
+         13   100BASE-T2      100BASE-T2 Half Duplex
+         14   100BASE-T2FD    100BASE-T2 Full Duplex
+         15   1000BASE-X      1000BASE-X Half Duplex
+         16   1000BASE-XFD    1000BASE-X Full Duplex
+         17   1000BASE-T      1000BASE-T Half Duplex
+         18   1000BASE-TFD    1000BASE-T Full Duplex
+         19   Rem Fault1      Remote Fault Bit 1
+         20   Rem Fault2      Remote Fault Bit 2 
+         21   ISO Ethernet    IEEE Std 802.9 ISLAN-16T
+      "
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition 30.6.1.1.5"
+    ::= { ctAutoNegCtlEntry 4 }
+
+ctAutoNegAdvertisedTechnologyAbility OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Indicates the advertised ability of the local hardware, but only
+       becomes active on ports that have auto-negotiation enabled.  
+
+       The value is a sum.  This sum initially takes the value zero. Then, for
+       each technology, T, that the port is advertising, 2 raised to (T - 1)
+       is added to the sum.  For example, a port that advertises 1000BASE-TFD
+       (T = 18) and 1000BASE-T (T = 17) would return a value of 196608 
+       ((2 ^ (18 - 1)) + (2 ^ (17 - 1))). 
+       
+       Values for T are limited to technologies supported by the hardware as
+       specified by ctAutoNegLocalTechnologyAbility.  For ports supporting 
+       Auto-Negotiation, values should be calculated as follows:
+
+          T   Technology           Description
+         --   -----------     ------------------------------------------------
+          1   global          Reserved for future use.
+          2   other           None of the following.
+          3   unknown         Initializing, true state or type not yet known
+          4   10BASE-T        10BASE-T Half Duplex
+          5   10BASE-TFD      10BASE-T Full Duplex
+          6   100BASE-T4      100BASE-T4 Half Duplex
+          7   100BASE-TX      100BASE-TX Half Duplex
+          8   100BASE-TXFD    100BASE-TX Full Duplex
+          9   FDX PAUSE       Full Duplex Flow Control
+         10   FDX APAUSE      Full Duplex Asymmetric Flow Control
+         11   FDX SPAUSE      Full Duplex Symmetric Flow Control
+         12   FDX BPAUSE      Full Duplex Asymmetric and Symmetric Flow Control
+         13   100BASE-T2      100BASE-T2 Half Duplex
+         14   100BASE-T2FD    100BASE-T2 Full Duplex
+         15   1000BASE-X      1000BASE-X Half Duplex
+         16   1000BASE-XFD    1000BASE-X Full Duplex
+         17   1000BASE-T      1000BASE-T Half Duplex
+         18   1000BASE-TFD    1000BASE-T Full Duplex
+         19   Rem Fault1      Remote Fault Bit 1
+         20   Rem Fault2      Remote Fault Bit 2 
+         21   ISO Ethernet    IEEE Std 802.9 ISLAN-16T
+
+       A successful set operation will result in immediate link re-negotiation
+       if Auto-Negotiation is enabled on this port, as specified by
+       ctAutoNegAdminStatus.  A set of this object to a value containing bits 
+       that are not supported by the hardware will be successful, but, the port
+       will only advertise values which are the logical AND of the set value and
+       ctAutoNegLocalTechnologyAbility.
+
+       Note: this re-negotiation will in every case cause temporary link loss
+       during the link re-negotiation.  If set to a value that is incompatible
+       with ctAutoNegLocalTechnologyAbility, link negotiation will not
+       be successful and will cause permanent link loss."
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition 30.6.1.1.6"
+    ::= { ctAutoNegCtlEntry 5 }
+
+ctAutoNegReceivedTechnologyAbility OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "Indicates the advertised ability of the remote hardware, or link
+       partner.  
+
+       The value is a sum.  This sum initially takes the value zero. Then, for
+       each technology, T, that the link partner supports, 2 raised to (T - 1)
+       is added to the sum.  For example, a link partner advertising 
+       1000BASE-TFD (T = 18) and 1000BASE-T (T = 17) would return a value 
+       of 196608 ((2 ^ (18 - 1)) + (2 ^ (17 - 1))).
+
+       For ports supporting Auto-Negotiation, values should be calculated
+       as follows:
+
+          T   Technology           Description
+         --   -----------     ------------------------------------------------
+          1   global          Reserved for future use.
+          2   other           None of the following.
+          3   unknown         Initializing, true state or type not yet known
+          4   10BASE-T        10BASE-T Half Duplex
+          5   10BASE-TFD      10BASE-T Full Duplex
+          6   100BASE-T4      100BASE-T4 Half Duplex
+          7   100BASE-TX      100BASE-TX Half Duplex
+          8   100BASE-TXFD    100BASE-TX Full Duplex
+          9   FDX PAUSE       Full Duplex Flow Control
+         10   FDX APAUSE      Full Duplex Asymmetric Flow Control
+         11   FDX SPAUSE      Full Duplex Symmetric Flow Control
+         12   FDX BPAUSE      Full Duplex Asymmetric and Symmetric Flow Control
+         13   100BASE-T2      100BASE-T2 Half Duplex
+         14   100BASE-T2FD    100BASE-T2 Full Duplex
+         15   1000BASE-X      1000BASE-X Half Duplex
+         16   1000BASE-XFD    1000BASE-X Full Duplex
+         17   1000BASE-T      1000BASE-T Half Duplex
+         18   1000BASE-TFD    1000BASE-T Full Duplex
+         19   Rem Fault1      Remote Fault Bit 1
+         20   Rem Fault2      Remote Fault Bit 2 
+         21   ISO Ethernet    IEEE Std 802.9 ISLAN-16T
+      "
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition 30.6.1.1.7"
+    ::= { ctAutoNegCtlEntry 6 }
+   
+ctFlowControl  OBJECT IDENTIFIER ::= { ctEthernetCtlParameters 2 }
+-- The ctFlowCtl group provides configuration and statistics for
+-- Cabletron Flow Control capable devices. 
+--
+-- The implementation of this group is OPTIONAL.
+
+ctFlowCtlTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtFlowCtlEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "Provides a list of statistic and control objects over 10BASE-X, 
+        100BASE-X and 1000BASE-X Cabletron interfaces that support flow 
+        control as described by IEEE Std 802.3, 1998 Edition."
+     ::= { ctFlowControl 1 }
+
+
+ctFlowCtlEntry OBJECT-TYPE
+    SYNTAX CtFlowCtlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       definition and control over Cabletron flow control capable interfaces."
+    INDEX { ctIfPortIfNumber, ctIfPortPortNumber }
+    ::= { ctFlowCtlTable 1 }
+
+CtFlowCtlEntry ::= SEQUENCE {
+      ctFlowCtlHalfDuplexAdminStatus
+            INTEGER,
+      ctFlowCtlHalfDuplexOperStatus
+            INTEGER,
+      ctEtherSupportedPauseModes
+            INTEGER,
+      ctFlowCtlPauseAdminStatus
+            INTEGER,           
+      ctFlowCtlPauseOperStatus
+            INTEGER,
+      ctFlowCtlPauseTimer
+            INTEGER,
+      ctFlowCtlRxPauseFrames
+            Counter,
+      ctFlowCtlTxPauseFrames
+            Counter
+}
+
+ctFlowCtlHalfDuplexAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+      }            
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The administrative status requested by management for back pressure
+       on this port.  Back pressure is a collision based flow control mechanism 
+       used in half duplex configurations.  The value of enabled(1) indicates 
+       that back pressure should be enabled on this port if the port is in half
+       duplex.  The value of disable(2) indicates that back pressure should be 
+       disabled on this port."
+    DEFVAL { enabled }
+    ::= { ctFlowCtlEntry 1 }
+
+ctFlowCtlHalfDuplexOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2),
+      notsupported(3)
+      }            
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The current operational status of back pressure on this port."
+    ::= { ctFlowCtlEntry 2 }
+
+ctEtherSupportedPauseModes OBJECT-TYPE
+    SYNTAX INTEGER             
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This indicates the frame based modes of full duplex flow control for this
+       port.
+    
+       The value is a sum.  This sum initially takes the value zero. Then, for
+       each mode, M, that the port supports, 2 raised to (M - 1) is added to 
+       the sum.  For example, a port that supports Symmetric (M= 2),
+       AsymmetricRX (M = 3) and AsymmetricTx (M = 4) would return a value 
+       of 14 ((2 ^ (2 - 1)) + (2 ^ (3 - 1)) + (2 ^ (4 - 1))).
+
+       Speed values should be calculated as follows:
+
+          M   Mode            Description
+         --   ------------    ------------------------------------------------
+          1   Other           None of the following
+          2   Symmetric       Receive and Transmit Pause Frames        
+          3   AsymmetricRx    Receive Pause Frames
+          4   AsymmetricTx    Transmit Pause Frames
+      "
+    ::= { ctFlowCtlEntry 3 }
+    
+ctFlowCtlPauseAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      symmetric(1),
+      asymmetricRx(2),
+      asymmetricTx(3),
+      disabled(4),
+      autonegotiate(5)
+      }            
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The administrative status requested by management for frame based
+       flow control on this port.  For 10 Mb and 100 Mb ports the value of 
+       symmetric(1) indicates that if Auto-Negotiation is supported for this 
+       port, that the FDX PAUSE bit in the ctAutoNegLocalTechnologyAbility will
+       be set, further indicating that the port supports full duplex flow 
+       control.  For 1000 Mb the value of symmetric(1) indicates that if 
+       Auto-Negotiation is supported for this port, that the FDX SPAUSE
+       bit in the ctAutoNegLocalTechnologyAbility will be set, further 
+       indicating that the port supports symmetric frame based flow control.
+       In all cases a set of symmetric(1) will cause the port to interpret 
+       received PAUSE frames and allow the port to transmit PAUSE frames when 
+       necessary.  A set of a value of symmetric(1) is limited to those ports 
+       that support symmetric frame based flow control as specified by
+       ctEtherSupportedPauseModes.
+       
+       The value of asymmetricRx(2) indicates that if Auto-Negotiation is 
+       supported for this port, that the FDX BPAUSE bit in the 
+       ctAutoNegLocalTechnologyAbility will be set, further
+       indicating that the port supports asymmetric receive frame based flow 
+       control.  In all cases a set of asymmetricRx(2) will cause the port to 
+       interpret received PAUSE frames and disallow the port to transmit PAUSE 
+       frames.  A set of a value of asymmetricRx(2) is limited to those ports 
+       that support asymmetricRx frame based flow control as specified by 
+       ctEtherSupportedPauseModes. 
+
+       The value of asymmetricTx(3) indicates that if Auto-Negotiation is
+       supported for this port, that the FDX APAUSE bit in the
+       ctAutoNegLocalTechnologyAbility will be set, further indicating that the
+       port supports asymmetric transmit frame based flow control.  In all cases
+       a set of asymmetricTx(3) will cause the port to ignore PAUSE frames and 
+       allow the port to transmit PAUSE frames when necessary.  A set of a value
+       of asymmetricTx(3) is limited to those ports that support asymmetricTx 
+       frame based flow control as specified by ctEtherSupportedPauseModes.
+
+       The value of disabled(4) indicates that if Auto-Negotiation is supported 
+       for this port, that the FDX PAUSE, FDX APAUSE, FDX SPAUSE and FDX BPAUSE
+       bits in the ctAutoNegLocalTechnologyAbility will be cleared, further 
+       indicating that the port does not support frame based flow control.  In 
+       all cases a set of disable(2) will cause the port to ignore received 
+       PAUSE frames and to disallow the port to transmit PAUSE frames.  
+       
+       The value of autonegotiate(5) indicates that if Auto-Negotiation is 
+       supported for this port, and the hardware supports the ability to
+       advertise PAUSE capability, that the maximum flow control capabilities 
+       of the hardware are to be reflected in the PAUSE bits of 
+       ctAutoNegLocalTechnologyAbility.  The ports flow control operational
+       state will be determined by the results of Auto-Negotiation.  If 
+       Auto-Negotiation is not supported for this port, a set of 
+       autonegotiate(5) will fail.
+       
+       In all cases frame based flow control is only used for ports that
+       are in full duplex."
+    DEFVAL { autonegotiate }
+    ::= { ctFlowCtlEntry 4 }
+
+ctFlowCtlPauseOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      symmetric(1),
+      asymmetricRx(2),
+      asymmetricTx(3),
+      disabled(4),
+      unknown(5),
+      notsupported(6)
+      }            
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The current operational status of full duplex flow control 
+       on this port.  A value of unknown(5) will be returned for any port which 
+       has a Pause Frame Admin Status of autonegotiate(5), as specified by
+       ctFlowCtlPauseAdminStatus, but is in an unknown Auto-Negotiation state."
+    ::= { ctFlowCtlEntry 5 }
+
+ctFlowCtlPauseTimer OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "A 2 octet, unsigned integer containing the length of time for which
+       the receiving station is requested to inhibit data frame transmission.
+       The pause time is measured in units of pause_quanta, equal to 512 bit
+       times of the particular implementation." 
+    REFERENCE
+      "IEEE Std 802.3, 1998 Edition Annex 31B.2"
+    ::= { ctFlowCtlEntry 6 }
+  
+ctFlowCtlRxPauseFrames  OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS read-only
+    STATUS mandatory 
+    DESCRIPTION
+      "The number of pause frames received on this port."
+    ::= { ctFlowCtlEntry 7 }
+
+ctFlowCtlTxPauseFrames  OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS read-only
+    STATUS mandatory 
+    DESCRIPTION
+      "The number of pause frames transmitted from this port."
+    ::= { ctFlowCtlEntry 8 }
+
+ctEtherManualConfig  OBJECT IDENTIFIER ::= { ctEthernetCtlParameters 3 }
+-- The ctEtherManualConfig group provides manual configuration of speed
+-- and duplex for 10BASE-T, 100BASE-X, or 1000BASE-X Cabletron Ethernet 
+-- interfaces.
+--
+-- The implementation of this group is MANDATORY.
+
+ctEtherManualConfigTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtEtherManualConfigEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "Provides a list of speed and duplex control objects over 10BASE-X, 
+        100BASE-X and 1000 BASE-X Cabletron Ethernet interfaces." 
+     ::= { ctEtherManualConfig 1 }
+
+ctEtherManualConfigEntry OBJECT-TYPE
+    SYNTAX CtEtherManualConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       definition and control over Cabletron Ethernet interfaces."
+    INDEX { ctIfPortIfNumber, ctIfPortPortNumber }
+    ::= { ctEtherManualConfigTable 1 }
+
+CtEtherManualConfigEntry ::= SEQUENCE {
+      ctEtherSupportedSpeed
+            INTEGER,
+      ctEtherSpeedAdminStatus
+            INTEGER,
+      ctEtherSpeedOperStatus
+            INTEGER,
+      ctEtherSupportedDuplex
+            INTEGER,           
+      ctEtherDuplexAdminStatus
+            INTEGER,
+      ctEtherDuplexOperStatus
+            INTEGER
+}
+
+ctEtherSupportedSpeed OBJECT-TYPE
+    SYNTAX INTEGER             
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This indicates the supported speeds for the port.
+    
+       The value is a sum.  This sum initially takes the value zero. Then, for
+       each speed, S, that the port supports, 2 raised to (S - 1) is added to 
+       the sum.  For example, a port that supports 10 Mb (S = 1) and 100 Mb
+       (S = 2) would return a value of 3 ((2 ^ (1 - 1)) + (2 ^ (2 - 1))).
+
+       Speed values should be calculated as follows:
+
+          S   Speed           Description
+         --   -----------     ------------------------------------------------
+          1   10 Mb           Ethernet
+          2   100 Mb          Fast Ethernet
+          3   1000 Mb         Gigabit Ethernet
+      "
+    ::= { ctEtherManualConfigEntry 1 }
+
+ctEtherSpeedAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       tenmegabit(2),
+       hundredmegabit(3),
+       gigabit(4)
+       }           
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The administrative status requested by management for the speed of this 
+       port.  The value of tenmegabit(2) indicates that if Auto-Negotiation 
+       is disabled for this port, that the port will operate at a speed of
+       10 megabits per second, provided that the port supports that speed,
+       as specified by ctEtherSupportedSpeed.  
+       
+       The value of hundredmegabit(3) indicates that if Auto-Negotiation 
+       is disabled for this port, that the port will operate at a speed of
+       100 megabits per second, provided that the port supports that speed,
+       as specified by ctEtherSupportedSpeed.
+  
+       The value of gigabit(4) indicates that if Auto-Negotiation 
+       is disabled for this port, that the port will operate at a speed of
+       1000 megabits per second, provided that the port supports that speed,
+       as specified by ctEtherSupportedSpeed.
+       
+       In all cases, if the value specified does not indicate a speed that 
+       the port supports the set will fail."
+    ::= { ctEtherManualConfigEntry 2 }
+
+ctEtherSpeedOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       unknown(1),
+       tenmegabit(2),
+       hundredmegabit(3),
+       gigabit(4)
+       }           
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This object indicates the current speed of the Ethernet port."
+    ::= { ctEtherManualConfigEntry 3 }
+      
+ctEtherSupportedDuplex OBJECT-TYPE
+    SYNTAX INTEGER {
+       halfduplex(1),
+       fullduplex(2),
+       halfandfullduplex(3)
+       }           
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This object indicates the duplex modes supported by this port.
+       A value of halfduplex(1) indicates that the port only supports
+       half duplex operation.  A value of fullduplex(2) indicates that
+       the port only supports full duplex operation.  A value of
+       halfandfullduplex(3) indicates that the port supports both
+       half and full duplex operation."
+    ::= { ctEtherManualConfigEntry 4 }
+    
+ctEtherDuplexAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       halfduplex(2),
+       fullduplex(3)
+       }           
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The administrative status requested by management for the duplex of this 
+       port.  The value of halfduplex(2) indicates that if Auto-Negotiation 
+       is disabled for this port, that the port will operate in half duplex,
+       provided that the port supports half duplex, as specified by 
+       ctEtherSupportedDuplex.
+       
+       The value of fullduplex(3) indicates that if Auto-Negotiation 
+       is disabled for this port, that the port will operate in full duplex,
+       provided that the port supports full duplex, as specified by 
+       ctEtherSupportedDuplex.
+       
+       In all cases, if the value specified does not indicate a duplex that 
+       the port supports the set will fail."
+    DEFVAL { halfduplex }
+    ::= { ctEtherManualConfigEntry 5 } 
+ 
+ctEtherDuplexOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       unknown(1),
+       halfduplex(2),
+       fullduplex(3)
+       }           
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This object indicates the current duplex of the Ethernet port."
+    ::= { ctEtherManualConfigEntry 6 }
+     
+END

@@ -1,0 +1,422 @@
+ALCATEL-IND1-IPRM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   	MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32
+        FROM SNMPv2-SMI
+    RowStatus,TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    IANAipRouteProtocol
+	FROM IANA-RTPROTO-MIB
+    routingIND1Iprm
+        FROM ALCATEL-IND1-BASE ;
+
+alcatelIND1IPRMMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of IPRM global configuration parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Iprm 1 }
+
+alcatelIND1IPRMMIBObjects  OBJECT IDENTIFIER ::= { alcatelIND1IPRMMIB 1 }
+
+alaIprmConfig  OBJECT IDENTIFIER ::= { alcatelIND1IPRMMIBObjects 1 }
+
+   --  Textual Conventions
+       AdminStatus ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+            " Admin status"
+       SYNTAX  INTEGER { enabled(1),
+                         disabled(2)
+                        }
+
+       StaticRouteType ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+            "A mechanism for distinguishing the type of static route"
+       SYNTAX  INTEGER { 
+                         regular(1),
+                         recursive(2),
+                         bfd-enabled(3)
+                        }
+
+
+-- Route Table
+
+alaIprmRouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF AlaIprmRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Routing table."
+    ::= { alaIprmConfig 1 }
+
+alaIprmRouteEntry OBJECT-TYPE
+    SYNTAX   AlaIprmRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A particular route to  a  particular  destination"
+    INDEX {
+        alaIprmRouteDest,
+        alaIprmRouteMask,
+        alaIprmRouteTos,
+        alaIprmRouteNextHop
+        }
+    ::= { alaIprmRouteTable 1 }
+
+AlaIprmRouteEntry ::=
+    SEQUENCE {
+        alaIprmRouteDest
+            IpAddress,
+        alaIprmRouteMask
+            IpAddress,
+        alaIprmRouteTos
+             Integer32,
+        alaIprmRouteNextHop
+            IpAddress,
+ 	alaIprmRouteProto
+            IANAipRouteProtocol,
+        alaIprmRouteMetric
+            Integer32,
+	alaIprmRoutePriority
+	    Integer32
+    }
+
+alaIprmRouteDest OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The destination IP address of this route."
+    ::= { alaIprmRouteEntry 1 }
+
+alaIprmRouteMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+	"The mask of this route"
+    ::= { alaIprmRouteEntry 2 }
+
+alaIprmRouteTos OBJECT-TYPE
+    SYNTAX   Integer32 (0..16)
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+	"The TOS for this route"
+    ::= { alaIprmRouteEntry 3 }
+
+alaIprmRouteNextHop OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+	"The Gateway for this route"
+    ::= { alaIprmRouteEntry 4 }
+
+alaIprmRouteProto OBJECT-TYPE
+    SYNTAX   IANAipRouteProtocol
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+	"The protocol that this route was learned from"
+    ::= { alaIprmRouteEntry 5 }
+
+alaIprmRouteMetric OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+	"The metric for this route"
+    ::= { alaIprmRouteEntry 6 }
+
+alaIprmRoutePriority OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+	"The priority for this route"
+    ::= { alaIprmRouteEntry 7 }
+
+
+-- Static Route Table
+
+alaIprmStaticRouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF AlaIprmStaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Static Route table."
+    ::= { alaIprmConfig 2 }
+
+alaIprmStaticRouteEntry OBJECT-TYPE
+    SYNTAX   AlaIprmStaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+	"A route entered by the user"
+    INDEX {
+        alaIprmStaticRouteDest,
+        alaIprmStaticRouteMask,
+        alaIprmStaticRouteNextHop
+        }
+    ::= { alaIprmStaticRouteTable 1 }
+
+AlaIprmStaticRouteEntry ::=
+    SEQUENCE {
+        alaIprmStaticRouteDest
+            IpAddress,
+        alaIprmStaticRouteMask
+            IpAddress,
+        alaIprmStaticRouteNextHop
+            IpAddress,
+	alaIprmStaticRouteMetric
+	    Integer32,
+	alaIprmStaticRouteStatus
+	    RowStatus,
+	alaIprmStaticRouteBfdStatus
+	    AdminStatus,
+	alaIprmStaticRouteType
+	    StaticRouteType 
+    }
+
+alaIprmStaticRouteDest OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The destination IP address of this route."
+    ::= { alaIprmStaticRouteEntry 1 }
+
+alaIprmStaticRouteMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+	"The mask of this route"
+    ::= { alaIprmStaticRouteEntry 2 }
+
+alaIprmStaticRouteNextHop OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+	"The Gateway for this route"
+    ::= { alaIprmStaticRouteEntry 3 }
+
+alaIprmStaticRouteMetric OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+	"The metric for this route"
+    ::= { alaIprmStaticRouteEntry 4 }
+
+alaIprmStaticRouteStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The status of this entry.  Enabling causes a new
+		static route to be created, disabled causes that
+		static route to be deleted."
+    ::= { alaIprmStaticRouteEntry 5 }
+
+alaIprmStaticRouteBfdStatus OBJECT-TYPE
+    SYNTAX     AdminStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+	    "For enabling or disabling the BFD status on this static route."
+    ::= { alaIprmStaticRouteEntry 6 }
+
+alaIprmStaticRouteType OBJECT-TYPE
+    SYNTAX     StaticRouteType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+	    "Type of static route."
+    ::= { alaIprmStaticRouteEntry 7 }
+
+    	
+
+
+-- Route Preference Configurations
+
+alaIprmRtPrefLocal OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Local Routes."
+    DEFVAL	{ 1 }
+    ::= { alaIprmConfig 3 }
+
+alaIprmRtPrefStatic OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Static Routes."
+    DEFVAL	{ 2 }
+    ::= { alaIprmConfig 4 }
+
+alaIprmRtPrefOspf OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Ospf Routes."
+    DEFVAL	{ 110 }
+    ::= { alaIprmConfig 5 }
+
+alaIprmRtPrefRip OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on RIP Routes."
+    DEFVAL	{ 120 }
+    ::= { alaIprmConfig 6 }
+
+alaIprmRtPrefBgp OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   deprecated
+    DESCRIPTION
+       "Replaced by alaIprmRtPrefEbgp and alaIprmRtPrefIbgp."
+    DEFVAL	{ 200 }
+    ::= { alaIprmConfig 7 }
+
+alaIprmRtPrefEbgp OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on External BGP Routes."
+    DEFVAL	{ 190 }
+    ::= { alaIprmConfig 8 }
+
+alaIprmRtPrefIbgp OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Internal BGP Routes."
+    DEFVAL	{ 200 }
+    ::= { alaIprmConfig 9 }
+
+alaIprmRtPrefIsisL1 OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Level 1 ISIS Routes."
+    DEFVAL	{ 115 }
+    ::= { alaIprmConfig 10 }
+
+alaIprmRtPrefIsisL2 OBJECT-TYPE
+    SYNTAX   Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "IPRM's Route Preference on Level 2 ISIS Routes."
+    DEFVAL	{ 118 }
+    ::= { alaIprmConfig 11 }
+
+alaIprmStaticAllBfd   OBJECT-TYPE
+   SYNTAX   AdminStatus
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+	" BFD Enable/Disable to all static routes."
+    DEFVAL      { disabled } 
+    ::= { alaIprmConfig 12 }
+
+
+-- conformance information
+
+alcatelIND1IPRMMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPRMMIB 2 }
+alcatelIND1IPRMMIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1IPRMMIBConformance 1 }
+alcatelIND1IPRMMIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1IPRMMIBConformance 2 }
+
+-- compliance statements
+
+alaIprmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running IPRM
+            and implementing the ALCATEL-IND1-IPRM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaIprmConfigMIBGroup }
+
+    ::= { alcatelIND1IPRMMIBCompliances 1 }
+
+-- units of conformance
+
+alaIprmConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaIprmRouteProto, alaIprmRouteMetric, alaIprmRoutePriority,
+		alaIprmStaticRouteMetric, alaIprmStaticRouteStatus,
+		alaIprmRtPrefLocal, alaIprmRtPrefStatic, alaIprmRtPrefOspf,
+		alaIprmRtPrefRip, alaIprmRtPrefBgp, alaIprmRtPrefEbgp,
+		alaIprmRtPrefIbgp, alaIprmRtPrefIsisL1, alaIprmRtPrefIsisL2
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of the IPRM Module."
+    ::= { alcatelIND1IPRMMIBGroups 1 }
+
+
+END
+

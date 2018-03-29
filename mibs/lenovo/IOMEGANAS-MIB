@@ -1,0 +1,664 @@
+IOMEGANAS-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		RowStatus, DisplayString
+			FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB
+		enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE, IpAddress, Gauge32
+			FROM SNMPv2-SMI;
+
+	lenovoemc	MODULE-IDENTITY
+		LAST-UPDATED	"200703011011Z"
+		ORGANIZATION	"LenovoEMC"
+		CONTACT-INFO	"lenovo_customerfeedback@mailca.custhelp.com"
+		DESCRIPTION		"MIB for Iomega NAS"
+		REVISION		"200703011011Z"
+		DESCRIPTION		""
+		::=  {  enterprises  11369  }
+
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	private	OBJECT IDENTIFIER
+		::=  {  internet  4  }
+
+	enterprises	OBJECT IDENTIFIER
+		::=  {  private  1  }
+
+	iomegaNAS	OBJECT IDENTIFIER
+		::=  {  lenovoemc  10  }
+
+	iomegaNASInfo	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  1  }
+
+	systemPerformance	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  2  }
+
+	iomegaNASFunctionStatus	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  3  }
+
+	iomegaNASStorage	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  4  }
+
+	iomegaNASDevice	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  5  }
+
+	iomegaNASSensor	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  6  }
+
+	iomegaNASEvent	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  7  }
+
+	iomegaNASNotifications	OBJECT IDENTIFIER
+		::=  {  iomegaNAS  8  }
+
+	deviceDescr	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description of this device."
+		DEFVAL			{ "Iomega NAS BOX" }
+		::=  {  iomegaNASInfo  1  }
+
+	deviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Iomega NAS host name."
+		::=  {  iomegaNASInfo  2  }
+
+	netConfig	OBJECT IDENTIFIER
+		::=  {  iomegaNASInfo  3  }
+
+	ioTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  IoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of disk I/O performance."
+		::=  { systemPerformance  1 }
+
+	ioEntry	OBJECT-TYPE
+		SYNTAX		IoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry of one disk I/O performance."
+		INDEX		{  ioIndex  }
+		::=  { ioTable 1 }
+
+	IoEntry  ::=  SEQUENCE {
+		ioIndex  Integer32,
+		diskName  OCTET STRING,
+		ioMgrs  OCTET STRING,
+		ioMgws  OCTET STRING,
+		ioReqrs  OCTET STRING,
+		ioReqws  OCTET STRING,
+		ioKbrs  OCTET STRING,
+		ioKbws  OCTET STRING,
+		ioAvgQueue  OCTET STRING,
+		ioAvgWait  OCTET STRING,
+		ioAvgSvc  OCTET STRING,
+		ioAvgUtil  OCTET STRING,
+		ioCpuTime  OCTET STRING
+		}
+
+
+	ioIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"ioIndex"
+		::=  {  ioEntry  1  }
+
+
+	diskName	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Disk names such as sda and so on"
+		::=  {  ioEntry  2  }
+
+
+	ioMgrs	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Read merges per second."
+		::=  {  ioEntry  3  }
+
+
+	ioMgws	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Write merges per second."
+		::=  {  ioEntry  4  }
+
+
+	ioReqrs	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Read io requests per second."
+		::=  {  ioEntry  5  }
+
+
+	ioReqws	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Write io requests per second."
+		::=  {  ioEntry  6  }
+
+
+	ioKbrs	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Kilobytes read per second."
+		::=  {  ioEntry  7  }
+
+
+	ioKbws	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Kilobytes written per second."
+		::=  {  ioEntry  8  }
+
+
+	ioAvgQueue	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Average queue length."
+		::=  {  ioEntry  9  }
+
+
+	ioAvgWait	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Average waiting time (queue + service)"
+		::=  {  ioEntry  10  }
+
+
+	ioAvgSvc	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Average service time at disk."
+		::=  {  ioEntry  11  }
+
+
+	ioAvgUtil	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Average disk utilization."
+		::=  {  ioEntry  12  }
+
+
+	ioCpuTime	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of CPU time during  which  I/O  requests  were issued  to  the  device."
+		::=  {  ioEntry  13  }
+
+	bkupTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BkupEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of backup status."
+		::=  { iomegaNASFunctionStatus  1 }
+
+	bkupEntry	OBJECT-TYPE
+		SYNTAX		BkupEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry of backup status."
+		INDEX		{  bkupIndex  }
+		::=  { bkupTable 1 }
+
+	BkupEntry  ::=  SEQUENCE {
+		bkupIndex  Integer32,
+		bkupClient  OCTET STRING,
+		bkupltStatus  OCTET STRING,
+		bkupTotalSpace  OCTET STRING
+		}
+
+
+	bkupIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Record backup status"
+		::=  {  bkupEntry  1  }
+
+
+	bkupClient	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Client Name"
+		::=  {  bkupEntry  2  }
+
+
+	bkupltStatus	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Last backup status"
+		::=  {  bkupEntry  3  }
+
+
+	bkupTotalSpace	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Total space"
+		::=  {  bkupEntry  4  }
+
+	remoteAccess	OBJECT IDENTIFIER
+		::=  {  iomegaNASFunctionStatus  2  }
+
+	conTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  ConEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table for connected client count"
+		::=  { iomegaNASFunctionStatus  3 }
+
+	conEntry	OBJECT-TYPE
+		SYNTAX		ConEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Entry for connected client count"
+		INDEX		{  conIndex  }
+		::=  { conTable 1 }
+
+	ConEntry  ::=  SEQUENCE {
+		conIndex  Integer32,
+		conCount  Integer32,
+		conProtocol  DisplayString
+		}
+
+
+	conIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Index for entry"
+		::=  {  conEntry  1  }
+
+
+	conCount	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Connected client count for a given protocol"
+		DEFVAL			{ 0 }
+		::=  {  conEntry  2  }
+
+
+	conProtocol	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Protocol used by this kind of clients"
+		::=  {  conEntry  3  }
+
+	mediaService	OBJECT IDENTIFIER
+		::=  {  iomegaNASFunctionStatus  4  }
+
+	raidStatus	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description of raid status. There are five different status:
+	NORMAL
+	REBUILDING
+	DEGRADED
+	REBUILDFS
+	FAULTED"
+		::=  {  iomegaNASStorage  1  }
+
+	raidLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Raid level(5/10)"
+		::=  {  iomegaNASStorage  2  }
+
+	diskTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  DiskEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table of disks that build the RAID."
+		::=  { iomegaNASStorage  3 }
+
+	diskEntry	OBJECT-TYPE
+		SYNTAX		DiskEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry of one disk."
+		INDEX		{  diskIndex  }
+		::=  { diskTable 1 }
+
+	DiskEntry  ::=  SEQUENCE {
+		diskIndex  Integer32,
+		diskID  OCTET STRING,
+		diskSize  OCTET STRING,
+		diskStatus  OCTET STRING
+		}
+
+
+	diskIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Index of disk entry"
+		::=  {  diskEntry  1  }
+
+
+	diskID	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"ID of disk in array"
+		::=  {  diskEntry  2  }
+
+
+	diskSize	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Capacity of disk"
+		::=  {  diskEntry  3  }
+
+
+	diskStatus	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Status of Disk. There are four status:
+	NORMAL
+	FOREIGN
+	FAULTED
+	MISSING"
+		::=  {  diskEntry  4  }
+
+	usbTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  UsbEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of connected usb devices."
+		::=  { iomegaNASDevice  1 }
+
+	usbEntry	OBJECT-TYPE
+		SYNTAX		UsbEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Entry for connected USB device"
+		INDEX		{  usbIndex  }
+		::=  { usbTable 1 }
+
+	UsbEntry  ::=  SEQUENCE {
+		usbIndex  Integer32,
+		usbManufacture  DisplayString,
+		usbModel  DisplayString,
+		usbType  Integer32
+		}
+
+
+	usbIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Index for entry in the table"
+		::=  {  usbEntry  1  }
+
+
+	usbManufacture	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Manufucture of the device"
+		::=  {  usbEntry  2  }
+
+
+	usbModel	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Model of the USB device"
+		::=  {  usbEntry  3  }
+
+
+	usbType	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"USB device type(such UPS(3), PTP(6), printer(7) and so on)"
+		::=  {  usbEntry  4  }
+
+	fanTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  FanEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table for fan sensors"
+		::=  { iomegaNASSensor  1 }
+
+	fanEntry	OBJECT-TYPE
+		SYNTAX		FanEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Entry for fan sensor"
+		INDEX		{  fanIndex  }
+		::=  { fanTable 1 }
+
+	FanEntry  ::=  SEQUENCE {
+		fanIndex  Integer32,
+		fanName  DisplayString,
+		fanValue  Gauge32
+		}
+
+
+	fanIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Index for the entry"
+		::=  {  fanEntry  1  }
+
+
+	fanName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Name of the fan sensor"
+		::=  {  fanEntry  2  }
+
+
+	fanValue	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Rotation speed of the fan in RPM"
+		::=  {  fanEntry  3  }
+
+	tempTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TempEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table for temperature sensor"
+		::=  { iomegaNASSensor  2 }
+
+	tempEntry	OBJECT-TYPE
+		SYNTAX		TempEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Entry for temperature sensor"
+		INDEX		{  tempIndex  }
+		::=  { tempTable 1 }
+
+	TempEntry  ::=  SEQUENCE {
+		tempIndex  Integer32,
+		tempName  DisplayString,
+		tempValue  Gauge32
+		}
+
+
+	tempIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Index for entry"
+		::=  {  tempEntry  1  }
+
+
+	tempName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Name of the temperature sensor"
+		::=  {  tempEntry  2  }
+
+
+	tempValue	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The temperature of the sensor in mC."
+		::=  {  tempEntry  3  }
+
+	voltTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  VoltEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table for volt sensor"
+		::=  { iomegaNASSensor  3 }
+
+	voltEntry	OBJECT-TYPE
+		SYNTAX		VoltEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Entry for volt sensor"
+		INDEX		{  voltIndex  }
+		::=  { voltTable 1 }
+
+	VoltEntry  ::=  SEQUENCE {
+		voltIndex  Integer32,
+		voltName  DisplayString,
+		voltValue  Gauge32
+		}
+
+
+	voltIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Index for the entry"
+		::=  {  voltEntry  1  }
+
+
+	voltName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Name of the volt sensor"
+		::=  {  voltEntry  2  }
+
+
+	voltValue	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The voltage in mV"
+		::=  {  voltEntry  3  }
+
+	eventID	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"ID of the event"
+		::=  {  iomegaNASEvent  1  }
+
+	eventText	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description of the event."
+		::=  {  iomegaNASEvent  2  }
+
+	iomegaNASNotificationError	NOTIFICATION-TYPE
+		OBJECTS			{deviceDescr, deviceName, eventID, eventText }
+		STATUS			current
+		DESCRIPTION		"An Error EventMonitorTrap is generated in response to a user-specified event. Details can be found in Variables data."
+		::=  {  iomegaNASNotifications  1  }
+
+	dns0	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The first DNS server"
+		::=  {  netConfig  1  }
+
+	dns1	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Backup DNS server"
+		::=  {  netConfig  2  }
+
+	wins0	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The first wins server"
+		::=  {  netConfig  3  }
+
+	wins1	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Backup wins server"
+		::=  {  netConfig  4  }
+
+	raEnabled	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Whether RA is enabled
+0	Disable
+1	Enable"
+		::=  {  remoteAccess  1  }
+
+	mediaServiceEnabled	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Whether media service is enabled
+0	disable
+1	enable"
+		::=  {  mediaService  1  }
+
+	iomegaNASNotificationWarn	NOTIFICATION-TYPE
+		OBJECTS			{ deviceDescr, deviceName, eventID, eventText }
+		STATUS			current
+		DESCRIPTION		"A Warning EventMonitorTrap is generated in response to a user-specified event. Details can be found in Variables data."
+		::=  {  iomegaNASNotifications  2  }
+
+	iomegaNASNotificationInfo	NOTIFICATION-TYPE
+		OBJECTS			{ deviceDescr, deviceName, eventID, eventText }
+		STATUS			current
+		DESCRIPTION		"An Informational EventMonitorTrap is generated in response to a user-specified event. Details can be found in Variables data."
+		::=  {  iomegaNASNotifications  3  }
+
+END

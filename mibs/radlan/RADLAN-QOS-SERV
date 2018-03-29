@@ -1,0 +1,1328 @@
+RADLAN-QOS-SERV DEFINITIONS ::= BEGIN
+
+-- Version:    7.39_10_00
+-- Date:       31 May 2005
+--
+-- 22-Dec-2003 Add scalar rlQosServMibAction.
+-- 12-Jan-2004 Change the index to name table to be read-write and
+--             add rlQosServMibAction value 'noImportPolicy'.
+-- 26-Jan-2004 Split Template's and FCE's TCP and UDP port fields onto
+--             sperate ones.
+-- 18-Jan-2005 RevitalM
+--             1. Merge Template's and FCE's TCP and UDP port fields into one field for both profiles.
+--             2. Add two service types: committedBoundBW and trust.
+-- 25-Jan-2005 LiorM
+--             1. Add VPT, Ethertype,ICMP code , ICMP type , IGMP Type and TCP flags to template and FCE
+-- 20-Feb-2005 GalitV
+--             1. Add rlQosServFceVptMask, rlQosServFceTcpFlagsMask
+-- 29-May-2005 RevitalM
+--             1. Change default value of rlQosServFceEtherType to 1501 (=minimum value for etherType)
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+    IpAddress                                   FROM SNMPv2-SMI
+    InterfaceIndex                              FROM IF-MIB
+    RowStatus, TruthValue                       FROM RADLAN-SNMPv2
+    TEXTUAL-CONVENTION, DisplayString,
+    MacAddress                                  FROM SNMPv2-TC
+    PortList                                    FROM Q-BRIDGE-MIB
+    rnd                                         FROM RADLAN-MIB;
+
+rlQosServ MODULE-IDENTITY
+      LAST-UPDATED "200308280024Z"  -- August 28, 2003
+      ORGANIZATION "Radlan Computer Communication Ltd."
+      CONTACT-INFO
+              "radlan.com"
+      DESCRIPTION
+              "The MIB module describes the private MIB for QOS service mode."
+      REVISION     "200310280024Z"  -- October 28, 2003
+      DESCRIPTION
+              "Initial revision"
+      ::= { rnd 99 }
+
+RlQosServServiceStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of service statuses"
+    SYNTAX  INTEGER {
+        active(1),
+        suspended(2)
+    }
+
+RlQosServNamedTableId  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies one of the named tables Id"
+    SYNTAX INTEGER {
+        fcl(1),
+        fce(2),
+        profile(3)
+    }
+
+
+ -- QoS Template Table
+
+rlQosServTemplateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServTemplateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies classification template information.
+         Currently this table will contain exactly one entry."
+    ::= { rlQosServ 1 }
+
+rlQosServTemplateEntry OBJECT-TYPE
+    SYNTAX RlQosServTemplateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of this table describes all classifier fields.
+         The index is sequential integer represent by rlQosServTemplateEntry."
+    INDEX { rlQosServTemplateIndex }
+    ::= { rlQosServTemplateTable 1 }
+
+RlQosServTemplateEntry::= SEQUENCE {
+    rlQosServTemplateIndex                  INTEGER,
+    rlQosServTemplateDestMac                TruthValue,
+    rlQosServTemplateDestMacMask            MacAddress,
+    rlQosServTemplateSrcMac                 TruthValue,
+    rlQosServTemplateSrcMacMask             MacAddress,
+    rlQosServTemplateVlan                   TruthValue,
+    rlQosServTemplateDestIp                 TruthValue,
+    rlQosServTemplateDestIpMask             IpAddress,
+    rlQosServTemplateSrcIp                  TruthValue,
+    rlQosServTemplateSrcIpMask              IpAddress,
+    rlQosServTemplateIpProtocol             TruthValue,
+    rlQosServTemplateSrcPort                TruthValue,
+    rlQosServTemplateDestPort               TruthValue,
+    rlQosServTemplateTos                    TruthValue,
+    rlQosServTemplateVpt                    TruthValue,
+    rlQosServTemplateEtherType              TruthValue,
+    rlQosServTemplateTcpFlags               TruthValue,
+    rlQosServTemplateIcmpType               TruthValue,
+    rlQosServTemplateIcmpCode               TruthValue,
+    rlQosServTemplateIgmpType               TruthValue
+}
+
+rlQosServTemplateIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary index for the template table."
+    ::= { rlQosServTemplateEntry 1 }
+
+rlQosServTemplateDestMac OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the destination Mac field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 2 }
+
+rlQosServTemplateDestMacMask OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination Mac address mask. It may specify any byte (not bit),
+         within the Mac address, for classification, designated by 0."
+--    DEFVAL { '000000000000'H }
+    ::= { rlQosServTemplateEntry 3 }
+
+rlQosServTemplateSrcMac OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the source Mac field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 4 }
+
+rlQosServTemplateSrcMacMask OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source Mac address mask. It may specify any byte (not bit),
+         within the Mac address, for classification, designated by 0."
+--    DEFVAL { '000000000000'H }
+    ::= { rlQosServTemplateEntry 5 }
+
+rlQosServTemplateVlan OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Vlan field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 6 }
+
+rlQosServTemplateDestIp OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the destination Ip field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 7 }
+
+rlQosServTemplateDestIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination Ip address mask. It may specify any byte (not bit),
+         within the Ip address, for classification, designated by 0."
+    DEFVAL { '00000000'H }
+    ::= { rlQosServTemplateEntry 8 }
+
+rlQosServTemplateSrcIp OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the source Ip field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 9 }
+
+rlQosServTemplateSrcIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source Ip address mask. It may specify any byte (not bit),
+         within the Ip address, for classification, designated by 0."
+    DEFVAL { '00000000'H }
+    ::= { rlQosServTemplateEntry 10 }
+
+rlQosServTemplateIpProtocol OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Ip protocol field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 11 }
+
+rlQosServTemplateSrcPort OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Tcp/Udp source port field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 12 }
+
+rlQosServTemplateDestPort OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Tcp/Udp destination port field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 13 }
+
+rlQosServTemplateTos OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Tos field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 14 }
+
+rlQosServTemplateVpt OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the VPT field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 15 }
+
+rlQosServTemplateEtherType OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Ether Type field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 16 }
+
+rlQosServTemplateTcpFlags OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Tcp flags (Control Bits) field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 17 }
+
+rlQosServTemplateIcmpType OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Icmp type field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 18 }
+
+rlQosServTemplateIcmpCode OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Icmp code field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 19 }
+
+rlQosServTemplateIgmpType OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Include the Igmp type field as a template classifier."
+    DEFVAL { false }
+    ::= { rlQosServTemplateEntry 20 }
+
+-- QoS FCL (Flow Classification List) table
+
+rlQosServFclTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServFclEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies FCL table information"
+    ::= { rlQosServ 2 }
+
+rlQosServFclEntry OBJECT-TYPE
+    SYNTAX RlQosServFclEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one Flow Classification List with
+         It's Flow Classification Element.
+         The information includes the FCL index and reference to a FCE index.
+         The indices are the Fcl index represent by rlQosServFclIndex and the
+         Fce index represent by rlQosServFclFceIndex."
+    INDEX { rlQosServFclIndex,
+            rlQosServFclFcePriority }
+    ::= { rlQosServFclTable 1 }
+
+RlQosServFclEntry::= SEQUENCE {
+    rlQosServFclIndex           INTEGER,
+    rlQosServFclFcePriority     INTEGER,
+    rlQosServFclFceIndex        INTEGER,
+    rlQosServFclStatus          RowStatus
+}
+
+rlQosServFclIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary index for the FCL table. Value '0' is invalid."
+    ::= { rlQosServFclEntry 1 }
+
+rlQosServFclFcePriority OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Priority of the FCE within the FCL."
+    ::= { rlQosServFclEntry 2 }
+
+rlQosServFclFceIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "A reference to the FCE index."
+    ::= { rlQosServFclEntry 3 }
+
+rlQosServFclStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosServFclEntry 4 }
+
+
+-- QoS FCE (Flow Classification Element) table
+
+rlQosServFceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServFceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies FCE table information"
+    ::= { rlQosServ 3 }
+
+rlQosServFceEntry OBJECT-TYPE
+    SYNTAX RlQosServFceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one Flow Classifier Element.
+         The information includes ACE index and a combination of all the other
+         classifications, as depicted in the selection field.
+         Classifiers are Mac and Ip source and destination addresses, Vlan,
+         Ip protocol, TCP & UDP source and destination ports, Dscp and Ip
+         precedence values.
+         The index is a sequential integer represent by rlQosServFceIndex."
+    INDEX { rlQosServFceIndex }
+    ::= { rlQosServFceTable 1 }
+
+RlQosServFceEntry::= SEQUENCE {
+    rlQosServFceIndex               INTEGER,
+    rlQosServFceErrorCode           INTEGER,
+    rlQosServFceSelection           BITS,
+    rlQosServFceDestMac             MacAddress,
+    rlQosServFceDestMacMask         MacAddress,
+    rlQosServFceSrcMac              MacAddress,
+    rlQosServFceSrcMacMask          MacAddress,
+    rlQosServFceVlan                INTEGER,
+    rlQosServFceVlanMask            INTEGER,
+    rlQosServFceDestIp              IpAddress,
+    rlQosServFceDestIpMask          IpAddress,
+    rlQosServFceSrcIp               IpAddress,
+    rlQosServFceSrcIpMask           IpAddress,
+    rlQosServFceIpProtocol          INTEGER,
+    rlQosServFceDestPort            INTEGER,
+    rlQosServFceDestPortMask        INTEGER,
+    rlQosServFceSrcPort             INTEGER,
+    rlQosServFceSrcPortMask         INTEGER,
+    rlQosServFceDscp                INTEGER,
+    rlQosServFceIpPrecedence        INTEGER,
+    rlQosServFceVpt                 INTEGER,
+    rlQosServFceVptMask             INTEGER,
+    rlQosServFceEtherType           INTEGER,
+    rlQosServFceTcpFlags            INTEGER,
+    rlQosServFceTcpFlagsMask        INTEGER,
+    rlQosServFceIcmpType            INTEGER,
+    rlQosServFceIcmpCode            INTEGER,
+    rlQosServFceIgmpType            INTEGER,
+    rlQosServFceStatus              RowStatus
+}
+
+rlQosServFceIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary incremental Index for the Fce table."
+    ::= { rlQosServFceEntry 1 }
+
+rlQosServFceErrorCode OBJECT-TYPE
+    SYNTAX INTEGER {
+         noError(1),
+         noTemplate(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Fce error code."
+    DEFVAL { noError }
+    ::= { rlQosServFceEntry 2 }
+
+rlQosServFceSelection OBJECT-TYPE
+    SYNTAX BITS {
+         macDestAddr(0),
+         macSrcAddr(1),
+         vlan(2),
+         ipDestAddr(3),
+         ipSrcAddr(4),
+         ipProtocol(5),
+         destPort(6),
+         srcPort(7),
+         dscp(8),
+         ipPrecedence(9),
+         vpt(10),
+         etherType(11),
+         tcpFlags(12),
+         icmpType(13),
+         icmpCode(14),
+         igmpType(15)
+         }
+
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Flow Classification Elements selection."
+    ::= { rlQosServFceEntry 3 }
+
+rlQosServFceDestMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the destination Mac address to compare with."
+--    DEFVAL { '000000000000'H }
+    ::= { rlQosServFceEntry 4 }
+
+rlQosServFceDestMacMask OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the destination Mac address mask to compare with.
+         It may specify any byte (not bit), designated by 0."
+--    DEFVAL { '000000000000'H }
+    ::= { rlQosServFceEntry 5 }
+
+rlQosServFceSrcMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the source Mac address to compare with."
+--    DEFVAL { '000000000000'H }
+    ::= { rlQosServFceEntry 6 }
+
+rlQosServFceSrcMacMask OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the source Mac address mask to compare.
+         It may specify any byte (not bit), designated by 0."
+--    DEFVAL { '000000000000'H }
+    ::= { rlQosServFceEntry 7 }
+
+rlQosServFceVlan OBJECT-TYPE
+    SYNTAX INTEGER(0..4095)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Vlan to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 8 }
+
+rlQosServFceVlanMask OBJECT-TYPE
+    SYNTAX INTEGER(0..4095)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates 12-bits Vlan bits to compare.
+         It may specify any byte (not bit), designated by 0."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 9 }
+
+rlQosServFceDestIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the destination Ip address to compare with."
+    DEFVAL { '00000000'H }
+    ::= { rlQosServFceEntry 10 }
+
+rlQosServFceDestIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the destination Ip address mask to compare.
+         It may specify any byte (not bit), designated by 0."
+    DEFVAL { '00000000'H }
+    ::= { rlQosServFceEntry 11 }
+
+rlQosServFceSrcIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the source Ip address to compare with."
+    DEFVAL { '00000000'H }
+    ::= { rlQosServFceEntry 12 }
+
+rlQosServFceSrcIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the source Ip address mask to compare.
+         It may specify any byte (not bit), designated by 0."
+    DEFVAL { '00000000'H }
+    ::= { rlQosServFceEntry 13 }
+
+rlQosServFceIpProtocol OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Ip protocol to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 14 }
+
+rlQosServFceDestPort OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the TCP/UDP destination port to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 15 }
+
+rlQosServFceDestPortMask OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates 16-bits TCP/UDP destination port bits to compare.
+         It may specify any byte (not bit), designated by 0."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 16 }
+
+rlQosServFceSrcPort OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the TCP/UDP source port to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 17 }
+
+rlQosServFceSrcPortMask OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates 16-bits TCP/UDP source port bits to compare.
+         It may specify any byte (not bit), designated by 0."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 18 }
+
+rlQosServFceDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Destination Mac address to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 19 }
+
+rlQosServFceIpPrecedence OBJECT-TYPE
+    SYNTAX INTEGER(0..7)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Ip precedence to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 20 }
+
+rlQosServFceVpt OBJECT-TYPE
+    SYNTAX INTEGER(0..7)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the VPT to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 21 }
+
+rlQosServFceVptMask OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the VPT mask to compare with.
+         It may specify any bit, designated by 0."
+--    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 22 }
+
+rlQosServFceEtherType OBJECT-TYPE
+    SYNTAX INTEGER(1501..65536)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicate the Ether Type to compare with."
+    DEFVAL { 1501 }
+    ::= { rlQosServFceEntry 23 }
+
+rlQosServFceTcpFlags OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Tcp Flags field to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 24 }
+
+    rlQosServFceTcpFlagsMask OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Tcp Flags field to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 25 }
+
+rlQosServFceIcmpType OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Icmp type to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 26 }
+
+    rlQosServFceIcmpCode OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Icmp code to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 27 }
+
+rlQosServFceIgmpType OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the Igmp type to compare with."
+    DEFVAL { 0 }
+    ::= { rlQosServFceEntry 28 }
+
+rlQosServFceStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of this table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosServFceEntry 29 }
+
+
+-- QoS profile table
+
+rlQosServProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies (service) profile table information"
+    ::= { rlQosServ 4 }
+
+rlQosServProfileEntry OBJECT-TYPE
+    SYNTAX RlQosServProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one service profile element.
+         The information includes: Profile name, type and various numeric
+         parameters associated with the profile's service types.
+         The index is sequential integer represent by rlQosServProfileIndex."
+    INDEX { rlQosServProfileIndex }
+    ::= { rlQosServProfileTable 1 }
+
+RlQosServProfileEntry::= SEQUENCE {
+    rlQosServProfileIndex               INTEGER,
+    rlQosServProfileType                INTEGER,
+    rlQosServProfileServiceType         INTEGER,
+    rlQosServProfileIngressBurstSize    Unsigned32,
+    rlQosServProfileMaxBandwidth        Unsigned32,
+    rlQosServProfileMinBandwidth        Unsigned32,
+    rlQosServProfileMaxDelay            Unsigned32,
+    rlQosServProfileStatus              RowStatus
+    }
+
+rlQosServProfileIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary index for the profile table."
+    ::= { rlQosServProfileEntry 1 }
+
+rlQosServProfileType OBJECT-TYPE
+    SYNTAX INTEGER {
+        regular(1),
+        aggregate(2)
+    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Profile's type"
+    DEFVAL{ regular }
+    ::= { rlQosServProfileEntry 2 }
+
+rlQosServProfileServiceType OBJECT-TYPE
+    SYNTAX INTEGER {
+        bestEffort(1),
+        minDelay(2),
+        committedDelay(3),
+        minMaxBandwidth(4),
+        committedBoundBandwidth(5),
+        rateLimit(6),
+        trustCos(7),
+        trustDscp(8),
+        trust(9),
+        drop(10),
+        dropAndDisablePort(11)
+
+    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Profile's service type."
+    DEFVAL{ bestEffort }
+    ::= { rlQosServProfileEntry 3 }
+
+rlQosServProfileIngressBurstSize OBJECT-TYPE
+    SYNTAX Unsigned32(0..1000000)
+    UNITS   "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Profile's Ingress Burst Size, used only by the 'rate limit' service."
+    DEFVAL{ 3000 }
+    ::= { rlQosServProfileEntry 4 }
+
+rlQosServProfileMaxBandwidth OBJECT-TYPE
+    SYNTAX Unsigned32(0..10000000)
+    UNITS   "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Profile's Max Bandwidth, used by the 'min delay', committed delay'
+         'min max bandwidth' and committed Bound Bandwidth'services.
+         Value 0 is used only as default value, and is invalid otherwise."
+    DEFVAL{ 0 }
+    ::= { rlQosServProfileEntry 5 }
+
+rlQosServProfileMinBandwidth OBJECT-TYPE
+    SYNTAX Unsigned32(0..10000000)
+    UNITS   "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Profile's Min Bandwidth, used only by the 'min max bandwidth'
+         service.
+         Value 0 is used only as default value, and is invalid otherwise."
+    DEFVAL{ 0 }
+    ::= { rlQosServProfileEntry 6 }
+
+rlQosServProfileMaxDelay  OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "milliseconds"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Profile's Max Delay, used only by the 'committed delay' service.
+         Value 0 is used only as default value, and is invalid otherwise."
+    DEFVAL{ 0 }
+    ::= { rlQosServProfileEntry 7 }
+
+rlQosServProfileStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosServProfileEntry 8 }
+
+
+-- QoS service table
+
+rlQosServServiceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies service table information."
+    ::= { rlQosServ 5 }
+
+rlQosServServiceEntry OBJECT-TYPE
+    SYNTAX RlQosServServiceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one service profile element.
+        The information includes: service's index, priority, pointers to
+        associated profile and Fcl, operational and administrative statuses,
+        ingress and egress interface lists, and two operational parameter
+        values associated with a service type, as defined in the profile table.
+        The index is sequential integer represent by rlQosServServiceIndex."
+    INDEX { rlQosServServiceIndex }
+    ::= { rlQosServServiceTable 1 }
+
+RlQosServServiceEntry::= SEQUENCE {
+    rlQosServServiceIndex               INTEGER,
+    rlQosServServicePriority            Unsigned32,
+    rlQosServServiceProfilePointer      INTEGER,
+    rlQosServServiceFclPointer          INTEGER,
+    rlQosServServiceInIfList            PortList,
+    rlQosServServiceOutIfList           PortList,
+    rlQosServServiceScaledOutIfList     PortList,
+    rlQosServServiceProfileParamOper    Unsigned32,
+    rlQosServServiceStatusOper          RlQosServServiceStatus,
+    rlQosServServiceStatusAdmin         RlQosServServiceStatus,
+    rlQosServServiceStatus              RowStatus
+}
+
+rlQosServServiceIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An arbitrary index for the service table."
+    ::= { rlQosServServiceEntry 1 }
+
+rlQosServServicePriority OBJECT-TYPE
+    SYNTAX Unsigned32(1..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Service's priority."
+    ::= { rlQosServServiceEntry 2 }
+
+rlQosServServiceProfilePointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Pointer to attached profile entry."
+    ::= { rlQosServServiceEntry 3 }
+
+rlQosServServiceFclPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Pointer to attached FCL entry."
+    ::= { rlQosServServiceEntry 4 }
+
+rlQosServServiceInIfList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Ingress interface list associated with this service entry."
+    ::= { rlQosServServiceEntry 5 }
+
+rlQosServServiceOutIfList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Egress interface list associated with this service entry."
+    ::= { rlQosServServiceEntry 6 }
+
+rlQosServServiceScaledOutIfList OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Egress scaled interface list associated with this service entry."
+    ::= { rlQosServServiceEntry 7 }
+
+rlQosServServiceProfileParamOper OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "If the service type specified in a profile associated with this entry
+         has a parameter, this object instance specifies the parameter's
+         operative value.
+         This value will be different from the value defined in the associated
+         profile only in case of scaling out, otherwise value 0 is used."
+    ::= { rlQosServServiceEntry 8 }
+
+rlQosServServiceStatusOper  OBJECT-TYPE
+    SYNTAX RlQosServServiceStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operational value of the service status."
+    ::= { rlQosServServiceEntry 9 }
+
+rlQosServServiceStatusAdmin  OBJECT-TYPE
+    SYNTAX RlQosServServiceStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Administrative value of the service status."
+    DEFVAL{ suspended }
+    ::= { rlQosServServiceEntry 10 }
+
+rlQosServServiceStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosServServiceEntry 11 }
+
+
+-- QoS service priority table
+
+rlQosServServicePriorityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServServicePriorityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies service priority table information."
+    ::= { rlQosServ 6 }
+
+rlQosServServicePriorityEntry OBJECT-TYPE
+    SYNTAX RlQosServServicePriorityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table maps a priority to a service.
+        The information includes: service's priority and the service index
+        in the service table.
+        The index is sequential integer represent by
+        rlQosServServicePriorityIndex."
+    INDEX { rlQosServServicePriorityIndex }
+    ::= { rlQosServServicePriorityTable 1 }
+
+RlQosServServicePriorityEntry::= SEQUENCE {
+    rlQosServServicePriorityIndex       INTEGER,
+    rlQosServServicePriorityPointer     INTEGER
+}
+
+rlQosServServicePriorityIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The service priority."
+    ::= { rlQosServServicePriorityEntry 1 }
+
+rlQosServServicePriorityPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the service associated with this priority in the service
+         table."
+    ::= { rlQosServServicePriorityEntry 2 }
+
+
+--  QoS service type DSCP and VPT default mapping
+
+rlQosServServiceDefaultMappingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServServiceDefaultMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies service priority table information."
+    ::= { rlQosServ 7 }
+
+rlQosServServiceDefaultMappingEntry OBJECT-TYPE
+    SYNTAX RlQosServServiceDefaultMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes one service priority entry.
+        The information includes: service's priority, a pointer to its
+        corresponding index in the service table.
+        The index is sequential integer represent by
+        rlQosServServicePriorityIndex."
+    INDEX { rlQosServServiceDefaultMappingType }
+    ::= { rlQosServServiceDefaultMappingTable 1 }
+
+RlQosServServiceDefaultMappingEntry::= SEQUENCE {
+    rlQosServServiceDefaultMappingType      INTEGER,
+    rlQosServServiceDefaultMappingDscp      INTEGER,
+    rlQosServServiceDefaultMappingVpt       INTEGER
+}
+
+rlQosServServiceDefaultMappingType OBJECT-TYPE
+    SYNTAX INTEGER {
+        bestEffort(1),
+        minDelay(2),
+        committedDelay(3),
+        minMaxBandwidth(4),
+        committedBoundBandwidth(5),
+        rateLimit(6),
+        trustDscp(7)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Service type for the default mapping.
+         'Trust DSCP' service type is absent since no default mapping
+         is possible for it."
+    ::= { rlQosServServiceDefaultMappingEntry 1 }
+
+rlQosServServiceDefaultMappingDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..64)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "DSCP default mapping value.
+         A value of 64 means no DSCP default mapping is done."
+    ::= { rlQosServServiceDefaultMappingEntry 2 }
+
+rlQosServServiceDefaultMappingVpt OBJECT-TYPE
+    SYNTAX INTEGER (0..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Vpt default mapping value.
+         A value of 9 means no VPT default mapping is done."
+    ::= { rlQosServServiceDefaultMappingEntry 3 }
+
+--  QoS scaling error table
+
+rlQosServScalingErrorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServScalingErrorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies scaling error table"
+    ::= { rlQosServ 8 }
+
+rlQosServScalingErrorEntry OBJECT-TYPE
+    SYNTAX RlQosServScalingErrorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table specifies for each interface its scaling
+        error, if such indeed exists."
+    INDEX { rlQosServScalingErrorIfIndex }
+    ::= { rlQosServScalingErrorTable 1 }
+
+RlQosServScalingErrorEntry::= SEQUENCE {
+        rlQosServScalingErrorIfIndex        InterfaceIndex,
+        rlQosServScalingErrorReason         INTEGER
+}
+
+rlQosServScalingErrorIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The interface index."
+    ::= { rlQosServScalingErrorEntry 1 }
+
+rlQosServScalingErrorReason OBJECT-TYPE
+    SYNTAX INTEGER {
+        changeSpeed-10000to1000(1),
+        changeSpeed-10000to100(2),
+        changeSpeed-10000to10(3),
+        changeSpeed-1000to100(4),
+        changeSpeed-1000to10(5),
+        changeSpeed-100to10(6),
+        changeSpeed-10to100(7),
+        changeSpeed-10to1000(8),
+        changeSpeed-10to10000(9),
+        changeSpeed-100to1000(10),
+        changeSpeed-100to10000(11),
+        changeSpeed-1000to10000(12)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Scaling error reason."
+    ::= { rlQosServScalingErrorEntry 2 }
+
+-- QoS free sequential table
+
+rlQosServFreeSequentialTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServFreeSequentialEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used to get free indices of tables to create
+         new entries, and next free priorities.
+         The algorithm for free indexes depends on table types:
+         Fcl table        - first free index.
+         Fce table        - first free index.
+         Service table    - first free index.
+         Service priority - last used priority + priority-delta.
+
+         The priority-delta is used to supply QoS MIB user easy new priority
+         insert entry capabilities.
+         Values of these deltas depend on the MIB implementation.
+         The 'Get and Increment' approach is used in all cases."
+    ::= { rlQosServ 9 }
+
+rlQosServFreeSequentialEntry OBJECT-TYPE
+    SYNTAX RlQosServFreeSequentialEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry is used to get free index for particular table."
+    INDEX  { rlQosServFreeSequentialId }
+    ::= { rlQosServFreeSequentialTable 1 }
+
+RlQosServFreeSequentialEntry ::= SEQUENCE  {
+    rlQosServFreeSequentialId           INTEGER,
+    rlQosServFreeSequentialValue        INTEGER
+}
+
+rlQosServFreeSequentialId OBJECT-TYPE
+    SYNTAX INTEGER {
+        fcl(1),
+        fce(2),
+        profile(3),
+        service(4),
+        priorityService(5)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the sequential, for which free indices or priority
+         are retrieved."
+    ::= { rlQosServFreeSequentialEntry 1 }
+
+rlQosServFreeSequentialValue OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The free index for the table or service priority.
+         Returned '0' means no free entries/priority."
+    ::= { rlQosServFreeSequentialEntry 2 }
+
+-- QoS name to index table
+
+rlQosServNameToIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServNameToIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used to get specific table(s) indices from the name."
+    ::= { rlQosServ 10 }
+
+rlQosServNameToIndexEntry OBJECT-TYPE
+    SYNTAX  RlQosServNameToIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to get index form particular name and table type."
+    INDEX  {  rlQosServNameToIndexTableId,
+              rlQosServNameToIndexName}
+    ::= { rlQosServNameToIndexTable 1 }
+
+RlQosServNameToIndexEntry ::= SEQUENCE  {
+    rlQosServNameToIndexTableId      RlQosServNamedTableId,
+    rlQosServNameToIndexName         DisplayString,
+    rlQosServNameToIndexValue        INTEGER,
+    rlQosServNameToIndexStatus       RowStatus
+}
+
+rlQosServNameToIndexTableId OBJECT-TYPE
+    SYNTAX RlQosServNamedTableId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the table, for which the index is retrieved."
+    ::= { rlQosServNameToIndexEntry 1 }
+
+rlQosServNameToIndexName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Name of the table's entry"
+    ::= { rlQosServNameToIndexEntry 2 }
+
+rlQosServNameToIndexValue OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The index of the table. Value '0' is invalid."
+    ::= { rlQosServNameToIndexEntry 3 }
+
+rlQosServNameToIndexStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlQosServNameToIndexEntry 4 }
+
+-- QoS index to name table
+
+rlQosServIndexToNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosServIndexToNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table is used to get specific table(s) name from indices.
+         It is a read-write table for internal (CDB) purpose only and is not to
+         set by outside users."
+    ::= { rlQosServ 11 }
+
+rlQosServIndexToNameEntry OBJECT-TYPE
+    SYNTAX  RlQosServIndexToNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry is used to get name form particular index and table type."
+    INDEX  {  rlQosServIndexToNameTableId,
+              rlQosServIndexToNameIndex}
+    ::= { rlQosServIndexToNameTable 1 }
+
+RlQosServIndexToNameEntry ::= SEQUENCE  {
+    rlQosServIndexToNameTableId      RlQosServNamedTableId,
+    rlQosServIndexToNameIndex        INTEGER,
+    rlQosServIndexToNameValue        DisplayString
+}
+
+rlQosServIndexToNameTableId OBJECT-TYPE
+    SYNTAX RlQosServNamedTableId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the table, for which the name is retrieved."
+    ::= { rlQosServIndexToNameEntry 1 }
+
+rlQosServIndexToNameIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of the table. Value '0' is invalid."
+    ::= { rlQosServIndexToNameEntry 2 }
+
+rlQosServIndexToNameValue OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name of the table's entry"
+    ::= { rlQosServIndexToNameEntry 3 }
+
+-- QoS Mib version
+
+rlQosServMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1.
+         1 - original version.
+         2- "
+    ::= { rlQosServ 12 }
+
+-- QoS Mib action
+
+rlQosServMibAction OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(1),
+        importPolicy(2),
+        noImportPolicy(3),
+        flatServicePriorities(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Actions to be performed by QoS service mode MIB."
+    DEFVAL { none }
+    ::= { rlQosServ 13 }
+
+END

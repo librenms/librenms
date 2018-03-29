@@ -1,0 +1,340 @@
+--
+-- Juniper Enterprise Specific MIB:LDP MIB Extension
+-- 
+-- Copyright (c) 2002-2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-LDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    IpAddress, Counter64, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    jnxMibs, jnxLdpTraps
+        FROM JUNIPER-SMI
+    jnxMplsLdpSesState
+        FROM JUNIPER-MPLS-LDP-MIB
+    MplsVpnName
+	FROM MPLS-VPN-MIB
+    InetAddressType, InetAddress, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB;
+
+jnxLdp MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:54 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The MIB modules extends the LDP mib draft."
+
+    REVISION     "200408100000Z"    -- Aug 10, 2004
+    DESCRIPTION  "Added 'jnxLdpInstanceName' to the jnxLdpLspUp and 
+		  jnxLdpLspDown trap."
+
+    REVISION     "200406230000Z"    -- Jun 23, 2004
+    DESCRIPTION  "Modified description of jnxLdpSesDownIf and jnxLdpSesDown."
+
+    REVISION     "200406220000Z"    -- Jun 22, 2004
+    DESCRIPTION  "Added 'jnxLdpSesUpIf' to the jnxLdpSesUp trap."
+
+    REVISION      "200201100000Z" 
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxMibs 14 }
+
+
+
+    jnxLdpTrapVars      OBJECT IDENTIFIER ::= { jnxLdp 1 }
+
+--
+-- define branches for jnx ldp traps
+--
+-- Note that we need jnxLdpTrapPrefix with the 0
+-- sub-identifier to make this MIB translate to
+-- an SNMPv1 format in a reversible way. For example
+-- it is needed for proxies that convert SNMPv1 traps
+-- to SNMPv2 notifications without MIB knowledge.
+--   
+
+    jnxLdpTrapPrefix    OBJECT IDENTIFIER ::= { jnxLdpTraps 0 }
+
+jnxLdpLspFec OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"The LSP FEC in IP address format."
+    ::= { jnxLdpTrapVars 1 }
+
+jnxLdpRtrid OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"The router id of the sending router."
+    ::= { jnxLdpTrapVars 2 }
+
+jnxLdpLspDownReason OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                    topologyChanged (1), 
+		    receivedWithdrawl (2),
+		    neighborDown (3),
+		    filterChanged (4),
+		    bfdSessionDown (5),
+		    unknown (6),
+		    lspingDown (7) }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"The reason why the LSP went down. Can be one of the following:
+	the topology changed, the neighbor withdrew the label, 
+	the neighbor went down, the filter changed, the BFD session
+	went down, lsping down, or the reason is unknown."
+    ::= { jnxLdpTrapVars 3 }
+
+jnxLdpSesDownReason OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                    unknown (0),
+                    holdExpired (1), 
+		    connectionExpired (2),
+		    allAdjacenciesDown (3),
+		    badTLV (4),
+		    badPDU (5),
+		    connectionError (6),
+		    connectionReset (7),
+		    peerSentNotification (8),
+		    unexpectedEOF (9),
+		    authenticationChanged (10),
+		    initError (11),
+		    gracefulRestartAbort (12),
+		    cliCommand (13),
+		    gracefulRestartChanged (14) }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"The reason why the session transitioned to nonexistent state. 
+	Can be one of the following:
+	unknown reason, hold time expired, connection time expired, 
+	all adjacencies down,  received bad tlv, received bad pdu, 
+	connectionn error, connection reset, received notification from peer, 
+	received unexpected end-of-file, authentication key was changed, 
+	error during initialization, graceful restart was aborted or cli
+	command."
+    ::= { jnxLdpTrapVars 4 }
+
+jnxLdpSesDownIf OBJECT-TYPE
+    SYNTAX        InterfaceIndexOrZero
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"This variable is the snmp index of the interface relevant to the 
+	session-down  event. If no interface can be correlated to the 
+	session-down, then it is the interface associated with one of 
+	the neighbors."
+    ::= { jnxLdpTrapVars 5 }
+
+jnxLdpLspFecLen OBJECT-TYPE
+    SYNTAX        INTEGER (0..32)
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"The length in bits of the LSP FEC prefix."
+    ::= { jnxLdpTrapVars 6 }
+
+jnxLdpSesUpIf OBJECT-TYPE
+    SYNTAX        InterfaceIndexOrZero
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+	"This variable is the interface index of one of the neighbors
+	associated with this session."
+    ::= { jnxLdpTrapVars 7 }
+
+jnxLdpInstanceName OBJECT-TYPE
+    SYNTAX        MplsVpnName
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "Name of the VPN instance."
+    ::= { jnxLdpTrapVars 8 }
+
+
+jnxLdpLspUp NOTIFICATION-TYPE
+    OBJECTS  { jnxLdpLspFec, jnxLdpRtrid, jnxLdpLspFecLen, jnxLdpInstanceName}
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when an LSP comes up."
+    ::= { jnxLdpTrapPrefix 1 }
+
+jnxLdpLspDown NOTIFICATION-TYPE
+    OBJECTS  { jnxLdpLspFec, jnxLdpRtrid, jnxLdpLspDownReason, jnxLdpLspFecLen,
+	       jnxLdpInstanceName }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the LSP goes down."
+    ::= { jnxLdpTrapPrefix 2 }
+
+jnxLdpSesUp NOTIFICATION-TYPE
+    OBJECTS  { jnxMplsLdpSesState,
+               jnxLdpSesUpIf}
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the value of 'jnxMplsLdpSesState'
+	 enters the 'operational(5) state."
+    ::= { jnxLdpTrapPrefix 3 }
+
+jnxLdpSesDown NOTIFICATION-TYPE
+    OBJECTS  { jnxMplsLdpSesState, 
+               jnxLdpSesDownReason,
+	       jnxLdpSesDownIf}
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the value of 'jnxMplsLdpSesState'
+	leaves the 'operational(5) state. The value of jnxLdpSesDownIf is 
+	one of the neighbor's interface. It is the interface associated with
+	the last neighbor when jnxLdpSesDownReason is allAdjacenciesDown (3)."
+    ::= { jnxLdpTrapPrefix 4 }
+
+
+
+jnxLdpStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxLdpStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "Table of statistics of Ldp FECs."
+
+    ::= { jnxLdp 2 }
+
+jnxLdpStatsEntry OBJECT-TYPE
+    SYNTAX     JnxLdpStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing statistics information about a particular
+         LDP FEC."
+    INDEX { jnxLdpInstanceId,
+	    jnxLdpFecType,
+	    jnxLdpFec,
+	    jnxLdpFecLength }
+    ::= { jnxLdpStatsTable 1 }
+
+JnxLdpStatsEntry ::=
+    SEQUENCE {
+	jnxLdpInstanceId     	Unsigned32,
+	jnxLdpFecType	 	InetAddressType,
+	jnxLdpFec	    	InetAddress,
+	jnxLdpFecLength		InetAddressPrefixLength,
+	jnxLdpFecStatisticsStatus INTEGER,
+	jnxLdpIngressOctets  	Counter64,
+        jnxLdpIngressPackets 	Counter64,
+	jnxLdpTransitOctets  	Counter64,
+        jnxLdpTransitPackets 	Counter64
+    }
+
+jnxLdpInstanceId OBJECT-TYPE
+    SYNTAX     	Unsigned32
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION "LDP instance."
+    ::= { jnxLdpStatsEntry 1 }
+
+jnxLdpFecType OBJECT-TYPE
+    SYNTAX     	InetAddressType
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION 
+	"Type of this LDP FEC."
+    ::= { jnxLdpStatsEntry 2 }
+
+jnxLdpFec OBJECT-TYPE
+    SYNTAX     	InetAddress (SIZE (4|16))
+    MAX-ACCESS	not-accessible
+    STATUS     	current
+    DESCRIPTION "LDP FEC."
+    ::= { jnxLdpStatsEntry 3 }
+
+jnxLdpFecLength OBJECT-TYPE
+    SYNTAX     	InetAddressPrefixLength (0..32)
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION "LDP FEC length (in bits)."
+    ::= { jnxLdpStatsEntry 4 }
+
+jnxLdpFecStatisticsStatus OBJECT-TYPE
+    SYNTAX     	INTEGER {
+			ok(1),
+			disabled(2),
+			unavailable(3)
+		}
+    MAX-ACCESS 	read-only
+    STATUS     	current
+    DESCRIPTION
+        "Indicates the status of traffic statistics for this FEC.
+	 For penultimate hop FECs traffic statistics can be disabled.
+	 For such FECs, the following objects will have the value '0'."
+      ::= { jnxLdpStatsEntry 5 }
+
+jnxLdpIngressOctets OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS     	current
+    DESCRIPTION
+        "The number of octets of traffic originated on 
+	 this box, forwarded over the current LDP FEC. The
+	 number reported is not realtime and may be subject 
+	 to several minutes delay. The delay is controllable
+	 by ldp statistics gathering interval, which by
+         default is 5 minutes."
+    ::= { jnxLdpStatsEntry 6 }
+
+jnxLdpIngressPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets of traffic originated on
+ 	 this box, forwarded over the current LDP FEC. The
+         number reported is not realtime and may be subject 
+	 to several minutes delay. The delay is controllable
+	 by ldp statistics gathering interval, which by
+         default is 5 minutes."
+    ::= { jnxLdpStatsEntry 7 }
+
+jnxLdpTransitOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets of traffic destined to this FEC,
+	 originated on a different box, forwarded over the 
+	 current LDP FEC. The number reported is not realtime 
+         and may be subject to several minutes delay. The delay 
+         is controllable by ldp statistics gathering interval, 
+         which by default is 5 minutes."
+    ::= { jnxLdpStatsEntry 8 }
+
+jnxLdpTransitPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets of traffic destined to this FEC,
+	 originated on a different box, forwarded over the 
+	 current LDP FEC. The number reported is not realtime 
+         and may be subject to several minutes delay. The delay 
+         is controllable by ldp statistics gathering interval, 
+         which by default is 5 minutes."
+      ::= { jnxLdpStatsEntry 9 }
+
+END

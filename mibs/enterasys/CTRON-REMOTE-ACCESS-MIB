@@ -1,0 +1,3551 @@
+CTRON-REMOTE-ACCESS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-remote-access-mib.txt  The Cabletron Remote Access MIB.
+--  Revision: 1.00.04 
+--  Part Number: 
+--  Date:  November 24, 1998 
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for part
+--  of the naming tree below:
+--
+--  cabletron { enterprises 52 }
+--
+--  This module will be extended, as additional sub-sections
+--  of this naming tree are defined.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 1997 Cabletron Systems
+
+
+   IMPORTS
+        IpAddress, Counter,enterprises          FROM RFC1155-SMI
+        DisplayString                           FROM RFC1213-MIB
+        OBJECT-TYPE                             FROM RFC-1212;
+
+
+        Index ::= INTEGER
+
+        DLCI ::= INTEGER
+
+        --  DisplayString ::= OCTET STRING
+
+        cabletron               OBJECT IDENTIFIER ::= { enterprises 52 }
+--                      1.3.6.1.4.1.52
+
+        mibs                    OBJECT IDENTIFIER ::= { cabletron 4 }
+--                      1.3.6.1.4.1.52.4
+
+        ctron                   OBJECT IDENTIFIER ::= { mibs 1 }
+--                      1.3.6.1.4.1.52.4.1
+
+        ctDataLink              OBJECT IDENTIFIER ::= { ctron 2 }
+--                      1.3.6.1.4.1.52.4.1.2
+
+        ctronWan                OBJECT IDENTIFIER ::= { ctDataLink 7 }
+--                      1.3.6.1.4.1.52.4.1.2.7
+
+        ctRemoteAccess          OBJECT IDENTIFIER ::= { ctronWan 2 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2
+----------------------------------------------------------
+-- Groups
+
+        ctRemoteConnection      OBJECT IDENTIFIER ::= { ctRemoteAccess 1 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.1
+
+        ctDs1Ext                OBJECT IDENTIFIER ::= { ctRemoteAccess 2 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.2
+
+        ctRs232Ext              OBJECT IDENTIFIER ::= { ctRemoteAccess 3 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.3
+
+        ctFrDcp                 OBJECT IDENTIFIER ::= { ctRemoteAccess 4 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.4
+
+        ctDDSExt                OBJECT IDENTIFIER ::= { ctRemoteAccess 5 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.5
+
+        ctPPPExt                OBJECT IDENTIFIER ::= { ctRemoteAccess 6 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.6
+    
+        ctWanalyzer             OBJECT IDENTIFIER ::= { ctRemoteAccess 7 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.7
+
+    ctDs1Alarms     OBJECT IDENTIFIER ::= { ctRemoteAccess 8 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.8
+
+    ctIPPQFilters  OBJECT IDENTIFIER  ::= { ctRemoteAccess 9 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.9
+        
+        ctDs3Ext                OBJECT IDENTIFIER ::= { ctRemoteAccess 10 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.10
+
+--      Cabletron Remote Access Connection Group
+--      This group is mandatory for all platforms that have one or more
+--      physical remote access connections
+
+        ctRemNumConnections OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object describes the number of physical remote 
+                access connections on the platform."
+        ::= { ctRemoteConnection 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.1
+
+        ctRemPhysPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtRemPhysPortEntry
+        ACCESS  not-accessible  
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of the descriptions of the physical remote access
+                 ports of this platform."
+        ::= { ctRemoteConnection 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2
+
+        ctRemPhysPortEntry OBJECT-TYPE
+        SYNTAX  CtRemPhysPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A physical port entry. It contains objects relating to a
+                given physical remote access port"
+        INDEX   { ctRemConnectionIndex }
+        ::= { ctRemPhysPortTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1
+
+        CtRemPhysPortEntry ::=
+        SEQUENCE {
+                        ctRemConnectionIndex
+                        INTEGER,
+                        ctRemPhysPortType
+                        INTEGER,
+                        ctRemPhysPortSpecificMib
+                        OBJECT IDENTIFIER,
+                        ctRemPhysPortProtMgrType
+                        INTEGER,
+                        ctRemPhysPortProtMgrIfaceNum
+                        INTEGER,
+                        ctRemPhysPortWanIfaceNum
+                        INTEGER,
+                        ctRemPhysPortProtMgrMaxIfos
+                        INTEGER,
+                        ctRemPhysPortProtMgrIfaceList
+                        DisplayString,
+                        ctRemPhysAlarmTimeOut
+                        INTEGER,
+                        ctRemPhysWpimType
+                        INTEGER
+                        }
+
+        ctRemConnectionIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A value indicating the remote connection this entry
+                is located on."
+        ::= { ctRemPhysPortEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.1
+
+        ctRemPhysPortType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        t1(2),
+                        e1(3),
+                        synchronous(4),
+                        dds(5),
+                        di(6),           -- Drop and Insert
+                        hdsl(7),
+                        isdnBRI(8),
+                        ds30(9),
+                        t1dds(10)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The type of physical port that this entry describes. None
+                indicates that the physical port has no connector."
+        DEFVAL { none }
+        ::= { ctRemPhysPortEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.2
+
+        ctRemPhysPortSpecificMib OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies an instance of the
+                index object in the first group of objects in the
+                MIB specific to the physical port."
+        ::= { ctRemPhysPortEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.3
+
+        ctRemPhysPortProtMgrType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        pppNailedUp(2),
+                        isdnPriPpp(3),
+                        isdnBriPpp(4),
+                        frameRelayPvcRtr(5),
+                        frameRelayPvcSw(6),
+                        hdlc(7)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies an instance of the type
+                of Protocol Manager residing on this physical
+                port.  Before a physical port may be used, the type
+                of manager must be designated.  For example, if the
+                physical port was going to be used as an ISDN PRI
+                interface, with dial up PPP links, then the manager
+                type would be set to (4), ISDN-PRI-PPP."
+        DEFVAL { none }
+        ::= { ctRemPhysPortEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.4
+
+        ctRemPhysPortProtMgrIfaceNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies the interface number that
+                will be assigned to the Protocol Managers IFO"
+        ::= { ctRemPhysPortEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.5
+
+        ctRemPhysPortWanIfaceNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies the interface number that
+                will be assigned to the Wanio's IFO"
+        ::= { ctRemPhysPortEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.6
+
+        ctRemPhysPortProtMgrMaxIfos OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION   
+                "This object identifies the maximum number of IFO's
+                that can be created on this physical interface."
+        ::= { ctRemPhysPortEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.7
+
+        ctRemPhysPortProtMgrIfaceList OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies a list of interfaces that
+                will be assigned to this Protocol Managers data IFO's"
+        ::= { ctRemPhysPortEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.8
+
+        ctRemPhysAlarmTimeOut OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Whenever the physical port is configured for nailed-up 
+                PPP this object specifies the time the physical port 
+                must remain in a failed state as a condition to begin 
+                the backup procedure. The backup procedure is begun for 
+                any active interface(s) that were connected over the
+                failed physical port and which have been configured for 
+                backup."
+        ::= { ctRemPhysPortEntry 9 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.9
+
+        ctRemPhysWpimType OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This Mib object determines the Mode of operation that
+                the T1/DDS Wpim module will function as. Setting a value
+                of 1 will set the mode to DDS, setting a value of 2 will
+                set the mode to T1."
+        DEFVAL { 2 }
+        ::= { ctRemPhysPortEntry 10 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.2.1.10
+
+        ctRemInterfaceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtRemInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The interface table for Cabletron remote interfaces.
+                It is a list of items that are pertinant to the interfaces
+                that are part of remote physical ports. The number of 
+                entries is dependent upon the total number of remote 
+                interfaces configured."
+        ::= { ctRemoteConnection 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3
+
+        ctRemInterfaceEntry OBJECT-TYPE
+        SYNTAX  CtRemInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A remote interface entry. It
+                contains objects relating to an interface that is defined
+                for remote Cabletron products."
+        INDEX   { ctRemIntEntIfIndex }
+        ::= { ctRemInterfaceTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1
+
+        CtRemInterfaceEntry  ::=
+        SEQUENCE {
+                        ctRemIntEntIfIndex
+                        INTEGER,
+                        ctRemIntEntCompression
+                        INTEGER,
+                        ctRemIntEntCompRatio
+                        DisplayString,
+                        ctRemIntEntCompStatus
+                        INTEGER,
+                        ctRemIntEntMTU
+                        INTEGER,
+                        ctRemIntEntCongestion
+                        INTEGER,
+                        ctRemIntEntMaxProfiles
+                        INTEGER,
+                        ctRemIntEntTxIdleTimeout
+                        INTEGER,
+                        ctRemIntEntRxIdleTimeout
+                        INTEGER,
+                        ctRemIntEntCircuitName
+                        DisplayString,
+                        ctRemIntEntEncryption
+                        INTEGER,
+                        ctRemIntEntEncryptStatus
+                        INTEGER
+                        }
+
+        ctRemIntEntIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctRemInterfaceEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.1
+
+        ctRemIntEntCompression OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                on(1),
+                                off(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This flag will indicate whether compression should take
+                place on this interface."
+        DEFVAL { off }
+        ::= { ctRemInterfaceEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.2
+
+        ctRemIntEntCompRatio OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This string indicates the current compression ratio
+                on this interface."
+        ::= { ctRemInterfaceEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.3
+
+        ctRemIntEntCompStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                on(1),
+                                off(2)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This flag will indicate whether compression has been 
+                nogotiated on this interface."
+        ::= { ctRemInterfaceEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.4
+
+        ctRemIntEntMTU OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The MTU to be negotiated for this interface. This will 
+                not be updated with the actual MTU, which can be found 
+                in the ifTable."
+        ::= { ctRemInterfaceEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.5
+
+        ctRemIntEntCongestion OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                enabled(1),
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies the Leaky Bucket algorithm flag for
+                a Frame Relay circuit on this intertface. The option is 
+                supported when this flag is enabled, and not supported 
+                when this flag is disabled."
+        DEFVAL { disabled }
+        ::= { ctRemInterfaceEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.6
+
+        ctRemIntEntMaxProfiles OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "This object specifies the maximum number of neighbor profiles.
+        A neighbor profile describes a possible connection. The maximum
+        should be set to account for support of PPP multilink. That is
+        to say, if PPP multilink is being used then the number of profiles
+        must at least accomodate the maximum possible number of additional
+        more BW connections. As such, each neighbor profile would then
+        describe a possible connection to the same remote end point."
+        ::= { ctRemInterfaceEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.7
+
+        ctRemIntEntTxIdleTimeout OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies the idle timeout value in which a 
+                packet needs to be transmitted before the interface is 
+                automatically disconnected. Allowed values are in 
+                increments of five seconds including zero."
+        ::= { ctRemInterfaceEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.8
+
+        ctRemIntEntRxIdleTimeout OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies the idle timeout in which a packet
+                needs to be received before the interface is automatically
+                disconnected. Allowed values are in increments of five 
+                seconds including zero."        
+        ::= { ctRemInterfaceEntry 9 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.9
+
+        ctRemIntEntCircuitName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "This object associates a circuit name with a specific interface."
+        ::= { ctRemInterfaceEntry 10 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.10
+
+        ctRemIntEntEncryption OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                on(1),
+                                off(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This flag will indicate whether encryption should take
+                place on this interface."
+        DEFVAL { off }
+        ::= { ctRemInterfaceEntry 11 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.11
+
+        ctRemIntEntEncryptStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                on(1),
+                                off(2)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This flag will indicate whether Encryption has been 
+                nogotiated on this interface."
+        ::= { ctRemInterfaceEntry 12 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.3.1.12
+
+        ctRemPrimaryInterfaceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtRemPrimaryInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The interface table for Cabletron remote interfaces.
+                It is a list of items that are pertinant to the interfaces
+                that are part of remote physical ports. The number of 
+                entries is dependent upon the total number of remote 
+                interfaces configured."
+        ::= { ctRemoteConnection 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.4
+
+        ctRemPrimaryInterfaceEntry OBJECT-TYPE
+        SYNTAX  CtRemPrimaryInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A remote interface entry. It
+                contains objects relating to an interface that is defined
+                for remote Cabletron products."
+        INDEX   { ctRemPriIntEntIfIndex }
+        ::= { ctRemPrimaryInterfaceTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.4.1
+
+        CtRemPrimaryInterfaceEntry  ::=
+        SEQUENCE {
+                        ctRemPriIntEntIfIndex
+                        INTEGER,
+                        ctRemPriIntEntConnectRetryInterval
+                        INTEGER
+                        }
+
+        ctRemPriIntEntIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctRemPrimaryInterfaceEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.4.1.1
+
+        ctRemPriIntEntConnectRetryInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object specifies the interval in seconds between retries 
+                for restoring the primary interface."
+        DEFVAL { 30 }
+        ::= { ctRemPrimaryInterfaceEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.4.1.2
+
+        ctRemBackupInterfaceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtRemBackupInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The interface table for Cabletron remote interfaces.
+                It is a list of items that are pertinant to the interfaces
+                that are part of remote physical ports. The number of 
+                entries is dependent upon the total number of remote 
+                interfaces configured."
+        ::= { ctRemoteConnection 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5
+
+        ctRemBackupInterfaceEntry OBJECT-TYPE
+        SYNTAX  CtRemBackupInterfaceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A remote interface entry. It
+                contains objects relating to an interface that is defined
+                for remote Cabletron products."
+        INDEX   { ctRemIntEntBackupIfIndex }
+        ::= { ctRemBackupInterfaceTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1
+
+        CtRemBackupInterfaceEntry  ::=
+        SEQUENCE {
+                        ctRemIntEntBackupIfIndex
+                        INTEGER,
+                        ctRemIntEntBackupIfNum
+                        INTEGER,
+                        ctRemIntEntBackupIfInUseCnt
+                        INTEGER,
+                        ctRemIntEntBackupIfTimeToConnect
+                        INTEGER,
+                        ctRemIntEntBackupIfTimeToDisconnect
+                        INTEGER,
+                        ctRemIntEntBackupIfOverride
+                        INTEGER,
+                        ctRemIntEntBackupConnectRetries
+                        INTEGER,
+                        ctRemIntEntBackupConnectRetryInterval
+                        INTEGER
+                        }
+
+        ctRemIntEntBackupIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctRemBackupInterfaceEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.1
+
+        ctRemIntEntBackupIfNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies which ifIndex will backup this
+                interface in the event of a communications failure."
+        ::= { ctRemBackupInterfaceEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.2
+
+        ctRemIntEntBackupIfInUseCnt OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies how many other interfaces this
+                interface will backup."
+        ::= { ctRemBackupInterfaceEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.3
+
+        ctRemIntEntBackupIfTimeToConnect OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies how long to wait in seconds before
+                attempting to switchover to the backup interface. Allowed
+                values are in increments of five seconds including zero."
+        ::= { ctRemBackupInterfaceEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.4
+
+        ctRemIntEntBackupIfTimeToDisconnect OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies how long to wait in seconds before
+                attempting to switchover to the primary interface. Allowed
+                values are in increments of five seconds including zero."
+        ::= { ctRemBackupInterfaceEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.5
+
+        ctRemIntEntBackupIfOverride OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies if the interface will switch back to
+                the primary link after it has become active again. A force
+                condition will not allow the interface to switch back."
+        DEFVAL { disabled }
+        ::= { ctRemBackupInterfaceEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.6
+
+        ctRemIntEntBackupConnectRetries OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object specifies the number of tries to bring-up the 
+                backup interface before giving up."
+        ::= { ctRemBackupInterfaceEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.7
+
+        ctRemIntEntBackupConnectRetryInterval OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object specifies the interval in seconds between retries 
+                for bringing up backup interface before giving up."
+        ::= { ctRemBackupInterfaceEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.5.1.8
+
+        ctRemExtPhysPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtRemExtPhysPortEntry
+        ACCESS  not-accessible  
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of the descriptions of the physical remote access
+                 ports of this platform."
+        ::= { ctRemoteConnection 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6
+
+        ctRemExtPhysPortEntry OBJECT-TYPE
+        SYNTAX  CtRemExtPhysPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A physical port entry. It contains objects relating to a
+                given physical remote access port"
+        INDEX   { ctRemExtConnectionIndex }
+        ::= { ctRemExtPhysPortTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1
+
+        CtRemExtPhysPortEntry ::=
+        SEQUENCE {
+                        ctRemExtConnectionIndex
+                        INTEGER,
+                        ctRemExtProtMgrIndex
+                        INTEGER,
+                        ctRemExtPhysPortProtMgrType
+                        INTEGER,
+                        ctRemExtPhysPortProtMgrEnable
+                        INTEGER,
+                        ctRemExtPhysPortProtMgrIfaceNum
+                        INTEGER,
+                        ctRemExtPhysPortProtMgrMaxIfos
+                        INTEGER,
+                        ctRemExtPhysPortProtMgrIfaceList
+                        DisplayString,
+                        ctRemExtPhysPortProtMgrChannelList
+                        DisplayString
+                        }
+
+        ctRemExtConnectionIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A value indicating the remote connection this entry
+                is located on."
+        ::= { ctRemExtPhysPortEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.1
+
+        ctRemExtProtMgrIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A value indicating the protMgr number for this entry."
+        ::= { ctRemExtPhysPortEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.2
+
+        ctRemExtPhysPortProtMgrType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        pppNailedUp(2),
+                        isdnPriPpp(3),
+                        isdnBriPpp(4),
+                        frameRelayPvcRtr(5),
+                        frameRelayPvcSw(6),
+                        hdlc(7)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies an instance of the type
+                of Protocol Manager residing on this physical
+                port.  Before a physical port may be used, the type
+                of manager must be designated.  For example, if the
+                physical port was going to be used as an ISDN PRI
+                interface, with dial up PPP links, then the manager
+                type would be set to (4), ISDN-PRI-PPP."
+        DEFVAL { none }
+        ::= { ctRemExtPhysPortEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.3
+
+        ctRemExtPhysPortProtMgrEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies an instance of the the
+                enable flag of Protocol Manager residing on this
+                physical port."
+        DEFVAL { disabled }
+        ::= { ctRemExtPhysPortEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.4
+
+        ctRemExtPhysPortProtMgrIfaceNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies the interface number that
+                will be assigned to the Protocol Managers IFO"
+        ::= { ctRemExtPhysPortEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.5
+
+        ctRemExtPhysPortProtMgrMaxIfos OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION   
+                "This object identifies the maximum number of IFO's
+                that can be created on this physical interface."
+        ::= { ctRemExtPhysPortEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.6
+
+        ctRemExtPhysPortProtMgrIfaceList OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies a list of interfaces that
+                will be assigned to this Protocol Managers data IFO's"
+        ::= { ctRemExtPhysPortEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.7
+
+        ctRemExtPhysPortProtMgrChannelList OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object identifies a list of channles/timeslots
+                that will be assigned to this Protocol Managers data IFO's"
+        ::= { ctRemExtPhysPortEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.1.6.1.8
+
+
+-- Cabletron Ds1 Extensions Group
+-- This group is required for any platforms that have a t1 or e1 physical 
+-- port.
+
+        ctDs1ExtensionsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtDs1ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table is an extension to the standard ds1 configuration
+                table. It is a list of items that are pertinant to ds1 ports
+                on a platform. There is one entry per ds1 physical port on
+                the platform."
+        ::= { ctDs1Ext 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1
+
+        ctDs1ExtensionsEntry OBJECT-TYPE
+        SYNTAX  CtDs1ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A ds1 extensions entry containing objects relating to
+                the particular ds1 physical port."
+        INDEX   { ctDs1ExtensionsEntryIndex }
+        ::= { ctDs1ExtensionsTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1
+
+        CtDs1ExtensionsEntry ::=
+        SEQUENCE {
+                        ctDs1ExtensionsEntryIndex
+                        INTEGER,
+                        ctDs1ExtensionsNumInterfaces
+                        INTEGER,
+                        ctDs1ExtensionsToggleFracTable
+                        INTEGER,
+                        ctDs1ExtensionsLineBuildOut
+                        INTEGER,
+                        ctDs1ExtensionsCFADuration
+                        INTEGER,
+                        ctDs1ExtensionsDIEnable
+                        INTEGER,
+                        ctDs1ExtensionsTotalValidIntervals
+                        Counter,
+                        wanDs1ExtensionsBertTestMode
+                        INTEGER,
+                        wanDs1ExtensionsBertRun
+                        INTEGER,
+                        wanDs1ExtensionsBertCurrentResults
+                        INTEGER,
+                        wanDs1ExtensionsBertCumulativeResults
+                        INTEGER,
+                        wanDs1ExtensionsBertPeakResults
+                        INTEGER,
+                        wanDs1ExtensionsBertAverageResult
+                        INTEGER,
+                        wanDs1ExtensionsBertTestPattern
+                        INTEGER,
+                        wanDs1ExtensionsBertSamplePeriod
+                        INTEGER,
+                        wanDs1ExtensionsBertNumPeriods
+                        Counter,
+                        wanDs1ExtensionsBertTestTraps
+                        INTEGER,
+                        wanDs1ExtensionsBertDataStatus
+                        INTEGER
+                }
+
+        ctDs1ExtensionsEntryIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each ds1 physical port on the platform."
+        ::= { ctDs1ExtensionsEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.1
+
+        ctDs1ExtensionsNumInterfaces OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of interfaces on this physical port. This
+                number inidicates the number of entries this physical port
+                uses in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctDs1ExtensionsEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.2
+
+        ctDs1ExtensionsToggleFracTable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        update-table(1),
+                        display-new(2),
+                        display-old(3),
+                        restore-old(4)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Setting this object to 1 will cause the Ds1 Fractional 
+                Table to be updated with the new values, as entered.
+
+                Setting this object to 2, will cause the Ds1 Fractional 
+                Table to view as the table being entered.
+
+                Setting this object to 3, will cause the Ds1 Fractional 
+                Table to be the table that is currently in use, regardless 
+                of any changes being entered.
+
+                Setting this object to 4, will cause any changes that have
+                been made to the Ds1 Fractional Table since the last
+                update-table to be deleted.
+
+                For physical ports that are of type synch, or for Ds1 ports
+                that do not support the Ds1 Fractional Table, this object will
+                have no affect, and will always return a 1."
+        REFERENCE
+                "rfc-1406"
+        ::= { ctDs1ExtensionsEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.3
+
+        ctDs1ExtensionsLineBuildOut OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unknown(1),
+                        zero(2),
+                        minus-7point5(3),
+                        minus-15(4),
+                        a133to266feet(5),
+                        a266to399feet(6),
+                        a399to533feet(7),
+                        a533to655feet(8)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The line build out setting for this ds1 physical port.
+                Unknown indicates that the setting is neither readable or
+                writable."
+        DEFVAL { zero }
+        ::= { ctDs1ExtensionsEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.4
+
+        ctDs1ExtensionsCFADuration OBJECT-TYPE
+        SYNTAX  INTEGER (1..15)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The length of time (in seconds), that the ds1 port will
+                remain in the Carrier Failure Alarm state after the
+                alarm condition has cleared. For those Ds1 ports not 
+                supporting Carrier Failure Alarm duration, this object
+                always returns 1, and setting the object has no effect."
+        ::= { ctDs1ExtensionsEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.5
+
+        ctDs1ExtensionsDIEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables or disables Drop and Insert functionality on a
+                D/I WPIM.  If enabled, all zero assigned timeslots will 
+                designate D/I interface channels, if disabled all zero 
+                channels will designate dummy channels as on a T1 or E1."
+        DEFVAL { enable }
+        ::= { ctDs1ExtensionsEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.6
+
+        ctDs1ExtensionsTotalValidIntervals OBJECT-TYPE
+        SYNTAX  Counter 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of  previous  intervals  for  which
+                valid data was collected for the DS1 mib, which
+                is currently RFC1406.  This counter is similar to
+                RFC1406 dsx1ValidIntervals except that the count
+                represents the total number of complete 15 minute
+                intervals since the ds1 interface has been online,
+                and does not stop at the 24 hour period."
+        ::= { ctDs1ExtensionsEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.7
+
+    wanDs1ExtensionsBertTestMode        OBJECT-TYPE
+        SYNTAX  INTEGER{
+        none(1),
+        internal(2),
+        manual(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to request that a type of
+                process be in control of the testing function.
+                This is used to differentiate between automated test 
+                procedures and those manually controlled by a user.  
+                When read, this object reflects which type of process 
+                is actually in control of the testing function.  The 
+                implementation is free to prioritize or deny requests
+                in a proprietary manner."
+        ::= { ctDs1ExtensionsEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.8
+
+    wanDs1ExtensionsBertRun   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+                "Controls the sending of test data over this physical 
+                port.  The data is a pattern described by 
+                wanDs1ExtensionsBertTestPattern." 
+        ::= { ctDs1ExtensionsEntry 9 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.9
+
+    wanDs1ExtensionsBertCurrentResults   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the results of the testing for the
+                last completed sampling period.  A non-negative
+                number is the error rate in bits per million bits."
+        ::= { ctDs1ExtensionsEntry 10 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.10
+
+    wanDs1ExtensionsBertCumulativeResults   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the total number of errors since the
+                testing was enabled.  It is not a rate."
+        ::= { ctDs1ExtensionsEntry 11 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.11
+
+    wanDs1ExtensionsBertPeakResults   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the highest value of 
+                wanDs1ExtensionsBertCurrentResults since the testing 
+                was enabled.  A non-negative number is the error rate 
+                in bits per million bits." 
+        ::= { ctDs1ExtensionsEntry 12 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.12
+
+    wanDs1ExtensionsBertAverageResult   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "Indicates the average value of 
+                wanDs1ExtensionsBertCurrentResults since the testing 
+                was enabled.  A non-negative number is the error rate 
+                in bits per million bits." 
+        ::= { ctDs1ExtensionsEntry 13 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.13
+
+    wanDs1ExtensionsBertTestPattern     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                patternOther(1),
+                pattern1s(2),
+                pattern63(3),
+                pattern511(4),
+                pattern2047(5),
+                pattern3in24(6),
+                patternQRSS(7)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to specify the pattern of the 
+                test data."
+        ::= { ctDs1ExtensionsEntry 14 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.14
+
+    wanDs1ExtensionsBertSamplePeriod    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is the duration of time in seconds at
+                which the current test results will be periodically
+                written to wanDs1ExtensionsBertCurrentResults.  The 
+                range is 1 to 3600, with a default value of 10."
+        ::= { ctDs1ExtensionsEntry 15 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.15
+
+    wanDs1ExtensionsBertNumPeriods   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                " The number of sampling periods that have elapsed
+                during the current test run."
+        ::= { ctDs1ExtensionsEntry 16 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.16
+
+    wanDs1ExtensionsBertTestTraps       OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used to enable or disable the sending
+                of a trap at the conclusion of the measurement period.
+                The trap will contain the information described by
+                ctDs1BertCurrentResults.  The default value is disabled."
+        ::= { ctDs1ExtensionsEntry 17 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.17
+
+    wanDs1ExtensionsBertDataStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                idle(1),
+                waitingForLink(2),
+                waitingForLoopback(3),
+                running(4)
+                }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+                "This object provides the operating status of the
+                transmission of test data packets."
+        ::= { ctDs1ExtensionsEntry 18 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.1.1.18
+
+        ctDs1WanDriverTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtDs1WanDriverEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table is an extension to the standard ds1 
+                configuration table. It is a list of items that are 
+                pertinant to the hdlc driver on a platform. There is 
+                one entry per ds1 physical port on the platform."
+        ::= { ctDs1Ext 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.2
+
+        ctDs1WanDriverEntry OBJECT-TYPE
+        SYNTAX  CtDs1WanDriverEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A ds1 wan driver entry containing objects relating to
+                the particular ds1 physical port pertaining to a specific
+                channel on the wan driver chip."
+        INDEX   { ctDs1WanDriverEntryIndex, ctDs1WanDriverChannelIndex }
+        ::= { ctDs1WanDriverTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.2.1
+
+        CtDs1WanDriverEntry ::=
+        SEQUENCE        {
+                        ctDs1WanDriverEntryIndex
+                        INTEGER,
+                        ctDs1WanDriverChannelIndex
+                        INTEGER,
+                        ctDs1WanDriverLineCode
+                        INTEGER,
+                        ctDs1WanDriverCRCBits
+                        INTEGER
+                                }
+
+        ctDs1WanDriverEntryIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each ds1 physical port on the platform."
+        ::= { ctDs1WanDriverEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.2.1.1
+
+        ctDs1WanDriverChannelIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each channel on a wan driver on the 
+                platform."
+        ::= { ctDs1WanDriverEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.2.1.2
+
+        ctDs1WanDriverLineCode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none (1),
+                        jBZS (2),
+                        invHDLC (3)
+                                        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object controls the individual channels line coding 
+                on a wan driver device on the platform."
+        DEFVAL { none }
+        ::= { ctDs1WanDriverEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.2.1.3
+
+        ctDs1WanDriverCRCBits OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        crc16 (1),
+                        crc32 (2)
+                                        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object controls the individual channels CRC bits 
+                generation on a wan driver device on the platform."
+        DEFVAL { crc16 }
+        ::= { ctDs1WanDriverEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.2.2.1.4
+
+
+-- Cabletron Rs232 Extensions Group
+-- This group is only required if any physical port on the system can be
+-- classified as rs232-like
+
+        ctRs232ExtensionsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtRs232ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table is an extension to the standard rs232-like mib.
+                It is a list of items that are pertinant to rs232-like ports
+                on a platform. There is one entry per synchronous physical
+                port on the platform."
+        REFERENCE
+                "rfc-1317"
+        ::= { ctRs232Ext 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1
+
+        ctRs232ExtensionsEntry OBJECT-TYPE
+        SYNTAX  CtRs232ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A rs232-like extensions entry containing objects relating 
+                to the particular rs232-like physical port."
+        INDEX   { ctRs232ExtensionsEntryIndex }
+        ::= { ctRs232ExtensionsTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1.1
+
+        CtRs232ExtensionsEntry ::=
+        SEQUENCE        {
+                        ctRs232ExtensionsEntryIndex
+                        INTEGER,
+                        ctRs232ExtensionsCTSEnable
+                        INTEGER,
+                        ctRs232ExtensionsDSREnable
+                        INTEGER,
+                        ctRs232ExtensionsRTSEnable
+                        INTEGER,
+                        ctRs232ExtensionsDTREnable
+                        INTEGER
+                                }
+
+        ctRs232ExtensionsEntryIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each rs232-like physical port on
+                the platform."
+        ::= { ctRs232ExtensionsEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1.1.1
+
+        ctRs232ExtensionsCTSEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates  whether the platform should 
+                generate CTS. When disabled the platform will not 
+                generate CTS, when enabled, the platform will generate 
+                CTS.  The actual state of the CTS line is available 
+                in the rs-232 like mib."
+        REFERENCE
+                "rfc-1317"
+        DEFVAL { disable }
+        ::= { ctRs232ExtensionsEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1.1.2
+
+        ctRs232ExtensionsDSREnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates whether the platform should 
+                generate DSR. When disabled the platform will not 
+                generate DSR, when enabled, the platform will generate 
+                DSR.  The actual state of the DSR line is available 
+                in the rs-232 like mib."
+        REFERENCE
+                "rfc-1317 "
+        DEFVAL { disable }
+        ::= { ctRs232ExtensionsEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1.1.3
+
+        ctRs232ExtensionsRTSEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates  whether the platform should 
+                generate RTS. When disabled the platform will not 
+                generate RTS, when enabled, the platform will generate 
+                RTS.  The actual state of the RTS line is available 
+                in the rs-232 like mib."
+        REFERENCE
+                "rfc-1317"
+        DEFVAL { disable }
+        ::= { ctRs232ExtensionsEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1.1.4
+
+        ctRs232ExtensionsDTREnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object indicates whether the platform should 
+                generate DTR. When disabled the platform will not 
+                generate DSR, when enabled, the platform will generate 
+                DTR.  The actual state of the DTR line is available 
+                in the rs-232 like mib."
+        REFERENCE
+                "rfc-1317 "
+        DEFVAL { disable }
+        ::= { ctRs232ExtensionsEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.3.1.1.5
+
+--  ctFrDcp Group
+--  This group is mandatory to support Data Compression Protocol 
+--  (DCP following FRF.9) for per virtual circuit basis
+
+        frDcpCircuitTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FrDcpCircuitEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table containing data compression information about 
+                specific Data Link Connection Identifiers and 
+                corresponding virtual circuit. This information is used 
+                to support the frCircuitTable following RFC-1315."
+        ::= { ctFrDcp 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1
+
+        frDcpCircuitEntry OBJECT-TYPE
+        SYNTAX  FrDcpCircuitEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The data compression information regarding a single Data 
+                Link Connection Identifier."
+        INDEX { frDcpCircuitIfIndex, frDcpCircuitDlci }
+        ::= { frDcpCircuitTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1.1
+
+    FrDcpCircuitEntry ::=
+        SEQUENCE        {
+                        frDcpCircuitIfIndex
+                        Index,
+                        frDcpCircuitDlci
+                        DLCI,
+                        frDcpCircuitEnable
+                        INTEGER,
+                        frDcpCircuitStatus
+                        INTEGER,
+                        frDcpCircuitRatio
+                        OCTET STRING
+                                }
+
+        frDcpCircuitIfIndex OBJECT-TYPE
+        SYNTAX  Index
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex value of ifEntry that this DCP virtual 
+                circuit object is layered onto."
+        ::= { frDcpCircuitEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1.1.1
+
+        frDcpCircuitDlci OBJECT-TYPE
+        SYNTAX  DLCI
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Data Link Connection Identifier for this DCP virtual 
+                circuit object."
+        REFERENCE
+                "Draft American National Standard T1.618-1991, 
+                Section 3.3.6"
+        ::= { frDcpCircuitEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1.1.2
+
+        frDcpCircuitEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        on (1),
+                        off (2)          -- default
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether data compression should take place on
+                this particular end side virtual circuit."
+        DEFVAL { off }
+        ::= { frDcpCircuitEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1.1.3
+
+        frDcpCircuitStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        on (1),
+                        off (2)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "On indicates that the compression has been successfully
+                negotiated and is operating. Off indicates that the
+                compression negotiation has failed and compression is not
+                operating at this time, or compression has been terminated
+                by either peer."
+        ::= { frDcpCircuitEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1.1.4
+
+        frDcpCircuitRatio OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (5))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ratio of uncompressed to compressed transmitted data. 
+                If the data compression status is off, 1:1 will be 
+                displayed."
+        ::= { frDcpCircuitEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.4.1.1.5
+
+-- Cabletron DDS Extensions Group
+-- This group is required for any platforms that have a dds physical port.
+
+        ctDDSConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtDDSConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The DDS Configuration Table"
+        ::= { ctDDSExt 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1
+
+        ctDDSConfigEntry OBJECT-TYPE
+        SYNTAX  CtDDSConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An Entry in the DDS Configuration Table"
+        INDEX   { ctDDSLineIndex }
+        ::= { ctDDSConfigTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1
+
+        CtDDSConfigEntry ::=
+        SEQUENCE        {
+                        ctDDSLineIndex
+                        INTEGER,
+                        ctDDSIfIndex
+                        INTEGER,
+                        ctDDSLineMode
+                        INTEGER,
+                        ctDDSLineCoding
+                        INTEGER,
+                        ctDDSLoopbackConfig
+                        INTEGER,
+                        ctDDSLineStatus
+                        INTEGER,
+                        ctDDSTxClockSource
+                        INTEGER,
+                        ctDDSPortInSpeed
+                        INTEGER,
+                        ctDDSPortOutSpeed
+                        INTEGER
+                        }
+
+        ctDDSLineIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..'7fffffff'h)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each ds1 physical port on the 
+                platform."
+        ::= { ctDDSConfigEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.1
+
+        ctDDSIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..'7fffffff'h)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Index associated with this dds physical port"
+        ::= { ctDDSConfigEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.2
+
+        ctDDSLineMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ddsPri (1),
+                        ddsSc (2),
+                        ddsCc (3)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "DDS-PRI is full duplex 56k link, No framing in loop data
+                so loop speed is also 56k. Data stream:
+                        --d1 d2 d3 d4 d5 d6 d7--        
+                DDS-SC is also full duplex 56k link, requires framing bits 
+                to distinguish between primary and secondary channels.
+                        --d1 d2 d3 d4 d5 d6 d7 F C/S--
+                where F is framing bit and C/S for secondary channel as 
+                well as used for control bit.
+                With these two extra bits the loop speed is increased to 
+                72k.  primary channel rate is 56k.
+
+                DDS-CC is full duplex 64k link. Does not require framing 
+                bit but uses a same format as SC, nineth bit position is 
+                lumped with primary channel and not used for control.
+                Loop speed is 72k, Primary channel rate is 64k.
+                        --d1 d2 d3 d4 d5 d6 d7 F d8--"
+        ::= { ctDDSConfigEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.3
+
+        ctDDSLineCoding OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ddsNone (1),
+                        ddsJBZS (2),
+                        otherLineCode (3)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object describes the variety of Zero Code 
+                suppression on this interface.  JBZS refers to Jammed 
+                Bit Zero suppresion, which forces a 1 bit every 8 bit 
+                periods. None refers to a mode in which some other 
+                means is used to insure pulse density requirements."
+        ::= { ctDDSConfigEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.4
+
+        ctDDSLoopbackConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ddsNoLoop (1),
+                        ddsLocalLoop (2),
+                        ddsLineLoop (3),
+                        ddsOtherLoop (4)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This variable represents the loopback configuration 
+                of the DDS interface.  ddsNoLoop means the interface 
+                is not in loopback state, ddsLocalLoop means the signal 
+                is transmitted and looped back to the same interface, 
+                ddsLineLoop means the received signal at this interface 
+                does not go through the device but is looped back out, 
+                and ddsOtherLoop represents a loop not defined here."
+        ::= { ctDDSConfigEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.5
+
+        ctDDSLineStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ddsNoAlarm (1),
+                        ddsLossOfSignal (2),
+                        ddsOutOfService (3),
+                        ddsOutOfFrame (4)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This variable describes the current operational status of
+                DDS line."
+        ::= { ctDDSConfigEntry 6 }      
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.6
+
+        ctDDSTxClockSource OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ddsLoopTiming (1),
+                        ddsLocalTiming (2),
+                        ddsThroughTiming (3)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The source of Transmit clock.
+                'ddsLoopTiming' indicates that the recovered receive clock
+                is used as transmit clock.
+
+                'ddsLocalTiming' indicates that a local clock source is 
+                used.
+
+                'ddsThroughTiming' indicates that recovered receive clock 
+                from another interface is used as transmit clock."
+        ::= { ctDDSConfigEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.7
+
+        ctDDSPortInSpeed OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " This variable describes the current operational
+                receive speed of DDS line.  It is a read only value
+                based entirely on DDS type (CC or PRI)."
+        ::= { ctDDSConfigEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.8
+   
+        ctDDSPortOutSpeed OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This variable describes the current operational
+                transmit speed of DDS line.  It is a read only value
+                based entirely on DDS type CC or PRI"
+        ::= { ctDDSConfigEntry 9 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.5.1.1.9
+
+
+--
+-- Ctron PPP Counters Group.
+
+-- The following object reflect the values of the
+-- counters used for each PPP link.
+-- ctPppCountersIfIndex
+-- ctPppCountersMaxTerminate
+-- ctPppCountersMaxConfigure
+-- ctPppCountersMaxFailure
+-- ctPppCountersRestartTimer
+
+        ctPppCountersTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPppCountersEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table containing the parameters for the local
+                PPP entity related to the counters and timers."
+        ::= { ctPPPExt 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1
+
+        ctPppCountersEntry OBJECT-TYPE
+        SYNTAX  CtPppCountersEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "PPP counter/timer information for a particular
+                PPP link."
+        INDEX { ctPppCountersIfIndex }
+        ::= { ctPppCountersTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1.1
+        
+        CtPppCountersEntry ::= SEQUENCE {
+                        ctPppCountersIfIndex
+                        INTEGER,
+                        ctPppCountersMaxTerminate
+                        INTEGER,
+                        ctPppCountersMaxConfigure               
+                        INTEGER,
+                        ctPppCountersMaxFailure
+                        INTEGER,
+                        ctPppCountersRestartTimer
+                        INTEGER
+                                }
+
+        ctPppCountersIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctPppCountersEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1.1.1
+
+        ctPppCountersMaxTerminate OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "MaxTerminate indicates the number of Terminate-
+                Request packets sent without receiving a Terminate-Ack
+                before assuming that the peer in unable to respond."
+        ::= { ctPppCountersEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1.1.2
+
+        ctPppCountersMaxConfigure OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "MaxConfigure indicates the number of Configure-
+                Request packets sent without receiving a Configure-Ack,
+                Configre-Nak or Configure-Reject before assuming that 
+                the peer in unable to respond."
+        ::= { ctPppCountersEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1.1.3
+
+        ctPppCountersMaxFailure OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "MaxFailure indicates the number of Configure-Nak
+                packets sent without sending a Configure-Ack
+                before assuming that the configuration is not
+                converging.  Any further Configure-Reject packets
+                for peer requested options are converted to 
+                Configure-Reject packets, and locally desires options
+                are no longer appended."
+        ::= { ctPppCountersEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1.1.4
+
+        ctPppCountersRestartTimer OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Restart timer is used to time transmissions
+                of Configure-Request and Terminate-Request packets.
+                Expiration of the Restart-Timer causes a Timeout
+                event, and retransmission of the corresponding
+                Configure-Request or Terminate-Request packet."
+        ::= { ctPppCountersEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.1.1.5
+
+--
+-- Ctron PPP LCP Extentions Group.
+
+-- The following object reflect the values of the
+-- LCP parameters not included in RFCs for this PPP link.
+--              
+--              ctPppLcpExtIfIndex
+--              ctPppLcpExtAuthenticationProt
+--              ctPppLcpExtQualityProt  
+--              ctPppLcpExtPFC          
+--              ctPppLcpExtACFC 
+--              ctPppLcpExtSelfDescribePadding
+--              ctPppLcpExtCallback             
+--              ctPppLcpExtCompoundFrames       
+--              ctPppLcpExtMru
+--              ctPppLcpExtAccm
+--              ctPppLcpExtEchoRequest
+--              ctPppLcpExtReplyCounter
+--              ctPppLcpExtMpCapable
+
+        ctPppLcpExtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPppLcpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table containing the parameters for the local
+                PPP entity related to the counters and timers."
+        ::= { ctPPPExt 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2
+
+        ctPppLcpExtEntry OBJECT-TYPE
+        SYNTAX  CtPppLcpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "PPP LCP configurationinformation for a particular
+                PPP link."
+        INDEX { ctPppLcpExtIfIndex }
+        ::= { ctPppLcpExtTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1
+        
+        CtPppLcpExtEntry ::= SEQUENCE {
+                                        ctPppLcpExtIfIndex
+                                        INTEGER,
+                                        ctPppLcpExtAuthenticationProt
+                                        INTEGER,
+                                        ctPppLcpExtQualityProt  
+                                        INTEGER,
+                                        ctPppLcpExtPFC          
+                                        INTEGER,
+                                        ctPppLcpExtACFC 
+                                        INTEGER,
+                                        ctPppLcpExtSelfDescribePadding
+                                        INTEGER,
+                                        ctPppLcpExtCallback             
+                                        INTEGER,
+                                        ctPppLcpExtCompoundFrames       
+                                        INTEGER,
+                                        ctPppLcpExtMru
+                                        INTEGER,
+                                        ctPppLcpExtAccm
+                                        INTEGER,
+                                        ctPppLcpExtEchoRequest
+                                        INTEGER,
+                                        ctPppLcpExtReplyCounter
+                                        INTEGER,
+                                        ctPppLcpExtMpCapable
+                                        INTEGER
+                                        }
+
+        ctPppLcpExtIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctPppLcpExtEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.1
+
+        ctPppLcpExtAuthenticationProt OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                none(1), 
+                                pap(2), 
+                                chap(3)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables a particular authentication protocol on this
+                PPP link(now modified for read-only."
+        ::= { ctPppLcpExtEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.2
+
+        ctPppLcpExtQualityProt OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                none(1), 
+                                lqr(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables a particular link-quality protocol on this
+                PPP link."
+        ::= { ctPppLcpExtEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.3
+
+        ctPppLcpExtPFC OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                enabled(1), 
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables protocol field compression on this PPP link."
+        ::= { ctPppLcpExtEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.4
+
+        ctPppLcpExtACFC OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                enabled(1), 
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables address and control field compression on this PPP 
+                link."
+        ::= { ctPppLcpExtEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.5
+
+        ctPppLcpExtSelfDescribePadding OBJECT-TYPE
+        SYNTAX  INTEGER(1..256)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This Configuration Option provides a method for an
+                implementation to indicate to the peer that it
+                understands self-describing pads when padding is added
+                at the end of the PPP Information field."
+        ::= { ctPppLcpExtEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.6
+
+        ctPppLcpExtCallback OBJECT-TYPE
+        SYNTAX  INTEGER(1..6)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This Configuration Option provides a method for an
+                implementation to request a dial-up peer to call back."
+        ::= { ctPppLcpExtEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.7
+
+        ctPppLcpExtCompoundFrames OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                enabled(1), 
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This Configuration Option provides a method for an
+                implementation to send multiple PPP encapsulated packets
+                within the same frame."
+        ::= { ctPppLcpExtEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.8
+
+        ctPppLcpExtMru OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                enabled(1), 
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables and disables Mru status."
+        ::= { ctPppLcpExtEntry 9 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.9
+
+        ctPppLcpExtAccm OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                enabled(1), 
+                                disabled(2)
+                                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enables and disables Accm status."
+        ::= { ctPppLcpExtEntry 10 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.10
+
+        ctPppLcpExtEchoRequest  OBJECT-TYPE
+        SYNTAX      INTEGER (0..2147483647) 
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+        "A zero indicated no Echo Request and any other value provides
+        an interval to send Echo-Requests to the Peer.
+        The Echo-Request provides a Data Link Layer loopback mechanism
+        for use in exercising both directions of the link.  This 
+        is useful in debugging, link quality determination.  LCP
+        MUST be in the OPENED state for an Echo-Request to occur."
+        
+        ::= { ctPppLcpExtEntry 11 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.11
+
+        ctPppLcpExtReplyCounter OBJECT-TYPE
+        SYNTAX      INTEGER (0..2147483647)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+        "Increments a counter if the Local Device correctly
+        received an Echo-Reply from the Peer.  LCP MUST be
+        in the OPENED state for an Echo-Reply to occur."
+        ::= { ctPppLcpExtEntry 12 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.12
+
+        ctPppLcpExtMpCapable OBJECT-TYPE
+      SYNTAX      INTEGER{ 
+                        enabled(1), 
+                        disabled(2) }
+      ACCESS      read-write
+      STATUS      mandatory
+      DESCRIPTION
+                "Multilink Protocol (MP) option selector. Set to a value 
+                of one when MP support is desired otherwise set to a 
+                value of two. The default value is two. When set to two 
+                the attempt is made to negotiate MP support.  MP support 
+                is symmetrical."
+        ::= { ctPppLcpExtEntry 13 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.2.1.13
+
+--
+-- Ctron PPP BNCP Extentions Group.
+
+-- The following object reflect the values of the
+-- LCP parameters not included in RFCs for this PPP link.
+--              pppBncpExtIfIndex     
+--              pppBncpExtCrcStatus 
+
+        ctPppBncpExtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPppBncpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table containing the parameters for the local
+                PPP entity related to the counters and timers."
+        ::= { ctPPPExt 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.3
+
+        ctPppBncpExtEntry OBJECT-TYPE
+        SYNTAX  CtPppBncpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "PPP LCP configuration information for a particular
+                PPP link."
+        INDEX { ctPppBncpExtIfIndex }
+        ::= { ctPppBncpExtTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.3.1
+        
+        CtPppBncpExtEntry ::= SEQUENCE  {
+                                        ctPppBncpExtIfIndex
+                                        INTEGER,
+                                        ctPppBncpExtCrcStatus
+                                        INTEGER
+                                        }
+
+        ctPppBncpExtIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctPppBncpExtEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.3.1.1
+
+        ctPppBncpExtCrcStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enables and disables CRC status. First our platform must 
+                support CRC.  If the platform does, then setting to 
+                disabled will not send CRC.  The default is enabled, 
+                which sends CRC."
+        ::= { ctPppBncpExtEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.3.1.2
+
+-- Ctron PPP MP Extentions Group.
+-- The following object reflect the values of the
+-- LCP parameters not included in RFCs for this PPP link.
+--                              ctPppMpExtIfIndex
+--              ctPppLcpExtMpLUT       
+--              ctPppLcpExtMpHistoryTime
+--              ctPppLcpExtMpMoreBW
+--              ctPppLcpExtMpLessBW
+--              ctPppLcpExtMpMaxChannels
+--              ctPppLcpExtMpChannelsToAdd 
+--              ctPppLcpExtMpChannelsToRemove    
+
+        ctPppMpExtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPppMpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table containing the parameters for the local
+                PPP entity related to the counters and timers."
+        ::= { ctPPPExt 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4
+
+        ctPppMpExtEntry OBJECT-TYPE
+        SYNTAX  CtPppMpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "PPP LCP configurationinformation for a particular
+                PPP link."
+        INDEX { ctPppMpExtIfIndex }
+        ::= { ctPppMpExtTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1
+        
+        CtPppMpExtEntry ::= SEQUENCE    {
+                                        ctPppMpExtIfIndex
+                                        INTEGER,
+                                        ctPppLcpExtMpLUT
+                                        INTEGER,
+                                        ctPppLcpExtMpHistoryTime
+                                        INTEGER,
+                                        ctPppLcpExtMpMoreBW
+                                        INTEGER,
+                                        ctPppLcpExtMpLessBW
+                                        INTEGER,
+                                        ctPppLcpExtMpMaxChannels
+                                        INTEGER,
+                                        ctPppLcpExtMpChannelsToAdd
+                                        INTEGER,
+                                        ctPppLcpExtMpChannelsToRemove
+                                        INTEGER
+                                        }
+
+        ctPppMpExtIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctPppMpExtEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.1
+
+        ctPppLcpExtMpLUT OBJECT-TYPE
+        SYNTAX  INTEGER (1..100)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the Line Utilization Threshold (LUT) % value 
+                to compare against the linear weighted percentage by 
+                which to determine when more/less bandwidth is to be 
+                added/removed. Linear weighting is averaged over the 
+                period of time specified by ctPppLcpExtMpHistoryTime."
+        ::= { ctPppMpExtEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.2
+
+        ctPppLcpExtMpHistoryTime OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the history time value in seconds for the 
+                number of line utilization reading(s) desired to compute 
+                the average line utilization. That is to say, it 
+                specifies the window size over which to compute the
+                average line utilization."
+        ::= { ctPppMpExtEntry 3 } 
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.3
+
+        ctPppLcpExtMpMoreBW OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the number of consecutive line utilization 
+                average readings that must exceed ctPppLcpExtMpLUT as 
+                a condition of when to increase the bandwidth if more 
+                BW is permitted."
+        ::= { ctPppMpExtEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.4
+
+        ctPppLcpExtMpLessBW OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the number of consecutive line utilization 
+                average readings that must fall below ctPppLcpExtMpLUT 
+                as a condition of when to remove possible previously 
+                added bandwidth."
+        ::= { ctPppMpExtEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.5
+
+        ctPppLcpExtMpMaxChannels OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the maxium number of channels an MP capable
+                connection is allowed."
+        ::= { ctPppMpExtEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.6
+ 
+        ctPppLcpExtMpChannelsToAdd OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the number of additional channel(s) to 
+                increment by whenever the need for more bandwidth is 
+                determined."
+        ::= { ctPppMpExtEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.7
+ 
+        ctPppLcpExtMpChannelsToRemove OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Used to set the number of channel(s) to decrement by 
+                whenever the need for possible previously added bandwidth 
+                is determined to no longer be needed."
+        ::= { ctPppMpExtEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.4.1.8
+
+-- Ctron PPP ECP Extentions Group.
+-- The following object reflect the values of the
+-- ECP parameters not included in RFCs for this PPP link.
+
+        ctPppEcpExtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPppEcpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table containing the parameters for the local
+                PPP entity related to the encrpytion control protocol."
+        ::= { ctPPPExt 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.5
+
+        ctPppEcpExtEntry OBJECT-TYPE
+        SYNTAX  CtPppEcpExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "PPP ECP configuration information for a particular
+                PPP link."
+        INDEX { ctPppEcpExtIfIndex }
+        ::= { ctPppEcpExtTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.5.1
+        
+        CtPppEcpExtEntry ::= SEQUENCE   {
+                                        ctPppEcpExtIfIndex
+                                        INTEGER,
+                                        ctPppEcpKey
+                                        DisplayString,
+                                        ctPppEcpIV
+                                        DisplayString
+                                        }
+
+        ctPppEcpExtIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER(1..1024)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctPppEcpExtEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.5.1.1
+
+        ctPppEcpKey OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(14))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A 56-bit key (14 hex characters) used for the DES encryption."
+        ::= { ctPppEcpExtEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.5.1.2
+
+        ctPppEcpIV OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(16))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A 64-bit initialization vector (16 hex characters) used for 
+                the DES encryption in CBC mode."
+        ::= { ctPppEcpExtEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.6.5.1.3
+
+--  ctWanalyzer Group
+--  This group is mandatory for all platforms which implement the 
+--  WANalyzer
+
+--              ctWanalyzerIfIndex
+--              ctwanalyzerEnabled
+--              ctwanalyzerMaxEntries
+--              ctwanalyzerClearAll
+--              ctwanalyzerClearInterface
+--              ctwanalyzerDisplayInterface
+--              ctwanalyzerCurrEntries
+
+        ctWanalyzerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtWanalyzerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table containing the parameters for the local
+                Wanalyzer entity related to the configured Protocol."
+        ::= { ctWanalyzer 1         }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1
+
+        ctWanalyzerEntry OBJECT-TYPE
+        SYNTAX  CtWanalyzerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Information for a particular
+                interface."
+        INDEX { ctWanalyzerIfIndex }
+        ::= { ctWanalyzerTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1
+
+        CtWanalyzerEntry ::= SEQUENCE   {
+                                        ctWanalyzerIfIndex
+                                        INTEGER,
+                                        ctWanalyzerEnabled
+                                        INTEGER,
+                                        ctWanalyzerMaxEntries
+                                        INTEGER,
+                                        ctWanalyzerClearAll
+                                        INTEGER,
+                                        ctWanalyzerClearInterface
+                                        INTEGER,
+                                        ctWanalyzerDisplayInterface
+                                        INTEGER,
+                                        ctWanalyzerCurrEntries
+                                        INTEGER
+                                        }
+
+        ctWanalyzerIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER(1..2147483647)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The ifIndex of the interface. This is the index of this 
+                entry in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctWanalyzerEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.1
+
+        ctWanalyzerEnabled OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                disabled(1),
+                                enabled(2)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This Persistent Object is a flag which indicates whether
+                or not the WANalyzer is enabled or disabled. Upon system
+                initialization this flag defaults to disabled unless
+                a value for this object is found in NVRAM."
+        ::= { ctWanalyzerEntry 2         }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.2
+
+        ctWanalyzerMaxEntries OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This Persistent Object is an integer greater than 1
+                which specifies the maximum total number of entries 
+                which the table will handle. When the WANalyzer is 
+                enabled this value defaults to a value dependent on
+                the implementation unless a value is found in NVRAM."
+        ::= { ctWanalyzerEntry 3         }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.3
+
+    ctWanalyzerClearAll OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "When set to 2, the entire table of entries is cleared.
+                Upon clearing of the table, this value is reset to 1.
+                This object is not present if the WANalyzer is disabled."
+        ::= { ctWanalyzerEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.4
+
+        ctWanalyzerClearInterface OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "When set to 2, all entries for this MIB-II interface 
+                index will be removed from the table. Upon complete 
+                removal of those entries, this value is reset to 1.
+                This object is not present if the WANalyzer is disabled."
+        
+        ::= { ctWanalyzerEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.5
+
+        ctWanalyzerDisplayInterface     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "When set to a valid MIB-II interface number, the table
+                displays only those entries in the table which were
+                received from that MIB-II interface. This value is set
+                to -1 upon initialization and indicates that entries
+                from all interfaces will be displayed. This object 
+                is not present if the WANalyzer is disabled."
+        ::= { ctWanalyzerEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.6
+
+        ctWanalyzerCurrEntries OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A non-negative integer indicating the current number
+                of entries in the table. This object is not present
+                if the WANalyzer is disabled."
+        ::= { ctWanalyzerEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.1.1.7
+
+--      Ctron Wan Table Extentions Group.
+--              wanMessageIndex
+--              wanMessageInterfaceIndex
+--              wanMessageDate
+--              wanMessageTime
+--              wanMessageCode
+
+        wanalyzerMessageTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF WanalyzerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table containing all of the message entries for this 
+                device. If the WANalyzer is disabled, this table will
+                not be present."
+        ::= { ctWanalyzer 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2
+
+        wanalyzerEntry OBJECT-TYPE
+        SYNTAX  WanalyzerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A message entry in the WANalyzer table corresponding
+                to a particular interface in a particular instance."
+        INDEX { wanMessageIndex }
+        ::= { wanalyzerMessageTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2.1
+
+        WanalyzerEntry ::= SEQUENCE     {
+                                        wanMessageIndex
+                                        INTEGER,
+                                        wanMessageInterfaceIndex
+                                        INTEGER,
+                                        wanMessageDate
+                                        DisplayString,
+                                        wanMessageTime
+                                        DisplayString,
+                                        wanMessageCode
+                                        INTEGER
+                                        }
+
+        wanMessageIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An integer between 1 and wanalyzerMaxEntries which
+                indicates the overall position this entry has in the
+                WANalyzer table."
+        ::= { wanalyzerEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2.1.1
+
+        wanMessageInterfaceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MIB-II interface index representing the interface
+                which sent this message."
+        ::= { wanalyzerEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2.1.2
+
+        wanMessageDate OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(8))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The date when this message was received by the WANalyzer 
+                 in the standard MMDDYY format."
+        ::= { wanalyzerEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2.1.3
+
+        wanMessageTime OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(6))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time of day when this message was received by the
+                WANalyzer in the standard HHMMSS format."
+        ::= { wanalyzerEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2.1.4
+
+        wanMessageCode OBJECT-TYPE
+        SYNTAX  INTEGER {
+        wanalyzerLastMessageRepeated(1),
+        pppAuthentication(2),
+        pppBncpThisLayerStart(3),
+        pppBncpThisLayerFinished(4),
+        pppBncpThisLayerUp(5),
+        pppBncpThisLayerDown(6),
+        pppBncpInitializeRestartCount(7),
+        pppBncpZeroRestartCount(8),
+        pppBncpRcvConfReqGood(9),
+        pppBncpRcvConfReqBad(10),
+        pppBncpReceiveConfigureAck(11),
+        pppBncpReceiveConfigureNak(12),
+        pppBncpReceiveConfigureReject(13),
+        pppBncpReceiveTerminateRequest(14),
+        pppBncpReceiveTerminateAck(15),
+        pppBncpReceiveCodeRejectPermitted(16),
+        pppBncpReceiveCodeRejectCatastrophic(17),
+        pppBncpReceiveProtocolRejectPermitted(18),
+        pppBncpReceiveEchoRequest(19),
+        pppBncpReceiveEchoReply(20),
+        pppBncpReceiveDiscardRequest(21),
+        pppBncpReceiveUnknownCode(22),
+        pppBncpIllegalAction(23),
+        pppBncpSendConfigureRequest(24),
+        pppBncpSendConfigureAck(25),
+        pppBncpSendConfigureNak(26),
+        pppBncpSendConfigureReject(27),
+        pppBncpSendTerminateRequest(28),
+        pppBncpSendTerminateAck(29),
+        pppBncpSendCodeReject(30),
+        pppBncpSendProtocolReject(31),
+        pppBncpSendEchoReply(32),
+        pppBncpInitialState(33),
+        pppBncpStartingState(34),
+        pppBncpClosedState(35),
+        pppBncpStoppedState(36),
+        pppBncpClosingState(37),
+        pppBncpStoppingState(38),
+        pppBncpReqSentState(39),
+        pppBncpAckRcvdState(40),
+        pppBncpAckSentState(41),
+        pppBncpOpenedState(42),
+        pppBncpEthernetMacType(43),
+        pppBncpTokenRingMacType(44),
+        pppBncpFddiMacType(45),
+        pppBncpBridgeIdRcvReq(46),
+        pppBncpBridgeIdRcvNak(47),
+        pppBncpBridgeIdRcvRej(48),
+        pppBncpBridgeIdXmitReq(49),
+        pppBncpMacSelectRcvReq(50),
+        pppBncpMacSelectRcvNak(51),
+        pppBncpMacSelectRcvRej(52),
+        pppBncpMacSelectXmitReq(53),
+        pppBncpTinygramRcvReq(54),
+        pppBncpTinygramRcvNak(55),
+        pppBncpTinygramRcvRej(56),
+        pppBncpTinygramXmitReq(57),
+        pppBncpLanIdRcvReq(58),
+        pppBncpLanIdRcvNak(59),
+        pppBncpLanIdRcvRej(60),
+        pppBncpLanIdXmitReq(61),
+        pppCcpThisLayerStart(62),
+        pppCcpThisLayerFinished(63),
+        pppCcpThisLayerUp(64),
+        pppCcpThisLayerDown(65),
+        pppCcpInitializeRestartCount(66),
+        pppCcpZeroRestartCount(67),
+        pppCcpRcvConfReqGood(68),
+        pppCcpRcvConfReqBad(69),
+        pppCcpReceiveConfigureAck(70),
+        pppCcpReceiveConfigureNak(71),
+        pppCcpReceiveConfigureReject(72),
+        pppCcpReceiveTerminateRequest(73),
+        pppCcpReceiveTerminateAck(74),
+        pppCcpReceiveCodeRejectPermitted(75),
+        pppCcpReceiveCodeRejectCatastrophic(76),
+        pppCcpReceiveProtocolRejectPermitted(77),
+        pppCcpReceiveEchoRequest(78),
+        pppCcpReceiveEchoReply(79),
+        pppCcpReceiveDiscardRequest(80),
+        pppCcpReceiveUnknownCode(81),
+        pppCcpIllegalAction(82),
+        pppCcpSendConfigureRequest(83),
+        pppCcpSendConfigureAck(84),
+        pppCcpSendConfigureNak(85),
+        pppCcpSendConfigureReject(86),
+        pppCcpSendTerminateRequest(87),
+        pppCcpSendTerminateAck(88),
+        pppCcpSendCodeReject(89),
+        pppCcpSendProtocolReject(90),
+        pppCcpSendEchoReply(91),
+        pppCcpInitialState(92),
+        pppCcpStartingState(93),
+        pppCcpClosedState(94),
+        pppCcpStoppedState(95),
+        pppCcpClosingState(96),
+        pppCcpStoppingState(97),
+        pppCcpReqSentState(98),
+        pppCcpAckRcvdState(99),
+        pppCcpAckSentState(100),
+        pppCcpOpenedState(101),
+        pppCcpProprietaryCompRcvReq(102),
+        pppCcpProprietaryCompRcvNak(103),
+        pppCcpProprietaryCompRcvRej(104),
+        pppCcpProprietaryCompXmitReq(105),
+        pppCcpPredictorType1RcvReq(106),
+        pppCcpPredictorType1RcvNak(107),
+        pppCcpPredictorType1RcvRej(108),
+        pppCcpPredictorType1XmitReq(109),
+        pppCcpPredictorType2RcvReq(110),
+        pppCcpPredictorType2RcvNak(111),
+        pppCcpPredictorType2RcvRej(112),
+        pppCcpPredictorType2XmitReq(113),
+        pppCcpPuddleJumperRcvReq(114),
+        pppCcpPuddleJumperRcvNak(115),
+        pppCcpPuddleJumperRcvRej(116),
+        pppCcpPuddleJumperXmitReq(117),
+        pppCcpHpPpcRcvReq(118),
+        pppCcpHpPpcRcvNak(119),
+        pppCcpHpPpcRcvRej(120),
+        pppCcpHpPpcXmitReq(121),
+        pppCcpStacLzsRcvReq(122),
+        pppCcpStacLzsRcvNak(123),
+        pppCcpStacLzsRcvRej(124),
+        pppCcpStacLzsXmitReq(125),
+        pppCcpMsPpcRcvReq(126),
+        pppCcpMsPpcRcvNak(127),
+        pppCcpMsPpcRcvRej(128),
+        pppCcpMsPpcXmitReq(129),
+        pppCcpGandalfFzaRcvReq(130),
+        pppCcpGandalfFzaRcvNak(131),
+        pppCcpGandalfFzaRcvRej(132),
+        pppCcpGandalfFzaXmitReq(133),
+        pppCcpV42bisRcvReq(134),
+        pppCcpV42bisRcvNak(135),
+        pppCcpV42bisRcvRej(136),
+        pppCcpV42bisXmitReq(137),
+        pppCcpBsdLzwRcvReq(138),
+        pppCcpBsdLzwRcvNak(139),
+        pppCcpBsdLzwRcvRej(140),
+        pppCcpBsdLzwXmitReq(141),
+        pppCcpStackDcpRcvReq(142),
+        pppCcpStackDcpRcvNak(143),
+        pppCcpStackDcpRcvRej(144),
+        pppCcpStackDcpXmitReq(145),
+        pppChapChallengeReceived(146),
+        pppChapResponseReceived(147),
+        pppChapSuccessReceived(148),
+        pppChapFailureReceived(149),
+        pppChapSuccessSent(150),
+        pppChapFailureSent(151),
+        pppChapChallengeSent(152),
+        pppChapResponseSent(153),
+        pppIpcpThisLayerStart(154),
+        pppIpcpThisLayerFinished(155),
+        pppIpcpThisLayerUp(156),
+        pppIpcpThisLayerDown(157),
+        pppIpcpInitializeRestartCount(158),
+        pppIpcpZeroRestartCount(159),
+        pppIpcpRcvConfReqGood(160),
+        pppIpcpRcvConfReqBad(161),
+        pppIpcpReceiveConfigureAck(162),
+        pppIpcpReceiveConfigureNak(163),
+        pppIpcpReceiveConfigureReject(164),
+        pppIpcpReceiveTerminateRequest(165),
+        pppIpcpReceiveTerminateAck(166),
+        pppIpcpReceiveCodeRejectPermitted(167),
+        pppIpcpReceiveCodeRejectCatastrophic(168),
+        pppIpcpReceiveProtocolRejectPermitted(169),
+        pppIpcpReceiveEchoRequest(170),
+        pppIpcpReceiveEchoReply(171),
+        pppIpcpReceiveDiscardRequest(172),
+        pppIpcpReceiveUnknownCode(173),
+        pppIpcpIllegalAction(174),
+        pppIpcpSendConfigureRequest(175),
+        pppIpcpSendConfigureAck(176),
+        pppIpcpSendConfigureNak(177),
+        pppIpcpSendConfigureReject(178),
+        pppIpcpSendTerminateRequest(179),
+        pppIpcpSendTerminateAck(180),
+        pppIpcpSendCodeReject(181),
+        pppIpcpSendProtocolReject(182),
+        pppIpcpSendEchoReply(183),
+        pppIpcpInitialState(184),
+        pppIpcpStartingState(185),
+        pppIpcpClosedState(186),
+        pppIpcpStoppedState(187),
+        pppIpcpClosingState(188),
+        pppIpcpStoppingState(189),
+        pppIpcpReqSentState(190),
+        pppIpcpAckRcvdState(191),
+        pppIpcpAckSentState(192),
+        pppIpcpOpenedState(193),
+        pppIpcpIpAddressRcvReq(194),
+        pppIpcpIpAddressRcvNak(195),
+        pppIpcpIpAddressRcvRej(196),
+        pppIpcpIpAddressXmitReq(197),
+        pppIpcpCompressionTypeRcvReq(198),
+        pppIpcpCompressionTypeRcvRej(199),
+        pppIpcpCompressionTypeRcvNak(200),
+        pppIpcpCompressionTypeXmitReq(201),
+        pppIpxcpThisLayerStart(202),
+        pppIpxcpThisLayerFinished(203),
+        pppIpxcpThisLayerUp(204),
+        pppIpxcpThisLayerDown(205),
+        pppIpxcpInitializeRestartCount(206),
+        pppIpxcpZeroRestartCount(207),
+        pppIpxcpRcvConfReqGood(208),
+        pppIpxcpRcvConfReqBad(209),
+        pppIpxcpReceiveConfigureAck(210),
+        pppIpxcpReceiveConfigureNak(211),
+        pppIpxcpReceiveConfigureReject(212),
+        pppIpxcpReceiveTerminateAck(214),
+        pppIpxcpReceiveCodeRejectPermitted(215),
+        pppIpxcpReceiveCodeRejectCatastrophic(216),
+        pppIpxcpReceiveProtocolRejectPermitted(217),
+        pppIpxcpReceiveEchoRequest(218),
+        pppIpxcpReceiveEchoReply(219),
+        pppIpxcpReceiveDiscardRequest(220),
+        pppIpxcpReceiveUnknownCode(221),
+        pppIpxcpIllegalAction(222),
+        pppIpxcpSendConfigureRequest(223),
+        pppIpxcpSendConfigureAck(224),
+        pppIpxcpSendConfigureNak(225),
+        pppIpxcpSendConfigureReject(226),
+        pppIpxcpSendTerminateRequest(227),
+        pppIpxcpSendTerminateAck(228),
+        pppIpxcpSendCodeReject(229),
+        pppIpxcpSendProtocolReject(230),
+        pppIpxcpSendEchoReply(231),
+        pppIpxcpInitialState(232),
+        pppIpxcpStartingState(233),
+        pppIpxcpClosedState(234),
+        pppIpxcpStoppedState(235),
+        pppIpxcpClosingState(236),
+        pppIpxcpStoppingState(237),
+        pppIpxcpReqSentState(238),
+        pppIpxcpAckRcvdState(239),
+        pppIpxcpAckSentState(240),
+        pppIpxcpOpenedState(241),
+        pppIpxcpCompressionProtocolRcvReq(242),
+        pppIpxcpCompressionProtocolRcvNak(243),
+        pppIpxcpCompressionProtocolRcvRej(244),
+        pppIpxcpCompressionProtocolXmitReq(245),
+        pppIpxcpNetworkNumberRcvReq(246),
+        pppIpxcpNetworkNumberRcvNak(247),
+        pppIpxcpNetworkNumberRcvRej(248),
+        pppIpxcpNetworkNumberXmitReq(249),
+        pppIpxcpNodeNumberRcvReq(250),
+        pppIpxcpNodeNumberRcvNak(251),
+        pppIpxcpNodeNumberRcvRej(252),
+        pppIpxcpNodeNumberXmitReq(253),
+        pppIpxcpRoutingProtocolRcvReq(254),
+        pppIpxcpRoutingProtocolRcvNak(255),
+        pppIpxcpRoutingProtocolRcvRej(256),
+        pppIpxcpRoutingProtocolXmitReq(257),
+        pppIpxcpRouterNameRcvReq(258),
+        pppIpxcpRouterNameRcvNak(259),
+        pppIpxcpRouterNameRcvRej(260),
+        pppIpxcpRouterNameXmitReq(261),
+        pppIpxcpConfigurationCompleteRcvReq(262),
+        pppIpxcpConfigurationCompleteRcvNak(263),
+        pppIpxcpConfigurationCompleteRcvRej(264),
+        pppIpxcpConfigurationCompleteXmitReq(265),
+        pppLcpThisLayerStart(266),
+        pppLcpThisLayerFinished(267),
+        pppLcpThisLayerUp(268),
+        pppLcpThisLayerDown(269),
+        pppLcpInitializeRestartCount(270),
+        pppLcpZeroRestartCount(271),
+        pppLcpRcvConfReqGood(272),
+        pppLcpRcvConfReqBad(273),
+        pppLcpReceiveConfigureAck(274),
+        pppLcpReceiveConfigureNak(275),
+        pppLcpReceiveConfigureReject(276),
+        pppLcpReceiveTerminateRequest(277),
+        pppLcpReceiveTerminateAck(278),
+        pppLcpReceiveCodeRejectPermitted(279),
+        pppLcpReceiveCodeRejectCatastrophic(280),
+        pppLcpReceiveProtocolReject(281),
+        pppLcpReceiveEchoRequest(282),
+        pppLcpReceiveEchoReply(283),
+        pppLcpReceiveDiscardRequest(284),
+        pppLcpReceiveUnknownCode(285),
+        pppLcpIllegalAction(286),
+        pppLcpSendConfigureRequest(287),
+        pppLcpSendConfigureAck(288),
+        pppLcpSendConfigureNak(289),
+        pppLcpSendConfigureReject(290),
+        pppLcpSendTerminateRequest(291),
+        pppLcpSendTerminateAck(292),
+        pppLcpSendCodeReject(293),
+        pppLcpSendProtocolReject(294),
+        pppLcpSendEchoReply(295),
+        pppLcpInitialState(296),
+        pppLcpStartingState(297),
+        pppLcpClosedState(298),
+        pppLcpStoppedState(299),
+        pppLcpClosingState(300),
+        pppLcpStoppingState(301),
+        pppLcpReqSentState(302),
+        pppLcpAckRcvdState(303),
+        pppLcpAckSentState(304),
+        pppLcpOpenedState(305),
+        pppLcpMruRcvReq(306),
+        pppLcpMruRcvNak(307),
+        pppLcpMruRcvRej(308),
+        pppLcpMruXmitReq(309),
+        pppLcpAsyncCharMapRcvReq(310),
+        pppLcpAsyncCharMapRcvNak(311),
+        pppLcpAsyncCharMapRcvRej(312),
+        pppLcpAsyncCharMapXmitReq(313),
+        pppLcpAuthenticationRcvReq(314),
+        pppLcpAuthenticationRcvNak(315),
+        pppLcpAuthenticationRcvRej(316),
+        pppLcpAuthenticationXmitReq(317),
+        pppLcpMagicNumberRcvReq(318),
+        pppLcpMagicNumberRcvNak(319),
+        pppLcpMagicNumberRcvRej(320),
+        pppLcpMagicNumberXmitReq(321),
+        pppLcpLinkQualityRcvReq(322),
+        pppLcpLinkQualityRcvNak(323),
+        pppLcpLinkQualityRcvRej(324),
+        pppLcpLinkQualityXmitReq(325),
+        pppLcpProtCompRcvReq(326),
+        pppLcpProtCompRcvNak(327),
+        pppLcpProtCompRcvRej(328),
+        pppLcpProtCompXmitReq(329),
+        pppLcpAddrCompRcvReq(330),
+        pppLcpAddrCompRcvNak(331),
+        pppLcpAddrCompRcvRej(332),
+        pppLcpAddrCompXmitReq(333),
+        pppLcpFcs32BitRcvReq(334),
+        pppLcpFcs32BitRcvNak(335),
+        pppLcpFcs32BitRcvRej(336),
+        pppLcpFcs32BitXmitReq(337),
+        pppLcpSelfDescPaddingRcvReq(338),
+        pppLcpSelfDescPaddingRcvNak(339),
+        pppLcpSelfDescPaddingRcvRej(340),
+        pppLcpSelfDescPaddingXmitReq(341),
+        pppLcpCompoundFramesRcvReq(342),
+        pppLcpCompoundFramesRcvNak(343),
+        pppLcpCompoundFramesRcvRej(344),
+        pppLcpCompoundFramesXmitReq(345),
+        pppLcpCallbackRcvReq(346),
+        pppLcpCallbackRcvNak(347),
+        pppLcpCallbackRcvRej(348),
+        pppLcpCallbackXmitReq(349),
+        pppLexThisLayerStart(350),
+        pppLexThisLayerFinished(351),
+        pppLexThisLayerUp(352),
+        pppLexThisLayerDown(353),
+        pppLexInitializeRestartCount(354),
+        pppLexZeroRestartCount(355),
+        pppLexRcvConfReqGood(356),
+        pppLexRcvConfReqBad(357),
+        pppLexReceiveConfigureAck(358),
+        pppLexReceiveConfigureNak(359),
+        pppLexReceiveConfigureReject(360),
+        pppLexReceiveTerminateRequest(361),
+        pppLexReceiveTerminateAck(362),
+        pppLexReceiveCodeRejectPermitted(363),
+        pppLexReceiveCodeRejectCatastrophic(364),
+        pppLexReceiveProtocolRejectPermitted(365),
+        pppLexReceiveEchoRequest(366),
+        pppLexReceiveEchoReply(367),
+        pppLexReceiveDiscardRequest(368),
+        pppLexReceiveUnknownCode(369),
+        pppLexIllegalAction(370),
+        pppLexSendConfigureRequest(371),
+        pppLexSendConfigureAck(372),
+        pppLexSendConfigureNak(373),
+        pppLexSendConfigureReject(374),
+        pppLexSendTerminateRequest(375),
+        pppLexSendTerminateAck(376),
+        pppLexSendCodeReject(377),
+        pppLexSendProtocolReject(378),
+        pppLexSendEchoReply(379),
+        pppLexInitialState(380),
+        pppLexStartingState(381),
+        pppLexClosedState(382),
+        pppLexStoppedState(383),
+        pppLexClosingState(384),
+        pppLexStoppingState(385),
+        pppLexReqSentState(386),
+        pppLexAckRcvdState(387),
+        pppLexAckSentState(388),
+        pppLexOpenedState(389),
+        pppLexMacTypeSelectRcvReq(390),
+        pppLexMacTypeSelectRcvNak(391),
+        pppLexMacTypeSelectRcvRej(392),
+        pppLexMacTypeSelectXmitReq(393),
+        pppLexTinygramCompressRcvReq(394),
+        pppLexTinygramCompressRcvNak(395),
+        pppLexTinygramCompressRcvRej(396),
+        pppLexTinygramCompressXmitReq(397),
+        pppLexMacAddressRcvReq(398),
+        pppLexMacAddressRcvNak(399),
+        pppLexMacAddressRcvRej(400),
+        pppLexMacAddressXmitReq(401),
+        pppLexMacRelayRcvReq(402),
+        pppLexMacRelayRcvNak(403),
+        pppLexMacRelayRcvRej(404),
+        pppLexMacRelayXmitReq(405),
+        pppLexStatisticsRequestRcvReq(406),
+        pppLqrSent(407),
+        pppLqrReceived(408),
+        pppLinkDead(409),
+        pppLinkEstablishment(410),
+        pppLinkTermination(411),
+        pppNetworkLayerPhase(412),
+        pppPapAuthenticateReqReceived(413),
+        pppPapAuthenticateAckReceived(414),
+        pppPapAuthenticateNakReceived(415),
+        pppPapAuthenticateReqSent(416),
+        pppPapAuthenticateAckSent(417),
+        pppPapAuthenticateNakSent(418),
+        frGotLmiPacket(500),
+        frGotBadQ922Header(501),
+        frGotCllmPacket(502),
+        frInactiveReceivedPacket(503),
+        frReceivedNlpidIpPacket(504),
+        frSentXidPacket(505),
+        frSentXidResponse(506),
+        frReceivedXidPacket(507),
+        frXidTimerExpired(508),
+        frGotBadUi(509),
+        frGotBadSnapPacket(510),
+        frLinkUp(511),
+        frLinkDown(512),
+        frLmiStarted(513),
+        frLmiStopped(514),
+        frLmiSentFullStatusEnquiry(515),
+        frLmiSentKeepAliveMessage(516),
+        frLmiStatusResponseReceived(517),
+        frLmiGotAnsiReportType(518),
+        frLmiGotFullStatusReport(519),
+        frLmiGotKeepAliveMessage(520),
+        frLmiUnsolicitedKeepAlive(521),
+        frLmiAsynchronousStatus(522),
+        frLmiGotQ933AReportType(523),
+        frLmiBadPvcStatusLength(524),
+        frLmiT391TimeoutFs(525),
+        frLmiT391TimeoutSe(526),
+        frLmiT391PollFailed(527),
+        frLmiT391PollSucceeded(528),
+        frLmiStatusEnquiryReceived(529),
+        frDcpMode1Initializing(530),
+        frDcpMode1Disabled(531),
+        frDcpMode1ControlPacketReceived(532),
+        frDcpMode1DataPacketReceived(533),
+        frDcpMode1RequestSent(534),
+        frDcpMode1RequestReceived(535),
+        frDcpMode1ResponseSent(536),
+        frDcpMode1ResponseReceived(537),
+        frDcpMode1Operational(538),
+        frDcpMode1TimerExpired(539),
+        frDcpMode2ControlPacketReceived(540),
+        frDcpResetPacketSent(541),
+        frDcpResetTimerExpired(542),
+        frDcpResetAckSent(543),
+        frDcpDictionaryQuotaExceeded(544),
+        isdnRemoteConnectionUp(1000),
+        isdnRemoteConnectionDown(1001),
+        isdnActivateConnection(1002),
+        isdnDeactivateConnection(1003),
+        multilinkMpLinkUp(1500),
+        multilinkMpAddBW(1501),
+        multilinkMpRemoveBW(1502),
+        multilinkMpSentBeginningFragment(1503),
+        multilinkMpSentMiddleFragment(1504),
+        multilinkMpSentEndFragment(1505),
+        multilinkMpSentCompleteMessage(1506),
+        multilinkMpReceivedBeginningFragment(1507),
+        multilinkMpReceivedMiddleFragment(1508),
+        multilinkMpReceivedEndFragment(1509),
+        multilinkMpReceivedCompleteMessage(1510)
+                                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "An enumerated value representing the nature of the debug
+                 message sent by the interface."
+        ::= { wanalyzerEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.7.2.1.5
+
+--
+-- Wan Alarms Group
+-- This group is required for any platforms that support
+-- Cabletron's WAN Alarm processing functionality
+--
+
+--
+-- DS1 Alarms Global Configuration Variables
+--
+--      These parameters apply globally to the DS1 Alarms
+--      entity.  These variables allow the user to program
+--      DS1 alarm characteristics to be the same for all DS1
+--      lines installed in the device.  The other option
+--      available to the user would be to configure each DS1
+--      line individually, using the parameters in the DS1
+--      Alarms Configuration Table.
+--
+
+        ds1AlarmsGlobalConfigGroup OBJECT IDENTIFIER ::= { ctDs1Alarms 1 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.8.1
+
+        ds1AlarmGlobalAdmin     OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),    -- default
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Monitoring Application for all DS1 circuits on the 
+                        device."
+                ::= { ds1AlarmsGlobalConfigGroup 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.1
+
+        ds1AlarmGlobalAutoRecovery      OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Automatic Recovery feature for all DS1 circuits on 
+                        the device. For those devices that support ds1
+                        alarm monitoring, but do not support the automatic
+                        recovery feature, this object always returns disabled,
+                        and performs no action when written."
+                ::= { ds1AlarmsGlobalConfigGroup 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.2
+
+        ds1AlarmGlobalTrapEnable        OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        SNMP Trap generation feature for all DS1 circuits on 
+                        the device.  This object operates in conjunction with 
+                        configuration of objects in the ctron-trap-mib.txt"
+                ::= { ds1AlarmsGlobalConfigGroup 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.3
+
+        ds1AlarmGlobalESCount   OBJECT-TYPE
+                SYNTAX  INTEGER (1..300)        -- default is 100
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ctDs1AlarmESInterval to set 
+                        the threshold for alarm generation when the number of 
+                        Errored Seconds for a specified time interval, 
+                        measured in minutes, is exceeded.  The default 
+                        Errored Seconds alarm condition is 100 errored seconds 
+                        over a 6 minute time interval."
+                ::= { ds1AlarmsGlobalConfigGroup 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.4
+
+        ds1AlarmGlobalESInterval        OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 6 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ds1AlarmGlobalESCount to 
+                        set the threshold for alarm generation when the number 
+                        of Errored Seconds for a specified time interval, 
+                        measured in minutes, is exceeded.  The default
+                        Errored Seconds alarm condition is 100 errored seconds 
+                        over a 6 minute time interval."
+                ::= { ds1AlarmsGlobalConfigGroup 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.5
+
+        ds1AlarmGlobalBPVErrorRate      OBJECT-TYPE 
+                SYNTAX  INTEGER (5..9)  -- default is 6
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the negative exponent of 10, used in
+                        monitoring Bipolar Violations (Code Violations for E1)
+                        over intervals defined by ds1AlarmGlobalBPVInterval.  
+                        For example, for a ds1AlarmGlobalBPVErrorRate value 
+                        of 6 used with a ds1AlarmGlobalBPVInterval of 15, 
+                        an alarm is generated when a 15 minute period has an 
+                        average error rate which exceeds 1 Bipolar Violation 
+                        (Code Violation for E1) per million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not support detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmsGlobalConfigGroup 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.6
+
+        ds1AlarmGlobalBPVInterval       OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 15 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the interval, used in monitoring 
+                        Bipolar Violations (Code Violations for E1)
+                        with thresholds defined by ds1AlarmGlobalBPVErrorRate.
+                        For example, for a ds1AlarmGlobalBPVErrorRate value 
+                        of 6 used with a ds1AlarmGlobalBPVInterval of 15, an 
+                        alarm is generated when a 15 minute period has an 
+                        average error rate which exceeds 1 Bipolar Violation 
+                        (Code Violation for E1) per million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmsGlobalConfigGroup 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.7
+
+        ds1AlarmGlobalManualRecovery    OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        recover(1)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "To cause a manual recovery to occur on all Ds1 circuits, this
+                        object is set to a 1.  It is always read as a 1.  The recovery 
+                        will occur only when automatic recovery is disabled."
+                ::= { ds1AlarmsGlobalConfigGroup 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.1.8
+
+--
+-- DS1 Alarms Configuration Table
+--
+--      The DS1 alarm table structure contains the same information as the
+--      global configuration objects, but allows seperate configuratoin of 
+--      specific DS1 circuits contained on the device
+--
+        ds1AlarmConfigTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF Ds1AlarmConfigEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Table containing objects used to configure DS1 alarm 
+                        functionality on a per DS1 basis."
+                ::= { ctDs1Alarms 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2
+        
+        ds1AlarmConfigEntry OBJECT-TYPE
+                SYNTAX      Ds1AlarmConfigEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single entry."
+                INDEX       { ds1PhysNum }
+                ::= { ds1AlarmConfigTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1
+        
+        Ds1AlarmConfigEntry ::=
+                SEQUENCE {
+                        ds1PhysNum
+                        INTEGER,
+                        ds1AlarmAdmin
+                        INTEGER,
+                        ds1AlarmAutoRecovery
+                        INTEGER,
+                        ds1AlarmTrapEnable
+                        INTEGER,
+                        ds1AlarmESCount
+                        INTEGER,
+                        ds1AlarmESInterval
+                        INTEGER,
+                        ds1AlarmBPVErrorRate
+                        INTEGER,
+                        ds1AlarmBPVInterval
+                        INTEGER,
+                        ds1AlarmManualRecovery
+                        INTEGER
+                        }
+        
+        ds1PhysNum    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "The value for this object is equal to the value
+                        of a unique physical connection identifier associated
+                        with this DS1 which is clearly labeled on the device.
+                        For those products that do not have a DS1 identifier
+                        labeled on the device, the value for this object is
+                        the same as rfc1406 dsx1LineIndex."
+                ::= { ds1AlarmConfigEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.1
+        
+        ds1AlarmAdmin   OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),    -- default
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Monitoring Application for this DS1 circuit."
+                ::= { ds1AlarmConfigEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.2
+
+        ds1AlarmAutoRecovery    OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        Automatic Recovery feature for this DS1 circuit.
+                        For those devices that support ds1
+                        alarm monitoring, but do not support the automatic
+                        recovery feature, this object always returns disabled,
+                        and performs no action when written."
+                ::= { ds1AlarmConfigEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.3
+
+        ds1AlarmTrapEnable      OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)      -- default
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DS1 Alarm
+                        SNMP Trap generation feature for this DS1 circuit.
+                        This object operates in conjunction with configuration 
+                        of objects in the ctron-trap-mib.txt"
+                ::= { ds1AlarmConfigEntry 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.4
+
+        ds1AlarmESCount OBJECT-TYPE
+                SYNTAX  INTEGER (1..300)        -- default is 100
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ctDs1AlarmESInterval to set 
+                        the threshold for alarm generation when the number of 
+                        Errored Seconds for a specified time interval, measured 
+                        in minutes, is exceeded.  The default Errored Seconds 
+                        alarm condition is 100 errored seconds over a 6 minute
+                        time interval."
+                ::= { ds1AlarmConfigEntry 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.5
+
+        ds1AlarmESInterval      OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 6 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used in conjuction with ctDs1AlarmESCount to set the 
+                        threshold for alarm generation when the number of 
+                        Errored Seconds for a specified time interval, measured 
+                        in minutes, is exceeded.  The default Errored Seconds 
+                        alarm condition is 100 errored seconds over a 6 minute 
+                        time interval."
+                ::= { ds1AlarmConfigEntry 6 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.6
+
+        ds1AlarmBPVErrorRate    OBJECT-TYPE
+                SYNTAX  INTEGER (5..9)  -- default is 6
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the negative exponent of 10, used in
+                        monitoring Bipolar Violations (Code Violations for E1)
+                        over intervals defined by ds1AlarmBPVInterval.  For 
+                        example, for a ds1AlarmBPVErrorRate value of 6 used 
+                        with a ds1AlarmBPVInterval of 15, an alarm is generated 
+                        when a 15 minute period has an average error rate which 
+                        exceeds 1 Bipolar Violation (Code Violation for E1) per
+                        million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not support detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmConfigEntry 7 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.7
+
+        ds1AlarmBPVInterval     OBJECT-TYPE
+                SYNTAX  INTEGER (1..15) -- default is 15 minutes
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to specify the interval, used in
+                        monitoring Bipolar Violations (Code Violations for E1)
+                        with thresholds defined by ds1AlarmBPVErrorRate.  For 
+                        example, for a ds1AlarmBPVErrorRate value of 6 used 
+                        with a ds1AlarmBPVInterval of 15, an alarm is generated 
+                        when a 15 minute period has an average error rate
+                        which exceeds 1 Bipolar Violation (Code Violation for 
+                        E1) per million bits.
+                        For those devices that support ds1 alarm monitoring
+                        but who's hardware does not support detect bipolar
+                        violations, this object always returns the default,
+                        and performs no action when written."
+                ::= { ds1AlarmConfigEntry 8 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.8
+
+        ds1AlarmManualRecovery  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        recover(1)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "To cause a manual recovery to occur, this object is set
+                        to a 1.  It is always read as a 1.  The recovery will 
+                        occur only when automatic recovery is disabled."
+                ::= { ds1AlarmConfigEntry 9 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.8.2.1.9
+
+--
+-- Wan Internet Protocol Priority Queue Filters Group
+-- This group is required for any platforms that support
+-- Cabletron's WAN IP Priority Queue processing functionality
+--
+
+--
+-- IP PQ Configuration Variables
+--
+--      These parameters apply to the IP Priority Queue
+--      entity.  These variables allow the user to program
+--      IP addresses in a filtering database.  The database
+--      of IP addresses are used when a WAN service is over
+--      subscribed, and the packet would normally be discarded.
+--      If the IP PQ admin status is enabled, and the IP 
+--      address of the packet to be discarded matches one
+--      programmed in the database, an attempt will be made
+--      to use high priority, reserved, resources to transmit
+--      the packet.  The addresses programmed in this table
+--      should be reserved for those packets which MUST be
+--      transmitted.  Some examples would be RIP, and SNMP
+--      packets, who's loss would cause major networking
+--      problems for the system.
+--
+
+        ipPQConfigGroup OBJECT IDENTIFIER ::= { ctIPPQFilters 1 }
+--                      1.3.6.1.4.1.52.4.1.2.7.2.9.1
+
+        ipPQAdmin       OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),    -- default
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the IP Priority Queue
+                        Forwarding Application."
+                ::= { ipPQConfigGroup 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.1.1
+
+        iPPQMaxEntries  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Returns the maximum number of IP address entries 
+                        supported by the IP Priority Queue application on 
+                        this device."
+                ::= { ipPQConfigGroup 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.1.2
+
+        iPPQNumEntries  OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Get the number of IP address entries currently
+                        programmed in the ipPQAddressTable."
+                ::= { ipPQConfigGroup 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.1.3
+
+        iPPQAddAddress OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Add an IP address to the ipPQAddressTable. Always
+                        read as a 0.0.0.0."
+                ::= { ipPQConfigGroup 4 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.1.4
+          
+        iPPQDelAddress OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Delete an IP address from the ipPQAddressTable.
+                        Always read as a 0.0.0.0."
+                ::= { ipPQConfigGroup 5 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.1.5
+          
+--
+--
+--
+-- IP Priority Queue Address Table
+--
+--      The IP PQ table contains a list of IP adresses used with the 
+--      Priority Queue filtering mechanism. 
+--
+        ipPQAddressTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF IpPQAddressEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Table containing IP addresses, used in an
+                        IP Priority Queue Forwarding function."
+                ::= { ctIPPQFilters 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.2
+        
+        ipPQAddressEntry OBJECT-TYPE
+                SYNTAX      IpPQAddressEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single entry."
+                INDEX       { ipPQAddressId }
+                ::= { ipPQAddressTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.2.1
+        
+        IpPQAddressEntry ::=
+                SEQUENCE {
+                        ipPQAddressId
+                        INTEGER,
+                        ipPQIPAddress
+                        IpAddress
+                        }
+        
+        ipPQAddressId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence
+                        of IP PQ address entries."
+                ::= { ipPQAddressEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.2.1.1
+
+        ipPQIPAddress    OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns an IP address associated with a specific
+                        entry in this table."
+                ::= { ipPQAddressEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.9.2.1.2
+
+-- Cabletron Ds3 Extensions Group
+-- This group is required for any platforms that have a t3 physical 
+-- port.
+
+        ctDs3ExtensionsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtDs3ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table is an extension to the standard ds3 configuration
+                table. It is a list of items that are pertinant to ds3 ports
+                on a platform. There is one entry per ds3 physical port on
+                the platform."
+        ::= { ctDs3Ext 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.10.1
+
+        ctDs3ExtensionsEntry OBJECT-TYPE
+        SYNTAX  CtDs3ExtensionsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A ds3 extensions entry containing objects relating to
+                the particular ds3 physical port."
+        INDEX   { ctDs3ExtensionsEntryIndex }
+        ::= { ctDs3ExtensionsTable 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.10.1.1
+
+        CtDs3ExtensionsEntry ::=
+        SEQUENCE {
+                        ctDs3ExtensionsEntryIndex
+                        INTEGER,
+                        ctDs3ExtensionsNumInterfaces
+                        INTEGER,
+                        ctDs3ExtensionsLineBuildOut
+                        INTEGER
+                }
+
+        ctDs3ExtensionsEntryIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each ds3 physical port on the platform."
+        ::= { ctDs3ExtensionsEntry 1 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.10.1.1.1
+
+        ctDs3ExtensionsNumInterfaces OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of interfaces on this physical port. This
+                number inidicates the number of entries this physical port
+                uses in the ifTable."
+        REFERENCE
+                "rfc-1213"
+        ::= { ctDs3ExtensionsEntry 2 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.10.1.1.2
+
+        ctDs3ExtensionsLineBuildOut OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unknown(1),
+                        zeroto255feet(2),
+                        a255to450feet(3)
+                                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The line build out setting for this ds3 physical port.
+                Unknown indicates that the setting is neither readable or
+                writable."
+        DEFVAL { zeroto255feet }
+        ::= { ctDs3ExtensionsEntry 3 }
+--          1.3.6.1.4.1.52.4.1.2.7.2.10.1.1.3
+
+END

@@ -1,0 +1,2248 @@
+CISCOSB-vlan-MIB DEFINITIONS ::= BEGIN
+
+-- Version:    7.46
+-- Date:       15 Jan 2007
+--
+-- 26-Oct-2004 Added
+--              vlanDynamicVlanSupported
+--              vlanDynamicVlanTable
+--              vlanPortModeExtTable
+--              vlanPrivateSupported
+--              vlanPrivateTable
+--              vlanPrivateCommunityTable
+-- 01-Jul-2005 Added vlanMulticastTvTable
+-- 14-Jul-2005 Added vlanMacBaseVlan group
+-- 19-Jul-2005  Added
+--              vlanPrivateEdgeGroupTable
+--              vlanPrivateEdgeGroupIfIndexTable
+-- 14-Jul-2005 Added
+--              vlanSubnetRangeTable
+--              vlanSubnetPortTable
+-- 20-Jul-2005 Added
+--              vlanSubnetRangeTable
+--              vlanSubnetPortTable
+-- 30-Nov-2005 Added
+--              vlanTriplePlayTable
+--              vlanTriplePlayMulticastTvTable
+-- 21-Nov-2006 Added vlanVoice
+-- 15-Jan-2007 Devided file appolo.txt to a few files
+--             Renamed file appolo.txt to ralan-mib.mib
+-- 11-Feb-2007 (VeredK) Added default vlan tagged ports MIBs
+-- 29-Sep-2008 Added Default VLAN membership enabled ports
+-- 16-Oct-2008 (ShaharG) Added DIPO Asymmetric vlan MIB
+-- 13-Oct-2009 (GenadyB) Added trunk port mode vlan list  MIB
+-- 06-Sep-2010 (GenadyB) Added rldot1qPortVlanStaticTable MIB
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    DisplayString, TruthValue, RowStatus,
+    MacAddress                                  FROM SNMPv2-TC
+    VlanIndex, dot1qVlanIndex, PortList         FROM Q-BRIDGE-MIB
+    VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB
+    ifIndex                                     FROM IF-MIB
+    dot1dBasePort                               FROM BRIDGE-MIB
+    SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress     FROM SNMPv2-SMI
+    InetAddressType                             FROM INET-ADDRESS-MIB;
+
+vlan MODULE-IDENTITY
+              LAST-UPDATED "200602120000Z"
+              ORGANIZATION "Cisco Systems, Inc."
+
+              CONTACT-INFO
+              "Postal: 170 West Tasman Drive
+              San Jose , CA 95134-1706
+              USA
+
+              
+              Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+              DESCRIPTION
+                      "The private MIB module definition for IP Multicast support in CISCOSB devices."
+              REVISION "200602120000Z"
+              DESCRIPTION
+                       "Editorial changes to support new MIB compilers."
+               REVISION "200404190000Z"
+              DESCRIPTION
+                      "Initial version of this MIB."
+          ::= { switch001 48 }
+
+vlanMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version :
+           Version 2: the current VLAN MIB replaced the previous one;
+           Version 3: field vlanPortForbiddenEgressPort was added.
+           Version 4: dot1q and dot1v supported
+           Version 5: Private Edge Vlan
+                        vlanPrivateEdgeSupported
+                        vlanPrivateEdgeMibVersion
+                        vlanPrivateEdgeTable"
+    ::= { vlan 1 }
+
+vlanMaxTableNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of VLAN Tables supported by the device."
+    ::= { vlan 2 }
+
+vlanNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table translates Vlan name to Vlan's tag and ifindex"
+    ::= { vlan 21 }
+
+vlanNameEntry OBJECT-TYPE
+    SYNTAX      VlanNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { vlanNameName  }
+    ::= { vlanNameTable 1 }
+
+VlanNameEntry ::= SEQUENCE {
+    vlanNameName          DisplayString,
+    vlanNameTag           INTEGER,
+    vlanNameIfIndex       INTEGER
+}
+
+vlanNameName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Vlan's name"
+    ::=  { vlanNameEntry 1 }
+
+vlanNameTag OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Vlan's tag"
+    ::=  { vlanNameEntry 2 }
+
+vlanNameIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Vlan's ifindex"
+    ::=  { vlanNameEntry 3 }
+
+vlanPortModeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPortModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table hold information on port status trunk or access"
+    ::= { vlan 22 }
+
+vlanPortModeEntry OBJECT-TYPE
+    SYNTAX      VlanPortModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { ifIndex }
+    ::= { vlanPortModeTable 1 }
+
+VlanPortModeEntry ::= SEQUENCE {
+    vlanPortModeState      INTEGER
+}
+
+vlanPortModeState OBJECT-TYPE
+   SYNTAX       INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The port state, 1 is generic cli"
+    ::=  { vlanPortModeEntry 1 }
+
+vlanSendUnknownToAllPorts OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If a value of the parameter is true a frame with unknown
+         destination MAC address sent by the Layer 3 to a VLAN will be
+         sent to all ports of the VLAN.
+         If a value of the parameter is false a frame with unknown
+         destination MAC address sent by the Layer 3 to a VLAN will be
+         discarded."
+    DEFVAL { true }
+    ::= { vlan 27 }
+
+vlanDefaultSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "supported or not default vlan."
+    ::= { vlan 29 }
+
+vlanDot1vSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "802.1v standard for vlan per port and protocol."
+    ::= { vlan 31 }
+
+vlanDefaultEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "if supported default vlan , indicate enabled or disabled"
+    ::= { vlan 32 }
+
+vlanSpecialTagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanSpecialTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "special vlan tag used for this port"
+    ::= { vlan 33 }
+
+vlanSpecialTagEntry OBJECT-TYPE
+    SYNTAX      VlanSpecialTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of special tag"
+    INDEX   { ifIndex  }
+    ::= { vlanSpecialTagTable 1 }
+
+VlanSpecialTagEntry ::= SEQUENCE {
+        vlanSpecialTagVID     VlanIndex,
+        vlanSpecialTagStatus  RowStatus
+    }
+
+vlanSpecialTagVID OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "specify the special vlan tag ."
+    ::= { vlanSpecialTagEntry  1 }
+
+vlanSpecialTagStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanSpecialTagEntry 2 }
+
+vlanSpecialTagCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanSpecialTagCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "special Current vlan tag used for this port"
+    ::= { vlan 34 }
+
+vlanSpecialTagCurrentEntry OBJECT-TYPE
+    SYNTAX      VlanSpecialTagCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of Current special tag"
+    INDEX   { ifIndex  }
+    ::= { vlanSpecialTagCurrentTable 1 }
+
+VlanSpecialTagCurrentEntry ::= SEQUENCE {
+        vlanSpecialTagCurrentVID      VlanIndex,
+        vlanSpecialTagCurrentReserved TruthValue,
+        vlanSpecialTagCurrentActive   TruthValue
+    }
+
+vlanSpecialTagCurrentVID OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "specify the special vlan tag ."
+    ::= { vlanSpecialTagCurrentEntry  1 }
+
+vlanSpecialTagCurrentReserved OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "specify if the special vlan tag is reserved ."
+    ::= { vlanSpecialTagCurrentEntry  2 }
+
+vlanSpecialTagCurrentActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "specify if the special vlan tag is used ."
+    ::= { vlanSpecialTagCurrentEntry  3 }
+
+vlanPrivateEdgeSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "is private edge supported."
+    ::= { vlan 35 }
+
+vlanPrivateEdgeVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "private edge version."
+    ::= { vlan 36 }
+
+vlanPrivateEdgeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateEdgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table for pve port and uplink"
+    ::= { vlan 37 }
+
+vlanPrivateEdgeEntry OBJECT-TYPE
+    SYNTAX      VlanPrivateEdgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of pve"
+    INDEX   { ifIndex  }
+    ::= { vlanPrivateEdgeTable 1 }
+
+VlanPrivateEdgeEntry ::= SEQUENCE {
+        vlanPrivateEdgeUplink  INTEGER,
+        vlanPrivateEdgeStatus  RowStatus
+    }
+
+vlanPrivateEdgeUplink OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "specify the uplink port."
+    ::= { vlanPrivateEdgeEntry  1 }
+
+vlanPrivateEdgeStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPrivateEdgeEntry 2 }
+
+vlanDynamicVlanSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "is DynamicVlanVlan supported."
+    ::= { vlan 38 }
+
+vlanDynamicVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanDynamicVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table for DynamicVlan"
+    ::= { vlan 39 }
+
+vlanDynamicVlanEntry OBJECT-TYPE
+    SYNTAX      VlanDynamicVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of DynamicVlan"
+    INDEX   { vlanDynamicVlanMacAddress  }
+    ::= { vlanDynamicVlanTable 1 }
+
+VlanDynamicVlanEntry ::= SEQUENCE {
+        vlanDynamicVlanMacAddress  MacAddress,
+        vlanDynamicVlanTag         VlanIndex,
+        vlanDynamicVlanStatus      RowStatus
+    }
+
+vlanDynamicVlanMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "mac address "
+    ::= { vlanDynamicVlanEntry  1 }
+
+vlanDynamicVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "vlan Tag"
+    ::= { vlanDynamicVlanEntry  2 }
+
+vlanDynamicVlanStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanDynamicVlanEntry 3 }
+
+vlanPortModeExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPortModeExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table hold information on port status trunk or access"
+    ::= { vlan 40 }
+
+vlanPortModeExtEntry OBJECT-TYPE
+    SYNTAX      VlanPortModeExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { ifIndex }
+    ::= { vlanPortModeExtTable 1 }
+
+VlanPortModeExtEntry ::= SEQUENCE {
+    vlanPortModeExtState      INTEGER,
+    vlanPortModeExtStatus     RowStatus
+}
+
+vlanPortModeExtState OBJECT-TYPE
+   SYNTAX       INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ext"
+    ::=  { vlanPortModeExtEntry 1 }
+
+vlanPortModeExtStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPortModeExtEntry 2 }
+
+vlanPrivateSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "is private vlan supported."
+    ::= { vlan 41 }
+
+vlanPrivateTableOld OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateEntryOld
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table for PrivateVlan"
+    ::= { vlan 42 }
+
+vlanPrivateEntryOld OBJECT-TYPE
+    SYNTAX      VlanPrivateEntryOld
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of PrivateVlan"
+    INDEX   { dot1qVlanIndex  }
+    ::= { vlanPrivateTableOld 1 }
+
+VlanPrivateEntryOld ::= SEQUENCE {
+        vlanPrivateOldIsolatedVlanTag  INTEGER,
+        vlanPrivateOldStatus           RowStatus
+    }
+
+vlanPrivateOldIsolatedVlanTag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "vlan Tag"
+    ::= { vlanPrivateEntryOld  1 }
+
+vlanPrivateOldStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPrivateEntryOld 2 }
+
+vlanPrivateCommunityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateCommunityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table for PrivateVlan"
+    ::= { vlan 43 }
+
+vlanPrivateCommunityEntry OBJECT-TYPE
+    SYNTAX      VlanPrivateCommunityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of PrivateVlan"
+    INDEX   { dot1qVlanIndex, vlanPrivateCommunityVlanTag  }
+    ::= { vlanPrivateCommunityTable 1 }
+
+VlanPrivateCommunityEntry ::= SEQUENCE {
+        vlanPrivateCommunityVlanTag  VlanIndex,
+        vlanPrivateCommunityStatus   RowStatus
+    }
+
+vlanPrivateCommunityVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "vlan Tag"
+    ::= { vlanPrivateCommunityEntry  1 }
+
+vlanPrivateCommunityStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPrivateCommunityEntry 2 }
+
+vlanMulticastTvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanMulticastTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " multicast vlan used for this port"
+    ::= { vlan 44 }
+
+vlanMulticastTvEntry OBJECT-TYPE
+    SYNTAX      VlanMulticastTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of multicast tag"
+    INDEX   { ifIndex  }
+    ::= { vlanMulticastTvTable 1 }
+
+VlanMulticastTvEntry ::= SEQUENCE {
+        vlanMulticastTvVID     VlanIndex,
+        vlanMulticastTvStatus  RowStatus
+    }
+
+vlanMulticastTvVID OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "specify the TV vlan tag, vlan must exist ."
+    ::= { vlanMulticastTvEntry  1 }
+
+vlanMulticastTvStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanMulticastTvEntry 2 }
+
+-- -------------------------------------------------------------
+-- vlanMacBaseVlan group
+-- -------------------------------------------------------------
+
+vlanMacBaseVlanGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanMacBaseVlanGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains mappings from Range of MAC
+         addresses to Group Identifiers used for
+         MAC-based VLAN Classification."
+    ::= { vlan 45 }
+
+vlanMacBaseVlanGroupEntry OBJECT-TYPE
+    SYNTAX      VlanMacBaseVlanGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping from a Range of MAC addresses to a
+         Group Identifier."
+    INDEX       { vlanMacBaseVlanMacAddress,
+                  vlanMacBaseVlanMacMask }
+    ::= { vlanMacBaseVlanGroupTable 1 }
+
+VlanMacBaseVlanGroupEntry ::=
+    SEQUENCE {
+        vlanMacBaseVlanMacAddress
+            MacAddress,
+        vlanMacBaseVlanMacMask
+            INTEGER,
+        vlanMacBaseVlanGroupId
+            INTEGER,
+        vlanMacBaseVlanGroupRowStatus
+            RowStatus
+    }
+
+vlanMacBaseVlanMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The base MAC address of the range."
+    REFERENCE
+        "IEEE 802.1v clause 8.6.2"
+    ::= { vlanMacBaseVlanGroupEntry 1 }
+
+vlanMacBaseVlanMacMask OBJECT-TYPE
+    SYNTAX      INTEGER (9..48)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Mask of the range.
+        The mask determains the leading '1' bits of the mask (MSB).
+        48 means single HOST and 9 means the widest range.
+        The MASK is limited to 9 to avoid entring ranges including
+        multicast addresses.
+        "
+    ::= { vlanMacBaseVlanGroupEntry 2 }
+
+vlanMacBaseVlanGroupId OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents a group of ranges of MAC addresses
+         that are associated together when assigning a
+         VID to a frame."
+    ::= { vlanMacBaseVlanGroupEntry 3 }
+
+vlanMacBaseVlanGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { vlanMacBaseVlanGroupEntry 4 }
+
+vlanMacBaseVlanPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanMacBaseVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains VID sets used for
+         MAC-based VLAN Classification."
+    ::= { vlan 46 }
+
+vlanMacBaseVlanPortEntry OBJECT-TYPE
+    SYNTAX      VlanMacBaseVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A VID set for a port and group."
+    INDEX       { dot1dBasePort,
+                  vlanMacBaseVlanPortGroupId }
+    ::= { vlanMacBaseVlanPortTable 1 }
+
+VlanMacBaseVlanPortEntry ::=
+    SEQUENCE {
+        vlanMacBaseVlanPortGroupId
+            INTEGER,
+        vlanMacBaseVlanPortGroupVid
+            VlanIndex,
+        vlanMacBaseVlanPortRowStatus
+            RowStatus
+    }
+
+vlanMacBaseVlanPortGroupId OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Designates a group of Ranges in the ranges
+         Group Database."
+    ::= { vlanMacBaseVlanPortEntry 1 }
+
+vlanMacBaseVlanPortGroupVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VID associated with a group of range MAC addresses for
+         each port."
+    ::= { vlanMacBaseVlanPortEntry 2 }
+
+vlanMacBaseVlanPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { vlanMacBaseVlanPortEntry 3 }
+
+vlanPrivateEdgeGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateEdgeGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table for pve port and uplink"
+    ::= { vlan 47 }
+
+vlanPrivateEdgeGroupEntry OBJECT-TYPE
+    SYNTAX      VlanPrivateEdgeGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of pve"
+    INDEX   { vlanPrivateEdgeGroupSource }
+    ::= { vlanPrivateEdgeGroupTable 1 }
+
+VlanPrivateEdgeGroupEntry ::= SEQUENCE {
+        vlanPrivateEdgeGroupSource  INTEGER,
+        vlanPrivateEdgeGroupUplink  INTEGER,
+        vlanPrivateEdgeGroupStatus  RowStatus
+    }
+
+vlanPrivateEdgeGroupSource OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "specify the uplink group."
+    ::= { vlanPrivateEdgeGroupEntry  1 }
+
+vlanPrivateEdgeGroupUplink OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "specify the uplink port."
+    ::= { vlanPrivateEdgeGroupEntry  2 }
+
+vlanPrivateEdgeGroupStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPrivateEdgeGroupEntry 3 }
+
+vlanPrivateEdgeGroupIfIndexTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateEdgeGroupIfIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table for pve port and uplink"
+    ::= { vlan 48 }
+
+vlanPrivateEdgeGroupIfIndexEntry OBJECT-TYPE
+    SYNTAX      VlanPrivateEdgeGroupIfIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of pve"
+    INDEX   { ifIndex }
+    ::= { vlanPrivateEdgeGroupIfIndexTable 1 }
+
+VlanPrivateEdgeGroupIfIndexEntry ::= SEQUENCE {
+        vlanPrivateEdgeGroupIfIndexID       INTEGER,
+        vlanPrivateEdgeGroupIfIndexDomainID INTEGER
+    }
+
+vlanPrivateEdgeGroupIfIndexID OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "specify the ifIndex group id."
+    ::= { vlanPrivateEdgeGroupIfIndexEntry  1 }
+
+vlanPrivateEdgeGroupIfIndexDomainID OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "specify the ifIndex group id."
+    ::= { vlanPrivateEdgeGroupIfIndexEntry  2 }
+
+
+-- -------------------------------------------------------------
+-- vlanSubnetRange group
+-- -------------------------------------------------------------
+vlanSubnetRangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanSubnetRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains mappings from subnet
+                 range to Group Identifiers used for
+                 Port-and-subnet-based VLAN Classification."
+    REFERENCE        "IEEE 802.1v clause 8.6.4"
+    ::= { vlan 49 }
+
+vlanSubnetRangeEntry OBJECT-TYPE
+    SYNTAX      VlanSubnetRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION        "A mapping from a subnet to a
+                        Group Identifier."
+    INDEX       {  vlanSubnetRangeAddr,
+                   vlanSubnetRangeMask  }
+    ::= { vlanSubnetRangeTable 1 }
+
+VlanSubnetRangeEntry ::=
+SEQUENCE {        vlanSubnetRangeAddr       IpAddress,
+                  vlanSubnetRangeMask       INTEGER,
+                  vlanSubnetRangeGroupId    INTEGER,
+                  vlanSubnetRangeRowStatus  RowStatus    }
+
+vlanSubnetRangeAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION            "The IP address of the range "
+::= { vlanSubnetRangeEntry 1 }
+
+vlanSubnetRangeMask OBJECT-TYPE
+    SYNTAX      INTEGER (1..32)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION            "The numbers of continuous ones in the mask "
+     ::= { vlanSubnetRangeEntry 2 }
+
+vlanSubnetRangeGroupId OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION        "Represents a group of subnets that are associated
+                        together when assigning a VID to a frame."
+    ::= { vlanSubnetRangeEntry 3 }
+
+vlanSubnetRangeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION        "This object indicates the status of this entry."
+    ::= { vlanSubnetRangeEntry 4 }
+
+-- port bind
+vlanSubnetPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanSubnetPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION        "A table that contains VID sets used for
+                        Port-and-subnet-based VLAN Classification."
+    ::= { vlan 50 }
+
+vlanSubnetPortEntry OBJECT-TYPE
+    SYNTAX      VlanSubnetPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION        "A VID set for a port."
+    INDEX       { dot1dBasePort,                  vlanSubnetPortGroupId }
+    ::= { vlanSubnetPortTable 1 }
+
+VlanSubnetPortEntry ::=
+    SEQUENCE {        vlanSubnetPortGroupId            INTEGER,
+                      vlanSubnetPortGroupVid           INTEGER,
+                      vlanSubnetPortRowStatus          RowStatus    }
+
+vlanSubnetPortGroupId OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION        "Designates a group of subnets in the
+                         Group Database."
+    ::= { vlanSubnetPortEntry 1 }
+
+vlanSubnetPortGroupVid OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION        "The VID associated with a group of subnets for
+                        each port."
+    ::= { vlanSubnetPortEntry 2 }
+
+vlanSubnetPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION        "This object indicates the status of this entry."
+::= { vlanSubnetPortEntry 3 }
+
+----------------------
+--  Triple Play
+----------------------
+
+-- vlanTriplePlayTable table converted to Inet  See vlanInetTriplePlayTable
+
+vlanTriplePlayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanTriplePlayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " TriplePlay table, map CPE vlan to multicastTvVlan"
+    ::= { vlan 51}
+
+vlanTriplePlayEntry OBJECT-TYPE
+    SYNTAX      VlanTriplePlayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of TriplePlay table"
+    INDEX   { vlanTriplePlayInnerVID     }
+    ::= { vlanTriplePlayTable 1 }
+
+VlanTriplePlayEntry ::= SEQUENCE {
+        vlanTriplePlayInnerVID       VlanIndex,
+        vlanTriplePlayMulticastTvVID VlanIndex,
+        vlanTriplePlayRowStatus  RowStatus
+    }
+
+vlanTriplePlayInnerVID     OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         " Specifies  the CPE inner vlan."
+    ::= { vlanTriplePlayEntry  1 }
+
+vlanTriplePlayMulticastTvVID     OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       " Specifies the multicast TV outer vlan."
+    ::= { vlanTriplePlayEntry  2 }
+
+vlanTriplePlayRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row creation and removal conventions."
+    ::= { vlanTriplePlayEntry  3 }
+
+
+-- vlanTriplePlayMulticastTvTable  table converted to Inet  see vlanInetTriplePlayMulticastTvTable
+vlanTriplePlayMulticastTvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanTriplePlayMulticatTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " TriplePlayMulticastTv table saves a list of ports for a certain multicastTvVlan"
+    ::= { vlan 52}
+
+vlanTriplePlayMulticatTvEntry OBJECT-TYPE
+    SYNTAX      VlanTriplePlayMulticatTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of triple play MulticastTv table"
+    INDEX   { vlanTriplePlayMulticastTvMulticastTvVID      }
+    ::= { vlanTriplePlayMulticastTvTable 1 }
+
+VlanTriplePlayMulticatTvEntry ::= SEQUENCE {
+        vlanTriplePlayMulticastTvMulticastTvVID      VlanIndex,
+        vlanTriplePlayMulticastTvMulticastTvPortList PortList
+
+}
+
+vlanTriplePlayMulticastTvMulticastTvVID      OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Specifies the multicast TV external vlan."
+    ::= { vlanTriplePlayMulticatTvEntry 1 }
+
+
+vlanTriplePlayMulticastTvMulticastTvPortList  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "the multicast tv port list."
+    ::= { vlanTriplePlayMulticatTvEntry 2}
+
+vlanDefaultExtManagment  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "enable disable ext managment on default vlan."
+    ::= { vlan 53 }
+
+
+-------------------------------
+--  Voice VLAN MIBs definition
+-------------------------------
+
+-- deprecated
+vlanVoice  OBJECT IDENTIFIER ::= { vlan 54 }
+
+vlanVoiceAgingTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (1..43200)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The vlanVoiceAgingTimeout indicates the time (in units of
+            minutes) from when the last OUI MAC was ageout from the FDB the port
+            will be removed from the Voice VLAN.
+
+            The default value for vlanVoiceAgingTimeout object is 1440 minutes (24 hours).
+
+            The value of this object must be restored from non-volatile
+            storage after a re-initialization of the management system."
+    DEFVAL      { 1440 }
+    ::= { vlanVoice 1 }
+
+
+-- voice vlan table
+vlanVoiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanVoiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static configuration information for
+        each voice VLAN configured into the device and dynamic port membership.
+        All entries are permanent and will
+        be restored after the device is reset."
+    ::= { vlanVoice 2 }
+
+vlanVoiceEntry OBJECT-TYPE
+    SYNTAX      VlanVoiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a voice VLAN configured into the device by management."
+    INDEX   { dot1qVlanIndex }
+    ::= { vlanVoiceTable 1 }
+
+VlanVoiceEntry ::=
+    SEQUENCE {
+        vlanVoicePriority
+            INTEGER,
+        vlanVoicePriorityRemark
+            TruthValue,
+        vlanVoiceRowStatus
+            RowStatus
+    }
+
+vlanVoicePriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An administratively assigned Priority, which will be used
+        for all traffic on the voice vlan, this gives the packets
+        the requested priority (CoS) within the bridge."
+    DEFVAL{ 6 }
+    ::= { vlanVoiceEntry 1 }
+
+vlanVoicePriorityRemark OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Remark VPT on tagged frames egress the voice vlan according.
+         to priority true.false"
+    DEFVAL { false }
+    ::= { vlanVoiceEntry 2 }
+
+vlanVoiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { vlanVoiceEntry 3 }
+
+
+-- Voice VLAN OUI Table
+vlanVoiceOUITable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanVoiceOUIEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static global configuration information for Voice VLANs OUI MAC Prefixes.
+        All entries are permanent and will be restored after the device is reset."
+    ::= { vlanVoice 3 }
+
+vlanVoiceOUIEntry OBJECT-TYPE
+    SYNTAX      VlanVoiceOUIEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a voice VLANs OUI MAC Prefixes configured into the
+        device by management."
+    INDEX   { vlanVoiceOUIPrefix }
+    ::= { vlanVoiceOUITable  1 }
+
+VlanVoiceOUIEntry ::= SEQUENCE {
+              vlanVoiceOUIPrefix                      OCTET STRING,
+              vlanVoiceOUIDescription                 DisplayString,
+              vlanVoiceOUIEntryRowStatus              RowStatus
+}
+
+vlanVoiceOUIPrefix   OBJECT-TYPE
+    SYNTAX         OCTET STRING(SIZE(3))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the OUI MAC Prefix component
+             associated with this entry.
+
+            The value of this object is used as an index to the
+            vlanVoiceOUITable.
+
+            Voice VLANs OUI Prefix is the first 3 most significant
+            octets of the MAC address."
+    ::= { vlanVoiceOUIEntry 1 }
+
+vlanVoiceOUIDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An optional text that describes the OUI."
+    DEFVAL {""}
+    ::=  { vlanVoiceOUIEntry 2 }
+
+vlanVoiceOUIEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { vlanVoiceOUIEntry 3 }
+
+
+-- Voice VLAN per Port configuration Table
+vlanVoicePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanVoicePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static and dynamic per port configuration information for Voice VLAN.
+        All entries are permanent and will be restored after the device is reset."
+    ::= { vlanVoice 4 }
+
+vlanVoicePortEntry OBJECT-TYPE
+    SYNTAX      VlanVoicePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static and dynamic per port information for a voice VLAN."
+    INDEX { ifIndex }
+    ::= { vlanVoicePortTable 1 }
+
+VlanVoicePortEntry ::= SEQUENCE {
+              vlanVoicePortEnable                           TruthValue,
+              vlanVoicePortVlanIndex                        VlanIndex,
+              vlanVoicePortSecure                           TruthValue,
+              vlanVoicePortCurrentMembership                INTEGER {active(1),notActive(2)},
+              vlanVoicePortQosMode                          INTEGER {src(1),all(2)}
+}
+
+vlanVoicePortEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable this port to be a candidate to be added into the Voice VLAN."
+    DEFVAL{ false }
+    ::= { vlanVoicePortEntry 1 }
+
+vlanVoicePortVlanIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Voice VLAN-ID the port is a candidate to be in."
+    DEFVAL{ 4095 }
+    ::= { vlanVoicePortEntry 2 }
+
+vlanVoicePortSecure OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify this port to be in Secure Mode when entering the Voice VLAN.
+          In Secure mode only frames with MAC prefix matched to one of the OUI table prefixes
+         are accepted, otherwise dropped."
+    DEFVAL{ false }
+    ::= { vlanVoicePortEntry 3 }
+
+vlanVoicePortCurrentMembership OBJECT-TYPE
+    SYNTAX  INTEGER {
+            active(1),
+            notActive(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port's current status of membership in Voice VLAN.
+
+         Port's possible values of membership in Voice VLAN:
+          'Active(1)'    - Port is currently added to a Voice VLAN .
+          'NotActive(2)' - Specifies either that port is a candidate to be
+                           in Voice VLAN or disabled."
+    ::= { vlanVoicePortEntry 4 }
+
+vlanVoicePortQosMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            src(1),
+            all(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port's current QOS mode in Voice VLAN.
+         Possible values:
+          'src(1)' - Only traffic with OUI prefix in the source MAC received QOS of the Voice Vlan.
+          'all(2)' - All traffic through that port received QOS of the Voice Vlan."
+    ::= { vlanVoicePortEntry 5 }
+
+
+vlanVoiceOUISetToDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The vlanVoiceOUISetToDefault indicates that vlanVoiceOUITable
+            should be set to it's default values if existed
+            (OUI default prefixes).
+
+            To do so the vlanVoiceOUITable should be previuosly deleted by usual
+            entries destroying.
+
+            This object behaviors as write-only than
+            reading this object will always return 'false'."
+    DEFVAL{ false }
+    ::= { vlanVoice 5 }
+--------------------------------------------------
+--  Default VLAN tagged ports - MIBs definition
+--------------------------------------------------
+
+vlanDefault  OBJECT IDENTIFIER ::= { vlan 55 }
+
+vlanDefaultTaggedPorts OBJECT-TYPE
+    SYNTAX  PortList
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "list of default valn tagged ports."
+    ::= { vlanDefault 1 }
+
+--------------------------------------------------
+--  Default VLAN excluded ports - MIBs definition
+--------------------------------------------------
+
+vlanDefaultEnabledPorts OBJECT-TYPE
+    SYNTAX  PortList
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "List of default VLAN membership enabled ports."
+    ::= { vlanDefault 2 }
+
+-- vlanInetTriplePlayTable (replaced DEPRICATED vlanTriplePlayTable)
+
+vlanInetTriplePlayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanInetTriplePlayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " TriplePlay table, map CPE vlan to multicastTvVlan"
+    ::= { vlan 56}
+
+vlanInetTriplePlayEntry OBJECT-TYPE
+    SYNTAX      VlanInetTriplePlayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of TriplePlay table"
+    INDEX   { vlanInetTriplePlayInetAddressType, vlanTriplePlayInnerVID }
+    ::= { vlanInetTriplePlayTable 1 }
+
+VlanInetTriplePlayEntry ::= SEQUENCE {
+        vlanInetTriplePlayInetAddressType   InetAddressType,
+        vlanInetTriplePlayInnerVID          VlanIndex,
+        vlanInetTriplePlayMulticastTvVID    VlanIndex,
+        vlanInetTriplePlayRowStatus         RowStatus
+    }
+
+vlanInetTriplePlayInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type IPv4/IPv6."
+    ::= { vlanInetTriplePlayEntry 1 }
+
+vlanInetTriplePlayInnerVID     OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         " Specifies  the CPE inner vlan."
+    ::= { vlanInetTriplePlayEntry 2 }
+
+vlanInetTriplePlayMulticastTvVID     OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       " Specifies the multicast TV outer vlan."
+    ::= { vlanInetTriplePlayEntry  3 }
+
+vlanInetTriplePlayRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row creation and removal conventions."
+    ::= { vlanInetTriplePlayEntry  4 }
+
+-- vlanInetTriplePlayMulticastTvTable (replaced DEPRICATED vlanTriplePlayMulticastTvTable)
+
+vlanInetTriplePlayMulticastTvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanInetTriplePlayMulticatTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " TriplePlayMulticastTv table saves a list of ports for a certain multicastTvVlan"
+    ::= { vlan 57 }
+
+vlanInetTriplePlayMulticatTvEntry OBJECT-TYPE
+    SYNTAX      VlanInetTriplePlayMulticatTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " entry of triple play MulticastTv table"
+    INDEX   { vlanTriplePlayMulticastTvMulticastTvVID      }
+    ::= { vlanInetTriplePlayMulticastTvTable 1 }
+
+VlanInetTriplePlayMulticatTvEntry ::= SEQUENCE {
+        vlanInetTriplePlayMulticastTvMulticastTvVID      VlanIndex,
+        vlanInetTriplePlayMulticastTvMulticastTvPortList PortList
+}
+
+vlanInetTriplePlayMulticastTvMulticastTvVID      OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Specifies the multicast TV external vlan."
+    ::= { vlanInetTriplePlayMulticatTvEntry 1 }
+
+
+vlanInetTriplePlayMulticastTvMulticastTvPortList  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "the multicast tv port list."
+    ::= { vlanInetTriplePlayMulticatTvEntry 2}
+
+vlanAsymmetricEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Indicates enabled or disabled of Asymetric Vlan"
+    ::= { vlan 58 }
+
+
+--------------------------------------------------
+--  Private VLAN - MIBs definition
+--------------------------------------------------
+
+-- vlanPrivateTable
+
+vlanPrivateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Private vlan table which contains the private vlan entries."
+    ::= { vlan 59 }
+
+vlanPrivateEntry OBJECT-TYPE
+    SYNTAX      VlanPrivateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Private vlan entry which contains the private vlan definition."
+    INDEX   { vlanPrivateVid }
+    ::= { vlanPrivateTable 1 }
+
+VlanPrivateEntry ::= SEQUENCE {
+        vlanPrivateVid              VlanIndex,
+        vlanPrivateType             INTEGER,
+        vlanPrivatePrimaryVid       VlanIndex,
+        vlanPrivateStatus           RowStatus
+}
+
+vlanPrivateVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The static vlan ID which is set to one of the
+          private vlan types."
+    ::= { vlanPrivateEntry  1 }
+
+vlanPrivateType OBJECT-TYPE
+    SYNTAX INTEGER {
+        primary(1),
+        isolated(2),
+        community(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "private vlan types:
+            primary    - Carries traffic from promiscuous ports.
+                         promiscuous port can communicate with all ports of the
+                         same PVLAN, including the isolated and community
+                         ports of the same PVLAN.
+
+            isolated   - Carries traffic from isolated ports.
+                         isolated ports can communicate only with the
+                         promiscuous ports of the same PVLAN.
+
+            community  - Carries traffic from community ports.
+                         community ports of the same community can communicate
+                         among themselves and with the promiscuous ports of the
+                         same PVLAN."
+    DEFVAL  { primary }
+    ::= { vlanPrivateEntry 2 }
+
+
+vlanPrivatePrimaryVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The primary vlan ID which has defined in VlanPrivateEntry and which is
+          associated with secondary vlan (in vlanPrivateMapTable).
+          vlanPrivatePrimaryVid is equivalent to vlanPrivateVid when vlanPrivateVid is
+          primary vlan."
+    ::= { vlanPrivateEntry  3 }
+
+vlanPrivateStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPrivateEntry 4 }
+
+-- end of vlanPrivateTable
+
+-- vlanPrivateMapTable
+
+vlanPrivateMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanPrivateMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Private vlan mapping table which contains the private vlan mapping entries."
+    ::= { vlan 60 }
+
+vlanPrivateMapEntry OBJECT-TYPE
+    SYNTAX      VlanPrivateMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Private vlan mapping entry which contains the primary / secondary
+         private vlan association and their ports membership."
+    INDEX   { vlanPrivateMapPrimaryVid, vlanPrivateMapSecondaryVid }
+    ::= { vlanPrivateMapTable 1 }
+
+VlanPrivateMapEntry ::= SEQUENCE {
+        vlanPrivateMapPrimaryVid            VlanIndex,
+        vlanPrivateMapSecondaryVid          VlanIndex,
+        vlanPrivateMapPrimaryPorts          PortList,
+        vlanPrivateMapSecondaryPorts        PortList,
+        vlanPrivateMapPrimaryOperPorts      PortList,
+        vlanPrivateMapSecondaryOperPorts    PortList,
+        vlanPrivateMapStatus                RowStatus
+}
+
+vlanPrivateMapPrimaryVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The primary private vlan ID which is associated with the secondary
+         (isolated or community) vlan (vlanPrivateMapSecondaryVid)."
+    ::= { vlanPrivateMapEntry  1 }
+
+vlanPrivateMapSecondaryVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The secondary private vlan ID which is associated with the primary
+         vlan (vlanPrivateMapPrimaryVid)."
+    ::= { vlanPrivateMapEntry  2 }
+
+vlanPrivateMapPrimaryPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The private vlan promiscuous ports mode which are belongs to the
+          association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
+    ::= { vlanPrivateMapEntry 3}
+
+vlanPrivateMapSecondaryPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The private vlan host ports mode which are belongs to the
+          association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
+    ::= { vlanPrivateMapEntry 4}
+
+vlanPrivateMapPrimaryOperPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The private vlan active promiscuous ports mode which are belongs to the
+          association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
+    ::= { vlanPrivateMapEntry 5}
+
+vlanPrivateMapSecondaryOperPorts  OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The private vlan active host ports mode which are belongs to the
+          association of vlanPrivateMapPrimaryVid and vlanPrivateMapSecondaryVid."
+    ::= { vlanPrivateMapEntry 6}
+
+vlanPrivateMapStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { vlanPrivateMapEntry 7 }
+
+-- end of vlanPrivateMapTable
+
+
+-- vlanTrunkModePortTable
+
+vlanTrunkPortModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanTrunkPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains trunk mode port entries."
+    ::= { vlan 61}
+
+vlanTrunkPortModeEntry  OBJECT-TYPE
+    SYNTAX VlanTrunkPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains port ifIndex,native vlan id and vlan list the port has a membership.
+          The vlan list can contain not created vlans."
+    INDEX { ifIndex }
+    ::= { vlanTrunkPortModeTable 1 }
+
+VlanTrunkPortModeEntry::=SEQUENCE{
+   vlanTrunkPortModeNativeVlanId   VlanIndex,
+   vlanTrunkModeList1to1024        VlanList1,
+   vlanTrunkModeList1025to2048     VlanList2,
+   vlanTrunkModeList2049to3072     VlanList3,
+   vlanTrunkModeList3073to4094     VlanList4
+}
+
+vlanTrunkPortModeNativeVlanId OBJECT-TYPE
+   SYNTAX  VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicated native vlan index.Default value 0"
+   DEFVAL {0}
+   ::= { vlanTrunkPortModeEntry 1 }
+
+vlanTrunkModeList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "vlan trunk mode list 1. Default value is {0}"
+
+   ::= { vlanTrunkPortModeEntry 2 }
+
+vlanTrunkModeList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "vlan trunk mode list 2. Default value is {0}"
+
+   ::= { vlanTrunkPortModeEntry 3 }
+
+vlanTrunkModeList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "vlan trunk mode list 3. Default value is {0}"
+
+   ::= { vlanTrunkPortModeEntry 4 }
+
+vlanTrunkModeList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "vlan trunk mode list 4. Default value is {0}"
+   ::= { vlanTrunkPortModeEntry 5 }
+
+-- vlanAccessModePortTable
+
+vlanAccessPortModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanAccessPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains access mode port entries."
+    ::= { vlan 62}
+
+vlanAccessPortModeEntry  OBJECT-TYPE
+    SYNTAX VlanAccessPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains port ifIndex,access vlan id and multicast TV vlan id."
+    INDEX { ifIndex }
+    ::= { vlanAccessPortModeTable 1 }
+
+VlanAccessPortModeEntry::=SEQUENCE{
+   vlanAccessPortModeVlanId         VlanIndex,
+   vlanAccessPortModeMcstTvVlanId   VlanIndex
+}
+
+vlanAccessPortModeVlanId OBJECT-TYPE
+   SYNTAX  VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicated access vlan id.Default value is 0"
+   DEFVAL { 0 }
+   ::= { vlanAccessPortModeEntry 1 }
+
+vlanAccessPortModeMcstTvVlanId OBJECT-TYPE
+   SYNTAX  VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicated multicast TV vlan id. "
+
+   ::= { vlanAccessPortModeEntry 2 }
+
+
+-- vlanCustomerModePortTable
+
+vlanCustomerPortModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanCustomerPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains customer mode port entries."
+    ::= { vlan 63}
+
+vlanCustomerPortModeEntry  OBJECT-TYPE
+    SYNTAX VlanCustomerPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains port ifIndex,customer vlan id and customer multicast TV vlan id."
+    INDEX { ifIndex }
+    ::= { vlanCustomerPortModeTable 1 }
+
+VlanCustomerPortModeEntry::=SEQUENCE{
+   vlanCustomerPortModeVlanId                VlanIndex,
+   vlanCustomerPortModeMtvList1to1024        VlanList1,
+   vlanCustomerPortModeMtvList1025to2048     VlanList2,
+   vlanCustomerPortModeMtvList2049to3072     VlanList3,
+   vlanCustomerPortModeMtvList3073to4094     VlanList4
+
+}
+
+vlanCustomerPortModeVlanId OBJECT-TYPE
+   SYNTAX  VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicated customer vlan id.Default value is 0"
+   DEFVAL { 0 }
+   ::= { vlanCustomerPortModeEntry 1 }
+
+vlanCustomerPortModeMtvList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "vlan customer port mode multicast TV list 1. Default value is {0}"
+
+   ::= { vlanCustomerPortModeEntry 2 }
+
+vlanCustomerPortModeMtvList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "vlan customer port mode multicast TV list 2. Default value is {0}"
+
+   ::= { vlanCustomerPortModeEntry 3 }
+
+vlanCustomerPortModeMtvList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "vlan customer port mode multicast TV list 3. Default value is {0}"
+
+   ::= { vlanCustomerPortModeEntry 4 }
+
+vlanCustomerPortModeMtvList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "vlan customer port mode multicast TV list 4. Default value is {0}"
+   ::= { vlanCustomerPortModeEntry 5 }
+
+
+vlanSwitchPortModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanSwitchPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+     DESCRIPTION   "The table defines L3/L2 port context."
+    ::= { vlan 64}
+
+vlanSwitchPortModeEntry  OBJECT-TYPE
+    SYNTAX VlanSwitchPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry contains port ifIndex and switch port enable value."
+    INDEX { ifIndex }
+    ::= { vlanSwitchPortModeTable 1 }
+
+VlanSwitchPortModeEntry::=SEQUENCE{
+   vlanSwitchPortModeCategory            INTEGER
+}
+
+vlanSwitchPortModeCategory            OBJECT-TYPE
+SYNTAX INTEGER {
+       l2(1),
+       l3(2)
+   }
+  MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION    "Indicated if a port is switchport (l2 port) or no switchport (l3 port)
+                        1 - switchport
+                        2 - no switchport. Default is 1"
+   DEFVAL { 1 }
+   ::= { vlanSwitchPortModeEntry  1 }
+
+
+
+vlanPortModeContextTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanPortModeContextEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains current port mode context entries."
+    ::= { vlan 65}
+
+vlanPortModeContextEntry OBJECT-TYPE
+    SYNTAX VlanPortModeContextEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry contains current port mode context."
+    INDEX { ifIndex }
+    ::= { vlanPortModeContextTable 1 }
+
+VlanPortModeContextEntry::=SEQUENCE{
+   vlanPortModeContextValue            INTEGER
+}
+
+vlanPortModeContextValue   OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION    "Indicated port context value:
+                        0. Lag
+                        1. Monitor
+                        2. L3
+                        3. RAVA
+                        4. Dot1x
+                        5. Dot1q
+                        6. Access
+                        7. Trunk
+                        8. Customer
+                        9. PV_promisc
+                        10. PV_host"
+
+
+   ::= { vlanPortModeContextEntry  1 }
+
+-- vlanRsvl MIBs reservation
+
+-- vlanRsvlEnable
+
+vlanRsvlEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+           enable(1),
+           disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable / Disable Shared Vlans at the device."
+    ::= { vlan 66 }
+
+-- vlanRsvlMapTable
+
+vlanRsvlMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanRsvlMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Shared vlan learning mapping table which contains the SVL mapping entries."
+    ::= { vlan 67 }
+
+vlanRsvlMapEntry OBJECT-TYPE
+    SYNTAX      VlanRsvlMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SVL mapping entry which contains the primary / secondary
+         SVL association."
+    INDEX   { vlanRsvlMapPrimaryVid, vlanRsvlMapSecondaryVid }
+    ::= { vlanRsvlMapTable 1 }
+
+VlanRsvlMapEntry ::= SEQUENCE {
+        vlanRsvlMapPrimaryVid        VlanIndex,
+        vlanRsvlMapSecondaryVid      VlanIndex,
+        vlanRsvlMapStatus            RowStatus
+}
+
+vlanRsvlMapPrimaryVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The primary SVL ID which is associated with the secondary
+          shared vlan vlanRsvlMapSecondaryVid."
+    ::= { vlanRsvlMapEntry  1 }
+
+vlanRsvlMapSecondaryVid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The secondary SVL ID which is associated with the primary
+          shared vlan vlanRsvlMapPrimaryVid."
+    ::= { vlanRsvlMapEntry  2 }
+
+vlanRsvlMapStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+        row installation and removal conventions."
+    ::= { vlanRsvlMapEntry 3 }
+
+rldot1qPortVlanStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1qPortVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static vlan port membership information."
+    ::= { vlan 68 }
+
+rldot1qPortVlanStaticEntry OBJECT-TYPE
+    SYNTAX      Rldot1qPortVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static vlan membership information per port"
+    INDEX   {ifIndex}
+    ::= { rldot1qPortVlanStaticTable 1 }
+
+Rldot1qPortVlanStaticEntry ::=SEQUENCE {
+
+    rldot1qPortVlanStaticEgressList1to1024              VlanList1,
+    rldot1qPortVlanStaticEgressList1025to2048           VlanList2,
+    rldot1qPortVlanStaticEgressList2049to3072           VlanList3,
+    rldot1qPortVlanStaticEgressList3073to4094           VlanList4,
+    rldot1qPortVlanStaticUntaggedEgressList1to1024      VlanList1,
+    rldot1qPortVlanStaticUntaggedEgressList1025to2048   VlanList2,
+    rldot1qPortVlanStaticUntaggedEgressList2049to3072   VlanList3,
+    rldot1qPortVlanStaticUntaggedEgressList3073to4094   VlanList4,
+    rldot1qPortVlanStaticForbiddenList1to1024           VlanList1,
+    rldot1qPortVlanStaticForbiddenList1025to2048        VlanList2,
+    rldot1qPortVlanStaticForbiddenList2049to3072        VlanList3,
+    rldot1qPortVlanStaticForbiddenList3073to4094        VlanList4
+}
+
+rldot1qPortVlanStaticEgressList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 1 }
+
+rldot1qPortVlanStaticEgressList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 2 }
+
+rldot1qPortVlanStaticEgressList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 3 }
+
+rldot1qPortVlanStaticEgressList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 4}
+
+rldot1qPortVlanStaticUntaggedEgressList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress untagged vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 5 }
+
+rldot1qPortVlanStaticUntaggedEgressList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress untagged vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 6 }
+
+rldot1qPortVlanStaticUntaggedEgressList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress untagged vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 7 }
+
+rldot1qPortVlanStaticUntaggedEgressList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port egress untagged vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 8}
+
+rldot1qPortVlanStaticForbiddenList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port forbidden vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 9 }
+
+rldot1qPortVlanStaticForbiddenList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port forbidden vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 10 }
+
+rldot1qPortVlanStaticForbiddenList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port forbidden vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 11 }
+
+rldot1qPortVlanStaticForbiddenList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The port forbidden vlan static list.Default value is {0}"
+   DEFVAL {'00'H}
+   ::= { rldot1qPortVlanStaticEntry 12}
+
+rldot1qVlanStaticListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1qVlanStaticListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains only one entry of a static vlan list."
+    ::= { vlan 69 }
+
+rldot1qVlanStaticListEntry OBJECT-TYPE
+    SYNTAX      Rldot1qVlanStaticListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Staticly created by local or network management vlan list"
+    INDEX   {rldot1qVlanStaticListIndex}
+    ::= { rldot1qVlanStaticListTable 1 }
+
+Rldot1qVlanStaticListEntry ::=SEQUENCE {
+    rldot1qVlanStaticListIndex         INTEGER,
+    rldot1qVlanStaticList1to1024       VlanList1,
+    rldot1qVlanStaticList1025to2048    VlanList2,
+    rldot1qVlanStaticList2049to3072    VlanList3,
+    rldot1qVlanStaticList3073to4094    VlanList4
+
+}
+
+rldot1qVlanStaticListIndex  OBJECT-TYPE
+   SYNTAX      INTEGER {
+        static(0),
+        dynamicGvrp(1),
+        dynamicRava(2)
+   }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "An index is entrie's sequence.
+      This field substitutes a vlan type.
+      If the vlan was created by user configuration then
+      the type is static.
+      If the vlan was created by GVRP/MVRP protocols then the type is dynamicGvrp.
+      If the vlan was created by Radius server attribute assignment mechanism then
+      the type is dynamicRava."
+   ::= { rldot1qVlanStaticListEntry 1}
+
+rldot1qVlanStaticList1to1024 OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of staticaly created vlans from 1 to 1024."
+
+   ::= { rldot1qVlanStaticListEntry 2}
+
+rldot1qVlanStaticList1025to2048 OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of according to the type field created vlans from 1025 to 2048."
+   DEFVAL {'00'H}
+   ::= { rldot1qVlanStaticListEntry 3}
+
+rldot1qVlanStaticList2049to3072 OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of according to the type field created vlans from 2049 to 3072."
+   DEFVAL {'00'H}
+   ::= { rldot1qVlanStaticListEntry 4}
+
+rldot1qVlanStaticList3073to4094 OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of according to the type field created vlans from 3073 to 4094."
+   DEFVAL {'00'H}
+   ::= { rldot1qVlanStaticListEntry 5}
+
+rldot1qVlanStaticNameTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1qVlanStaticNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains created by user vlans names."
+    ::= { vlan 70 }
+
+rldot1qVlanStaticNameEntry  OBJECT-TYPE
+    SYNTAX      Rldot1qVlanStaticNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Staticly created by local or network management vlan list"
+    INDEX   {dot1qVlanIndex}
+    ::= { rldot1qVlanStaticNameTable 1 }
+
+Rldot1qVlanStaticNameEntry ::=SEQUENCE {
+    rldot1qVlanStaticName   SnmpAdminString
+}
+
+rldot1qVlanStaticName OBJECT-TYPE
+   SYNTAX      SnmpAdminString(SIZE(0..32))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "An administratively assigned string,which may be used
+     to identify the VLAN. The VLAN name must be unique or no name."
+   REFERENCE "IEEE 802.1Q/D11 Section 12.10.2.1"
+   DEFVAL {""}
+   ::= { rldot1qVlanStaticNameEntry 1}
+
+rlPortVlanTriplePlayMulticastTvTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPortVlanTriplePlayMulticastTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table saves a list of vlans per port/lag."
+    ::= { vlan 71 }
+
+rlPortVlanTriplePlayMulticastTvEntry OBJECT-TYPE
+    SYNTAX      RlPortVlanTriplePlayMulticastTvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry of Triple Play Multicast Tv  table."
+    INDEX   {ifIndex}
+    ::= { rlPortVlanTriplePlayMulticastTvTable 1 }
+
+RlPortVlanTriplePlayMulticastTvEntry ::=SEQUENCE {
+    rlPortVlanTriplePlayMulticastTvList1to1024       VlanList1,
+    rlPortVlanTriplePlayMulticastTvList1025to2048    VlanList2,
+    rlPortVlanTriplePlayMulticastTvList2049to3072    VlanList3,
+    rlPortVlanTriplePlayMulticastTvList3073to4094    VlanList4
+}
+
+rlPortVlanTriplePlayMulticastTvList1to1024  OBJECT-TYPE
+   SYNTAX      VlanList1
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of staticaly created Triple Play MTV vlans from 1 to 1024."
+
+   ::= { rlPortVlanTriplePlayMulticastTvEntry 1}
+
+rlPortVlanTriplePlayMulticastTvList1025to2048  OBJECT-TYPE
+   SYNTAX      VlanList2
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of staticaly created Triple Play MTV vlans from 1025 to 2048."
+
+   ::= { rlPortVlanTriplePlayMulticastTvEntry 2}
+
+rlPortVlanTriplePlayMulticastTvList2049to3072  OBJECT-TYPE
+   SYNTAX      VlanList3
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of staticaly created Triple Play MTV vlans from 2049 to 3072."
+
+   ::= { rlPortVlanTriplePlayMulticastTvEntry 3}
+
+rlPortVlanTriplePlayMulticastTvList3073to4094  OBJECT-TYPE
+   SYNTAX      VlanList4
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A list of staticaly created Triple Play MTV vlans from 3073 to 4094."
+
+   ::= { rlPortVlanTriplePlayMulticastTvEntry 4}
+
+rldot1qVlanMembershipTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1qVlanMembershipTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains a bitmap of the VLAN owners(applications) that can create the VLAN and/or add a port to the VLAN."
+    ::= { vlan 72 }
+
+rldot1qVlanMembershipTypeEntry  OBJECT-TYPE
+    SYNTAX      Rldot1qVlanMembershipTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Staticly or dynamicly created VLAN ID owner entry"
+    INDEX   {dot1qVlanIndex}
+    ::= { rldot1qVlanMembershipTypeTable 1 }
+
+Rldot1qVlanMembershipTypeEntry ::=SEQUENCE {
+    rldot1qVlanMembershipTypeBitmap        INTEGER
+
+}
+
+rldot1qVlanMembershipTypeBitmap  OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "This field contains a bitmap of owners that can creates and/or  add a port
+      to the VLAN.
+      There exist three such type of owners :
+      Default VLAN
+      Manual created VLAN
+      Dynamic(RAVA)created VLAN
+      GVRP(MVRP)created VLAN
+     "
+   ::= { rldot1qVlanMembershipTypeEntry 1}
+
+-- next free ::= {vlan 73}
+
+
+END

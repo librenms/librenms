@@ -1,0 +1,3031 @@
+JNX-OPT-IF-EXT-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+           MODULE-IDENTITY,
+           OBJECT-TYPE,
+           Gauge32,
+           Integer32,
+           Unsigned32,
+           Counter64,
+           transmission,
+           NOTIFICATION-TYPE
+                   FROM SNMPv2-SMI
+           TEXTUAL-CONVENTION,
+           RowPointer,
+           RowStatus,
+           TruthValue,
+           DisplayString,
+           DateAndTime
+                   FROM SNMPv2-TC
+           SnmpAdminString
+                   FROM SNMP-FRAMEWORK-MIB
+           MODULE-COMPLIANCE, OBJECT-GROUP
+                   FROM SNMPv2-CONF
+           ifIndex
+                   FROM IF-MIB
+           JnxoptIfDirectionality,
+           jnxoptIfOChConfigEntry,
+           jnxoptIfOChSinkCurrentEntry,
+           jnxoptIfMibModule
+                  FROM JNX-OPT-IF-MIB;
+
+
+
+--  This is the MIB module for the optical parameters associated with the
+--    black link end points.
+
+jnxoptIfExtMibModule MODULE-IDENTITY
+    LAST-UPDATED "201204250000Z"
+    ORGANIZATION "IETF Ops/Camp MIB Working Group"
+    CONTACT-INFO
+       " Email:      Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+       "The MIB module to describe Black Link extension to rfc3591.
+        It is the enterprise version of the draft
+        draft-galikunze-ccamp-g-698-2-snmp-mib-02 "
+    REVISION  "201204250000Z"
+    DESCRIPTION
+       "Draft version 1.0"
+    REVISION  "201301250000Z"
+    DESCRIPTION
+       "Draft version 2.0"
+    REVISION  "201302270000Z"
+    DESCRIPTION
+       "Update FEC error count to Counter64"
+    REVISION  "201311010000Z"
+    DESCRIPTION
+       "Enhancement for OTN PM 24 hour TCA thresholds"
+    ::={ jnxoptIfMibModule 3 }
+
+
+JnxoptIfChannelSpacing ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Channel spacing
+           1 - 100  GHz
+           2 - 50   GHz
+           3 - 25   GHz
+           4 - 12.5 GHz
+           5 - 6.25 GHz "
+    SYNTAX  INTEGER {
+        spacing100Ghz(1),
+        spacing50Ghz(2),
+        spacing25Ghz(3),
+        spacing12point5Ghz(4),
+        spacing6point5Ghz(5)
+        }
+
+
+JnxoptIfBitRateLineCoding ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Optical tributary signal class
+           1 - NRZ 2.5G (from nominally 622 Mbit/s to nominally 2.67 Gbit/s)
+           2 - NRZ 10G nominally 2.4 Gbit/s to nominally 10.71 Gbit/s.
+           3 - 40  Gbits/s
+           4 - 100 Gbits/s
+           5 - 400 Gbits/s
+        40 Gbits/s and above are under study."
+    SYNTAX  INTEGER {
+        rate2point5G(1),
+        rate10G(2),
+        rate40G(3),
+        rate100G(4),
+        rate400G(5)
+        }
+
+JnxoptIfFiberTypeRecommendation ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Fiber Types - ITU-T Recs G.652, G.653, G.654 and G.655
+            One for recommendation and one for category.
+            G.652 A, B, C, D
+            G.653 A, B
+            G.654 A, B, C
+            G.655 C, D, E
+            G.656
+            G.657 A, B "
+    SYNTAX  INTEGER {
+        g652(1),
+        g653(2),
+        g654(3),
+        g655(4),
+        g656(5),
+        g657(6)
+    }
+
+JnxoptIfFiberTypeCategory  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Fiber Types - ITU-T Recs G.652, G.653, G.654 and G.655
+            G.652 A, B, C, D
+            G.653 A, B
+            G.654 A, B, C
+            G.655 C, D, E
+            G.656
+            G.657 A, B
+            Categories - A, B, C, D and E "
+    SYNTAX  INTEGER {
+        categoryA(1),
+        categoryB(2),
+        categoryC(3),
+        categoryD(4),
+        categoryE(5)
+        }
+
+JnxoptIfOTNType     ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for
+          the Near End or Far End performance data.
+            1 - Near End
+            2 - Far End "
+    SYNTAX INTEGER {
+        nearEnd(1),
+        farEnd(2)
+    }
+
+JnxoptIfOTNDirection  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  " Indicates the direction as Rx/Tx or bi-directional."
+    SYNTAX       INTEGER {
+                    jnxTxDir(1),
+                    jnxRxDir(2),
+                    jnxBiDir(3)
+                 }
+
+JnxoptIfOTNLayer   ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for OTUk,
+          ODUk, TCM performance data.
+            1 - OTUk
+            2 - ODUk
+            3 - TCM
+         The ODUk layer and TCM sublayer PM is not related to the black link PM
+         management, but since this could be a common PM model for the ODUk
+         layer and TCM layers, we include it here so it may be used for simple
+         scenarios where only lower order ODUk or higher order ODUk is present.
+         For scenarios where both lower order ODUk and higher order ODUk are
+         present, further extension to the MIB model is required, in particular
+         for the indexing for these layers."
+    SYNTAX INTEGER {
+        jnxoptIfOTUkLayer(1),
+        jnxoptIfODUkLayer(2),
+        jnxoptIfTCMSubLayer(3)
+    }
+
+--
+-- Alarm for the OCh and OTUk sublayer
+--
+JnxoptIfOTNOChAlarms  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This is the possible alarms from the OCh and OTUk layer."
+    SYNTAX INTEGER {
+        -- No alarm
+        jnxoptIfOtnNoAlarm(0),
+        -- OTN Loss of signal alarm
+        jnxoptIfOtnLosAlarm(1),
+        -- OTN Loss of frame alarm
+        jnxoptIfOtnLofAlarm(2),
+        -- OTN Loss of multi framealarm
+        jnxoptIfOtnLomAlarm(3),
+        -- OTN SSF alarm
+        jnxoptIfOtuSsfAlarm(4),
+        -- OTN OTU BDI alarm
+        jnxoptIfOtuBdiAlarm(5),
+        -- OTN OTU Trail Trace mismatch alarm
+        jnxoptIfOtuTimAlarm(6),
+        -- OTN OTU IAE alarm
+        jnxoptIfOtuIaeAlarm(7),
+        -- OTN OTU BIAE alarm,
+        jnxoptIfOtuBiaeAlarm(8),
+        -- OTN TSF alarm
+        jnxoptIfOtuTsfAlarm(9),
+        -- OTN OTU Degraded alarm,
+        jnxoptIfOtuDegAlarm(10),
+        -- OTN OTU Fec ExcessiveErrors alarm
+        jnxoptIfOtuFecExcessiveErrsAlarm(11),
+        -- OTN OTU BBE Thresholdalarm
+        jnxoptIf15MinThreshBBETCA(12),
+        -- OTN OTU ES Thresholdalarm
+        jnxoptIf15MinThreshESTCA(13),
+        -- OTN OTU SES Threshold alarm
+        jnxoptIf15MinThreshSESTCA(14),
+        -- OTN OTU UAS Threshold alarm
+        jnxoptIf15MinThreshUASTCA(15),
+        -- OTN OTU Bip8 Thresholdalarm alarm
+        jnxoptIf15MinThreshBip8TCA(16),
+        -- OTN  FEC uncorrectedwords TCA
+        jnxoptIf15MinThUnCorrectedWordsTCA(17),
+        -- OTN  Pre FEC BER TCA
+        jnxoptIf15MinThreshPreFECBERTCA(18),
+        -- OTN OTU 24 hour BBE Thresholdalarm
+        jnxoptIf24HourThreshBBETCA(19),
+        -- OTN OTU 24 hour  ES Thresholdalarm
+        jnxoptIf24HourThreshESTCA(20),
+        -- OTN OTU 24 hour SES Threshold alarm
+        jnxoptIf24HourThreshSESTCA(21),
+        -- OTN OTU 24 hour UAS Threshold alarm
+        jnxoptIf24HourThreshUASTCA(22),
+        -- OTN OTU 24 hour Bip8 Thresholdalarm alarm
+        jnxoptIf24HourThreshBip8TCA(23),
+        -- OTN  Pre FEC BER 24 hour TCA
+        jnxoptIf24HourThreshPreFECBERTCA(24),
+        -- OTN OTU AIS alarm
+        jnxoptIfOtuAisAlarm(25)
+    }
+
+JnxoptIfOTNODUkTcmAlarms  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This is the alarms from the ODUk and TCM layer."
+    SYNTAX INTEGER {
+        -- No alarm
+        jnxoptIfOtnOdukTcmNoAlarm(0),
+        -- OTN ODU/TCM OCI alarm
+        jnxoptIfOdukTcmOciAlarm(1),
+        -- OTN ODU/TCM LCK alarm
+        jnxoptIfOdukTcmLckAlarm(2),
+        -- OTN ODU/TCM BDI alarm
+        jnxoptIfOdukTcmBdiAlarm(3),
+        -- OTN ODU/TCM Trail Trace mismatch alarm
+        jnxoptIfOdukTcmTimAlarm(4),
+        -- OTN ODU/TCM Degraded alarm,
+        jnxoptIfOdukTcmDegAlarm(5),
+        -- OTN ODU IAE alarm
+        jnxoptIfOdukTcmIaeAlarm(6),
+        -- OTN ODU/TCM Loss of Tandem Connection
+        jnxoptIfOdukTcmLTCAlarm(7),
+        -- OTN ODU/TCM CSF alarm,
+        jnxoptIfOdukTcmCSfAlarm(8),
+        -- OTN ODU/TCM SSF alarm,
+        jnxoptIfOdukTcmSSfAlarm(9),
+        -- OTN ODU/TCM TSF alarm,
+        jnxoptIfOdukTcmTSfAlarm(10),
+        -- OTN ODU BBE Threshold alarm
+        jnxoptIfOdukTcm15MinThreshBBETCA(11),
+        -- OTN ODU ES Threshold alarm
+        jnxoptIfOdukTcm15MinThreshESTCA(12),
+        -- OTN ODU SES Threshold alarm
+        jnxoptIfOdukTcm15MinThreshSESTCA(13),
+        -- OTN ODU UAS Threshold alarm
+        jnxoptIfOdukTcm15MinThreshUASTCA(14),
+        -- OTN ODU Bip8 Threshold alarm
+        jnxoptIfOdukTcm15MinThreshBip8TCA(15),
+        -- OTN ODU Ais 
+        jnxoptIfOdukTcmAisAlarm(16), 
+        -- OTN ODU PTM - payload type mismatch 
+        jnxoptIfOdukPtmAlarm(17),
+        -- OTN ODU 24 hour BBE Threshold alarm
+        jnxoptIfOdukTcm24HourThreshBBETCA(18),
+        -- OTN ODU 24 hour ES Threshold alarm
+        jnxoptIfOdukTcm24HourThreshESTCA(19),
+        -- OTN ODU SES Threshold alarm
+        jnxoptIfOdukTcm24HourThreshSESTCA(20),
+        -- OTN ODU 24 hour UAS Threshold alarm
+        jnxoptIfOdukTcm24HourThreshUASTCA(21),
+        -- OTN ODU 24 hour bip8 Threshold alarm
+        jnxoptIfOdukTcm24HourThreshBip8TCA(22) 
+     }
+
+JnxoptIfOTNAlarmSeverity  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Severity of the Notification"
+    SYNTAX       INTEGER {
+        jnxCritical(1),
+        jnxMajor(2),
+        jnxMinor(3),
+        jnxInfo(4)
+    }
+
+-- Addition to the RFC 3591 objects
+jnxoptIfOTNNotifications    OBJECT IDENTIFIER   ::= { jnxoptIfExtMibModule 0 }
+jnxoptIfOPSmEntry           OBJECT IDENTIFIER   ::= { jnxoptIfExtMibModule 1 }
+jnxoptIfOChSrcSinkGroup     OBJECT IDENTIFIER   ::= { jnxoptIfExtMibModule 2 }
+jnxoptIfOTNPMGroup          OBJECT IDENTIFIER   ::= { jnxoptIfExtMibModule 3 }
+jnxoptIfOTNAlarm            OBJECT IDENTIFIER   ::= { jnxoptIfExtMibModule 4 }
+
+-- OPS - Optical Phyical Section
+jnxoptIfOPSmConfigTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOPSmConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of OPS General config  parameters."
+    ::= { jnxoptIfOPSmEntry 1 }
+
+jnxoptIfOPSmConfigEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOPSmConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An conceptual row of OPS General config parameters."
+    INDEX  { ifIndex  }
+    ::= { jnxoptIfOPSmConfigTable 1 }
+
+    JnxoptIfOPSmConfigEntry  ::=
+        SEQUENCE {
+            jnxoptIfOPSmDirectionality        
+                                      JnxoptIfDirectionality,
+            jnxoptIfOPSmFiberTypeRecommendation
+                                      JnxoptIfFiberTypeRecommendation,
+            jnxoptIfOPSmFiberTypeCategory  
+                                      JnxoptIfFiberTypeCategory
+        }
+
+jnxoptIfOPSmDirectionality  OBJECT-TYPE
+    SYNTAX    JnxoptIfDirectionality
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates the directionality of the entity."
+    ::= { jnxoptIfOPSmConfigEntry  1 }
+
+jnxoptIfOPSmFiberTypeRecommendation  OBJECT-TYPE
+    SYNTAX    JnxoptIfFiberTypeRecommendation
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Fiber type as per fibre types are chosen from those defined in
+         ITU-T Recs G.652, G.653, G.654, G.655, G.656 and G.657."
+    ::= { jnxoptIfOPSmConfigEntry  2 }
+
+jnxoptIfOPSmFiberTypeCategory  OBJECT-TYPE
+    SYNTAX    JnxoptIfFiberTypeCategory
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Fiber type as per fibre types are chosen from those defined in
+         ITU-T Recs G.652, G.653, and G.655.
+         The categories are A, B, C, D and E."
+    ::= { jnxoptIfOPSmConfigEntry  3 }
+
+
+-- OCh config table
+-- modified the OCh Table group
+-- General parameters for the Black Link Ss-Rs will be added to
+-- the OchConfigTable
+
+jnxoptIfOChConfigExtTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOChConfigExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of Och General config extension parameters"
+    ::= {  jnxoptIfOChSrcSinkGroup 1 }
+
+jnxoptIfOChConfigExtEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOChConfigExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual row that contains OCh configuration extension
+         information of an interface."
+    AUGMENTS { jnxoptIfOChConfigEntry }
+    ::= { jnxoptIfOChConfigExtTable 1 }
+
+
+JnxoptIfOChConfigExtEntry ::=
+    SEQUENCE {
+        jnxoptIfOChMiminumChannelSpacing                JnxoptIfChannelSpacing,
+        jnxoptIfOChBitRateLineCoding                    JnxoptIfBitRateLineCoding,
+        jnxoptIfOChFEC                                  Unsigned32,
+        jnxoptIfOChSinkMaximumBERMantissa               Unsigned32,
+        jnxoptIfOChSinkMaximumBERExponent               Unsigned32,
+        jnxoptIfOChMinWavelength                        Unsigned32,
+        jnxoptIfOChMaxWavelength                        Unsigned32,
+        jnxoptIfOChWavelength                           Unsigned32,
+        jnxoptIfOChVendorTransceiverClass               DisplayString,
+        jnxoptIfOChOpticalInterfaceApplicationCode      DisplayString,
+        jnxoptIfOChLaserAdminState                      INTEGER,
+        jnxoptIfOChLaserOperationalState                INTEGER,
+        jnxoptIfOChAdminState                           INTEGER,
+        jnxoptIfOChOperationalState                     INTEGER
+     }
+
+jnxoptIfOChMiminumChannelSpacing  OBJECT-TYPE
+    SYNTAX      JnxoptIfChannelSpacing
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A minimum nominal difference in frequency (GHz) between two adjacent
+         channels."
+    ::= { jnxoptIfOChConfigExtEntry 1 }
+
+jnxoptIfOChBitRateLineCoding  OBJECT-TYPE
+    SYNTAX  JnxoptIfBitRateLineCoding
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Optical tributary signal class
+          NRZ 2.5G (from nominally 622 Mbit/s  to nominally  2.67 Gbit/s)
+          NRZ 10G  (nominally 2.4 Gbit/s to nominally 10.71 Gbit/s) "
+    ::= { jnxoptIfOChConfigExtEntry 2 }
+
+jnxoptIfOChFEC  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates what Forward Error Correction (FEC) code
+         is used at Source and Sink.
+         GFEC (from G709) and the I.x EFEC's
+         (G.975 - Table I.1 super FEC).
+           1 - No FEC
+           2 - GFEC
+           3 - I.2 EFEC
+           4 - I.3 EFEC
+           5 - I.4 EFEC
+           6 - I.5 EFEC
+           7 - I.6 EFEC
+           8 - I.7 EFEC
+           9 - I.8 EFEC
+          10 - I.9 EFEC
+          11 - 100G FEC (for new applications)
+          12 - 100G EFEC (for new applications)
+          99 - Vendor Specific "
+    ::= { jnxoptIfOChConfigExtEntry 3 }
+
+jnxoptIfOChSinkMaximumBERMantissa  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicate the maximum Bit(mantissa) error rate can be
+         supported by the application at the Receiver.  In case of FEC
+         applications it is intended after the FEC correction."
+    ::= { jnxoptIfOChConfigExtEntry  4 }
+
+jnxoptIfOChSinkMaximumBERExponent  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicate the maximum Bit(exponent) error rate can be
+         supported by the application at the Receiver.  In case of FEC
+         applications it is intended after the FEC correction."
+    ::= { jnxoptIfOChConfigExtEntry  5 }
+
+jnxoptIfOChMinWavelength  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS "0.01 nm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "This parameter indicate minimum wavelength spectrum in a
+        definite wavelength Band (L, C and S) "
+    ::= { jnxoptIfOChConfigExtEntry  6 }
+
+jnxoptIfOChMaxWavelength  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS "0.01 nm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "This parameter indicate maximum wavelength spectrum in a
+        definite wavelength Band (L, C and S) "
+    ::= { jnxoptIfOChConfigExtEntry  7 }
+
+jnxoptIfOChWavelength  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS "0.01 nm"
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the wavelength value."
+    ::= { jnxoptIfOChConfigExtEntry  8 }
+
+jnxoptIfOChVendorTransceiverClass  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "As defined in G.698
+        Vendors can summarize a set of parameters in a
+        single proprietary parameter: the Class of transceiver.  The
+        Transceiver classification will be based on the Vendor Name and
+        the main TX and RX parameters (i.e.  Trunk Mode, Framing, Bit
+        rate, Trunk Type etc).
+        If this parameter is used, the MIB parameters
+        specifying the Transceiver characteristics may not be significant
+        and the vendor will be responsible to specify the Class contents
+        and values.  The Vendor can publish the parameters of its Classes
+        or declare to be compatible with published Classes.(G) Optional
+        for compliance. (not mentioned in G.698) "
+    ::= { jnxoptIfOChConfigExtEntry  9 }
+
+jnxoptIfOChOpticalInterfaceApplicationCode  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the transceiver application code at Ss
+         and Rs as defined in [ITU.G698.2] Chapter 5.3 "
+    ::= { jnxoptIfOChConfigExtEntry  10 }
+
+jnxoptIfOChLaserAdminState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The configured State of the laser:
+            0 - disabled
+            1 - enabled "
+    ::= { jnxoptIfOChConfigExtEntry  11 }
+
+jnxoptIfOChLaserOperationalState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1),
+                fault(2),
+                degraded(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Operational Status of Laser:
+            0 - disabled
+            1 - Enabled 
+            2 - fault
+            3 - degraded"
+    ::= {  jnxoptIfOChConfigExtEntry  12 }
+
+jnxoptIfOChAdminState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                disable(0),
+                enable(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Administrative Status of an Interface:
+            0 - Out of Service
+            1 - In Service
+        "
+    ::= {  jnxoptIfOChConfigExtEntry  13 }
+
+jnxoptIfOChOperationalState  OBJECT-TYPE
+    SYNTAX   INTEGER {
+                 disabled(0),
+                 enabled(1),
+                 fault(2),
+                 degraded(3)
+             }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Operational Status of an Interface:
+            0 - disabled
+            1 - enabled
+            2 - Fault 
+            3 - Degraded"
+    ::= {  jnxoptIfOChConfigExtEntry  14 }
+
+
+
+-- Parameters at OCh Src (Ss)
+--  OptIfOChSrcConfigEntry
+
+jnxoptIfOChSrcConfigTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOChSrcConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A configuration table of OCh Src (Ss) parameters."
+    ::= { jnxoptIfOChSrcSinkGroup 2 }
+
+jnxoptIfOChSrcConfigEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOChSrcConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual row that contains the Src (Ss) configuration
+         parameters for a given interface."
+    INDEX  { ifIndex  }
+    ::= { jnxoptIfOChSrcConfigTable 1 }
+
+JnxoptIfOChSrcConfigEntry ::=
+    SEQUENCE {
+        jnxoptIfOChMinimumMeanChannelOutputPower               Integer32,
+        jnxoptIfOChMaximumMeanChannelOutputPower               Integer32,
+        jnxoptIfOChMinimumCentralFrequency                     Unsigned32,
+        jnxoptIfOChMaximumCentralFrequency                     Unsigned32,
+        jnxoptIfOChMaximumSpectralExcursion                    Unsigned32,
+        jnxoptIfOChMaximumTxDispersionOSNRPenalty              Integer32
+     }
+
+jnxoptIfOChMinimumMeanChannelOutputPower  OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.01 dbm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum mean launched power at Ss is the average power (in dbm)
+         of a pseudo-random data sequence coupled into the DWDM link."
+    ::= { jnxoptIfOChSrcConfigEntry  1}
+
+jnxoptIfOChMaximumMeanChannelOutputPower  OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.01 dbm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum mean launched power at Ss is the average power (in dbm)
+         of a pseudo-random data sequence coupled into the DWDM link."
+    ::= { jnxoptIfOChSrcConfigEntry  2}
+
+jnxoptIfOChMinimumCentralFrequency  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS      "0.01 THz"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum central frequency is the nominal single-channel frequency
+         (in THz) on which the digital coded information of the particular
+         optical channel is modulated by use of the NRZ line code.
+         Eg 191.5THz will be represented as 19150 "
+    ::= { jnxoptIfOChSrcConfigEntry  3}
+
+jnxoptIfOChMaximumCentralFrequency  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS      "0.01 THz"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum central frequency is the nominal single-channel frequency
+         (in THz) on which the digital coded information of the particular
+         optical channel is modulated by use of the NRZ line code.
+         Eg 191.5THz will be represented as 19150 "
+    ::= { jnxoptIfOChSrcConfigEntry  4}
+
+jnxoptIfOChMaximumSpectralExcursion  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS      "0.1 GHz"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is the maximum acceptable difference between the nominal
+         central frequency (in GHz) of the channel and the minus 15 dB
+         points of the transmitter spectrum furthest from the nominal
+         central frequency measured at point Ss."
+    ::= { jnxoptIfOChSrcConfigEntry  5}
+
+
+jnxoptIfOChMaximumTxDispersionOSNRPenalty OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Defines a reference receiver that this penalty is measured with.
+         Lowest OSNR at Ss with worst case (residual) dispersion minus the
+         Lowest OSNR at Ss with no dispersion. Lowest OSNR at Ss with no
+         dispersion "
+    ::= { jnxoptIfOChSrcConfigEntry  6}
+
+--  Optical Path from Point Src (Ss) to Sink (Rs)
+--  Alternatively this can be jnxoptIfOChSsRsTable
+
+jnxoptIfOChSrcSinkConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOChSrcSinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of paramters for the optical path from Src to Sink
+        (Ss to Rs)."
+    ::= { jnxoptIfOChSrcSinkGroup 3 }
+
+jnxoptIfOChSrcSinkConfigEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOChSrcSinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual row that contains the optical path Src-Sink (Ss-Rs)
+         configuration parameters for a given interface."
+    INDEX  { ifIndex  }
+    ::= { jnxoptIfOChSrcSinkConfigTable 1 }
+
+JnxoptIfOChSrcSinkConfigEntry ::=
+     SEQUENCE {
+         jnxoptIfOChSrcSinkMinimumChromaticDispersion              Integer32,
+         jnxoptIfOChSrcSinkMaximumChromaticDispersion              Integer32,
+         jnxoptIfOChSrcSinkMinimumSrcOpticalReturnLoss             Integer32,
+         jnxoptIfOChSrcSinkMaximumDiscreteReflectanceSrcToSink     Integer32,
+         jnxoptIfOChSrcSinkMaximumDifferentialGroupDelay           Integer32,
+         jnxoptIfOChSrcSinkMaximumPolarisationDependentLoss        Integer32,
+         jnxoptIfOChSrcSinkMaximumInterChannelCrosstalk            Integer32,
+         jnxoptIfOChSrcSinkInterFerometricCrosstalk                Integer32,
+         jnxoptIfOChSrcSinkOpticalPathOSNRPenalty                  Integer32
+     }
+
+jnxoptIfOChSrcSinkMinimumChromaticDispersion OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "These parameters define the minimum value of the
+         optical path 'end to end chromatic dispersion' (in ps/nm) that the
+         system shall be able to tolerate."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  1}
+
+jnxoptIfOChSrcSinkMaximumChromaticDispersion OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "These parameters define the maximum value of the
+         optical path 'end to end chromatic dispersion' (in ps/nm) that the
+         system shall be able to tolerate."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  2 }
+
+jnxoptIfOChSrcSinkMinimumSrcOpticalReturnLoss    OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "These parameter defines minimum optical return loss (in dB) of the
+         cable plant at the source reference point (Src/Ss), including any
+         connectors."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  3 }
+
+
+jnxoptIfOChSrcSinkMaximumDiscreteReflectanceSrcToSink   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Optical reflectance is defined to be the ratio of the reflected
+         optical power pre.sent at a point, to the optical power incident to
+         that point.  Control of reflections is discussed extensively in
+         ITU-T Rec. G.957."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  4}
+
+jnxoptIfOChSrcSinkMaximumDifferentialGroupDelay   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "ps"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Differential group delay (DGD) is the time difference between the
+         fractions of a pulse that are transmitted in the two principal
+         states of polarization of an optical signal.  For distances
+         greater than several kilometres, and assuming random (strong)
+         polarization mode coupling, DGD in a fibre can be statistically
+         modelled as having a Maxwellian distribution."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  5}
+
+
+jnxoptIfOChSrcSinkMaximumPolarisationDependentLoss   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The polarisation dependent loss (PDL) is the difference (in dB)
+         between the maximum and minimum values of the channel insertion
+         loss (or gain) of the black-link from point SS to RS due to a
+         variation of the state of polarization (SOP) over all SOPs."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  6}
+
+jnxoptIfOChSrcSinkMaximumInterChannelCrosstalk   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Inter-channel crosstalk is defined as the ratio of total power in
+         all of the disturbing channels to that in the wanted channel,
+         where the wanted and disturbing channels are at different
+         wavelengths.  The parameter specify the isolation of a link
+         conforming to the 'black-link' approach such that under the worst-
+         case operating conditions the inter-channel crosstalk at any
+         reference point RS is less than the maximum inter-channel
+         crosstalk value."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  7}
+
+
+jnxoptIfOChSrcSinkInterFerometricCrosstalk   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This parameter places a requirement on the isolation of a link
+         conforming to the 'black-link' approach such that under the worst
+         case operating conditions the interferometric crosstalk at any
+         reference point RS is less than the maximum interferometric
+         crosstalk value.."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  8}
+
+jnxoptIfOChSrcSinkOpticalPathOSNRPenalty  OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The optical path OSNR penalty is defined as the difference between
+         the Lowest OSNR at Rs and Lowest OSNR at Ss that meets the BER
+         requirement."
+    ::= { jnxoptIfOChSrcSinkConfigEntry  9}
+
+-- Parameters at Sink (Rs)
+-- jnxoptIfOChSinkConfigTable
+jnxoptIfOChSinkConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOChSinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of OCh Sink (Rs) configuration parameters."
+    ::= { jnxoptIfOChSrcSinkGroup  4 }
+
+jnxoptIfOChSinkConfigEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOChSinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual row that contains the Sink (Rs) configuration
+         parameters for a given interface."
+    INDEX  { ifIndex  }
+    ::= { jnxoptIfOChSinkConfigTable 1 }
+
+JnxoptIfOChSinkConfigEntry ::=
+    SEQUENCE {
+        jnxoptIfOChSinkMinimumMeanIntputPower            Integer32,
+        jnxoptIfOChSinkMaximumMeanIntputPower            Integer32,
+        jnxoptIfOChSinkMinimumOSNR                       Integer32,
+        jnxoptIfOChSinkOSNRTolerance                     Integer32
+    }
+
+jnxoptIfOChSinkMinimumMeanIntputPower OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.01 dbm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " The minimum values of the average received power (in dbm
+          at point the Sink (Rs)."
+    ::= { jnxoptIfOChSinkConfigEntry  1}
+
+jnxoptIfOChSinkMaximumMeanIntputPower OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.01 dbm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum values of the average received power (in dbm)
+         at point the Sink (Rs)."
+    ::= { jnxoptIfOChSinkConfigEntry  2}
+
+jnxoptIfOChSinkMinimumOSNR OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum optical signal-to-noise ratio (OSNR) is the minimum
+         value of the ratio of the signal power in the wanted channel to
+         the highest noise power density in the range of the central
+         frequency plus and minus the maximum spectral excursion."
+    ::= { jnxoptIfOChSinkConfigEntry  3}
+
+jnxoptIfOChSinkOSNRTolerance OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The receiver OSNR tolerance is defined as the minimum value of
+         OSNR at point Sink (Rs) that can be tolerated while maintaining the
+         maximum BER of the application. Sink (Rs)."
+    ::= { jnxoptIfOChSinkConfigEntry  4}
+
+
+
+
+
+-- Performance Monitoring
+
+-- The OptIfOChSinkCurrentExtEntry table is an extension to the
+-- jnxoptIfOChSinkCurrentExtEntry
+-- following optional parameters for current status
+-- OptIfOChSinkCurrentExtEntry
+
+jnxoptIfOChSinkCurrentExtTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOChSinkCurrentExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of OCh sink etxension to the performance monitoring
+         information for the current 15-minute interval."
+    ::= { jnxoptIfOTNPMGroup 1 }
+
+
+jnxoptIfOChSinkCurrentExtEntry OBJECT-TYPE
+    SYNTAX  JnxoptIfOChSinkCurrentExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual row that contains OCh sink performance
+         monitoring information for an interface for the current
+         15-minute interval."
+    AUGMENTS { jnxoptIfOChSinkCurrentEntry }
+    ::= { jnxoptIfOChSinkCurrentExtTable 1 }
+
+
+
+JnxoptIfOChSinkCurrentExtEntry ::=
+    SEQUENCE {
+        jnxoptIfOChSinkCurrentChromaticDispersion        Integer32,
+        jnxoptIfOChSinkCurrentOSNR                       Integer32,
+        jnxoptIfOChSinkCurrentQ                          Integer32
+    }
+
+jnxoptIfOChSinkCurrentChromaticDispersion OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Residual Chromatic Dispersion measured at Rx Transceiver port."
+    ::= { jnxoptIfOChSinkCurrentExtEntry  1}
+
+jnxoptIfOChSinkCurrentOSNR OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current Optical Signal to Noise Ratio (OSNR) estimated at Rx
+            Transceiver port ."
+    ::= { jnxoptIfOChSinkCurrentExtEntry  2}
+
+jnxoptIfOChSinkCurrentQ  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "'Q' factor estimated at Rx Transceiver port."
+    ::= { jnxoptIfOChSinkCurrentExtEntry  3}
+
+-- Performance Monitoring
+-- OTN  PM Config Table
+--
+
+--
+
+jnxoptIfOTNPMConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of performance monitoring configuration for the type
+         'jnxoptIfOTNPMConfigLayer' layer."
+    ::= { jnxoptIfOTNPMGroup 2 }
+
+jnxoptIfOTNPMConfigEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the performance monitoring configuration
+         for the type 'jnxoptIfOTNPMConfigLayer' layer."
+    INDEX  { ifIndex, jnxoptIfOTNPMConfigType, jnxoptIfOTNPMConfigLayer,
+             jnxoptIfOTNPMConfigTCMLevel  }
+    ::= { jnxoptIfOTNPMConfigTable 1 }
+
+JnxoptIfOTNPMConfigEntry ::=
+    SEQUENCE {
+        jnxoptIfOTNPMConfigType                   JnxoptIfOTNType,
+        jnxoptIfOTNPMConfigLayer                  JnxoptIfOTNLayer,
+        jnxoptIfOTNPMConfigTCMLevel               Unsigned32,
+        jnxoptIfOTNPMESRInterval                  Unsigned32,
+        jnxoptIfOTNPMSESRInterval                 Unsigned32,
+        jnxoptIfOTNPMValidIntervals               Unsigned32,
+        jnxoptIfOTNPM15MinBip8Threshold           Unsigned32,
+        jnxoptIfOTNPM15MinESsThreshold            Unsigned32,
+        jnxoptIfOTNPM15MinSESsThreshold           Unsigned32,
+        jnxoptIfOTNPM15MinUASsThreshold           Unsigned32,
+        jnxoptIfOTNPM15MinBBEsThreshold           Unsigned32,
+        jnxoptIfOTNPM24HourBip8Threshold          Unsigned32,
+        jnxoptIfOTNPM24HourESsThreshold           Unsigned32,
+        jnxoptIfOTNPM24HourSESsThreshold          Unsigned32,
+        jnxoptIfOTNPM24HourUASsThreshold          Unsigned32,
+        jnxoptIfOTNPM24HourBBEsThreshold          Unsigned32,
+        jnxoptIfOTNPMBip8EnableTCA                TruthValue,
+        jnxoptIfOTNPMESsEnableTCA                 TruthValue,
+        jnxoptIfOTNPMSESsEnableTCA                TruthValue,
+        jnxoptIfOTNPMUASsEnableTCA                TruthValue,
+        jnxoptIfOTNPMBBEsEnableTCA                TruthValue
+    }
+
+jnxoptIfOTNPMConfigType       OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS not-accessible 
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMConfigEntry  1}
+
+jnxoptIfOTNPMConfigLayer   OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNLayer
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for OTUk,
+         ODUk, TCMn performance data.
+         1 - OTUk
+         2 - ODUk
+         3 - TCM
+         The ODUk/TCM sublayer PM is not related to the black link PM
+         management, but since this is a common PM model for the ODU/TCM layer,
+         we may include it here."
+    ::= { jnxoptIfOTNPMConfigEntry  2}
+
+jnxoptIfOTNPMConfigTCMLevel   OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..6)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the TCM level (1-6)
+         if the PM is of the type TCM. This will be 0 for OTUK/ODUK."
+    ::= { jnxoptIfOTNPMConfigEntry  3}
+
+jnxoptIfOTNPMESRInterval  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..96)
+    UNITS "seconds"
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the measurement interval
+         for error seconds ratio."
+    ::= {jnxoptIfOTNPMConfigEntry  4}
+
+jnxoptIfOTNPMSESRInterval  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS "seconds"
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the measurement interval
+         for severely error seconds ratio."
+    ::= {jnxoptIfOTNPMConfigEntry  5}
+
+jnxoptIfOTNPMValidIntervals OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of contiguous 15 minute intervals for which valid
+         PM data is available for the particular interface."
+    ::= { jnxoptIfOTNPMConfigEntry 6 }
+
+jnxoptIfOTNPM15MinBip8Threshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of Bip8 encountered by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshBip8TCA. One notification will be
+         sent per interval per interface. A value of `0' will disable the
+         notification."
+    ::= { jnxoptIfOTNPMConfigEntry  7 }
+
+jnxoptIfOTNPM15MinESsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of ES encountered by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshEsTCA. One notification will be
+         sent per interval per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry 8 }
+
+jnxoptIfOTNPM15MinSESsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of SES encountered by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshSESTCA. One notification will be
+         sent per interval per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry 9 }
+
+
+jnxoptIfOTNPM15MinUASsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of UAS encountered by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshUASTCA. One notification will be
+         sent per interval per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry  10 }
+
+jnxoptIfOTNPM15MinBBEsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of UAS encountered by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshBBETCA. One notification will be
+         sent per interval per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry  11 }
+
+jnxoptIfOTNPM24HourBip8Threshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of Bip8 encountered by the interface within any
+         given 24 Hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshBip8TCA. One notification will be
+         sent per interval per interface. A value of `0' will disable the
+         notification."
+    ::= { jnxoptIfOTNPMConfigEntry  12 }
+
+jnxoptIfOTNPM24HourESsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of ES encountered by the interface within any
+         given 24 hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf24HourThreshEsTCA. One notification will be
+         sent per 24 hour per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry 13 }
+
+jnxoptIfOTNPM24HourSESsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of SES encountered by the interface within any
+         given 24 hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf24HourThreshSESsTCA. One notification will be
+         sent per 24 hour per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry 14 }
+
+jnxoptIfOTNPM24HourUASsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of SES encountered by the interface within any
+         given 24 hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf24HourThreshUASsTCA. One notification will be
+         sent per 24 hour per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry 15 }
+
+jnxoptIfOTNPM24HourBBEsThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of BBE encountered by the interface within any
+         given 24 hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf24HourThreshBBEsTCA. One notification will be
+         sent per 24 hour per interface. A value of `0' will disable the
+         notification."
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry 16 }
+
+jnxoptIfOTNPMBip8EnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for Bip8 "
+    ::= { jnxoptIfOTNPMConfigEntry  17 }
+
+jnxoptIfOTNPMESsEnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for ESs "
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry  18 }
+
+jnxoptIfOTNPMSESsEnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for SESs "
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry  19 }
+
+jnxoptIfOTNPMUASsEnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for UASs "
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry  20 }
+
+jnxoptIfOTNPMBBEsEnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for BBEs "
+    --
+    --
+    --
+    ::= { jnxoptIfOTNPMConfigEntry  21 }
+
+
+--
+-- PM Current Entry  at either the OTU/ODUk/TCM
+--
+jnxoptIfOTNPMCurrentTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table for the Performance monitoring Current Table."
+    ::= {jnxoptIfOTNPMGroup 3}
+
+jnxoptIfOTNPMCurrentEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "A conceptual entry in the Near end or Far End performance monitoring
+        Current table for the type 'jnxoptIfOTNPMCurrentLayer' layer."
+    INDEX  { ifIndex, jnxoptIfOTNPMCurrentType ,
+             jnxoptIfOTNPMCurrentLayer, jnxoptIfOTNPMCurrentTCMLevel  }
+    ::= { jnxoptIfOTNPMCurrentTable 1 }
+
+JnxoptIfOTNPMCurrentEntry ::=
+    SEQUENCE {
+        jnxoptIfOTNPMCurrentType                        JnxoptIfOTNType,
+        jnxoptIfOTNPMCurrentLayer                       JnxoptIfOTNLayer,
+        jnxoptIfOTNPMCurrentTCMLevel                    Unsigned32,
+        jnxoptIfOTNPMCurrentSuspectedFlag               TruthValue,
+        jnxoptIfOTNPMCurrentBip8                        Unsigned32,
+        jnxoptIfOTNPMCurrentESs                         Unsigned32,
+        jnxoptIfOTNPMCurrentSESs                        Unsigned32,
+        jnxoptIfOTNPMCurrentUASs                        Unsigned32,
+        jnxoptIfOTNPMCurrentBBEs                        Unsigned32,
+        jnxoptIfOTNPMCurrentESR                         Unsigned32,
+        jnxoptIfOTNPMCurrentSESR                        Unsigned32,
+        jnxoptIfOTNPMCurrentBBER                        Unsigned32,
+        jnxoptIfOTNPMCurrentElapsedTime                 Unsigned32,
+        jnxoptIfOTNPMCurSuspectReason                   Integer32
+    }
+
+jnxoptIfOTNPMCurrentType           OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the Near
+         End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMCurrentEntry  1}
+
+jnxoptIfOTNPMCurrentLayer   OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNLayer
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for OTUk,
+         ODUk, TCMn performance data.
+         1 - OTUk (OCh which is used for the black link)
+         2 - ODUk
+         3 - TCM
+         The ODUk/TCM sublayer PM is not related to the black link PM
+         management, but since this is a common PM model for the ODU/TCM layer,
+         we may include it here."
+    ::= { jnxoptIfOTNPMCurrentEntry  2}
+
+jnxoptIfOTNPMCurrentTCMLevel   OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..6)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the TCM level (1-6)
+         if the PM is of the type TCM. This will be 0 for OTUK/ODUK."
+    ::= { jnxoptIfOTNPMCurrentEntry  3}
+
+
+jnxoptIfOTNPMCurrentSuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxoptIfOTNPMCurrentEntry  4}
+
+jnxoptIfOTNPMCurrentBip8   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of Failures occurred in an observation period."
+    ::= { jnxoptIfOTNPMCurrentEntry  5}
+
+jnxoptIfOTNPMCurrentESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is the number of seconds in which one or more bits are in
+         error or during which Loss of Signal (LOS) or Alarm Indication
+         Signal (AIS) is detected."
+    ::= { jnxoptIfOTNPMCurrentEntry  6}
+
+jnxoptIfOTNPMCurrentSESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of seconds which have a severe error.
+         This is the number of seconds in which the bit-error ratio =
+         1x10Eminus3 or during which Loss of Signal (LOS) or Alarm
+         Indication Signal (AIS) is detected."
+    ::= { jnxoptIfOTNPMCurrentEntry  7}
+
+jnxoptIfOTNPMCurrentUASs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It is the number of unavailable seconds.
+         A period of unavailable time begins at the onset of ten
+         consecutive SES events.  These ten seconds are considered to be
+         part of unavailable time.  A new period of available time begins
+         at the onset of ten consecutive non-SES events.  These ten seconds
+         are considered to be part of available time."
+    ::= { jnxoptIfOTNPMCurrentEntry  8}
+
+jnxoptIfOTNPMCurrentBBEs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "An errored block not occurring as part of an SES."
+    ::= { jnxoptIfOTNPMCurrentEntry  9}
+ 
+jnxoptIfOTNPMCurrentESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of ES in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMCurrentEntry  10}
+
+
+jnxoptIfOTNPMCurrentSESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of SES in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMCurrentEntry  11}
+
+jnxoptIfOTNPMCurrentBBER OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of BER in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMCurrentEntry 12 }
+
+jnxoptIfOTNPMCurrentElapsedTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  "seconds"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Time elapsed for this 15 minute interval"
+    ::= { jnxoptIfOTNPMCurrentEntry 13 }
+
+jnxoptIfOTNPMCurSuspectReason OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - interval too short secs < 890
+          7 - interval too long secs > 910
+          8 - near end unavailable
+          9 - far end unavailable
+         10 - partial data
+         11 - missing intervals due to restarts
+        "
+    ::= { jnxoptIfOTNPMCurrentEntry 14 }
+
+--
+-- OTN PM Interval Table
+-- Upto 96 15-minute intervals
+--
+jnxoptIfOTNPMIntervalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring Interval Table."
+    ::= { jnxoptIfOTNPMGroup 4 }
+
+jnxoptIfOTNPMIntervalEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance monitoring
+         Interval table for the type 'jnxoptIfOTNPMIntervalLayer' layer."
+    INDEX  { ifIndex, jnxoptIfOTNPMIntervalType, jnxoptIfOTNPMIntervalLayer,
+             jnxoptIfOTNPMIntervalTCMLevel, jnxoptIfOTNPMIntervalNumber  }
+    ::= { jnxoptIfOTNPMIntervalTable 1 }
+
+JnxoptIfOTNPMIntervalEntry  ::=
+    SEQUENCE {
+        jnxoptIfOTNPMIntervalType                      JnxoptIfOTNType,
+        jnxoptIfOTNPMIntervalLayer                     JnxoptIfOTNLayer,
+        jnxoptIfOTNPMIntervalTCMLevel                  Unsigned32,
+        jnxoptIfOTNPMIntervalNumber                    Unsigned32,
+        jnxoptIfOTNPMIntervalSuspectedFlag             TruthValue,
+        jnxoptIfOTNPMIntervalBip8                      Unsigned32,
+        jnxoptIfOTNPMIntervalESs                       Unsigned32,
+        jnxoptIfOTNPMIntervalSESs                      Unsigned32,
+        jnxoptIfOTNPMIntervalUASs                      Unsigned32,
+        jnxoptIfOTNPMIntervalBBEs                      Unsigned32,
+        jnxoptIfOTNPMIntervalESR                       Unsigned32,
+        jnxoptIfOTNPMIntervalSESR                      Unsigned32,
+        jnxoptIfOTNPMIntervalBBER                      Unsigned32,
+        jnxoptIfOTNPMIntervalTimeStamp                 DateAndTime,
+        jnxoptIfOTNPMIntSuspectReason                  Integer32
+    }
+
+jnxoptIfOTNPMIntervalType         OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMIntervalEntry  1}
+
+jnxoptIfOTNPMIntervalLayer   OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNLayer
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for OTUk,
+         ODUk, TCMn performance data.
+         1 - OTUk
+         2  - ODUk
+         3 - TCM
+         The ODUk/TCM sublayer PM is not related to the black link PM
+         management, but since this is a common  PM model for the ODU/TCM
+         layer, we may include it here."
+    ::= { jnxoptIfOTNPMIntervalEntry  2}
+
+jnxoptIfOTNPMIntervalTCMLevel   OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..6)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the TCM level (1-6)
+         if the PM is of the type TCM. This will be 0 for OTUK/ODUK."
+    ::= { jnxoptIfOTNPMIntervalEntry  3}
+
+jnxoptIfOTNPMIntervalNumber   OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A number between 1 and 96, where 1 is the most
+         recently completed 15 minute interval and 96 is
+         the 15 minutes interval completed 23 hours and 45
+         minutes prior to interval 1."
+    ::= { jnxoptIfOTNPMIntervalEntry  4}
+
+jnxoptIfOTNPMIntervalSuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxoptIfOTNPMIntervalEntry  5}
+ 
+jnxoptIfOTNPMIntervalBip8   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of Failures occurred in an observation period."
+    ::= { jnxoptIfOTNPMIntervalEntry  6}
+
+jnxoptIfOTNPMIntervalESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It is a one-second period in which one or more bits are in error
+         or during which Loss of Signal (LOS) or Alarm Indication Signal
+         (AIS) is detected."
+    ::= { jnxoptIfOTNPMIntervalEntry  7}
+
+
+jnxoptIfOTNPMIntervalSESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of seconds which have a severe error.
+         It is a one-second period which has a bit-error ratio =
+         1x10Eminus3 or during which Loss of Signal (LOS) or Alarm
+         Indication Signal (AIS) is detected."
+    ::= { jnxoptIfOTNPMIntervalEntry  8}
+
+jnxoptIfOTNPMIntervalUASs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It is the number of unavailable seconds in this 15 minute interval.
+         A period of unavailable time begins at the onset of ten
+         consecutive SES events.  These ten seconds are considered to be
+         part of unavailable time.  A new period of available time begins
+         at the onset of ten consecutive non-SES events.  These ten seconds
+         are considered to be part of available time."
+    ::= { jnxoptIfOTNPMIntervalEntry  9}
+
+jnxoptIfOTNPMIntervalBBEs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "An errored block not occurring as part of an SES."
+    ::= { jnxoptIfOTNPMIntervalEntry  10}
+
+jnxoptIfOTNPMIntervalESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of ES in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMIntervalEntry  11}
+ 
+jnxoptIfOTNPMIntervalSESR   OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of SES in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMIntervalEntry  12}
+
+jnxoptIfOTNPMIntervalBBER   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of BBE in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMIntervalEntry  13}
+
+jnxoptIfOTNPMIntervalTimeStamp  OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Time stamp of this interval."
+    ::= { jnxoptIfOTNPMIntervalEntry  14}
+  
+jnxoptIfOTNPMIntSuspectReason  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - interval too short secs < 890
+          7 - interval too long secs > 910
+          8 - near end unavailable
+          9 - far end unavailable
+         10 - partial data
+         11 - missing intervals due to restarts
+
+        "
+    ::= { jnxoptIfOTNPMIntervalEntry  15}
+--
+-- PM Current Day Entry
+--
+jnxoptIfOTNPMCurrentDayTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMCurrentDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring Current Day Table."
+    ::= { jnxoptIfOTNPMGroup  5 }
+ 
+
+jnxoptIfOTNPMCurrentDayEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMCurrentDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring Current day table for the type
+         'jnxoptIfOTNPMCurrentDayLayer'  layer."
+    INDEX { ifIndex, jnxoptIfOTNPMCurrentDayType, jnxoptIfOTNPMCurrentDayLayer,
+            jnxoptIfOTNPMCurrentDayTCMLevel  }
+    ::= { jnxoptIfOTNPMCurrentDayTable 1 }
+
+JnxoptIfOTNPMCurrentDayEntry  ::=
+    SEQUENCE {
+        jnxoptIfOTNPMCurrentDayType                   JnxoptIfOTNType,
+        jnxoptIfOTNPMCurrentDayLayer                  JnxoptIfOTNLayer,
+        jnxoptIfOTNPMCurrentDayTCMLevel               Unsigned32,
+        jnxoptIfOTNPMCurrentDaySuspectedFlag          TruthValue,
+        jnxoptIfOTNPMCurrentDayBip8                   Unsigned32,
+        jnxoptIfOTNPMCurrentDayESs                    Unsigned32,
+        jnxoptIfOTNPMCurrentDaySESs                   Unsigned32,
+        jnxoptIfOTNPMCurrentDayUASs                   Unsigned32,
+        jnxoptIfOTNPMCurrentDayBBEs                   Unsigned32,
+        jnxoptIfOTNPMCurrentDayESR                    Unsigned32,
+        jnxoptIfOTNPMCurrentDaySESR                   Unsigned32,
+        jnxoptIfOTNPMCurrentDayBBER                   Unsigned32,
+        jnxoptIfOTNPMCurrentDayElapsedTime            Unsigned32,
+        jnxoptIfOTNPMCurDaySuspectReason              Integer32
+    }
+
+jnxoptIfOTNPMCurrentDayType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for
+         the Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMCurrentDayEntry  1}
+
+jnxoptIfOTNPMCurrentDayLayer   OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNLayer
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for OTUk,
+         ODUk, TCMn performance data.
+         1 - OTUk
+         2 - ODUk
+         3 - TCM
+         The ODUk/TCM sublayer PM is not related to the black link PM
+         management, but since this is a common PM model for the ODU/TCM layer,
+         we may include it here."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  2}
+
+jnxoptIfOTNPMCurrentDayTCMLevel   OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..6)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the TCM level (1-6)
+         if the PM is of the type TCM. This will be 0 for OTUK/ODUK."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  3}
+
+
+jnxoptIfOTNPMCurrentDaySuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+  ::= { jnxoptIfOTNPMCurrentDayEntry  4}
+
+jnxoptIfOTNPMCurrentDayBip8   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of Failures occurred in an observation period."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  5}
+
+
+
+jnxoptIfOTNPMCurrentDayESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of seconds which have an error.
+         It is a one-second period in which one or more bits are in error
+         or during which Loss of Signal (LOS) or Alarm Indication Signal
+         (AIS) is detected."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  6}
+
+jnxoptIfOTNPMCurrentDaySESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of seconds which have a severe error.
+         It is a one-second period which has a bit-error ratio =
+         1x10Eminus3 or during which Loss of Signal (LOS) or Alarm
+         Indication Signal (AIS) is detected."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  7}
+
+jnxoptIfOTNPMCurrentDayUASs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It is the number of unavailable seconds in the cunrrent day.
+         A period of unavailable time begins at the onset of ten
+         consecutive SES events.  These ten seconds are considered to be
+         part of unavailable time.  A new period of available time begins
+         at the onset of ten consecutive non-SES events. These ten seconds
+         are considered to be part of available time."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  8}
+
+jnxoptIfOTNPMCurrentDayBBEs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "An errored block not occurring as part of an SES."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  9}
+
+jnxoptIfOTNPMCurrentDayESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of ES in available time to total seconds in available
+        time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  10}
+
+jnxoptIfOTNPMCurrentDaySESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of SES in available time to total seconds in available
+        time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  11}
+ 
+jnxoptIfOTNPMCurrentDayBBER   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of BBE in available time to total seconds in available
+        time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMCurrentDayEntry  12}
+
+jnxoptIfOTNPMCurrentDayElapsedTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time elapsed for current day"
+    ::= { jnxoptIfOTNPMCurrentDayEntry  13 }
+
+jnxoptIfOTNPMCurDaySuspectReason  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - partial data
+          7 - one or more intervals are invaild
+        "
+    ::= { jnxoptIfOTNPMCurrentDayEntry  14 }
+
+--
+-- PM Prev Day Entry
+--
+jnxoptIfOTNPMPrevDayTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMPrevDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring Previous Day Table."
+    ::= { jnxoptIfOTNPMGroup 6 }
+
+jnxoptIfOTNPMPrevDayEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMPrevDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring previous day table for the type
+         'jnxoptIfOTNPMPrevDayLayer' layer."
+    INDEX  { ifIndex, jnxoptIfOTNPMPrevDayType     ,
+             jnxoptIfOTNPMPrevDayLayer, jnxoptIfOTNPMPrevDayTCMLevel  }
+    ::= { jnxoptIfOTNPMPrevDayTable 1 }
+
+JnxoptIfOTNPMPrevDayEntry  ::=
+    SEQUENCE {
+        jnxoptIfOTNPMPrevDayType                      JnxoptIfOTNType,
+        jnxoptIfOTNPMPrevDayLayer                     JnxoptIfOTNLayer,
+        jnxoptIfOTNPMPrevDayTCMLevel                  Unsigned32,
+        jnxoptIfOTNPMPrevDaySuspectedFlag             TruthValue,
+        jnxoptIfOTNPMPrevDayBip8                      Unsigned32,
+        jnxoptIfOTNPMPrevDayESs                       Unsigned32,
+        jnxoptIfOTNPMPrevDaySESs                      Unsigned32,
+        jnxoptIfOTNPMPrevDayUASs                      Unsigned32,
+        jnxoptIfOTNPMPrevDayBBEs                      Unsigned32,
+        jnxoptIfOTNPMPrevDayESR                       Unsigned32,
+        jnxoptIfOTNPMPrevDaySESR                      Unsigned32,
+        jnxoptIfOTNPMPrevDayBBER                      Unsigned32,
+        jnxoptIfOTNPMPrevDayTimeStamp                 DateAndTime,
+        jnxoptIfOTNPMPrevDaySuspectReason             Integer32
+
+    }
+
+jnxoptIfOTNPMPrevDayType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMPrevDayEntry  1}
+
+jnxoptIfOTNPMPrevDayLayer   OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNLayer
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for OTUk,
+         ODUk, TCMn performance data.
+         1 - OTUk
+         2 - ODUk
+         3 - TCM
+         The ODUk/TCM sublayer PM is not related to the black link PM
+         management, but since this is a common PM model for the ODU/TCM
+         layer, we may include it here."
+    ::= { jnxoptIfOTNPMPrevDayEntry  2}
+
+jnxoptIfOTNPMPrevDayTCMLevel   OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..6)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the TCM level (1-6)
+         if the PM is of the type TCM."
+    ::= { jnxoptIfOTNPMPrevDayEntry  3}
+
+
+jnxoptIfOTNPMPrevDaySuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+  ::= { jnxoptIfOTNPMPrevDayEntry  4}
+
+jnxoptIfOTNPMPrevDayBip8   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of pre FEC failures occurred in an observation period."
+    ::= { jnxoptIfOTNPMPrevDayEntry  5}
+
+jnxoptIfOTNPMPrevDayESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of seconds which have an error.
+         It is a one-second period in which one or more bits are in error
+         or during which Loss of Signal (LOS) or Alarm Indication Signal
+         (AIS) is detected."
+    ::= { jnxoptIfOTNPMPrevDayEntry  6}
+
+jnxoptIfOTNPMPrevDaySESs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of seconds which have a severe error.
+         A severely errored second, is a one-second period which has
+         a bit-error ratio = 1x10Eminus3 or during which Loss of Signal (LOS)
+         or Alarm Indication Signal (AIS) is detected."
+    ::= { jnxoptIfOTNPMPrevDayEntry  7}
+
+jnxoptIfOTNPMPrevDayUASs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It is the number of unavailable seconds in the previous day.
+         A period of unavailable time begins at the onset of ten
+         consecutive SES events.  These ten seconds are considered to be
+         part of unavailable time.  A new period of available time begins
+         at the onset of ten consecutive non-SES events.  These ten seconds
+         are considered to be part of available time."
+    ::= { jnxoptIfOTNPMPrevDayEntry  8}
+
+jnxoptIfOTNPMPrevDayBBEs   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "An errored block not occurring as part of an SES."
+    ::= { jnxoptIfOTNPMPrevDayEntry  9}
+
+jnxoptIfOTNPMPrevDayESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of ES in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMPrevDayEntry  10}
+
+jnxoptIfOTNPMPrevDaySESR   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of SES in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMPrevDayEntry  11}
+
+jnxoptIfOTNPMPrevDayBBER   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  ".001"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The ratio of BBE in available time to total seconds in available
+         time during a fixed measurement interval."
+    ::= { jnxoptIfOTNPMPrevDayEntry  12}
+
+jnxoptIfOTNPMPrevDayTimeStamp  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time stamp of this interval."
+    ::= { jnxoptIfOTNPMPrevDayEntry  13}
+
+jnxoptIfOTNPMPrevDaySuspectReason  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - clock shift detected
+          4 - cleared by user
+          5 - partial data
+          6 - missing intervals due to restarts
+          7 - one or more intervals are invaild
+        "
+    ::= { jnxoptIfOTNPMPrevDayEntry  14 }
+
+--
+-- OTN FEC PM Config Table
+--
+jnxoptIfOTNPMFECConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMFECConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of performance monitoring  FEC configuration."
+    ::= { jnxoptIfOTNPMGroup 7 }
+
+jnxoptIfOTNPMFECConfigEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMFECConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the performance monitoring FEC configuration
+         layer."
+    INDEX  { ifIndex, jnxoptIfOTNPMFECConfigType }
+    ::= { jnxoptIfOTNPMFECConfigTable 1 }
+
+JnxoptIfOTNPMFECConfigEntry  ::=
+    SEQUENCE {
+        jnxoptIfOTNPMFECConfigType                      JnxoptIfOTNType,
+        jnxoptIfOTNPMFECValidIntervals                  Unsigned32,
+        jnxoptIfOTNPM15MinPreFECBERMantissaThreshold    Unsigned32,
+        jnxoptIfOTNPM15MinPreFECBERExponentThreshold    Unsigned32,
+        jnxoptIfOTNPM24HourPreFECBERMantissaThreshold   Unsigned32,
+        jnxoptIfOTNPM24HourPreFECBERExponentThreshold   Unsigned32,
+        jnxoptIfOTNPMFECBEREnableTCA                    TruthValue
+    }
+
+jnxoptIfOTNPMFECConfigType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMFECConfigEntry  1}
+
+jnxoptIfOTNPMFECValidIntervals  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of contiguous 15 minute intervals for which valid FEC
+         PM data is available for the particular interface."
+    ::= {jnxoptIfOTNPMFECConfigEntry  2}
+
+jnxoptIfOTNPM15MinPreFECBERMantissaThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "BER (mantissa) by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshPreFECBERTCA. One notification
+         will be sent per interval per interface. A value of `0' will disable
+         the notification."
+    ::= {jnxoptIfOTNPMFECConfigEntry  3}
+
+jnxoptIfOTNPM15MinPreFECBERExponentThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Pre FEC BER (exponent) by the interface within any
+         given 15 minutes performance data collection period, which causes the
+         SNMP agent to send jnxoptIf15MinThreshPreFECBERTCA. One notification
+         will be sent per interval per interface. A value of `0' will disable
+         the notification."
+    ::= {jnxoptIfOTNPMFECConfigEntry  4}
+
+jnxoptIfOTNPM24HourPreFECBERMantissaThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "BER (mantissa) by the interface within any
+         given 24 Hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf5s24Hour15MinThreshPreFECBERTCA. 
+         One notification will be sent per 24 hour period per interface. 
+         A value of `0' will disable the notification."
+    ::= {jnxoptIfOTNPMFECConfigEntry  5}
+
+jnxoptIfOTNPM24HourPreFECBERExponentThreshold  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Pre FEC BER (exponent) by the interface within any
+         given 24 Hour performance data collection period, which causes the
+         SNMP agent to send jnxoptIf5s24Hour15MinThreshPreFECBERTCA.
+         One notification will be sent per 24 hour period per interface.
+         A value of `0' will disable the notification."
+    ::= {jnxoptIfOTNPMFECConfigEntry  6}
+
+jnxoptIfOTNPMFECBEREnableTCA  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Enable TCA's - 15minute and 24hr for FEC BER "
+    ::= { jnxoptIfOTNPMFECConfigEntry 7 }
+
+--
+-- FEC PM Table
+--
+jnxoptIfOTNPMFECCurrentTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMFECCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC Current Table."
+    ::= { jnxoptIfOTNPMGroup 8 }
+
+jnxoptIfOTNPMFECCurrentEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMFECCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC current table."
+    INDEX  { ifIndex, jnxoptIfOTNPMFECCurrentType}
+    ::= { jnxoptIfOTNPMFECCurrentTable  1 }
+
+JnxoptIfOTNPMFECCurrentEntry  ::=
+    SEQUENCE {
+        jnxoptIfOTNPMFECCurrentType                     JnxoptIfOTNType,
+        jnxoptIfOTNPMFECCurrentSuspectedFlag            TruthValue,
+        jnxoptIfOTNPMCurrentFECCorrectedErr             Counter64,
+        jnxoptIfOTNPMCurrentFECUncorrectedWords         Counter64,
+        jnxoptIfOTNPMCurrentFECBERMantissa              Unsigned32,
+        jnxoptIfOTNPMCurrentFECBERExponent              Unsigned32,
+        jnxoptIfOTNPMCurrentFECMinBERMantissa           Unsigned32,
+        jnxoptIfOTNPMCurrentFECMinBERExponent           Unsigned32,
+        jnxoptIfOTNPMCurrentFECMaxBERMantissa           Unsigned32,
+        jnxoptIfOTNPMCurrentFECMaxBERExponent           Unsigned32,
+        jnxoptIfOTNPMCurrentFECAvgBERMantissa           Unsigned32,
+        jnxoptIfOTNPMCurrentFECAvgBERExponent           Unsigned32,
+        jnxoptIfOTNPMCurrentFECElapsedTime              Unsigned32,
+        jnxoptIfOTNPMFECCurSuspectReason                Integer32
+    }
+
+jnxoptIfOTNPMFECCurrentType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMFECCurrentEntry  1}
+
+
+jnxoptIfOTNPMFECCurrentSuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  2}
+
+jnxoptIfOTNPMCurrentFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         interval."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  3}
+
+jnxoptIfOTNPMCurrentFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of un-corrected words by the FEC are counted over the
+         interval."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  4}
+
+jnxoptIfOTNPMCurrentFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  5}
+
+jnxoptIfOTNPMCurrentFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  6}
+
+jnxoptIfOTNPMCurrentFECMinBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  7}
+
+jnxoptIfOTNPMCurrentFECMinBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimum number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  8}
+
+jnxoptIfOTNPMCurrentFECMaxBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  9}
+
+jnxoptIfOTNPMCurrentFECMaxBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  10}
+
+jnxoptIfOTNPMCurrentFECAvgBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average number of Errored bits at receiving side before the FEC
+         function counted over one second .. mantissa."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  11}
+
+jnxoptIfOTNPMCurrentFECAvgBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average number of Errored bits at receiving side before the FEC
+         function counted over one second .. exponent (eg -1)."
+    ::= { jnxoptIfOTNPMFECCurrentEntry  12}
+
+jnxoptIfOTNPMCurrentFECElapsedTime    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time elapsed for this 15 minute interval."
+    ::= { jnxoptIfOTNPMFECCurrentEntry 13 }
+
+jnxoptIfOTNPMFECCurSuspectReason OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - interval too short secs < 890
+          7 - interval too long secs > 910
+          8 - near end unavailable
+          9 - far end unavailable
+         10 - partial data
+         11 - missing intervals due to restarts
+        "
+    ::= { jnxoptIfOTNPMFECCurrentEntry 14 }
+--
+-- FEC PM  Interval Table
+--
+jnxoptIfOTNPMFECIntervalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMFECIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC Interval Table."
+    ::= { jnxoptIfOTNPMGroup 9 }
+ 
+jnxoptIfOTNPMFECIntervalEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMFECIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC interval table."
+    INDEX  { ifIndex, jnxoptIfOTNPMFECIntervalType,
+             jnxoptIfOTNPMFECIntervalNumber }
+    ::= { jnxoptIfOTNPMFECIntervalTable 1 }
+
+JnxoptIfOTNPMFECIntervalEntry ::=
+    SEQUENCE {
+        jnxoptIfOTNPMFECIntervalType                   JnxoptIfOTNType,
+        jnxoptIfOTNPMFECIntervalNumber                 Unsigned32,
+        jnxoptIfOTNPMFECIntervalSuspectedFlag          TruthValue,
+        jnxoptIfOTNPMIntervalFECCorrectedErr           Counter64,
+        jnxoptIfOTNPMIntervalFECUncorrectedWords       Counter64,
+        jnxoptIfOTNPMIntervalMinFECBERMantissa         Unsigned32,
+        jnxoptIfOTNPMIntervalMinFECBERExponent         Unsigned32,
+        jnxoptIfOTNPMIntervalMaxFECBERMantissa         Unsigned32,
+        jnxoptIfOTNPMIntervalMaxFECBERExponent         Unsigned32,
+        jnxoptIfOTNPMIntervalAvgFECBERMantissa         Unsigned32,
+        jnxoptIfOTNPMIntervalAvgFECBERExponent         Unsigned32,
+        jnxoptIfOTNPMFECIntervalTimeStamp              DateAndTime,
+        jnxoptIfOTNPMFECIntSuspectReason               Integer32
+    }
+
+jnxoptIfOTNPMFECIntervalType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMFECIntervalEntry  1}
+
+jnxoptIfOTNPMFECIntervalNumber   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS not-accessible 
+    STATUS  current
+    DESCRIPTION
+        "A number between 1 and 96, where 1 is the most
+         recently completed 15 minute interval and 96 is
+         the 15 minutes interval completed 23 hours and 45
+         minutes prior to interval 1."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  2}
+
+jnxoptIfOTNPMFECIntervalSuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  3}
+
+jnxoptIfOTNPMIntervalFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         interval."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  4}
+
+jnxoptIfOTNPMIntervalFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of words un-corrected words by the FEC are counted over
+         the interval."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  5}
+
+jnxoptIfOTNPMIntervalMinFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the minimum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  6}
+
+jnxoptIfOTNPMIntervalMinFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the minimum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  7}
+
+jnxoptIfOTNPMIntervalMaxFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  8}
+
+jnxoptIfOTNPMIntervalMaxFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the maximum Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  9}
+
+jnxoptIfOTNPMIntervalAvgFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the average Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  10}
+
+jnxoptIfOTNPMIntervalAvgFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the average Pre
+         FEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECIntervalEntry  11}
+
+jnxoptIfOTNPMFECIntervalTimeStamp  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time stamp of this interval."
+    ::= { jnxoptIfOTNPMFECIntervalEntry 12 }
+
+jnxoptIfOTNPMFECIntSuspectReason  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - interface disabled
+          4 - clock shift detected
+          5 - cleared by user
+          6 - interval too short secs < 890
+          7 - interval too long secs > 910
+          8 - near end unavailable
+          9 - far end unavailable
+         10 - partial data
+         11 - missing intervals due to restarts
+        "
+    ::= { jnxoptIfOTNPMFECIntervalEntry 13 }
+
+--
+-- FEC PM  Current Day day Table
+--
+jnxoptIfOTNPMFECCurrentDayTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMFECCurrentDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC current day table."
+    ::= { jnxoptIfOTNPMGroup 10 }
+
+jnxoptIfOTNPMFECCurrentDayEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMFECCurrentDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC current day table."
+    INDEX  { ifIndex, jnxoptIfOTNPMFECCurrentDayType }
+    ::= { jnxoptIfOTNPMFECCurrentDayTable 1 }
+
+JnxoptIfOTNPMFECCurrentDayEntry ::=
+    SEQUENCE {
+        jnxoptIfOTNPMFECCurrentDayType                     JnxoptIfOTNType,
+        jnxoptIfOTNPMFECCurrentDaySuspectedFlag            TruthValue,
+        jnxoptIfOTNPMCurrentDayFECCorrectedErr             Counter64,
+        jnxoptIfOTNPMCurrentDayFECUncorrectedWords         Counter64,
+        jnxoptIfOTNPMCurrentDayMinFECBERMantissa           Unsigned32,
+        jnxoptIfOTNPMCurrentDayMinFECBERExponent           Unsigned32,
+        jnxoptIfOTNPMCurrentDayMaxFECBERMantissa           Unsigned32,
+        jnxoptIfOTNPMCurrentDayMaxFECBERExponent           Unsigned32,
+        jnxoptIfOTNPMCurrentDayAvgFECBERMantissa           Unsigned32,
+        jnxoptIfOTNPMCurrentDayAvgFECBERExponent           Unsigned32,
+        jnxoptIfOTNPMFECCurrentDayElapsedTime              Unsigned32,
+        jnxoptIfOTNPMFECCurDaySuspectReason                Integer32
+    }
+
+jnxoptIfOTNPMFECCurrentDayType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  1}
+
+
+jnxoptIfOTNPMFECCurrentDaySuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  2}
+
+jnxoptIfOTNPMCurrentDayFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         interval."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  3}
+
+jnxoptIfOTNPMCurrentDayFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of words un-corrected by the FEC are counted over the
+         Day."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  4}
+
+jnxoptIfOTNPMCurrentDayMinFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the minimum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  5}
+
+jnxoptIfOTNPMCurrentDayMinFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the minimum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  6}
+
+jnxoptIfOTNPMCurrentDayMaxFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  7}
+
+jnxoptIfOTNPMCurrentDayMaxFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the maximum
+         PreFEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  8}
+
+jnxoptIfOTNPMCurrentDayAvgFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the average
+         PreFEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  9}
+
+jnxoptIfOTNPMCurrentDayAvgFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the average
+         PreFEC BER in the current 24hour period."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  10}
+
+jnxoptIfOTNPMFECCurrentDayElapsedTime    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Time elapsed for current day."
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  11}
+
+jnxoptIfOTNPMFECCurDaySuspectReason  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - clock shift detected
+          4 - cleared by user
+          5 - partial data
+          6 - missing intervals due to restarts
+          7 - one or more intervals are invaild
+        "
+    ::= { jnxoptIfOTNPMFECCurrentDayEntry  12}
+
+--
+-- FEC PM  Prev day Table
+--
+jnxoptIfOTNPMFECPrevDayTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF JnxoptIfOTNPMFECPrevDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Performance monitoring FEC previous day table."
+    ::= { jnxoptIfOTNPMGroup 11 }
+
+jnxoptIfOTNPMFECPrevDayEntry OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNPMFECPrevDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A conceptual entry in the Near end or Far End performance
+         monitoring FEC previous day table."
+    INDEX  { ifIndex, jnxoptIfOTNPMFECPrevDayType }
+    ::= { jnxoptIfOTNPMFECPrevDayTable 1 }
+
+JnxoptIfOTNPMFECPrevDayEntry ::=
+    SEQUENCE {
+        jnxoptIfOTNPMFECPrevDayType                     JnxoptIfOTNType,
+        jnxoptIfOTNPMFECPrevDaySuspectedFlag            TruthValue,
+        jnxoptIfOTNPMPrevDayFECCorrectedErr             Counter64,
+        jnxoptIfOTNPMPrevDayFECUncorrectedWords         Counter64,
+        jnxoptIfOTNPMPrevDayMinFECBERMantissa           Unsigned32,
+        jnxoptIfOTNPMPrevDayMinFECBERExponent           Unsigned32,
+        jnxoptIfOTNPMPrevDayMaxFECBERMantissa           Unsigned32,
+        jnxoptIfOTNPMPrevDayMaxFECBERExponent           Unsigned32,
+        jnxoptIfOTNPMPrevDayAvgFECBERMantissa           Unsigned32,
+        jnxoptIfOTNPMPrevDayAvgFECBERExponent           Unsigned32,
+        jnxoptIfOTNPMFECPrevDayTimeStamp                DateAndTime,
+        jnxoptIfOTNPMFECPrevDaySuspectReason            Integer32
+    }
+
+jnxoptIfOTNPMFECPrevDayType        OBJECT-TYPE
+    SYNTAX  JnxoptIfOTNType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This parameter indicates the parameters for the table are for the
+         Near End or Far End performance data.
+         1 - Near End
+         2 - Far End "
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  1}
+
+
+jnxoptIfOTNPMFECPrevDaySuspectedFlag   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If true, the data in this entry may be unreliable."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  2}
+
+jnxoptIfOTNPMPrevDayFECCorrectedErr   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits corrected by the FEC are counted in the
+         previous day."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  3}
+
+jnxoptIfOTNPMPrevDayFECUncorrectedWords   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of un-corrected words by the FEC are counted over the
+         previous Day."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  4}
+
+jnxoptIfOTNPMPrevDayMinFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum Pre
+         FEC BER in the previous 24hour period."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  5}
+
+jnxoptIfOTNPMPrevDayMinFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The minimun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent. This is the maximum Pre
+         FEC BER in the previous 24hour period."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  6}
+
+jnxoptIfOTNPMPrevDayMaxFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the maximum Pre
+         FEC BER in the previous 24hour period (mantissa)."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  7}
+
+jnxoptIfOTNPMPrevDayMaxFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun bit error rate at receiving side before the FEC
+         function counted over one second .. exponent (eg -3).
+         This is the maximum Pre FEC BER in the previous 24hour period."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  8}
+
+jnxoptIfOTNPMPrevDayAvgFECBERMantissa   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. mantissa. This is the average Pre
+         FEC BER during the previous 24hour period (mantissa)."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  9}
+
+jnxoptIfOTNPMPrevDayAvgFECBERExponent   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The average bit error rate at receiving side before the FEC
+         function counted over one second .. exponent (eg -3).
+         This is the average Pre FEC BER during the previous 24hour period."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  10}
+
+jnxoptIfOTNPMFECPrevDayTimeStamp OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Time stamp for the Prev day."
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  11}
+
+jnxoptIfOTNPMFECPrevDaySuspectReason  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If SuspectedFlag is true, the reson for the PM data being suspect.
+          0 - not applicable
+          1 - unknown
+          2 - new object
+          3 - clock shift detected
+          4 - cleared by user
+          5 - partial data
+          6 - missing intervals due to restarts
+          7 - one or more intervals are invaild
+        "
+    ::= { jnxoptIfOTNPMFECPrevDayEntry  12}
+
+--
+-- OTN Alarm Table
+--
+jnxoptIfOTNAlarmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxoptIfOTNAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of alarm entries."
+
+    ::= { jnxoptIfOTNAlarm 1 }
+
+jnxoptIfOTNAlarmEntry OBJECT-TYPE
+    SYNTAX     JnxoptIfOTNAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual entry in the alarm table."
+    INDEX { ifIndex }
+    ::= { jnxoptIfOTNAlarmTable 1 }
+
+JnxoptIfOTNAlarmEntry ::= SEQUENCE {
+    jnxoptIfOTNAlarmLocation                 JnxoptIfOTNType,
+    jnxoptIfOTNAlarmDirection                JnxoptIfOTNDirection,
+    jnxoptIfOTNAlarmLayer                    JnxoptIfOTNLayer,
+    jnxoptIfOTNAlarmTCMLevel                 Unsigned32,
+    jnxoptIfOTNOChOTUkAlarmType              JnxoptIfOTNOChAlarms,
+    jnxoptIfOTNAlarmSeverity                 JnxoptIfOTNAlarmSeverity,
+    jnxoptIfOTNAlarmDate                     DateAndTime,
+    jnxoptIfOTNODUkTcmAlarmType              JnxoptIfOTNODUkTcmAlarms
+}
+
+jnxoptIfOTNAlarmLocation OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object identifies indicates if this entry was for
+         Near end/Far end."
+    ::= { jnxoptIfOTNAlarmEntry 1 }
+
+jnxoptIfOTNAlarmDirection OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNDirection
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object identifies indicates if this entry was for
+         for the Tx/Rx or both."
+    ::= { jnxoptIfOTNAlarmEntry 2 }
+
+jnxoptIfOTNAlarmLayer OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNLayer
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This specifies which sublayer this alarm is for."
+    ::= { jnxoptIfOTNAlarmEntry 3 }
+
+jnxoptIfOTNAlarmTCMLevel   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "TCM level 1-6 of the alarm. It will be 0 if alarm sublayer is
+         OCh, OTUk or ODUk."
+    ::= { jnxoptIfOTNAlarmEntry 4 }
+
+jnxoptIfOTNOChOTUkAlarmType OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNOChAlarms
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This specifies the type of alarm of the sublayer
+         'jnxoptIfOTNAlarmLayer' for OCh/OTUk ."
+    ::= { jnxoptIfOTNAlarmEntry 5 }
+
+jnxoptIfOTNAlarmSeverity  OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNAlarmSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object identifies the severity of the last alarm/alert
+         that most recently was set or cleared."
+    ::= { jnxoptIfOTNAlarmEntry 6 }
+
+jnxoptIfOTNAlarmDate OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This specifies the date and time when this alarm occurred."
+    ::= { jnxoptIfOTNAlarmEntry 7 }
+
+jnxoptIfOTNODUkTcmAlarmType OBJECT-TYPE
+    SYNTAX      JnxoptIfOTNODUkTcmAlarms
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This specifies the type of alarm of the sublayer
+         'jnxoptIfOTNAlarmLayer' for ODUk/TCM ."
+    ::= { jnxoptIfOTNAlarmEntry 8 }
+
+
+ --
+ -- OTN Notifications
+ --
+
+jnxoptIfOTNOChOTUkAlarmSet NOTIFICATION-TYPE
+    OBJECTS { jnxoptIfOTNAlarmLocation,
+              jnxoptIfOTNAlarmDirection,
+              jnxoptIfOTNAlarmLayer,
+              jnxoptIfOTNAlarmTCMLevel,
+              jnxoptIfOTNOChOTUkAlarmType,
+              jnxoptIfOTNAlarmSeverity,
+              jnxoptIfOTNAlarmDate }
+    STATUS  current
+    DESCRIPTION
+        "Notification of a recently set OTN alarm of Layer
+         and Type."
+    ::= { jnxoptIfOTNNotifications 1 }
+
+jnxoptIfOTNOChOTUkAlarmClear NOTIFICATION-TYPE
+    OBJECTS { jnxoptIfOTNAlarmLocation,
+              jnxoptIfOTNAlarmDirection,
+              jnxoptIfOTNAlarmLayer,
+              jnxoptIfOTNAlarmTCMLevel,
+              jnxoptIfOTNOChOTUkAlarmType,
+              jnxoptIfOTNAlarmSeverity,
+              jnxoptIfOTNAlarmDate }
+    STATUS  current
+    DESCRIPTION
+        "Notification of a recently clear OTN alarm of Layer
+         and Type."
+    ::= { jnxoptIfOTNNotifications 2 }
+
+jnxoptIfOTNODUkTcmAlarmSet NOTIFICATION-TYPE
+    OBJECTS { jnxoptIfOTNAlarmLocation,
+              jnxoptIfOTNAlarmDirection,
+              jnxoptIfOTNAlarmLayer,
+              jnxoptIfOTNAlarmTCMLevel,
+              jnxoptIfOTNODUkTcmAlarmType,
+              jnxoptIfOTNAlarmSeverity,
+              jnxoptIfOTNAlarmDate }
+    STATUS  current
+    DESCRIPTION
+        "Notification of a recently set OTN alarm of Layer
+         and Type."
+    ::= { jnxoptIfOTNNotifications 3 }
+
+jnxoptIfOTNODUkTcmAlarmClear NOTIFICATION-TYPE
+    OBJECTS { jnxoptIfOTNAlarmLocation,
+              jnxoptIfOTNAlarmDirection,
+              jnxoptIfOTNAlarmLayer,
+              jnxoptIfOTNAlarmTCMLevel,
+              jnxoptIfOTNODUkTcmAlarmType,
+              jnxoptIfOTNAlarmSeverity,
+              jnxoptIfOTNAlarmDate }
+    STATUS  current
+    DESCRIPTION
+        "Notification of a recently clear OTN alarm of Layer
+         and Type."
+    ::= { jnxoptIfOTNNotifications 4 }
+
+
+END

@@ -1,0 +1,110 @@
+
+-- *****************************************************************************
+-- Juniper Networks Data Products SNMP Experimental MIB Registry.
+--
+-- Copyright (c) 2000, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Experiment  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    juniperUniExperiment
+        FROM Juniper-UNI-SMI;
+
+juniExperiment  MODULE-IDENTITY
+    LAST-UPDATED "200211132058Z"  -- 13-Nov-02 03:58 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The object identifiers for experimental MIBs for the Juniper
+        Networks, Inc. edge router products.  This is the top-level
+        object identifier registry for SNMP modules containing experimental MIB
+        definitions.  Experimental MIBs are defined as:
+
+        1) IETF work-in-process MIBs which have not been assigned a permanent
+           object identifier by the IANA.
+
+        2) Juniper work-in-process MIBs that have not achieved final
+           production quality or field experience.
+
+        NOTE: Support for MIBs under the this OID subtree is temporary and
+              changes to objects may occur without notice."
+    -- Revision History
+    REVISION    "200211132058Z"  -- 13-Nov-02 03:58 PM EST  - RX 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added OID for the Internet draft MPLS MIB."
+    REVISION    "200106202036Z"  -- 20-Jun-01 04:36 PM EDT  - RX 4.0
+    DESCRIPTION
+        "Added OID for the Internet draft SONET APS-MIB."
+    REVISION    "200010242100Z"  -- 24-Oct-00  5:00 PM EDT  - RX 3.0
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniperUniExperiment 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Experimental MIB OID assignments.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDvmrpExperiment  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft for
+        the Distance Vector Multicast Routing Protocol (DVMRP) MIB."
+    REFERENCE
+        "IETF Inter-Domain Multicast Routing (idmr) Working Group document:
+        draft-ietf-idmr-dvmrp-mib-11.txt."
+    ::= { juniExperiment 1 }
+
+juniSonetApsExperiment  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft for
+        the SONET linear Automatic Protection Switching (APS) MIB."
+    REFERENCE
+        "IETF AToM MIB (atommib) Working Group document:
+        draft-ietf-atommib-sonetaps-mib-05.txt."
+    ::= { juniExperiment 2 }
+
+juniMplsExperiment  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF drafts for
+        the Multiprotocol Label Switching (MPLS) set of MIBs."
+    REFERENCE
+        "IETF Multiprotocol Label Switching (MPLS) Working Group documents:
+            draft-ietf-mpls-tc-mib-03.txt
+            draft-ietf-mpls-lsr-mib-08.txt."
+    ::= { juniExperiment 3 }
+
+juniMplsVPNExperiment  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF drafts for
+        the MPLS/BGP Layer 3 Virtual Private Network Management Information Base."
+    REFERENCE
+        "IETF Layer-3 Virtual Private Networks Working Group documents:
+            draft-ietf-l3vpn-mpls-vpn-mib-07.txt."
+    ::= { juniExperiment 4 }
+    
+juniBFDExperiment  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF drafts for
+        BFD Management Information Base."
+    REFERENCE
+        "Bidirectional Forwarding Detection Management Information Base 
+			draft-ietf-bfd-mib-02.txt "
+    ::= { juniExperiment 5}
+
+END

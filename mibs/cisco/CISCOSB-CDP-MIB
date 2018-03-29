@@ -1,0 +1,919 @@
+CISCOSB-CDP-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB CDP ROS
+--                       This Private MIB provides the port and global information concerning CDP protocol
+-- Version:              7.47
+-- Date:                 14 Sep 2008
+
+
+
+IMPORTS
+    switch001, rndNotifications                   FROM CISCOSB-MIB
+    rndErrorDesc, rndErrorSeverity          FROM CISCOSB-DEVICEPARAMS-MIB
+    InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
+    OBJECT-TYPE, IpAddress, Unsigned32,
+    MODULE-IDENTITY,Counter32               FROM SNMPv2-SMI
+    DisplayString,
+    TEXTUAL-CONVENTION,
+    MacAddress,
+    TruthValue                              FROM SNMPv2-TC
+    PortList                                FROM Q-BRIDGE-MIB
+    VlanId                                  FROM Q-BRIDGE-MIB
+    InterfaceIndexOrZero, InterfaceIndex    FROM IF-MIB
+    cdpCacheEntry,
+    cdpCacheIfIndex,
+    cdpCacheDeviceIndex                     FROM CISCO-CDP-MIB;
+
+rlCdp MODULE-IDENTITY
+         LAST-UPDATED "201102150000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "The private MIB module definition for CDP protocol."
+         REVISION "200809140000Z"
+         DESCRIPTION
+                "Initial revision."
+         REVISION "201008110000Z"
+         DESCRIPTION
+                "Added rlCdpLogMismatchVoiceVlanEnable, rlCdpLogMismatchNativeVlanEnable"
+         REVISION "201010250000Z"
+         DESCRIPTION
+                "Added rlCdpSecondaryCacheTable.
+                 Added maxNeighborsExceededInSecondaryCache.
+                 Renamed maxNeighborsExceeded to maxNeighborsExceededInMainCache."
+         REVISION "201011100000Z"
+         DESCRIPTION
+                "Added rlCdpGlobalLogMismatchDuplexEnable.
+                 Added rlCdpGlobalLogMismatchVoiceVlanEnable.
+                 Added rlCdpGlobalLogMismatchNativeVlanEnable."
+         REVISION "201011140000Z"
+         DESCRIPTION
+                "Added rlCdpTlvTable.
+                 Added rlCdpAdvertiseApplianceTlv."
+         REVISION "201101090000Z"
+         DESCRIPTION
+                "Added rlCdpValidateMandatoryTlvs."
+         REVISION "201102150000Z"
+         DESCRIPTION
+                "Added rlCdpLogMismatchDuplexTrap.
+                 Added rlCdpLogMismatchVoiceVlanTrap.
+                 Added rlCdpLogMismatchNativeVlanTrap."
+         REVISION "201202140000Z"
+         DESCRIPTION
+                "Added rlCdpTlvSysName to rlCdpTlvTable."
+
+        ::= { switch001 137 }
+
+RlCdpVersionTypes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "version-v1 - cdp version 1
+         version-v2 - cdp version 2  "
+     SYNTAX INTEGER {
+        version-v1(1),
+        version-v2(2)
+     }
+
+RlCdpCounterTypes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        " v1OutputPackets counter specifies the number of sent CDP packets with version 1
+          v2OutputPackets counter specifies the number of sent CDP packets with version 2
+          v1InputPackets counter specifies the number of received CDP packets with version 1
+          v2InputPackets counter specifies the number of received CDP packets with version 2
+          totalInputPackets counter specifies the total number of received CDP packets
+          totalOutputPackets counter specifies the total number of sent CDP packets
+          illegalChksum counter specifies the number of received CDP packets with illegal checksum.
+          errorPackets counter specifies the number of received CDP packets with other error (duplicated TLVs, illegal TLVs, etc.)
+          maxNeighborsExceededInMainCache counter specifies the number of times a CDP neighbor could not be stored in the main cache.
+          maxNeighborsExceededInSecondaryCache specifies counter the number of times a CDP neighbor could not be stored in the secondary cache. "
+     SYNTAX INTEGER {
+        totalInputPackets(1),
+        v1InputPackets(2),
+        v2InputPackets(3),
+        totalOutputPackets(4),
+        v1OutputPackets(5),
+        v2OutputPackets(6),
+        illegalChksum(7),
+        errorPackets(8),
+        maxNeighborsExceededInMainCache(9),
+        maxNeighborsExceededInSecondaryCache(10)
+     }
+
+
+RlCdpPduActionTypes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "filtering - CDP packets would filtered (dropped).
+         bridging  - CDP packets  bridged as regular data packets  "
+     SYNTAX INTEGER {
+        filtering(1),
+        bridging(2),
+        flooding(3)
+     }
+-- rlCdpVersionAdvertised
+
+rlCdpVersionAdvertised OBJECT-TYPE
+    SYNTAX  RlCdpVersionTypes
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the verison of sent CDP packets"
+    ::= {rlCdp 1}
+
+-- rlCdpSourceInterface
+
+rlCdpSourceInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Specifices the CDP source-interface, which the IP address advertised
+       into TLV is accoding to this source-interface instead
+       of the outgoing interface.
+       value of 0 indicates no source interface.
+       value must belong to an ethernet port/lag "
+    DEFVAL     { 0 }
+    ::=  { rlCdp 2 }
+
+-- rlCdpLogMismatchDuplexEnable
+
+rlCdpLogMismatchDuplexEnable OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Enable logging messages when detecting mishmatch between
+       advertised and received duplex mode.
+       To enable loging on specific interface set the corresponing bit."
+    ::=  { rlCdp 3 }
+
+-- rlCdpCountersTable
+
+rlCdpCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all CDP counters values, indexed by counter name"
+    ::= { rlCdp 4 }
+
+rlCdpCountersEntry OBJECT-TYPE
+    SYNTAX      RlCdpCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlCdpCountersName  }
+    ::= { rlCdpCountersTable 1 }
+
+RlCdpCountersEntry ::= SEQUENCE {
+    rlCdpCountersName     RlCdpCounterTypes,
+    rlCdpCountersValue    Counter32
+}
+
+rlCdpCountersName OBJECT-TYPE
+    SYNTAX  RlCdpCounterTypes
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "counter name used as key for counters table "
+    ::= {rlCdpCountersEntry 1}
+
+rlCdpCountersValue OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the value of the counter name specisifed by rlCdpCountersName, unsuppo
+        will have no entry in the tab."
+    ::= {rlCdpCountersEntry 2}
+
+-- rlCdpCountersClear
+
+rlCdpCountersClear OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "By setting the MIB to True, all error and traffic counters are set to zero."
+    ::= {rlCdp 5}
+
+-- rlCdpCacheClear
+
+rlCdpCacheClear OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "By setting the MIB to True, all entries from the cdp cache table is deleted."
+    ::= {rlCdp 6}
+
+-- rlCdpVoicevlanId
+rlCdpVoiceVlanId  OBJECT-TYPE
+    SYNTAX INTEGER (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "voice vlan Id, used as the Appliance Vlan-Id TLV"
+    ::= {rlCdp 7}
+
+-- Augment to cdpCacheTable
+rlCdpCacheTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table contains externtion for the cdpCache table.
+        indexed by cdpCacheEntry."
+    ::= { rlCdp 8 }
+
+rlCdpCacheEntry OBJECT-TYPE
+    SYNTAX      RlCdpCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    AUGMENTS    { cdpCacheEntry }
+    ::= { rlCdpCacheTable 1 }
+
+RlCdpCacheEntry ::= SEQUENCE {
+    rlCdpCacheVersionExt           DisplayString,
+    rlCdpCacheTimeToLive           INTEGER,
+    rlCdpCacheCdpVersion           RlCdpVersionTypes
+}
+rlCdpCacheVersionExt OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This field contains the extention of the cdpCacheVersion field
+            in the cdpCache table.
+            In case the neighbour advertised the SW TLV as a string with length
+            larger than 160, this field contains the chacters from place 160 and on.
+            Zero-length strings indicates no Version
+            field (TLV) was reported in the most recent CDP
+            message, or it was smaller than 160 chars  "
+    ::= { rlCdpCacheEntry 1 }
+
+rlCdpCacheTimeToLive OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This field indicates the time remains in seconds
+            till the entry should be expried. "
+    ::= { rlCdpCacheEntry 2 }
+
+rlCdpCacheCdpVersion OBJECT-TYPE
+    SYNTAX     RlCdpVersionTypes
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This field indicates the cdp version that was reported in the most recent CDP
+            message."
+    ::= { rlCdpCacheEntry 3 }
+
+-- rlCdpPduAction
+rlCdpPduAction  OBJECT-TYPE
+    SYNTAX      RlCdpPduActionTypes
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Defines CDP packets handling when CDP is globally disabled."
+    DEFVAL     { bridging }
+    ::= {rlCdp 9}
+
+-- rlCdpLogMismatchVoiceVlanEnable
+
+rlCdpLogMismatchVoiceVlanEnable OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Enable logging messages when detecting mishmatch between
+       advertised and received voice VLAN.
+       To enable logging on specific interface set the corresponing bit."
+    ::=  { rlCdp 10 }
+
+-- rlCdpLogMismatchNativeVlanEnable
+
+rlCdpLogMismatchNativeVlanEnable OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Enable logging messages when detecting mishmatch between
+       advertised and received native VLAN.
+       To enable loging on specific interface set the corresponing bit."
+    ::=  { rlCdp 11 }
+
+
+-- rlCdpSecondaryCacheTable
+
+rlCdpSecondaryCacheTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpSecondaryCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table contains partial information from cdpCache table.
+        indexed by rlCdpSecondaryCacheEntry."
+    ::= { rlCdp 12 }
+
+rlCdpSecondaryCacheEntry OBJECT-TYPE
+    SYNTAX      RlCdpSecondaryCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlCdpSecondaryCacheTable,
+            containing partial information received via CDP on one
+            interface from one device.  Entries appear when
+            a CDP advertisement is received from a neighbor
+            device.  Entries disappear when CDP is disabled
+            on the interface, globally or when the secondary cache is cleared"
+    INDEX      { cdpCacheIfIndex, cdpCacheDeviceIndex }
+    ::= { rlCdpSecondaryCacheTable 1 }
+
+RlCdpSecondaryCacheEntry ::= SEQUENCE {
+    rlCdpSecondaryCacheMacAddress       MacAddress,
+    rlCdpSecondaryCachePlatform         DisplayString,
+    rlCdpSecondaryCacheCapabilities     OCTET STRING,
+    rlCdpSecondaryCacheVoiceVlanID      Unsigned32,
+    rlCdpSecondaryCacheTimeToLive       INTEGER
+}
+
+rlCdpSecondaryCacheMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The MAC address of the neighbor."
+    ::= { rlCdpSecondaryCacheEntry  3 }
+
+
+rlCdpSecondaryCachePlatform OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's Hardware Platform prefix, as reported in the most
+            recent CDP message.  The zero-length string indicates
+            that no Platform field (TLV) was reported in the most
+            recent CDP message."
+    ::= { rlCdpSecondaryCacheEntry 4 }
+
+rlCdpSecondaryCacheCapabilities OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..4))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's Functional Capabilities as reported in the
+            most recent CDP message."
+    ::= { rlCdpSecondaryCacheEntry 5 }
+
+
+rlCdpSecondaryCacheVoiceVlanID OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's VoIP VLAN ID, as reported in the
+        most recent CDP message. This object is not instantiated if
+        no Appliance VLAN-ID field (TLV) was reported in the most
+        recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 6 }
+
+rlCdpSecondaryCacheTimeToLive OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This field indicates the number of seconds
+            till the entry is expried. "
+    ::= { rlCdpSecondaryCacheEntry 7 }
+
+rlCdpGlobalLogMismatchDuplexEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Globally enable/disable logging messages when detecting mishmatch between
+       advertised and received duplex mode."
+    DEFVAL     { true }
+    ::=  { rlCdp 13 }
+
+rlCdpGlobalLogMismatchVoiceVlanEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Globally enable/disable logging messages when detecting mishmatch between
+       advertised and received voice VLAN."
+    DEFVAL     { true }
+    ::=  { rlCdp 14 }
+
+rlCdpGlobalLogMismatchNativeVlanEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Globally enable/disable logging messages when detecting mishmatch between
+       advertised and received native VLAN."
+    DEFVAL     { true }
+    ::=  { rlCdp 15 }
+
+-- rlCdpTlvTable
+rlCdpTlvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table contains the local advertised information.
+        indexed by rlCdpTlvEntry."
+    ::= { rlCdp 16 }
+
+rlCdpTlvEntry OBJECT-TYPE
+    SYNTAX      RlCdpTlvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlCdpTlvTable,
+            containing local information advertised by CDP on one
+            interface. Entries are available only when CDP is globally enabled,
+            for interfaces on which CDP is enabled and the interface state is UP."
+    INDEX      { rlCdpTlvIfIndex }
+    ::= { rlCdpTlvTable 1 }
+
+RlCdpTlvEntry ::= SEQUENCE {
+    rlCdpTlvIfIndex                             Unsigned32,
+    rlCdpTlvDeviceIdFormat                      INTEGER,
+    rlCdpTlvDeviceId                            DisplayString,
+    rlCdpTlvAddress1Type                        InetAddressType,
+    rlCdpTlvAddress1                            InetAddress,
+    rlCdpTlvAddress2Type                        InetAddressType,
+    rlCdpTlvAddress2                            InetAddress,
+    rlCdpTlvAddress3Type                        InetAddressType,
+    rlCdpTlvAddress3                            InetAddress,
+    rlCdpTlvPortId                              DisplayString,
+    rlCdpTlvCapabilities                        OCTET STRING,
+    rlCdpTlvVersion                             DisplayString,
+    rlCdpTlvPlatform                            DisplayString,
+    rlCdpTlvNativeVLAN                          Unsigned32,
+    rlCdpTlvDuplex                              INTEGER,
+    rlCdpTlvApplianceID                         Unsigned32,
+    rlCdpTlvApplianceVlanID                     Unsigned32,
+    rlCdpTlvExtendedTrust                       INTEGER,
+    rlCdpTlvCosForUntrustedPorts                Unsigned32,
+    rlCdpTlvPowerAvailableRequestId             Unsigned32,
+    rlCdpTlvPowerAvailablePowerManagementId     Unsigned32,
+    rlCdpTlvPowerAvailable                      Unsigned32,
+    rlCdpTlvPowerAvailableManagementPowerLevel  Unsigned32,
+    rlCdpTlvSysName                             DisplayString
+}
+
+rlCdpTlvIfIndex OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the local interface.
+            A value of zero is used to access TLVs which do not
+            changed between interfaces."
+    ::= { rlCdpTlvEntry 1 }
+
+rlCdpTlvDeviceIdFormat  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 serialNumber(1),
+                 macAddress(2),
+                 other(3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An indication of the format of Device-Id contained in the
+        corresponding instance of rlCdpTlvDeviceId.
+
+        serialNumber(1) indicates that the value of rlCdpTlvDeviceId
+        object is in the form of an ASCII string contain the device
+        serial number.
+
+        macAddress(2) indicates that the value of rlCdpTlvDeviceId
+        object is in the form of Layer 2 MAC address.
+
+        other(3) indicates that the value of rlCdpTlvDeviceId object
+        is in the form of a platform specific ASCII string contain
+        info that identifies the device. For example: ASCII string
+        contains serialNumber appended/prepened with system name."
+    ::= { rlCdpTlvEntry 2 }
+
+rlCdpTlvDeviceId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device-ID string as will be advertised in subsequent CDP
+            messages."
+    ::= { rlCdpTlvEntry 3 }
+
+rlCdpTlvAddress1Type OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Inet address type of rlCdpTlvAddress1"
+    ::=  { rlCdpTlvEntry  4 }
+
+rlCdpTlvAddress1 OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "The (first) network-layer address of the device
+          as will be advertised in the Address TLV of subsequent
+          CDP messages.  For example, if the corresponding instance of
+          rlCdpTlvAddress1Type had the value 'ipv4(1)', then this object
+          would be an IPv4-address."
+    ::= { rlCdpTlvEntry 5 }
+
+rlCdpTlvAddress2Type OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Inet address type of rlCdpTlvAddress2"
+    ::=  { rlCdpTlvEntry  6 }
+
+rlCdpTlvAddress2 OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "The (first) network-layer address of the device
+          as will be advertised in the Address TLV of subsequent
+          CDP messages.  For example, if the corresponding instance of
+          rlCdpTlvAddress2Type had the value 'ipv6(2)', then this object
+          would be an IPv6-address."
+    ::= { rlCdpTlvEntry 7 }
+
+rlCdpTlvAddress3Type OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Inet address type of rlCdpTlvAddress3"
+    ::=  { rlCdpTlvEntry  8 }
+
+rlCdpTlvAddress3 OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "The (first) network-layer address of the device
+          as will be advertised in the Address TLV of subsequent
+          CDP messages.  For example, if the corresponding instance of
+          rlCdpTlvAddress3Type had the value 'ipv6(2)', then this object
+          would be an IPv6-address."
+    ::= { rlCdpTlvEntry 9 }
+
+rlCdpTlvPortId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Port-ID string as will be advertised in subsequent CDP messages from
+            this interface.  This will typically be the value of the ifName
+            object (e.g., 'Ethernet0')."
+    ::= { rlCdpTlvEntry 10 }
+
+rlCdpTlvCapabilities OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..4))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's Functional Capabilities as will be advertised in
+            subsequent CDP messages.  For latest set of specific
+            values, see the latest version of the CDP specification."
+    REFERENCE "Cisco Discovery Protocol Specification, 10/19/94."
+    ::= { rlCdpTlvEntry 11 }
+
+rlCdpTlvVersion OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Version string as will be advertised in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 12 }
+
+
+rlCdpTlvPlatform OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's Hardware Platform as will be advertised in subsequent
+            CDP messages."
+    ::= { rlCdpTlvEntry 13 }
+
+
+rlCdpTlvNativeVLAN OBJECT-TYPE
+    SYNTAX    Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local device's interface's native VLAN, as will be
+        advertised in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 14 }
+
+rlCdpTlvDuplex OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  unknown(1),
+                  halfduplex(2),
+                  fullduplex(3)
+              }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local device's interface's duplex mode, as will be advertised
+        in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 15 }
+
+rlCdpTlvApplianceID OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local device's Appliance ID, as will be advertised in subsequent
+        CDP messages. A value of zero denotes no Appliance VLAN-ID TLV will be
+        advertised in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 16 }
+
+rlCdpTlvApplianceVlanID OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local device's VoIP VLAN ID, as will be advertised in subsequent
+        CDP messages. A value of zero denotes no Appliance VLAN-ID TLV will be
+        advertised in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 17 }
+
+rlCdpTlvExtendedTrust OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  untrusted(0),
+                  trusted(1)
+              }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local device's interface's extended trust mode, as will be advertised
+        in subsequent CDP messages. A value of zero indicates the absence of extended
+        trust."
+    ::= { rlCdpTlvEntry 18 }
+
+rlCdpTlvCosForUntrustedPorts OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The COS value with which all packets received on an
+         untrusted port should be marked by a simple switching device
+         which cannot itself classify individual packets.
+         This TLV only has any meaning if corresponding instance of rlCdpTlvExtendedTrust
+         indicates the absence of extended trust."
+    ::= { rlCdpTlvEntry 19 }
+
+rlCdpTlvPowerAvailableRequestId OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Power Available TLV Request-ID field echoes the Request-ID field
+        last received in a Power Requested TLV.  It is 0 if no Power Requested TLV
+        has been received since the interface last transitioned to ifOperState == Up."
+    ::= { rlCdpTlvEntry 20 }
+
+rlCdpTlvPowerAvailablePowerManagementId OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Power Available TLV Power-Management-ID field."
+    ::= { rlCdpTlvEntry 21 }
+
+rlCdpTlvPowerAvailable OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Power Available TLV Available-Power field indicates the
+        number of milliwatts of power available to powered devices at the
+        time this object is instatiated."
+    ::= { rlCdpTlvEntry 22 }
+
+rlCdpTlvPowerAvailableManagementPowerLevel OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Power Available TLV Management-Power-Level field indicates the
+        number of milliwatts representing the supplier's request to the powered
+        device for its Power Consumption TLV. A value of 0xFFFFFFFF indicates
+        the local device has no preference."
+    ::= { rlCdpTlvEntry 23 }
+
+rlCdpTlvSysName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The sysName MIB as will be advertised in subsequent CDP messages."
+    ::= { rlCdpTlvEntry 24 }
+
+--------------------------------------------------------------------------------
+
+rlCdpAdvertiseApplianceTlv OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "By setting the MIB to True Appliance VLAN-ID TLV may be advertised.
+         A value of False will prevent this TLV from being advertised."
+    DEFVAL     { true }
+    ::= {rlCdp 17}
+
+rlCdpValidateMandatoryTlvs OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "By setting the MIB to true all mandatory TLVs 0x0001-0x0006 will be validated.
+         Incoming CDP frames without any of the TLVs will be dropped.
+         A value of false indicates that only the Device ID TLV (0x0001) is mandatory.
+         Frames containing Device ID TLV will be processed,
+                 regardless of whether other TLVs are present or not."
+    DEFVAL     { false }
+    ::= {rlCdp 18}
+
+
+-- rlCdpInterfaceCountersPTable
+
+rlCdpInterfaceCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpInterfaceCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all CDP counters values, indexed by interface id."
+    ::= { rlCdp 19 }
+
+rlCdpInterfaceCountersEntry OBJECT-TYPE
+    SYNTAX      RlCdpInterfaceCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlCdpInterfaceId  }
+    ::= { rlCdpInterfaceCountersTable 1 }
+
+RlCdpInterfaceCountersEntry ::= SEQUENCE {
+    rlCdpInterfaceId                    InterfaceIndex,
+    rlCdpInterfaceTotalInputPackets     Counter32,
+    rlCdpInterfaceV1InputPackets        Counter32,
+    rlCdpInterfaceV2InputPackets        Counter32,
+    rlCdpInterfaceTotalOutputPackets    Counter32,
+    rlCdpInterfaceV1OutputPackets       Counter32,
+    rlCdpInterfaceV2OutputPackets       Counter32,
+    rlCdpInterfaceIllegalChksum         Counter32,
+    rlCdpInterfaceErrorPackets          Counter32,
+    rlCdpInterfaceMaxNeighborsExceededInMainCache       Counter32,
+    rlCdpInterfaceMaxNeighborsExceededInSecondaryCache  Counter32
+}
+rlCdpInterfaceId OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Interface id, used as index for interface counters table."
+    ::= {rlCdpInterfaceCountersEntry 1}
+
+rlCdpInterfaceTotalInputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of received packets on rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 2}
+
+rlCdpInterfaceV1InputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v1 received packets on rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 3}
+
+rlCdpInterfaceV2InputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v2 received packets on rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 4}
+
+rlCdpInterfaceTotalOutputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of sent packets from rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 5}
+
+rlCdpInterfaceV1OutputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v1 sent packets from rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 6}
+
+rlCdpInterfaceV2OutputPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of v2 sent packets from rlCdpInterfaceId"
+    ::= {rlCdpInterfaceCountersEntry 7}
+
+rlCdpInterfaceIllegalChksum OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Num of received packets with illegal CDP checksum."
+    ::= {rlCdpInterfaceCountersEntry 8}
+
+rlCdpInterfaceErrorPackets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "specifies the number of received CDP packets with other error (duplicated TLVs, illegal TLVs, etc.) "
+    ::= {rlCdpInterfaceCountersEntry 9}
+
+rlCdpInterfaceMaxNeighborsExceededInMainCache OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "specifies the number of times a CDP neighbor could not be stored in the main cache. "
+    ::= {rlCdpInterfaceCountersEntry 10}
+
+rlCdpInterfaceMaxNeighborsExceededInSecondaryCache OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " specifies the number of times a CDP neighbor could not be stored in the secondary cache."
+    ::= {rlCdpInterfaceCountersEntry 11}
+
+rlCdpInterfaceCountersClear OBJECT-TYPE
+    SYNTAX  InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "By setting the scalar to a interface id , all error and traffic counters of this interface
+         are set to zero.
+         To clear the counters for ALL interfaces set the scalar to 0x0FFFFFFF"
+    ::= {rlCdp 20}
+
+--------------------------------------------------------------------------------
+--  TRAPS
+--------------------------------------------------------------------------------
+rlCdpLogMismatchDuplexTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that duplex mismatch has been detected by CDP"
+    ::=  { rndNotifications 224 }
+
+rlCdpLogMismatchVoiceVlanTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that voice vlan mismatch has been detected by CDP"
+    ::=  { rndNotifications 225 }
+
+rlCdpLogMismatchNativeVlanTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that native vlan mismatch has been detected by CDP"
+    ::=  { rndNotifications 226 }
+END

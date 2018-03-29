@@ -1,0 +1,3213 @@
+CTRON-APPN-MIB  DEFINITIONS ::= BEGIN
+
+--  ctron-appn-mib.txt
+--  Revision: 1.00.03
+--  Part Number: 2171066
+--  Date: June 20, 1996
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific APPN Routing Services MIB.
+--
+--
+--  This module will be extended as required.
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+
+--  Copyright August 95 Cabletron Systems
+
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212   
+      nwRtrProtoSuites
+                FROM ROUTER-OIDS
+      DisplayString
+                FROM RFC1213-MIB
+      Counter, TimeTicks
+                FROM RFC1155-SMI;
+
+--  The APPN Router Group.
+
+nwAppnRouter             OBJECT IDENTIFIER ::= { nwRtrProtoSuites 5 }
+
+nwAppnMibs               OBJECT IDENTIFIER ::= { nwAppnRouter 1 }
+nwAppnComponents         OBJECT IDENTIFIER ::= { nwAppnRouter 2 }
+
+--  APPN Router Component Groups
+
+nwAppnSystem             OBJECT IDENTIFIER ::= { nwAppnComponents 1 }
+nwAppnForwarding         OBJECT IDENTIFIER ::= { nwAppnComponents 2 }
+nwAppnTopology           OBJECT IDENTIFIER ::= { nwAppnComponents 4 }
+nwAppnFib                OBJECT IDENTIFIER ::= { nwAppnComponents 5 }
+nwAppnEndSystems         OBJECT IDENTIFIER ::= { nwAppnComponents 6 }
+nwAppnAccessControl      OBJECT IDENTIFIER ::= { nwAppnComponents 7 }
+nwAppnFilters            OBJECT IDENTIFIER ::= { nwAppnComponents 8 }
+nwAppnRedirector         OBJECT IDENTIFIER ::= { nwAppnComponents 9 }
+nwAppnEvent              OBJECT IDENTIFIER ::= { nwAppnComponents 10 }
+nwAppnWorkGroup          OBJECT IDENTIFIER ::= { nwAppnComponents 11 }
+
+
+--  APPN Router System Groups
+
+nwAppnSysConfig          OBJECT IDENTIFIER ::= { nwAppnSystem 1 }
+nwAppnSysAdministration  OBJECT IDENTIFIER ::= { nwAppnSystem 2 }
+
+--  APPN Router System Configuration Groups
+
+nwAppnSysCfgLocalNode    OBJECT IDENTIFIER ::= { nwAppnSysConfig 2 }
+nwAppnSysCfgTables       OBJECT IDENTIFIER ::= { nwAppnSysConfig 3 }
+
+--  APPN Router Forwarding Groups
+
+nwAppnFwdSystem          OBJECT IDENTIFIER ::= { nwAppnForwarding 1 }
+nwAppnFwdInterfaces      OBJECT IDENTIFIER ::= { nwAppnForwarding 2 }
+nwAppnFwdLinks           OBJECT IDENTIFIER ::= { nwAppnForwarding 3 }
+
+nwAppnFwdCounters        OBJECT IDENTIFIER ::= { nwAppnFwdSystem 1 }
+nwAppnFwdIfConfig        OBJECT IDENTIFIER ::= { nwAppnFwdInterfaces 1 }
+nwAppnIfCn               OBJECT IDENTIFIER ::= { nwAppnFwdIfConfig 3 }
+nwAppnFwdIfCounters      OBJECT IDENTIFIER ::= { nwAppnFwdInterfaces 2 }
+nwAppnFwdLsConfig        OBJECT IDENTIFIER ::= { nwAppnFwdLinks 1 }
+nwAppnFwdLsCounters      OBJECT IDENTIFIER ::= { nwAppnFwdLinks 2 }
+
+
+--  APPN Router Routing Groups
+
+nwAppnDistanceVector     OBJECT IDENTIFIER ::= { nwAppnTopology 1 }
+nwAppnLinkState          OBJECT IDENTIFIER ::= { nwAppnTopology 2 }
+
+nwAppnIsr                OBJECT IDENTIFIER ::= { nwAppnLinkState 1 }
+
+nwAppnIsrSystem          OBJECT IDENTIFIER ::= { nwAppnIsr 1 }
+nwAppnIsrInterfaces      OBJECT IDENTIFIER ::= { nwAppnIsr 2 }
+nwAppnIsrDatabase        OBJECT IDENTIFIER ::= { nwAppnIsr 3 }
+nwAppnIsrFilters         OBJECT IDENTIFIER ::= { nwAppnIsr 4 }
+
+nwAppnIsrConfig          OBJECT IDENTIFIER ::= { nwAppnIsrSystem 1 }
+nwAppnIsrCounters        OBJECT IDENTIFIER ::= { nwAppnIsrSystem 2 }
+
+nwAppnIsrIfConfig        OBJECT IDENTIFIER ::= { nwAppnIsrInterfaces 1 }
+nwAppnIsrIfCounters      OBJECT IDENTIFIER ::= { nwAppnIsrInterfaces 2 }
+
+--  APPN Router Host End Systems Groups  ( NOT USED )
+
+nwAppnHostsSystem        OBJECT IDENTIFIER ::= { nwAppnEndSystems 1 }
+nwAppnHostsInterfaces    OBJECT IDENTIFIER ::= { nwAppnEndSystems 2 }
+
+
+--  APPN Router Event Log Group
+
+nwAppnEventLogConfig           OBJECT IDENTIFIER ::= { nwAppnEvent 1 }
+nwAppnEventLogFilterTable      OBJECT IDENTIFIER ::= { nwAppnEvent 2 }
+nwAppnEventLogTable            OBJECT IDENTIFIER ::= { nwAppnEvent 3 }
+
+
+
+
+--  APPN MIB Group
+--  This group contains information about the revision level of this
+--  MIB within the device.  It allows verification of the released
+--  version without having to read other objects.
+
+nwAppnMibRevText OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current revision level of the Cabletron APPN 
+                Router MIB in textual format." 
+        ::= { nwAppnMibs 1 }
+
+
+--  APPN Routing Services System Group
+--  This group contains the objects related to APPN Routing Services at a
+--  global system-wide level.
+
+--  APPN Routing Services System Configuration Group
+--  This group contains the objects that pertain to the setup and
+--  configuration of APPN Routing Services at a global,
+--  system-wide level.  
+
+nwAppnSysRouterId   OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (3..17))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies the APPN Fully-Qualified Control Point name that is used
+                to uniquely identify APPN Routing Services in an APPN network. The
+                name format is NNNNNNNN.CCCCCCCC where NNNNNNNN is the network
+                identifier and CCCCCCCC is the Control Point name. Valid characters
+                to make up these two strings are uppercase letters A through Z,
+                numerics 0 through 9, and the special characters $, @, and #. The
+                first character of the string must NOT be numeric. Each string must
+                be a maximum length of 8 characters with no embedded spaces and the
+                strings are joined by a dot. nwAppnSysRouterId cannot be modified
+                while APPN routing services is in any operational state other than
+                DISABLED as reflected in nwAppnSysOperStatus. Otherwise, the
+                request will be rejected."
+        ::= { nwAppnSysConfig 1 }
+
+
+
+--  APPN Routing Services System Group
+--  This group contains the objects related to initializing APPN Routing Services
+--  at a global, system-wide level.
+--  All parameters (except for Stop Type) cannot be modified unless the
+--  operational state is disabled. Otherwise, the request will be rejected.
+
+nwAppnSysNodeType   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        networknode(1)
+                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               "Indicates the node type supported by APPN Routing Services which
+                is always of type Network Node. "
+        DEFVAL { networknode }
+        ::= { nwAppnSysCfgLocalNode 1 }
+
+nwAppnSysCpAlias   OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies the Control Point alias name used by APPN Routing
+                Services. "
+        ::= { nwAppnSysCfgLocalNode 2 }
+
+nwAppnSysModeCosMap   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies whether mode to COS mapping is supported by
+                APPN Routing Services."
+        DEFVAL { yes }
+        ::= { nwAppnSysCfgLocalNode 3 }
+
+nwAppnSysMdsSupport   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies whether Management Services supports Multiple
+                Domain Support and Management Services capabilities. "
+        DEFVAL { yes }
+        ::= { nwAppnSysCfgLocalNode 4 }
+
+nwAppnSysMaxLocates   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum Number of locate requests that APPN Routing
+                Services can concurrently process. Note: if nwAppnSysMaxLocates is
+                set to a value too small, it will be internally increased to a
+                higher value after APPN Routing Services has been successfully
+                enabled. A subsequent GET operation on nwAppnSysMaxLocates will
+                reflect this new value."
+        DEFVAL { 10 }
+        ::= { nwAppnSysCfgLocalNode 6 }
+
+nwAppnSysDirCacheSize   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies number of located resources maintained in the Directory
+                Cache.  Note: if nwAppnSysDirCacheSize is set to a value too small,
+                it will be internally increased to a higher value after APPN routing
+                services has been successfully enabled. A subsequent GET
+                operation on nwAppnSysDirCacheSize will reflect this new value. "
+        DEFVAL { 255 }
+        ::= { nwAppnSysCfgLocalNode 7 }
+
+nwAppnSysMaxDirEntries   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum number of directory entries.  If zero is selected,
+                the number of entries is unlimited. "
+        DEFVAL { 0 }
+        ::= { nwAppnSysCfgLocalNode 8}
+
+nwAppnSysLocateTimeout   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies time in seconds before a network search will timeout. Zero
+                indicates that the search has no timeout."
+        DEFVAL { 0 }
+        ::= { nwAppnSysCfgLocalNode 9 }
+
+nwAppnSysRegCds   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies whether the local or domain resources can be registered
+                with the Central Directory Server."
+        DEFVAL { yes }
+        ::= { nwAppnSysCfgLocalNode 10 }
+
+nwAppnSysMdsSendQSize   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies size of the MDS send alert Queue."
+        DEFVAL { 100 }
+        ::= { nwAppnSysCfgLocalNode 11 }
+
+nwAppnSysCosSize   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum number of COS definitions maintained in the COS
+                database weights cache. It determines the size of the COS Database
+                weights cache.  Note: if nwAppnSysCosSize is set to a value too
+                small, it will be internally increased to a higher value after
+                APPN Routing Services has been successfully enabled. A subsequent
+                GET operation on nwAppnSysCosSize will reflect this new value. "
+        DEFVAL { 16 }
+        ::= { nwAppnSysCfgLocalNode 12 }
+
+nwAppnSysTreeSize   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies the number of routes maintained in the Topology Database
+                routing tree cache. Note: if nwAppnSysTreeSize is set to a value
+                too small, it will be internally increased to a higher value after
+                APPN Routing Services has been successfully enabled. A subsequent
+                GET operation on nwAppnSysTreeSize will reflect this new value. "
+        DEFVAL { 40 }
+        ::= { nwAppnSysCfgLocalNode 13 }
+
+nwAppnSysTreeUseLimit   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Maximum number of times a cached tree will be used to compute a
+                route before the tree is discarded and recomputed.  This
+                allows the APPN Routing Services to balance sessions among
+                equal weight routes. A low value provides better load balancing
+                at the expense of increased activation latency. "
+        DEFVAL { 40 }
+        ::= { nwAppnSysCfgLocalNode 14 }
+
+nwAppnSysMaxTdmNodes   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum number of nodes that can be stored in the Topology
+                Database. Zero means unlimited. "
+        DEFVAL { 0 }
+        ::= { nwAppnSysCfgLocalNode 15 }
+
+nwAppnSysMaxTdmTGs   OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum number of transmission groups that can be stored in
+                Topology Database. Zero means unlimited. "
+        DEFVAL { 0 }
+        ::= { nwAppnSysCfgLocalNode 16 }
+
+nwAppnSysMaxIsrSessions   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum number of intermediate routing sessions permitted
+                by APPN Routing Services at one time. This must be a non-negative
+                number."
+        DEFVAL { 1000 }
+        ::= { nwAppnSysCfgLocalNode 18 }
+
+nwAppnSysIsrUpperThresh   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "The thresholds control the congestion status of APPN routing
+                services.  If the number of ISR sessions exceeds the upper
+                threshold, congestion status changes from uncongested to congested.
+                When this occurs, the status will not become uncongested until the
+                the number of ISR sessions fall below the lower threshold. The
+                lower threshold should be less than the upper threshold to prevent
+                thrashing. The upper threshold should be lower than
+                nwAppnSysMaxIsrSessions.  This must be a non-negative number."
+        DEFVAL { 900 }
+        ::= { nwAppnSysCfgLocalNode 19 }
+
+nwAppnSysIsrLowerThresh   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifes the number of ISR sessions at which congestion status will
+                revert to uncongested. This must be a non-negative number.
+                nwAppnSysIsrLowerThresh must be less than nwAppnSysIsrUpperThresh
+                to prevent thrashing. "
+        DEFVAL { 800 }
+        ::= { nwAppnSysCfgLocalNode 20 }
+
+nwAppnSysIsrMaxRuSize   OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies maximum RU size supported for intermediate sessions.
+                Note: the number provided will be rounded up to the 
+                next valid RU size if necessary after APPN Routing Services has
+                been successfully enabled. A subsequent GET operation on
+                nwAppnSysMaxLocates will reflect this new value."
+        DEFVAL { 1024 }
+        ::= { nwAppnSysCfgLocalNode 21 }
+
+nwAppnSysIsrRcvPaceWind   OBJECT-TYPE
+        SYNTAX  INTEGER (1..63)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies suggested receive pacing window size for intermediate
+                sessions. This value may be used as a fixed window size for 
+                fixed pacing, or as a tuning value for adaptive pacing. "
+        DEFVAL { 8 }
+        ::= { nwAppnSysCfgLocalNode 22 }
+
+nwAppnSysRtAddResist   OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies a desirability factor for APPN Routing Services to
+                perform intermediate session routing.  255 is least desirable
+                and 0 is more desirable. "
+        DEFVAL { 0 }
+        ::= { nwAppnSysCfgLocalNode 23 }
+
+nwAppnSysStopType   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  abort(1),      --  Shutdown APPN Routing Services immediately 
+                  immediate(2),  --  deactivate links then abort(1)
+                  quiesce(3),    --  advertize quiesce, deactivate endpoint
+                                 --  sessions, then immediate(2)
+                  quiesceIsr(4)  --  allow all isr sessions to end then
+                                 --  quiesce(3)
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies the type of APPN Routing Services shutdown.
+                Once specified, select disable from nwAppnSysAdminStatus. The
+                shutdown choices are as follows:
+
+                abort(1)       All APPN Routing Services components are immediately
+                               stopped and resources released. To become active again,
+                               the APPN Routing Services must be enabled.
+                immediate(2)   APPN Routing Services immediately deactivates all links
+                               then performs abort(1) processing.
+                quiesce(3)     APPN Routing Services indicates to other APPN network
+                               nodes that it is quiesced. Session limits
+                               are reset on all modes, UNBINDs are issued
+                               on all endpoint sessions (CP-CP sessions last),
+                               and then immediate(2) processing is performed.
+                quiesceIsr(4)  Allows all intermediate sessions to end,
+                               then performs the quiesce(3) processing."
+        DEFVAL { quiesceIsr }
+        ::= { nwAppnSysCfgLocalNode 24 }
+
+nwAppnSysBlockNum       OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(3))
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This represents the 3 hexadecimal digit block number which 
+                precedes the 5 digit id number in the 8 digit node id used in
+                XIDs and Alerts. The block number identifies the product type.
+                Both the block number and id number combined, uniquely identify
+                this instance of APPN Routing Services within the installation
+                network."
+--      DEFVAL { 'e08'H }
+        ::= { nwAppnSysCfgLocalNode 25 }
+
+nwAppnSysIdNum          OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(5))
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This represents the 5 hexadecimal digit id number which follows
+                the 3 digit block number in the 8 digit node id used in XIDs and
+                Alerts. The id number uniquely identifies this instance of APPN
+                Routing Services within a product type indicated by the block number.
+                Both the block number and id number combined, uniquely identify
+                this instance of APPN Routing Services within the installation
+                network."
+--      DEFVAL { '00000'H }
+        ::= { nwAppnSysCfgLocalNode 26 }
+
+
+--  APPN Router System Group - Local APPN Routing Service Parameters
+--  This group contains tables related to configuring:
+--
+--      LU Definition Table
+
+
+--  
+--  LU Table
+--  
+
+
+nwAppnSysLuTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwAppnSysLuEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains entries for LUs that are owned by adjacent
+                 LEN nodes. Defining or deleting an entry is equivalent to defining
+                 or deleting an entry in the directory database. To add an entry,
+                 set nwAppnSysLuControl to other. To delete an entry, set
+                 nwAppnSysLuControl to delete."
+                ::= { nwAppnSysCfgTables 1 }
+
+nwAppnSysLuEntry OBJECT-TYPE
+        SYNTAX  NwAppnSysLuEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry defines an LU entry in the directory database. The
+                fully qualified CP name and the name of the LU are the indexes into
+                this table."
+        INDEX   { nwAppnSysCpName, nwAppnSysLuName }
+        ::= { nwAppnSysLuTable 1 }
+
+NwAppnSysLuEntry ::= SEQUENCE {
+        nwAppnSysCpName         DisplayString,
+        nwAppnSysLuName         DisplayString,
+        nwAppnSysLuControl      INTEGER
+                                   }
+
+nwAppnSysCpName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (3..17))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the fully qualified name of the Control Point 
+                containing the LU being defined. The format of this name
+                is NNNNNNNN.CCCCCCCC where NNNNNNNN is the network identifier and
+                CCCCCCCC is the LU or Control Point name. Valid characters to make
+                up these two strings are uppercase letters A through Z, numerics 0
+                through 9 and the special charcters $, @, and #.  The first character
+                of the name must NOT be numeric. Each string must be a maximum length
+                of 8 characters with no embedded spaces and the strings are joined by
+                a dot.  This CP name must appear as an Adjacent CP in a link station
+                definition where the adjacent CP type is EN and CP-CP session support
+                is NO."
+        ::= { nwAppnSysLuEntry 1 }
+
+nwAppnSysLuName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the name of the LU being registered. The name format is
+                LLLLLLLL where LLLLLLLL are the characters: uppercase letters
+                A through Z, numerics 0 through 9, and the special characters
+                $, @, and #. The first character of the name must NOT be numeric.
+                The string must be a maximum length of 8 characters with no
+                embedded spaces. Note that the nework identifier of the LU is 
+                taken from the fully qualified control point name of the adjacent
+                LEN node (nwAppnSysCpName) which owns the LU. "
+        ::= { nwAppnSysLuEntry 2 }
+
+nwAppnSysLuControl  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        delete(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Set this object to delete to remove an entry."
+        ::= { nwAppnSysLuEntry 3 }
+
+
+
+--  APPN System Administration Group
+--  This group contains the objects that pertain to the administration of
+--  APPN Routing Services at a global, system-wide level.
+
+nwAppnSysAdminStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  other(1),             --  none of the following
+                  disable(2),           --  shut down APPN Routing Services 
+                  enabled(3)            --  start up APPN Routing Services
+                        
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Sets the system-wide administrative state of APPN Routing Services.
+                If enable(3) is selected, APPN Routing Services is activated.
+
+                There are two cases: the very first activation, and activations
+                subsequent to the successful first activation. Before activating
+                APPN Routing Services the very first time, nwAppnSysRouterId in
+                the System Configuration branch and all objects under
+                nwAppnSysCfgLocalNode must be assigned a value. If not explicitly
+                assigned, default values will be used for objects under
+                nwAppnSysCfgLocalNode. After this first activation has completed
+                successfully, all objects under nwAppnSysCfgLocalNode will be
+                saved in non-volatile RAM and restored for the next node activation
+                at power up time. After this subsequent power up, enable(3) may be
+                selected without setting nwAppnSysRouterId or any objects under
+                under nwAppnSysCfgLocalNode. Those values defined prior to the
+                last power up or reset will be used.
+
+                If disable(2) is selected, APPN Routing Services will become
+                inactive in the manner specifed by nwAppnSysStopType. To
+                modify objects under nwAppnSysCfgLocalNode, nwAppnSysAdminStatus
+                must be disabled. "
+
+        ::= { nwAppnSysAdministration 1 }
+
+nwAppnSysOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  inactive
+                        enabled(3),           --  active
+                        pendingDisable(4),    --  deactivate in progress
+                        pendingEnable(5)      --  activate in progress
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current operating system-wide status of APPN 
+                Routing Services.  "
+        ::= { nwAppnSysAdministration 2 }
+
+nwAppnSysAdminReset      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Resets APPN Routing Services system-wide. Reset (2) forces a
+                restart of APPN Routing Services without a graceful shutdown on
+                any active router ports, without affecting any other routing
+                services."
+        ::= { nwAppnSysAdministration 3 }
+
+nwAppnSysOperationalTime  OBJECT-TYPE
+        SYNTAX  TimeTicks 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the elapsed time, in hundredths of a second, that
+                nwAppnOperStatus has been in its current state."
+        ::= { nwAppnSysAdministration 4 }
+
+nwAppnSysVersion  OBJECT-TYPE
+        SYNTAX  DisplayString 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current revision level of APPN routing 
+                 services in textual format."
+        ::= { nwAppnSysAdministration 5 }
+
+
+--  APPN Forwarding Group
+--  This group contains the managed objects used to setup and configure
+--  APPN Routing Services for aggregate, system-wide, port Message Unit
+--  (MU) and byte counters.
+
+
+nwAppnFwdCtrAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the aggregate, system-wide,
+                port Message Unit (MU) and byte counters. Enabled (3) causes
+                these counters to become active.  Disabled (2) causes these
+                counters to become inactive."
+        ::= { nwAppnFwdCounters 1 }
+
+nwAppnFwdCtrReset        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Resets the aggregate, system-wide port Message Unit (MU)
+                and byte counters. Reset (2) resets the aggregate counters to 0.
+                nwAppnFwdCtrOperationalTime is also reset to 0."
+        ::= { nwAppnFwdCounters 2 }
+
+nwAppnFwdCtrOperationalTime       OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the elapsed time, in hundredths of a second,
+                that nwAppnFwdCtrAdminStatus has been in the current state."
+        ::= { nwAppnFwdCounters 3 }
+
+nwAppnFwdCtrInMus       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MU)s that have
+                been received system-wide (for all ports) during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 4 }
+
+nwAppnFwdCtrOutMus      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MU)s that have
+                been transmitted system-wide (for all ports) during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 5 }
+
+nwAppnFwdCtrFwdMus      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MU)s that have
+                been forwarded system-wide (for all ports) during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 6 }
+
+nwAppnFwdCtrFilteredMus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdCounters 7 }
+
+nwAppnFwdCtrDiscardMus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdCounters 8 }
+
+nwAppnFwdCtrAddrErrMus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs)
+                that have been received system-wide (for all ports), during
+                nwAppnFwdCtrOperationalTime, that contain an address error(s)
+                in the SNA header."
+        ::= { nwAppnFwdCounters 9 }
+
+nwAppnFwdCtrLenErrMus  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that have
+                been received system-wide (for all ports), during
+                nwAppnFwdCtrOperationalTime, that contain a length error."
+        ::= { nwAppnFwdCounters 10 }
+
+nwAppnFwdCtrHdrErrMus  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that have
+                been received system-wide (for all ports), during
+                nwAppnFwdCtrOperationalTime, that contain an SNA header error
+                other than an address or length error."
+        ::= { nwAppnFwdCounters 11 }
+
+nwAppnFwdCtrInBytes     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates number of bytes in Message Units (MUs) that have
+                been received system-wide (for all ports), during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 12 }
+
+nwAppnFwdCtrOutBytes    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MUs) that
+                have been forwarded system-wide (for all ports), during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 13 }
+
+nwAppnFwdCtrFwdBytes    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MUs) that
+                have been forwarded system-wide (for all ports), during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 14 }
+
+nwAppnFwdCtrFilteredBytes        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdCounters 15 }
+
+nwAppnFwdCtrDiscardBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdCounters 16 }
+
+nwAppnFwdCtrHostInMus   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that have
+                been delivered system-wide (for all ports), to local half
+                sessions during nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 17 }
+
+nwAppnFwdCtrHostOutMus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that have
+                been successfully sent from local half sessions system-wide
+                (for all ports), to Path Control during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 18 }
+
+nwAppnFwdCtrHostDiscardMus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdCounters 19 }
+
+
+nwAppnFwdCtrHostInBytes  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MUs)
+                that have been delivered system-wide (for all ports), to
+                local half sessions during nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 20 }
+
+nwAppnFwdCtrHostOutBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MUs)
+                that have been successfully sent from local half sessions
+                system-wide (for all ports), to Path Control during
+                nwAppnFwdCtrOperationalTime."
+        ::= { nwAppnFwdCounters 21 }
+
+nwAppnFwdCtrHostDiscardBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdCounters 22 }
+
+
+--  APPN Forwarding Port Table
+--  This table contains the managed objects used to setup and configure
+--  each port used by APPN Routing Services.
+--
+--
+nwAppnFwdIfTable        OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwAppnFwdIfEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains an entry for each router port which can
+                be used by APPN Routing Services. This table is indexed by
+                nwAppnFwdIfIndex, which indicates the value of MIB 2 ifindex
+                which identifes the router port for which an entry exists.
+                These port configuration entries will be provided automatically
+                based on physical port configuration. Such entries cannot be
+                deleted - only modified."
+        ::= { nwAppnFwdIfConfig 1 }
+
+nwAppnFwdIfEntry    OBJECT-TYPE
+        SYNTAX          NwAppnFwdIfEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry specifies the APPN Routing Services port
+                configuration for the router port for which the entry exists."
+        INDEX   { nwAppnFwdIfIndex }
+        ::= { nwAppnFwdIfTable 1 }
+
+NwAppnFwdIfEntry ::=
+        SEQUENCE {
+                nwAppnFwdIfIndex                INTEGER,
+                nwAppnFwdIfAdminStatus          INTEGER,
+                nwAppnFwdIfOperStatus           INTEGER,
+                nwAppnFwdIfOperationalTime      TimeTicks,
+                nwAppnFwdIfControl              INTEGER,
+                nwAppnFwdIfMtu                  INTEGER,
+                nwAppnFwdIfForwarding           INTEGER,
+                nwAppnFwdIfFrameType            INTEGER,
+                nwAppnFwdIfAclIdentifier        INTEGER,
+                nwAppnFwdIfAclStatus            INTEGER,
+                nwAppnFwdIfCacheControl         INTEGER,
+                nwAppnFwdIfCacheEntries         Counter,
+                nwAppnFwdIfCacheHits            Counter,
+                nwAppnFwdIfCacheMisses          Counter
+        }
+
+nwAppnFwdIfIndex        OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the value of MIB2 ifindex, which identifies the
+                router port for which the entry exists. "
+        ::= { nwAppnFwdIfEntry 1 }
+
+nwAppnFwdIfAdminStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disable(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of an APPN Routing Services 
+                port for which the entry exists. enabled(3) causes the
+                APPN Routing Services port to become active. disable(2)
+                causes it to become inactive. There are various choices
+                for the method by which the port can be disabled, which are
+                enumerated by nwAppnExtIfStopType. "
+    ::= { nwAppnFwdIfEntry 2 }
+
+nwAppnFwdIfOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  inactive
+                        enabled(3),           --  active
+                        pendingDisable(4),    --  deactivate in progress
+                        pendingEnable(5)      --  activate in progress
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               "Indicates the current operating condition of the APPN Routing
+                Services port for which the entry exists."
+        ::= { nwAppnFwdIfEntry 3 }
+
+nwAppnFwdIfOperationalTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the elapsed time, in hundredths of a second, that
+                nwAppnFwdIfOperStatus has been in the current state."
+        ::= { nwAppnFwdIfEntry 4 }
+
+nwAppnFwdIfControl  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 5 }
+
+nwAppnFwdIfMtu      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 6 }
+
+nwAppnFwdIfForwarding       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 7 }
+
+nwAppnFwdIfFrameType        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            ethernet(2),
+                            i8022(4),
+                            sync(8)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+               "Specifies the framing type for the APPN Routing Services port
+                for which the entry exists. "
+        ::= { nwAppnFwdIfEntry 8 }
+
+nwAppnFwdIfAclIdentifier    OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 9 }
+
+nwAppnFwdIfAclStatus        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 10 }
+
+nwAppnFwdIfCacheControl     OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                disable(2),
+                                enable(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 11 }
+
+nwAppnFwdIfCacheEntries     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 12 }
+
+nwAppnFwdIfCacheHits        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 13 }
+
+nwAppnFwdIfCacheMisses      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs. Setting this object has no effect."
+        ::= { nwAppnFwdIfEntry 14 }
+
+
+--  The APPN Routing Services Port Extension Table
+--  This table contains additional objects used to setup and configure
+--  APPN Routing Services on a per port basis.
+
+nwAppnExtensionTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwAppnExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains additional APPN definitions for each
+                physical port. Entries cannot be added to or deleted from this
+                table. With the exception of nwAppnExtIfStopType, objects in
+                this table may only be modified when nwAppnFwdIfAdminStatus
+                is disabled.  Note: if APPN Routing Services is not active, no
+                entries will exist for this table. "
+        ::= { nwAppnFwdIfConfig 2 }
+
+nwAppnExtEntry    OBJECT-TYPE
+        SYNTAX  NwAppnExtEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry specifies additional APPN configuration parameters
+                for the port for which this entry exists."
+        INDEX   { nwAppnExtIfIndex }
+        ::= { nwAppnExtensionTable 1 }
+
+NwAppnExtEntry ::=
+        SEQUENCE {
+                nwAppnExtIfIndex                INTEGER,
+                nwAppnExtIfPortName             DisplayString,
+                nwAppnExtIfPortType             INTEGER,
+                nwAppnExtIfDlcType              INTEGER,
+                nwAppnExtIfMaxRBtuSize          INTEGER,
+                nwAppnExtIfTotLsActLim          INTEGER,
+                nwAppnExtIfInbLsActLim          INTEGER,
+                nwAppnExtIfOutbLsActLim         INTEGER,
+                nwAppnExtIfLocalLsRole          INTEGER,
+                nwAppnExtIfActXidXchgLimit      INTEGER,
+                nwAppnExtIfNonActXidXchgLimit   INTEGER,
+                nwAppnExtIfLsXmitRcvCap         INTEGER,
+                nwAppnExtIfMaxIfrmRcvd          INTEGER,
+                nwAppnExtIfDfltTargetPacing     INTEGER,
+                nwAppnExtIfDfltMaxSBtuSize      INTEGER,
+                nwAppnExtIfDfltEffectCap        INTEGER,
+                nwAppnExtIfDfltConnectCost      INTEGER,
+                nwAppnExtIfDfltByteCost         INTEGER,
+                nwAppnExtIfDfltSecurity         INTEGER,
+                nwAppnExtIfDfltPropDelay        INTEGER,
+                nwAppnExtIfDfltUsrDef1          INTEGER,
+                nwAppnExtIfDfltUsrDef2          INTEGER,
+                nwAppnExtIfDfltUsrDef3          INTEGER,
+                nwAppnExtIfStopType             INTEGER,
+                nwAppnExtIfCpCpSupp             INTEGER,
+                nwAppnExtIfLimitedRsrc          INTEGER,
+                nwAppnExtIfAddress              OCTET STRING,
+                nwAppnExtIfSsap                 OCTET STRING
+        }
+
+nwAppnExtIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the primary index into the APPN port extension table.
+                This number corresponds to the index into the nwAppnFwdIfTable. "
+        ::= { nwAppnExtEntry 1 }
+
+nwAppnExtIfPortName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..8))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the user friendly name for this port. "
+        ::= { nwAppnExtEntry 2 }
+
+nwAppnExtIfPortType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        nonswitched(1),
+                        switched(2),
+                        satf(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the type of line used by the port.  The value
+                 corresponds to one of the following:  nonswitched(1),
+                 switched(2), or satf(3). "
+        ::= { nwAppnExtEntry 4 }
+
+nwAppnExtIfDlcType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        llc2(1),
+                        sdlc(2),
+                        x25(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the type of DLC using the port. "
+        ::= { nwAppnExtEntry 5 }
+
+nwAppnExtIfMaxRBtuSize  OBJECT-TYPE
+        SYNTAX  INTEGER (99..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the maximum Message Unit (MU) size that can be received. "
+        DEFVAL { 2048 }
+        ::= { nwAppnExtEntry 6 }
+
+nwAppnExtIfTotLsActLim  OBJECT-TYPE
+        SYNTAX  INTEGER (1..256)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of links that can be active on this
+                port. If nwAppnExtIfPortType = nonswitched(1) and
+                nwAppnExtIfLocalLsRole = negotiable(1), or secondary(3), then
+                this value must be set to 1. "
+        DEFVAL { 16 }
+        ::= { nwAppnExtEntry 7 }
+
+nwAppnExtIfInbLsActLim  OBJECT-TYPE
+        SYNTAX  INTEGER (0..256)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of inbound links that can be active on
+                this port.  If nwAppnExtIfPortType = nonswitched(1) and
+                nwAppnExtIfLocalLsRole = negotiable(1) or primary(2), then this
+                value must be set to 0. "
+        DEFVAL { 8 }
+        ::= { nwAppnExtEntry 8 }
+
+nwAppnExtIfOutbLsActLim  OBJECT-TYPE
+        SYNTAX  INTEGER (0..256)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of outbound links that can be active on
+                this port.  If nwAppnExtIfPortType = nonswitched(1) and
+                nwAppnExtIfLocalLsRole = negotiable(1), then this value must be
+                set to 0.  If nwAppnExtIfLocalLsRole = primary(2), then this value
+                must be set the same as nwAppnExtIfTotLsActLim. "
+        DEFVAL { 8 }
+        ::= { nwAppnExtEntry 9 }
+
+nwAppnExtIfLocalLsRole  OBJECT-TYPE
+        SYNTAX  INTEGER  {  negotiable(1),
+                            primary(2),
+                            secondary(3)  }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the link station role - primary, secondary, or
+                negotiable.  For nwAppnExtIfPortType = satf(3), the link station
+                role must be negotiable(1). "
+        DEFVAL { negotiable }
+        ::= { nwAppnExtEntry 10 }
+
+nwAppnExtIfActXidXchgLimit  OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of activation XIDs that may be
+                exchanged. "
+        DEFVAL { 9 }
+        ::= { nwAppnExtEntry 11 }
+
+nwAppnExtIfNonActXidXchgLimit  OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of non-activation XIDs that may be
+                exchanged. "
+        DEFVAL { 5 }
+        ::= { nwAppnExtEntry 12 }
+
+nwAppnExtIfLsXmitRcvCap  OBJECT-TYPE
+        SYNTAX  INTEGER  { twowaysimultaneous(1), 
+                           twowayalternating(2)  }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the link station's transmit/receive capability. "
+        DEFVAL { twowaysimultaneous }
+        ::= { nwAppnExtEntry 13 }
+
+nwAppnExtIfMaxIfrmRcvd  OBJECT-TYPE
+        SYNTAX  INTEGER (1..127)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the maximum number of I-frames received before an
+                acknowledgment is sent to the sender. "
+        DEFVAL { 4 }
+        ::= { nwAppnExtEntry 14 }
+
+nwAppnExtIfDfltTargetPacing  OBJECT-TYPE
+        SYNTAX  INTEGER (1..32767) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the pacing window size for BINDs on this transmission
+                group. "
+        DEFVAL { 7 }
+        ::= { nwAppnExtEntry 15 }
+
+nwAppnExtIfDfltMaxSBtuSize  OBJECT-TYPE
+        SYNTAX  INTEGER (99..65535) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the maximum Message Unit (MU) size which can be sent. "
+        DEFVAL { 2048 }
+        ::= { nwAppnExtEntry 16 }
+
+nwAppnExtIfDfltEffectCap  OBJECT-TYPE
+        SYNTAX  INTEGER  (0..603979776)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the default maximum kilo bits per second rate
+                (line speed) for all links on this port. "
+        ::= { nwAppnExtEntry 17 }
+
+nwAppnExtIfDfltConnectCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the default cost per connect time for all link
+                stations on this port.  0 is the lowest cost and 255 is the
+                largest cost. "
+        ::= { nwAppnExtEntry 18 }
+
+nwAppnExtIfDfltByteCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the default Cost per Byte for link stations. 0 is
+                the lowest cost and 255 is the largest cost. "
+        ::= { nwAppnExtEntry 19 }
+
+nwAppnExtIfDfltSecurity  OBJECT-TYPE
+        SYNTAX  INTEGER {       nonsecure(1),           --X'01'
+                                publicSwitchNw(32),     --X'20'
+                                undergroundCable(64),   --X'40'
+                                secureConduit(96),      --X'60'
+                                guardedConduit(128),    --X'80'
+                                encrypted(160),         --X'A0'
+                                guardedRadiation(192)   --X'C0'
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specify one of the following security selections:
+
+                        non-secure        - specifies no security.
+                        public switched   - data flows over a public switched 
+                                            network.
+                        underground cable - data transmitted over a secure
+                                            underground cable.
+                        secure conduit    - line is secure conduit that is not
+                                            guarded.
+                        guarded conduit   - conduit that is protected against
+                                            physical tapping.
+                        encrypted         - encryption over the line.
+                        guarded radiation - line is proected against physical
+                                            and radiation tapping. "
+
+        ::= { nwAppnExtEntry 20 }
+
+nwAppnExtIfDfltPropDelay  OBJECT-TYPE
+        SYNTAX  INTEGER {       
+                                minimum(0),                     --X'00'
+                                negligible(384),                --X'4C'
+                                terrestrial(9216),              --X'71'
+                                packetswitched(147456),         --X'91'
+                                long(294912),                   --X'99'
+                                maximum(2013265920)             --X'FF'
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the propagation delay which represents the relative
+                time it takes for a signal to travel the length of the link in
+                microseconds, with some of the more common default values
+                enumerated. The default times in parentheses are in microseconds.
+                These default values fall into the following ranges:
+
+                        minimum                 - no propagation delay
+                        negligible, lan         - less than 480 microseconds
+                        terrestrial, telephone  - between 480 and 49,512
+                                                  microseconds
+                        packetswitched          - between 49,512 and 245,760
+                                                  microseconds
+                        long, satellite         - more than 245760 microseconds.
+                        maximum                 - the maximum propagation delay. "
+        ::= { nwAppnExtEntry 21 }
+
+nwAppnExtIfDfltUsrDef1  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 1. "
+        DEFVAL { 128 }
+        ::= { nwAppnExtEntry 22 }
+
+nwAppnExtIfDfltUsrDef2  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 2. "
+        DEFVAL { 128 }
+        ::= { nwAppnExtEntry 23 }
+
+nwAppnExtIfDfltUsrDef3  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 3. "
+        DEFVAL { 128 }
+        ::= { nwAppnExtEntry 24 }
+
+nwAppnExtIfStopType OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                  immediate(1), 
+                  orderly(2) 
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the type of shutdown for APPN Routing Services
+                on the port. Once set, nwAppnFwdIfAdminStatus may
+                be set to disable. The disable choices are as follows:
+
+                   immediate(1) causes the link stations belonging to the
+                                physical port to be disabled immediately
+                                without flushing pending messages and 
+                                without initiating an orderly disconnect sequence.
+                   orderly(2)   causes pending messages in link stations to be
+                                flushed, followed by an orderly disconnect
+                                sequence.  The link station is then disabled. "
+        DEFVAL { orderly }
+        ::= { nwAppnExtEntry 25 }
+
+nwAppnExtIfCpCpSupp  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether CP-CP sessions are permitted on dynamic 
+                 links generated on this port. "
+        DEFVAL { yes }
+        ::= { nwAppnExtEntry 26 }
+
+nwAppnExtIfLimitedRsrc  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether dynamic links generated on this port
+                are a limited resource. A limited resource link will
+                be deactivated when there are no sessions using the link."
+        DEFVAL { no }
+        ::= { nwAppnExtEntry 27 }
+
+nwAppnExtIfAddress  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the physical address of this port depending on the
+                media type. For token ring or ethernet ports, the information is
+                the 6 byte MAC address which starts in byte 1 and ends in byte 6.
+                For token ring ports the MAC address must be specified in non-
+                canonical format. For ethernet ports the MAC address must be 
+                specified in canonical format.  For frame relay ports, there is
+                no associated address, i.e., it will be a zero length octet string."
+        ::= { nwAppnExtEntry 28 }
+
+nwAppnExtIfSsap  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "For token ring or ethernet ports specifies the Source SAP Address
+                of this port. "
+        DEFVAL { '04'h }
+        ::= { nwAppnExtEntry 29 }
+
+
+--
+--  Connection Network Tables
+--
+
+nwAppnIfCnPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwAppnIfCnPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains definitions for the Connection
+                 Network port table which defines which local ports can
+                 access a connection network. To add a row to the table,
+                 nwAppnIfCnPtFqName and nwAppnIfCnPtName are required entries.
+                 To delete a row, set the control field to delete.
+                 Adding the first row for a connection network implicitly
+                 creates the connection network and deleting the last
+                 remaining row for a connection network implicitly removes
+                 the connection network."
+        ::= { nwAppnIfCn 1 }
+
+nwAppnIfCnPortEntry    OBJECT-TYPE
+        SYNTAX  NwAppnIfCnPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the APPN Connection Network port definitions."
+        INDEX   { nwAppnIfCnPtFqName, nwAppnIfCnPtName }
+        ::= { nwAppnIfCnPortTable 1 }
+
+NwAppnIfCnPortEntry ::=
+        SEQUENCE {
+                nwAppnIfCnPtFqName             DisplayString,
+                nwAppnIfCnPtName               DisplayString,
+                nwAppnIfCnPtControl            INTEGER
+        }
+
+nwAppnIfCnPtFqName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (3..17))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the fully-qualified Name of the Virtual Routing Node.
+                The name format is NNNNNNNN.CCCCCCCC where NNNNNNNN is the
+                network identifier and CCCCCCCC is the Control Point name. Valid
+                characters to make up these two strings are uppercase letters
+                A through Z, numerics 0 through 9, and the special characters
+                $, @, and #.  The first character of the name must NOT be
+                numeric. Each string must be a maximum length of 8 characters
+                with no embedded spaces and the strings are joined by a dot. "
+        ::= { nwAppnIfCnPortEntry 1 }
+
+nwAppnIfCnPtName     OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies one of the ports which can access this Connection
+                Network."
+        ::= { nwAppnIfCnPortEntry 2 }
+
+nwAppnIfCnPtControl  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        delete(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Set this object to delete to delete this port from this
+                Connection Network."
+        ::= { nwAppnIfCnPortEntry 3 }
+
+
+nwAppnIfCnTgCharTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwAppnIfCnTgCharEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the APPN definitions for a Connection
+                Network's transmission group characteristics. Rows may be
+                neither added nor deleted, only modified. Rows are
+                added/deleted implicitly through CnPortTable."
+        ::= { nwAppnIfCn 2 }
+
+
+nwAppnIfCnTgCharEntry    OBJECT-TYPE
+        SYNTAX  NwAppnIfCnTgCharEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the APPN transmission group characteristics for
+                the Connection Network."
+        INDEX   { nwAppnIfCnTgFqName }
+        ::= { nwAppnIfCnTgCharTable 1 }
+
+NwAppnIfCnTgCharEntry ::=
+        SEQUENCE {
+                nwAppnIfCnTgFqName                DisplayString,
+                nwAppnIfCnTgEffectCap             INTEGER,
+                nwAppnIfCnTgConnectCost           INTEGER,
+                nwAppnIfCnTgByteCost              INTEGER,
+                nwAppnIfCnTgSecurity              INTEGER,
+                nwAppnIfCnTgPropDelay             INTEGER,
+                nwAppnIfCnTgUsrDef1               INTEGER,
+                nwAppnIfCnTgUsrDef2               INTEGER,
+                nwAppnIfCnTgUsrDef3               INTEGER
+        }
+
+nwAppnIfCnTgFqName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (3..17))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the fully-qualified Name of the Virtual Routing Node.
+                The name format is NNNNNNNN.CCCCCCCC where NNNNNNNN is the
+                network identifier and CCCCCCCC is the Control Point name. Valid
+                characters to make up these two strings are uppercase letters
+                A through Z, numerics 0 through 9, and the special characters
+                #, $, and @. The first character of the name must NOT be
+                numeric. Each string must be a maximum length of 8 characters
+                with no embedded spaces and the strings are joined by a dot. "
+        ::= { nwAppnIfCnTgCharEntry 1 }
+
+nwAppnIfCnTgEffectCap  OBJECT-TYPE
+        SYNTAX  INTEGER (0..603979776)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the maximum kilo bits per second rate (link speed) for
+                the connection network. "
+        ::= { nwAppnIfCnTgCharEntry 2 }
+
+nwAppnIfCnTgConnectCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the cost per connect time for the Connection Network.
+                0 is the lowest cost and 255 is the largest cost."
+        ::= { nwAppnIfCnTgCharEntry 3 }
+
+nwAppnIfCnTgByteCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the cost per byte for the Connection Network.
+                0 is the lowest cost and 255 is the largest cost."
+        ::= { nwAppnIfCnTgCharEntry 4 }
+
+nwAppnIfCnTgSecurity  OBJECT-TYPE
+        SYNTAX  INTEGER {       nonsecure(1),           --X'01'
+                                publicSwitchNw(32),   --X'20'
+                                undergroundCable(64),  --X'40'
+                                secureConduit(96),     --X'60'
+                                guardedConduit(128),   --X'80'
+                                encrypted(160),         --X'A0'
+                                guardedRadiation(192)  --X'C0'
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "For the Connection Network, specify one of the following
+                 security selections:
+                        non-secure - specifies no security.
+                        public switched - data flows over a public switched
+                                network.
+                        underground cable - data transmitted over a secure
+                                underground cable.
+                        secure conduit - line is secure conduit that is not
+                                guarded.
+                        guarded conduit - conduit that is protected against
+                                physical tapping.
+                        encrypted - encryption over the line.
+                        guarded radiation - line is proected against physical
+                                and radiation tapping. "
+        ::= { nwAppnIfCnTgCharEntry 5 }
+
+nwAppnIfCnTgPropDelay OBJECT-TYPE
+        SYNTAX  INTEGER {       
+                                minimum(0),                     --X'00'
+                                negligible(384),                --X'4C'
+                                terrestrial(9216),              --X'71'
+                                packetswitched(147456),         --X'91'
+                                long(294912),                   --X'99'
+                                maximum(2013265920)             --X'FF'
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the propagation delay which represents the time it
+                takes for a signal to travel the length of the link in
+                microseconds, with some of the more common default values
+                enumerated.  The default times in parentheses are in microseconds.
+                These default values fall into the following ranges:
+
+                        minimum                 - no propagation delay
+                        negligible, lan         - less than 480 microseconds
+                        terrestrial, telephone  - between 480 and 49,512
+                                                  microseconds
+                        packetswitched          - between 49,512 and 245,760
+                                                  microseconds
+                        long, satellite         - more than 245760 microseconds.
+                        maximum                 - the maximum propagation delay. "
+        ::= { nwAppnIfCnTgCharEntry 6 }
+
+nwAppnIfCnTgUsrDef1  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 1. "
+        DEFVAL { 128 }
+        ::= { nwAppnIfCnTgCharEntry 7 }
+
+nwAppnIfCnTgUsrDef2  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 2. "
+        DEFVAL { 128 }
+        ::= { nwAppnIfCnTgCharEntry 8 }
+
+nwAppnIfCnTgUsrDef3  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 3. "
+        DEFVAL { 128 }
+        ::= { nwAppnIfCnTgCharEntry 9 }
+
+
+--  APPN Forwarding Ports Counter Table
+--  This table contains the objects that specify the Message Unit (MU) and byte
+--  counters for each port used by APPN Routing Services.
+--
+--
+nwAppnFwdIfCtrTable         OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwAppnFwdIfCtrEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains the Message Unit (MU) and byte counters for
+                each port configured and enabled for APPN Routing Services. "
+        ::= { nwAppnFwdIfCounters 1 }
+
+nwAppnFwdIfCtrEntry         OBJECT-TYPE
+        SYNTAX          NwAppnFwdIfCtrEntry
+         ACCESS         not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry indicates Message Units (MU) and byte counts on
+                the router port for which this entry exists."
+        INDEX           { nwAppnFwdIfCtrIfIndex }
+        ::= { nwAppnFwdIfCtrTable 1 }
+
+NwAppnFwdIfCtrEntry ::=
+        SEQUENCE {
+                nwAppnFwdIfCtrIfIndex               INTEGER,
+                nwAppnFwdIfCtrAdminStatus           INTEGER,
+                nwAppnFwdIfCtrReset                 INTEGER,
+                nwAppnFwdIfCtrOperationalTime       TimeTicks,
+                nwAppnFwdIfCtrInMus                 Counter,
+                nwAppnFwdIfCtrOutMus                Counter,
+                nwAppnFwdIfCtrFwdMus                Counter,
+                nwAppnFwdIfCtrFilteredMus           Counter,
+                nwAppnFwdIfCtrDiscardMus            Counter,
+                nwAppnFwdIfCtrAddrErrMus            Counter,
+                nwAppnFwdIfCtrLenErrMus             Counter,
+                nwAppnFwdIfCtrHdrErrMus             Counter,
+                nwAppnFwdIfCtrInBytes               Counter,
+                nwAppnFwdIfCtrOutBytes              Counter,
+                nwAppnFwdIfCtrFwdBytes              Counter,
+                nwAppnFwdIfCtrFilteredBytes         Counter,
+                nwAppnFwdIfCtrDiscardBytes          Counter,
+                nwAppnFwdIfCtrHostInMus             Counter,
+                nwAppnFwdIfCtrHostOutMus            Counter,
+                nwAppnFwdIfCtrHostDiscardMus        Counter,
+                nwAppnFwdIfCtrHostInBytes           Counter,
+                nwAppnFwdIfCtrHostOutBytes          Counter,
+                nwAppnFwdIfCtrHostDiscardBytes      Counter
+        }
+
+nwAppnFwdIfCtrIfIndex       OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the value of MIB 2 ifindex, which identifies the
+                 router port for which the entry exists. This is the primary
+                index into the APPN per-port counter table. "
+        ::= { nwAppnFwdIfCtrEntry 1 }
+
+nwAppnFwdIfCtrAdminStatus   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the per-port Message Unit
+                (MU) and byte counters on the router port for which the entry
+                exists.  enabled(3) causes these counters to become active.
+                disabled(2) causes these counters to become inactive."
+        ::= { nwAppnFwdIfCtrEntry 2 }
+
+nwAppnFwdIfCtrReset         OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Resets the per-port Message Unit (MU) and byte counters on the
+                router port for which this entry exists. reset (2) resets the
+                counters to 0.  nwAppnFwdIfCtrOperationalTime is also reset to 0."
+        ::= { nwAppnFwdIfCtrEntry 3 }
+
+nwAppnFwdIfCtrOperationalTime        OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the amount of time in hundreths of a second that the
+                per-port Message Unit (MU) and byte counters have been active on
+                the APPN routing services port for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 4 }
+
+nwAppnFwdIfCtrInMus        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MU)s that have been 
+                received, during nwAppnFwdIfCtrOperationaltime on the router port
+                for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 5 }
+
+nwAppnFwdIfCtrOutMus       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MU)s that have been
+                transmitted, during nwAppnFwdIfCtrOperationalTime, on the router
+                port for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 6 }
+
+nwAppnFwdIfCtrFwdMus       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MU)s that have
+                been forwarded during nwAppnFwdIfCtrOperationalTime on the router
+                port for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 7 }
+
+nwAppnFwdIfCtrFilteredMus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdIfCtrEntry 8 }
+
+nwAppnFwdIfCtrDiscardMus  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdIfCtrEntry 9 }
+
+nwAppnFwdIfCtrAddrErrMus        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that contain
+                an address error in the SNA header that have been received
+                during nwAppnFwdIfCtrOperationalTime on the router port for which
+                this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 10 }
+
+nwAppnFwdIfCtrLenErrMus        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that contain
+                a length error that have been received during
+                nwAppnFwdIfCtrOperationalTime on the router port for which
+                this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 11 }
+
+nwAppnFwdIfCtrHdrErrMus        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that contain
+                a header error other than an address or length error that have
+                been received during nwAppnFwdIfCtrOperationalTime on the router
+                port for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 12 }
+
+nwAppnFwdIfCtrInBytes      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+               "Indicates the total number of bytes in the Message Units (MU)s
+                that have been received, during nwAppnFwdIfCtrOperationalTime,
+                on the router port for which the entry exists."
+        ::= { nwAppnFwdIfCtrEntry 13 }
+
+nwAppnFwdIfCtrOutBytes     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in the Message Units (MU)s
+                that have been transmitted, during nwAppnFwdIfCtrOperationalTime,
+                on the router port for which the entry exists."
+        ::= { nwAppnFwdIfCtrEntry 14 }
+
+nwAppnFwdIfCtrFwdBytes     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MU)s that
+                have been forwarded during nwAppnFwdIfCtrOperationalTime on the
+                router port for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 15 }
+
+nwAppnFwdIfCtrFilteredBytes        OBJECT-TYPE
+        SYNTAX                  Counter
+        ACCESS                  read-only
+        STATUS                  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdIfCtrEntry 16 }
+
+nwAppnFwdIfCtrDiscardBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdIfCtrEntry 17 }
+
+nwAppnFwdIfCtrHostInMus   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that have
+                been delivered to local half sessions during
+                nwAppnFwdIfCtrOperationalTime on the router port for which this
+                entry exists."
+        ::= { nwAppnFwdIfCtrEntry 18 }
+
+nwAppnFwdIfCtrHostOutMus  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of Message Units (MUs) that have
+                been successfully sent from local half sessions to Path Control
+                during nwAppnFwdIfCtrOperationalTime on the router port for
+                which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 19 }
+
+nwAppnFwdIfCtrHostDiscardMus      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdIfCtrEntry 20 }
+
+nwAppnFwdIfCtrHostInBytes  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MUs)
+                that have been delivered to local half sessions during
+                nwAppnFwdIfCtrOperationalTime on the router port for which this
+                entry exists."
+        ::= { nwAppnFwdIfCtrEntry 21 }
+
+nwAppnFwdIfCtrHostOutBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in Message Units (MUs) that
+                have been successfully sent from local half sessions to Path
+                Control during nwAppnFwdIfCtrOperationalTime on the router port
+                for which this entry exists."
+        ::= { nwAppnFwdIfCtrEntry 22 }
+
+nwAppnFwdIfCtrHostDiscardBytes     OBJECT-TYPE
+        SYNTAX                  Counter
+        ACCESS                  read-only
+        STATUS                  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdIfCtrEntry 23 }
+
+
+
+--  APPN Forwarding Adjacent Link Station Table
+--  This table contains the managed objects used to set up and configure
+--  links to adjacent link stations. Only those links that are configured by the
+--  user can be modified. Links which are active cannot be modified.
+--  If an attempt is made to modify an active link, the operational status
+--  will indicate busy-failed.
+
+nwAppnFwdLsTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwAppnFwdLsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the configuration and management 
+                information for links to adjacent link stations. This table is
+                indexed by nwAppnFwdLsName.  Operations which apply are add,
+                delete, modify, enable, and disable.  To add a row to the
+                table, the required fields in the row must be provided.
+                The required fields are nwAppnFwdLsPortName and 
+                nwAppnFwdLsDestAddr.  All other fields which are not provided
+                will be defaulted.  To enable a link select enable(3) from
+                nwAppnFwdLsAdminStatus. To delete a row, set nwAppnFwdLsControl
+                to delete(3).  To disable a link set nwAppnFwdLsStopType and
+                then select disable(2) in nwAppnFwdLsAdminStatus.
+                If nwAppnFwdLsStopType is not selected, the link is disabled in
+                an orderly fashion. "
+        ::= { nwAppnFwdLsConfig 1 }
+
+nwAppnFwdLsEntry    OBJECT-TYPE
+        SYNTAX  NwAppnFwdLsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the configuration for a link to an adjacent link
+                station for which the entry exists."
+        INDEX   { nwAppnFwdLsName }
+        ::= { nwAppnFwdLsTable 1 }
+
+NwAppnFwdLsEntry ::=
+        SEQUENCE {
+                nwAppnFwdLsName                 DisplayString,
+                nwAppnFwdLsAdminStatus          INTEGER,
+                nwAppnFwdLsOperStatus           INTEGER,
+                nwAppnFwdLsOperationalTime      TimeTicks,
+                nwAppnFwdLsControl              INTEGER,
+                nwAppnFwdLsPortName             DisplayString,
+                nwAppnFwdLsAdjCpName            DisplayString,
+                nwAppnFwdLsAdjCpType            INTEGER,
+                nwAppnFwdLsAutoActSupport       INTEGER,
+                nwAppnFwdLsLimitedRsrc          INTEGER,
+                nwAppnFwdLsSscpSession          INTEGER,
+                nwAppnFwdLsPuName               DisplayString,
+                nwAppnFwdLsBackLvlLenEN         INTEGER,
+                nwAppnFwdLsCpCpSessSupp         INTEGER,
+                nwAppnFwdLsEffectCap            INTEGER,
+                nwAppnFwdLsConnectCost          INTEGER,
+                nwAppnFwdLsByteCost             INTEGER,
+                nwAppnFwdLsSecurity             INTEGER,
+                nwAppnFwdLsPropDelay            INTEGER,
+                nwAppnFwdLsUsrDef1              INTEGER,
+                nwAppnFwdLsUsrDef2              INTEGER,
+                nwAppnFwdLsUsrDef3              INTEGER,
+                nwAppnFwdLsTrgtPacingCount      INTEGER,
+                nwAppnFwdLsMaxSendBtu           INTEGER,
+                nwAppnFwdLsNumActiveSession     INTEGER,
+                nwAppnFwdLsdynamicLs            INTEGER,
+                nwAppnFwdLsStopType             INTEGER,
+                nwAppnFwdLsPortNbr              INTEGER,
+                nwAppnFwdLsDestAddr             OCTET STRING,
+                nwAppnFwdLsDsap                 OCTET STRING,
+                nwAppnFwdLsBlockNum             DisplayString,
+                nwAppnFwdLsIdNum                DisplayString
+        }
+
+nwAppnFwdLsName    OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the primary index to the adjacent link station table
+                (nwAppnFwdLsTable). "
+        ::= { nwAppnFwdLsEntry 1 }
+
+nwAppnFwdLsAdminStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disable(2),
+                            enable(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of a link to an adjacent
+                link station. enabled(3) causes the link to become established.
+                disable(2) causes the link to terminate. There are various
+                severities of disabling a link which are selected via the leaf
+                node nwAppnFwdLsStopType described further within this branch. "
+    ::= { nwAppnFwdLsEntry 2 }
+
+nwAppnFwdLsOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  inactive
+                        enabled(3),           --  active
+                        pendingDisable(4),    --  deactivate in progress
+                        pendingEnable(5)      --  activate in progress
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the current operating status of the link for which this
+                entry exists."
+        ::= { nwAppnFwdLsEntry 3 }
+
+nwAppnFwdLsOperationalTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               "Specifies the elapsed time, in hundredths of a second, that
+                nwAppnFwdLsAdminStatus has been either enabled or DISABLED.
+                If the operational state is pending-disable,
+                nwAppnFwdLsOperationalTime indicates the amount of time since
+                the state was enabled.  If the operational state is pending-enable,
+                nwAppnFwdLsOperationalTime indicates the amount of time since the
+                state was DISABLED."
+        ::= { nwAppnFwdLsEntry 4 }
+
+nwAppnFwdLsControl  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        delete(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Set this object to delete in order to delete the entry."
+        ::= { nwAppnFwdLsEntry 5 }
+
+nwAppnFwdLsPortName    OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This link station port name corresponds to the port name
+                index into the the nwAppnExtensionTable which describes the
+                router port on which the adjacent link station is defined."
+        ::= { nwAppnFwdLsEntry 6 }
+
+nwAppnFwdLsAdjCpName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (3..17))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the fully-qualified, 17 byte long, adjacent Control
+                Point name. The name format is NNNNNNNN.CCCCCCCC where NNNNNNNN
+                is the network identifier and CCCCCCCC is the Control Point name.
+                Valid characters to make up these two strings are uppercase
+                letters A through Z, numerics 0 through 9, and the special
+                characters $, # and @.  The first character of the name must NOT
+                be numeric. Each string must be a maximum length of 8 characters
+                with no embedded spaces and the strings are joined by a dot. "
+        ::= { nwAppnFwdLsEntry 7 }
+
+nwAppnFwdLsAdjCpType  OBJECT-TYPE
+        SYNTAX  INTEGER { endnode(1), networknode(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the adjacent node type. The following values are
+                valid: endnode(1), networknode(2). endnode(1) includes both
+                End Node and LEN node types."
+        DEFVAL { endnode }
+        ::= { nwAppnFwdLsEntry 8 }
+
+nwAppnFwdLsAutoActSupport  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether the link is automatically enabled when
+                a session is activated over the link. It is an error to set
+                this to yes(1) when nwAppnFwdLsCpCpSessSupp is set to yes(1). "
+        DEFVAL { no }
+        ::= { nwAppnFwdLsEntry 10 }
+
+nwAppnFwdLsLimitedRsrc  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether this link is to be deactivated when
+                there are no sessions using the link. If
+                nwAppnFwdLsCpCpSessSupp is yes, however, the link will
+                not be deactivated if CP-CP sessions are terminated.
+                Note also that a link over a non-switched port cannot
+                be configured as a limited resource."
+        DEFVAL { no }
+        ::= { nwAppnFwdLsEntry 11 }
+
+nwAppnFwdLsSscpSession OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Requests a host system to initiate sessions between its SSCP and
+                dependent LUs within APPN Routing Services. If set to yes,
+                then nwAppnFwdLsPuName is required. Note: once this parameter
+                is set along with other link station parameters associated with
+                a link station definition, it cannot be modified. In order to
+                change it, the link station definition itself must be deleted and
+                then redefined with the new parameter."
+        DEFVAL { no }
+        ::= { nwAppnFwdLsEntry 12 }
+
+nwAppnFwdLsPuName OBJECT-TYPE
+SYNTAX  DisplayString (SIZE (1..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the name of the local PU if nwAppnFwdLsSscpSession is
+                set to yes.  Valid characters are uppercase A through Z and
+                numerics 0 through 9.  The name must start with an alphabetic
+                character. Note: once this parameter is set along with other 
+                link station parameters associated with a link station definition,
+                it cannot be modified. In order to change it, the link station
+                definition itself must be deleted and then redefined with the new
+                parameter."
+        ::= { nwAppnFwdLsEntry 13 }
+
+nwAppnFwdLsBackLvlLenEN  OBJECT-TYPE
+        SYNTAX  INTEGER { no(1), xid3(2), xid0(3), noxid(4) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether or not the adjacent node is a back level
+                LEN Node. If so, specify the type of back level LEN node as
+                follows:
+
+                xid3(2) -       supports XID-3 protocols, but does not include 
+                                Network Name control vector in the XID.
+
+                xid0(3) -       Supports XID-0 protocols. Not valid if
+                                nwAppnExtIfLocalLsRole is negotiable(1).
+
+                noxid(4) -      Does not support XID protocols. Valid only if
+                                nwAppnExtIfPortType is nonswitched(1) and not
+                                valid if nwAppnExtIfLocalLsRole is negotiable(1).
+                                
+                If not no(1), then nwAppnFwdLsAdjCpName and nwAppnFwdLsIdNum
+                must be specified. "
+        DEFVAL { no }
+        ::= { nwAppnFwdLsEntry 14 }
+
+nwAppnFwdLsCpCpSessSupp  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether this link supports CP to CP sessions."
+        DEFVAL { yes }
+        ::= { nwAppnFwdLsEntry 16 }
+
+nwAppnFwdLsEffectCap    OBJECT-TYPE
+        SYNTAX  INTEGER (0..603979776)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies th maximum kilo bits per second rate (link speed)
+                for the link. "
+        ::= { nwAppnFwdLsEntry 17 }
+
+nwAppnFwdLsConnectCost  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the cost per connect time for the link. Zero is the
+                lowest cost and 255 is the largest cost."
+        ::= { nwAppnFwdLsEntry 18 }
+
+nwAppnFwdLsByteCost     OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the cost per Byte for the link. Zero is the lowest
+                cost and 255 is the largest cost."
+        ::= { nwAppnFwdLsEntry 19 }
+
+nwAppnFwdLsSecurity     OBJECT-TYPE
+        SYNTAX  INTEGER {       nonsecure(1),           --X'01'
+                                publicSwitchNw(32),   --X'20'
+                                undergroundCable(64),  --X'40'
+                                secureConduit(96),     --X'60'
+                                guardedConduit(128),   --X'80'
+                                encrypted(160),         --X'A0'
+                                guardedRadiation(192)  --X'C0'
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Security selections available for the link are as follows:
+
+                        non-secure        - specifies no security.
+                        public switched   - data flows over a public switched
+                                            network.
+                        underground cable - data transmitted over a secure
+                                            underground cable.
+                        secure conduit    - line is secure conduit that is not
+                                            guarded.
+                        guarded conduit   - conduit that is protected against
+                                            physical tapping.
+                        encrypted         - encryption over the line.
+                        guarded radiation - line is proected against physical
+                                            and radiation tapping. "
+        ::= { nwAppnFwdLsEntry 20 }
+
+nwAppnFwdLsPropDelay    OBJECT-TYPE
+        SYNTAX  INTEGER {       
+                                minimum(0),                     --X'00'
+                                negligible(384),                --X'4C'
+                                terrestrial(9216),              --X'71'
+                                packetswitched(147456),         --X'91'
+                                long(294912),                   --X'99'
+                                maximum(2013265920)             --X'FF'
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the propagation delay which represents the relative
+                time it takes for a signal to travel the length of the link in
+                microseconds, with some of the more common default values
+                enumerated.  The default times in parentheses are in microseconds.
+                These default values fall into the following ranges:
+
+                        minimum                 - no propagation delay
+                        negligible, lan         - less than 480 microseconds
+                        terrestrial, telephone  - between 480 and 49,512
+                                                  microseconds
+                        packetswitched          - between 49,512 and 245,760
+                                                  microseconds
+                        long, satellite         - more than 245760 microseconds.
+                        maximum                 - the maximum propagation delay. "
+        ::= { nwAppnFwdLsEntry 21 }
+
+nwAppnFwdLsUsrDef1  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 1. "
+        DEFVAL { 128 }
+        ::= { nwAppnFwdLsEntry 22 }
+
+nwAppnFwdLsUsrDef2  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 2. "
+        DEFVAL { 128 }
+        ::= { nwAppnFwdLsEntry 23 }
+
+nwAppnFwdLsUsrDef3  OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies user defined parameter 3. "
+        DEFVAL { 128 }
+        ::= { nwAppnFwdLsEntry 24 }
+
+nwAppnFwdLsTrgtPacingCount  OBJECT-TYPE
+        SYNTAX  INTEGER (0..32767)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Species the desired pacing window size for BINDs on this
+                transmission group. The number is a value between 0 and 32767
+                and is significant only when fixed bind pacing is being used."
+        DEFVAL { 7 }
+        ::= { nwAppnFwdLsEntry 25 }
+
+nwAppnFwdLsMaxSendBtu  OBJECT-TYPE
+        SYNTAX  INTEGER (99..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies maximum Message Unit (MU) size that can be sent."
+        DEFVAL { 2048 }
+        ::= { nwAppnFwdLsEntry 26 }
+
+nwAppnFwdLsNumActiveSession  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies total number of active sessions on this link.
+                This includes both end point sessions and intermediate sessions."
+        ::= { nwAppnFwdLsEntry 27 }
+
+nwAppnFwdLsdynamicLs  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1), no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies whether this link station was dynamically
+                allocated (yes(1)) or whether the link station was defined by
+                the user (no(2))."
+        ::= { nwAppnFwdLsEntry 28 }
+
+nwAppnFwdLsStopType  OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                        immediate(1), 
+                        orderly(2) 
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the type of shutdown for a link. Once selected,
+                set disable in nwAppnFwdIfAdminStatus. The shutdown choices are
+                as follows:
+
+                 immediate(1) causes the link station to disconnect
+                              immediately without flushing remaining Message Unit (MU)s.
+                 orderly(2)   causes the link station to disconnect
+                              after successfully flushing remaining Message Unit (MU)s. "
+        DEFVAL { orderly }
+        ::= { nwAppnFwdLsEntry 29 }
+
+nwAppnFwdLsPortNbr    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This link station port number corresponds to the index into
+                the nwAppnFwdIfTable and the nwAppnExtensionTable, which 
+                together describe the port used by APPN Routing Services."
+        ::= { nwAppnFwdLsEntry 30 }
+
+nwAppnFwdLsDestAddr  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1..32))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the destination address of the adjacent link station
+                depending on the media type. For token ring or ethernet ports,
+                the information is the 6 byte Destination MAC Address which
+                starts in byte 1 and ends in byte 6. For token ring ports, 
+                the MAC address must be specified in non-canonical format.
+                For ethernet ports the MAC address must be specified in
+                canonical format. For frame relay, the  address is a non-null
+                terminated string which is the ascii representation of the DLCI."
+        ::= { nwAppnFwdLsEntry 31 }
+
+nwAppnFwdLsDsap  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (1))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "For a token ring or ethernet network, specifies the destination
+                SAP address associated with the adjacent link station.  "
+        DEFVAL { '04'h }
+        ::= { nwAppnFwdLsEntry 32 }
+
+nwAppnFwdLsBlockNum       OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(3))
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This represents the 3 hexadecimal digit block number which 
+                precedes the 5 digit id number in the 8 digit node id of the
+                adjacent node. The node id is used in XIDs and Alerts. The
+                block number identifies the product type. Both the block number
+                and id number combined, uniquely identify the adjacent node
+                within the installation network."
+        ::= { nwAppnFwdLsEntry 33 }
+
+nwAppnFwdLsIdNum    OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(5))
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "This represents the 5 hexadecimal digit id number which follows
+                the 3 digit block number in the 8 digit node id of the adjacent
+                node. The node id is used in XIDs and Alerts. The id number
+                uniquely identifies the adjacent node within a product type
+                indicated by its block number. Both the block number and id number
+                combined, uniquely identify the adjacent node within the 
+                installation network."
+        ::= { nwAppnFwdLsEntry 34 }
+
+
+
+--  APPN Forwarding Link Station Counter Table
+
+--  APPN Forwarding link station Counter Table
+--  This table contains the objects that specify Basic Link Unit (BLU) and
+--  byte counters for each configured adjacent link station.
+--
+nwAppnFwdLsCtrTable         OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwAppnFwdLsCtrEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains the Basic Link Unit (BLU) and byte
+                counters for each configured adjacent link station."
+        ::= { nwAppnFwdLsCounters 1 }
+
+nwAppnFwdLsCtrEntry         OBJECT-TYPE
+        SYNTAX          NwAppnFwdLsCtrEntry
+         ACCESS         not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry indicates the Basic Link Unit (BLU) and byte
+                count for the configured adjacent link station for which the
+                entry exists. "
+
+        INDEX           { nwAppnFwdLsCtrLsName }
+        ::= { nwAppnFwdLsCtrTable 1 }
+
+NwAppnFwdLsCtrEntry ::=
+        SEQUENCE {
+                nwAppnFwdLsCtrLsName                DisplayString,
+                nwAppnFwdLsCtrAdminStatus           INTEGER,
+                nwAppnFwdLsCtrReset                 INTEGER,
+                nwAppnFwdLsCtrOperationalTime       TimeTicks,
+                nwAppnFwdLsCtrInBlus                Counter,
+                nwAppnFwdLsCtrOutBlus               Counter,
+                nwAppnFwdLsCtrFwdBlus               Counter,
+                nwAppnFwdLsCtrFilteredBlus          Counter,
+                nwAppnFwdLsCtrDiscardBlus           Counter,
+                nwAppnFwdLsCtrAddrErrBlus           Counter,
+                nwAppnFwdLsCtrLenErrBlus            Counter,
+                nwAppnFwdLsCtrHdrErrBlus            Counter,
+                nwAppnFwdLsCtrInBytes               Counter,
+                nwAppnFwdLsCtrOutBytes              Counter,
+                nwAppnFwdLsCtrFwdBytes              Counter,
+                nwAppnFwdLsCtrFilteredBytes         Counter,
+                nwAppnFwdLsCtrDiscardBytes          Counter,
+                nwAppnFwdLsCtrHostInBlus            Counter,
+                nwAppnFwdLsCtrHostOutBlus           Counter,
+                nwAppnFwdLsCtrHostDiscardBlus       Counter,
+                nwAppnFwdLsCtrHostInBytes           Counter,
+                nwAppnFwdLsCtrHostOutBytes          Counter,
+                nwAppnFwdLsCtrHostDiscardBytes      Counter
+        }
+
+nwAppnFwdLsCtrLsName       OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..8))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the primary index into the link station 
+                counter table. This index is the link station name. "
+        ::= { nwAppnFwdLsCtrEntry 1 }
+
+nwAppnFwdLsCtrAdminStatus   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the Basic Link Unit (BLU)
+                and byte counters on the link for which this entry exists.
+                enabled(3) causes these counters to reset and become active.
+                disabled(2) causes these counters to become inactive. "
+        ::= { nwAppnFwdLsCtrEntry 2 }
+
+nwAppnFwdLsCtrReset         OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Resets the Basic Link Unit (BLU) and byte counters on the link
+                for which this entry exists. reset(2) resets the counters to 0.
+                nwAppnFwdLsCtrOperationalTime is also reset to 0."
+        ::= { nwAppnFwdLsCtrEntry 3 }
+
+nwAppnFwdLsCtrOperationalTime        OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the amount of time in hundreths of a second that the
+                Basic Link Unit (BLU) and byte counters have been active on the
+                link for which this entry exists."
+        ::= { nwAppnFwdLsCtrEntry 4 }
+
+nwAppnFwdLsCtrInBlus        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the total number of Basic Link Unit (BLU)s that have
+                been received, during nwAppnFwdLsCtrOperationaltime, on the link
+                for which this entry exists. This includes both information
+                (I-frame) and XID BLUs."
+        ::= { nwAppnFwdLsCtrEntry 5 }
+
+nwAppnFwdLsCtrOutBlus       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the total number of Basic Link Unit (BLU)s that have
+                been transmitted, during nwAppnFwdLsCtrOperationalTime, on the
+                link for which this entry exists. This includes both information
+                (I-frame) and XID BLUs."
+        ::= { nwAppnFwdLsCtrEntry 6 }
+
+nwAppnFwdLsCtrFwdBlus       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 7 }
+
+nwAppnFwdLsCtrFilteredBlus OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 8 }
+
+nwAppnFwdLsCtrDiscardBlus  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 9 }
+
+nwAppnFwdLsCtrAddrErrBlus        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 10 }
+
+nwAppnFwdLsCtrLenErrBlus        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of received Basic Link Unit (BLU)s
+                during nwAppnFwdLsCtrOperationalTime which have invalid DLC
+                headers on the link for which this entry exists." 
+        ::= { nwAppnFwdLsCtrEntry 11 }
+
+nwAppnFwdLsCtrHdrErrBlus        OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the total number of received Basic Link Unit (BLU)s
+                during nwAppnFwdLsCtrOperationalTime which have length errors
+                on the link for which this entry exists." 
+        ::= { nwAppnFwdLsCtrEntry 12 }
+
+nwAppnFwdLsCtrInBytes      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the total number of bytes that have been received,
+                during nwAppnFwdLsCtrOperationalTime, on the link for which
+                the entry exists.  This includes bytes contained in 
+                information (I-frames) and XID BLUs."
+        ::= { nwAppnFwdLsCtrEntry 13 }
+
+nwAppnFwdLsCtrOutBytes     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the total number of bytes that have been transmitted,
+                during nwAppnFwdLsCtrOperationalTime, on the link for which the
+                entry exists.  This includes bytes contained in information
+                (I-frames) and XID BLUs."
+        ::= { nwAppnFwdLsCtrEntry 14 }
+
+nwAppnFwdLsCtrFwdBytes     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 15 }
+
+nwAppnFwdLsCtrFilteredBytes        OBJECT-TYPE
+        SYNTAX                  Counter
+        ACCESS                  read-only
+        STATUS                  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 16 }
+
+nwAppnFwdLsCtrDiscardBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 17 }
+
+nwAppnFwdLsCtrHostInBlus   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 18 }
+
+nwAppnFwdLsCtrHostOutBlus  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 19 }
+
+nwAppnFwdLsCtrHostDiscardBlus      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 20 }
+
+nwAppnFwdLsCtrHostInBytes  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 21 }
+
+nwAppnFwdLsCtrHostOutBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 22 }
+
+nwAppnFwdLsCtrHostDiscardBytes     OBJECT-TYPE
+        SYNTAX                  Counter
+        ACCESS                  read-only
+        STATUS                  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnFwdLsCtrEntry 23 }
+
+--  Link State-Based Protocols
+--  This group contains the managed objects for Link State protocols for
+--  APPN Routing Services.
+
+--  APPN ISR System Group
+--  This group contains the managed objects for global, system-wide
+--  APPN Intermediate Session Routing (ISR) LinkState based routing protocol.
+
+--  APPN ISR System Configuration Parameters
+--  This group contains the objects that pertain to the setup and
+--  configuration of the APPN ISR LinkState based routing protocol.
+
+
+
+-- Link State-Based Protocols
+-- This group contains the objects that apply to the Link State based routing
+-- protocols supported by APPN Routing Services.
+
+-- APPN ISR System Group
+-- This group contains the objects that pertain to the APPN Intermediate Session
+-- Routing (ISR) LinkState-based routing protocol at a system-wide, global level.
+
+-- APPN ISR System Configuration Parameters
+-- This group contains the objects that pertain to the setup and configuration
+-- of the APPN ISR Link State based routing protocol at a system-wide, global level.
+
+
+nwAppnIsrAdminStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  other(1),             --  none of the following
+                  disable(2),           --  disable
+                  enable(3)             --  enable
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Intermediate Session Routing cannot be turned on and
+                 off.  Any modifications to this leaf will have no
+                 affect. "
+        ::= { nwAppnIsrConfig 1 }
+
+nwAppnIsrOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  inactive
+                        enabled(3),           --  active
+                        pendingDisable(4),    --  deactivate in progress
+                        pendingEnable(5)      --  activate in progress
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the current operating condition of the ISR routing
+                protocol, system-wide."
+        ::= { nwAppnIsrConfig 2 }
+
+nwAppnIsrAdminReset      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1)              -- none of the following
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object does not apply to this protocol. It is a common
+                object, inherited from the MIB framework used to provide a
+                common management interface to all the Cabletron Routing Services
+                protocol-specific MIBs."
+        ::= { nwAppnIsrConfig 3 }
+
+nwAppnIsrOperationalTime  OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the elapsed time, in hundredths of a second, that
+                nwAppnOperStatus has been in its current state."
+        ::= { nwAppnIsrConfig 4 }
+
+nwAppnIsrVersion  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current revision level of the ISR firmware in
+                textual format. This is the same version number as that of APPN
+                Routing Services firmware, nwAppnSysVersion. "
+        ::= { nwAppnIsrConfig 5 }
+
+
+--  APPN Event Group
+nwAppnEventAdminStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Set the administrative state of APPN Routing Services event
+                logging. enabled(3) causes the event log to become active.
+                disabled(2) causes the event log to become inactive."
+        ::= { nwAppnEventLogConfig 1 }
+
+nwAppnEventMaxEntries     OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the maximum number of entries allowed in the event log
+                table.  When the number of entries reaches the value of
+                nwAppnEventMaxEntries the first (oldest) entry is deleted
+                to allow a new entry to be added."
+        ::= { nwAppnEventLogConfig 2 }
+
+nwAppnEventTraceAll OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "enabled(3) allows logging of all event types on all ports.
+                disabled(2) causes the filter table to specify which events to
+                log."
+        ::= { nwAppnEventLogConfig 3 }
+
+
+-- Event Log Filter Table
+-- The Event Log Filter Table contains the managed objects used to setup
+-- and configure event log filters for APPN Routing Services events.
+
+
+nwAppnEventFilterTable            OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwAppnEventFilterEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains descriptions of how to filter log entries."
+        ::= { nwAppnEventLogFilterTable 1 }
+
+nwAppnEventFilterEntry            OBJECT-TYPE
+        SYNTAX          NwAppnEventFilterEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry specifies the filter for log entries.  The
+                instance nwAppnEventProtocol refers to the instance used
+                in the nwRtgProtocolTable and nwComponentTable specified
+                by the ctrouter-mib.txt. "
+        INDEX   { nwAppnEventFltrProtocol, nwAppnEventFltrIfNum }
+        ::= { nwAppnEventFilterTable 1 }
+
+NwAppnEventFilterEntry ::=
+        SEQUENCE {
+                nwAppnEventFltrProtocol   INTEGER,
+                nwAppnEventFltrIfNum      INTEGER,
+                nwAppnEventFltrControl    INTEGER,
+                nwAppnEventFltrType       INTEGER,
+                nwAppnEventFltrSeverity   INTEGER,
+                nwAppnEventFltrAction     INTEGER
+        }
+
+nwAppnEventFltrProtocol   OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Selects the protocol to log events from."
+        ::= { nwAppnEventFilterEntry 1 }
+
+nwAppnEventFltrIfNum      OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the APPN Routing Services port on which to log events. "
+        ::= { nwAppnEventFilterEntry 2 }
+
+nwAppnEventFltrControl    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                delete(2),
+                                add(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Setting this field to delete will allow entries to be
+                removed from the table.  This is done by adding new entries
+                with instance fields that match the entry to be removed from
+                the table.  The new entry being added must have this control
+                field set to delete in order for the matching entry already
+                in the table to be deleted.  Setting this field to add will
+                add the entry to the table."
+        ::= { nwAppnEventFilterEntry 3 }
+
+nwAppnEventFltrType        OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            misc(1),
+                            timer(2),
+                            rcv(4),
+                            xmit(8),
+                            event(16),
+                            error(32)
+            }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+                "This bit field mask filter will allow only events of
+                certain types to be logged.  By default all types will be
+                logged.  Clearing event types from this field will cause
+                those types not to be logged.  Adding event types to this
+                field will enable those types to be logged. "
+    ::= { nwAppnEventFilterEntry 4 }
+
+nwAppnEventFltrSeverity   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             highest(1),
+                             highmed(2),
+                             highlow(3)
+            }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+                "This filter controls the amount of logging by ignoring events
+                of lower priority than that specified by the filter value.
+                Specifying highest(1) causes all events except those of highest
+                severity to be ignored. Specifying highmed(2) causes lowest
+                severity events to be ignored.  Specifying highlow(3) causes
+                all events to be logged.  highmed(2) is the default setting."
+    ::= { nwAppnEventFilterEntry 5 }
+
+nwAppnEventFltrAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        log(1),
+                        trap(2),
+                        logTrap(3)
+            }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+                "This field specifies how the events are to be logged.
+                Specifying log(1) stores the events in the event log
+                table (defined below).  Specifying trap(2) sends events
+                out through the trap mechanism. Specifying logTrap(3)
+                does both. "
+    ::= { nwAppnEventFilterEntry 6 }
+
+--  Event Log Table
+--  The Event Log Table contains the logged events.
+
+nwAppnEventTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwAppnEventEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains all events that have been logged."
+        ::= { nwAppnEventLogTable 1 }
+
+nwAppnEventEntry          OBJECT-TYPE
+        SYNTAX          NwAppnEventEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry specifies events that have been logged."
+        INDEX           { nwAppnEventNumber }
+        ::= { nwAppnEventTable 1 }
+
+NwAppnEventEntry ::=
+        SEQUENCE {
+                nwAppnEventNumber         INTEGER,
+                nwAppnEventTime           TimeTicks,
+                nwAppnEventType           INTEGER,
+                nwAppnEventSeverity       INTEGER,
+                nwAppnEventProtocol       INTEGER,
+                nwAppnEventIfNum          INTEGER,
+                nwAppnEventTextString     OCTET STRING
+        }
+
+nwAppnEventNumber         OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This ordinal number uniquely identifies events."
+        ::= { nwAppnEventEntry 1 }
+
+nwAppnEventTime           OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This number specifies when the event was logged."
+        ::= { nwAppnEventEntry 2 }
+
+nwAppnEventType           OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                misc(1),
+                                timer(2),
+                                rcv(4),
+                                xmit(8),
+                                event(16),
+                                diags(32),
+                                error(64)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies type of event logged."
+        ::= { nwAppnEventEntry 3 }
+
+nwAppnEventSeverity               OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                highest(1),
+                                highmed(2),
+                                highlow(3)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the severity of the event logged."
+        ::= { nwAppnEventEntry 4 }
+
+nwAppnEventProtocol               OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the protocol where the event occured."
+        ::= { nwAppnEventEntry 5 }
+
+nwAppnEventIfNum          OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the APPN Routing Services port the event occurred on."
+        ::= { nwAppnEventEntry 6 }
+
+nwAppnEventTextString     OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the actual text string to be logged."
+        ::= { nwAppnEventEntry 7 }
+
+END

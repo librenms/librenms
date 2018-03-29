@@ -1,0 +1,167 @@
+--------------------------------------------------------------------
+-- NMS-LOG-SERVER-MIB
+-- AUTHER : LIUQIANG
+-- OCT 2011
+--------------------------------------------------------------------
+
+            NMS-LOG-SERVER-MIB DEFINITIONS ::= BEGIN
+
+            IMPORTS
+                    TimeTicks
+            FROM RFC1155-SMI
+                    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmslocal
+			FROM NMS-SMI
+		    RowStatus     FROM SNMPv2-TC
+		    IpAddress     FROM  RFC1155-SMI;
+          
+               logServer             OBJECT IDENTIFIER ::= { nmslocal 235 }
+
+--logServerTable
+               logServerTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF LogServerTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of log server configuration."
+                   ::= { logServer 1 }
+
+               logServerTableEntry OBJECT-TYPE
+                   SYNTAX  LogServerTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of log server configuration."
+                   INDEX { logServerLevel,logServerAddr }
+               ::= { logServerTable 1 }
+
+               LogServerTableEntry ::=
+                   SEQUENCE {
+                       logServerLevel
+                           INTEGER,
+                       logServerAddr
+                           IpAddress,
+                       logServerRowStatus
+                       	   RowStatus
+                          }
+	
+               logServerLevel OBJECT-TYPE
+                   SYNTAX  INTEGER{emerg(0), 
+                                   alert(1), 
+                                   critical(2), 
+                                   error(3), 
+                                   warning(4), 
+                                   notice(5),
+                                   info(6),
+                                   debug(7)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log server filter class. One of the index of this table. And default value is debug(7). "
+                   ::= { logServerTableEntry 1 }
+               
+               logServerAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log server IP address. One of the index of this table."
+                   ::= { logServerTableEntry 2 }
+               
+               logServerRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log server table row  status."
+                   ::= { logServerTableEntry 3 }
+               
+--logServerOff               
+               logServerOff OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   on(0),
+                                   off(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is syslog service ON or OFFs. 0-ON, 1-OFF."
+                   ::= { logServer 2 }		
+
+--logTrapTable
+               logTrapTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF LogTrapTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of log trap configuration."
+                   ::= { logServer 3 }
+
+               logTrapTableEntry OBJECT-TYPE
+                   SYNTAX  LogTrapTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of log trap configuration."
+                   INDEX { logTrapLevel,logTrapAddr }
+               ::= { logTrapTable 1 }
+
+               LogTrapTableEntry ::=
+                   SEQUENCE {
+                       logTrapAddr
+                           IpAddress,
+                       logTrapRfcVer
+                       		INTEGER,
+                       logTrapRowStatus
+                       	   RowStatus
+                          }
+               
+               logTrapAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log trap IP address. The index of this table."
+                   ::= { logTrapTableEntry 1 }
+                
+               logTrapRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log trap table row status."
+                   ::= { logTrapTableEntry 2 }    
+               logTrapRfcVer OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   RFC3164(0),
+                                   RFC5424(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log trap syslog format. Rfc3164 or Rfc5424."
+                   ::= { logTrapTableEntry 3 }
+         
+--logTrap
+               logTrap OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   emerg(0), 
+                                   alert(1), 
+                                   critical(2), 
+                                   error(3), 
+                                   warning(4), 
+                                   notice(5),
+                                   info(6),
+                                   debug(7)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Log trap level. And default value is info(6). "
+                   ::= { logServer 4 }
+
+END

@@ -1,0 +1,2047 @@
+CISCOSB-BRIDGEMIBOBJECTS-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private BRIDGE MIB OBJECTS MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                                        FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, Counter32               FROM SNMPv2-SMI
+    TruthValue, DisplayString, RowStatus                             FROM SNMPv2-TC
+    Counter                                                          FROM RFC1155-SMI
+    BridgeId, Timeout, dot1dBasePort,dot1dStpPort                    FROM BRIDGE-MIB
+    InterfaceIndex, ifIndex                                          FROM IF-MIB
+    PortList                                                         FROM Q-BRIDGE-MIB
+    SnmpAdminString                                                  FROM SNMP-FRAMEWORK-MIB;
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+VlanList1 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        vlans, with the first octet specifying vlan 1 through
+        8, the second octet specifying vlan 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered vlan, and the least significant bit
+        represents the highest numbered vlan.  Thus, each vlan
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that vlan is included in the set of vlans; the vlan
+        is not included if its bit has a value of '0'.
+        VlanList1 represent vlans 1-1024"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+VlanList2 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "As VlanList1 but represent vlans 1025-2048"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+VlanList3 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "As VlanList1 but represent vlans 2049-3072"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+VlanList4 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "As VlanList1 but represent vlans 3073-4094"
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+
+
+rlpBridgeMIBObjects MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines bridge MIB objects private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 57 }
+
+rldot1dPriority  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 1 }
+
+rldot1dPriorityMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rldot1dPriority 1 }
+
+--
+-- rldot1dPriorityPortGroupTable
+--
+
+rldot1dPriorityPortGroupTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1dPriorityPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of PortGroupNumber for each port."
+    ::= { rldot1dPriority 2 }
+
+rldot1dPriorityPortGroupEntry OBJECT-TYPE
+    SYNTAX  Rldot1dPriorityPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "All ports belonging to a same group have
+         the same User Priority to Traffic Class mapping."
+   INDEX   { dot1dBasePort }
+    ::= { rldot1dPriorityPortGroupTable 1 }
+
+Rldot1dPriorityPortGroupEntry ::= SEQUENCE {
+    rldot1dPriorityPortGroupNumber       INTEGER
+}
+
+rldot1dPriorityPortGroupNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A group, that port belongs to. All ports belonging
+         to a same group have the same User Priority to
+         Traffic Class mapping."
+    ::= { rldot1dPriorityPortGroupEntry 1 }
+
+
+rldot1dStp  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 2 }
+
+--
+-- Scalars
+--
+rldot1dStpMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 2."
+    ::= { rldot1dStp 1 }
+
+rldot1dStpType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        perDevice  (1),
+        mstp       (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether the device supports Spanning Tree per device,
+         or per group."
+    ::= { rldot1dStp 2 }
+
+rldot1dStpEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable / Disable spanning tree. When working in per vlan mode
+         enable / disable STP per all vlans."
+    DEFVAL { true }
+    ::= { rldot1dStp 3 }
+
+rldot1dStpPortMustBelongToVlan OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether a port must belong to a VLAN in order
+         to participate in the STP."
+    DEFVAL { true }
+    ::= { rldot1dStp 4 }
+
+rldot1dStpExtendedPortNumberFormat OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether the STP uses the extended port fnumber format."
+    DEFVAL { false }
+    ::= { rldot1dStp 5 }
+
+--
+--   The Spanning Tree Vlan Table
+--
+rldot1dStpVlanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1dStpVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A table that contains vlan-specific information
+            for the Spanning Tree Protocol."
+    ::= { rldot1dStp 6 }
+
+rldot1dStpVlanEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every Vlan
+         about the Spanning Tree Protocol state for that
+         Vlan."
+    INDEX   { rldot1dStpVlan }
+    ::= { rldot1dStpVlanTable 1 }
+
+Rldot1dStpVlanEntry ::= SEQUENCE {
+    rldot1dStpVlan                      INTEGER,
+    rldot1dStpVlanEnable                TruthValue,
+    rldot1dStpTimeSinceTopologyChange   TimeTicks,
+    rldot1dStpTopChanges                Counter,
+    rldot1dStpDesignatedRoot            BridgeId,
+    rldot1dStpRootCost                  INTEGER,
+    rldot1dStpRootPort                  INTEGER,
+    rldot1dStpMaxAge                    Timeout,
+    rldot1dStpHelloTime                 Timeout,
+    rldot1dStpHoldTime                  INTEGER,
+    rldot1dStpForwardDelay              Timeout
+}
+
+rldot1dStpVlan OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Vlan index."
+    ::= { rldot1dStpVlanEntry 1 }
+
+rldot1dStpVlanEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether this vlan is STP enable or disable"
+    REFERENCE
+        " ??  "
+    DEFVAL { true }
+    ::= { rldot1dStpVlanEntry 2 }
+
+rldot1dStpTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the
+         last time a topology change was detected by the
+         bridge entity."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.1.1.3"
+    ::= { rldot1dStpVlanEntry 3 }
+
+rldot1dStpTopChanges OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total number of topology changes detected by
+         this bridge since the management entity was last
+         reset or initialized."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.1.1.3"
+    ::= { rldot1dStpVlanEntry 4 }
+
+rldot1dStpDesignatedRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bridge identifier of the root of the spanning
+         tree as determined by the Spanning Tree Protocol
+         as executed by this node.  This value is used as
+         the Root Identifier parameter in all Configuration
+         Bridge PDUs originated by this node."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.1"
+    ::= { rldot1dStpVlanEntry 5 }
+
+rldot1dStpRootCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The cost of the path to the root as seen from
+         this bridge."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.2"
+    ::= { rldot1dStpVlanEntry 6 }
+
+rldot1dStpRootPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port which offers the
+         lowest cost path from this bridge to the root
+         bridge."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.3"
+    ::= { rldot1dStpVlanEntry 7 }
+
+rldot1dStpMaxAge OBJECT-TYPE
+    SYNTAX  Timeout
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum age of Spanning Tree Protocol
+         information learned from the network on any port
+         before it is discarded, in units of hundredths of
+         a second.  This is the actual value that this
+         bridge is currently using."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.4"
+    ::= { rldot1dStpVlanEntry 8 }
+
+rldot1dStpHelloTime OBJECT-TYPE
+    SYNTAX  Timeout
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The amount of time between the transmission of
+         Configuration bridge PDUs by this node on any port
+         when it is the root of the spanning tree or trying
+         to become so, in units of hundredths of a second.
+         This is the actual value that this bridge is
+         currently using."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.5"
+    ::= { rldot1dStpVlanEntry 9 }
+
+rldot1dStpHoldTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This time value determines the interval length
+         during which no more than two Configuration bridge
+         PDUs shall be transmitted by this node, in units
+         of hundredths of a second."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.14"
+    ::= { rldot1dStpVlanEntry 10 }
+
+rldot1dStpForwardDelay OBJECT-TYPE
+    SYNTAX  Timeout
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This time value, measured in units of hundredths
+         of a second, controls how fast a port changes its
+         spanning state when moving towards the Forwarding
+         state.  The value determines how long the port
+         stays in each of the Listening and Learning
+         states, which precede the Forwarding state.  This
+         value is also used, when a topology change has
+         been detected and is underway, to age all dynamic
+         entries in the Forwarding Database.  [Note that
+         this value is the one that this bridge is
+         currently using, in contrast to
+         dot1dStpBridgeForwardDelay which is the value that
+         this bridge and all others would start using
+         if/when this bridge were to become the root.]"
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.6"
+    ::= { rldot1dStpVlanEntry 11 }
+
+--
+-- rldot1dStpVlanPortTable
+--
+rldot1dStpVlanPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1dStpVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains pair <vlan, port> specific information
+         for the Spanning Tree Protocol."
+    ::= { rldot1dStp 7 }
+
+rldot1dStpVlanPortEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every pair <vlan, port>
+         about the Spanning Tree Protocol state for that pair."
+    INDEX   { rldot1dStpVlanPortVlan, rldot1dStpVlanPortPort }
+    ::= { rldot1dStpVlanPortTable 1 }
+
+Rldot1dStpVlanPortEntry ::= SEQUENCE {
+    rldot1dStpVlanPortVlan                  INTEGER,
+    rldot1dStpVlanPortPort                  INTEGER,
+    rldot1dStpVlanPortPriority              INTEGER,
+    rldot1dStpVlanPortState                 INTEGER,
+    rldot1dStpVlanPortEnable                INTEGER,
+    rldot1dStpVlanPortPathCost              INTEGER,
+    rldot1dStpVlanPortDesignatedRoot        BridgeId,
+    rldot1dStpVlanPortDesignatedCost        INTEGER,
+    rldot1dStpVlanPortDesignatedBridge      BridgeId,
+    rldot1dStpVlanPortDesignatedPort        OCTET STRING,
+    rldot1dStpVlanPortForwardTransitions    Counter
+}
+
+rldot1dStpVlanPortVlan OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Vlan number that the port belongs to, and for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1s/D2-1999 "
+    ::= { rldot1dStpVlanPortEntry 1 }
+
+rldot1dStpVlanPortPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..4096)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1t/D2-1999: Section 9.2.6"
+    ::= { rldot1dStpVlanPortEntry 2 }
+
+rldot1dStpVlanPortPriority OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value of the priority field which is
+         contained in the more significant  4 bits of the most
+         significant octet of the (2 octet long) Port ID.
+         The other octet of the Port ID is given by the value
+         of rldot1dStpVlanPort."
+    REFERENCE
+        "IEEE 802.1t/D2-1999: Section 9.2.6"
+    ::= { rldot1dStpVlanPortEntry 3 }
+
+rldot1dStpVlanPortState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(1),
+        blocking(2),
+        listening(3),
+        learning(4),
+        forwarding(5),
+        broken(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port's current state as defined by application of
+         the Spanning Tree Protocol. This state controls what
+         action a port takes on reception of a frame.
+         If the bridge has detected a port that is malfunctioning
+         it will place that port into the broken(6) state.  For ports
+         which are disabled (see dot1dStpVlanPortEnable), this object
+         will have a value of disabled(1)."
+    REFERENCE
+            "IEEE 802.1D-1990: Section 4.5.5.2"
+    ::= { rldot1dStpVlanPortEntry 4 }
+
+rldot1dStpVlanPortEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The enabled/disabled status of the port."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.2"
+    ::= { rldot1dStpVlanPortEntry 5 }
+
+rldot1dStpVlanPortPathCost OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The contribution of this port to the path cost of
+         paths towards the spanning tree root which include
+         this port.  802.1D-1990 recommends that the
+         default value of this parameter be in inverse
+         proportion to the speed of the attached LAN."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.3"
+    ::= { rldot1dStpVlanPortEntry 6 }
+
+rldot1dStpVlanPortDesignatedRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The unique Bridge Identifier of the Bridge
+         recorded as the Root in the Configuration BPDUs
+         transmitted by the Designated Bridge for the
+         segment to which the port is attached."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.4"
+    ::= { rldot1dStpVlanPortEntry 7 }
+
+rldot1dStpVlanPortDesignatedCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The path cost of the Designated Port of the
+         segment connected to this port.  This value is
+         compared to the Root Path Cost field in received
+         bridge PDUs."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.5"
+    ::= { rldot1dStpVlanPortEntry 8 }
+
+rldot1dStpVlanPortDesignatedBridge OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Bridge Identifier of the bridge which this
+         port considers to be the Designated Bridge for
+         this port's segment."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.6"
+    ::= { rldot1dStpVlanPortEntry 9 }
+
+rldot1dStpVlanPortDesignatedPort OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Port Identifier of the port on the Designated
+         Bridge for this port's segment."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.7"
+    ::= { rldot1dStpVlanPortEntry 10 }
+
+rldot1dStpVlanPortForwardTransitions OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of times this port has transitioned
+         from the Learning state to the Forwarding state."
+    ::= { rldot1dStpVlanPortEntry 11 }
+
+--
+-- STP Private TRAP variables
+--
+rldot1dStpTrapVariable  OBJECT IDENTIFIER ::= { rldot1dStp 8 }
+
+rldot1dStpTrapVrblifIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The ifIndex of port which STP status was changed"
+    ::= { rldot1dStpTrapVariable 1  }
+
+rldot1dStpTrapVrblVID OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The VID of VLAN to which the port belongs which STP status was changed"
+    ::= { rldot1dStpTrapVariable 2  }
+
+rldot1dStpTypeAfterReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        perDevice(1),
+        mstp(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New mode of spaning tree supported by the device after the next reset."
+    DEFVAL { perDevice }
+    ::= { rldot1dStp 9 }
+
+rldot1dStpMonitorTime OBJECT-TYPE
+    SYNTAX  INTEGER (1..20)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Factor of hello-time during which a port is monotored to determine if it is stable."
+    DEFVAL { 10 }
+    ::= { rldot1dStp 10 }
+
+rldot1dStpBpduCount OBJECT-TYPE
+    SYNTAX  INTEGER (1..60)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of bpdu that need to received for the link to be considered stable."
+    DEFVAL { 10 }
+    ::= { rldot1dStp 11 }
+
+rldot1dStpLastChanged  OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "The last time any object in this table was changed
+          by SNMP or other local management means."
+    REFERENCE
+        ""
+    ::= { rldot1dStp 12 }
+
+--
+-- rldot1dStpPortTable
+--
+rldot1dStpPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1dStpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains extended pair port specific information."
+    ::= { rldot1dStp 13 }
+
+rldot1dStpPortEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every port
+         about the Spanning Tree Protocol state for that port."
+    INDEX   { rldot1dStpPortPort }
+    ::= { rldot1dStpPortTable 1 }
+
+Rldot1dStpPortEntry ::= SEQUENCE {
+    rldot1dStpPortPort                  INTEGER,
+    rldot1dStpPortDampEnable            TruthValue,
+    rldot1dStpPortDampStable            TruthValue,
+    rldot1dStpPortFilterBpdu            INTEGER,
+    rldot1dStpPortBpduSent              Counter32,
+    rldot1dStpPortBpduReceived          Counter32,
+    rldot1dStpPortRole                  INTEGER,
+    rldot1dStpBpduType                  INTEGER,
+    rldot1dStpPortRestrictedRole        TruthValue,
+    rldot1dStpPortAutoEdgePort          TruthValue,
+    rldot1dStpPortLoopback              TruthValue,
+    rldot1dStpPortBpduOperStatus        INTEGER
+}
+
+rldot1dStpPortPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..4096)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1t/D2-1999: Section 9.2.6"
+    ::= { rldot1dStpPortEntry 1 }
+
+rldot1dStpPortDampEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specified if dampening is enabled on this port."
+    REFERENCE
+        ""
+    DEFVAL { false }
+    ::= { rldot1dStpPortEntry 2 }
+
+rldot1dStpPortDampStable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified if the port is stable."
+    REFERENCE
+        ""
+    DEFVAL { true }
+    ::= { rldot1dStpPortEntry 3 }
+
+rldot1dStpPortFilterBpdu OBJECT-TYPE
+    SYNTAX  INTEGER {
+        false(0),
+        true(1),
+        none(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specified if this port should filter bpdus when stp is disabled."
+    REFERENCE
+        ""
+    DEFVAL { none }
+    ::= { rldot1dStpPortEntry 4 }
+
+rldot1dStpPortBpduSent OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified the number of bpdu sent from this port."
+    REFERENCE
+        ""
+    ::= { rldot1dStpPortEntry 5 }
+
+rldot1dStpPortBpduReceived OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified the number of bpdu received in this port."
+    REFERENCE
+        ""
+    ::= { rldot1dStpPortEntry 6 }
+
+rldot1dStpPortRole OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    unknown(0),
+                    disabled(1),
+                    alternate(2),
+                    backup(3),
+                    root(4),
+                    designated(5)
+                }
+
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified the role of this this port."
+    REFERENCE
+        ""
+    ::= { rldot1dStpPortEntry 7 }
+
+rldot1dStpBpduType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        stp(0),
+        rstp(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified the type of BPDU transmitted by this port."
+    ::= { rldot1dStpPortEntry 8 }
+
+rldot1dStpPortRestrictedRole OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If TRUE causes the Port not to be selected as Root Port for the CIST or
+         any MSTI, even if it has the best spanning tree priority vector.
+         Such a Port will be selected as an Alternate Port after the Root Port
+         has been selected."
+    REFERENCE
+        "IEEE 802.1ad-D3-1: Section 13.24.29"
+    DEFVAL { false }
+    ::= { rldot1dStpPortEntry 9 }
+
+rldot1dStpPortAutoEdgePort OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If TRUE causes the Port when become up, to enter the blocking state,
+         and if during 3 seconds it doesn't receive a BPDU, it will enter
+         the forwarding state."
+    REFERENCE
+        "IEEE 802.1D-2004: Section 17.13.3"
+    DEFVAL { false }
+    ::= { rldot1dStpPortEntry 10 }
+
+rldot1dStpPortLoopback OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified loopback was detected on port.
+         Usable for only a short period of time if stp loopback guard is enabled
+         (since port enters into shutdown state)."
+    REFERENCE
+        ""
+    ::= { rldot1dStpPortEntry 11 }
+
+rldot1dStpPortBpduOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        filter(0),
+        flood(1),
+        bridge(2),
+        stp(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specified BPDU handling operative status for port."
+    REFERENCE
+        ""
+    ::= { rldot1dStpPortEntry 12 }
+
+rldot1dStpPortsEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable / Disable spanning tree on ports by default ."
+    DEFVAL { true }
+    ::= { rldot1dStp 14 }
+
+rldot1dStpTaggedFlooding OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "flooding can be done in tagged bpdu ."
+    ::= { rldot1dStp 15 }
+
+rldot1dStpPortBelongToVlanDefault OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The default value of rldot1dStpPortMustBelongToVlan ."
+    ::= { rldot1dStp 16 }
+
+rldot1dStpEnableByDefault OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The default value of rldot1dStpEnable ."
+    ::= { rldot1dStp 17 }
+
+rldot1dStpPortToDefault OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "To order port/s to revert to default setings ."
+    ::= { rldot1dStp 18 }
+
+rldot1dStpSupportedType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        perDevice(1),
+        perVlan(2),
+        mstp(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The type of stp supported by the device."
+    ::= { rldot1dStp 19 }
+
+rldot1dStpEdgeportSupportInStp OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If EdgePort is supported in stpCompatible mode ."
+    ::= { rldot1dStp 20 }
+
+rldot1dStpFilterBpdu OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specified if the device should filter BPDUs when STP is disabled."
+    ::= { rldot1dStp 21 }
+
+rldot1dStpFloodBpduMethod OBJECT-TYPE
+    SYNTAX  INTEGER {
+        classic(0),
+        bridging(1)  }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specified flooding method:
+        1 - classic - untagged to all stp disabled ports
+        2 - bridging -normal bridging."
+    ::= { rldot1dStp 22 }
+
+rldot1dStpSeparatedBridges OBJECT IDENTIFIER ::= { rldot1dStp 23 }
+
+--
+-- rldot1dStpPortBpduGuardTable
+--
+rldot1dStpPortBpduGuardTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1dStpPortBpduGuardEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains for each port whether it is bpdu guard ."
+    ::= { rldot1dStp 24 }
+
+rldot1dStpPortBpduGuardEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpPortBpduGuardEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every port
+         whether it is bpdu guard."
+    INDEX   { dot1dBasePort }
+    ::= { rldot1dStpPortBpduGuardTable 1 }
+
+Rldot1dStpPortBpduGuardEntry ::= SEQUENCE {
+    rldot1dStpPortBpduGuardEnable       TruthValue
+}
+
+
+rldot1dStpPortBpduGuardEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specified if bpdu guard is enabled on this port."
+    REFERENCE
+        ""
+    DEFVAL { false }
+    ::= { rldot1dStpPortBpduGuardEntry 1 }
+
+rldot1dStpLoopbackGuardEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Define if STP loopback guard feature is globally enabled."
+    DEFVAL { false }
+    ::= { rldot1dStp 25 }
+
+rldot1dStpSeparatedBridgesTable    OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF Rldot1dStpSeparatedBridgesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Define if separated bridges feature is enabled  for each interface."
+    ::=  { rldot1dStpSeparatedBridges 1 }
+
+rldot1dStpSeparatedBridgesEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpSeparatedBridgesEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Defines the contents of each line in the rlSeparatedBridgesTable table."
+    INDEX  { ifIndex }
+    ::=  { rldot1dStpSeparatedBridgesTable 1 }
+
+Rldot1dStpSeparatedBridgesEntry ::= SEQUENCE {
+    rldot1dStpSeparatedBridgesPortEnable             TruthValue
+}
+
+rldot1dStpSeparatedBridgesPortEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "This variable indicates whether the separated bridge feature is enabled on a specified ifIndex."
+    DEFVAL { false }
+    ::= {  rldot1dStpSeparatedBridgesEntry  1 }
+
+rldot1dStpSeparatedBridgesEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable / Disable Separated Bridges Feature."
+    DEFVAL { false }
+    ::= { rldot1dStpSeparatedBridges 2 }
+
+rldot1dStpSeparatedBridgesAutoConfig OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable / Disable Separated Bridges Automatic Configuration."
+    DEFVAL { false }
+    ::= { rldot1dStpSeparatedBridges 3 }
+
+
+rldot1dStpDisabledPortStateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF Rldot1dStpDisabledPortStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Define stp port state for each stp disabled interface.
+      This is auxiliary MIB emulates stp enabled port behaviour in ASIC for stp disabled port.
+      The MIB contains only stp disabled ports entries "
+    ::=  { rldot1dStp 26 }
+
+rldot1dStpDisabledPortStateEntry OBJECT-TYPE
+    SYNTAX  Rldot1dStpDisabledPortStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Defines the contents of each line in the rldot1dStpDisabledPortStateTable table."
+    INDEX  { dot1dStpPort }
+    ::=  { rldot1dStpDisabledPortStateTable 1 }
+
+Rldot1dStpDisabledPortStateEntry ::= SEQUENCE {
+    rldot1dStpDisabledPortState        INTEGER
+
+}
+
+
+rldot1dStpDisabledPortState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                blocking(2),
+                listening(3),
+                learning(4),
+                forwarding(5)
+
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The port's stp state as defined by  external
+            application .  This state controls what action a port takes on
+            reception of a frame."
+
+    DEFVAL {forwarding}
+    ::= { rldot1dStpDisabledPortStateEntry 1 }
+
+
+rldot1dExtBase  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 3 }
+
+rldot1dExtBaseMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rldot1dExtBase 1 }
+
+rldot1dDeviceCapabilities OBJECT-TYPE
+--    SYNTAX      BITS {
+--        rldot1dIGMPSnoopingFilteringServices(0)
+--                              ## can perform filtering of
+--                              ## individual multicast addresses
+--                              ## controlled by IGMP snooping.
+--        rldot1dDefaultFilteringAllServices(1)
+--                              ## can perform default filtering
+--                              ## behavior for All multicast addresses.
+--                              ## controlled by Multicast DB.
+--        rldot1dDefaultFilteringUnregServices(2)
+--                              ## can perform default filtering
+--                              ## behavior for Unregistered
+--                              ## multicast addresses.
+--                              ## controlled by Multicast DB.
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates the optional parts of private extension of
+         IEEE 802.1D and 802.1Q that are implemented by this
+         device and are manageable through this MIB.
+         Capabilities that are allowed on a per-port basis are
+         indicated in dot1dPortCapabilities."
+    ::= { rldot1dExtBase 2 }
+
+
+
+
+rldot1wRStp  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 4 }
+
+--
+-- rldot1wStpVlanEdgePortTable
+--
+rldot1wRStpVlanEdgePortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1wRStpVlanEdgePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains pair <vlan, port> specific information
+         for the Rapid Spanning Tree Protocol."
+    ::= { rldot1wRStp 1 }
+
+rldot1wRStpVlanEdgePortEntry OBJECT-TYPE
+    SYNTAX  Rldot1wRStpVlanEdgePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every pair <vlan, port>
+         about the RAPID Spanning Tree Protocol state for that pair."
+    INDEX   { rldot1wRStpVlanEdgePortVlan, rldot1wRStpVlanEdgePortPort }
+    ::= { rldot1wRStpVlanEdgePortTable 1 }
+
+Rldot1wRStpVlanEdgePortEntry ::= SEQUENCE {
+    rldot1wRStpVlanEdgePortVlan         INTEGER,
+    rldot1wRStpVlanEdgePortPort         INTEGER,
+    rldot1wRStpEdgePortStatus           TruthValue
+}
+
+rldot1wRStpVlanEdgePortVlan OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Vlan number that the port belongs to, and for which this entry
+         contains Spanning Tree Protocol management information,
+         If STP per device then only one value of 1 is allowed.
+         If STP per a VLAN then all value of 1..4095 are allowed."
+    ::= { rldot1wRStpVlanEdgePortEntry 1 }
+
+rldot1wRStpVlanEdgePortPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains Spanning Tree Protocol management information."
+    ::= { rldot1wRStpVlanEdgePortEntry 2 }
+
+rldot1wRStpEdgePortStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether this port is an Edge Port or not"
+    REFERENCE
+        "IEEE 802.1wd6-2000: Section 17.13.3.1 "
+    DEFVAL { false }
+    ::= { rldot1wRStpVlanEdgePortEntry 3 }
+
+--
+-- rldot1wStpForceVersionTable
+--
+rldot1wRStpForceVersionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1wRStpForceVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains  <vlan> specific information
+         for the Rapid Spanning Tree Protocol."
+    ::= { rldot1wRStp 2 }
+
+rldot1wRStpForceVersionEntry OBJECT-TYPE
+    SYNTAX  Rldot1wRStpForceVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every  <vlan>
+         about the RAPID Spanning Tree Protocol state for that pair."
+    INDEX   { rldot1wRStpForceVersionVlan }
+    ::= { rldot1wRStpForceVersionTable 1 }
+
+Rldot1wRStpForceVersionEntry ::= SEQUENCE {
+    rldot1wRStpForceVersionVlan         INTEGER,
+    rldot1wRStpForceVersionState        INTEGER
+}
+
+rldot1wRStpForceVersionVlan OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Vlan number that the port belongs to, and for which this entry
+         contains Spanning Tree Protocol management information,
+         If STP per device then only one value of 1 is allowed.
+         If STP per a VLAN then all value of 1..4095 are allowed."
+    ::= { rldot1wRStpForceVersionEntry 1 }
+
+rldot1wRStpForceVersionState OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether this Bridge uses the normal RSTP algorithm,
+         or STP Compatibility algorythm:
+         0 - STP Compatibility
+         2 - Normal RSTP"
+    REFERENCE
+        "IEEE 802.1wd9-2000: Section 17.16.1 "
+    DEFVAL { 2 }
+    ::= { rldot1wRStpForceVersionEntry 2 }
+
+rldot1pPriorityMap  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 5 }
+
+rldot1pPriorityMapState OBJECT-TYPE
+   SYNTAX  INTEGER {
+        enable (1),
+        disable (2)
+   }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "enable / disable"
+   ::= { rldot1pPriorityMap 1 }
+
+rldot1pPriorityMapTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1pPriorityMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table hold information the priority maps"
+    ::= { rldot1pPriorityMap 2 }
+
+rldot1pPriorityMapEntry OBJECT-TYPE
+    SYNTAX  Rldot1pPriorityMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rldot1pPriorityMapName }
+    ::= { rldot1pPriorityMapTable 1 }
+
+Rldot1pPriorityMapEntry ::= SEQUENCE {
+    rldot1pPriorityMapName     DisplayString,
+    rldot1pPriorityMapPriority OCTET STRING,
+    rldot1pPriorityMapPort     PortList,
+    rldot1pPriorityMapPortList PortList,
+    rldot1pPriorityMapStatus   RowStatus
+}
+
+rldot1pPriorityMapName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..25))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The map name"
+    ::=  { rldot1pPriorityMapEntry 1 }
+
+rldot1pPriorityMapPriority OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (8))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The map holding the queue"
+    ::=  { rldot1pPriorityMapEntry 2 }
+
+rldot1pPriorityMapPort OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "the port that the map, is applied on in config"
+    ::= { rldot1pPriorityMapEntry 3 }
+
+rldot1pPriorityMapPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "the ports that the map, is applied on in actual"
+    ::= { rldot1pPriorityMapEntry 4 }
+
+rldot1pPriorityMapStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The status of the  table entry. It's used to delete an entry"
+    ::= { rldot1pPriorityMapEntry 5 }
+
+
+
+
+
+rldot1sMstp  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 6 }
+
+--
+--   The Multiple Spanning Tree Instance Table
+--
+rldot1sMstpInstanceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1sMstpInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A table that contains Mstp instance specific information
+            for the Multiple Spanning Tree Protocol."
+    ::= { rldot1sMstp 1 }
+
+rldot1sMstpInstanceEntry OBJECT-TYPE
+    SYNTAX  Rldot1sMstpInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every instance
+         about the multiple Spanning Tree Protocol state for
+         that instance."
+    INDEX   { rldot1sMstpInstanceId }
+    ::= { rldot1sMstpInstanceTable 1 }
+
+Rldot1sMstpInstanceEntry ::= SEQUENCE {
+    rldot1sMstpInstanceId                        INTEGER,
+    rldot1sMstpInstanceEnable                    TruthValue,
+    rldot1sMstpInstanceTimeSinceTopologyChange   TimeTicks,
+    rldot1sMstpInstanceTopChanges                Counter,
+    rldot1sMstpInstanceDesignatedRoot            BridgeId,
+    rldot1sMstpInstanceRootCost                  INTEGER,
+    rldot1sMstpInstanceRootPort                  INTEGER,
+    rldot1sMstpInstanceMaxAge                    Timeout,
+    rldot1sMstpInstanceHelloTime                 Timeout,
+    rldot1sMstpInstanceHoldTime                  INTEGER,
+    rldot1sMstpInstanceForwardDelay              Timeout,
+    rldot1sMstpInstancePriority                  INTEGER,
+    rldot1sMstpInstanceRemainingHopes            INTEGER
+}
+
+rldot1sMstpInstanceId OBJECT-TYPE
+    SYNTAX  INTEGER (1..64)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Instance index."
+    ::= { rldot1sMstpInstanceEntry 1 }
+
+rldot1sMstpInstanceEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies whether this Instance is STP enable or disable"
+    REFERENCE
+        " ??  "
+    ::= { rldot1sMstpInstanceEntry 2 }
+
+rldot1sMstpInstanceTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the
+         last time a topology change was detected by the
+         Mstp Instance ."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.1.1.3"
+    ::= { rldot1sMstpInstanceEntry 3 }
+
+rldot1sMstpInstanceTopChanges OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total number of topology changes detected by
+         this Instance since the management entity was last
+         reset or initialized."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.1.1.3"
+    ::= { rldot1sMstpInstanceEntry 4 }
+
+rldot1sMstpInstanceDesignatedRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bridge identifier of the root of the spanning
+         tree as determined by the Muliple Spanning Tree Protocol
+         as executed by this node.  This value is used as
+         the Root Identifier parameter in all Configuration
+         Bridge PDUs originated by this node."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.1"
+    ::= { rldot1sMstpInstanceEntry 5 }
+
+rldot1sMstpInstanceRootCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The cost of the path to the root as seen from
+         this bridge."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.2"
+    ::= { rldot1sMstpInstanceEntry 6 }
+
+rldot1sMstpInstanceRootPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port which offers the
+         lowest cost path from this bridge to the root
+         bridge."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.3"
+    ::= { rldot1sMstpInstanceEntry 7 }
+
+rldot1sMstpInstanceMaxAge OBJECT-TYPE
+    SYNTAX  Timeout
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum age of Spanning Tree Protocol
+         information learned from the network on any port
+         before it is discarded, in units of hundredths of
+         a second.  This is the actual value that this
+         bridge is currently using."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.4"
+    ::= { rldot1sMstpInstanceEntry 8 }
+
+rldot1sMstpInstanceHelloTime OBJECT-TYPE
+    SYNTAX  Timeout
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The amount of time between the transmission of
+         Configuration bridge PDUs by this node on any port
+         when it is the root of the spanning tree or trying
+         to become so, in units of hundredths of a second.
+         This is the actual value that this bridge is
+         currently using."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.5"
+    ::= { rldot1sMstpInstanceEntry 9 }
+
+rldot1sMstpInstanceHoldTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This time value determines the interval length
+         during which no more than two Configuration bridge
+         PDUs shall be transmitted by this node, in units
+         of hundredths of a second."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.14"
+    ::= { rldot1sMstpInstanceEntry 10 }
+
+rldot1sMstpInstanceForwardDelay OBJECT-TYPE
+    SYNTAX  Timeout
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This time value, measured in units of hundredths
+         of a second, controls how fast a port changes its
+         spanning state when moving towards the Forwarding
+         state.  The value determines how long the port
+         stays in each of the Listening and Learning
+         states, which precede the Forwarding state.  This
+         value is also used, when a topology change has
+         been detected and is underway, to age all dynamic
+         entries in the Forwarding Database.  [Note that
+         this value is the one that this bridge is
+         currently using, in contrast to
+         dot1dStpBridgeForwardDelay which is the value that
+         this bridge and all others would start using
+         if/when this bridge were to become the root.]"
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.6"
+    ::= { rldot1sMstpInstanceEntry 11 }
+
+rldot1sMstpInstancePriority OBJECT-TYPE
+    SYNTAX  INTEGER (0..61440)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The value of the write-able portion of the Bridge
+            ID, i.e., the first four bits of the first octet
+            of the (8 octet long) Bridge ID.The value is a product
+            of 4096. The next 12 bit are the msti id .
+            The other (last) 6 octets of the Bridge ID are given
+            by the value of dot1dBaseBridgeAddress."
+    REFERENCE
+            "IEEE 802.1S-2001: Section 13.24.2"
+    ::= {rldot1sMstpInstanceEntry 12 }
+
+rldot1sMstpInstanceRemainingHopes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This count value determines the amount of hopes
+         the information transmited by this bridge on this
+         instance can travel."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.14"
+    ::= { rldot1sMstpInstanceEntry 13 }
+
+--
+-- rldot1sMstpInstancePortTable
+--
+rldot1sMstpInstancePortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1sMstpInstancePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains pair <msti, port> specific information
+         for the Spanning Tree Protocol."
+    ::= { rldot1sMstp 2 }
+
+rldot1sMstpInstancePortEntry OBJECT-TYPE
+    SYNTAX  Rldot1sMstpInstancePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every pair <msti, port>
+         about the Spanning Tree Protocol state for that pair."
+    INDEX   { rldot1sMstpInstancePortMstiId, rldot1sMstpInstancePortPort }
+    ::= { rldot1sMstpInstancePortTable 1 }
+
+Rldot1sMstpInstancePortEntry ::= SEQUENCE {
+    rldot1sMstpInstancePortMstiId                INTEGER,
+    rldot1sMstpInstancePortPort                  INTEGER,
+    rldot1sMstpInstancePortPriority              INTEGER,
+    rldot1sMstpInstancePortState                 INTEGER,
+    rldot1sMstpInstancePortEnable                INTEGER,
+    rldot1sMstpInstancePortPathCost              INTEGER,
+    rldot1sMstpInstancePortDesignatedRoot        BridgeId,
+    rldot1sMstpInstancePortDesignatedCost        INTEGER,
+    rldot1sMstpInstancePortDesignatedBridge      BridgeId,
+    rldot1sMstpInstancePortDesignatedPort        OCTET STRING,
+    rldot1sMstpInstancePortForwardTransitions    Counter,
+    rldot1sMStpInstancePortAdminPathCost         INTEGER,
+    rldot1sMStpInstancePortRole                  INTEGER
+
+}
+
+rldot1sMstpInstancePortMstiId OBJECT-TYPE
+    SYNTAX  INTEGER (1..64)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Vlan group number that the port belongs to, and for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1s/D11-2001 "
+    ::= { rldot1sMstpInstancePortEntry 1 }
+
+rldot1sMstpInstancePortPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..4096)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1t/D2-1999: Section 9.2.6"
+    ::= { rldot1sMstpInstancePortEntry 2 }
+
+rldot1sMstpInstancePortPriority OBJECT-TYPE
+    SYNTAX  INTEGER (0..240)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value of the priority field which is
+         contained in the more significant  4 bits of the most
+         significant octet of the (2 octet long) Port ID.
+         The value is a product of 16.
+         The other octet of the Port ID is given by the value
+         of rldot1dStpVlanGroupPort."
+    REFERENCE
+        "IEEE 802.1t/D2-1999: Section 9.2.6"
+    ::= { rldot1sMstpInstancePortEntry 3 }
+
+rldot1sMstpInstancePortState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(1),
+        blocking(2),
+        listening(3),
+        learning(4),
+        forwarding(5),
+        broken(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port's current state as defined by application of
+         the Spanning Tree Protocol. This state controls what
+         action a port takes on reception of a frame.
+         If the bridge has detected a port that is malfunctioning
+         it will place that port into the broken(6) state.  For ports
+         which are disabled (see dot1dStpVlanPortEnable), this object
+         will have a value of disabled(1)."
+    REFERENCE
+            "IEEE 802.1D-1990: Section 4.5.5.2"
+    ::= { rldot1sMstpInstancePortEntry 4 }
+
+rldot1sMstpInstancePortEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The enabled/disabled status of the port."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.2"
+    ::= { rldot1sMstpInstancePortEntry 5 }
+
+rldot1sMstpInstancePortPathCost OBJECT-TYPE
+    SYNTAX  INTEGER (1..200000000)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The contribution of this port to the path cost of
+         paths towards the spanning tree root which include
+         this port.  802.1D-1990 recommends that the
+         default value of this parameter be in inverse
+         proportion to the speed of the attached LAN."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.3"
+    ::= { rldot1sMstpInstancePortEntry 6 }
+
+rldot1sMstpInstancePortDesignatedRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The unique Bridge Identifier of the Bridge
+         recorded as the Root in the Configuration BPDUs
+         transmitted by the Designated Bridge for the
+         segment to which the port is attached."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.4"
+    ::= { rldot1sMstpInstancePortEntry 7 }
+
+rldot1sMstpInstancePortDesignatedCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The path cost of the Designated Port of the
+         segment connected to this port.  This value is
+         compared to the Root Path Cost field in received
+         bridge PDUs."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.5"
+    ::= { rldot1sMstpInstancePortEntry 8 }
+
+rldot1sMstpInstancePortDesignatedBridge OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Bridge Identifier of the bridge which this
+         port considers to be the Designated Bridge for
+         this port's segment."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.6"
+    ::= { rldot1sMstpInstancePortEntry 9 }
+
+rldot1sMstpInstancePortDesignatedPort OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Port Identifier of the port on the Designated
+         Bridge for this port's segment."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.7"
+    ::= { rldot1sMstpInstancePortEntry 10 }
+
+rldot1sMstpInstancePortForwardTransitions OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of times this port has transitioned
+         from the Learning state to the Forwarding state."
+    ::= { rldot1sMstpInstancePortEntry 11 }
+
+rldot1sMStpInstancePortAdminPathCost OBJECT-TYPE
+    SYNTAX      INTEGER (0..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned value for the contribution
+         of this port to the path cost of paths towards the spanning
+         tree root.
+
+         Writing a value of '0' assigns the automatically calculated
+         default Path Cost value to the port.  If the default Path
+         Cost is being used, this object returns '0' when read.
+
+         This complements the object dot1dStpPortPathCost, which
+         returns the operational value of the path cost."
+    REFERENCE
+        "IEEE 802.1D-1998: Section 8.5.5.3"
+    ::= { rldot1sMstpInstancePortEntry 12 }
+
+rldot1sMStpInstancePortRole OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    unknown(0),
+                    disabled(1),
+                    alternate(2),
+                    backup(3),
+                    root(4),
+                    designated(5),
+                    master(6)
+                }
+
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specify the role of this this port."
+    REFERENCE
+        ""
+    ::= { rldot1sMstpInstancePortEntry 13 }
+
+rldot1sMstpMaxHopes OBJECT-TYPE
+    SYNTAX  INTEGER (1..40)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Max number of hopes that an MST BPDU will travel inside a region."
+    DEFVAL { 20 }
+    ::= { rldot1sMstp 3 }
+
+rldot1sMstpConfigurationName OBJECT-TYPE
+    SYNTAX  SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The active configuration name as will be caried in MST BPDU's."
+    ::= { rldot1sMstp 4 }
+
+rldot1sMstpRevisionLevel OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The active revision level."
+    DEFVAL { 0 }
+    ::= { rldot1sMstp 5 }
+
+--
+-- rldot1sMstpVlanTable
+--
+rldot1sMstpVlanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1sMstpVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains information about the alocation of vlans to groups."
+    ::= { rldot1sMstp 6 }
+
+rldot1sMstpVlanEntry OBJECT-TYPE
+    SYNTAX  Rldot1sMstpVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every vlan
+         about the group it belongs to."
+    INDEX   { rldot1sMstpVlan }
+    ::= { rldot1sMstpVlanTable 1 }
+
+Rldot1sMstpVlanEntry ::= SEQUENCE {
+      rldot1sMstpVlan              INTEGER,
+      rldot1sMstpGroup             INTEGER,
+      rldot1sMstpPendingGroup      INTEGER
+
+}
+
+rldot1sMstpVlan OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The vlan number of the vlan for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1s/D11-2001: Section 13.7"
+    ::= { rldot1sMstpVlanEntry 1 }
+
+rldot1sMstpGroup OBJECT-TYPE
+    SYNTAX  INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifid the active group number this vlan belonges to."
+    REFERENCE
+        ""
+    DEFVAL { 0 }
+    ::= { rldot1sMstpVlanEntry 2 }
+
+rldot1sMstpPendingGroup OBJECT-TYPE
+    SYNTAX  INTEGER (0..64)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifid the pending group number this vlan belonges to."
+    REFERENCE
+        ""
+    DEFVAL { 0 }
+    ::= { rldot1sMstpVlanEntry 3 }
+
+--
+-- rldot1sMstpExtPortTable
+--
+rldot1sMstpExtPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1sMstpExtPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains MSTP information about ports of the CIST."
+    ::= { rldot1sMstp 7 }
+
+rldot1sMstpExtPortEntry OBJECT-TYPE
+SYNTAX  Rldot1sMstpExtPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of information maintained by every port
+         of the CIST."
+    INDEX   { rldot1sMstpExtPortPort }
+    ::= { rldot1sMstpExtPortTable 1 }
+
+Rldot1sMstpExtPortEntry ::= SEQUENCE {
+      rldot1sMstpExtPortPort                   INTEGER,
+      rldot1sMstpExtPortInternalOperPathCost   INTEGER,
+      rldot1sMstpExtPortDesignatedRegionalRoot BridgeId,
+      rldot1sMstpExtPortDesignatedRegionalCost INTEGER,
+      rldot1sMstpExtPortBoundary               TruthValue,
+      rldot1sMstpExtPortInternalAdminPathCost  INTEGER
+
+}
+rldot1sMstpExtPortPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..4096)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains Spanning Tree Protocol management
+         information."
+    REFERENCE
+         "IEEE 802.1t/D2-1999: Section 9.2.6"
+    ::= { rldot1sMstpExtPortEntry 1 }
+
+rldot1sMstpExtPortInternalOperPathCost OBJECT-TYPE
+    SYNTAX  INTEGER (1..200000000)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The contribution of this port to the path cost of
+         paths towards the spanning tree regional root which
+         include this port.  802.1S-2002 recommends that the
+         default value of this parameter be in inverse
+         proportion to the speed of the attached LAN."
+    ::= { rldot1sMstpExtPortEntry 2 }
+
+rldot1sMstpExtPortDesignatedRegionalRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The unique Bridge Identifier of the Bridge
+         recorded as the Root in the Configuration BPDUs
+         transmitted by the Designated Bridge for the
+         segment to which the port is attached."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.4"
+    ::= { rldot1sMstpExtPortEntry 3 }
+
+rldot1sMstpExtPortDesignatedRegionalCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The regional path cost of the Designated Port of the
+         segment connected to this port.  This value is
+         compared to the Root Path Cost field in received
+         bridge PDUs."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.5"
+    ::= { rldot1sMstpExtPortEntry 4 }
+
+rldot1sMstpExtPortBoundary OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indication if the port is conented to to a lan segment
+         outside or inside the region."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.5"
+    ::= { rldot1sMstpExtPortEntry 5 }
+
+rldot1sMstpExtPortInternalAdminPathCost OBJECT-TYPE
+    SYNTAX  INTEGER (0..200000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The administratively assigned value for the contribution
+         of this port to the path cost of paths towards the spanning
+         tree root.
+
+         Writing a value of '0' assigns the automatically calculated
+         default Path Cost value to the port.  If the default Path
+         Cost is being used, this object returns '0' when read.
+
+         This complements the object dot1dStpPortPathCost, which
+         returns the operational value of the path cost."
+
+    ::= { rldot1sMstpExtPortEntry 6 }
+
+rldot1sMstpDesignatedMaxHopes OBJECT-TYPE
+    SYNTAX  INTEGER (1..40)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max number of hopes that an MST BPDU will travel inside a region."
+    ::= { rldot1sMstp 8 }
+
+rldot1sMstpRegionalRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "CIST Regional Root Identifier (13.16.4).
+            The Bridge Identifier of the current CIST Regional Root."
+    REFERENCE
+            "IEEE 802.1S-2002: Section 13.16.4"
+    ::= { rldot1sMstp 9 }
+
+rldot1sMstpRegionalRootCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The CIST path cost from the transmitting Bridge to the
+            CIST Regional Root."
+    REFERENCE
+            "IEEE 802.1S-2002: Section 12.8.1.1.3"
+    ::= { rldot1sMstp 10 }
+
+rldot1sMstpPendingConfigurationName OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The pending configuration name."
+    ::= { rldot1sMstp 11 }
+
+rldot1sMstpPendingRevisionLevel OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The pending revision level."
+    DEFVAL { 0 }
+    ::= { rldot1sMstp 12 }
+
+rldot1sMstpPendingAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        copyPendingActive(1),
+        copyActivePending(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The action to be done with the pending configuration.
+         copyPendingActive - to copy the pending mst configuration to the active one.
+         copyActivePending - to copy the active mst configuration to the pending one. "
+    ::= { rldot1sMstp 13 }
+
+rldot1sMstpRemainingHops OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This count value determines the amount of hops
+         the information transmitted by this bridge can travel."
+    ::= { rldot1sMstp 14 }
+
+--
+-- rldot1sMstpInstanceVlanTable
+--
+rldot1sMstpInstanceVlanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Rldot1sMstpInstanceVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains vlan lists per MSTP instances."
+    ::= { rldot1sMstp 15 }
+
+rldot1sMstpInstanceVlanEntry OBJECT-TYPE
+    SYNTAX Rldot1sMstpInstanceVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains vlan lists per specific MSTP instance."
+    INDEX { rldot1sMstpInstanceVlanId }
+    ::= { rldot1sMstpInstanceVlanTable 1 }
+
+Rldot1sMstpInstanceVlanEntry::= SEQUENCE {
+        rldot1sMstpInstanceVlanId             INTEGER,
+        rldot1sMstpInstanceVlanId1To1024      VlanList1,
+        rldot1sMstpInstanceVlanId1025To2048   VlanList2,
+        rldot1sMstpInstanceVlanId2049To3072   VlanList3,
+        rldot1sMstpInstanceVlanId3073To4094   VlanList4
+    }
+
+rldot1sMstpInstanceVlanId OBJECT-TYPE
+    SYNTAX  INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifiy the instance number."
+    ::= { rldot1sMstpInstanceVlanEntry 1 }
+
+rldot1sMstpInstanceVlanId1To1024 OBJECT-TYPE
+    SYNTAX  VlanList1
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "first VlanId List of specific MSTP instance."
+    ::= { rldot1sMstpInstanceVlanEntry 2 }
+
+rldot1sMstpInstanceVlanId1025To2048 OBJECT-TYPE
+    SYNTAX  VlanList2
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "second VlanId List of specific MSTP instance."
+    ::= { rldot1sMstpInstanceVlanEntry 3 }
+
+rldot1sMstpInstanceVlanId2049To3072 OBJECT-TYPE
+    SYNTAX  VlanList3
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "third VlanId List of specific MSTP instance."
+    ::= { rldot1sMstpInstanceVlanEntry 4 }
+
+rldot1sMstpInstanceVlanId3073To4094 OBJECT-TYPE
+    SYNTAX  VlanList4
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "fourth VlanId List of specific MSTP instance."
+    ::= { rldot1sMstpInstanceVlanEntry 5 }
+
+rldot1dTpAgingTime  OBJECT IDENTIFIER ::= { rlpBridgeMIBObjects 7 }
+
+rldot1dTpAgingTimeMin OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The min timeout period in seconds for aging out
+         dynamically learned forwarding information."
+    REFERENCE
+        "P802.1d/D9, July 14, 1989: Section 6.7.1.1.3"
+    ::= { rldot1dTpAgingTime 1 }
+
+rldot1dTpAgingTimeMax OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The max timeout period in seconds for aging out
+         dynamically learned forwarding information."
+    REFERENCE
+        "P802.1d/D9, July 14, 1989: Section 6.7.1.1.3"
+    ::= { rldot1dTpAgingTime 2 }
+
+
+
+
+END
+

@@ -1,0 +1,1202 @@
+--========================================================
+--
+-- MIB      : IPO-PROD  Avaya Inc.
+--
+-- Version  : 1.0.26   06 Aug 2014
+--
+--========================================================
+--
+-- Copyright (c) 2003 - 2012 Avaya Inc.
+-- All Rights Reserved.
+--
+--========================================================
+IPO-PROD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    products
+        FROM AVAYAGEN-MIB;
+
+ipoProdMIB MODULE-IDENTITY
+    LAST-UPDATED    "201408060000Z" -- 06 Aug 2014
+    ORGANIZATION 	"Avaya Inc."
+    CONTACT-INFO
+        "Avaya Customer Services
+         Postal: Avaya, Inc.
+                 211 Mt Airy Rd.
+                 Basking Ridge, NJ 07920
+                 USA
+         Tel:    +1 908 953 6000
+
+         WWW:    http://www.avaya.com"
+
+    DESCRIPTION
+        "Avaya IP Office Products OID tree.
+
+         This MIB module defines the product/sysObjectID values for
+         use with Avaya IP Office family of telephone switches."
+
+    REVISION    "201408060000Z" -- 06 Aug 2014
+    DESCRIPTION
+         "Rev 1.00.26
+          J Modules are now part of IP500v2."
+
+    REVISION    "201405300000Z" -- 30 May 2014
+    DESCRIPTION
+         "Rev 1.00.25
+          Additional IOD for IP500v2 Select and 
+          IP Office Server Edition Expansion Select Mode."
+    REVISION    "201402270000Z" -- 27 Feb 2014
+    DESCRIPTION
+         "Rev 1.00.24
+          Additional IOD for IP 500 UCM V2 module"
+    REVISION    "201312100000Z" -- 10 Dec 2013
+    DESCRIPTION
+         "Rev 1.00.23
+          Update description for Unified Communications Module"
+    REVISION    "201207230000Z" -- 23 July 2012
+    DESCRIPTION
+         "Rev 1.00.22
+         Additional IOD for IP 500 ATM4U V2 module."
+    REVISION    "201203260000Z" -- 26 March 2012
+    DESCRIPTION
+         "Rev 1.00.21
+         Additional IOD for IP 500 VCM module."
+    REVISION    "201111141128Z" -- 14 November 2011
+    DESCRIPTION
+        "Rev 1.00.20
+        Additional OID for IP Office Server Edition Expansion Mode."
+    REVISION    "201108111658Z" -- 11 August 2011
+    DESCRIPTION
+        "Rev 1.00.19
+        Added new C110 UCP Module."
+    REVISION    "201102101457Z" -- 10 February 2011
+    DESCRIPTION
+        "Rev 1.00.18
+        Added new OID for TCM 8 card."
+    REVISION    "201102011457Z" -- 01 February 2011
+    DESCRIPTION
+        "Rev 1.00.17
+        Added new OID for DS30A  Expansion module."
+    REVISION    "201101111630Z" -- 11 January 2011
+    DESCRIPTION
+        "Rev 1.00.16
+        Avaya Inside OIDs removed.
+        Additional OIDs added for Norstar, Branch and Quick IP Office
+        modes."
+    REVISION    "201006091515Z" -- 09 June 2010
+    DESCRIPTION
+        "Rev 1.00.15
+        Added new OID for Combo Card VCM sub module."
+    REVISION    "201004281626Z" -- 28 April 2010
+    DESCRIPTION
+        "Rev 1.00.14
+        Added new OID for Avaya Inside."
+    REVISION    "200908261713Z" -- 26 August 2009
+    DESCRIPTION
+        "Rev 1.00.13
+        Added new OIDs for IP500v2, combo card and ETR card."
+    REVISION    "200908051048Z" -- 05 August 2009
+    DESCRIPTION
+        "Rev 1.00.12
+        Added a new OID for IP500 4 Port Expansion Module."
+    REVISION    "200608161100Z" -- 16 August 2006
+    DESCRIPTION
+        "Rev 1.00.11
+        Corrected PRI module defined for IP500 and revised description
+        for Ethernet wAN link ports to make common across units."
+    REVISION    "200608021752Z" -- 02 August 2006
+    DESCRIPTION
+        "Rev 1.00.10
+        Added a new OID for Universal PRI module and revised
+        descriptions for LAN ports used on IP412."
+    REVISION    "200607132220Z" -- 13 July 2006
+    DESCRIPTION
+        "Rev 1.00.09
+        Added further OIDs for missing modules.
+        Replaced references to IP408 with IP500"
+    REVISION    "200606101416Z" -- 10 June 2006
+    DESCRIPTION
+        "Rev 1.00.08
+        Added new OIDs for IP500 chassis and plug-in cards."
+    REVISION    "200606071014Z" -- 07 June 2006
+    DESCRIPTION
+        "Rev 1.00.07
+        Added new OID for generic IP Office License dongle."
+    REVISION    "200605241620Z" -- 24 May 2006
+    DESCRIPTION
+        "Rev 1.00.06
+        Added new OID for revised variant of ATM4U
+        trunk module."
+    REVISION    "200605241615Z" -- 24 May 2006
+    DESCRIPTION
+        "Rev 1.00.05
+        Corrected descriptions of E1 R2 modules/ports."
+    REVISION    "200604040000Z" -- 04 April 2006
+    DESCRIPTION
+        "Rev 1.00.04
+        Added new OIDs for revised (v2) variants of DS and POTS
+        expansion modules."
+    REVISION    "200408060000Z" -- 06 August 2004
+    DESCRIPTION
+        "Rev 1.00.03
+        Added SOG family products."
+    REVISION 	"200403030000Z" -- 03 March 2004
+    DESCRIPTION
+        "Rev 1.00.02
+        Revised for external publication."
+    REVISION 	"200401060000Z" -- 06 January 2004
+    DESCRIPTION
+        "Rev 1.0.1
+        New OIDs added for revised 403 and 406 variants."
+    REVISION 	"200310100000Z" -- 10 October 2003
+    DESCRIPTION
+        "Rev 1.0.0
+        The first published version of this MIB module."
+    ::= { products 2 }
+
+-- Product Groups
+
+ipoProdControllers      OBJECT IDENTIFIER ::= { ipoProdMIB 1 }
+ipoProdExpModules       OBJECT IDENTIFIER ::= { ipoProdMIB 2 }
+ipoProdSlots            OBJECT IDENTIFIER ::= { ipoProdMIB 3 }
+ipoProdSlotModules      OBJECT IDENTIFIER ::= { ipoProdMIB 4 }
+ipoProdPorts            OBJECT IDENTIFIER ::= { ipoProdMIB 5 }
+ipoProdDongleModules    OBJECT IDENTIFIER ::= { ipoProdMIB 6 }
+ipoProdSubModules       OBJECT IDENTIFIER ::= { ipoProdMIB 7 }
+ipoProdUCModules        OBJECT IDENTIFIER ::= { ipoProdMIB 8 }
+
+-- Controller Product families
+
+ipoProd401Family   OBJECT IDENTIFIER ::= { ipoProdControllers 1 }
+ipoProd403Family   OBJECT IDENTIFIER ::= { ipoProdControllers 2 }
+ipoProd406Family   OBJECT IDENTIFIER ::= { ipoProdControllers 3 }
+ipoProd412Family   OBJECT IDENTIFIER ::= { ipoProdControllers 4 }
+ipoProdSmallOfficeEditionFamily OBJECT IDENTIFIER ::= { ipoProdControllers 5 }
+ipoProdR403Family  OBJECT IDENTIFIER ::= { ipoProdControllers 6 }
+ipoProdR406Family  OBJECT IDENTIFIER ::= { ipoProdControllers 7 }
+ipoProdSogFamily   OBJECT IDENTIFIER ::= { ipoProdControllers 8 }
+ipoProd500Family   OBJECT IDENTIFIER ::= { ipoProdControllers 9 }
+ipoProd500v2Family OBJECT IDENTIFIER ::= { ipoProdControllers 10 }
+
+-- IP Office 401 Family units
+
+ipoProd401DT2    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP401
+	Compact Office DT 2 Telephone Switch"
+    ::= { ipoProd401Family 1 }
+
+ipoProd401DT4    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP401
+	Compact Office DT 4 Telephone Switch"
+    ::= { ipoProd401Family 2 }
+
+ipoProd401DS2    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP401
+	Compact Office DS 2 Telephone Switch"
+    ::= { ipoProd401Family 3 }
+
+ipoProd401DS4    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP401
+	Compact Office DS 4 Telephone Switch"
+    ::= { ipoProd401Family 4 }
+
+-- IP Office 403 Family units
+
+ipoProd403DT    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP403 DT
+	 Office Platform Telephone Switch Controller Unit"
+    ::= { ipoProd403Family 1 }
+
+ipoProd403DS    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP403 DS
+	 Office Platform Telephone Switch Controller Unit"
+    ::= { ipoProd403Family 2 }
+
+-- IP Office 406 Family units
+
+ipoProd406    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP406
+	 Office Platform Telephone Switch Controller Unit"
+    ::= { ipoProd406Family 1 }
+
+-- IP Office 412 Family units
+
+ipoProd412    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP412
+	Office Platform Telephone Switch Controller Unit"
+    ::= { ipoProd412Family 1 }
+
+-- IP Office - Small Office Edition Family units
+
+ipoProdSmallOfficeEditionPOTS4  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office -
+	Small Office Edition Telephone Switch POTS 4"
+    ::= { ipoProdSmallOfficeEditionFamily 1 }
+
+ipoProdSmallOfficeEditionPOTS8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office -
+	Small Office Edition Telephone Switch POTS 8"
+    ::= { ipoProdSmallOfficeEditionFamily 2 }
+
+ipoProdSmallOfficeEditionDT8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office -
+	Small Office Edition Telephone Switch DT 8"
+    ::= { ipoProdSmallOfficeEditionFamily 3 }
+
+ipoProdSmallOfficeEditionDS8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office -
+	Small Office Edition Telephone Switch DS 8"
+    ::= { ipoProdSmallOfficeEditionFamily 4 }
+
+-- IP Office Revised 403 Family units
+
+ipoProdR403DT    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised IP403 DT
+	 Office Platform Telephone Switch Controller Unit"
+    ::= { ipoProdR403Family 1 }
+
+ipoProdR403DS    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised IP403 DS
+	 Office Platform Telephone Switch Controller Unit"
+    ::= { ipoProdR403Family 2 }
+
+-- IP Office Revised 406 Family units
+
+ipoProdR406    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised IP406
+	 Office Platform Telephone Switch Controller Unit (2 POTs, no DS)"
+    ::= { ipoProdR406Family 1 }
+
+ipoProdR406DT    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised IP406
+	 Office Platform Telephone Switch Controller Unit (2 POTs, 8 DT)"
+    ::= { ipoProdR406Family 2 }
+
+ipoProdR406DS    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised IP406
+	 Office Platform Telephone Switch Controller Unit (2 POTs, 8 DS)"
+    ::= { ipoProdR406Family 3 }
+
+ipoProdR406Full    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised IP406
+	 Office Platform Telephone Switch Controller Unit (Full version)"
+    ::= { ipoProdR406Family 4 }
+
+-- IP Office - SOG Family units
+
+ipoProdSogSOEPOTS4  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for the Avaya IP Office -
+        Small Office Edition Telephone Switch POTS 4"
+    ::= { ipoProdSogFamily 1 }
+
+ipoProdSogSOEPOTS8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for the Avaya IP Office -
+        Small Office Edition Telephone Switch POTS 8"
+    ::= { ipoProdSogFamily 2 }
+
+ipoProdSogSOEDT8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for the Avaya IP Office -
+        Small Office Edition Telephone Switch DT 8"
+    ::= { ipoProdSogFamily 3 }
+
+ipoProdSogSOEDS8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for the Avaya IP Office -
+        Small Office Edition Telephone Switch DS 8"
+    ::= { ipoProdSogFamily 4 }
+
+-- IP Office 500 Family units
+
+ipoProd500Slot4    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500
+	 Office Platform Telephone Switch 4 Slot Controller Unit"
+    ::= { ipoProd500Family 1 }
+
+ipoProd500Slot8    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500
+	 Office Platform Telephone Switch 8 Slot Controller Unit"
+    ::= { ipoProd500Family 2 }
+
+-- IP Office 500v2 Family units
+
+ipoProd500v2IPOffice    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in IP Office Mode"
+    ::= { ipoProd500v2Family 1 }
+
+ipoProd500v2Partner    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in Partner Mode"
+    ::= { ipoProd500v2Family 2 }
+
+ipoProd500v2Norstar    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in Norstar Mode"
+    ::= { ipoProd500v2Family 3 }
+
+ipoProd500v2Branch    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in Branch Gateway Mode"
+    ::= { ipoProd500v2Family 4 }
+
+ipoProd500v2Quick    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in Quick Mode"
+    ::= { ipoProd500v2Family 5 }
+
+ipoProd500v2SEditionExpansion    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in Server Edition Expansion Mode"
+    ::= { ipoProd500v2Family 6 }
+
+ipoProd500v2IPOfficeSelect    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in IP Office Select Mode"
+    ::= { ipoProd500v2Family 7 }
+
+ipoProd500v2SEditionExpansionSelect    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500v2
+	 Office Platform Telephone Switch in Server Edition Expansion Select Mode"
+    ::= { ipoProd500v2Family 8 }
+    
+-- Expansion Modules
+
+ipoProdExpModDT       OBJECT IDENTIFIER ::= { ipoProdExpModules 1 }
+ipoProdExpModDS       OBJECT IDENTIFIER ::= { ipoProdExpModules 2 }
+ipoProdExpModPhone    OBJECT IDENTIFIER ::= { ipoProdExpModules 3 }
+ipoProdExpModS0       OBJECT IDENTIFIER ::= { ipoProdExpModules 4 }
+ipoProdExpModAnalog   OBJECT IDENTIFIER ::= { ipoProdExpModules 5 }
+ipoProdExpModWAN      OBJECT IDENTIFIER ::= { ipoProdExpModules 6 }
+ipoProdExpModRDS      OBJECT IDENTIFIER ::= { ipoProdExpModules 7 }
+ipoProdExpModRPhone   OBJECT IDENTIFIER ::= { ipoProdExpModules 8 }
+ipoProdExpModDSA      OBJECT IDENTIFIER ::= { ipoProdExpModules 9 }
+
+ipoProdExpModDT16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Digital
+	Terminal 16"
+    ::= { ipoProdExpModDT 1 }
+
+ipoProdExpModDT30  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Digital
+	Terminal 30"
+    ::= { ipoProdExpModDT 2 }
+
+ipoProdExpModDS16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Digital
+	Station 16"
+    ::= { ipoProdExpModDS 1 }
+
+ipoProdExpModDS30  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Digital
+	Station 30"
+    ::= { ipoProdExpModDS 2 }
+
+ipoProdExpModPhone8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Phone 8"
+    ::= { ipoProdExpModPhone 1 }
+
+ipoProdExpModPhone16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Phone 16"
+    ::= { ipoProdExpModPhone 2 }
+
+ipoProdExpModPhone30  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Phone 30"
+    ::= { ipoProdExpModPhone 3 }
+
+ipoProdExpModS08  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office S0 8"
+    ::= { ipoProdExpModS0 1 }
+
+ipoProdExpModS016  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office S0 16"
+    ::= { ipoProdExpModS0 2 }
+
+ipoProdExpModATM8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Analog Trunk 16"
+    ::= { ipoProdExpModAnalog 1 }
+
+ipoProdExpModATM16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Analog Trunk 16"
+    ::= { ipoProdExpModAnalog 2 }
+
+ipoProdExpModWAN3  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office WAN 3"
+    ::= { ipoProdExpModWAN 1 }
+
+ipoProdExpModRDS16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(V2) Digital Station 16"
+    ::= { ipoProdExpModRDS 1 }
+
+ipoProdExpModRDS30  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(V2) Digital Station 30"
+    ::= { ipoProdExpModRDS 2 }
+
+ipoProdExpModRPhone8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(V2) Phone 8"
+    ::= { ipoProdExpModRPhone 1 }
+
+ipoProdExpModRPhone16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(V2) Phone 16"
+    ::= { ipoProdExpModRPhone 2 }
+
+ipoProdExpModRPhone30  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(V2) Phone 30"
+    ::= { ipoProdExpModRPhone 3 }
+
+ipoProdExpModDSA16RJ21  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(Adaptive) Digital Station 16 RJ21"
+    ::= { ipoProdExpModDSA 1 }
+
+ipoProdExpModDSA30RJ21  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(Adaptive) Digital Station 30 RJ21"
+    ::= { ipoProdExpModDSA 2 }
+
+ipoProdExpModDSA16RJ45  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(Adaptive) Digital Station 16 RJ45"
+    ::= { ipoProdExpModDSA 3 }
+
+ipoProdExpModDSA30RJ45  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Revised
+	(Adaptive) Digital Station 30 RJ45"
+    ::= { ipoProdExpModDSA 4 }
+
+-- Slots
+
+ipoProdSlotVCM  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office VCM Slot"
+    ::= { ipoProdSlots 1 }
+
+ipoProdSlotModems  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Modem Slot"
+    ::= { ipoProdSlots 2 }
+
+ipoProdSlotVmailMemory  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP401
+	Voicemail Memory Slot"
+    ::= { ipoProdSlots 3 }
+
+ipoProdSlotWAN  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP401 WAN
+	Slot"
+    ::= { ipoProdSlots 4 }
+
+ipoProdSlotPCCard  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office PC-Card
+	Slot"
+    ::= { ipoProdSlots 5 }
+
+ipoProdSlotTrunks  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Trunk
+	Slot"
+    ::= { ipoProdSlots 6 }
+
+ipoProdSlotExpansion  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Expansion
+	Slot"
+    ::= { ipoProdSlots 7 }
+
+ipoProdSlot500Generic  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500
+	Generic Expansion Slot"
+    ::= { ipoProdSlots 8 }
+
+ipoProdSlotMezzanine  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500
+	Mezzanine Slot"
+    ::= { ipoProdSlots 9 }
+
+ipoProdSlotCarrierVCM  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500
+	Carrier Module VCM Slot"
+    ::= { ipoProdSlots 10 }
+
+ipoProdSlotCarrierTrunk  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office IP500
+	Carrier Module Trunk Slot"
+    ::= { ipoProdSlots 11 }
+
+
+-- Slot Module Groups
+
+ipoProdIntegralModules  OBJECT IDENTIFIER ::= { ipoProdSlotModules 1 }
+ipoProdTrunkModules     OBJECT IDENTIFIER ::= { ipoProdSlotModules 2 }
+ipoProdPCCardModules    OBJECT IDENTIFIER ::= { ipoProdSlotModules 3 }
+ipoProdCarrierModules   OBJECT IDENTIFIER ::= { ipoProdSlotModules 4 }
+ipoProdPhonePortModules OBJECT IDENTIFIER ::= { ipoProdSlotModules 5 }
+ipoProdVCMModules       OBJECT IDENTIFIER ::= { ipoProdSlotModules 6 }
+ipoProdExpansionModules OBJECT IDENTIFIER ::= { ipoProdSlotModules 7 }
+ipoProdUCPModules         OBJECT IDENTIFIER ::= { ipoProdSlotModules 8 }
+
+-- Integral Modules
+
+ipoProdIntModVCM        OBJECT IDENTIFIER ::= { ipoProdIntegralModules 1 }
+ipoProdIntModModem      OBJECT IDENTIFIER ::= { ipoProdIntegralModules 2 }
+ipoProdIntModWAN        OBJECT IDENTIFIER ::= { ipoProdIntegralModules 3 }
+ipoProdIntModMem        OBJECT IDENTIFIER ::= { ipoProdIntegralModules 4 }
+
+ipoProdIntModVCM3  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 3 Module"
+    ::= { ipoProdIntModVCM 1 }
+
+ipoProdIntModVCM5  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 5 Module"
+    ::= { ipoProdIntModVCM 2 }
+
+ipoProdIntModVCM6  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 6 Module"
+    ::= { ipoProdIntModVCM 3 }
+
+ipoProdIntModVCM8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 8
+	Module."
+    ::= { ipoProdIntModVCM 4 }
+
+ipoProdIntModVCM10  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 10 Module"
+    ::= { ipoProdIntModVCM 5 }
+
+ipoProdIntModVCM12  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 12 Module"
+    ::= { ipoProdIntModVCM 6 }
+
+ipoProdIntModVCM16  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 16
+	Module."
+    ::= { ipoProdIntModVCM 7 }
+
+ipoProdIntModVCM20  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 20 Module"
+    ::= { ipoProdIntModVCM 8 }
+
+ipoProdIntModVCM30  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 30
+	Module."
+    ::= { ipoProdIntModVCM 9 }
+
+ipoProdIntModVCM24  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 24
+	Module."
+    ::= { ipoProdIntModVCM 10 }
+
+ipoProdIntModVCM4  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office VCM 4
+	Module."
+    ::= { ipoProdIntModVCM 11 }
+
+ipoProdIntModModemDual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Dual Modem Module"
+    ::= { ipoProdIntModModem 1 }
+
+ipoProdIntModModemMulti  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Multi Modem Module"
+    ::= { ipoProdIntModModem 2 }
+
+ipoProdIntModWANModule  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office WAN Module"
+    ::= { ipoProdIntModWAN 1 }
+
+ipoProdIntModMemVmail  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Voicemail
+	Memory Module"
+    ::= { ipoProdIntModMem 1 }
+
+
+-- Trunk Modules
+
+ipoProdTrunkAnalogQuad  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Quad Analog
+	Trunk Module"
+    ::= { ipoProdTrunkModules 1 }
+
+ipoProdTrunkBRIQuad  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Quad BRI
+	Trunk Module"
+    ::= { ipoProdTrunkModules 2 }
+
+ipoProdTrunkE1PRISingle  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Single PRI 30
+	E1 Trunk Module"
+    ::= { ipoProdTrunkModules 3 }
+
+ipoProdTrunkE1PRIDual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Dual PRI 60
+	E1 Trunk Module"
+    ::= { ipoProdTrunkModules 4 }
+
+ipoProdTrunkJ1PRISingle  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+      Single PRI 24J Trunk Module"
+    ::= { ipoProdTrunkModules 5 }
+
+ipoProdTrunkJ1PRIDual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500 
+      Dual PRI 48J Trunk Module"
+    ::= { ipoProdTrunkModules 6 }
+
+ipoProdTrunkT1PRISingle  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Single PRI 24
+	T1 Trunk Module"
+    ::= { ipoProdTrunkModules 7 }
+
+ipoProdTrunkT1PRIDual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Dual PRI 48
+	T1 Trunk Module"
+    ::= { ipoProdTrunkModules 8 }
+
+ipoProdTrunkIndex  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Index Module"
+    ::= { ipoProdTrunkModules 9 }
+
+ipoProdTrunkR2Single  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Single E1 R2 30
+	Trunk Module"
+    ::= { ipoProdTrunkModules 10 }
+
+ipoProdTrunkR2Dual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Dual E1 R2 60
+	Trunk Module"
+    ::= { ipoProdTrunkModules 11 }
+
+ipoProdTrunkR2CoAxSingle  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Single E1 R2
+	CO-AX 30 Trunk Module"
+    ::= { ipoProdTrunkModules 12 }
+
+ipoProdTrunkR2CoAxDual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Single E1 R2
+	CO-AX 30 Trunk Module"
+    ::= { ipoProdTrunkModules 13 }
+
+ipoProdTrunkRAnalogQuad  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Revised Quad
+	Analog Trunk Module"
+    ::= { ipoProdTrunkModules 14 }
+
+ipoProdTrunk500AnalogQuad  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Quad Analog Trunk Module"
+    ::= { ipoProdTrunkModules 15 }
+
+ipoProdTrunk500BRIDual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Dual BRI Trunk Module"
+    ::= { ipoProdTrunkModules 16 }
+
+ipoProdTrunk500BRIQuad  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Quad BRI Trunk Module"
+    ::= { ipoProdTrunkModules 17 }
+
+ipoProdTrunkUniversalPRIDS0Single  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Single Universal PRI (DS0) Trunk Module
+        24 Channels in T1 configuration
+        30 Channels in E1 configuration"
+    ::= { ipoProdTrunkModules 18 }
+
+ipoProdTrunkUniversalPRIDS0Dual  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Single Universal PRI (DS0) Trunk Module
+        48 Channels across two ports in T1 configuration
+        60 Channels across two ports in E1 configuration"
+    ::= { ipoProdTrunkModules 19 }
+
+ipoProdTrunk500AnalogQuadV2  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Quad Analog Trunk Module V2"
+    ::= { ipoProdTrunkModules 20 }
+
+
+-- PC-Card Modules
+
+ipoProdPCCardMemVmail  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office PC-Card
+	Voicemail Memory Module"
+    ::= { ipoProdPCCardModules 1 }
+
+ipoProdPCCardWLAN     OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office PC-Card
+	WLAN Module"
+    ::= { ipoProdPCCardModules 2 }
+
+-- Carrier Modules
+
+ipoProdCarrier  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Carrier Module for older IP Office plug-in modules"
+    ::= { ipoProdCarrierModules 1 }
+
+-- Phone Port Modules
+
+ipoProdPhonePortPOT8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	POT 8 Phone Port Module"
+    ::= { ipoProdPhonePortModules 1 }
+
+ipoProdPhonePortDS8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	Digital Station 8 Phone Port Module"
+    ::= { ipoProdPhonePortModules 2 }
+
+ipoProdPhonePortPOT2  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500
+	POT 2 Phone Port Module"
+    ::= { ipoProdPhonePortModules 3 }
+
+ipoProdPhonePortCombo  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "The authoritative reference for Avaya IP Office IP500v2 Combo
+        Phone Port and trunk Module which provides a 10 channel VCM, 6
+        Digital Station Phone Ports, 2 POT Phone Ports and either a 4
+        port ATM trunk module or a 4 port BRI module."
+    ::= { ipoProdPhonePortModules 4 }
+
+ipoProdPhonePortETR6  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500v2
+	ETR 6 Phone Port Module"
+    ::= { ipoProdPhonePortModules 5 }
+
+ipoProdPhonePortTCM8  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office IP500v2
+	TCM 8 Phone Port Module"
+    ::= { ipoProdPhonePortModules 6 }
+
+-- VCM Modules
+
+ipoProdVCMMod32  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office DSP based
+	VCM 32 Module."
+    ::= { ipoProdVCMModules 1 }
+
+ipoProdVCMMod64  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office DSP based
+	VCM 64 Module."
+    ::= { ipoProdVCMModules 2 }
+
+ipoProdVCMMod32V2  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office DSP based
+	VCM 32 V2 Module."
+    ::= { ipoProdVCMModules 3 }
+
+ipoProdVCMMod64V2  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office DSP based
+	VCM 64 V2 Module."
+    ::= { ipoProdVCMModules 4 }
+
+-- Expansion Modules
+
+ipoProdExpMod4Port  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office 4 Port
+	Expansion Module."
+    ::= { ipoProdExpansionModules 1 }
+
+-- Ports
+
+ipoProdPortBRI  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office BRI Ports"
+    ::= { ipoProdPorts 1 }
+
+ipoProdPortE1PRI  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office E1 PRI Ports"
+    ::= { ipoProdPorts 2 }
+
+ipoProdPortJ1PRI  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office J1 PRI Ports"
+    ::= { ipoProdPorts 3 }
+
+ipoProdPortT1PRI  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office T1 PRI Ports"
+    ::= { ipoProdPorts 4 }
+
+ipoProdPortR2  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office E1 R2 Ports"
+    ::= { ipoProdPorts 5 }
+
+ipoProdPortR2CoAx  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office E1 R2 CO-AX
+	Ports"
+    ::= { ipoProdPorts 6 }
+
+ipoProdPortWAN  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office WAN Ports"
+    ::= { ipoProdPorts 7 }
+
+ipoProdPortAnalog  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Analog Ports"
+    ::= { ipoProdPorts 8 }
+
+ipoProdPortPower  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office Power Port"
+    ::= { ipoProdPorts 9 }
+
+ipoProdPortDT  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office DT Phone Ports"
+    ::= { ipoProdPorts 10 }
+
+ipoProdPortDS  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office DS Phone Ports"
+    ::= { ipoProdPorts 11 }
+
+ipoProdPortPOT  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office POT Ports"
+    ::= { ipoProdPorts 12 }
+
+ipoProdPortS0  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office ISDN BRI S-Bus Ports"
+    ::= { ipoProdPorts 13 }
+
+ipoProdPortLAN  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office LAN
+	(10BASE-T/100BASE-TX) Ports"
+    ::= { ipoProdPorts 14 }
+
+ipoProdPortWLAN  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office LAN
+	WLAN (802.11) Ports"
+    ::= { ipoProdPorts 15 }
+
+ipoProdPortDTE  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office DTE Port"
+    ::= { ipoProdPorts 16 }
+
+ipoProdPortUSB  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office USB Port"
+    ::= { ipoProdPorts 17 }
+
+ipoProdPortAudio  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Audio I/P Port"
+    ::= { ipoProdPorts 18 }
+
+ipoProdPortEtherWANLink  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office Fast
+	Ethernet (10BASE-T/100BASE-TX) WAN Link Port"
+    ::= { ipoProdPorts 19 }
+
+ipoProdPortExtOP  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office - Small
+	Office Edition Telephone Switch Ethernet Ext O/P Port"
+    ::= { ipoProdPorts 20 }
+
+ipoProdPortNet1  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office
+	Fast Ethernet (10BASE-T/100BASE-TX) Network 1 Port"
+    ::= { ipoProdPorts 21 }
+
+ipoProdPortNet2  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office
+	Fast Ethernet (10BASE-T/100BASE-TX) Network 2 Port"
+    ::= { ipoProdPorts 22 }
+
+ipoProdGenericDongle    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the Avaya IP Office License
+	Dongle - A single representation for three dongle types,
+	Parallel, Serial and USB. The Parallel and USB ones not truly
+	connected directly to the IP Office but the managing PC."
+    ::= { ipoProdDongleModules 1 }
+
+ipoProdSubModVCM10    OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for the 10 channel VCM sub module
+	resident on the Avaya IP Office IP500v2 Combo Phone Port and
+	trunk Module."
+    ::= { ipoProdSubModules 1 }
+
+
+ -- Unified Communications Module
+
+ipoProdC110UCM OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office
+	Unified Communications Module. model C110"
+    ::= { ipoProdUCModules 1 }
+    
+ipoProdC110UCMV2 OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+	"The authoritative reference for Avaya IP Office
+	Unified Communications Module V2. model C110"
+    ::= { ipoProdUCModules 2 }
+
+END

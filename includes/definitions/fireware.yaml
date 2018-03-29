@@ -1,0 +1,12 @@
+os: fireware
+text: 'Watchguard Fireware'
+type: firewall
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+icon: watchguard
+group: watchguard
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3097.1.4
+        - .1.3.6.1.4.1.3097.1.5

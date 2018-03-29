@@ -1,0 +1,568 @@
+CISCOSB-SECURITY-SUITE DEFINITIONS ::= BEGIN
+
+-- Version:    7.42_00
+-- Date:       24 JAN 2006
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,Counter32,
+    Gauge32, Unsigned32, IpAddress, TimeTicks     FROM SNMPv2-SMI
+    InterfaceIndexOrZero, InterfaceIndex,ifIndex  FROM IF-MIB
+    TEXTUAL-CONVENTION,TruthValue, RowStatus,
+    RowPointer, DisplayString                     FROM SNMPv2-TC
+    Percents,switch001                            FROM CISCOSB-MIB
+    PortList                                      FROM Q-BRIDGE-MIB;
+
+
+rlSecuritySuiteMib MODULE-IDENTITY
+        LAST-UPDATED "200604080000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for blocking attacks
+                such as DoS(=Denial Of Service), SYN and well known viruses Attacks
+                in CISCOSB devices."
+        REVISION "200601090000Z"
+        DESCRIPTION
+                "Add per port dos attack table suport
+                rlSecuritySuiteDenyTypesTable ,rlSecuritySuiteDoSSynAttackTable."
+        ::= { switch001  120}
+
+RlsecuritySuiteGlobalEnableType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the operating modes of the security-suite"
+    SYNTAX INTEGER {
+        enable-global-rules-only(1),
+        enable-all-rules-types(2),
+        disable(3)
+    }
+
+RlSecuritySuiteKnownDosAttackType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies well-known DoS attack"
+    SYNTAX INTEGER {
+        stacheldraht(1),
+        invasor-Trojan(2),
+        back-orifice-Trojan(3)
+    }
+
+RlSecuritySuiteKnownDosAttackProtocolType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies protocol type of the well-known DoS attack"
+    SYNTAX INTEGER {
+        tcp(1),
+        upd(2)
+    }
+
+RlSecuritySuiteAllMartianEntryType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies Martian-address origin: pre-defined (reserved) or statically configured"
+    SYNTAX INTEGER {
+        reserved(1),
+        static(2)
+    }
+
+RlSecuritySuiteDenyAttackType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the deny attack types"
+    SYNTAX INTEGER {
+        syn(1),
+        icmp-echo-request(2),
+        fragmented(3)
+    }
+
+RlSecuritySuiteDenySynFinTcp ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the dropping SYN, FIN flags enabled TCP packets status"
+    SYNTAX INTEGER {
+        deny(1),
+        permit(2)
+    }
+
+RlSecuritySuiteSynProtectionMode ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the TCP SYN attack protection mode ."
+    SYNTAX INTEGER {
+        disabled(1),
+        report(2),
+        block(3)
+    }
+
+RlSecuritySuiteSynProtectionPortMode  ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the TCP SYN attack protection mode ."
+    SYNTAX INTEGER {
+        normal(1),
+        attacked(2),
+        blocked(3)
+    }
+
+rlSecuritySuiteGlobalEnable OBJECT-TYPE
+ SYNTAX     RlsecuritySuiteGlobalEnableType
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally enables/disables the DoS attack Suite. "
+    ::= { rlSecuritySuiteMib 1 }
+
+rlSecuritySuiteKnownDoSAttacksTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteKnownDoSAttacksEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table enables/disable well-know DoS attacks,
+        applied globally to all ifIndexes."
+    ::= { rlSecuritySuiteMib 2 }
+
+rlSecuritySuiteKnownDoSAttacksEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteKnownDoSAttacksEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes one well known DoS attack address"
+    INDEX { rlSecuritySuiteKnownDoSAttack}
+    ::= { rlSecuritySuiteKnownDoSAttacksTable 1 }
+
+RlSecuritySuiteKnownDoSAttacksEntry::= SEQUENCE {
+    rlSecuritySuiteKnownDoSAttack          RlSecuritySuiteKnownDosAttackType,
+    rlSecuritySuiteKnownDoSAttackEnable    TruthValue
+    }
+
+rlSecuritySuiteKnownDoSAttack OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteKnownDosAttackType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A well-known DoS attack to enable"
+    ::= { rlSecuritySuiteKnownDoSAttacksEntry 1 }
+
+rlSecuritySuiteKnownDoSAttackEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Enable/Disable a well-known DoS attack "
+    ::= { rlSecuritySuiteKnownDoSAttacksEntry 2 }
+
+rlSecuritySuiteKnownDoSAttacksDetailsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteKnownDoSAttacksDetailsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This read-only table used to present the detailed attributes
+        of each well-known DoS attack. Used for presentation propose only."
+    ::= { rlSecuritySuiteMib 3 }
+
+rlSecuritySuiteKnownDoSAttacksDetailsEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteKnownDoSAttacksDetailsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes one well known DoS attack address ,"
+    INDEX { rlSecuritySuiteKnownDoSAttack}
+    ::= { rlSecuritySuiteKnownDoSAttacksDetailsTable 1 }
+
+RlSecuritySuiteKnownDoSAttacksDetailsEntry::= SEQUENCE {
+    rlSecuritySuiteKnownDoSAttackProtocl           RlSecuritySuiteKnownDosAttackProtocolType,
+    rlSecuritySuiteKnownDoSAttackSrcTcpUdpPort     INTEGER,
+    rlSecuritySuiteKnownDoSAttackDestTcpUdpPort    INTEGER
+    }
+rlSecuritySuiteKnownDoSAttackProtocl OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteKnownDosAttackProtocolType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Specifies the protocol type of the relevant well-known attack"
+    ::= { rlSecuritySuiteKnownDoSAttacksDetailsEntry 1 }
+
+rlSecuritySuiteKnownDoSAttackSrcTcpUdpPort OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Specifies the source tcp/udp port of the relevant well-known attack"
+    ::= { rlSecuritySuiteKnownDoSAttacksDetailsEntry 2 }
+
+rlSecuritySuiteKnownDoSAttackDestTcpUdpPort OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Specifies the destination tcp/udp port of the relevant well-known attack"
+    ::= { rlSecuritySuiteKnownDoSAttacksDetailsEntry 3 }
+
+rlSecuritySuiteReservedMartianAddresses OBJECT-TYPE
+   SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+     "This scalar globally enables/disables discarding of the IP
+     well-known addresses described below:
+    -------------------------------------------------------------------------------
+    |  Address block               |  Present use
+    |-------------------------------------------------------------------------------
+    |0.0.0.0/8                     |  Addresses in this block refer to source hosts
+    |(except 0.0.0.0/32            |  on 'this' network.
+    | as source address)           |
+    |------------------------------------------------------------------------------
+    |127.0.0.0/8                   | This block is assigned for use as the Internet host loop-back address.
+    |-----------------------------------------------------------------------------------------------------
+    |192.0.2.0/24                  | This block is assigned as 'TEST-NET'
+    |                              | for use in documentation and example code.
+    |---------------------------------------------------------------------------
+    |224.0.0.0/4 as source.        | This block, formerly known as the Class D address space,
+    |                              | is allocated for use in IPv4 multicast address assignments.
+    |-------------------------------------------------------------------------------------------
+    |240.0.0.0/4                   |
+    |(except 255.255.255.255/32    | This block, formerly known as the Class E address space, is reserved.
+    | as destination address)      |
+    |-------------------------------------------------------------------------------------------------------
+   "
+    ::= { rlSecuritySuiteMib 4 }
+
+rlSecuritySuiteMartianAddrAllTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteMartianAddrAllEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This read-only table specifies all current configured Martian addresses -
+        both pre-defined (=reserved) and used-configured (=static) addresses"
+    ::= { rlSecuritySuiteMib 5 }
+
+rlSecuritySuiteMartianAddrAllEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteMartianAddrAllEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes one Martian address ,
+   packets with this address as IP source or IP destination, are discarded."
+    INDEX { rlSecuritySuiteMartianAddr,rlSecuritySuiteMartianAddrNetMask}
+    ::= { rlSecuritySuiteMartianAddrAllTable 1 }
+
+RlSecuritySuiteMartianAddrAllEntry::= SEQUENCE {
+    rlSecuritySuiteMartianAddr                  IpAddress,
+    rlSecuritySuiteMartianAddrNetMask           IpAddress,
+    rlSecuritySuiteAllMartianEntryType          RlSecuritySuiteAllMartianEntryType
+    }
+rlSecuritySuiteMartianAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An IP address to discard all packets with that address as source
+        or destination"
+    ::= { rlSecuritySuiteMartianAddrAllEntry 1 }
+
+rlSecuritySuiteMartianAddrNetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Specify the net mask that comprise the destination IP address prefix."
+    ::= { rlSecuritySuiteMartianAddrAllEntry 2 }
+
+rlSecuritySuiteAllMartianEntryType OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteAllMartianEntryType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Specific the entry origin: pre-defined (reserved) of statically configured."
+    ::= { rlSecuritySuiteMartianAddrAllEntry 3 }
+
+rlSecuritySuiteMartianAddrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDoSAttackMartianAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies the Martian addresses -
+        the addresses that packets with these IP addressed as source or
+        destination are discarded."
+    ::= { rlSecuritySuiteMib 6 }
+
+rlSecuritySuiteMartianAddrEntry OBJECT-TYPE
+    SYNTAX     RlDoSAttackMartianAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes one Martian address ,
+   packets with this address as IP source or IP destination, are discarded."
+    INDEX { rlSecuritySuiteMartianAddr,rlSecuritySuiteMartianAddrNetMask}
+    ::= { rlSecuritySuiteMartianAddrTable 1 }
+
+RlDoSAttackMartianAddrEntry::= SEQUENCE {
+    rlSecuritySuiteMartianAddrStatus              RowStatus
+    }
+
+rlSecuritySuiteMartianAddrStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlSecuritySuiteMartianAddrEntry 1  }
+
+rlSecuritySuiteDoSSynAttackTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteDoSSynAttackEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains IP address and rate, to limit DoS SYN attacks from
+        a specific IP address and interface(s)"
+    ::= { rlSecuritySuiteMib 7 }
+
+rlSecuritySuiteDoSSynAttackEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteDoSSynAttackEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes one Martian address ,
+   packets with this address as IP source or IP destination, are discarded."
+    INDEX { rlSecuritySuiteDoSSynAttackIfIndex,
+            rlSecuritySuiteDoSSynAttackAddr,
+            rlSecuritySuiteDoSSynAttackNetMask}
+    ::= { rlSecuritySuiteDoSSynAttackTable 1 }
+
+RlSecuritySuiteDoSSynAttackEntry::= SEQUENCE {
+    rlSecuritySuiteDoSSynAttackIfIndex             InterfaceIndex,
+    rlSecuritySuiteDoSSynAttackAddr                IpAddress,
+    rlSecuritySuiteDoSSynAttackNetMask             IpAddress,
+    rlSecuritySuiteDoSSynAttackSynRate             INTEGER,
+    rlSecuritySuiteDoSSynAttackStatus              RowStatus
+    }
+rlSecuritySuiteDoSSynAttackIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Interface which the attack is applied on"
+    ::= { rlSecuritySuiteDoSSynAttackEntry 1 }
+
+rlSecuritySuiteDoSSynAttackAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An IP address to discard all packets with that address as destination"
+    ::= { rlSecuritySuiteDoSSynAttackEntry 2 }
+
+rlSecuritySuiteDoSSynAttackNetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Relevant when rlSecuritySuiteSynAttackRangeType equals prefix(2).
+        Specify the number of bits that comprise the destination
+        IP address prefix."
+    ::= { rlSecuritySuiteDoSSynAttackEntry 3 }
+
+rlSecuritySuiteDoSSynAttackSynRate OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Specify the maximum connections per second allowed from this IP address
+        and rlSecuritySuiteSynAttackPortList"
+    ::= { rlSecuritySuiteDoSSynAttackEntry 4 }
+
+rlSecuritySuiteDoSSynAttackStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlSecuritySuiteDoSSynAttackEntry 6  }
+
+rlSecuritySuiteDenyTypesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteDenyTypesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies the ip address and TCP ports that
+        TCP SYN packets from them on a specific interfaces are dropped."
+    ::= { rlSecuritySuiteMib 8 }
+
+rlSecuritySuiteDenyTypesEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteDenyTypesEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes one ip address, TCP port and
+   list of ifIndexes, that packets with these attributes are discarded."
+    INDEX { rlSecuritySuiteDenyIfIndex,
+            rlSecuritySuiteDenyAttackType,
+            rlSecuritySuiteDenyDestAddr,
+            rlSecuritySuiteDenyNetMask,
+            rlSecuritySuiteDenyDestPort}
+    ::= { rlSecuritySuiteDenyTypesTable 1 }
+
+RlSecuritySuiteDenyTypesEntry::= SEQUENCE {
+    rlSecuritySuiteDenyIfIndex             InterfaceIndex,
+    rlSecuritySuiteDenyAttackType          RlSecuritySuiteDenyAttackType,
+    rlSecuritySuiteDenyDestAddr            IpAddress,
+    rlSecuritySuiteDenyNetMask             IpAddress,
+    rlSecuritySuiteDenyDestPort            INTEGER,
+    rlSecuritySuiteDenyStatus              RowStatus
+    }
+
+rlSecuritySuiteDenyIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Interface which the attack is applied on"
+    ::= { rlSecuritySuiteDenyTypesEntry 1 }
+
+rlSecuritySuiteDenyAttackType OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteDenyAttackType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The specific deny attack type"
+    ::= { rlSecuritySuiteDenyTypesEntry 2 }
+
+rlSecuritySuiteDenyDestAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An IP address to discard all packets with that address as destination"
+    ::= { rlSecuritySuiteDenyTypesEntry 3 }
+
+rlSecuritySuiteDenyNetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Relevant when rlSecuritySuiteDenyTCPRangeType equals mask(1).
+        Specify the number of bits that comprise the destination
+        IP address prefix."
+    ::= { rlSecuritySuiteDenyTypesEntry 4 }
+
+rlSecuritySuiteDenyDestPort OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Destination TCP port.
+        Use 65553 to specify all ports.
+        This key-field is relevant in specific attack types (not all)
+        Use 0 when not relevant."
+    ::= { rlSecuritySuiteDenyTypesEntry 5 }
+
+rlSecuritySuiteDenyStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of a table entry.
+        It is used to delete/Add an entry from this table."
+    ::= { rlSecuritySuiteDenyTypesEntry 6  }
+
+
+rlSecuritySuiteDenySynFinTcp OBJECT-TYPE
+ SYNTAX     RlSecuritySuiteDenySynFinTcp
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally enable or disable dropping of tcp packets with both SYN and FIN flags enabled. "
+    ::= { rlSecuritySuiteMib 9 }
+
+rlSecuritySuiteSynProtectionMode OBJECT-TYPE
+ SYNTAX     RlSecuritySuiteSynProtectionMode
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally set protection mode on TCP SYN traffic.
+      Disabled - the system doesn't support protection against TCP SYN attack.
+      Report   - the system doesn't support protection against TCP SYN attack,but reports about it.
+      Block    - the systems supports protection against TCP SYN attack by blocking this traffic on the port.  "
+    ::= { rlSecuritySuiteMib 10 }
+
+rlSecuritySuiteSynProtectionTreshold OBJECT-TYPE
+ SYNTAX     INTEGER
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally set protection mode treshold value in packet per second
+      on TCP SYN traffic."
+    ::= { rlSecuritySuiteMib 11 }
+
+rlSecuritySuiteSynProtectionRecoveryTimeout OBJECT-TYPE
+ SYNTAX     INTEGER
+ MAX-ACCESS read-write
+ STATUS     current
+ DESCRIPTION
+     "This scalar globally set protection reovery time out in secounds."
+    ::= { rlSecuritySuiteMib 12 }
+
+rlSecuritySuiteSynProtectionPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSecuritySuiteSynProtectionPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table keeps SYN protection status per port."
+    ::= { rlSecuritySuiteMib 13 }
+
+rlSecuritySuiteSynProtectionPortEntry OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteSynProtectionPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+   "Each entry in this table describes TCP SYN protection status for one port."
+    INDEX { ifIndex}
+    ::= { rlSecuritySuiteSynProtectionPortTable 1 }
+
+RlSecuritySuiteSynProtectionPortEntry::= SEQUENCE {
+    rlSecuritySuiteSynProtectionPortMode                RlSecuritySuiteSynProtectionPortMode,
+    rlSecuritySuiteSynProtectionPortModeLastTimeAttack  RlSecuritySuiteSynProtectionPortMode,
+    rlSecuritySuiteSynProtectionPortLastTimeAttack      DisplayString
+    }
+
+rlSecuritySuiteSynProtectionPortMode OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteSynProtectionPortMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port's TCP SYN protection mode."
+    ::= { rlSecuritySuiteSynProtectionPortEntry 1 }
+
+
+rlSecuritySuiteSynProtectionPortModeLastTimeAttack OBJECT-TYPE
+    SYNTAX     RlSecuritySuiteSynProtectionPortMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port's TCP SYN protection last attack time mode."
+    ::= { rlSecuritySuiteSynProtectionPortEntry 2 }
+
+rlSecuritySuiteSynProtectionPortLastTimeAttack OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port's TCP SYN protection last attack time."
+    ::= { rlSecuritySuiteSynProtectionPortEntry 3 }
+
+
+
+END
+

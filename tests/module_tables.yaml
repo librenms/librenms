@@ -1,0 +1,58 @@
+applications:
+    applications:
+        excluded_fields: [device_id, app_id, timestamp]
+    application_metrics:
+        excluded_fields: [app_id]
+        joins:
+            - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)' }
+        custom_where: ''
+arp-table:
+    ipv4_mac:
+        excluded_fields: [device_id, port_id]
+        order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
+bgp-peers:
+    devices:
+        included_fields: [bgpLocalAs]
+    bgpPeers:
+        excluded_fields: [device_id, bgpPeer_id]
+    bgpPeers_cbgp:
+        excluded_fields: [device_id]
+mempools:
+    mempools:
+        excluded_fields: [device_id, mempool_id]
+ports:
+    ports:
+        excluded_fields: [device_id, port_id, poll_time, poll_period]
+        joins:
+            - { left: ports.port_id, right: ports_statistics.port_id }
+        order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+os:
+    devices:
+        included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
+processors:
+    processors:
+        excluded_fields: [device_id, processor_id]
+sensors:
+    sensors:
+        excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, sensors_to_state_translations_id, lastupdate]
+        joins:
+            - { left: sensors.sensor_id, right: sensors_to_state_indexes.sensor_id }
+            - { left: sensors_to_state_indexes.state_index_id, right: state_indexes.state_index_id }
+        order_by: sensors.sensor_class, sensors.sensor_type, sensors.sensor_index
+    state_indexes:
+        excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, state_lastupdated]
+        joins:
+            - { left: state_indexes.state_index_id, right: state_translations.state_index_id }
+            - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
+        order_by: state_indexes.state_name, state_translations.state_value
+        custom_where: ''
+storage:
+    storage:
+        excluded_fields: [device_id, storage_id]
+toner:
+    toner:
+        excluded_fields: [device_id]
+        order_by: toner_oid, toner_index
+wireless:
+    wireless_sensors:
+        excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]

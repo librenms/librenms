@@ -1,0 +1,309 @@
+ADTRAN-AOS-SIP-REGISTRATION DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Integer32, IpAddress,
+    NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY  
+        FROM SNMPv2-SMI 
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    sysName
+        FROM SNMPv2-MIB
+    adIdentityShared
+        FROM ADTRAN-MIB
+    adGenAOSVoice, adGenAOSConformance
+        FROM ADTRAN-AOS;
+
+adGenAOSSipRegistration MODULE-IDENTITY
+    LAST-UPDATED "201011020000Z"  -- November 2, 2010
+    ORGANIZATION "ADTRAN, Inc."
+    CONTACT-INFO
+        "Technical Support Dept.
+        Postal: ADTRAN, Inc.
+        901 Explorer Blvd.
+        Huntsville, AL 35806
+
+        Tel: +1 800 726-8663
+        Fax: +1 256 963 6217
+        E-mail: support@adtran.com"
+
+    DESCRIPTION
+        "This MIB contains information regarding SIP registrations."
+
+    REVISION    "201011020000Z"  -- November 2, 2010
+    DESCRIPTION
+        "Initial version of this MIB module."
+
+    ::= { adIdentityShared 53 5 4 }
+
+adSipRegistration               OBJECT IDENTIFIER ::= { adGenAOSVoice 4 }     
+adSipRegistrationTraps          OBJECT IDENTIFIER ::= { adSipRegistration 0 }
+
+--
+--  adSipRegistrationNotificationUtilityGroup Group
+--
+adSipTrunkRegistrationAlarmTrunkIdentity  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This DisplayString contains the three digit (i.e. T01) trunk
+         identifier associated with this failed REGISTER attempt."
+    ::= { adSipRegistration 1 }
+
+adSipTrunkRegistrationAlarmSipIdentity  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This DisplayString represents the SIP identity for a failed
+         REGISTER attempt."
+    ::= { adSipRegistration 2 }  
+    
+adSipTrunkRegistrationAlarmRegistrar OBJECT-TYPE
+     SYNTAX         IpAddress
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+        "The adSipTrunkRegistrationAlarmRegistrar contains the IP address
+         of the SIP registrar for a failed REGISTER attempt."
+     ::= { adSipRegistration 3 }
+         
+adSipTrunkRegistrationAlarmTimestamp  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time (seconds since epoch) that a failed REGISTER attempt
+         occurred and not necessarily the when the trap was sent."
+    ::= { adSipRegistration 4 }
+
+adSipTrunkRegistrationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdSipTrunkRegistrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Contains a list of trunk registrations and associated statistics."
+    ::= { adSipRegistration  5 }
+
+adSipTrunkRegistrationEntry  OBJECT-TYPE
+    SYNTAX      AdSipTrunkRegistrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the list defines all sip registration fields."
+    INDEX{ adSipTrunkRegistrationTableIndex }
+    ::= { adSipTrunkRegistrationTable  1 }
+    
+AdSipTrunkRegistrationEntry ::= SEQUENCE {
+    adSipTrunkRegistrationTableIndex          Unsigned32,
+    adSipTrunkRegistrationTrunkIdentity       DisplayString,
+    adSipTrunkRegistrationSipIdentity         DisplayString,
+    adSipTrunkRegistrationStatus              DisplayString,
+    adSipTrunkRegistrarIpAddress              DisplayString,
+    adSipTrunkRegistrationGrantTime           Unsigned32,
+    adSipTrunkRegistrationExpireTime          Unsigned32,
+    adSipTrunkRegistrationSuccesses           Unsigned32,
+    adSipTrunkRegistrationFailures            Unsigned32,
+    adSipTrunkRegistrationRequests            Unsigned32,
+    adSipTrunkRegistrationChallenges          Unsigned32,
+    adSipTrunkRegistrationRollovers           Unsigned32
+    }
+
+adSipTrunkRegistrationTableIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This Unsigned32 represents the index of the table."
+    ::= { adSipTrunkRegistrationEntry 1 }
+    
+adSipTrunkRegistrationTrunkIdentity OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This DisplayString contains the three digit (i.e. T01) trunk
+        identifier."
+    ::= { adSipTrunkRegistrationEntry 2 }
+    
+adSipTrunkRegistrationSipIdentity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This DisplayString represents the SIP identity."
+    ::= { adSipTrunkRegistrationEntry 3 }
+    
+adSipTrunkRegistrationStatus OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This DisplayString represents the registered state (yes/no) 
+        of this SIP identity."
+    ::= { adSipTrunkRegistrationEntry 4 }
+    
+adSipTrunkRegistrarIpAddress OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address of the SIP Registrar."
+    ::= { adSipTrunkRegistrationEntry 5 }
+
+adSipTrunkRegistrationGrantTime OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The granted registration time in seconds."
+    ::= { adSipTrunkRegistrationEntry 6 }
+    
+adSipTrunkRegistrationExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining in seconds until expiration."
+    ::= { adSipTrunkRegistrationEntry 7 }
+    
+adSipTrunkRegistrationSuccesses OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of successful registration attempts."
+    ::= { adSipTrunkRegistrationEntry 8 }
+    
+adSipTrunkRegistrationFailures OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of failed registration attempts."
+    ::= { adSipTrunkRegistrationEntry 9 }
+    
+adSipTrunkRegistrationRequests OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of registration requests sent."
+    ::= { adSipTrunkRegistrationEntry 10 }
+
+adSipTrunkRegistrationChallenges OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of registration challenges."
+    ::= { adSipTrunkRegistrationEntry 11 }
+    
+adSipTrunkRegistrationRollovers OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of registration rollovers."
+    ::= { adSipTrunkRegistrationEntry 12 }
+
+-- Traps
+adSipTrunkRegistrationAlarm     NOTIFICATION-TYPE
+    OBJECTS {
+        sysName,
+        adSipTrunkRegistrationAlarmTrunkIdentity,
+        adSipTrunkRegistrationAlarmSipIdentity,
+        adSipTrunkRegistrationAlarmRegistrar,
+        adSipTrunkRegistrationAlarmTimestamp        
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that a SIP trunk registration attempt failed.
+         The sysName is the exact same as defined in SNMPv2-MIB.
+         adSipTrunkRegistrationAlarmTrunkIdentity specifies the three
+         character trunk identity associated with the failed attempt.
+         The corresponding SIP identity and registrar server are contained
+         in adSipTrunkRegistrationAlarmSipIdentity and 
+         adSipTrunkRegistrationAlarmRegistrar respectively. The 
+         adSipTrunkRegistrationAlarmTimestamp indicates when this condition 
+         occurred and not necessarily when the trap was sent. "
+    ::= { adSipRegistrationTraps 1 }
+
+-- conformance information
+
+adSipRegistrationConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 12 }
+adSipRegistrationGroups      OBJECT IDENTIFIER ::= { adSipRegistrationConformance 1 }
+adSipRegistrationCompliances OBJECT IDENTIFIER ::= { adSipRegistrationConformance 2 }
+
+--
+-- MIB Compliance statements.
+--
+
+-- Full compliance statement
+adSipRegistrationFullCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        version 2 of the adGenAosSipRegistration MIB. When this MIB is 
+        fully implemented, then such an implementation can claim
+        full compliance."
+
+    MODULE  -- this module
+
+    GROUP adSipRegistrationNotificationUtilityGroup
+    DESCRIPTION
+        "A collection of objects accessible only for notifications."
+
+    GROUP adSipRegistrationNotificationGroup
+    DESCRIPTION
+        "This mandatory group is used for the notification of
+         SIP registration conditions."
+         
+     GROUP adSipRegistrationStatisticsGroup
+     DESCRIPTION
+        "A collection of readable objects for SIP registration statistics."
+    ::= { adSipRegistrationCompliances 1 }
+
+
+adSipRegistrationNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { adSipTrunkRegistrationAlarm }
+    STATUS  current
+    DESCRIPTION
+        "This group contains notifications about SIP registration conditions."
+    ::= { adSipRegistrationGroups 1 }
+
+adSipRegistrationNotificationUtilityGroup OBJECT-GROUP
+    OBJECTS {
+        adSipTrunkRegistrationAlarmTrunkIdentity,
+        adSipTrunkRegistrationAlarmSipIdentity,
+        adSipTrunkRegistrationAlarmRegistrar,
+        adSipTrunkRegistrationAlarmTimestamp
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects accessible only for notifications."
+    ::= { adSipRegistrationGroups 2 }
+
+adSipRegistrationStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+        adSipTrunkRegistrationTrunkIdentity,
+        adSipTrunkRegistrationSipIdentity,
+        adSipTrunkRegistrationStatus,
+        adSipTrunkRegistrarIpAddress,
+        adSipTrunkRegistrationGrantTime,
+        adSipTrunkRegistrationExpireTime,
+        adSipTrunkRegistrationSuccesses,
+        adSipTrunkRegistrationFailures,
+        adSipTrunkRegistrationRequests,
+        adSipTrunkRegistrationChallenges,
+        adSipTrunkRegistrationRollovers
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of readable objects for SIP registration statistics."
+    ::= { adSipRegistrationGroups 3 }
+
+
+END

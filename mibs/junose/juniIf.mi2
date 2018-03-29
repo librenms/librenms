@@ -1,0 +1,440 @@
+
+-- *****************************************************************************
+-- Juniper-UNI-IF-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Interfaces MIB
+--
+-- Copyright (c) 1998 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2003 Juniper Networks, Inc.
+-- Copyright (c) 2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-UNI-IF-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifEntry, ifStackHigherLayer, ifStackLowerLayer
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniIfMIB  MODULE-IDENTITY
+    LAST-UPDATED "200510112040Z"  -- 11-Oct-05 04:40 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The Generic Interfaces MIB for the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200510112040Z"  -- 11-Oct-05 04:40 PM EDT  - JUNOSe 7.1
+    DESCRIPTION
+        "Added interface type:
+            plsL2ShimInterface(45) "
+    REVISION    "200307162140Z"  -- 16-Jul-03 05:40 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added interface type:
+            atmActiveSubInterface(257) "
+    REVISION    "200302061557Z"  -- 06-Feb-03 10:57 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added interface types:
+            bridgeInterface(48),
+            ipsecTransportInterface(49),
+            ipv6Interface(50),
+            ipv6TunnelInterface(51),
+            ipv6Loopback(52),
+            osi(53),
+            atmVirtualCircuit(145),
+            pppLink(256) "
+    REVISION    "200201221652Z"  -- 22-Jan-02 11:52 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added interface types:
+            gtpInterface(37),
+            smdsMajorInterface(38),
+            smdsSubInterface(39),
+            ipsecInterface(43),
+            sgInterface(44),
+            lacGenInterface(47) "
+    REVISION    "200103281512Z"  -- 28-Mar-01 10:12 AM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "Added interface types:
+            l2fTunnelInterface(40),
+            l2fSessionInterface(41),
+            l2fDestinationInterface(42) "
+    REVISION    "200011222341Z"  -- 22-Nov-00 06:41 PM EST  - JUNOSe 3.1
+    DESCRIPTION
+        "Added interface types:
+            vlanMajorInterface(34),
+            vlanSubInterface(35),
+            cbfInterface(36) "
+    REVISION    "200009291835Z"  -- 29-Sep-00 02:35 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added interface types:
+            multilinkFrameRelayInterface(29),
+            ipTunnelInterface(30),
+            serverPortInterface(31),
+            smdsInterface(32) "
+    REVISION    "200007271545Z"  -- 27-Jul-00 11:45 AM EDT  - JUNOSe 2.2
+    DESCRIPTION
+        "Added interface type:
+            sonetVTInterface(33) "
+    REVISION    "200005051508Z"  -- 05-May-00 11:08 AM EDT  - JUNOSe 2.0
+    DESCRIPTION
+        "Added interface types:
+            l2tpSessionInterface(21),
+            mlPppLinkInterface(22),
+            l2tpDestinationInterface(24),
+            mplsMajorInterface(25),
+            mplsMinorInterface(26),
+            mlPppNetworkInterface(27),
+            ethernetSubInterface(28) "
+    REVISION    "199912211518Z"  -- 21-Dec-99 10:18 AM EST  - JUNOSe 1.3
+    DESCRIPTION
+        "Added interface types:
+            bridgedEthernet(19),
+            l2TpTunnelInterface(20),
+            slepInterface(23) "
+    REVISION    "199909031416Z"  -- 03-Sep-99 10:16 AM EDT  - JUNOSe 1.1
+    DESCRIPTION
+        "Added interface types:
+            pppoe(17),
+            pppoeSubInterface(18) "
+    REVISION      "9811132019Z"  -- 13-Nov-98 03:19 PM EST  - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Interface types.
+--
+JuniIfType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Interface type identification for physical-, link-, and
+        network-layer interfaces."
+    SYNTAX      INTEGER {
+                    ip(0),
+                    ppp(1),
+                    ds0(2),
+                    ds1(3),
+                    ds3(4),
+                    frameRelay(5),
+                    ethernet(6),
+                    sonet(7),
+                    sonetPath(8),
+                    atm(9),
+                    aal5(10),
+                    atmSubInterface(11),
+                    ft1(12),
+                    hdlc(13),
+                    ipLoopback(14),
+                    ipVirtual(15),
+                    frSubInterface(16),
+                    pppoe(17),
+                    pppoeSubInterface(18),
+                    bridgedEthernet(19),
+                    l2tpTunnelInterface(20),
+                    l2tpSessionInterface(21),
+                    mlPppLinkInterface(22),
+                    slepInterface(23),
+                    l2tpDestinationInterface(24),
+                    mplsMajorInterface(25),
+                    mplsMinorInterface(26),
+                    mlPppNetworkInterface(27),
+                    ethernetSubInterface(28),
+                    multilinkFrameRelayInterface(29),
+                    ipTunnelInterface(30),
+                    serverPortInterface(31),
+                    smdsInterface(32),
+                    sonetVTInterface(33),
+                    vlanMajorInterface(34),
+                    vlanSubInterface(35),
+                    cbfInterface(36),
+                    gtpInterface(37),
+                    smdsMajorInterface(38),
+                    smdsSubInterface(39),
+                    l2fTunnelInterface(40),
+                    l2fSessionInterface(41),
+                    l2fDestinationInterface(42),
+                    ipsecInterface(43),
+                    sgInterface(44),
+		    mplsL2ShimInterface(45),
+                    lacGenInterface(47),
+                    bridgeInterface(48),
+                    ipsecTransportInterface(49),
+                    ipv6Interface(50),
+                    ipv6TunnelInterface(51),
+                    ipv6Loopback(52),
+                    osi(53),
+                    lag(54),
+                    ipTunnelMdt(55),
+                    -- multi-personality and pseudo interfaces
+                    atmVirtualCircuit(145),
+                    pppLink(256),
+                    atmActiveSubInterface(257) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniInterfaces    OBJECT IDENTIFIER ::= { juniIfMIB 1 }
+juniIf            OBJECT IDENTIFIER ::= { juniInterfaces 1 }
+juniIfObjects     OBJECT IDENTIFIER ::= { juniIf 1 }
+
+--
+-- Generic Interfaces Table
+--
+juniIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a corresponding entry for each entry found in the
+        standard Generic Interfaces MIB ifTable/ifXTable.  The entries in this
+        table contain supplementary generic interface characteristics.
+
+        Entries in ifTable/ifXTable and in this table are created/deleted as a
+        consequence of hardware detection, or of management configuration via
+        standard or enterprise type-specific interface MIBs."
+    ::= { juniIfObjects 1 }
+
+juniIfEntry  OBJECT-TYPE
+    SYNTAX      JuniIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing an interface's enterprise-defined generic
+        interface characteristics."
+    AUGMENTS  { ifEntry }
+    ::= { juniIfTable 1 }
+
+JuniIfEntry ::= SEQUENCE {
+    juniIfType  JuniIfType }
+
+juniIfType  OBJECT-TYPE
+    SYNTAX      JuniIfType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the type of this interface."
+    ::= { juniIfEntry 1 }
+
+--
+-- Inverse Stack Table
+--
+-- Similar to IF-MIB ifStackTable, but with inverted indexing
+-- order of upper/lower layer interfaces: ifStackTable provides
+-- <upper, lower> index ordering, this table provides <lower, upper>
+-- index ordering.
+--
+-- This table facilitates efficient bottom-up GetNext traversal of interface
+-- layers, in contrast to the efficient top-down GetNext traversal afforded
+-- by IF-MIB ifStackTable.
+--
+-- This MIB table design is derived from the IETF Internet Draft
+-- draft-ietf-ifmib-invstackmib-00.txt, "The Inverted Stack Table Extension
+-- to the Interfaces Group MIB", McCloghrie & Hanson, July 16 1998.
+-- The table definition below is an interim solution, subject to
+-- deprecation in favor of a standard solution should the Internet Draft
+-- advance to Proposed Standard status.
+--
+juniIfInvStackTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIfInvStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information on the relationships between the
+        multiple sub-layers of network interfaces.  In particular, it contains
+        information on which sub-layers run 'underneath' which other sub-layers,
+        where each sub-layer corresponds to a conceptual row in the ifTable.
+        For example, when the sub-layer with ifIndex value x runs underneath the
+        sub-layer with ifIndex value y, then this table contains:
+
+              juniIfInvStackStatus.x.y = active
+
+        For each ifIndex value, I, which identifies an active interface, there
+        are always at least two instantiated rows in this table associated with
+        I.  For one of these rows, I is the value of ifStackHigherLayer; for the
+        other, I is the value of ifStackLowerLayer.  (If I is not involved in
+        multiplexing, then these are the only two rows associated with I.)
+
+        For example, two rows exist even for an interface which has no others
+        stacked on top or below it:
+
+              ifStackStatus.x.0 = active
+              ifStackStatus.0.x = active
+
+        This table contains exactly the same number of rows as the ifStackTable,
+        but the rows appear in a different order."
+    ::= { juniIfObjects 2 }
+
+juniIfInvStackEntry  OBJECT-TYPE
+    SYNTAX      JuniIfInvStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information on a particular relationship between two sub-layers,
+        specifying that one sub-layer runs underneath the other sub-layer.  Each
+        sub-layer corresponds to a conceptual row in the ifTable."
+    INDEX     { ifStackLowerLayer,
+                ifStackHigherLayer }
+    ::= { juniIfInvStackTable 1 }
+
+JuniIfInvStackEntry ::= SEQUENCE {
+    juniIfInvStackStatus    RowStatus }
+
+juniIfInvStackStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the relationship between two sub-layers.
+
+        An instance of this object exists for each instance of the ifStackStatus
+        object, and vice versa.  For example, if the variable ifStackStatus.H.L
+        exists, then the variable juniIfInvStackStatus.L.H must also exist, and
+        vice versa.  In addition, the two variables always have the same value.
+
+        However, unlike ifStackStatus, the juniIfInvStackStatus object is NOT
+        write-able.  A network management application wishing to change a
+        relationship between sub-layers H and L cannot do so by modifying the
+        value of juniIfInvStackStatus.L.H, but must instead modify the value of
+        ifStackStatus.H.L.  After the ifStackTable is modified, the change will
+        be reflected in this table."
+    ::= { juniIfInvStackEntry 1 }
+
+--
+-- Interfaces Count Table
+--
+juniIfCountTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIfCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for each interface type's system wide
+        interfaces counts."
+    ::= { juniIfObjects 3 }
+
+juniIfCountEntry  OBJECT-TYPE
+    SYNTAX      JuniIfCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry represents system wide total number of interfaces configured 
+        for the particular interface type."
+    INDEX  { juniIfCountIfType }
+    ::= { juniIfCountTable 1 }
+
+JuniIfCountEntry ::= SEQUENCE {
+    juniIfCountIfType JuniIfType,
+    juniIfCountNumberOfInterfaces  Unsigned32 }
+
+juniIfCountIfType  OBJECT-TYPE
+    SYNTAX      JuniIfType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the type of this interface."
+    ::= { juniIfCountEntry 1 }
+
+juniIfCountNumberOfInterfaces  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents system wide total number of interfaces configured for the 
+        particular interface type." 
+    ::= { juniIfCountEntry 2 }
+
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniIfTraps       OBJECT IDENTIFIER ::= { juniIf 3 }
+-- juniIfTrapPrefix  OBJECT IDENTIFIER ::= { juniIfTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIfConformance OBJECT IDENTIFIER ::= { juniIf 4 }
+juniIfCompliances OBJECT IDENTIFIER ::= { juniIfConformance 1 }
+juniIfGroups      OBJECT IDENTIFIER ::= { juniIfConformance 2 }
+
+--
+-- compliance statements
+--
+juniIfCompliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Generic Interfaces MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniIfGroup,
+            juniIfInvStackGroup }
+    ::= { juniIfCompliances 1 }                                    -- JUNOSe 1.0
+
+juniIfCompliance1  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Generic Interfaces MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniIfGroup,
+            juniIfInvStackGroup,
+            juniIfCountGroup }
+    ::= { juniIfCompliances 2 }                                    -- JUNOSe 6.0
+
+--
+-- units of conformance
+--
+juniIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIfType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing generic interfaces in a Juniper
+        product."
+    ::= { juniIfGroups 1 }                                         -- JUNOSe 1.0
+
+juniIfInvStackGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIfInvStackStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing inverted information on the layering
+        of MIB-II interfaces."
+    ::= { juniIfGroups 2 }                                         -- JUNOSe 1.0
+
+juniIfCountGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIfCountNumberOfInterfaces }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing interface information on the system
+        wide count of number of interfaces per interface type."
+    ::= { juniIfGroups 3 }                                         -- JUNOSe 6.0
+
+END

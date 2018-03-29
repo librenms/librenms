@@ -1,0 +1,630 @@
+CTRON-ENVIRONMENT-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-env-mib.txt Environmental MIB
+        --  Revision: 1.01.01
+        --  Part Number:  2170995
+        --  Date: August 16, 1996
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific ct-env MIB.
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+        IMPORTS
+                ctenv   
+                        FROM CTRON-MIB-NAMES
+                OBJECT-TYPE
+                        FROM RFC-1212;
+
+
+
+        --===============    group definitions     ===================
+
+        chEnv           OBJECT IDENTIFIER  ::= { ctenv 1 }
+        boardEnv        OBJECT IDENTIFIER  ::= { ctenv 2 }
+        psEnv           OBJECT IDENTIFIER  ::= { ctenv 3 }
+        bbuEnv          OBJECT IDENTIFIER  ::= { ctenv 4 }
+        
+        --    chEnv group          ====================
+
+        --  Chassis Environment Group
+        --  Implementation of the Chassis Environment group is optional.
+        --  It needs to be supported when an EM is present and operational
+        --  in the chassis.
+        --  This group covers information on the Temperature & Humidity.
+        --  This group also cover the temperature control in the form of
+        --  fan speed control.
+
+        chEnvAmbientTemp  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The ambient temperature of the room in which the chassis 
+                 is located. If this sensor is broken or not supported, then
+                 this object will be set to zero. The value of this object
+                 is the actual temperature in degrees Fahrenheit * 10."
+            ::= { chEnv 1 }
+
+        chEnvAmbientStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        cold(2),
+                        cool(3),
+                        normal(4),
+                        warm(5),
+                        hot(6),
+                        inoperative(7)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the ambient temperature
+                 reading."
+            ::= { chEnv 2 }
+
+        chEnvHumidity  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The humidity value of the air flowing thru the chassis.
+                 The value of this object is the actual humidity * 10."
+            ::= { chEnv 3 }
+
+        chEnvHumidityStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        dry(2),
+                        normal(3),
+                        moist(4),
+                        inoperative(5)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the ambient humidity
+                 reading."
+            ::= { chEnv 4 }
+
+        chEnvAmbientHot  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above which the ambient temperature
+                 is deemed to be hot."
+            ::= { chEnv 5 }
+
+        chEnvAmbientWarm  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above which the ambient temperature
+                 is deemed to be warm, if it is below or equal the hot 
+                 value."
+            ::= { chEnv 6 }
+
+        chEnvAmbientCool  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value below which the ambient temperature
+                 is deemed to be cool, if it is above or equal the cold
+                 value."
+            ::= { chEnv 7 }
+
+        chEnvAmbientCold  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value below which the ambient temperature
+                 is deemed to be cold."
+            ::= { chEnv 8 }
+
+        chEnvHumidityMoist  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The humidity value above which the chassis humidity
+                 is deemed to be moist."
+            ::= { chEnv 9 }
+
+        chEnvHumidityDry  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The humidity value below which the chassis humidity
+                 is deemed to be a static risk."
+            ::= { chEnv 10 }
+
+        chEnvNumFans  OBJECT-TYPE
+            SYNTAX  INTEGER (0..64)
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Number of fans in a chassis."
+            ::= { chEnv 11 }
+
+        chEnvFanTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChEnvFanEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of fans installed in this chassis."
+            ::= { chEnv 12 }
+
+        chEnvFanEntry  OBJECT-TYPE
+            SYNTAX  ChEnvFanEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module."
+            INDEX  { chEnvFanID }
+            ::= { chEnvFanTable 1 }
+
+        ChEnvFanEntry  ::=
+            SEQUENCE {
+                chEnvFanID
+                    INTEGER,
+                chEnvFanStatus
+                    INTEGER,
+                chEnvFanAdmin
+                    INTEGER,
+                chEnvFanSpeed
+                    INTEGER
+            }
+
+        chEnvFanID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A unique value, in the range between 1 and and the 
+                 value of chEnvNumFans."
+            ::= { chEnvFanEntry 1 }
+
+        chEnvFanStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        normal(2),
+                        testing(3),
+                        slow(4),                -- Not running a correct speed
+                        inoperative(5),
+                        off(6)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the chassis fan."
+            ::= { chEnvFanEntry 2 }
+
+        chEnvFanAdmin  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        autoMode(1),
+                        fullSpeed(2),
+                        testingMode(3)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object is used to select the operational mode of the 
+                 fan. If the value is set to 1 (auto) then fan speed is 
+                 based on temperature. If the value is set to 3 (testing) 
+                 then value will return to it's previous value prior to 
+                 being set at 3."
+            DEFVAL { autoMode }
+            ::= { chEnvFanEntry 3 }
+
+        chEnvFanSpeed  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The fan speed expressed as a percentage of the maximum 
+                 fan speed."
+            ::= { chEnvFanEntry 4 }
+
+        --==============    BoardEnv group          ===================
+
+        --  Board Environment Group
+        --  This group covers information on the Temperature.
+        --  This group also cover the temperature control in the form of
+        --  module shutdwon control.
+
+        boardEnvSlotTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF BoardEnvSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of networking modules installed in this chassis."
+            ::= { boardEnv 1 }
+
+        boardEnvSlotEntry  OBJECT-TYPE
+            SYNTAX  BoardEnvSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module."
+            INDEX  { boardEnvSlotID }
+            ::= { boardEnvSlotTable 1 }
+
+        BoardEnvSlotEntry  ::=
+            SEQUENCE {
+                boardEnvSlotID
+                    INTEGER,
+                boardEnvTemp
+                    INTEGER,
+                boardEnvTempStatus
+                    INTEGER,
+                boardEnvTempRelStatus
+                    INTEGER,
+                boardEnvShutdownAdmin
+                    INTEGER,
+                boardEnvTempHot
+                    INTEGER,
+                boardEnvTempWarm
+                    INTEGER,
+                boardEnvTempCool
+                    INTEGER,
+                boardEnvTempCold
+                    INTEGER,
+                boardEnvTempRelHot
+                    INTEGER,
+                boardEnvTempRelWarm
+                    INTEGER,
+                boardEnvTempMaxFanRelHot
+                    INTEGER,
+                boardEnvTempMaxFanRelWarm
+                    INTEGER
+            }
+
+        boardEnvSlotID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a chassis slot in which this board is
+                 installed.  This object is similiar to chSlotID in the
+                 Chassis MIB."
+            ::= { boardEnvSlotEntry 1 }
+
+        boardEnvTemp  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature of the networking board. If this sensor is 
+                 broken or not supported, then this object will be set to 
+                 zero. The temperature is in degrees Fahrenheit * 10."
+            ::= { boardEnvSlotEntry 2 }
+
+        boardEnvTempStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        cold(2),
+                        cool(3),
+                        normal(4),
+                        warm(5),
+                        hot(6),
+                        inoperative(7)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the board temperature
+                 reading."
+            ::= { boardEnvSlotEntry 3 }
+
+        boardEnvTempRelStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        normal(2),
+                        warm(3),
+                        hot(4),
+                        inoperative(5)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the board temperature
+                 reading relative to the ambient temperature."
+            ::= { boardEnvSlotEntry 4 }
+
+        boardEnvShutdownAdmin  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object enables or disables the auto shutdown due
+                 to a temperature condition."
+            DEFVAL { disabled }
+            ::= { boardEnvSlotEntry 5 }
+
+        boardEnvTempHot  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above which the board temperature
+                 is deemed to be hot."
+            ::= { boardEnvSlotEntry 6 }
+
+        boardEnvTempWarm  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above which the board temperature
+                 is deemed to be warm, if it is below or equal the hot 
+                 value."
+            ::= { boardEnvSlotEntry 7 }
+
+        boardEnvTempCool  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value below which the board temperature
+                 is deemed to be cool, if it is above or equal the cold
+                 value."
+            ::= { boardEnvSlotEntry 8 }
+
+        boardEnvTempCold  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value below which the board temperature
+                 is deemed to be cold."
+            ::= { boardEnvSlotEntry 9 }
+
+        boardEnvTempRelHot  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above ambient at which the board
+                 temperature is deemed to be hot relative to ambient."
+            ::= { boardEnvSlotEntry 10 }
+
+        boardEnvTempRelWarm  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above ambient at which the board 
+                 temperature is deemed to be warm relative to ambient, if
+                 it is below the relative hot value of boardEnvTempRelHot."
+            ::= { boardEnvSlotEntry 11 }
+
+        boardEnvTempMaxFanRelHot  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above ambient at which the board
+                 temperature is deemed to be hot relative to ambient, with
+                 all fans in the chassis running at there maximum speed."
+            ::= { boardEnvSlotEntry 12 }
+
+        boardEnvTempMaxFanRelWarm  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above ambient at which the board 
+                 temperature is deemed to be warm relative to ambient, if
+                 it is below the relative hot value of boardEnvTempMaxFanRelHot,
+                 with all fans in the chassis running at there maximum speed."
+            ::= { boardEnvSlotEntry 13 }
+
+        --===============    psEnv group          ====================
+
+        --  Power Supply Environment Group
+        --  This group covers information on the Temperature .
+        --  This group also cover the temperature control in the form of
+        --  power supply fan control.
+
+        psEnvSlotTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF PsEnvSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of networking modules installed in this chassis."
+            ::= { psEnv 1 }
+
+        psEnvSlotEntry  OBJECT-TYPE
+            SYNTAX  PsEnvSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module."
+            INDEX  { psEnvSlotID }
+            ::= { psEnvSlotTable 1 }
+
+        PsEnvSlotEntry  ::=
+            SEQUENCE {
+                psEnvSlotID
+                    INTEGER,
+                psEnvTemp
+                    INTEGER,
+                psEnvTempStatus
+                    INTEGER,
+                psEnvTempHot
+                    INTEGER,
+                psEnvTempWarm
+                    INTEGER,
+                psEnvTempCool
+                    INTEGER,
+                psEnvTempCold
+                    INTEGER,
+                psEnvFanStatus
+                    INTEGER,
+                psEnvFanAdmin
+                    INTEGER,
+                psEnvFanSpeed
+                    INTEGER
+            }
+
+        psEnvSlotID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a chassis slot in which this power supply
+                 is installed.  An unique value, in the range between 1 and 
+                 and the value of chNumSlots.  This object is similiar to
+                 chSlotID in the Chassis MIB."
+            ::= { psEnvSlotEntry 1 }
+
+        psEnvTemp  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature of the power supply. If this sensor is 
+                 broken or not supported, then this object will be set to 
+                 zero. The temperature is in degrees Fahrenheit * 10."
+            ::= { psEnvSlotEntry 2 }
+
+        psEnvTempStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        cold(2),
+                        cool(3),
+                        normal(4),
+                        warm(5),
+                        hot(6),
+                        inoperative(7)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the power supply
+                 temperature reading."
+            ::= { psEnvSlotEntry 3 }
+
+        psEnvTempHot  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above which the power supply
+                 temperature is deemed to be hot."
+            ::= { psEnvSlotEntry 4 }
+
+        psEnvTempWarm  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value above which the power supply 
+                 temperature is deemed to be warm, if it is below or
+                 equal the hot value."
+            ::= { psEnvSlotEntry 5 }
+
+        psEnvTempCool  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value below which the power supply 
+                 temperature is deemed to be cool, if it is above or 
+                 equal the cold value."
+            ::= { psEnvSlotEntry 6 }
+
+        psEnvTempCold  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The temperature value below which the power supply
+                 temperature is deemed to be cold."
+            ::= { psEnvSlotEntry 7 }
+
+        psEnvFanStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        normal(2),
+                        testing(3),
+                        slow(4),                -- not running a set speed
+                        inoperative(5),
+                        off(6)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object reflects the status of the chassis fan."
+            ::= { psEnvSlotEntry 8 }
+
+        psEnvFanAdmin  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        autoMode(1),
+                        fullSpeed(2),
+                        testingMode(3)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object is used to select the operational mode of the 
+                 fan. If the value is set to 1 (auto) then fan speed is 
+                 based on temperature. If the value is set to 3 (testing) 
+                 then value will return to it's previous value prior to 
+                 being set at 3."
+            DEFVAL { autoMode }
+            ::= { psEnvSlotEntry 9 }
+
+        psEnvFanSpeed  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The fan speed expressed as a percentage of the maximum 
+                 fan speed."
+            ::= { psEnvSlotEntry 10 }
+
+        --===============    bbuEnv group          ====================
+
+        --  Battery Backup Unit Environment Group
+        --  This group covers information on the temperature.
+        --  This group also cover the temperature control in the form of
+        --  fan speed control.
+
+END

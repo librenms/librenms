@@ -1,0 +1,805 @@
+CISCOSB-DHCPCL-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private DHCP CL MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, IpAddress, Unsigned32     FROM SNMPv2-SMI
+    TruthValue, RowStatus, DisplayString                    FROM SNMPv2-TC
+    InterfaceIndex, ifIndex                                 FROM IF-MIB
+    SnmpAdminString                                         FROM SNMP-FRAMEWORK-MIB
+    InetAddressType, InetAddress                            FROM INET-ADDRESS-MIB;
+
+rlDhcpCl MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines DHCP CL private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 76 }
+
+-- rlDhcpCl 1,2 saved for future use
+
+rlDhcpClActionTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpClActionEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The (conceptual) table mentione IP address which must be
+              released/renewed on the interface."
+    ::= { rlDhcpCl 3 }
+
+rlDhcpClActionEntry OBJECT-TYPE
+    SYNTAX     RlDhcpClActionEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in dhcpClActionTable."
+    INDEX      { rlDhcpClActionIfIndex }
+    ::= { rlDhcpClActionTable 1 }
+
+RlDhcpClActionEntry ::= SEQUENCE {
+    rlDhcpClActionIfIndex            InterfaceIndex,
+    rlDhcpClActionStatus             RowStatus,
+    rlDhcpClActionHostName           SnmpAdminString
+}
+
+rlDhcpClActionIfIndex          OBJECT-TYPE
+    SYNTAX             InterfaceIndex
+    MAX-ACCESS         read-only
+    STATUS      current
+    DESCRIPTION
+        " The interface which the action is implemented for
+        or NULL if it implemented for all device. "
+    ::= { rlDhcpClActionEntry  1 }
+
+rlDhcpClActionStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS     read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this entry.  Creating the entry renewing Dhcp
+              address on the interface; destroying the entry release Dhcp
+              address on the interface."
+    ::= { rlDhcpClActionEntry   2}
+
+rlDhcpClActionHostName OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(0..20))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+       " This option specifies the name of the client."
+    ::= { rlDhcpClActionEntry   3 }
+
+------------------------------
+-- DHCP Approval feature
+------------------------------
+
+-- rlDhcpApprovalEnabled --
+
+rlDhcpApprovalEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "DHCP Approval feature status - enable (True) or desable (False).
+                Must be True only if DHCP Approval supported, device has only one
+                ip interface and default ip exist."
+    ::= { rlDhcpCl 4 }
+
+
+-- rlDhcpApprovalWaitingTable --
+
+rlDhcpApprovalWaitingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlDhcpApprovalWaitingEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "IP addresses waiting for approval."
+    ::= { rlDhcpCl 5 }
+
+rlDhcpApprovalWaitingEntry OBJECT-TYPE
+    SYNTAX      RlDhcpApprovalWaitingEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in rlDhcpApprovalWaitingTable."
+    INDEX      { rlDhcpApprovalWaitingIfIndex }
+    ::= { rlDhcpApprovalWaitingTable 1 }
+
+RlDhcpApprovalWaitingEntry ::= SEQUENCE {
+    rlDhcpApprovalWaitingIfIndex     InterfaceIndex,
+    rlDhcpApprovalWaitingAddress     IpAddress,
+    rlDhcpApprovalWaitingMask        IpAddress,
+    rlDhcpApprovalWaitingGateway     IpAddress
+}
+
+rlDhcpApprovalWaitingIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "IP interface ifIndex."
+    ::= { rlDhcpApprovalWaitingEntry  1 }
+
+rlDhcpApprovalWaitingAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "IP Address waiting for approval."
+    ::= { rlDhcpApprovalWaitingEntry   2}
+
+rlDhcpApprovalWaitingMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "Mask waiting for approval."
+    ::= { rlDhcpApprovalWaitingEntry   3}
+
+rlDhcpApprovalWaitingGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "Default gateway of received address."
+    ::= { rlDhcpApprovalWaitingEntry   4}
+
+
+
+-- rlDhcpApprovalActionTable --
+
+rlDhcpApprovalActionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlDhcpApprovalActionEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "Action for waiting ip address (approve/decline)."
+    ::= { rlDhcpCl 6 }
+
+rlDhcpApprovalActionEntry OBJECT-TYPE
+    SYNTAX      RlDhcpApprovalActionEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in rlDhcpApprovalActionTable."
+    INDEX      {rlDhcpApprovalActionIfIndex,
+                rlDhcpApprovalActionAddress,
+                rlDhcpApprovalActionMask }
+    ::= { rlDhcpApprovalActionTable 1 }
+
+RlDhcpApprovalActionEntry ::= SEQUENCE {
+    rlDhcpApprovalActionIfIndex     InterfaceIndex,
+    rlDhcpApprovalActionAddress     IpAddress,
+    rlDhcpApprovalActionMask        IpAddress,
+    rlDhcpApprovalActionApprove     TruthValue
+}
+
+rlDhcpApprovalActionIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "IP interface ifIndex."
+    ::= { rlDhcpApprovalActionEntry  1 }
+
+rlDhcpApprovalActionAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "IP Address."
+    ::= { rlDhcpApprovalActionEntry  2 }
+
+rlDhcpApprovalActionMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION "IP Address mask."
+    ::= { rlDhcpApprovalActionEntry  3 }
+
+rlDhcpApprovalActionApprove OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION "Approve or decline ip address."
+    ::= { rlDhcpApprovalActionEntry   4}
+
+
+-- =======================================================
+-- DHCP Renew
+-- =======================================================
+
+rlDhcpClCommandTable        OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpClCommandEntry
+    MAX-ACCESS          read-only
+    STATUS          current
+    DESCRIPTION     "Action MIB for DHCP Renew command."
+    ::= { rlDhcpCl 7 }
+
+rlDhcpClCommandEntry OBJECT-TYPE
+    SYNTAX          RlDhcpClCommandEntry
+    MAX-ACCESS          not-accessible
+    STATUS          current
+    DESCRIPTION     "The row definition for this table."
+    INDEX { ifIndex }
+::= { rlDhcpClCommandTable 1 }
+
+RlDhcpClCommandEntry::= SEQUENCE {
+    rlDhcpClCommandAction  INTEGER
+}
+
+rlDhcpClCommandAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                none(0),
+                                renew(1),
+                                renewForceAutoconfig(2)
+                            }
+    MAX-ACCESS          read-write
+    STATUS          current
+    DESCRIPTION     "Action to apply. When the field is renew_force_autoconfig the meaning is that
+                     every time when DHCP option 67 is received, the configuration is downloaded from DHCP server.
+                     The default value is false."
+    ::= { rlDhcpClCommandEntry 2 }
+
+rlDhcpClConfigurationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The configuration file name that loaded into the device.
+        The filename is a relative path on the TFTP server, without the server IP address."
+        DEFVAL{""}
+    ::= { rlDhcpCl 8 }
+
+rlDhcpClOption67Enable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Defines whether the configuration file can be downloaded from DHCP packet option 67."
+    DEFVAL{ enable }
+    ::= { rlDhcpCl 9 }
+
+------------------------------
+-- DHCP TFTP configuration
+------------------------------
+-- rlDhcpClManualTftpServerAddress --
+rlDhcpClManualTftpServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Manually configured TFTP server IP Address."
+    ::= { rlDhcpCl 10 }
+
+-- rlDhcpClSelectedTftpServerAddress --
+rlDhcpClSelectedTftpServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Currently selected TFTP server IP Address."
+    ::= { rlDhcpCl 11 }
+
+-- rlDhcpClSelectedTftpServerAddressOrigin --
+rlDhcpClSelectedTftpServerAddressOrigin OBJECT-TYPE
+    SYNTAX INTEGER{
+       sname(1),
+       option66(2),
+       option150(3),
+       option129(4),
+       siaddr(5),
+       manual(6),
+       unknown(7),
+       none(8),
+       optionv6-59(9),
+       broadcastReply(10)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Currently selected TFTP server IP Address's origin"
+    ::= { rlDhcpCl 12 }
+
+-- rlDhcpClManualConfigurationFileName --
+rlDhcpClManualConfigurationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The manually configured file name."
+        DEFVAL{""}
+    ::= { rlDhcpCl 13 }
+
+-- rlDhcpClSelectedConfigurationFileName --
+rlDhcpClSelectedConfigurationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The selected configuration file name."
+    ::= { rlDhcpCl 14 }
+
+-- rlDhcpClSelectedConfigurationFileNameOrigin --
+rlDhcpClSelectedConfigurationFileNameOrigin OBJECT-TYPE
+    SYNTAX INTEGER{
+       file(1),
+       option67(2),
+       manual(3),
+       none(4),
+       hostname(5),
+       defaultConfigFile(6),
+       optionv6-60(7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The selected configuration files name origin."
+    ::= { rlDhcpCl 15 }
+
+------------------------------
+-- DHCP Client must be added by default
+------------------------------
+
+-- rlDhcpClEnabledByDefaultRemovedIfindex --
+
+rlDhcpClEnabledByDefaultRemovedIfindex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "DHCP Client flag is relevant when host parameter dhcp_client_active_on_start is TRUE.
+                 If the MIB has non zero value the meaning is that DHCP client has removed from configuration by the user
+                 on the interface and signs to application not to add DHCP client entry. Otherwise (zero value) - the meaning is
+                 that DHCP client entry must be added. "
+    DEFVAL{ 0 }
+    ::= { rlDhcpCl 16 }
+
+----------------------------------------------
+-- Auto-Update and Auto-Config MIB variables
+----------------------------------------------
+
+rlDhcpClAutoUpdateEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Setting this MIB value to True/False enables/disables DHCP
+                 auto-update process in the device (through option 125)."
+    ::= { rlDhcpCl 17 }
+
+rlDhcpClAutoUpdateStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+       noData(1),
+       openingIndirectFile(2),
+       downloadedIndirectFile(3),
+       startDownloadImageFile(4),
+       failedToDownloadImageFile(5),
+       quitFileContentsLenZero(6),
+       quitImageFileNameLenZero(7),
+       quitVersionAlreadyUpdated(8),
+       quitIndirectFileNotFound(9),
+       quitImageFileNotFound(10),
+       quitImageVersionNotSupported(11),
+       quitNoTftpOutgoingInterface(12),
+       quitUsbSetupFileOpenError(13),
+       quitUsbSetupFileFormatError(14),
+       quitUsbSetupFileReadWriteError(15),
+       quitUsbSetupFileSetIpAddrError(16),
+       quitUsbSetupFileImageFileNotExist(17),
+       quitUsbSetupFileConfigFileNotExist(18)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Describes the status of current/last DHCP auto-update process."
+    ::= { rlDhcpCl 18 }
+
+rlDhcpClAutoConfigForce OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Setting this MIB value to True will force DHCP auto-config process
+                 after next reboot. This configuration will take effect only during
+                 the time period between the next 2 reboots of the device (like
+                 a deffered action)."
+    ::= { rlDhcpCl 19 }
+
+rlDhcpClAutoConfigAutoSave OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Setting this MIB value to True configures automatic saving of
+                 running-cdb into startup-cdb, to be done at the end of successful
+                 DHCP auto-config process to running-cdb."
+    ::= { rlDhcpCl 20 }
+
+rlDhcpClAutoConfigStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+       noData(1),
+       openingDhcpConfigFile(2),
+       openingIndirectFile(3),
+       searchingHostnameInIndirectFile(4),
+       openingHostnameConfigFile(5),
+       openingHostnameCfgFile(6),
+       openingDefaultConfigFile(7),
+       downloadingConfigFile(8),
+       savingConfigInStartupCDB(9),
+       quitDhcpFileNotGivenOrNotExists(10),
+       quitFailedToFindAnyExistingConfigFile(11),
+       quitConfigFileContentsLenZero(12),
+       quitConfigFileDownloadFailed(13),
+       quitConditionsForAutoConfigChanged(14),
+       quitSelectedConfigFileNameUpdateFailed(15),
+       quitSelectedConfigFileNameOriginUpdateFailed(16),
+       quitSelectedTftpServerAddressUpdateFailed(17),
+       quitSelectedTftpServerAddressOriginUpdateFailed(18),
+       quitCopyRunningToStartupFailed(19),
+       quitNoTftpOutgoingInterface(20),
+       finishedSuccessfully(21)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Describes the status of current/last DHCP auto-config process."
+    ::= { rlDhcpCl 21 }
+
+
+
+rlDhcpClAutoConfigProtocol OBJECT-TYPE
+    SYNTAX INTEGER{
+       tftp(1),
+       scp(2),
+       auto(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Describes the auto-config process protocol.
+                 tftp - only the TFTP protocol is used by auto-configuration.
+                 scp - only the SCP protocol is used by auto-configuration.
+                 auto-(Default) Auto-configuration uses the TFTP or SCP protocol
+                 depending on the configuration file's extension.
+                 If this option is selected, the extension parameter may be
+                 specified or, if not, the default extension is used."
+     DEFVAL{ auto }
+    ::= { rlDhcpCl 22 }
+
+rlDhcpClAutoConfigScpFileExtention OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Describes the SCP file extention.
+                 When no vlaue is specified, 'scp' extension is used."
+    DEFVAL{ "scp" }
+    ::= { rlDhcpCl 23 }
+
+
+rlDhcpClSelectedTftpServerInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Currently selected TFTP server Inet Address type."
+    ::= { rlDhcpCl 24}
+
+rlDhcpClSelectedTftpServerInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Currently selected TFTP server inet Address."
+    ::= { rlDhcpCl 25}
+
+rlDhcpClManualAutoConfigDataTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpClManualAutoConfigDataEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+            " A table for configuring default values for auto-config/ auto-update process.
+              These values during the process, in case no appropriate
+              data was received from the DHCP server."
+    ::= { rlDhcpCl 26 }
+
+rlDhcpClManualAutoConfigDataEntry OBJECT-TYPE
+    SYNTAX     RlDhcpClManualAutoConfigDataEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in rlDhcpClManualAutoConfigDataTable."
+    INDEX      { rlDhcpClManualAutoConfigDataIndex }
+    ::= { rlDhcpClManualAutoConfigDataTable 1 }
+
+RlDhcpClManualAutoConfigDataEntry ::= SEQUENCE {
+    rlDhcpClManualAutoConfigDataIndex     INTEGER,
+    rlDhcpClManualServerInetAddressType   InetAddressType,
+    rlDhcpClManualServerInetAddress       InetAddress,
+    rlDhcpClManualImageIndirectFileName   DisplayString
+}
+
+rlDhcpClManualAutoConfigDataIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The index of this row. There is only one entry in this table,
+                 whose index is 1."
+    ::= { rlDhcpClManualAutoConfigDataEntry  1 }
+
+rlDhcpClManualServerInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Manually configured inet Address type of remote server."
+    ::= { rlDhcpClManualAutoConfigDataEntry  2 }
+
+rlDhcpClManualServerInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Manually configured inet Address of remote server."
+    ::= { rlDhcpClManualAutoConfigDataEntry  3 }
+
+rlDhcpClManualImageIndirectFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Manually configured indirect file name, that holds the
+                 name of the image file to download."
+    ::= { rlDhcpClManualAutoConfigDataEntry  4 }
+
+-- rlDhcpClInformationTable
+
+rlDhcpClInformationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpClInformationEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The (conceptual) table mentione IP address which must be
+              released/renewed on the interface."
+    ::= { rlDhcpCl 27 }
+
+rlDhcpClInformationEntry OBJECT-TYPE
+    SYNTAX     RlDhcpClInformationEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in dhcpClActionTable."
+    INDEX      { rlDhcpClInformationIfIndex }
+    ::= { rlDhcpClInformationTable 1 }
+
+RlDhcpClInformationEntry ::= SEQUENCE {
+    rlDhcpClInformationIfIndex            InterfaceIndex,
+    rlDhcpClInformationIpAddress          IpAddress,
+    rlDhcpClInformationIpMask             IpAddress,
+    rlDhcpClInformationT1                 Unsigned32,
+    rlDhcpClInformationT2                 Unsigned32,
+    rlDhcpClInformationDefaultGateway     IpAddress,
+    rlDhcpClInformationHostName           SnmpAdminString,
+    rlDhcpClInformationDomainName         DisplayString,
+    rlDhcpClInformationTftpServerName     DisplayString,
+    rlDhcpClInformationTftpFileName       DisplayString,
+    rlDhcpClInformationTimeZone           DisplayString,
+    rlDhcpClInformationTftpImageName      DisplayString
+}
+
+rlDhcpClInformationIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The DHCPv4 client informational table. Contains information received by DHCP client from DHCP server"
+    ::= { rlDhcpClInformationEntry  1 }
+
+rlDhcpClInformationIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP Address allocated by DHCP server."
+    ::= { rlDhcpClInformationEntry   2}
+
+rlDhcpClInformationIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP Address mask allocated by DHCP server."
+    ::= { rlDhcpClInformationEntry   3}
+
+rlDhcpClInformationT1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "T1 timer value."
+    ::= { rlDhcpClInformationEntry 4 }
+
+rlDhcpClInformationT2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "T2 timer value."
+    ::= { rlDhcpClInformationEntry 5 }
+
+rlDhcpClInformationDefaultGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Default Gateway IP Address."
+    ::= { rlDhcpClInformationEntry   6}
+
+rlDhcpClInformationHostName OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(0..160))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       " Specifies the name of the client."
+    ::= { rlDhcpClInformationEntry   7 }
+
+rlDhcpClInformationDomainName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Domain name received by DHCP client."
+    ::= { rlDhcpClInformationEntry 8 }
+
+rlDhcpClInformationTftpServerName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..160))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Tftp server name received by DHCP client."
+    ::= { rlDhcpClInformationEntry 9 }
+
+rlDhcpClInformationTftpFileName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Name of file to use in configuration process received by DHCP client."
+    ::= { rlDhcpClInformationEntry 10 }
+
+rlDhcpClInformationTimeZone   OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The timezone received by DHCP client."
+    ::= { rlDhcpClInformationEntry 11 }
+
+rlDhcpClInformationTftpImageName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Image filename to use in autoupdate process received by DHCP client."
+    ::= { rlDhcpClInformationEntry 12 }
+
+-- rlDhcpClInformationDnsServerListEntry --
+
+
+rlDhcpClInformationDnsServerListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpClInformationDnsServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The table saved the list of DNS servers received by DHCP client."
+    ::= { rlDhcpCl 28 }
+
+rlDhcpClInformationDnsServerListEntry OBJECT-TYPE
+    SYNTAX     RlDhcpClInformationDnsServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in rlDhcpClInformationDnsServerListTable."
+    INDEX      { rlDhcpClInformationDnsServerListIfIndex,
+                 rlDhcpClInformationDnsServerListPriority }
+    ::= { rlDhcpClInformationDnsServerListTable 1 }
+
+RlDhcpClInformationDnsServerListEntry ::= SEQUENCE {
+    rlDhcpClInformationDnsServerListIfIndex  InterfaceIndex,
+    rlDhcpClInformationDnsServerListPriority INTEGER,
+    rlDhcpClInformationDnsServerListAddress  IpAddress
+}
+
+rlDhcpClInformationDnsServerListIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IfIndex in rlDhcpClInformationDnsServerListEntry. "
+    ::= { rlDhcpClInformationDnsServerListEntry  1 }
+
+rlDhcpClInformationDnsServerListPriority          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The priority of the entry. "
+    ::= { rlDhcpClInformationDnsServerListEntry  2 }
+
+rlDhcpClInformationDnsServerListAddress   OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "DNS server address received by DHCP client"
+    ::= { rlDhcpClInformationDnsServerListEntry 3 }
+
+
+-- rlDhcpClInformationTftpServerListEntry --
+
+
+rlDhcpClInformationTftpServerListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpClInformationTftpServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " The table saved the list of Tftp servers received by DHCP client."
+    ::= { rlDhcpCl 29 }
+
+rlDhcpClInformationTftpServerListEntry OBJECT-TYPE
+    SYNTAX     RlDhcpClInformationTftpServerListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in rlDhcpClInformationTftpServerListTable."
+    INDEX      { rlDhcpClInformationTftpServerListIfIndex,
+                 rlDhcpClInformationTftpServerListPriority }
+    ::= { rlDhcpClInformationTftpServerListTable 1 }
+
+RlDhcpClInformationTftpServerListEntry ::= SEQUENCE {
+    rlDhcpClInformationTftpServerListIfIndex  InterfaceIndex,
+    rlDhcpClInformationTftpServerListPriority INTEGER,
+    rlDhcpClInformationTftpServerListAddress  IpAddress
+}
+
+rlDhcpClInformationTftpServerListIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The IfIndex in rlDhcpClInformationTftpServerListEntry. "
+    ::= { rlDhcpClInformationTftpServerListEntry  1 }
+
+rlDhcpClInformationTftpServerListPriority          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The priority of the entry. "
+    ::= { rlDhcpClInformationTftpServerListEntry  2 }
+
+rlDhcpClInformationTftpServerListAddress   OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tftp server address received by DHCP client"
+    ::= { rlDhcpClInformationTftpServerListEntry 3 }
+
+
+rlDhcpClAutoUpdateProtocol OBJECT-TYPE
+    SYNTAX INTEGER{
+       tftp(1),
+       scp(2),
+       auto(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Describes the auto-update process protocol.
+                 tftp - only the TFTP protocol is used by auto-update.
+                 scp - only the SCP protocol is used by auto-update.
+                 auto-(Default) Auto-update uses the TFTP or SCP protocol
+                 depending on the configuration file's extension.
+                 If this option is selected, the extension parameter may be
+                 specified or, if not, the default extension is used."
+     DEFVAL{ auto }
+    ::= { rlDhcpCl 30 }
+
+rlDhcpClAutoUpdateScpFileExtention OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Describes the SCP file extention used for auto-update.
+                 When no vlaue is specified, 'scp' extension is used."
+    DEFVAL{ "scp" }
+    ::= { rlDhcpCl 31 }
+
+END

@@ -1,0 +1,50 @@
+--
+-- Title: Switch Base MIB.
+--
+-- This is specified based on SMIv2, mainly to ensure that the specification
+-- can be parsed easily by off-the-shelf network management product in
+-- the market.
+--
+-- The goal of this mib is to access the switch of
+-- Brocade's family 
+-- NOTE: Load BRCD.mib file before loading this mib file.
+--
+
+SWBASE-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+	DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+    Counter32, Integer32, IpAddress,
+    OBJECT-TYPE, OBJECT-IDENTITY,
+	MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+    fcSwitch, bcsiModules
+      FROM Brocade-REG-MIB;
+
+  swMibModule MODULE-IDENTITY
+    LAST-UPDATED "1104151830Z" -- Apr 15, 20i11 6:30pm
+    ORGANIZATION "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO "Customer Support Group
+		  Brocade Communications Systems,
+          130 Holger Way,
+          San Jose, CA 95134 U.S.A
+          Tel: +1-408-333-8000
+          Fax: +1-408-333-8101
+		  Email: support@Brocade.COM
+		  WEB: www.brocade.com"
+		
+
+    DESCRIPTION	"The MIB module	is for Brocade's Switch.
+                 Copyright (c) 1996-2003 Brocade Communications Systems, Inc.
+  				 All rights reserved."
+    REVISION	"1104151830Z" -- Apr 15, 20i11 6:30pm
+    DESCRIPTION	"The initial version of this module."
+	::=	{ bcsiModules 3 }
+	
+    sw		    OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for Brocade's Silkworm Series of Switches."
+     ::= { fcSwitch 1 }
+
+   
+END

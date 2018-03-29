@@ -1,0 +1,243 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQL-LLDP-MIB DEFINITIONS ::= BEGIN
+
+-- ******************************************************************
+-- LLDP (IEEE 802.1AB) MIB
+-- ******************************************************************
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises,
+    Counter32,
+    Counter64,
+    Integer32,
+    Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]   
+    TimeInterval,
+    MacAddress,
+    TruthValue               FROM SNMPv2-TC     -- [RFC2579]
+    ifIndex                  FROM RFC1213-MIB
+    equalLogic               FROM EQUALLOGIC-SMI
+    eqlGroupId               FROM EQLGROUP-MIB
+    eqlMemberIndex           FROM EQLMEMBER-MIB
+   ;
+
+eqlLldpMib MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+   DESCRIPTION 
+        "Link Layer Discovery Protocol MIB module.
+        Copyright (c) 2010-2012 by Dell Inc.
+
+        All rights reserved.  This software may not be copied, disclosed,
+        transferred, or used except in accordance with a license granted
+        by Dell Inc.  This software embodies proprietary information
+        and trade secrets of Dell Inc.
+
+        Copyright (C) IEEE (2009). This version of this MIB module
+        is published as subclause 11.5.1 of IEEE Std 802.1AB-2009;
+        see the standard itself for full legal notices."
+   REVISION       "201007230000Z"    -- 7/23/2010 00:00GMT
+   DESCRIPTION 
+      "Initial revision - based on IEEE 802.1AB-2009 Copyright (C) IEEE."
+    ::= { enterprises equalLogic(12740) 21 }
+
+eqlLldpMIBObjects      OBJECT IDENTIFIER ::= { eqlLldpMib 1 }
+
+-------------------------------------------------------------------
+-- IEEE 802.1AB - LLDP Textual Conventions
+-------------------------------------------------------------------
+
+EqlLldpV2ChassisIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This describes the source of a chassis identifier."
+    SYNTAX      INTEGER {
+        chassisComponent(1),
+        interfaceAlias(2),
+        portComponent(3),
+        macAddress(4),
+        networkAddress(5),
+        interfaceName(6),
+        local(7)
+    }
+
+EqlLldpV2ChassisId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION
+        "This describes the format of a chassis identifier string."
+    SYNTAX      OCTET STRING (SIZE (255))
+
+EqlLldpV2PortIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This describes the source of a particular type of port
+        identifier used in the LLDP MIB."
+    SYNTAX      INTEGER {
+        interfaceAlias(1),
+        portComponent(2),
+        macAddress(3),
+        networkAddress(4),
+        interfaceName(5),
+        agentCircuitId(6),
+        local(7)
+    }
+
+EqlLldpV2PortId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION
+        "This describes the format of a port identifier string."
+    SYNTAX      OCTET STRING (SIZE (1..255))
+
+EqlLldpV2State ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This describes the state of LLDP for the port."
+    SYNTAX      INTEGER {
+        off(0),
+        noPeer(1),
+        active(2),
+        multiplePeers(3)
+    }
+
+
+--
+-- Dynamic LLDP interface table contains status information and
+-- counters for LLDP.
+--
+eqlLldpDynamicIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EqlLldpDynamicIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "EqualLogic-Dynamic
+        A table of LLDP information per each interface of a system.
+        Each row in this table supplies values for one port's
+        LLDP parameters."
+    ::= { eqlLldpMIBObjects 1 }
+
+eqlLldpDynamicIfEntry OBJECT-TYPE
+    SYNTAX      EqlLldpDynamicIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry in the LLDP table, containing information
+        about LLDP on a single interface."
+    INDEX { eqlGroupId, eqlMemberIndex, ifIndex }
+    ::= { eqlLldpDynamicIfTable 1 }
+
+EqlLldpDynamicIfEntry ::= SEQUENCE {
+        eqlLldpRemMacAddress                    MacAddress,
+        eqlLldpV2RemChassisIdSubtype            EqlLldpV2ChassisIdSubtype,
+        eqlLldpV2RemChassisId                   EqlLldpV2ChassisId,
+        eqlLldpV2RemPortIdSubtype               EqlLldpV2PortIdSubtype,
+        eqlLldpV2RemPortId                      EqlLldpV2PortId,
+        eqlLldpV2RemPortDesc                    OCTET STRING,
+        eqlLldpV2RemSysName                     OCTET STRING,
+        eqlLldpV2RemSysDesc                     OCTET STRING,
+        eqlLldpV2State                          EqlLldpV2State,
+        eqlLldpV2RemMgmtAddr                    OCTET STRING
+    }
+
+eqlLldpRemMacAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MAC address associated with the LLDP peer."
+    ::= { eqlLldpDynamicIfEntry 1 }
+
+eqlLldpV2RemChassisIdSubtype OBJECT-TYPE
+    SYNTAX          EqlLldpV2ChassisIdSubtype
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of encoding used to identify the chassis
+        associated with the remote system."
+    ::= { eqlLldpDynamicIfEntry 2 }
+
+eqlLldpV2RemChassisId OBJECT-TYPE
+    SYNTAX          EqlLldpV2ChassisId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string value used to identify the chassis component
+        associated with the remote system."
+    ::= { eqlLldpDynamicIfEntry 3 }
+
+eqlLldpV2RemPortIdSubtype OBJECT-TYPE
+    SYNTAX          EqlLldpV2PortIdSubtype
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of encoding used to identify the port
+        associated with the remote system."
+    ::= { eqlLldpDynamicIfEntry 4 }
+
+eqlLldpV2RemPortId OBJECT-TYPE
+    SYNTAX          EqlLldpV2PortId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string value used to identify the port component
+        associated with the remote system."
+    ::= { eqlLldpDynamicIfEntry 5 }
+
+eqlLldpV2RemPortDesc OBJECT-TYPE
+    SYNTAX          OCTET STRING  (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string value used to identify the description of
+        the given port associated with the remote system."
+    ::= { eqlLldpDynamicIfEntry 6 }
+
+eqlLldpV2RemSysName OBJECT-TYPE
+    SYNTAX          OCTET STRING  (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string value used to identify the system name of the
+        remote system."
+    ::= { eqlLldpDynamicIfEntry 7 }
+
+eqlLldpV2RemSysDesc OBJECT-TYPE
+SYNTAX              OCTET STRING  (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string value used to identify the system description
+        of the remote system."
+    ::= { eqlLldpDynamicIfEntry 8 }
+
+eqlLldpV2State OBJECT-TYPE
+    SYNTAX          EqlLldpV2State
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current LLDP state for the port."
+    ::= { eqlLldpDynamicIfEntry 9 }
+
+eqlLldpV2RemMgmtAddr OBJECT-TYPE
+SYNTAX              OCTET STRING  (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The management address reported by the remote system.
+
+        If multiple addresses were reported, they are delimited by
+        commas."
+    ::= { eqlLldpDynamicIfEntry 10 }
+
+END

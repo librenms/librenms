@@ -1,0 +1,208 @@
+								   -- *****************************************************************
+-- NMS-MacAcl.my:  NMS MacAcl MIB file
+-- Jan. 6 2010
+-- *****************************************************************
+--
+
+NMS-MacAcl DEFINITIONS ::= BEGIN
+
+			IMPORTS
+				MODULE-IDENTITY,
+				OBJECT-TYPE
+					FROM SNMPv2-SMI
+				nmslocal,nms
+					FROM NMS-SMI
+				DisplayString
+					FROM RFC1213-MIB
+				RowStatus,MacAddress
+					FROM SNMPv2-TC;
+
+nmsMacAclMIB	MODULE-IDENTITY
+		LAST-UPDATED	"201001060000Z"
+		ORGANIZATION	""
+		CONTACT-INFO
+					""
+
+		DESCRIPTION
+			"This MIB module defines the generic managed objects
+			for MAC Acl."
+		::= { nms 151 }
+
+  --ACL TABLE
+		 nmsMacAclTable OBJECT-TYPE
+			  SYNTAX  SEQUENCE OF nmsMacAclEntry
+			  ACCESS  not-accessible
+			  STATUS  mandatory
+			  DESCRIPTION
+					"This table containing one entry for each
+					MAC Acl on this device."
+			  ::= { nmsMacAclMIB 1 }
+
+		  nmsMacAclEntry OBJECT-TYPE
+			  SYNTAX  nmsMacAclEntry
+			  ACCESS  not-accessible
+			  STATUS  mandatory
+			  DESCRIPTION
+					"An entry (conceptual row) containing information
+					about an MAC Acl on this device."
+			  INDEX   { nmsMacAclname }
+			  ::= { nmsMacAclTable 1 }
+
+		  nmsMacAclEntry ::= SEQUENCE {
+				nmsMacAclname			DisplayString,
+				nmsMacAclnulecnt 		INTEGER,
+				nmsMacAclmergeenable		INTEGER,
+				nmsMacAclrowstatus		RowStatus
+				}
+
+		  nmsMacAclname OBJECT-TYPE
+				SYNTAX	   DisplayString
+				ACCESS	   read-only
+				STATUS	   mandatory
+				DESCRIPTION
+						"The name of this MAC Acl. Length: 1~20."
+				::= { nmsMacAclEntry 1 }
+
+
+		  nmsMacAclnulecnt OBJECT-TYPE
+				SYNTAX	  INTEGER
+				ACCESS	   read-only
+				STATUS	   mandatory
+				DESCRIPTION
+						"The total number of this MAC Acl entries."
+				::= { nmsMacAclEntry 2 }
+
+		  nmsMacAclmergeenable OBJECT-TYPE
+				SYNTAX	   INTEGER{
+								enable (1),
+								disable (2)
+							}
+				ACCESS	   read-write
+				STATUS	   mandatory
+				DESCRIPTION
+						"Mac ACL merge."
+				::= { nmsMacAclEntry 3 }
+
+		  nmsMacAclrowstatus OBJECT-TYPE
+				SYNTAX	   RowStatus
+				ACCESS	   read-write
+				STATUS	   mandatory
+				DESCRIPTION
+						"Table row status.
+						SNMP_ROW_ACTIVE				1, active Mac Acl
+						SNMP_ROW_NOTREADY			3, lock Mac Acl
+						SNMP_ROW_CREATEANDGO		4, create Mac Acl
+						SNMP_ROW_DESTROY			6, delete Mac Acl"
+				::= { nmsMacAclEntry 4 }
+
+
+--MAC ACL RULE TABLE
+				nmsMacAclRuleTable OBJECT-TYPE
+						SYNTAX	SEQUENCE OF nmsMacAclRuleEntry
+						ACCESS	not-accessible
+						STATUS	mandatory
+						DESCRIPTION
+						   ""
+						::= { nmsMacAclMIB 2 }
+
+				nmsMacAclRuleEntry OBJECT-TYPE
+						 SYNTAX  nmsMacAclRuleEntry
+						 ACCESS  not-accessible
+						 STATUS  mandatory
+						 DESCRIPTION
+							""
+						 INDEX	 { nmsMacAclRulename, nmsMacAclRuleid }
+						::= { nmsMacAclRuleTable 1 }
+
+				nmsMacAclRuleEntry ::= SEQUENCE {
+						nmsMacAclRulename			DisplayString,
+						nmsMacAclRuleid				INTEGER,
+						nmsMacAclRuleopt				INTEGER,
+						nmsMacAclRulesrcmac			MacAddress,
+						nmsMacAclRulesrcmacmask		MacAddress,
+						nmsMacAclRuledestmac			MacAddress,
+						nmsMacAclRuledestmacmask		MacAddress,
+						nmsMacAclRuleethertype		INTEGER,
+						nmsMacAclRulerowstatus		RowStatus
+						}
+
+				nmsMacAclRulename OBJECT-TYPE
+						SYNTAX	   DisplayString
+						ACCESS	   read-only
+						STATUS	   current
+						DESCRIPTION
+								"The name of this MAC Acl."
+						::= { nmsMacAclRuleEntry 1 }
+
+				nmsMacAclRuleid OBJECT-TYPE
+						SYNTAX	   INTEGER
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"Index of the rules."
+						::= { nmsMacAclRuleEntry 2 }
+
+				nmsMacAclRuleopt OBJECT-TYPE
+						SYNTAX	   INTEGER{
+								permit (1),
+								deny (2)
+								}
+						ACCESS	   read-write
+						STATUS	   mandatory
+						DESCRIPTION
+								"MAC ACL rule operation."
+						::= { nmsMacAclRuleEntry 3 }
+
+				nmsMacAclRulesrcmac OBJECT-TYPE
+						SYNTAX	   MacAddress
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"source MAC address. all zero means any."
+						::= { nmsMacAclRuleEntry 4 }
+
+				nmsMacAclRulesrcmacmask OBJECT-TYPE
+						SYNTAX	   MacAddress
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"source MAC address mask."
+						::= { nmsMacAclRuleEntry 5 }
+
+				nmsMacAclRuledestmac OBJECT-TYPE
+						SYNTAX	   MacAddress
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"destination MAC address. all zero means any."
+						::= { nmsMacAclRuleEntry 6 }
+
+				nmsMacAclRuledestmacmask OBJECT-TYPE
+						SYNTAX	   MacAddress
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"destination MAC address mask."
+						::= { nmsMacAclRuleEntry 7 }
+
+				nmsMacAclRuleethertype OBJECT-TYPE
+						SYNTAX	   INTEGER
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"ethernet packet type. zero means not set."
+						::= { nmsMacAclRuleEntry 8 }
+
+				nmsMacAclRulerowstatus OBJECT-TYPE
+						SYNTAX	   RowStatus
+						ACCESS	   read-write
+						STATUS	   current
+						DESCRIPTION
+								"table row status.
+								SNMP_ROW_ACTIVE				1, active Mac Acl rule
+								SNMP_ROW_NOTREADY			3, lock Mac Acl rule
+								SNMP_ROW_CREATEANDGO		4, create Mac Acl rule
+								SNMP_ROW_DESTROY			6, delete Mac Acl rule"
+						::= { nmsMacAclRuleEntry 9 }
+
+END

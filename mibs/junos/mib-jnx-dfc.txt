@@ -1,0 +1,840 @@
+JUNIPER-DFC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, 
+    NOTIFICATION-TYPE, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB      -- RFC 2571
+    InterfaceIndex
+        FROM IF-MIB
+    jnxMibs, jnxDfcNotifications
+        FROM JUNIPER-SMI;
+
+jnxDfc MODULE-IDENTITY
+    LAST-UPDATED "200507082153Z" -- Fri Jul 08 21:53:48 2005 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "    Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for Dynamic Flow Capture (DFC)"
+    ::= { jnxMibs 33 }
+
+
+
+    jnxDfcCSTable    OBJECT-TYPE
+      SYNTAX      SEQUENCE OF JnxDfcCSEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current 
+      DESCRIPTION
+            "Statistics information for Control Source."
+      ::= { jnxDfc 1 }
+
+    jnxDfcCSEntry    OBJECT-TYPE
+      SYNTAX      JnxDfcCSEntry 
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "An entry of DFC Control Source table."
+      INDEX	{ jnxDfcGrpName,
+                  jnxDfcCSId }
+      ::= { jnxDfcCSTable 1 }
+
+    JnxDfcCSEntry ::=
+	SEQUENCE {
+          jnxDfcGrpName                          DisplayString,
+          jnxDfcCSId                             DisplayString,
+          jnxDfcCSControlProtocolAddRequests     Counter64,
+          jnxDfcCSCriteriaAdded                  Counter64,
+          jnxDfcCSCriteriaAdditionFailed         Counter64,
+          jnxDfcCSControlProtocolDeleteRequests  Counter64,
+          jnxDfcCSCriteriaDeleted                Counter64,
+          jnxDfcCSCriteriaDeletionFailed         Counter64,
+          jnxDfcCSCriteriaDeletedTimeoutIdle     Counter64,
+          jnxDfcCSCriteriaDeletedTimeoutTotal    Counter64,
+          jnxDfcCSCriteriaDeletedPackets         Counter64,
+          jnxDfcCSCriteriaDeletedBytes           Counter64,
+          jnxDfcCSControlProtocolRefreshRequests Counter64,
+          jnxDfcCSCriteriaRefreshed              Counter64,
+          jnxDfcCSCriteriaRefreshFailed          Counter64,
+          jnxDfcCSControlProtocolListRequests    Counter64,
+          jnxDfcCSListSuccess                    Counter64,
+          jnxDfcCSListFailed                     Counter64,
+          jnxDfcCSControlProtocolNoopRequests    Counter64,
+          jnxDfcCSNoopSuccess                    Counter64,
+          jnxDfcCSNoopFailed                     Counter64,
+          jnxDfcCSDynamicCriteriaActive          Counter64,
+          jnxDfcCSStaticCriteriaActive           Counter64,
+          jnxDfcCSBadRequest                     Counter64,
+          jnxDfcCSResponseSuccessful             Counter64,
+          jnxDfcCSResponseImproperCriteria       Counter64,
+          jnxDfcCSResponseUnknownContentDest     Counter64,
+          jnxDfcCSResponseUnknownCriteriaId      Counter64,
+          jnxDfcCSResponseImproperTimeout        Counter64,
+          jnxDfcCSResponseInvalidAuthentication  Counter64,
+          jnxDfcCSResponseInvalidSequenceNumber  Counter64,
+          jnxDfcCSResponseInternalError          Counter64,
+          jnxDfcCSNotificationRestart            Counter64,
+          jnxDfcCSNotificationRollover           Counter64,
+          jnxDfcCSNotificationNoop               Counter64,
+          jnxDfcCSNotificationTimeout            Counter64,
+          jnxDfcCSNotificationCongestion         Counter64,
+          jnxDfcCSNotificationCongestionDelete   Counter64,
+          jnxDfcCSNotificationDuplicatesDropped  Counter64,
+          jnxDfcCSAddRequestRate                 Counter64,
+          jnxDfcCSAddRequestPeakRate             Counter64,
+          jnxDfcCSAggrCriteriaBandwidth          Counter64,
+          jnxDfcCSSequenceNumber                 Counter64
+      }
+
+    jnxDfcGrpName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..64))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "The name assigned to a DFC group. A DFC group defines a set of DFC
+             PICs that share same static/dynamic 
+             configuration."
+      ::= { jnxDfcCSEntry 1 }
+
+    jnxDfcCSId OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..48))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "Control Source identifier. Control Source identifies Juniper router
+             with one unique Control IP address. There can be multiple IP 
+             addresses from which a Control Source can send Control protocol 
+             request to Juniper router."
+      ::= { jnxDfcCSEntry 2 }
+
+    jnxDfcCSControlProtocolAddRequests OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Control protocol Add requests received. The add 
+             request specifies a new filter criteria to be merged with the
+             existing tasking list for a given Control Source and Content 
+             Destination."
+      ::= { jnxDfcCSEntry 3 }
+
+    jnxDfcCSCriteriaAdded OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria added successfully by the Control
+             Source."
+      ::= { jnxDfcCSEntry 4 }
+
+    jnxDfcCSCriteriaAdditionFailed OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria addition failed."		
+      ::= { jnxDfcCSEntry 5 }
+
+    jnxDfcCSControlProtocolDeleteRequests OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Control protocol delete requests received. The 
+             delete request removes a particular filter criterion." 
+      ::= { jnxDfcCSEntry 6 }
+
+    jnxDfcCSCriteriaDeleted OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria deleted successfully as requested 
+             by Control Source."
+      ::= { jnxDfcCSEntry 7 }
+
+    jnxDfcCSCriteriaDeletionFailed OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria deletion failed."		
+      ::= { jnxDfcCSEntry 8 }
+
+    jnxDfcCSCriteriaDeletedTimeoutIdle OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of criteria deleted by timeout idle."
+      ::= { jnxDfcCSEntry 9 }
+
+    jnxDfcCSCriteriaDeletedTimeoutTotal OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of criteria deleted by timeout total."
+      ::= { jnxDfcCSEntry 10 }
+
+    jnxDfcCSCriteriaDeletedPackets OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of criteria deleted by packets."
+      ::= { jnxDfcCSEntry 11 }
+
+    jnxDfcCSCriteriaDeletedBytes OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of criteria deleted by bytes."
+      ::= { jnxDfcCSEntry 12 }
+
+    jnxDfcCSControlProtocolRefreshRequests OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Control protocol Refresh requests received. The 
+             refresh request updates the timeout for a particular filter
+             criterion or set of filter criteria for the particular Control
+             Source to a particular Content Destination."
+      ::= { jnxDfcCSEntry 13 }
+
+    jnxDfcCSCriteriaRefreshed OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria refreshed successfully as requested
+             by Control Source."
+      ::= { jnxDfcCSEntry 14 }
+
+    jnxDfcCSCriteriaRefreshFailed OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria refresh request failed."		
+      ::= { jnxDfcCSEntry 15 }
+
+    jnxDfcCSControlProtocolListRequests OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Control protocol List requests received. The List 
+             request returns a list of all criteria that a particular Control 
+             Source has added and are currently active."
+      ::= { jnxDfcCSEntry 16 }
+
+    jnxDfcCSListSuccess OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of list commands processed successfully as requested 
+             by Control Source."
+      ::= { jnxDfcCSEntry 17 }
+
+    jnxDfcCSListFailed OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of list commands that could not be processed 
+             successfully."		
+      ::= { jnxDfcCSEntry 18 }
+
+    jnxDfcCSControlProtocolNoopRequests OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Control protocol Noop requests received. The purpose
+             of this request is to verify the end-to-end connectivity between 
+             Control Source and DFC PIC."
+      ::= { jnxDfcCSEntry 19 }
+
+    jnxDfcCSNoopSuccess OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Noop requests processed successfully as requested by
+             Control Source."
+      ::= { jnxDfcCSEntry 20 }
+
+    jnxDfcCSNoopFailed OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Noop requests that could not be processed 
+             successfully."		
+      ::= { jnxDfcCSEntry 21 }
+
+    jnxDfcCSDynamicCriteriaActive OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of active dynamic filter criteria."		
+      ::= { jnxDfcCSEntry 22 }
+
+    jnxDfcCSStaticCriteriaActive OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of active static filter criteria."		
+      ::= { jnxDfcCSEntry 23 }
+
+    jnxDfcCSBadRequest OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Bad requests received."
+      ::= { jnxDfcCSEntry 24 }
+
+    jnxDfcCSResponseSuccessful OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of successful response(s) corresponding to the 
+             requests (add, delete, refresh, list and noop) sent out to the 
+             Control Source."
+      ::= { jnxDfcCSEntry 25 }
+
+    jnxDfcCSResponseImproperCriteria OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of improper filter 
+             criterion specification in the add request."
+      ::= { jnxDfcCSEntry 26 }
+
+    jnxDfcCSResponseUnknownContentDest OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of unknown Content 
+             Destination specified in the add, delete, refresh and list 
+             request."
+      ::= { jnxDfcCSEntry 27 }
+
+    jnxDfcCSResponseUnknownCriteriaId OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of unknown Criteria 
+             Identifier specified in the delete, refresh and list request."
+      ::= { jnxDfcCSEntry 28 }
+
+    jnxDfcCSResponseImproperTimeout OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of improper timeout 
+             specified in the add and refresh request."
+      ::= { jnxDfcCSEntry 29 }
+
+    jnxDfcCSResponseInvalidAuthentication OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of invalid 
+             authentication specified in the add, delete, refresh, list and 
+             noop request."
+      ::= { jnxDfcCSEntry 30 }
+
+    jnxDfcCSResponseInvalidSequenceNumber OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of invalid Sequence 
+             Number specified in the add, delete, refresh, list and noop 
+             request."
+      ::= { jnxDfcCSEntry 31 }
+
+    jnxDfcCSResponseInternalError OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of response(s) generated because of internal error at
+             the DFC PIC in processing a request."
+      ::= { jnxDfcCSEntry 32 }
+
+    jnxDfcCSNotificationRestart OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Restart notifications sent to configured 
+             notification-recipients. This notification will be generated when
+             the system experiences a failure such that all the DFC filter 
+             criteria are lost."
+      ::= { jnxDfcCSEntry 33 }
+
+    jnxDfcCSNotificationRollover OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Rollover notifications sent to configured 
+             notification-recipients. This notification will be generated when 
+             the DFC PIC experiences a sequence number rollover."
+      ::= { jnxDfcCSEntry 34 }
+
+    jnxDfcCSNotificationNoop OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Noop notifications sent to configured 
+             notification-recipents. This notification will be generated when
+             the DFC PIC receives a Noop message with the SendAsync parameter
+             present."
+      ::= { jnxDfcCSEntry 35 }
+
+    jnxDfcCSNotificationTimeout OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Timeout notifications sent to configured 
+             notification-recipents. This notification will be generated when 
+             the DFC PIC times out a filter criterion on any one of its 
+             configured timeout parameters and the criterion contains a 
+             SendTimeoutAsync parameter."
+      ::= { jnxDfcCSEntry 36 }
+
+    jnxDfcCSNotificationCongestion OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Congestion notifications sent to configured 
+             notification-recipents. This notification will be generated when 
+             the 10-second average packet forwarding rate (in bits/second)
+             summed over all active filter criteria to a configured Content 
+             Destination exceeds the configured soft limit for that destination."
+      ::= { jnxDfcCSEntry 37 }
+
+    jnxDfcCSNotificationCongestionDelete OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Congestion Delete notifications sent to configured 
+             notification-recipents. This notification will be generated when 
+             the total 10-second average packet forwarding rate (in bits/second)
+             summed over all active filter criteria to a configured Content 
+             Destination exceeds the configured hard limit for that 
+             destination."
+      ::= { jnxDfcCSEntry 38 }
+
+    jnxDfcCSNotificationDuplicatesDropped OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Duplicates Dropped notifications sent to configured
+             notification-recipents. This notification will be generated when 
+             the configurable Maximum Duplicates parameter has been exceeded in
+             such a way as to cause packets matching criteria added by the 
+             corresponding Control Source to be dropped."
+      ::= { jnxDfcCSEntry 39 }
+
+    jnxDfcCSAddRequestRate OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "The request processing rate (requests processed/second)."		
+      ::= { jnxDfcCSEntry 40 }
+
+    jnxDfcCSAddRequestPeakRate OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "The peak request processing rate (requests processed/second)."	
+      ::= { jnxDfcCSEntry 41 }
+
+    jnxDfcCSAggrCriteriaBandwidth OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Bandwidth in bits/second."	
+      ::= { jnxDfcCSEntry 42 }
+
+    jnxDfcCSSequenceNumber OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Protocol sequence number."
+      ::= { jnxDfcCSEntry 43 }
+
+
+
+------------------------------------------------------------
+
+    jnxDfcCDTable    OBJECT-TYPE
+      SYNTAX      SEQUENCE OF JnxDfcCDEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current 
+      DESCRIPTION
+            "Statistics information for content destination."
+      ::= { jnxDfc 2 }
+
+    jnxDfcCDEntry    OBJECT-TYPE
+      SYNTAX      JnxDfcCDEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "An entry of DFC Content-Destination table."
+      INDEX	{ jnxDfcGrpName,
+              jnxDfcCDId }
+      ::= { jnxDfcCDTable 1 }
+
+    JnxDfcCDEntry ::=
+	SEQUENCE {
+          jnxDfcCDId                         DisplayString,
+          jnxDfcCDCriteria                   Counter64,
+          jnxDfcCDByteRate                   Counter64,
+          jnxDfcCDMatchedPackets             Counter64,
+          jnxDfcCDMatchedBytes               Counter64,
+          jnxDfcCDCongestionNotification     Counter64
+      }
+
+    jnxDfcCDId OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..48))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "Content Destination identifier. A Content Destination is the 
+             recipient of the extracted data, once it is forwarded by the 
+             Server."
+      ::= { jnxDfcCDEntry 1 }
+
+    jnxDfcCDCriteria OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of filter criteria configured for the Content 
+             Destination."
+      ::= { jnxDfcCDEntry 2 }
+
+    jnxDfcCDByteRate OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Average data rate (in bytes/second) summed over all active
+             filter criteria to a configured Content Destination."		
+      ::= { jnxDfcCDEntry 3 }
+
+    jnxDfcCDMatchedPackets OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of packets matching the filter criteria configured for 
+             the Content Destination."		
+      ::= { jnxDfcCDEntry 4 }
+
+    jnxDfcCDMatchedBytes OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of bytes matching the filter criteria configured for 
+             the Content Destination."		
+      ::= { jnxDfcCDEntry 5 }
+
+    jnxDfcCDCongestionNotification OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "Total number of Congestion Notifications sent to a configured 
+             notification-recipient."		
+      ::= { jnxDfcCDEntry 6 }
+
+
+--
+-- DFC PIC Notification objects
+--
+
+    jnxDfcNotifyVars OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Notification object definitions."
+        ::= { jnxDfc 3 }
+
+    jnxDfcInterfaceName OBJECT-TYPE
+        SYNTAX      DisplayString 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The textual name of the DFC interface." 
+        ::= { jnxDfcNotifyVars 1 }
+
+    jnxDfcInputPktRate OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "data packet rate (in packets per second)."
+        ::= { jnxDfcNotifyVars 2 }
+
+    jnxDfcPpsSoftOverloadLowWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Configured lowest value for data packet rate (in packets 
+             per second)." 
+        ::= { jnxDfcNotifyVars 3 }
+
+    jnxDfcPpsSoftOverloadHighWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Configured highest value for data packet rate (in packets 
+             per second)." 
+        ::= { jnxDfcNotifyVars 4 }
+
+    jnxDfcPpsHardOverloadLowWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Recommended lowest value for data packet rate (in packets 
+             per second)." 
+        ::= { jnxDfcNotifyVars 5 }
+
+    jnxDfcPpsHardOverloadHighWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Recommended highest value for data packet rate (in packets 
+             per second)." 
+        ::= { jnxDfcNotifyVars 6 }
+
+    jnxDfcFlowsUsage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "percent"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "% usage of total number of flows in system."
+        ::= { jnxDfcNotifyVars 7 }
+
+    jnxDfcCriteriaUsage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "percent"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "% usage of matching criteria for all filters."
+        ::= { jnxDfcNotifyVars 8 }
+
+    jnxDfcMemSoftOverloadLowWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "percent"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Configured lowest watermark percent for memory load."  
+        ::= { jnxDfcNotifyVars 9 }
+
+    jnxDfcMemSoftOverloadHighWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "percent"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Configured highest watermark percent for memory load."  
+        ::= { jnxDfcNotifyVars 10 }
+
+    jnxDfcFlowLowWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Recommended lowest value for number of flows allowed in
+             the system."
+        ::= { jnxDfcNotifyVars 11 }
+
+    jnxDfcFlowHighWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Recommended highest value for number of flows allowed in
+             the system."
+        ::= { jnxDfcNotifyVars 12 }
+
+
+    jnxDfcCriteriaLowWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Recommended lowest value for number of criterias allowed 
+             in the system."
+        ::= { jnxDfcNotifyVars 13 }
+
+    jnxDfcCriteriaHighWatermark OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Recommended highest value for number of criterias allowed 
+             in the system."
+        ::= { jnxDfcNotifyVars 14 }
+
+--
+-- DFC PIC Notification definitions
+--
+
+    jnxDfcNotificationPrefix OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "All DFC notifications are registered under this branch."
+        ::= { jnxDfcNotifications 0 }
+
+
+    jnxDfcSoftPpsThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcInputPktRate,
+                  jnxDfcPpsSoftOverloadLowWatermark,
+                  jnxDfcPpsSoftOverloadHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of input packet rate (in packet per second) 
+             going beyond the configured limit."
+        ::= { jnxDfcNotificationPrefix 1 }
+
+
+    jnxDfcSoftPpsUnderThreshold NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcInputPktRate,
+                  jnxDfcPpsSoftOverloadLowWatermark,
+                  jnxDfcPpsSoftOverloadHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of input packet rate (in packet per second)
+             dropping back to below the configured limit."
+        ::= { jnxDfcNotificationPrefix 2 }
+
+
+    jnxDfcHardPpsThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcInputPktRate,
+                  jnxDfcPpsHardOverloadLowWatermark,
+                  jnxDfcPpsHardOverloadHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of input packet rate (in packet per second)
+             going beyond the recommended limit."
+        ::= { jnxDfcNotificationPrefix 3 }
+
+
+    jnxDfcHardPpsUnderThreshold NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcInputPktRate,
+                  jnxDfcPpsHardOverloadLowWatermark,
+                  jnxDfcPpsHardOverloadHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of input packet rate (in packet per second)
+             dropping back to below the recommended limit."
+        ::= { jnxDfcNotificationPrefix 4 }
+
+
+    jnxDfcSoftMemThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcFlowsUsage,
+                  jnxDfcCriteriaUsage,
+                  jnxDfcMemSoftOverloadLowWatermark,
+                  jnxDfcMemSoftOverloadHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of memory overload condition i.e memory usage 
+             is going beyond the configured limit."
+        ::= { jnxDfcNotificationPrefix 5 }
+
+
+    jnxDfcSoftMemUnderThreshold NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcFlowsUsage,
+                  jnxDfcCriteriaUsage,
+                  jnxDfcMemSoftOverloadLowWatermark,
+                  jnxDfcMemSoftOverloadHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of memory usage dropping back to below the 
+             configured limit."
+        ::= { jnxDfcNotificationPrefix 6 }
+
+
+    jnxDfcHardMemThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcFlowsUsage,
+                  jnxDfcFlowLowWatermark,
+                  jnxDfcFlowHighWatermark,
+                  jnxDfcCriteriaUsage,
+                  jnxDfcCriteriaLowWatermark,
+                  jnxDfcCriteriaHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of memory overload condition i.e memory usage
+             is going beyond the recommended limit."
+        ::= { jnxDfcNotificationPrefix 7 }
+
+
+    jnxDfcHardMemUnderThreshold NOTIFICATION-TYPE
+        OBJECTS { jnxDfcInterfaceName, 
+                  jnxDfcFlowsUsage,
+                  jnxDfcFlowLowWatermark,
+                  jnxDfcFlowHighWatermark,
+                  jnxDfcCriteriaUsage,
+                  jnxDfcCriteriaLowWatermark,
+                  jnxDfcCriteriaHighWatermark}
+        STATUS  current
+        DESCRIPTION
+            "Notification of memory usage dropping back to below the
+             recommended limit."
+        ::= { jnxDfcNotificationPrefix 8 }
+
+
+END

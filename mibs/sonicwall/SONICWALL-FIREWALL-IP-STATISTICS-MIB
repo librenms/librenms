@@ -1,0 +1,252 @@
+-- *****************************************************************
+-- SONICWALL-FIREWALL-IP-STATISTICS
+--
+-- June 2002, Initial Version, Srikanth  Nayani
+-- Apr  2003,   Change Postal, Susan Yan
+-- Nov 2005, Add CPU and RAM Utilizations, GM Anderson
+-- 03-10-08 - Removed Imports that are not used to prevent warnings
+--            in MIB compilation, Mike Uy 
+-- 04-17-09 - Updated E-mail CONTACT-INFO, Rosalea Real
+-- 11-11-09 - Renamed this file from
+--            sonic_stats.mib to
+--            SONICWALL-FIREWALL-IP-STATISTICS-MIB.MIB, Mike Uy
+-- 11-11-09 - Updated SonicWALL company address, Mike Uy
+--
+-- Copyright (c) 2001 - 2009 by SonicWall, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+SONICWALL-FIREWALL-IP-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    DisplayString                               FROM SNMPv2-TC
+
+    IpAddress,
+    OBJECT-TYPE,
+        MODULE-IDENTITY             FROM SNMPv2-SMI
+        Counter                                         FROM RFC1155-SMI
+
+    sonicwallFw                         FROM SONICWALL-SMI;
+
+sonicwallFwStatsModule MODULE-IDENTITY
+        LAST-UPDATED "200911110000Z"
+        ORGANIZATION "SonicWall, Inc."
+        CONTACT-INFO
+                "       SonicWall Inc.
+
+                   Postal: 2001 Logic Drive
+                                   San Jose, CA 95124-3452
+                                   USA
+
+                   Tel: +1 408 745 9600
+                   Fax: +1 408 745 9300
+
+                E-mail: products@sonicwall.com"
+        DESCRIPTION
+                "The MIB Module for SonicWALL Firewall Ipsec Statistics."
+        REVISION      "200511090000Z"
+        DESCRIPTION
+                "Initial Version"
+    ::= { sonicwallFw 3 }
+
+-- =======================
+-- sonic Firewall Statistics
+-- =======================
+
+
+sonicwallFwStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 1}
+
+sonicMaxConnCacheEntries OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                " Maximum number of connection cache entries allowed through the firewall"
+        ::= { sonicwallFwStats 1 }
+
+sonicCurrentConnCacheEntries OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                " Number of active connection cache entries through the firewall"
+        ::= { sonicwallFwStats 2 }
+
+sonicCurrentCPUUtil OBJECT-TYPE
+        SYNTAX Gauge
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                " Instantaneous CPU Utilization in percent"
+        ::= { sonicwallFwStats 3 }
+
+sonicCurrentRAMUtil OBJECT-TYPE
+        SYNTAX Gauge
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                " Instantaneous RAM Utilization in percent"
+        ::= { sonicwallFwStats 4 }
+
+sonicwallFwVPNStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 2}
+
+sonicwallFwVpnIPSecStats OBJECT IDENTIFIER ::= {sonicwallFwVPNStats 1}
+
+
+-- =======================
+-- sonic IPsec Statistics Table
+-- =======================
+
+sonicSAStatTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SonicSAStatEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "This table provides statistics for each Security Association."
+        ::= { sonicwallFwVpnIPSecStats 1 }
+
+sonicSAStatEntry OBJECT-TYPE
+        SYNTAX SonicSAStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entries in table cannot be added or deleted. This table is
+                completely controlled by the agent. Each SA statistics will be
+                represented by an entry in this table. "
+        INDEX { sonicIpsecSaIndex}
+        ::= { sonicSAStatTable 1 }
+
+SonicSAStatEntry ::= SEQUENCE {
+        sonicIpsecSaIndex                          Counter,
+        sonicSAStatPeerGateway         IpAddress,
+        sonicSAStatSrcAddrBegin        IpAddress,
+        sonicSAStatSrcAddrEnd          IpAddress,
+        sonicSAStatDstAddrBegin        IpAddress,
+        sonicSAStatDstAddrEnd          IpAddress,
+        sonicSAStatCreateTime          DisplayString,
+        sonicSAStatEncryptPktCount     Counter,
+        sonicSAStatEncryptByteCount    Counter,
+        sonicSAStatDecryptPktCount     Counter,
+        sonicSAStatDecryptByteCount    Counter,
+        sonicSAStatInFragPktCount      Counter,
+        sonicSAStatOutFragPktCount     Counter,
+    sonicSAStatUserName            DisplayString
+        }
+
+
+sonicIpsecSaIndex OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                " Phase2  SA index."
+        ::= { sonicSAStatEntry 1 }
+
+sonicSAStatPeerGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Peer gateway address where the tunnel gets terminated ."
+        ::= { sonicSAStatEntry 2 }
+
+sonicSAStatSrcAddrBegin OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "First address of the Source network for the phase2 SA ."
+        ::= { sonicSAStatEntry 3 }
+
+sonicSAStatSrcAddrEnd OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Last address of the Source network for the phase2 SA ."
+        ::= { sonicSAStatEntry 4 }
+
+sonicSAStatDstAddrBegin OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "First address of the destination network for the phase2 SA ."
+        ::= { sonicSAStatEntry 5 }
+
+sonicSAStatDstAddrEnd OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Last address of the destination network for the phase2 SA ."
+        ::= { sonicSAStatEntry 6 }
+
+sonicSAStatCreateTime OBJECT-TYPE
+        SYNTAX DisplayString
+    MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Time this phase2 SA was actually created in GMT."
+        ::= { sonicSAStatEntry 7 }
+
+sonicSAStatEncryptPktCount OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Total encrypted packet count for this phase2 SA."
+        ::= { sonicSAStatEntry 8 }
+
+sonicSAStatEncryptByteCount OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Total encrypted byte count for this phase2 SA."
+        ::= { sonicSAStatEntry 9 }
+
+sonicSAStatDecryptPktCount OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Total decrypted packet count for this phase2 SA."
+        ::= { sonicSAStatEntry  10}
+
+sonicSAStatDecryptByteCount OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Total decrypted byte count for this phase2 SA."
+        ::= { sonicSAStatEntry  11 }
+
+sonicSAStatInFragPktCount OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming Fragmented packet count for this phase2 SA"
+        ::= { sonicSAStatEntry 12 }
+
+sonicSAStatOutFragPktCount OBJECT-TYPE
+        SYNTAX Counter
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing Fragmented packet count for this phase2 SA"
+        ::= { sonicSAStatEntry 13 }
+
+
+sonicSAStatUserName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of the security policy used for creating this phase2 SA."
+        ::= { sonicSAStatEntry 14 }
+
+
+END

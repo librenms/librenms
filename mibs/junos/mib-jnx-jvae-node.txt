@@ -1,0 +1,908 @@
+--
+-- Juniper JunosV App Engine Node MIB
+--
+-- Copyright (c) 2012 Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-JVAE-NODE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    Gauge32, Counter64
+        FROM SNMPv2-SMI
+
+    DisplayString, PhysAddress, TruthValue
+        FROM SNMPv2-TC
+
+    jnxJVAEMibRoot
+        FROM JUNIPER-SMI;
+
+jnxJVAENodeMIB MODULE-IDENTITY
+    LAST-UPDATED "201208010000Z" -- Aug 01 00:00:00 2012 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+        "The MIB modules for JunosV App Engine Compute Nodes."
+    REVISION    "201208010000Z" -- Aug 01 00:00:00 2012 UTC
+    DESCRIPTION
+            "Initial version of JVAE Node MIB."
+
+    ::= { jnxJVAEMibRoot 2 }
+
+
+jnxJVAENodeNotifications  OBJECT IDENTIFIER ::= { jnxJVAENodeMIB 0 }
+jnxJVAENodeObjects        OBJECT IDENTIFIER ::= { jnxJVAENodeMIB 1 }
+jnxJVAENodeTables         OBJECT IDENTIFIER ::= { jnxJVAENodeObjects 1 }
+
+
+   -- 
+   -- JVAE Node Objects
+   --
+
+   --
+   -- Compute Node System Information Table
+   --
+
+jnxJVAECNSysInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNSysInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for further information on Compute Nodes."
+    ::= { jnxJVAENodeTables 1 }
+
+jnxJVAECNSysInfoEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNSysInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "System information for a Compute Node."
+    INDEX { jnxJVAECNSysId }
+    ::= { jnxJVAECNSysInfoTable 1 }
+
+JnxJVAECNSysInfoEntry ::= SEQUENCE {
+    jnxJVAECNSysId                 DisplayString,
+    jnxJVAECNSysCpus               INTEGER,
+    jnxJVAECNSysProcessingLoad     INTEGER,
+    jnxJVAECNSysMemCapacity        Gauge32,
+    jnxJVAECNSysMemUsed            Gauge32,
+    jnxJVAECNSysMemFree            Gauge32,
+    jnxJVAECNSysMemUsedPr          INTEGER,
+    jnxJVAECNSysSwapCapacity       Gauge32,
+    jnxJVAECNSysSwapFree           Gauge32,
+    jnxJVAECNSysBootMethod         INTEGER,
+    jnxJVAECNSysLastReboot         DisplayString
+}
+
+jnxJVAECNSysId OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(1..32))
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+         "Id of the Compute Node."
+    ::= { jnxJVAECNSysInfoEntry 1 }
+
+jnxJVAECNSysCpus OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The number of CPUs or cores on the Compute Node."
+    ::= { jnxJVAECNSysInfoEntry 2 }
+
+jnxJVAECNSysProcessingLoad OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    UNITS	"%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Total processing load on the Compute Node, in percentage."
+    ::= { jnxJVAECNSysInfoEntry 3 }
+
+jnxJVAECNSysMemCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The amount of RAM on the Compute Node, in kilo bytes. Zero if 
+	  information is unavailable."
+    ::= { jnxJVAECNSysInfoEntry 4 }
+
+jnxJVAECNSysMemUsed OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The amount of RAM used on the Compute Node, in kilo bytes. Zero
+	  if information in unavailable."
+    ::= { jnxJVAECNSysInfoEntry 5 }
+
+jnxJVAECNSysMemFree OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The amount of RAM free on the Compute Node, in kilo bytes. Zero
+	  if information in unavailable."
+    ::= { jnxJVAECNSysInfoEntry 6 }
+
+jnxJVAECNSysMemUsedPr OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    UNITS	"%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The amount of RAM used on the Compute Node, in percentage. Zero
+	  if information in unavailable."
+    ::= { jnxJVAECNSysInfoEntry 7 }
+
+jnxJVAECNSysSwapCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Total swap space on the Compute Node, in kilo bytes. Zero if
+	  information is unavailable."
+    ::= { jnxJVAECNSysInfoEntry 8 }
+
+jnxJVAECNSysSwapFree OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The amout of swap space free on the Compute Node, in kilo bytes.
+	  Zero if information is unavailable."
+    ::= { jnxJVAECNSysInfoEntry 9 }
+
+jnxJVAECNSysBootMethod OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), network(1), local (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Boot method used by the Compute Node, in the last reboot."
+    ::= { jnxJVAECNSysInfoEntry 10 }
+
+jnxJVAECNSysLastReboot OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(30))
+    UNITS      "Secs"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Seconds passed since the last reboot or restart of the Compute Node."
+    ::= { jnxJVAECNSysInfoEntry 11 }
+
+   --
+   -- Compute Node Processor (CPU) Table
+   --
+
+jnxJVAECNProcessorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNProcessorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Processors contained in the Compute Nodes."
+    ::= { jnxJVAENodeTables 2 }
+
+jnxJVAECNProcessorEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNProcessorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Processor."
+    INDEX { jnxJVAECNSysId, jnxJVAECNProcessorId }
+    ::= { jnxJVAECNProcessorTable 1 }
+
+JnxJVAECNProcessorEntry ::= SEQUENCE {
+    jnxJVAECNProcessorId        INTEGER,
+    jnxJVAECNProcessorLoad      INTEGER
+}
+
+jnxJVAECNProcessorId OBJECT-TYPE
+    SYNTAX      INTEGER (1..256)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An unique identifier for the processor with this Compute Node."
+    ::= { jnxJVAECNProcessorEntry 1 }
+
+jnxJVAECNProcessorLoad OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    UNITS	"%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Load on the processor, expressed in percentage. Zero if information
+         is unavailable."
+    ::= { jnxJVAECNProcessorEntry 2 }
+
+   --
+   -- Compute Node Network Interface Table
+   --
+
+jnxJVAECNifTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of network interfaces contained in the Compute Nodes."
+    ::= { jnxJVAENodeTables 3 }
+
+jnxJVAECNifEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A network interface."
+    INDEX { jnxJVAECNSysId, jnxJVAECNifId }
+    ::= { jnxJVAECNifTable 1 }
+
+JnxJVAECNifEntry ::= SEQUENCE {
+    jnxJVAECNifId              INTEGER,
+    jnxJVAECNifName            DisplayString,
+    jnxJVAECNifOperStatus      INTEGER,
+    jnxJVAECNifAdminStatus     INTEGER,
+    jnxJVAECNifLinkDetect      TruthValue,
+    jnxJVAECNifAddress         PhysAddress,
+    jnxJVAECNifInPkts          Counter64,
+    jnxJVAECNifInDiscards      Counter64,
+    jnxJVAECNifInErrors        Counter64,
+    jnxJVAECNifOutPkts         Counter64,
+    jnxJVAECNifOutDiscards     Counter64,
+    jnxJVAECNifOutErrors       Counter64
+}
+
+jnxJVAECNifId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An unique identifier for the network interface."
+    ::= { jnxJVAECNifEntry 1 }
+
+jnxJVAECNifName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Description of the interface."
+    ::= { jnxJVAECNifEntry 2 }
+
+jnxJVAECNifOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { down(0), up (1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the interface."
+    ::= { jnxJVAECNifEntry 3 }
+
+jnxJVAECNifAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { down(0), up (1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Administrative state of the interface."
+    ::= { jnxJVAECNifEntry 4 }
+
+jnxJVAECNifLinkDetect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Link presence, True if present else False. This field is meaningless
+         when the interface is  administered down."
+    ::= { jnxJVAECNifEntry 5 }
+
+jnxJVAECNifAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Physcial address (MAC) of the interface."
+    ::= { jnxJVAECNifEntry 6 }
+
+jnxJVAECNifInPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received on the interface."
+    ::= { jnxJVAECNifEntry 7 }
+
+jnxJVAECNifInDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets discarded, on the interface."
+    ::= { jnxJVAECNifEntry 8 }
+
+jnxJVAECNifInErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets with errors, on the interface."
+    ::= { jnxJVAECNifEntry 9 }
+
+jnxJVAECNifOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets sent on the interface."
+    ::= { jnxJVAECNifEntry 10 }
+
+jnxJVAECNifOutDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent packets discarded, on the interface."
+    ::= { jnxJVAECNifEntry 11 }
+
+jnxJVAECNifOutErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sent packets with errors, on the interface."
+    ::= { jnxJVAECNifEntry 12 }
+
+   --
+   -- Compute Node File System Table
+   --
+
+jnxJVAECNFileSysTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNFileSysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of mounted file systems in the Compute Nodes."
+    ::= { jnxJVAENodeTables 4 }
+
+jnxJVAECNFileSysEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNFileSysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A File System."
+    INDEX { jnxJVAECNSysId, jnxJVAECNFileSysId }
+    ::= { jnxJVAECNFileSysTable 1 }
+
+JnxJVAECNFileSysEntry ::= SEQUENCE {
+    jnxJVAECNFileSysId            INTEGER,
+    jnxJVAECNFileSysMountPoint    DisplayString,
+    jnxJVAECNFileSysSize          Gauge32,
+    jnxJVAECNFileSysUsed          Gauge32,
+    jnxJVAECNFileSysFree          Gauge32,
+    jnxJVAECNFileSysUsedPr        INTEGER
+}
+
+jnxJVAECNFileSysId OBJECT-TYPE
+    SYNTAX      INTEGER (1..127)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An unique identifier for the file system."
+    ::= { jnxJVAECNFileSysEntry 1 }
+
+jnxJVAECNFileSysMountPoint OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Filesystem path where the file system is mounted."
+    ::= { jnxJVAECNFileSysEntry 2 }
+
+jnxJVAECNFileSysSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total storage capacity of the file system, in kilo bytes."
+    ::= { jnxJVAECNFileSysEntry 3 }
+
+jnxJVAECNFileSysUsed OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used Storage capacity of the file system, in kilo bytes."
+    ::= { jnxJVAECNFileSysEntry 4 }
+
+jnxJVAECNFileSysFree OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS	"KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unused Storage capacity of the file system, in kilo bytes."
+    ::= { jnxJVAECNFileSysEntry 5 }
+
+jnxJVAECNFileSysUsedPr OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    UNITS	"%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used Storage capacity of the file system, in percentage."
+    ::= { jnxJVAECNFileSysEntry 6 }
+
+   --
+   -- Compute Node Disk Table
+   --
+
+jnxJVAECNDiskTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Physical Disks connected to the Compute Nodes."
+    ::= { jnxJVAENodeTables 5 }
+
+jnxJVAECNDiskEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A disk."
+    INDEX { jnxJVAECNSysId, jnxJVAECNDiskId }
+    ::= { jnxJVAECNDiskTable 1 }
+
+JnxJVAECNDiskEntry ::= SEQUENCE {
+    jnxJVAECNDiskId            INTEGER,
+    jnxJVAECNDiskSlot          INTEGER,
+    jnxJVAECNDiskModel         DisplayString,
+    jnxJVAECNDiskRevision      DisplayString,
+    jnxJVAECNDiskVendor        DisplayString,
+    jnxJVAECNDiskOSPath        DisplayString
+}
+
+jnxJVAECNDiskId OBJECT-TYPE
+    SYNTAX      INTEGER (1..15)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier for this disk."
+    ::= { jnxJVAECNDiskEntry 1 }
+
+jnxJVAECNDiskSlot OBJECT-TYPE
+    SYNTAX      INTEGER (0..14)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slot at which disk is connected."
+    ::= { jnxJVAECNDiskEntry 2 }
+
+jnxJVAECNDiskModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disk product model."
+    ::= { jnxJVAECNDiskEntry 3 }
+
+jnxJVAECNDiskRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disk product revision."
+    ::= { jnxJVAECNDiskEntry 4 }
+
+jnxJVAECNDiskVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disk product vendor."
+    ::= { jnxJVAECNDiskEntry 5 }
+
+jnxJVAECNDiskOSPath OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disk device path."
+    ::= { jnxJVAECNDiskEntry 6 }
+
+   --
+   -- Compute Node Raid Table
+   --
+
+jnxJVAECNRaidTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNRaidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Raid Arrays on the Compute Nodes."
+    ::= { jnxJVAENodeTables 6 }
+
+jnxJVAECNRaidEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNRaidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Raid array."
+    INDEX { jnxJVAECNSysId, jnxJVAECNRaidId }
+    ::= { jnxJVAECNRaidTable 1 }
+
+JnxJVAECNRaidEntry ::= SEQUENCE {
+    jnxJVAECNRaidId                     INTEGER,
+    jnxJVAECNRaidName                   DisplayString,
+    jnxJVAECNRaidState                  DisplayString,
+    jnxJVAECNRaidLevel                  INTEGER,
+    jnxJVAECNRaidSize                   Gauge32,
+    jnxJVAECNRaidMembers                INTEGER,
+    jnxJVAECNRaidMemberDiskPartitions   DisplayString,
+    jnxJVAECNRaidMemberDiskAtSlots      DisplayString,
+    jnxJVAECNRaidOSPath                 DisplayString
+}
+
+jnxJVAECNRaidId OBJECT-TYPE
+    SYNTAX      INTEGER (1..15)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier for this raid array."
+    ::= { jnxJVAECNRaidEntry 1 }
+
+jnxJVAECNRaidName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the raid array."
+    ::= { jnxJVAECNRaidEntry 2 }
+
+jnxJVAECNRaidState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of the raid array."
+    ::= { jnxJVAECNRaidEntry 3 }
+
+jnxJVAECNRaidLevel OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raid level of the raid array."
+    ::= { jnxJVAECNRaidEntry 4 }
+
+jnxJVAECNRaidSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "GB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of the raid array."
+    ::= { jnxJVAECNRaidEntry 5 }
+
+jnxJVAECNRaidMembers OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of  members of the raid array."
+    ::= { jnxJVAECNRaidEntry 6 }
+
+jnxJVAECNRaidMemberDiskPartitions OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "List of device path of the partitions, that are members of the
+         raid array."
+    ::= { jnxJVAECNRaidEntry 7 }
+
+jnxJVAECNRaidMemberDiskAtSlots OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "List of slot numbers identifying the disks, that are members of
+         the raid array."
+    ::= { jnxJVAECNRaidEntry 8 }
+
+jnxJVAECNRaidOSPath OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The raid device disk path."
+    ::= { jnxJVAECNRaidEntry 9 }
+
+   --
+   -- Compute Node Sensor Table
+   --
+
+jnxJVAECNSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJVAECNSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Sensors on the Compute Nodes."
+    ::= { jnxJVAENodeTables 7 }
+
+jnxJVAECNSensorEntry OBJECT-TYPE
+    SYNTAX      JnxJVAECNSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Sensor."
+    INDEX { jnxJVAECNSysId, jnxJVAECNSensorId }
+    ::= { jnxJVAECNSensorTable 1 }
+
+JnxJVAECNSensorEntry ::= SEQUENCE {
+    jnxJVAECNSensorId                     INTEGER,
+    jnxJVAECNSensorType                   INTEGER,
+    jnxJVAECNSensorValue                  DisplayString,
+    jnxJVAECNSensorRange                  DisplayString,
+    jnxJVAECNSensorDesc                   DisplayString
+}
+
+jnxJVAECNSensorId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier for this sensor."
+    ::= { jnxJVAECNSensorEntry 1 }
+
+jnxJVAECNSensorType OBJECT-TYPE
+    SYNTAX      INTEGER { voltage(0), temperature(1), fan(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of the sensor."
+    ::= { jnxJVAECNSensorEntry 2 }
+
+jnxJVAECNSensorValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor reading."
+    ::= { jnxJVAECNSensorEntry 3 }
+
+jnxJVAECNSensorRange OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Normal operating range for the sensor, traps are raised the reading
+         is no within this range."
+    ::= { jnxJVAECNSensorEntry 4 }
+
+jnxJVAECNSensorDesc OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Description of the sensor."
+    ::= { jnxJVAECNSensorEntry 5 }
+
+
+
+   --
+   -- JVAE Node Notifications
+   --
+
+jnxJVAECNMemoryLow NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNSysMemCapacity,
+         jnxJVAECNSysMemUsed,
+         jnxJVAECNSysMemFree,
+         jnxJVAECNSysMemUsedPr,
+         jnxJVAECNSysSwapCapacity,
+         jnxJVAECNSysSwapFree
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever the free (unused) RAM goes 
+	 below threshold for this compute node."
+    ::= { jnxJVAENodeNotifications  1 }
+
+jnxJVAECNMemoryOk NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNSysMemCapacity,
+         jnxJVAECNSysMemUsed,
+         jnxJVAECNSysMemFree,
+         jnxJVAECNSysMemUsedPr,
+         jnxJVAECNSysSwapCapacity,
+         jnxJVAECNSysSwapFree
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever the free (unused) RAM recovers
+	 above threshold for this compute node and previously a
+	 jnxJVAECNMemoryLow was reported."
+    ::= { jnxJVAENodeNotifications  2 }
+
+jnxJVAECNProcessingLoadHigh NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNSysProcessingLoad
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever the overall system processing
+	 load exceeds threshold."
+    ::= { jnxJVAENodeNotifications  3 }
+
+jnxJVAECNProcessingLoadOk NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNSysProcessingLoad
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever the overall system processing
+	 load is within threshold and previously a jnxJVAECNProcessingLoadHigh
+	 was reported."
+    ::= { jnxJVAENodeNotifications  4 }
+
+jnxJVAECNProcessorLoadHigh NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNProcessorId,
+         jnxJVAECNProcessorLoad
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever the load on a processor
+	 exceeds threshold."
+    ::= { jnxJVAENodeNotifications  5 }
+
+jnxJVAECNProcessorLoadOk NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNProcessorId,
+         jnxJVAECNProcessorLoad
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever the load on a processor
+	 is within threshold and previously a jnxJVAECNProcessorLoadHigh
+	 was reported."
+    ::= { jnxJVAENodeNotifications  6 }
+
+jnxJVAECNifDown NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNifId,
+         jnxJVAECNifName,
+         jnxJVAECNifOperStatus,
+         jnxJVAECNifAdminStatus,
+         jnxJVAECNifLinkDetect
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever network interface is down."
+    ::= { jnxJVAENodeNotifications  7 }
+
+jnxJVAECNifUp NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNifId,
+         jnxJVAECNifName,
+         jnxJVAECNifOperStatus,
+         jnxJVAECNifAdminStatus,
+         jnxJVAECNifLinkDetect
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever network interface is up and
+	 previously a jnxJVAECNifDown was reported."
+    ::= { jnxJVAENodeNotifications  8 }
+
+jnxJVAECNStorageLow NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNFileSysId,
+         jnxJVAECNFileSysMountPoint,
+         jnxJVAECNFileSysSize,
+         jnxJVAECNFileSysUsed,
+         jnxJVAECNFileSysFree,
+         jnxJVAECNFileSysUsedPr
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever storage space falls below
+	 threshold."
+    ::= { jnxJVAENodeNotifications  9 }
+
+jnxJVAECNStorageOk NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNFileSysId,
+         jnxJVAECNFileSysMountPoint,
+         jnxJVAECNFileSysSize,
+         jnxJVAECNFileSysUsed,
+         jnxJVAECNFileSysFree,
+         jnxJVAECNFileSysUsedPr
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever storage space recovers and
+	 previously a jnxJVAECNStorageLow was reported."
+    ::= { jnxJVAENodeNotifications  10 }
+
+jnxJVAECNRaidError NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNRaidId,
+         jnxJVAECNRaidName,
+         jnxJVAECNRaidState,
+         jnxJVAECNRaidOSPath
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever raid array degradation or
+	 failure is detected."
+    ::= { jnxJVAENodeNotifications  11 }
+
+jnxJVAECNRaidOk NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNRaidId,
+         jnxJVAECNRaidName,
+         jnxJVAECNRaidState,
+         jnxJVAECNRaidOSPath
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever raid array recovers and
+	 previously a jnxJVAECNRaidError was reported."
+    ::= { jnxJVAENodeNotifications  12 }
+
+jnxJVAECNSensorAlert NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNSensorId,
+         jnxJVAECNSensorValue,
+         jnxJVAECNSensorType,
+         jnxJVAECNSensorRange,
+         jnxJVAECNSensorDesc
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever sensor reading is not within
+         the normal operating range."
+    ::= { jnxJVAENodeNotifications  13 }
+
+jnxJVAECNSensorOk NOTIFICATION-TYPE
+    OBJECTS {
+         jnxJVAECNSysId,
+         jnxJVAECNSensorId,
+         jnxJVAECNSensorValue,
+         jnxJVAECNSensorType,
+         jnxJVAECNSensorRange,
+         jnxJVAECNSensorDesc
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated whenever sensor reading recovers and
+	 previously a jnxJVAECNSensorAlert was reported."
+    ::= { jnxJVAENodeNotifications  14 }
+
+END

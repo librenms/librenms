@@ -1,0 +1,1219 @@
+ALCATEL-IND1-IPSEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32
+	    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue
+	    FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+	    FROM SNMPv2-CONF
+	InetAddressType, InetAddress
+	    FROM INET-ADDRESS-MIB
+	softentIND1IPsec
+	    FROM ALCATEL-IND1-BASE;
+
+
+alcatelIND1IPsecMIB MODULE-IDENTITY
+    LAST-UPDATED "200707020000Z" 
+    ORGANIZATION "Alcatel - Architects Of An Internet World"
+    CONTACT-INFO
+        "Please consult with Customer Service to insure the most appropriate
+         version of this document is used with the products in question:
+         
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+        
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+        
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+             Proprietary IPsec MIB definitions
+         
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+         
+         No liability shall be assumed for any incidental, indirect, special,
+	 or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+         
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+         
+           Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200707020000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { softentIND1IPsec 1 }
+
+
+alcatelIND1IPsecMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1IPsecMIB 1 }
+
+--
+-- Textual Conventions
+--
+
+IPsecName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "20a"
+    STATUS	current
+    DESCRIPTION
+	"The name of a table entry."
+    SYNTAX	OCTET STRING (SIZE(1..20))
+
+IPsecDescription ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "200a"
+    STATUS	current
+    DESCRIPTION
+	"Optional description of a table entry."
+    SYNTAX	OCTET STRING (SIZE(0..200))
+
+IPsecPortNumber ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"A port number value.  0 is the wildcard value to match any port."
+    SYNTAX	INTEGER (0..65535)
+
+IPsecPrefixLength ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"Significant bits in an IPv6 address prefix. 0..32 is the valid range
+	for IPv4 addresses.  0..128 is valid for IPv6 addresses"
+    SYNTAX	INTEGER (0..128)
+
+IPsecULProtocol ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"An upper-layer protocol number.  255 is the wildcard value to match
+	any protocol."
+    SYNTAX	INTEGER (0..255)
+
+IPsecAdminState ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"Administrative state."
+    SYNTAX	INTEGER {
+                  enabled(1),
+		  disabled(2)
+		}
+
+IPsecSAType ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"SA type."
+    SYNTAX	INTEGER {
+                  ah(2),
+                  esp(3)
+		}
+
+IPsecESPAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"ESP algorithms."
+    SYNTAX	INTEGER {
+                  none(0),
+		  descbc(2),
+		  des3cbc(3),
+		  null(11),
+		  aescbc(12),
+		  aesctr(13)
+		}
+
+IPsecAHAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"AH algorithms."
+    SYNTAX	INTEGER {
+                  none(0),
+		  hmacmd5(2),
+		  hmacsha1(3),
+		  aesxcbcmac(9)
+		}
+
+IPsecOperationalState ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"Operational state.
+
+	enabled(1) - The entry is enabled.
+
+	disabled(2) - The entry is administratively disabled or
+	DNS resolution has experienced a permanent failure.
+
+	dnspending(3) - Awaiting DNS resolution before making
+	the entry active."
+    SYNTAX	INTEGER {
+			  enabled(1),
+                          disabled(2),
+			  dnspending(3)
+			}
+ 			
+
+--
+-- Global IPsec Configuration
+--
+
+alaIPsecConfig OBJECT IDENTIFIER ::= { alcatelIND1IPsecMIBObjects 1 }
+
+alaIPsecSecurityKeyTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPsecSecurityKeyEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the configuration of the switch's IPsec security key.
+	The security key is used to encrypt and IPsec related information
+	retained in permanent storage.
+
+	There is always a single row in this table with an index value of 1."
+    ::= { alaIPsecConfig 1 }
+
+alaIPsecSecurityKeyEntry OBJECT-TYPE
+    SYNTAX     	AlaIPsecSecurityKeyEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"The security key entry."
+    INDEX   	{  alaIPsecSecurityKeyID }
+    ::= { alaIPsecSecurityKeyTable 1 }
+
+AlaIPsecSecurityKeyEntry ::= SEQUENCE {
+    alaIPsecSecurityKeyID				Unsigned32,
+    alaIPsecSecurityKeyCurrent                          OCTET STRING,
+    alaIPsecSecurityKeyNew                              OCTET STRING
+}
+
+alaIPsecSecurityKeyID OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The row's identifier.  Only one entry is ever present, with an
+	ID value of 1."
+    ::= { alaIPsecSecurityKeyEntry 1 }
+
+alaIPsecSecurityKeyCurrent OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(16))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The current value of the IPsec security key.  If an attempt
+	is made to read the value of this object, a zero-length octet
+	string will be returned."
+    ::= { alaIPsecSecurityKeyEntry 2 }
+
+alaIPsecSecurityKeyNew OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(16))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Used to set a new value for the IPsec security key.
+
+	Both alaIPsecSecurityKeyCurrent (with its correct value) and
+	alaIPsecSecurityKeyNew must be specified in the same SNMP SET
+	message.  If alaIPsecSecurityKeyCurrent is not present, or if
+	its value is incorrect, the attempt to set a new key will fail."
+    ::= { alaIPsecSecurityKeyEntry 3 }
+
+
+--
+-- IPsec Statistics Table
+--
+
+alaIPsecStatisticsTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPsecStatisticsEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the IPv6 statistics to be retrieved."
+    ::= { alaIPsecConfig 2 }
+
+alaIPsecStatisticsEntry OBJECT-TYPE
+    SYNTAX     	AlaIPsecStatisticsEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"The statistics entry."
+    INDEX   	{ alaIPsecStatisticsProtocol }
+    ::= { alaIPsecStatisticsTable 1 }
+
+AlaIPsecStatisticsEntry ::= SEQUENCE {
+    alaIPsecStatisticsProtocol				INTEGER,
+    alaIPsecStatisticsInSuccessful			Counter32,
+    alaIPsecStatisticsInPolicyViolation			Counter32,
+    alaIPsecStatisticsInNoSA				Counter32,
+    alaIPsecStatisticsInUnknownSPI			Counter32,
+    alaIPsecStatisticsInAHReplay			Counter32,
+    alaIPsecStatisticsInESPReplay			Counter32,
+    alaIPsecStatisticsInAHAuthenticationSuccess		Counter32,
+    alaIPsecStatisticsInAHAuthenticationFail		Counter32,
+    alaIPsecStatisticsInESPAuthenticationSuccess	Counter32,
+    alaIPsecStatisticsInESPAuthenticationFail		Counter32,
+    alaIPsecStatisticsInBadPacket			Counter32,
+    alaIPsecStatisticsInNoMemory			Counter32,
+    alaIPsecStatisticsOutSuccessful			Counter32,
+    alaIPsecStatisticsOutPolicyViolation		Counter32,
+    alaIPsecStatisticsOutNoSA				Counter32,
+    alaIPsecStatisticsOutBadPacket			Counter32,
+    alaIPsecStatisticsOutNoMemory			Counter32,
+    alaIPsecStatisticsInDiscarded                       Counter32,
+    alaIPsecStatisticsOutDiscarded                      Counter32
+}
+
+alaIPsecStatisticsProtocol OBJECT-TYPE
+    SYNTAX	INTEGER {
+		  ipv6(6)
+		}
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"IP protocol version covered by the IPsec statistics."
+    ::= { alaIPsecStatisticsEntry 1 }
+
+alaIPsecStatisticsInSuccessful OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets requiring IPsec processing
+	that were successfully handled."
+    ::= { alaIPsecStatisticsEntry 2 }
+
+alaIPsecStatisticsInPolicyViolation OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets that were dropped because
+	of policy violations."
+    ::= { alaIPsecStatisticsEntry 3 }
+
+alaIPsecStatisticsInNoSA OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets dropped because no
+	matching SA was found."
+    ::= { alaIPsecStatisticsEntry 4 }
+
+alaIPsecStatisticsInUnknownSPI OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets dropped because the SPI was
+	unknown."
+    ::= { alaIPsecStatisticsEntry 5 }
+
+alaIPsecStatisticsInAHReplay OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets that failed the AH replay
+	check."
+    ::= { alaIPsecStatisticsEntry 6 }
+
+alaIPsecStatisticsInESPReplay OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets taht failed the ESP 
+	replay check."
+    ::= { alaIPsecStatisticsEntry 7 }
+
+alaIPsecStatisticsInAHAuthenticationSuccess OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets that successfully passed
+	AH authentication."
+    ::= { alaIPsecStatisticsEntry 8 }
+
+alaIPsecStatisticsInAHAuthenticationFail OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets that failed AH
+	authentication."
+    ::= { alaIPsecStatisticsEntry 9 }
+
+alaIPsecStatisticsInESPAuthenticationSuccess OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets that successfully passed
+	ESP authentication."
+    ::= { alaIPsecStatisticsEntry 10 }
+
+alaIPsecStatisticsInESPAuthenticationFail OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets that failed ESP
+	authentication."
+    ::= { alaIPsecStatisticsEntry 11 }
+
+alaIPsecStatisticsInBadPacket OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets requiring IPsec
+	processing that were not valid."
+    ::= { alaIPsecStatisticsEntry 12 }
+
+alaIPsecStatisticsInNoMemory OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming IPsec packets dropped because
+	no memory was available."
+    ::= { alaIPsecStatisticsEntry 13 }
+
+alaIPsecStatisticsOutSuccessful OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of outgoing packets requiring IPsec processing
+	that were successfully handled."
+    ::= { alaIPsecStatisticsEntry 14 }
+
+alaIPsecStatisticsOutPolicyViolation OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of outgoing packets dropped because of a
+	policy violation."
+    ::= { alaIPsecStatisticsEntry 15 }
+
+alaIPsecStatisticsOutNoSA OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of outgoing packets dropped because no matching
+	SA was found."
+    ::= { alaIPsecStatisticsEntry 16 }
+
+alaIPsecStatisticsOutBadPacket OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of outgoing packets requiring IPsec processing 
+	that were not valid."
+    ::= { alaIPsecStatisticsEntry 17 }
+
+alaIPsecStatisticsOutNoMemory OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of outgoing IPsec packets dropped because no
+	memory was available."
+    ::= { alaIPsecStatisticsEntry 18 }
+
+alaIPsecStatisticsInDiscarded OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of incoming packets dropped because they matched
+        a discard policy."
+    ::= { alaIPsecStatisticsEntry 19 }
+
+alaIPsecStatisticsOutDiscarded OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of outgoing packets dropped because they matched
+        a discard policy."
+    ::= { alaIPsecStatisticsEntry 20 }
+
+
+--
+-- Security Policy Table
+--
+
+alaIPsecSecurityPolicyTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPsecSecurityPolicyEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the configuration of IPsec security policies."
+    ::= { alcatelIND1IPsecMIBObjects 2 }
+
+alaIPsecSecurityPolicyEntry OBJECT-TYPE
+    SYNTAX     	AlaIPsecSecurityPolicyEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"A security policy entry."
+    INDEX   	{  alaIPsecSecurityPolicyID }
+    ::= { alaIPsecSecurityPolicyTable 1 }
+
+AlaIPsecSecurityPolicyEntry ::= SEQUENCE {
+    alaIPsecSecurityPolicyID				Unsigned32,
+    alaIPsecSecurityPolicySourceType                    InetAddressType,
+    alaIPsecSecurityPolicySource			InetAddress,
+    alaIPsecSecurityPolicySourcePrefixLength		IPsecPrefixLength,
+    alaIPsecSecurityPolicySourcePort			IPsecPortNumber,
+    alaIPsecSecurityPolicyDestinationType               InetAddressType,
+    alaIPsecSecurityPolicyDestination                   InetAddress,
+    alaIPsecSecurityPolicyDestinationPrefixLength	IPsecPrefixLength,
+    alaIPsecSecurityPolicyDestinationPort	       	IPsecPortNumber,
+    alaIPsecSecurityPolicyULProtocol			IPsecULProtocol,
+    alaIPsecSecurityPolicyICMPv6Type			INTEGER,
+    alaIPsecSecurityPolicyDirection			INTEGER,
+    alaIPsecSecurityPolicyName				IPsecName,
+    alaIPsecSecurityPolicyDescription			IPsecDescription,
+    alaIPsecSecurityPolicyAction			INTEGER,
+    alaIPsecSecurityPolicyAdminState			IPsecAdminState,
+    alaIPsecSecurityPolicyOperationalState              IPsecOperationalState,
+    alaIPsecSecurityPolicyPriority                      INTEGER,
+    alaIPsecSecurityPolicyRowStatus			RowStatus
+}
+
+alaIPsecSecurityPolicyID OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A unique identifier for this security policy.  When creating a 
+	new policy, a zero value must be specified.  An available 
+	policy ID will then be automatically assigned to the policy."
+    ::= { alaIPsecSecurityPolicyEntry 1 }
+
+alaIPsecSecurityPolicySourceType OBJECT-TYPE
+    SYNTAX	InetAddressType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The type of source address specified.  Currently only ipv6(2) is allowed."
+    ::= { alaIPsecSecurityPolicyEntry 2 }
+
+alaIPsecSecurityPolicySource OBJECT-TYPE
+    SYNTAX	InetAddress
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The source of packets covered by this policy."
+    ::= { alaIPsecSecurityPolicyEntry 3 }
+
+alaIPsecSecurityPolicySourcePrefixLength OBJECT-TYPE
+    SYNTAX	IPsecPrefixLength
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The number of bits of the source address used to determine
+	which packets are covered by this policy. 
+
+	The default value varies depending upon the type of
+	source address specified:
+	   IPv4 - 32
+           IPv6 - 128
+           DNS name - 0 (any other value is ignored)"
+    ::= { alaIPsecSecurityPolicyEntry 4 }
+
+alaIPsecSecurityPolicySourcePort OBJECT-TYPE
+    SYNTAX	IPsecPortNumber
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The source port of packets covered by this policy. To
+	match packets from any port, specify the 0 wildcard value.  A 
+	wildcard policy will only be used when there is no exact match 
+	to a destination port in another entry."
+    DEFVAL { 0 }
+    ::= { alaIPsecSecurityPolicyEntry 5 }
+
+alaIPsecSecurityPolicyDestinationType OBJECT-TYPE
+    SYNTAX	InetAddressType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The type of destination address specified.  Currently only ipv6(2) is allowed."
+    ::= { alaIPsecSecurityPolicyEntry 6 }
+
+alaIPsecSecurityPolicyDestination OBJECT-TYPE
+    SYNTAX	InetAddress
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The destination of packets covered by this policy."
+    ::= { alaIPsecSecurityPolicyEntry 7 }
+
+alaIPsecSecurityPolicyDestinationPrefixLength OBJECT-TYPE
+    SYNTAX	IPsecPrefixLength
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The number of bits of the destination prefix used to determine
+	which packets are covered by this policy. 
+
+	The default value varies depending upon the type of
+	destination address specified:
+	   IPv4 - 32
+           IPv6 - 128
+           DNS name - 0 (any other value is ignored)"
+    ::= { alaIPsecSecurityPolicyEntry 8 }
+
+alaIPsecSecurityPolicyDestinationPort OBJECT-TYPE
+    SYNTAX	IPsecPortNumber
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The destination port of packets covered by this policy. To
+	match packets from any port, specify the 0 wildcard value.  A 
+	wildcard policy will only be used when there is no exact match 
+	to a destination port in another entry."
+    DEFVAL { 0 }
+    ::= { alaIPsecSecurityPolicyEntry 9 }
+
+alaIPsecSecurityPolicyULProtocol OBJECT-TYPE
+    SYNTAX	IPsecULProtocol
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The upper-layer protocol of packets covered by this policy.
+	To match all protocols, specify the 255 wildcard value.  A wildcard
+	policy will only be used when there is no exact match to the protocol
+	value specified in another entry."
+    DEFVAL	{ 255 }
+    ::= { alaIPsecSecurityPolicyEntry 10 }
+
+alaIPsecSecurityPolicyICMPv6Type OBJECT-TYPE
+    SYNTAX	INTEGER (0..255)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"If the upper-layer protocol is ICMPv6, an ICMPv6 type value may
+	be specified to restrict the policy to a specific packet type.
+
+	To match all ICMPv6 packets, the 0 wildcard value should be
+	specified."
+    DEFVAL	{ 0 }
+    ::= { alaIPsecSecurityPolicyEntry 11 }
+
+alaIPsecSecurityPolicyDirection OBJECT-TYPE
+    SYNTAX	INTEGER {
+                          in(1),
+			  out(2)
+			}
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The direction of traffic covered by this policy."
+    ::= { alaIPsecSecurityPolicyEntry 12 }
+
+alaIPsecSecurityPolicyName OBJECT-TYPE
+    SYNTAX	IPsecName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"A name for this policy."
+    ::= { alaIPsecSecurityPolicyEntry 13 }
+
+alaIPsecSecurityPolicyDescription OBJECT-TYPE
+    SYNTAX	IPsecDescription
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"A detailed description of this policy."
+    DEFVAL  { "" }	
+    ::= { alaIPsecSecurityPolicyEntry 14 }
+
+alaIPsecSecurityPolicyAction OBJECT-TYPE
+    SYNTAX	INTEGER {
+			  discard(0),
+                          none(1),
+			  ipsec(2)
+			}
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The action to take on traffic covered by this policy.
+
+	discard(0) means that all traffic covered by the policy
+	will be discarded.
+
+        none(1) means that no IPsec processing will be done on
+        the traffic covered by this policy.
+
+	ipsec(2) means that IPsec processing will take place on
+	the traffic. One or more rules should be defined in the
+	IPsec Rule Table.  If no rules are defined processing
+	is identical to none(0) being specified."
+    DEFVAL	{ ipsec }
+    ::= { alaIPsecSecurityPolicyEntry 15 }
+
+alaIPsecSecurityPolicyAdminState OBJECT-TYPE
+    SYNTAX	IPsecAdminState
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Allows a policy to be administratively enabled or
+	disabled."
+    DEFVAL  { enabled }
+    ::= { alaIPsecSecurityPolicyEntry 16 }
+
+alaIPsecSecurityPolicyOperationalState OBJECT-TYPE
+    SYNTAX	IPsecOperationalState
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The operational state of this policy."
+    ::= { alaIPsecSecurityPolicyEntry 17 }
+
+alaIPsecSecurityPolicyPriority OBJECT-TYPE
+    SYNTAX	INTEGER (1..1000)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The priority for this policy.  When traffic would be covered by
+	multiple policies the policy with the highest priority value is
+	used.  If two policies have the same priority, the one configured
+	first has precedence."
+    DEFVAL { 100 }
+    ::= { alaIPsecSecurityPolicyEntry 18 }
+
+alaIPsecSecurityPolicyRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of security
+	policy entries."
+    ::= { alaIPsecSecurityPolicyEntry 19 }
+
+
+--
+-- Security Policy IPsec Rule Table
+--
+
+alaIPsecSecurityPolicyRuleTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPsecSecurityPolicyRuleEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the configuration of the IPsec rules for
+	a security policy."
+    ::= { alcatelIND1IPsecMIBObjects 3 }
+
+alaIPsecSecurityPolicyRuleEntry OBJECT-TYPE
+    SYNTAX     	AlaIPsecSecurityPolicyRuleEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"A security policy entry."
+    INDEX   	{ 
+                   alaIPsecSecurityPolicyID,
+		   alaIPsecSecurityPolicyRuleIndex
+		}
+    ::= { alaIPsecSecurityPolicyRuleTable 1 }
+
+AlaIPsecSecurityPolicyRuleEntry ::= SEQUENCE {
+    alaIPsecSecurityPolicyRuleIndex	Unsigned32,
+    alaIPsecSecurityPolicyRuleProtocol	INTEGER,
+    alaIPsecSecurityPolicyRuleMode	INTEGER,
+    alaIPsecSecurityPolicyRuleRowStatus	RowStatus
+}
+
+alaIPsecSecurityPolicyRuleIndex OBJECT-TYPE
+    SYNTAX	Unsigned32 (1..10)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Index specifying the order in which multiple rules for
+	the same security policy will be applied.  Rules are
+	indexed by the order in which they are applied to the
+	original payload.  
+
+	For example, for a security policy where an IPv6 payload
+	should be protected by an ESP header, which should be protected
+	by an AH header, there would be two Rule Table entries.
+	The ESP entry would have an index of 1 (first rule applied
+	to the payload).  The AH entry would have an index of 2 
+	(second rule applied)."
+    ::= { alaIPsecSecurityPolicyRuleEntry 1 }
+
+alaIPsecSecurityPolicyRuleProtocol OBJECT-TYPE
+    SYNTAX	INTEGER {
+                          ah(1),
+			  esp(2)
+			}
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Indicates the type of header required by the rule."
+    ::= { alaIPsecSecurityPolicyRuleEntry 2 }
+
+alaIPsecSecurityPolicyRuleMode OBJECT-TYPE
+    SYNTAX	INTEGER {
+                          transport(1)
+			  --tunnel(2)
+			}
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The mode in which the rule's protocol is running.  At present,
+	only transport(1) is allowed.  Until tunnel mode is supported,
+	transport(1) will be treated as the default value."
+    ::= { alaIPsecSecurityPolicyRuleEntry 3 }
+
+alaIPsecSecurityPolicyRuleRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of security
+	policy IPsec rule entries."
+    ::= { alaIPsecSecurityPolicyRuleEntry 4 }
+
+
+--
+-- IPsec Security Association Configuration Table
+--
+
+alaIPsecSAConfigTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPsecSAConfigEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the manual configuration of Security
+	Associations in the Security Association Database (SAD)."
+    ::= { alcatelIND1IPsecMIBObjects 4 }
+
+alaIPsecSAConfigEntry OBJECT-TYPE
+    SYNTAX     	AlaIPsecSAConfigEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Manually configured security association (SA) parameters."
+    INDEX   	{ alaIPsecSAConfigID }
+    ::= { alaIPsecSAConfigTable 1 }
+
+AlaIPsecSAConfigEntry ::= SEQUENCE {
+    alaIPsecSAConfigID                  	Unsigned32,
+    alaIPsecSAConfigType                        IPsecSAType,
+    alaIPsecSAConfigSourceType			InetAddressType,
+    alaIPsecSAConfigSource			InetAddress,
+    alaIPsecSAConfigDestinationType		InetAddressType,
+    alaIPsecSAConfigDestination			InetAddress,
+    alaIPsecSAConfigSPI				Unsigned32,
+    alaIPsecSAConfigName       			IPsecName,
+    alaIPsecSAConfigDescription			IPsecDescription,
+    alaIPsecSAConfigEncryptionAlgorithm		IPsecESPAlgorithm,
+    alaIPsecSAConfigEncryptionKeyLength		Unsigned32,
+    alaIPsecSAConfigAuthenticationAlgorithm	IPsecAHAlgorithm,
+    alaIPsecSAConfigAdminState			IPsecAdminState,
+    alaIPsecSAConfigOperationalState	 	IPsecOperationalState,
+    alaIPsecSAConfigRowStatus			RowStatus
+}
+
+alaIPsecSAConfigID OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A unique identifier for this manually configured SA.  
+	When creating a new SA, a zero value must be specified.  
+	An available ID will then be automatically assigned to
+	the SA."
+    ::= { alaIPsecSAConfigEntry 1 }
+
+alaIPsecSAConfigType OBJECT-TYPE
+    SYNTAX	IPsecSAType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The type of this SA: AH or ESP.  Once set,
+	the type may not be changed."
+    ::= { alaIPsecSAConfigEntry 2 }
+
+alaIPsecSAConfigSourceType OBJECT-TYPE
+    SYNTAX	InetAddressType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The type of source address specified.  Currently only ipv6(2) is allowed."
+    ::= { alaIPsecSAConfigEntry 3 }
+
+alaIPsecSAConfigSource OBJECT-TYPE
+    SYNTAX	InetAddress
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The source of packets covered by this SA."
+    ::= { alaIPsecSAConfigEntry 4 }
+
+alaIPsecSAConfigDestinationType OBJECT-TYPE
+    SYNTAX	InetAddressType
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The type of destination address specified.  Currently only ipv6(2) is allowed."
+    ::= { alaIPsecSAConfigEntry 5 }
+
+alaIPsecSAConfigDestination OBJECT-TYPE
+    SYNTAX	InetAddress
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The destination of packets covered by this SA."
+    ::= { alaIPsecSAConfigEntry 6 }
+
+alaIPsecSAConfigSPI OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The Security Parameters Index (SPI) of this SA."
+    ::= { alaIPsecSAConfigEntry 7 }
+
+alaIPsecSAConfigName OBJECT-TYPE
+    SYNTAX	IPsecName
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The name of this manually configured SA."
+    ::= { alaIPsecSAConfigEntry 8 }
+
+alaIPsecSAConfigDescription OBJECT-TYPE
+    SYNTAX	IPsecDescription
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"A detailed description for the manually created IPsec SA."
+    DEFVAL  { "" }	
+    ::= { alaIPsecSAConfigEntry 9 }
+
+alaIPsecSAConfigEncryptionAlgorithm OBJECT-TYPE
+    SYNTAX	IPsecESPAlgorithm
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"For an ESP SA, defines the encryption algorithm to be used.
+	null(11) should be specified if ESP is being used for integrity
+	only.  If null(11) is specified, 
+	alaIPsecSAConfigAuthenticationAlgorithm may not be none(0).
+
+	The value of this object is none(0) for AH SAs."
+    DEFVAL  { none }	
+    ::= { alaIPsecSAConfigEntry 10 }
+
+alaIPsecSAConfigEncryptionKeyLength OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS       "bits"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"For those algorithms where multiple key lengths are supported,
+	specifies the key length to be used.  Zero may be specified to
+	use the default key length."
+    DEFVAL  { 0 }	
+    ::= { alaIPsecSAConfigEntry 11 }
+
+alaIPsecSAConfigAuthenticationAlgorithm OBJECT-TYPE
+    SYNTAX	IPsecAHAlgorithm
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Defines the authentication algorithm to be used.
+
+	For ESP SAs, none(0) may be specified for encryption-only ESP.
+	For ESP integrity-only, ESP integrity and encryption, or for
+	AH SAs, hmacmd5(2), hmacsha1(3), or aesxcbcmac(9)  must 
+	be specified."
+    DEFVAL  { none }	
+    ::= { alaIPsecSAConfigEntry 12 }
+
+alaIPsecSAConfigAdminState OBJECT-TYPE
+    SYNTAX	IPsecAdminState
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Allows a manually configured SA to be administratively enabled
+	or disabled."
+    DEFVAL  { enabled }
+    ::= { alaIPsecSAConfigEntry 13 }
+
+alaIPsecSAConfigOperationalState OBJECT-TYPE
+    SYNTAX	IPsecOperationalState
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The operational state of the manually configured SA."
+    ::= { alaIPsecSAConfigEntry 14 }
+
+alaIPsecSAConfigRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of manually configured
+	IPsec SAs."
+    ::= { alaIPsecSAConfigEntry 15 }
+
+
+--
+-- IPsec Key Configuration Table
+--
+
+alaIPsecKeyTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPsecKeyEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table used to configure the keys used by manually
+	configured Security Associations in the IPsec Security
+	Association Configuration table."
+    ::= { alcatelIND1IPsecMIBObjects 5 }
+
+alaIPsecKeyEntry OBJECT-TYPE
+    SYNTAX     	AlaIPsecKeyEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"An IPsec key.  Keys in the table must be uniquely
+	identified by the combination of key type and key name.
+	However, since the key name can be up to 255 characters,
+	beyond the 128-element size limit for SNMP index objects,
+	the key ID is used to uniquely identify a key for SNMP
+	access."
+    INDEX   	{ alaIPsecKeyID }
+    ::= { alaIPsecKeyTable 1 }
+
+AlaIPsecKeyEntry ::= SEQUENCE {
+    alaIPsecKeyID     		Unsigned32,
+    alaIPsecKeyType             INTEGER,
+    alaIPsecKeyName       	OCTET STRING,
+    alaIPsecKey      		OCTET STRING,
+    alaIPsecKeyEncrypted        TruthValue,
+    alaIPsecKeyRowStatus	RowStatus
+		}
+
+alaIPsecKeyID OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A unique identifier for this key.  When creating a
+	new key, a zero value must be specified.  An available
+	ID will then be automatically assigned to the key."
+    ::= { alaIPsecKeyEntry 1 }
+
+alaIPsecKeyType OBJECT-TYPE
+    SYNTAX	INTEGER {
+			  saAuthentication(1),
+                          saEncryption(2)
+			}
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Indicates if the key is to be used for encryption or
+	authentication by a SA.  Once a key is created, its type
+	may not be changed."
+    ::= { alaIPsecKeyEntry 2 }
+
+alaIPsecKeyName OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(1..255))
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The name of the key.  
+
+	For manually-configured SA keys, the name is limited to 
+	a maximum length of 20 characters and should correspond 
+	to an entry in the alaIPsecSAConfigTable.
+
+	The key name may not be changed once a key is created."
+    ::= { alaIPsecKeyEntry 3 }
+
+alaIPsecKey OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The key value.  The value specified must match the required
+	key length for the algorithm using the key.  If 
+	an attempt is made to read the value of this object a 
+	zero-length octet string will be returned."
+    ::= { alaIPsecKeyEntry 4 }
+
+alaIPsecKeyEncrypted OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"If true, the key value is specified in AOS encrypted form.
+	For example, keys being restored from the configuration file."
+    DEFVAL  { false }	
+    ::= { alaIPsecKeyEntry 5 }
+
+alaIPsecKeyRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of keys."
+    ::= { alaIPsecKeyEntry 6 }
+
+
+--
+-- conformance information
+--
+
+alcatelIND1IPsecMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPsecMIB 2 }
+alcatelIND1IPsecMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1IPsecMIBConformance 1 }
+alcatelIND1IPsecMIBGroups OBJECT IDENTIFIER ::= { alcatelIND1IPsecMIBConformance 2 }
+
+alaIPsecCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+	"The compliance statement for Alcatel switches 
+	implementing ALCATEL-IND1-IPSEC-MIB."
+    MODULE
+    MANDATORY-GROUPS { 
+		       alaIPsecConfigGroup,
+		       alaIPsecSecurityPolicyGroup,
+		       alaIPsecSAConfigGroup,
+		       alaIPsecKeyGroup
+		     }
+    ::= { alcatelIND1IPsecMIBCompliances 1 }
+
+
+--
+-- units of conformance
+--
+
+alaIPsecConfigGroup OBJECT-GROUP
+    OBJECTS	{
+		  -- alaIPsecSecurityKeyID,
+	    	  alaIPsecSecurityKeyCurrent,
+    		  alaIPsecSecurityKeyNew,
+		  -- alaIPsecStatisticsProtocol,
+    		  alaIPsecStatisticsInSuccessful,
+    		  alaIPsecStatisticsInPolicyViolation,
+    		  alaIPsecStatisticsInNoSA,
+    		  alaIPsecStatisticsInUnknownSPI,
+    		  alaIPsecStatisticsInAHReplay,
+    		  alaIPsecStatisticsInESPReplay,
+    		  alaIPsecStatisticsInAHAuthenticationSuccess,
+    		  alaIPsecStatisticsInAHAuthenticationFail,
+    		  alaIPsecStatisticsInESPAuthenticationSuccess,
+    		  alaIPsecStatisticsInESPAuthenticationFail,
+    		  alaIPsecStatisticsInBadPacket,
+    		  alaIPsecStatisticsInNoMemory,
+    		  alaIPsecStatisticsOutSuccessful,
+    		  alaIPsecStatisticsOutPolicyViolation,
+    		  alaIPsecStatisticsOutNoSA,
+    		  alaIPsecStatisticsOutBadPacket,
+    		  alaIPsecStatisticsOutNoMemory,
+    		  alaIPsecStatisticsInDiscarded,
+    		  alaIPsecStatisticsOutDiscarded
+		}
+    STATUS	current
+    DESCRIPTION
+	"A collection of objects to support global configuration
+	of IPsec."
+    ::= { alcatelIND1IPsecMIBGroups 1 }
+
+
+alaIPsecSecurityPolicyGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  -- alaIPsecSecurityPolicyID
+                  alaIPsecSecurityPolicySource,
+                  alaIPsecSecurityPolicySourceType,
+		  alaIPsecSecurityPolicySourcePrefixLength,
+		  alaIPsecSecurityPolicySourcePort,
+		  alaIPsecSecurityPolicyDestination,
+		  alaIPsecSecurityPolicyDestinationType,
+		  alaIPsecSecurityPolicyDestinationPrefixLength,
+		  alaIPsecSecurityPolicyDestinationPort,
+		  alaIPsecSecurityPolicyULProtocol,
+		  alaIPsecSecurityPolicyICMPv6Type,
+		  alaIPsecSecurityPolicyDirection,
+		  alaIPsecSecurityPolicyName,
+		  alaIPsecSecurityPolicyDescription,
+		  alaIPsecSecurityPolicyAction,
+		  alaIPsecSecurityPolicyAdminState,
+		  alaIPsecSecurityPolicyOperationalState,
+		  alaIPsecSecurityPolicyPriority,
+		  alaIPsecSecurityPolicyRowStatus,
+		  -- alaIPsecSecurityPolicyRuleIndex,
+		  alaIPsecSecurityPolicyRuleProtocol,
+		  alaIPsecSecurityPolicyRuleMode,
+		  alaIPsecSecurityPolicyRuleRowStatus
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPsec
+	security policies."
+    ::= { alcatelIND1IPsecMIBGroups 2 }
+
+alaIPsecSAConfigGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  -- alaIPsecSAConfigID,
+		  alaIPsecSAConfigType,
+                  alaIPsecSAConfigSource,
+                  alaIPsecSAConfigSourceType,
+                  alaIPsecSAConfigDestination,
+                  alaIPsecSAConfigDestinationType,
+		  alaIPsecSAConfigSPI,
+		  alaIPsecSAConfigName,
+		  alaIPsecSAConfigDescription,
+		  alaIPsecSAConfigEncryptionAlgorithm,
+		  alaIPsecSAConfigEncryptionKeyLength,
+		  alaIPsecSAConfigAuthenticationAlgorithm,
+		  alaIPsecSAConfigAdminState,
+		  alaIPsecSAConfigOperationalState,
+		  alaIPsecSAConfigRowStatus
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of manually
+	configured IPsec SAs."
+    ::= { alcatelIND1IPsecMIBGroups 3 }
+
+
+alaIPsecKeyGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  -- alaIPsecKeyID,
+		  alaIPsecKeyType,
+    		  alaIPsecKeyName,
+    		  alaIPsecKey,
+		  alaIPsecKeyEncrypted,
+    		  alaIPsecKeyRowStatus
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of keys."
+    ::= { alcatelIND1IPsecMIBGroups 4 }
+
+END

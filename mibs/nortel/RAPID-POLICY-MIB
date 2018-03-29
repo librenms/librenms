@@ -1,0 +1,305 @@
+RAPID-POLICY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks               FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        rapidstream                        FROM RAPID-MIB;
+        
+    rsPolicyMIB MODULE-IDENTITY
+        LAST-UPDATED "0105211200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+          DESCRIPTION
+               "The MIB module describes various policy objects
+               of RapidStream system."
+
+
+          REVISION      "200105211200Z"
+          DESCRIPTION
+                   "Initial revision."
+          REVISION      "200211011200Z"
+          DESCRIPTION
+                   "Changed CONTACT-INFO."
+          ::= { rapidstream 4 }
+
+    rsPolicyToTunnel OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all tunnels
+             information of the policies."
+        ::= {rsPolicyMIB 1}
+
+    rsPolicyStatistics OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all RASVPN user."
+        ::= { rsPolicyMIB 2 }
+
+    rsPolicyToTunnelNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of tunnels in the policytotunnel table. "
+        ::= { rsPolicyToTunnel 1 }
+
+    rsPolicyToTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSPolicyToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the policytotunnel table of all the policies."
+        ::= { rsPolicyToTunnel 2 }
+
+    rsPolicyToTunnelEntry OBJECT-TYPE
+        SYNTAX      RSPolicyToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the tunnels
+            information."
+        INDEX {
+            rsPolicyToTunnelPolicyID,
+            rsPolicyToTunnelTunnelID
+        }
+        ::= { rsPolicyToTunnelTable 1 }
+
+    RSPolicyToTunnelEntry ::= SEQUENCE {
+
+        rsPolicyToTunnelPolicyID    Integer32,
+        rsPolicyToTunnelTunnelID    Integer32
+    }
+    
+    rsPolicyToTunnelPolicyID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The policy identifier of this entity."
+        ::= {rsPolicyToTunnelEntry 1}
+            
+    rsPolicyToTunnelTunnelID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel identifier of this entity."
+        ::= {rsPolicyToTunnelEntry 2}
+        
+-- counter ID 
+-- per policy counter 
+-- 1-24 is reserved 
+
+    rsPolicyTableNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of policies in the policy table. "
+        ::= { rsPolicyStatistics 1 }
+
+    rsPolicyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the policytotunnel table of the policies."
+        ::= { rsPolicyStatistics 2 }
+
+    rsPolicyEntry OBJECT-TYPE
+        SYNTAX      RSPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the policy
+            information."
+        INDEX{
+            rsPolicyID
+        }
+        ::= { rsPolicyTable 1 }
+
+    RSPolicyEntry ::= SEQUENCE {
+
+        rsPolicyID                 Integer32,
+        rsPolicyName               OCTET STRING (SIZE(32)),
+        rsPolicyBytes              Counter64,
+        rsPolicyPackets            Counter64,
+        rsPolicyIpsecDecryptErr    Counter64,
+        rsPolicyIpsecAuthErr       Counter64,
+        rsPolicyIpsecReplayErr     Counter64,
+        rsPolicyIpsecPadErr        Counter64,
+        rsPolicyIpsecPolicyErr     Counter64,
+        rsPolicyFwDisc             Counter64,
+        rsPolicyOtherDisc          Counter64,
+        rsPolicyActiveStreams      Counter64,
+        rsPolicyIpsecDisc          Counter64,
+        rsPolicyDisc               Counter64,
+        rsPolicyNumTunl            Counter64,
+        rsPolicySingleCntrNum      Counter64,
+        rsPolicyLogging            INTEGER
+    }
+    
+
+    rsPolicyID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The policy identifier of this policy."
+        ::= {rsPolicyEntry 1}
+
+    rsPolicyName OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The policy name of this policy"
+        ::= {rsPolicyEntry 2}
+
+    rsPolicyBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total traffic in bytes since setting up this policy."
+        ::= {rsPolicyEntry 3}
+
+    rsPolicyPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total traffic in packets since setting up this policy."
+        ::= {rsPolicyEntry 4}
+
+    rsPolicyIpsecDecryptErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to decryption 
+             errors since setting up this policy."
+        ::= {rsPolicyEntry 5}
+
+    rsPolicyIpsecAuthErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication  
+             errors since setting up this policy."
+        ::= {rsPolicyEntry 6}
+
+    rsPolicyIpsecReplayErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay 
+             errors since setting up this policy."
+        ::= {rsPolicyEntry 7}
+
+    rsPolicyIpsecPadErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to pad value 
+             errors since setting up this policy."
+        ::= {rsPolicyEntry 8}
+
+    rsPolicyIpsecPolicyErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to policy 
+             errors since setting up this policy."
+        ::= {rsPolicyEntry 9}
+
+    rsPolicyFwDisc  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded by firewall policies 
+             since setting up this policy."
+        ::= {rsPolicyEntry 10}
+
+    rsPolicyOtherDisc OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to errors 
+             other than firewall errors, ipsec errors since setting up
+             this policy."
+        ::= {rsPolicyEntry 11}
+
+    rsPolicyActiveStreams OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of the active connections since setting 
+             up this policy."
+        ::= {rsPolicyEntry 12}
+
+    rsPolicyIpsecDisc OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded by IPSEC errors 
+             (decryption error, authentication error, replay error) 
+             since setting up this policy."
+        ::= {rsPolicyEntry 13}
+
+    rsPolicyDisc    OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded since setting up 
+             this policy."
+        ::= {rsPolicyEntry 14}
+
+    rsPolicyNumTunl OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of tunnels belong to this policy"
+        ::= {rsPolicyEntry 15}
+
+    rsPolicySingleCntrNum OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of single counters handled by this policy."
+        ::= {rsPolicyEntry 16}
+
+    rsPolicyLogging OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether if the logging of this policy has been enabled. "
+        ::= { rsPolicyEntry 17 }
+
+END

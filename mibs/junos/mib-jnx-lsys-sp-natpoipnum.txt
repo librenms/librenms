@@ -1,0 +1,204 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-NATPOIPNUM-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpNATpoipnum                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpNATpoipnumMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- May 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the NAT-port-overloading-IP-number-specific 
+             MIB for Juniper Enterprise Logical-System (LSYS) security profiles.
+             Juniper documentation is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security NAT-port-overloading-IP-number resource is the focus in 
+             this MIB. 
+            "
+        ::= { jnxLsysSpNATpoipnum 1 }
+
+    jnxLsysSpNATpoipnumObjects  OBJECT IDENTIFIER ::= { jnxLsysSpNATpoipnumMIB 1 }
+    jnxLsysSpNATpoipnumSummary  OBJECT IDENTIFIER ::= { jnxLsysSpNATpoipnumMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular NAT-port-overloading-IP-number resource information objects per LSYS:
+--   Below are NAT-port-overloading-IP-number resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- The NAT-port-overloading-IP-number resource table per LSYS
+
+    jnxLsysSpNATpoipnumTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpNATpoipnumEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE NAT-port-overloading-IP-number objects for 
+             NAT-port-overloading-IP-number resource consumption per LSYS."  
+    ::= { jnxLsysSpNATpoipnumObjects 1 }
+    
+    jnxLsysSpNATpoipnumEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpNATpoipnumEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in NAT-port-overloading-IP-number resource table."
+    INDEX { IMPLIED jnxLsysSpNATpoipnumLsysName }          
+    ::= { jnxLsysSpNATpoipnumTable 1 }          
+
+    JnxLsysSpNATpoipnumEntry ::= 
+       SEQUENCE {
+          jnxLsysSpNATpoipnumLsysName    DisplayString,
+          jnxLsysSpNATpoipnumProfileName DisplayString,
+          jnxLsysSpNATpoipnumUsage       Unsigned32,
+          jnxLsysSpNATpoipnumReserved    Unsigned32,
+          jnxLsysSpNATpoipnumMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the NAT-port-overloading-IP-number resource table
+ 
+    jnxLsysSpNATpoipnumLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which NAT-port-overloading-IP-
+             number resource information is retrieved. "
+        ::= { jnxLsysSpNATpoipnumEntry 1 }
+
+    jnxLsysSpNATpoipnumProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpNATpoipnumEntry 2 }
+
+    jnxLsysSpNATpoipnumUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpNATpoipnumEntry 3 }
+    
+    jnxLsysSpNATpoipnumReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpNATpoipnumEntry 4 } 
+
+    jnxLsysSpNATpoipnumMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpNATpoipnumEntry 5 }
+
+
+-- **********************************************************************
+-- The NAT-port-overloading-IP-number resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpNATpoipnumUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The NAT-port-overloading-IP-number resource consumption over all 
+            LSYS."
+    ::= { jnxLsysSpNATpoipnumSummary 1 }          
+
+    jnxLsysSpNATpoipnumMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-port-overloading-IP-number resource maximum quota for the 
+            whole device for all LSYS."
+    ::= { jnxLsysSpNATpoipnumSummary 2 }
+    
+    jnxLsysSpNATpoipnumAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-port-overloading-IP-number resource available in the 
+            whole device."
+    ::= { jnxLsysSpNATpoipnumSummary 3 }
+    
+    jnxLsysSpNATpoipnumHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of NAT-port-overloading-IP-number resource 
+            consumed of a LSYS."
+    ::= { jnxLsysSpNATpoipnumSummary 4 }
+    
+    jnxLsysSpNATpoipnumHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most NAT-port-overloading-IP-number 
+            resource."
+    ::= { jnxLsysSpNATpoipnumSummary 5 }
+    
+    jnxLsysSpNATpoipnumLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of NAT-port-overloading-IP-number resource 
+            consumed of a LSYS."
+    ::= { jnxLsysSpNATpoipnumSummary 6 }
+    
+    jnxLsysSpNATpoipnumLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least NAT-port-overloading-IP-
+            number resource."
+    ::= { jnxLsysSpNATpoipnumSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of NAT-port-overloading-IP-number resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

@@ -1,0 +1,904 @@
+ALCATEL-IND1-PORT-MIRRORING-MONITORING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	NOTIFICATION-TYPE              FROM SNMPv2-SMI
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP             FROM SNMPv2-CONF
+        DisplayString,
+	TEXTUAL-CONVENTION,
+        RowStatus		       FROM SNMPv2-TC
+	InterfaceIndex			FROM IF-MIB
+	portMirroringMonitoringTraps,
+        softentIND1PortMirroringMonitoring              FROM ALCATEL-IND1-BASE
+        sFlowFsEntry,
+        sFlowCpEntry 			FROM SFLOW-MIB
+	InetAddress,   
+        InetAddressType           FROM INET-ADDRESS-MIB; 
+		
+ 
+	alcatelIND1PortMirrorMonitoringMIB MODULE-IDENTITY
+		LAST-UPDATED "200704030000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+         
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+        
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+        
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+                 For the Birds Of Prey Product Line
+		 Port Mirroring and Monitoring for mirroring/monitoring session control
+         
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+         
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+         
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+         
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+     	        ::= { softentIND1PortMirroringMonitoring 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	alcatelIND1PortMirMonMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Port Mirroring and Monitoring
+            Subsystem Managed Objects."
+            ::= { alcatelIND1PortMirrorMonitoringMIB 1 }
+
+
+    alcatelIND1PortMirMonMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Port Mirroring and Monitoring
+            Subsystem Conformance Information."
+            ::= { alcatelIND1PortMirrorMonitoringMIB 2 }
+
+
+    alcatelIND1PortMirMonMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Port Mirroring and Monitoring
+            Subsystem Units Of Conformance."
+            ::= { alcatelIND1PortMirMonMIBConformance 1}
+
+
+    alcatelIND1PortMirMonMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Port Mirroring and Monitoring
+            Subsystem Compliance Statements."
+            ::= { alcatelIND1PortMirMonMIBConformance 2}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	mirmonMirroring  OBJECT IDENTIFIER ::= { alcatelIND1PortMirMonMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+mirrorTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF MirrorEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of port mirroring instances."
+            ::= { mirmonMirroring 1 }
+
+
+mirrorEntry  OBJECT-TYPE
+	SYNTAX  MirrorEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A port  mirroring entry."
+	INDEX { mirrorSessionNumber }
+	    ::= { mirrorTable 1 }
+
+
+MirrorEntry ::= SEQUENCE {
+	mirrorSessionNumber
+		INTEGER,
+	mirrorMirroredIfindex
+		InterfaceIndex,
+	mirrorMirroringIfindex
+		InterfaceIndex,
+	mirrorStatus
+		INTEGER,
+	mirrorUnblockedVLAN
+		INTEGER,
+        mirrorRowStatus
+		RowStatus,
+	mirrorDirection
+		INTEGER,
+	mirrorSessOperStatus
+		INTEGER,
+        mirrorTaggedVLAN
+                INTEGER
+	}
+
+mirrorSessionNumber OBJECT-TYPE
+	SYNTAX  INTEGER  (1..2147483647)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Identifies a specific port mirroring instance."
+           DEFVAL  { 1 }
+           ::= { mirrorEntry 1 }	
+
+mirrorMirroredIfindex  OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  read-write
+	STATUS deprecated 
+	DESCRIPTION
+		" This variable is deprecated and value will be ignored. Please use mirrorSrcTable
+		 to configure mirrored ports.
+		The physical identification number for this mirroring port instance (mirrorred port)."
+	::= { mirrorEntry 2 }
+
+mirrorMirroringIfindex  OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		" The physical identification number for this mirroring port instance (mirroring port)."
+	    ::= { mirrorEntry 3 }
+ 
+mirrorStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		off (1),
+		on (2)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Whether mirroring is enabled or disabled for this port.
+		 Prior to enabling mirroring, or at the same time all other
+		 read write values in this table for the same row must
+		 be set to appropriate values, or defaults will be assumed."
+            DEFVAL  { on }
+	    ::= { mirrorEntry 4 }
+
+
+
+mirrorUnblockedVLAN OBJECT-TYPE
+	SYNTAX  INTEGER  (0..2147483647)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A VLAN identifier which specifies the VLAN identifier that must remain unblocked no matter what is the output of the spanning tree algorithm.Value 0 indicates this parameter is not set"
+           ::= { mirrorEntry 5 }	
+
+
+
+mirrorRowStatus OBJECT-TYPE
+	 	SYNTAX  RowStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		        "The status of this table entry.  
+		         "
+           ::= { mirrorEntry 6 }	
+
+mirrorDirection  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		inport (1),
+		outport (2),
+		bidirectional (3)
+	}
+	MAX-ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		 " This variable is deprecated and the value will be ignored.
+		 Please use mirrorSrcTable to set the direction of mirroring.
+			Direction of mirroring."
+            DEFVAL  { bidirectional }
+	    ::= { mirrorEntry 7 }
+
+mirrorSessOperStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		off (1),
+		on (2)
+	}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Whether mirroring session is active. "
+	DEFVAL  { on }
+	    ::= { mirrorEntry 8 }
+
+mirrorTaggedVLAN OBJECT-TYPE
+        SYNTAX  INTEGER  (0..2147483647)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "A VLAN identifier which specifies the VLAN identifier that must used to tag the mirrored packets going
+out of the MTP for remote port mirroring .Value 0 indicates this parameter is not set"
+           ::= { mirrorEntry 9 }
+
+-- xxxxxxxxxxxxxxxxxxx
+-- Mirror Source Table 
+-- xxxxxxxxxxxxxxxxxxx
+
+
+mirrorSrcTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF MirrorSrcEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of port mirroring instances."
+            ::= { mirmonMirroring 2 }
+
+
+mirrorSrcEntry  OBJECT-TYPE
+	SYNTAX  MirrorSrcEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A port  mirroring entry."
+	INDEX { mirrorSessionNumber, mirrorSrcMirroredIf }
+	    ::= { mirrorSrcTable 1 }
+
+
+MirrorSrcEntry ::= SEQUENCE {
+	mirrorSrcMirroredIf
+		InterfaceIndex,
+	mirrorSrcStatus
+		INTEGER,
+	mirrorSrcDirection
+		INTEGER,
+        mirrorSrcRowStatus
+		RowStatus,
+	mirrorSrcOperStatus
+		INTEGER
+	}
+
+mirrorSrcMirroredIf  OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The physical identification number for this mirroring port instance (mirrorred port)."
+	::= { mirrorSrcEntry 1 }
+
+mirrorSrcStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disable (1),
+		enable (2)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Whether mirroring is enabled or disabled for this port.
+		 Prior to enabling mirroring, or at the same time all other
+		 read write values in this table for the same row must
+		 be set to appropriate values, or defaults will be assumed."
+            DEFVAL  { enable }
+	    ::= { mirrorSrcEntry 2 }
+
+mirrorSrcDirection  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		inport (1),
+		outport (2),
+		bidirectional (3)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		 "Direction of mirroring on the source port of this entry."
+            DEFVAL  { bidirectional }
+	    ::= { mirrorSrcEntry 3 }
+
+mirrorSrcRowStatus OBJECT-TYPE
+	 	SYNTAX  RowStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		        "The status of this table entry.Row Status to control creation,
+			modification and deletion of this entry. "
+           ::= { mirrorSrcEntry 4 }
+
+mirrorSrcOperStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		off (1),
+		on (2)
+	}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		 "The mirroring operational status of this mirrored source. "
+            DEFVAL  { on }
+	    ::= { mirrorSrcEntry 5 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        mirmonMonitoring  OBJECT IDENTIFIER ::= { alcatelIND1PortMirMonMIBObjects 2 }
+
+	    
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+monitorTable OBJECT-TYPE
+               SYNTAX  SEQUENCE OF MonitorEntry
+               MAX-ACCESS  not-accessible
+               STATUS  current
+           DESCRIPTION
+                       "A list of port monitoring instances."
+                   ::= { mirmonMonitoring 1 }
+       
+       monitorEntry  OBJECT-TYPE
+               SYNTAX  MonitorEntry
+               MAX-ACCESS  not-accessible
+               STATUS  current
+               DESCRIPTION
+                       "A port  monitoring entry."
+                   INDEX { monitorSessionNumber }
+                   ::= { monitorTable 1 }
+       
+       MonitorEntry ::= SEQUENCE {
+               monitorSessionNumber
+                       INTEGER,
+               monitorIfindex
+                       InterfaceIndex,
+               monitorFileStatus
+                       INTEGER,
+               monitorFileName
+                       DisplayString ,
+               monitorFileSize
+                       INTEGER,        
+               monitorScreenStatus
+                       INTEGER,
+               monitorScreenLine
+                       INTEGER,
+               monitorTrafficType
+                       INTEGER,
+               monitorStatus
+                       INTEGER,
+               monitorFileOverWrite
+                         INTEGER,
+               monitorDirection
+                         INTEGER,
+               monitorTimeout
+                         INTEGER,
+               monitorRowStatus
+                       RowStatus
+
+               }
+       
+       
+       monitorSessionNumber OBJECT-TYPE
+               SYNTAX  INTEGER  (1..2147483647)
+	       MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION
+                       "Identifies a specific port monitoring instance."
+                  DEFVAL  { 1 }
+                  ::= { monitorEntry 1 }       
+       
+       monitorIfindex  OBJECT-TYPE
+               SYNTAX  InterfaceIndex
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "The physical identification number for this monitoring port instance."
+                   DEFVAL  { 1 }
+                   ::= { monitorEntry 2 }
+       
+       monitorFileStatus OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       off (1),
+                       on (2)
+               }
+               MAX-ACCESS read-write
+               STATUS current
+               DESCRIPTION
+                       "The status of the file option of a monitoring port instance (default off)"
+                   DEFVAL  { off }
+                   ::= { monitorEntry 3 } 
+       
+       monitorFileName  OBJECT-TYPE
+               SYNTAX  DisplayString(SIZE(0..255))
+               MAX-ACCESS  read-write
+               STATUS  current 
+               DESCRIPTION
+                       "The name of the file in which the traffic will be stored (default PMONITOR.ENC)."
+                   ::= { monitorEntry 4 }
+       
+       monitorFileSize OBJECT-TYPE     
+               SYNTAX  INTEGER  (1..2147483647)
+               MAX-ACCESS read-write
+               STATUS current
+               DESCRIPTION
+       "The number of  16384 ( 16K ) bytes allowed for the file. The file contains only the last monitorFileSize bytes of the current port monitoring instance (default 16384 bytes)." 
+                   DEFVAL  { 1}
+                   ::= {  monitorEntry 5 }
+       
+       monitorScreenStatus  OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       off (1),
+                       on (2)
+               }
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "The status of the screen option of a monitoring port instance (default off)"
+                   DEFVAL  { off }
+                   ::= { monitorEntry 6 }
+       
+       monitorScreenLine  OBJECT-TYPE
+               SYNTAX  INTEGER  (1..2147483647)
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "The number of lines used when the screen option is activated (default 24)"
+                   DEFVAL  { 24 }
+                   ::= { monitorEntry 7 }
+       
+       
+       monitorTrafficType OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       all         (1),
+                       unicast     (2),
+                       multicast   (3),
+                       broadcast   (4),
+                       unimulti    (5),
+                       unibroad    (6),
+                       multibroad  (7)
+               }
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "The type of traffic being monitored (default all)"
+               DEFVAL  { all }
+               ::= { monitorEntry 8 } 
+       
+       monitorStatus OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       off (1),
+                       on  (2),
+                       suspended (3)
+               }
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "The status of the port monitoring instance"
+                   DEFVAL  { off }
+                   ::= { monitorEntry 9 }
+       
+
+-- anand
+       monitorFileOverWrite  OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       off (1),
+                       on (2)
+               }
+               MAX-ACCESS  read-write
+               STATUS  current
+               DESCRIPTION
+                       "The status of the File Over Write option of a monitoring port instance (default on)"
+                   DEFVAL  { on }
+                   ::= { monitorEntry 10 }
+       monitorDirection  OBJECT-TYPE
+                        SYNTAX  INTEGER {
+                                inport (1),
+                                outport (2),
+                                bidirectional (3)
+                       }
+                       MAX-ACCESS  read-write
+                       STATUS  current
+                       DESCRIPTION
+                                "Direction of monitoring."
+                           DEFVAL  { bidirectional }
+
+                           ::= { monitorEntry 11 }
+
+
+       monitorTimeout OBJECT-TYPE     
+               SYNTAX  INTEGER  (0..2147483647)
+               MAX-ACCESS read-write
+               STATUS current
+               DESCRIPTION
+                       "The number of seconds allowed for this session before the session gets deleted.
+                        (default:forever 0 second)." 
+               DEFVAL  { 0 }
+               ::= { monitorEntry 12 }
+
+
+       monitorRowStatus OBJECT-TYPE
+                       SYNTAX  RowStatus
+                       MAX-ACCESS  read-write
+                       STATUS  current
+                       DESCRIPTION
+                               "The status of this table entry.  
+                                Create,Delete and Modify."
+                  ::= { monitorEntry 13 }      
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	mirmonNotificationVars  OBJECT IDENTIFIER ::= { alcatelIND1PortMirMonMIBObjects 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+MirMonErrorIds ::= TEXTUAL-CONVENTION
+	STATUS 	current
+	DESCRIPTION
+		"This data type is used to define the different type of error
+		occured while configuring Mirroring/Monitoring."
+	SYNTAX INTEGER {
+		other (1), 
+		wrongSession (2), -- Wrong session given to NI.
+		hwQError (3),     -- HW queue error on NI 
+		swQError (4) 	  -- SW queue error on NI
+		}
+
+mirmonPrimarySlot OBJECT-TYPE
+	        SYNTAX  INTEGER  (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		        "Slot of mirrored or monitored interface."
+           ::= { mirmonNotificationVars 1 }	
+
+mirmonPrimaryPort OBJECT-TYPE
+	        SYNTAX  INTEGER  (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		        "Port of mirrored or monitored interface."
+           ::= { mirmonNotificationVars 2 }	
+
+mirroringSlot OBJECT-TYPE
+	        SYNTAX  INTEGER  (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		        "Slot of mirroring interface."
+           ::= { mirmonNotificationVars 3 }	
+
+mirroringPort OBJECT-TYPE
+	        SYNTAX  INTEGER  (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		        "Port of mirroring interface."
+           ::= { mirmonNotificationVars 4 }	
+
+mirMonSession	OBJECT-TYPE
+	 SYNTAX  INTEGER  (1..2147483647)
+	 MAX-ACCESS  read-only
+	 STATUS  current
+	 DESCRIPTION
+	 	"The Mirroring session number."
+	 ::= {mirmonNotificationVars 5 }
+
+mirMonError OBJECT-TYPE
+	SYNTAX	MirMonErrorIds
+	MAX-ACCESS read-only
+	STATUS	   current
+	DESCRIPTION
+		"The Error returned by the NI which failed to configure Mirroring/Monitoring"
+	::= {mirmonNotificationVars  6 }
+
+mirMonErrorNi OBJECT-TYPE
+           SYNTAX  INTEGER  (1..2147483647)
+           MAX-ACCESS  read-only
+           STATUS  current
+           DESCRIPTION
+                 "The NI slot number. "
+           ::= { mirmonNotificationVars 7 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  NOTIFICATIONS
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+mirrorConfigError NOTIFICATION-TYPE
+	OBJECTS {
+		mirmonPrimarySlot,
+		mirmonPrimaryPort,
+		mirroringSlot,
+		mirroringPort,
+		mirMonErrorNi, -- NI which reported the error.
+		mirMonError    -- Error
+		}
+	STATUS current
+	DESCRIPTION
+		"The Mirroring Configuration failed on NI.
+		This trap is sent when any NI fails to configure mirroring.			
+		Due to this error, port mirroring session will be terminated."
+	::= { portMirroringMonitoringTraps 0 1 }
+
+monitorFileWritten NOTIFICATION-TYPE
+       OBJECTS {
+                       mirmonPrimarySlot,
+                       mirmonPrimaryPort,
+                       monitorFileName,
+                       monitorFileSize
+                       }
+  STATUS current
+               DESCRIPTION
+                       "A File Written Trap is sent when the amount of data requested
+                       by the user has been written by the port monitoring instance."
+               ::= { portMirroringMonitoringTraps 0 2 }
+
+
+mirrorUnlikeNi	NOTIFICATION-TYPE
+	OBJECTS {
+		mirmonPrimarySlot,
+		mirmonPrimaryPort,
+		mirroringSlot,
+		mirroringPort,
+		mirMonErrorNi  -- NI slot number where the Unlike NI is inserted.
+		}
+	STATUS current
+	DESCRIPTION
+		" The Mirroring Configuration is deleted due to the swapping of different 
+		  NI board type. Port Mirroring session which was active on a slot,cannot 
+		  continue with the insertion of different NI type in the same slot. "
+	::= { portMirroringMonitoringTraps 0 3 }
+	
+
+	
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	mirmonSFlowObjects  OBJECT IDENTIFIER ::= { alcatelIND1PortMirMonMIBObjects 4}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Flow Sampling Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      alasFlowFsTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF AlaSFlowFsEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "A table of the flow samplers within a device."
+              ::= { mirmonSFlowObjects 1 }
+
+      alasFlowFsEntry OBJECT-TYPE
+              SYNTAX      AlaSFlowFsEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "Attributes of a flow sampler."
+    	      AUGMENTS  { sFlowFsEntry }
+              ::= { alasFlowFsTable 1 }
+
+      AlaSFlowFsEntry ::= SEQUENCE {
+              alasFlowFsDeleteEntry      INTEGER
+              }
+
+      alasFlowFsDeleteEntry OBJECT-TYPE
+          SYNTAX INTEGER   {
+		  active(1),
+		  notInService(2),
+                  delete(6)
+             }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                  "The object is used to delete entries in the sFlowFsTable.
+                  Only value 6 is supported."
+          ::= { alasFlowFsEntry 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Counter Polling Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      alasFlowCpTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF AlaSFlowCpEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "A table of the flow samplers within a device."
+              ::= { mirmonSFlowObjects 2 }
+
+      alasFlowCpEntry OBJECT-TYPE
+              SYNTAX      AlaSFlowCpEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "Attributes of a flow sampler."
+    	      AUGMENTS  { sFlowCpEntry }
+              ::= { alasFlowCpTable 1 }
+
+      AlaSFlowCpEntry ::= SEQUENCE {
+              alasFlowCpDeleteEntry      INTEGER
+              }
+
+      alasFlowCpDeleteEntry OBJECT-TYPE
+      	  SYNTAX INTEGER   {
+		active(1),
+		notInService(2),
+                  delete(6)
+             }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                  "The object is used to delete entries in the sFlowCpTable.
+                   Only value 6 is supported."
+          ::= { alasFlowCpEntry 1 } 
+  
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  Agent IP Information
+--  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ 
+       alasFlowAgentConfigType OBJECT-TYPE    
+           SYNTAX      INTEGER {
+                      default(1),
+                      user(2)
+                 }   
+           MAX-ACCESS read-write    
+           STATUS       obsolete 
+           DESCRIPTION    
+                  "The Agent Config Information    
+                   1 -- Default    
+                   2 -- sFlow Interface IP Specified by User
+		   This object has been obsoleted. Use the alaIpManagedIntfEntry objects
+		   in AlcatelIND1Ip.mib"
+           DEFVAL        { default }    
+          ::= {  mirmonSFlowObjects 3}  
+ 
+       alasFlowAgentAddressType OBJECT-TYPE
+               SYNTAX      InetAddressType
+               MAX-ACCESS  read-write
+               STATUS      obsolete 
+               DESCRIPTION
+                 "The address type of the address associated with this agent.
+                  Only ipv4 and ipv6 types are supported.
+		  This object has been obsoleted. Use the alaIpManagedIntfEntry objects
+		  in AlcatelIND1Ip.mib"
+               ::= { mirmonSFlowObjects 4}
+ 
+       alasFlowAgentAddress OBJECT-TYPE   
+           SYNTAX InetAddress   
+           MAX-ACCESS  read-write   
+           STATUS      obsolete 
+           DESCRIPTION   
+                 "The IP address associated with this agent. In the case of a   
+                  multi-homed agent, this should be the loopback address of the   
+                  agent. The sFlowAgent address must provide SNMP connectivity   
+                  to the agent. The address should be an invariant that does not   
+                  change as interfaces are reconfigured, enabled, disabled,   
+                  added or removed. A manager should be able to use the   
+                  sFlowAgentAddress as a unique key that will identify this   
+                  agent over extended periods of time so that a history can   
+                  be maintained.
+		  This object has been obsoleted. Use the alaIpManagedIntfEntry objects
+		  in AlcatelIND1Ip.mib"   
+           ::= { mirmonSFlowObjects 5 }   
+          
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1PortMirMonMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             Port Mirroring and Monitoring."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                portMirroringGroup,
+                portMonitoringGroup,
+                portNotificationVarsGroup 
+            }
+
+        ::= { alcatelIND1PortMirMonMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    portMirroringGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                mirrorSessionNumber,     -- port mirroring table
+	                mirrorMirroredIfindex,
+	                mirrorMirroringIfindex,
+	                mirrorStatus,
+	                mirrorUnblockedVLAN,
+	                mirrorRowStatus,
+	                mirrorDirection,
+			mirrorSessOperStatus,
+			mirrorSrcMirroredIf, -- port mirroring source interfaces table
+			mirrorSrcStatus,
+			mirrorSrcDirection,
+			mirrorSrcRowStatus,
+			mirrorSrcOperStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Port Mirroring."
+        ::= { alcatelIND1PortMirMonMIBGroups 1 }
+
+   portMonitoringGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        monitorSessionNumber,     -- port monitoring table
+                        monitorIfindex,
+                        monitorFileStatus,
+                        monitorFileName,
+                        monitorFileSize,
+                        monitorScreenStatus,
+                        monitorScreenLine,
+                        monitorTrafficType,
+                        monitorStatus,
+                        monitorFileOverWrite,
+                        monitorDirection ,
+                        monitorTimeout ,
+                        monitorRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Port Monitoring."
+        ::= { alcatelIND1PortMirMonMIBGroups 2 }
+                        
+
+    portNotificationVarsGroup OBJECT-GROUP
+        OBJECTS
+        {
+                       mirmonPrimarySlot,
+                       mirmonPrimaryPort,
+                       mirroringSlot,
+                       mirroringPort,
+		       mirMonSession,
+		       mirMonError,
+		       mirMonErrorNi
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects which appear only in notifications."
+        ::= { alcatelIND1PortMirMonMIBGroups 3 }
+		 
+
+    mirmonTrapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+  	    mirrorConfigError,
+	    mirrorUnlikeNi
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of Traps for port mirroring and monitoring."
+        ::= { alcatelIND1PortMirMonMIBGroups 4 }
+
+
+	END

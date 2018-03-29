@@ -1,0 +1,320 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-INTERFACE.MIB:  NMS LLID ONU MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-INTERFACE DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOnuIf         OBJECT IDENTIFIER ::= { nmsEPONGroup 12 }
+               
+               
+               nmsepononuifTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuIfEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU port property table entries."
+                   ::= { nmsEponOnuIf 1 }
+
+               nmsEponOnuIfEntry OBJECT-TYPE
+                   SYNTAX  NMSEponOnuIfEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU port property table."
+                   INDEX { onuLlidDiid,onuIfSequenceNo }
+               ::= { nmsepononuifTable 1 }
+
+               NMSEponOnuIfEntry ::=
+                   SEQUENCE {
+                       onuLlidDiid
+                           INTEGER,
+                       onuIfSequenceNo
+                           INTEGER,
+                       onuPvid
+                           INTEGER,
+                       onuOuterTagTpid
+                           INTEGER,
+                       onuMcstTagStrip
+                           TruthValue,
+                       onuMcstMaxGroup
+                           INTEGER,
+                       onuUniIfAdminStatus
+                           TruthValue,
+                       onuUniIfOperStatus
+                           TruthValue,
+                       onuUniIfMode
+                           INTEGER,
+                       onuUniIfSpeed
+                           INTEGER,
+                       onuUniIfFlowControlStatus
+                           TruthValue,
+                       onuUniIfLoopbackTest
+                           TruthValue,
+                       onuUniIfSpeedLimit
+                           INTEGER,
+                       onuUniIfStormControlType
+                           INTEGER,
+                       onuUniIfStormControlThreshold
+                           INTEGER,
+                       onuUniIfStormControlRowStatus
+                           RowStatus,
+                       onuUniIfDynamicMacLearningLimit
+                           INTEGER,
+                       onuUniIfVlanMode
+                           INTEGER,
+                       onuUniIfVlanCost
+                           INTEGER,
+                       onuUniIfTrunkvlans
+                           BIT STRING,
+                       onuUniIfSpeedLimitIngress
+                       	   INTEGER,
+                       onuUniIfctcLoopbackDetect
+                       	   INTEGER,
+                       onuUniIfctcNotifyLoopback
+                       	   INTEGER
+                      
+		}	             
+
+               onuLlidDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID port DIID, as one of the index together with onuIfSequenceNo."
+                   ::= { nmsEponOnuIfEntry 1 } 
+
+               onuIfSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU interface sequence number, as one of the index together with onuLlidDiid."
+                   ::= { nmsEponOnuIfEntry 2 } 
+		
+               onuPvid OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PVID, range is 1 to 4094. Only UNI set is supported."
+                   ::= { nmsEponOnuIfEntry 3 } 
+		
+               onuOuterTagTpid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The TPID value of the outer tag. Only UNI set is supported."
+                   ::= { nmsEponOnuIfEntry 4 } 
+		
+               onuMcstTagStrip OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "if onuMcstTagStrip is TRUE, ONU will stripe VLAN tag of in downstream, 
+                           and if onuMcstTagStrip is FALSE, ONU will not stripe VLAN tag of in downstream."
+                   ::= { nmsEponOnuIfEntry 5 } 
+		
+               onuMcstMaxGroup OBJECT-TYPE
+                   SYNTAX  INTEGER(1..64)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The maximum group number which an UNI port can hold. This value can be set only in igmp-snooping mode."
+                   ::= { nmsEponOnuIfEntry 6 } 
+		
+               onuUniIfAdminStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port administration status."
+                   ::= { nmsEponOnuIfEntry 7 } 
+		
+               onuUniIfOperStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port operating status."
+                   ::= { nmsEponOnuIfEntry 8 } 
+		
+               onuUniIfMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          full(1),
+                          half(2),
+                          auto(3)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port mode(1-full£¬2-half£¬3-auto)."
+                   ::= { nmsEponOnuIfEntry 9 } 
+		
+               onuUniIfSpeed OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          s10M(1),
+                          s100M(2),
+                          s1000M(3),
+                          auto(4)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port speed(1-10M£¬2-100M£¬3-1000M(ONU not support currently)4-auto)."
+                   ::= { nmsEponOnuIfEntry 10 } 
+		
+               onuUniIfFlowControlStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port flow control status."
+                   ::= { nmsEponOnuIfEntry 11 } 
+		
+               onuUniIfLoopbackTest OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port loopback test."
+                   ::= { nmsEponOnuIfEntry 12 } 
+		
+               onuUniIfSpeedLimit OBJECT-TYPE
+                   SYNTAX  INTEGER(64..100000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port speed limit()."
+                   ::= { nmsEponOnuIfEntry 13 } 
+		
+               onuUniIfStormControlType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          broadcast(1),
+                          broadcast-multicast(2),
+                          broadcast-multicast-unkown-unicast(3)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port storm control type(broadcast(1),broadcast-multicast(2),broadcast-multicast-unkown-unicast(3)."
+                   ::= { nmsEponOnuIfEntry 14 } 
+		
+               onuUniIfStormControlThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(256..100000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port storm control threshold(256~100000kbps)."
+                   ::= { nmsEponOnuIfEntry 15 } 
+		
+               onuUniIfStormControlRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port storm control configuration row status."
+                   ::= { nmsEponOnuIfEntry 16 } 
+		
+               onuUniIfDynamicMacLearningLimit OBJECT-TYPE
+                   SYNTAX  INTEGER(1..63)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port dynamic MAC address learning number limitation(1~63)."
+                   ::= { nmsEponOnuIfEntry 17 } 
+
+               onuUniIfVlanMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   transparent-mode(0),
+                                   tag-mode(1),
+                                   translation-mode(2),
+                                   aggregation-mode(3),
+                                   trunk-mode(4),
+                                   stacking-mode(253)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port VLAN mode."
+                   ::= { nmsEponOnuIfEntry 18 } 
+
+               onuUniIfVlanCost OBJECT-TYPE
+                   SYNTAX  INTEGER(0..7)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port VLAN cost. Default value is 0."
+                   ::= { nmsEponOnuIfEntry 19 } 
+
+               onuUniIfTrunkvlans OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port allowed VLAN in trunk mode. There is totally 4094 bit, and each bit value means allow VLAN or not, 0 mean forbidding VLAN and 1 means allowed VLAN."
+                   ::= { nmsEponOnuIfEntry 20 } 
+
+               onuUniIfSpeedLimitIngress OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Configure ONU UNI interface ingress rate limit. Default value is 0, that means disable."
+                   ::= { nmsEponOnuIfEntry 21 } 
+
+               onuUniMacBindMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  disable(0),
+                                  enable(1)
+                                  }
+                   
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI interface MAC bind mode. Default value is 0, that means disable."
+                   ::= { nmsEponOnuIfEntry 22 } 
+
+               onuUniIfctcLoopbackDetect OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  disable(0),
+                                  enable(1)
+                                  }
+                   
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port CTC loopback detect:disable(0),enable(1),default value is 0."
+                   ::= { nmsEponOnuIfEntry 23 } 
+
+               onuUniIfctcNotifyLoopback OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  disable(0),
+                                  enable(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port CTC notify loopback :disable(0),enable(1),default value is 0."
+                   ::= { nmsEponOnuIfEntry 24 } 
+
+
+
+
+END

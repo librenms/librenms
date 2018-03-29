@@ -1,0 +1,1343 @@
+   JNX-MPLS-TE-P2MP-STD-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Unsigned32, Counter32, Counter64, TimeTicks
+         FROM SNMPv2-SMI                                    -- RFC 2578
+      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                                   -- RFC 2580
+      TruthValue, RowStatus, StorageType, TimeStamp
+         FROM SNMPv2-TC                                     -- RFC 2579
+      mplsStdMIB, MplsPathIndexOrZero
+         FROM MPLS-TC-STD-MIB                               -- RFC 3811
+      MplsIndexType
+         FROM MPLS-LSR-STD-MIB                              -- RFC 3813
+      mplsTunnelIndex, mplsTunnelInstance, mplsTunnelIngressLSRId,
+      mplsTunnelEgressLSRId
+         FROM MPLS-TE-STD-MIB                               -- RFC 3812
+      IndexInteger, IndexIntegerNextFree
+         FROM DIFFSERV-MIB                                  -- RFC 3289
+      InetAddress, InetAddressType
+         FROM INET-ADDRESS-MIB                              -- RFC 4001
+      jnxP2mpExperiment                                     -- *** JNX ***
+         FROM JUNIPER-EXPERIMENT-MIB                        -- *** JNX ***
+      ;
+
+   jnxMplsTeP2mpStdMIB MODULE-IDENTITY
+      LAST-UPDATED "200904170000Z"  -- April 17, 2009
+      ORGANIZATION
+         "Multiprotocol Label Switching (MPLS) Working Group"
+      CONTACT-INFO
+           "        Adrian Farrel
+                    Old Dog Consulting
+            Email:  adrian@olddog.co.uk
+
+                    Seisho Yasukawa
+                    NTT Corporation
+            Email:  s.yasukawa@hco.ntt.co.jp
+
+                    Thomas D. Nadeau
+                    British Telecom
+            Email:  tom.nadeau@bt.com
+
+                   Comments about this document should be emailed
+                   directly to the MPLS working group mailing list at
+                   mpls@lists.ietf.org"
+
+
+      DESCRIPTION
+           "Copyright (c) 2009 IETF Trust and the persons identified as
+            the document authors. All rights reserved.
+
+            This document is subject to BCP 78 and the IETF Trust's
+            Legal Provisions Relating to IETF Documents in effect on the
+            date of publication of this document
+            (http://trustee.ietf.org/license-info). Please review these
+            documents carefully, as they describe your rights and
+            restrictions with respect to this document.
+
+            The initial version of this MIB module was published in
+            RFC XXXX. For full legal notices see the RFC itself or see:
+            http://www.ietf.org/copyrights/ianamib.html
+-- RFC Editor. Please replace XXXX with the RFC number for this
+-- document and remove this note.
+
+            This MIB module contains managed object definitions
+            for Point-to-Multipoint (P2MP) MPLS Traffic Engineering (TE)
+            defined in:
+            1. Signaling Requirements for Point-to-Multipoint
+               Traffic-Engineered MPLS Label Switched Paths (LSPs),
+               S. Yasukawa, RFC 4461, April 2006.
+            2. Extensions to Resource Reservation Protocol - Traffic
+               Engineering (RSVP-TE) for Point-to-Multipoint TE Label
+               Switched Paths (LSPs), Aggarwal, R., Papadimitriou, D.,
+               and Yasukawa, S., RFC 4875, May 2007."
+
+      -- Revision history.
+
+      REVISION
+         "200904170000Z"  -- April 17, 2009
+      DESCRIPTION
+           "Initial version issued as part of RFC XXXX."
+-- RFC Editor. Please replace XXXX with the RFC number for this
+-- document and remove this note.
+
+      -- ::= { mplsStdMIB YYY }
+      ::= { jnxP2mpExperiment 1 }
+
+-- RFC Editor. Please replace YYY with the codepoint issued by IANA
+-- and remove this note.
+
+
+
+
+
+
+
+
+
+   -- Top level components of this MIB module.
+
+   -- notifications
+   jnxMplsTeP2mpNotifications OBJECT IDENTIFIER ::= { jnxMplsTeP2mpStdMIB 0 }
+   -- tables, scalars
+   jnxMplsTeP2mpScalars       OBJECT IDENTIFIER ::= { jnxMplsTeP2mpStdMIB 1 }
+   jnxMplsTeP2mpObjects       OBJECT IDENTIFIER ::= { jnxMplsTeP2mpStdMIB 2 }
+   -- conformance
+   jnxMplsTeP2mpConformance   OBJECT IDENTIFIER ::= { jnxMplsTeP2mpStdMIB 3 }
+
+   -- MPLS P2MP Tunnel scalars.
+
+   jnxMplsTeP2mpTunnelConfigured OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The number of P2MP tunnels configured on this device. A
+            tunnel is considered configured if the mplsTunnelRowStatus
+            in MPLS-TE-STD-MIB is active(1)."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpScalars 1 }
+
+   jnxMplsTeP2mpTunnelActive OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The number of P2MP tunnels active on this device. A
+            tunnel is considered active if the mplsTunnelOperStatus
+            in MPLS-TE-STD-MIB is up(1)."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpScalars 2 }
+
+   jnxMplsTeP2mpTunnelTotalMaxHops OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The maximum number of hops that can be specified for an
+            entire P2MP tunnel on this device. This object should be
+            used in conjunction with mplsTunnelMaxHops in
+
+
+            MPLS-TE-STD-MIB that is used in the context of P2MP tunnels
+            to express the maximum number of hops to any individual
+            destination of a P2MP tunnel that can be configured on this
+            device. mplsTeP2mpTunnelTotalMaxHops would normally be set
+            larger than or equal to mplsTunnelMaxHops."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpScalars 3 }
+
+   -- End of MPLS Tunnel scalars.
+
+   -- MPLS P2MP tunnel table.
+
+   jnxMplsTeP2mpTunnelTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF JnxMplsTeP2mpTunnelEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The mplsTeP2mpTunnelTable allows new P2MP MPLS tunnels to be
+            created between an LSR and one or more remote end-points,
+            and existing P2MP tunnels to be reconfigured or removed.
+
+            This table sparse augments mplsTunnelTable in
+            MPLS-TE-STD-MIB such that entries in that table can be
+            flagged as point-to-multipoint, and can be configured and
+            monitored appropriately."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpObjects 1 }
+
+   jnxMplsTeP2mpTunnelEntry OBJECT-TYPE
+      SYNTAX        JnxMplsTeP2mpTunnelEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a P2MP MPLS tunnel.
+            An entry can be created by a network administrator or by an
+            SNMP agent as instructed by an MPLS signaling protocol.
+
+            An entry in this table MUST correspond to an entry in the
+            mplsTunnelTable in MPLS-TE-STD-MIB. This table shares index
+            objects with that table and sparse augments that table.
+
+            Thus, an entry in this table can only be created at the same
+
+
+            time as or after a corresponding entry in mplsTunnelTable,
+            and an entry in mplsTunnelTable cannot be deleted while a
+            corresponding entry exists in this table.
+
+            This table entry includes a row status object, but
+            administrative and operational statuses should be taken from
+            mplsTunnelAdminStatus and mplsTunnelOperStatus in the
+            corresponding entry in mplsTunnelTable."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      INDEX {  mplsTunnelIndex,
+               mplsTunnelInstance,
+               mplsTunnelIngressLSRId,
+               mplsTunnelEgressLSRId
+            }
+      ::= { jnxMplsTeP2mpTunnelTable 1 }
+
+   JnxMplsTeP2mpTunnelEntry ::= SEQUENCE {
+         jnxMplsTeP2mpTunnelP2mpIntegrity      TruthValue,
+         jnxMplsTeP2mpTunnelBranchRole         INTEGER,
+         jnxMplsTeP2mpTunnelP2mpXcIndex        MplsIndexType,
+         jnxMplsTeP2mpTunnelRowStatus          RowStatus,
+         jnxMplsTeP2mpTunnelStorageType        StorageType
+   }
+
+   jnxMplsTeP2mpTunnelP2mpIntegrity OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Denotes whether or not P2MP Integrity is required for this
+            tunnel.
+
+            If P2MP integrity is operational on a P2MP tunnel then the
+            failure of the path to any of the tunnel destinations should
+            cause the teardown of the entire P2MP tunnel."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      DEFVAL { false }
+      ::= { jnxMplsTeP2mpTunnelEntry 2 }
+
+
+
+
+
+   jnxMplsTeP2mpTunnelBranchRole OBJECT-TYPE
+      SYNTAX        INTEGER { notBranch(1),
+                              branch(2),
+                              bud(3) }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This value supplements the value in the object
+            mplsTunnelRole in MPLS-TE-STD-MIB that indicates the role
+            of this LSR in the tunnel represented by this entry in
+            mplsTeP2mpTunnelTable.
+
+            mplsTunnelRole may take any of the values:
+               head(1),
+               transit(2),
+               tail(3),
+               headTail(4)
+
+            If this LSR is an ingress and there is exactly one
+            out-segment, mplsTunnelRole should contain the value
+            head(1), and mplsTeP2mpTunnelBranchRole should have the
+            value notBranch(1).
+
+            If this LSR is an ingress with more than one out segment,
+            mplsTunnelRole should contain the value head(1), and
+            mplsTeP2mpTunnelBranchRole should have the value branch(2).
+
+            If this LSR is an ingress, an egress, and there is one or
+            more out-segments, mplsTunnelRole should contain the value
+            headTail(4), and mplsTeP2mpTunnelBranchRole should have the
+            value bud(3).
+
+            If this LSR is a transit with exactly one out-segment,
+            mplsTunnelRole should contain the value transit(2), and
+            mplsTeP2mpTunnelBranchRole should have the value
+            notBranch(1).
+
+            If this LSR is a transit with more than one out-segment,
+            mplsTunnelRole should contain the value transit(2), and
+            mplsTeP2mpTunnelBranchRole should have the value branch(2).
+
+            If this LSR is a transit with one or more out-segments and
+            is also an egress, mplsTunnelRole should contain the value
+            transit(2), and mplsTeP2mpTunnelBranchRole should have the
+            value bud(3).
+
+            If this LSR is an egress with no out-segment and is not the
+            ingress, mplsTunnelRole should contain the value tail(3),
+
+
+            and mplsTeP2mpTunnelBranchRole should have the value
+            notBranch(1).
+
+            If this LSR is an egress and has one or more out-segments,
+            mplsTunnelRole should contain the value transit(1), and
+            mplsTeP2mpTunnelBranchRole should have the value bud(3)."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      DEFVAL { notBranch }
+      ::= { jnxMplsTeP2mpTunnelEntry 3 }
+
+   jnxMplsTeP2mpTunnelP2mpXcIndex OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object contains the value of mplsXCIndex, the primary
+            index of the mplsXCTable for all cross-connect entries for
+            this P2MP LSP.
+
+            If no XC entries have been created yet, this object must
+            return zero.
+
+            The set of entries in the mplsXCTable for this P2MP LSP can
+            be walked by reading Get-or-GetNext starting with the three
+            indexes to mplsXCTable set as:
+              mplsXCIndex            = the value of this object
+              mplsXCInSegmentIndex   = 0x0
+              mplsXCOutSegmentIndex  = 0x0"
+      REFERENCE
+           "RFC 3813 - Multiprotocol Label Switching (MPLS) Label
+            Switching (LSR) Router Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T.  Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpTunnelEntry 4 }
+
+   jnxMplsTeP2mpTunnelRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable is used to create, modify, and/or delete a row
+            in this table.  When a row in this table is in active(1)
+            state, no objects in that row can be modified by the agent
+            except mplsTeP2mpTunnelRowStatus and
+            mplsTeP2mpTunnelStorageType.
+
+
+
+            This object and mplsTunnelRowStatus in the corresponding
+            entry in mplsTunnelTable in MPLS-TE-STD-MIB should be
+            managed together. No objects in a row in this table can be
+            modified when the mplsTunnelRowStatus object in the
+            corresponding row in mplsTunnelTable has value active(1).
+
+            Note that no admin or oper status objects are provided in
+            this table. The administrative and operational status of
+            P2MP tunnels is taken from the values of
+            mplsTunnelAdminStatus and mplsTunnelOperStatus in the
+            corresponding row mplsTunnelTable."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpTunnelEntry 5 }
+
+   jnxMplsTeP2mpTunnelStorageType OBJECT-TYPE
+      SYNTAX        StorageType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The storage type for this tunnel entry.
+            Conceptual rows having the value 'permanent' need not allow
+            write-access to any columnar objects in the row."
+      DEFVAL { volatile }
+      ::= { jnxMplsTeP2mpTunnelEntry 6 }
+
+   -- End of mplsTeP2mpTunnelTable
+
+   -- MPLS P2MP tunnel destination table.
+
+   jnxMplsTeP2mpTunnelSubGroupIDNext OBJECT-TYPE
+      SYNTAX        IndexIntegerNextFree (0..65535)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object contains an unused value for
+            mplsTeP2mpTunnelDestSubGroupID, or a zero to indicate that
+            none exists. Negative values are not allowed, as they do not
+            correspond to valid values of
+            mplsTeP2mpTunnelDestSubGroupID.
+
+            Note that this object offers an unused value for an
+            mplsTeP2mpTunnelDestSubGroupID value at the local LSR when
+            it is a sub-group originator. In other cases, the value of
+            mplsTeP2mpTunnelDestSubGroupID SHOULD be taken from the
+            received value signaled by the signaling protocol and
+
+
+            corresponds to the value in
+            mplsTeP2mpTunnelDestSrcSubGroupID."
+      ::= { jnxMplsTeP2mpObjects 2 }
+
+   jnxMplsTeP2mpTunnelDestTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF JnxMplsTeP2mpTunnelDestEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The mplsTeP2mpTunnelDestTable allows new destinations of
+            P2MP MPLS tunnels to be added to and removed from P2MP
+            tunnels."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpObjects 3 }
+
+   jnxMplsTeP2mpTunnelDestEntry OBJECT-TYPE
+      SYNTAX        JnxMplsTeP2mpTunnelDestEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a destination of a P2MP
+            MPLS tunnel. An entry can be created by a network
+            administrator or by an SNMP agent as instructed by an MPLS
+            signaling protocol.
+
+            Entries in this table share some index fields with the
+            mplsTeP2mpTunnelTable and the mplsTunnelTable in
+            MPLS-TE-STD-MIB. Entries in this table have no meaning
+            unless there is a corresponding entry in
+            mplsTeP2mpTunnelTable (which, itself, depends on a
+            corresponding entry in mplsTunnelTable).
+
+            Note that the same destination may be present more than once
+            if it is in more than one sub-group as reflected by the
+            mplsTeP2mpTunnelDestSrcSubGroupOriginType,
+            mplsTeP2mpTunnelDestSrcSubGroupOrigin,
+            mplsTeP2mpTunnelDestSrcSubGroupID,
+            mplsTeP2mpTunnelDestSubGroupOriginType,
+            mplsTeP2mpTunnelDestSubGroupOrigin, and
+            mplsTeP2mpTunnelDestSubGroupID, index objects.
+
+            Entries in this table may be created at any time. If created
+            before an entry in the mplsTeP2mpTunnelTable the entries
+            have no meaning, but may be kept ready for the creation of
+            the P2MP tunnel. If created after the entry in
+
+
+            mplsTeP2mpTunnelTable, entries in this table may reflect the
+            addition of destinations to active P2MP tunnels. For this
+            reason, entries in this table are equipped with row, admin,
+            and oper status objects. "
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      INDEX {  mplsTunnelIndex,
+               mplsTunnelInstance,
+               mplsTunnelIngressLSRId,
+               mplsTunnelEgressLSRId,
+               jnxMplsTeP2mpTunnelDestSrcSubGroupOriginType,
+               jnxMplsTeP2mpTunnelDestSrcSubGroupOrigin,
+               jnxMplsTeP2mpTunnelDestSrcSubGroupID,
+               jnxMplsTeP2mpTunnelDestSubGroupOriginType,
+               jnxMplsTeP2mpTunnelDestSubGroupOrigin,
+               jnxMplsTeP2mpTunnelDestSubGroupID,
+               jnxMplsTeP2mpTunnelDestDestinationType,
+               jnxMplsTeP2mpTunnelDestDestination
+            }
+      ::= { jnxMplsTeP2mpTunnelDestTable 1 }
+
+   JnxMplsTeP2mpTunnelDestEntry ::= SEQUENCE {
+         jnxMplsTeP2mpTunnelDestSrcSubGroupOriginType  InetAddressType,
+         jnxMplsTeP2mpTunnelDestSrcSubGroupOrigin      InetAddress,
+         jnxMplsTeP2mpTunnelDestSrcSubGroupID          IndexInteger,
+         jnxMplsTeP2mpTunnelDestSubGroupOriginType     InetAddressType,
+         jnxMplsTeP2mpTunnelDestSubGroupOrigin         InetAddress,
+         jnxMplsTeP2mpTunnelDestSubGroupID             IndexInteger,
+         jnxMplsTeP2mpTunnelDestDestinationType        InetAddressType,
+         jnxMplsTeP2mpTunnelDestDestination            InetAddress,
+         jnxMplsTeP2mpTunnelDestBranchOutSegment       MplsIndexType,
+         jnxMplsTeP2mpTunnelDestHopTableIndex          MplsPathIndexOrZero,
+         jnxMplsTeP2mpTunnelDestPathInUse              MplsPathIndexOrZero,
+         jnxMplsTeP2mpTunnelDestCHopTableIndex         MplsPathIndexOrZero,
+         jnxMplsTeP2mpTunnelDestARHopTableIndex        MplsPathIndexOrZero,
+         jnxMplsTeP2mpTunnelDestTotalUpTime            TimeTicks,
+         jnxMplsTeP2mpTunnelDestInstanceUpTime         TimeTicks,
+         jnxMplsTeP2mpTunnelDestPathChanges            Counter32,
+         jnxMplsTeP2mpTunnelDestLastPathChange         TimeTicks,
+         jnxMplsTeP2mpTunnelDestCreationTime           TimeStamp,
+         jnxMplsTeP2mpTunnelDestStateTransitions       Counter32,
+         jnxMplsTeP2mpTunnelDestDiscontinuityTime      TimeStamp,
+         jnxMplsTeP2mpTunnelDestAdminStatus            INTEGER,
+         jnxMplsTeP2mpTunnelDestOperStatus             INTEGER,
+         jnxMplsTeP2mpTunnelDestRowStatus              RowStatus,
+         jnxMplsTeP2mpTunnelDestStorageType            StorageType
+   }
+
+   jnxMplsTeP2mpTunnelDestSrcSubGroupOriginType OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This object identifies the type of address carried in
+            mplsTeP2mpTunnelDestSrcSubGroupOrigin.
+
+            Since the object mplsTeP2mpTunnelDestSrcSubGroupOrigin must
+            conform to the protocol specification, this object must
+            return either ipv4(1) or ipv6(2) at a transit or egress LSR.
+
+            At an ingress LSR, there is no source sub-group and this
+            object should return the value unknown(0)."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 1 }
+
+   jnxMplsTeP2mpTunnelDestSrcSubGroupOrigin OBJECT-TYPE
+      SYNTAX        InetAddress (SIZE(0|4|16))
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The TE Router ID (reachable and stable IP address) of the
+            originator of the P2MP sub-group as received on a Path
+            message by a transit or egress LSR.
+
+            This object is interpreted in the context of
+            mplsTeP2mpTunnelDestSrcSubGroupOriginType.
+
+            The value of the sub-group originator used on outgoing Path
+            messages is found in mplsTeP2mpTunnelDestSubGroupOrigin and
+            is copied from this object unless this LSR is responsible
+            for changing the sub-group ID.
+
+            At an ingress LSR there is no received Path message.
+            mplsTeP2mpTunnelDestSrcSubGroupOriginType should return
+            unknown(0), and this object should return a zero-length
+            string."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 2 }
+
+
+
+
+
+
+
+   jnxMplsTeP2mpTunnelDestSrcSubGroupID OBJECT-TYPE
+      SYNTAX        IndexInteger (0..65535)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The unique identifier assigned by the sub-group originator
+            for this sub-group of this P2MP tunnel as received on a Path
+            message by a transit or egress LSR.
+
+            The value of the sub-group identifier used on outgoing Path
+            messages is found in mplsTeP2mpTunnelDestSubGroupID and is
+            copied from this object unless this LSR is responsible for
+            changing the sub-group ID.
+
+            At an ingress LSR there is no received Path message, and
+            this object should return zero."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 3 }
+
+   jnxMplsTeP2mpTunnelDestSubGroupOriginType OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This object identifies the type of address carried in
+            mplsTeP2mpTunnelDestSubGroupOrigin.
+
+            This object must return either ipv4(1) or ipv6(2) in keeping
+            with the protocol specification."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 4 }
+
+   jnxMplsTeP2mpTunnelDestSubGroupOrigin OBJECT-TYPE
+      SYNTAX        InetAddress (SIZE(4|16))
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The TE Router ID (reachable and stable IP address) of the
+            originator of the P2MP sub-group. In many cases, this will
+            be the ingress LSR of the P2MP tunnel and will be the
+            received signaled value as available in
+            mplsTeP2mpTunnelDestSrcSubGroupOrigin.
+
+            When a signaling protocol is used, this object corresponds
+            to the Sub-Group Originator field in the SENDER_TEMPLATE
+
+
+            object.
+
+            This object is interpreted in the context of
+            mplsTeP2mpTunnelDestSubGroupOriginType."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 5 }
+
+   jnxMplsTeP2mpTunnelDestSubGroupID OBJECT-TYPE
+      SYNTAX        IndexInteger (1..65535)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The unique identifier assigned by the sub-group originator
+            for this sub-group of this P2MP tunnel.
+
+            An appropriate value for this object during row creation
+            when the sub-group origin in
+            mplsTeP2mpTunnelDestSubGroupOrigin is the local LSR can
+            be obtained by reading mplsTeP2mpTunnelSubGroupIDNext.
+
+            At an egress, there is no downstream sub-group ID. This
+            object should return the value received from upstream and
+            reported in mplsTeP2mpTunnelDestSrcSubGroupID."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 6 }
+
+   jnxMplsTeP2mpTunnelDestDestinationType OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This object identifies the type of address carried in
+            mplsTeP2mpTunnelDestDestination.
+
+            This object forms part of the index of this table and can,
+            therefore, not return the value unknown(0). Similarly, since
+            the object mplsTeP2mpTunnelDestDestination must conform to
+            the protocol specification, this object must return either
+            ipv4(1) or ipv6(2)."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 7 }
+
+
+   jnxMplsTeP2mpTunnelDestDestination OBJECT-TYPE
+      SYNTAX        InetAddress (SIZE(4|16))
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "A single destination of this P2MP tunnel. That is, a
+            routable TE address of a leaf. This will often be the TE
+            Router ID of the leaf, but can be any interface address.
+
+            When a signaling protocol is used, this object corresponds
+            to the S2L Sub-LSP destination address field in the
+            S2L_SUB_LSP object.
+
+            This object is interpreted in the context of
+            mplsTeP2mpTunnelDestDestinationType."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 8 }
+
+   jnxMplsTeP2mpTunnelDestBranchOutSegment OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object identifies the outgoing branch from this LSR
+            towards the destination represented by this table entry. It
+            must be a unique identifier within the scope of this tunnel.
+
+            If MPLS-LSR-STD-MIB is implemented, this object should
+            contain an index into mplsOutSegmentTable.
+
+            If MPLS-LSR-STD-MIB is not implemented, the LSR should
+            assign a unique value to each branch of the tunnel.
+
+            The value of this object is also used as an index into
+            mplsTeP2mpTunnelBranchPerfTable."
+         ::= { jnxMplsTeP2mpTunnelDestEntry 9 }
+
+   jnxMplsTeP2mpTunnelDestHopTableIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Index into the mplsTunnelHopTable entry that specifies the
+            explicit route hops for this destination of the P2MP tunnel.
+
+
+            This object represents the configured route for the branch
+            of the P2MP tree to this destination and is meaningful only
+            at the head-end (ingress or root) of the P2MP tunnel. Note
+            that many such paths may be configured within the
+            mplsTunnelHopTable for each destination, and that the object
+            mplsTeP2mpTunnelDestPathInUse identifies which path has been
+            selected for use."
+      DEFVAL { 0 }
+      ::= { jnxMplsTeP2mpTunnelDestEntry 10 }
+
+   jnxMplsTeP2mpTunnelDestPathInUse OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This value denotes the configured path that was chosen as
+            the explicit path to this destination of this P2MP tunnel.
+            This value reflects the secondary index into
+            mplsTunnelHopTable where the primary index comes from
+            mplsTeP2mpTunnelDestHopTableIndex.
+
+            The path indicated by this object might not exactly match
+            the one signaled and recorded in mplsTunnelCHopTable as
+            specific details of the path might be computed locally.
+
+            Similarly, the path might not match the actual path in use
+            as recorded in mplsTunnelARHopTable due to the fact that
+            some details of the path may have been resolved within the
+            network.
+
+            A value of zero denotes that no path is currently in use or
+            available."
+      DEFVAL { 0 }
+      ::= { jnxMplsTeP2mpTunnelDestEntry 11 }
+
+   jnxMplsTeP2mpTunnelDestCHopTableIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Index into the mplsTunnelCHopTable that identifies the
+            explicit path for this destination of the P2MP tunnel.
+
+            This path is based on the chosen configured path identified
+            by mplsTeP2mpTunnelDestHopTableIndex and
+            mplsTeP2mpTunnelDestPathInUse, but may have been modified
+            and automatically updated by the agent when computed hops
+            become available or when computed hops get modified.
+
+
+            If this destination is the destination of the 'first S2L
+            sub-LSP' then this path will be signaled in the Explicit
+            Route Object. If this destination is the destination of a
+            'subsequent S2L sub-LSP' then this path will be signaled in
+            a Secondary Explicit Route Object."
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 12 }
+
+   jnxMplsTeP2mpTunnelDestARHopTableIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Index into the mplsTunnelARHopTable that identifies the
+            actual hops traversed to this destination of the P2MP
+            tunnel. This is automatically updated by the agent when the
+            actual hops becomes available.
+
+            If this destination is the destination of the 'first S2L
+            sub-LSP' then this path will be signaled in the Recorded
+            Route Object. If this destination is the destination of a
+            'subsequent S2L sub-LSP' then this path will be signaled in
+            a Secondary Recorded Route Object."
+
+      REFERENCE
+           "RFC 4875 - Extensions to Resource Reservation Protocol -
+            Traffic Engineering (RSVP-TE) for Point-to-Multipoint TE
+            Label Switched Paths (LSPs), R. Aggarwal, D. Papadimitriou,
+            and S. Yasukawa, May 2007."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 13 }
+
+   jnxMplsTeP2mpTunnelDestTotalUpTime OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This value represents the aggregate up time for all
+            instances of this tunnel to this destination, if this
+            information is available.
+
+            If this information is not available, this object MUST
+            return a value of 0."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 14 }
+
+
+
+   jnxMplsTeP2mpTunnelDestInstanceUpTime OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This value identifies the total time that the currently
+            active tunnel instance to this destination has had its
+            operational status (mplsTeP2mpTunnelDestOperStatus) set to
+            up(1) since it was last previously not up(1)."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 15 }
+
+   jnxMplsTeP2mpTunnelDestPathChanges OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object counts the number of times the actual path for
+            this destination of this P2MP tunnel instance has changed.
+            This object should be read in conjunction with
+            mplsTeP2mpTunnelDestDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 16 }
+
+   jnxMplsTeP2mpTunnelDestLastPathChange OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the time since the last change to the actual path
+           for this destination of this P2MP tunnel instance."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 17 }
+
+   jnxMplsTeP2mpTunnelDestCreationTime OBJECT-TYPE
+      SYNTAX        TimeStamp
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the value of sysUpTime when the first instance of
+            this tunnel came into existence for this destination. That
+            is, when the value of mplsTeP2mpTunnelDestOperStatus was
+            first set to up(1)."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 18 }
+
+   jnxMplsTeP2mpTunnelDestStateTransitions OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object counts the number of times the status
+
+
+            (mplsTeP2mpTunnelDestOperStatus) of this tunnel instance to
+            this destination has changed.
+            This object should be read in conjunction with
+            mplsTeP2mpTunnelDestDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 19 }
+
+   jnxMplsTeP2mpTunnelDestDiscontinuityTime OBJECT-TYPE
+      SYNTAX      TimeStamp
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           "The value of sysUpTime on the most recent occasion at which
+            any one or more of this row's Counter32 objects experienced
+            a discontinuity. If no such discontinuity has occurred since
+            the last re-initialization of the local management
+            subsystem, then this object contains a zero value."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 20 }
+
+   jnxMplsTeP2mpTunnelDestAdminStatus OBJECT-TYPE
+      SYNTAX       INTEGER {
+                      up(1),        -- ready to pass data
+                      down(2),      -- out of service
+                      testing(3)    -- in some test mode
+                    }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Indicates the desired operational status of this
+            destination of this P2MP tunnel."
+      DEFVAL { up }
+      ::= { jnxMplsTeP2mpTunnelDestEntry 21 }
+
+   jnxMplsTeP2mpTunnelDestOperStatus OBJECT-TYPE
+      SYNTAX        INTEGER {
+                      up(1),             -- ready to pass data
+                      down(2),           -- out of service
+                      testing(3),        -- in some test mode
+                      unknown(4),        -- status cannot be determined
+                      lowerLayerDown(7)  -- down due to the state of
+                                         -- lower layer interfaces
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the actual operational status of this destination
+            of this P2MP tunnel. This object may be compared to
+            mplsTunnelOperStatus that includes two other values:
+              dormant(5)    -- some component is missing
+
+
+              notPresent(6) -- down due to the state of
+                            -- lower layer interfaces.
+            These states do not apply to an individual destination of a
+            P2MP MPLS-TE LSP and so are not included in this object."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 22 }
+
+   jnxMplsTeP2mpTunnelDestRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This object is used to create, modify, and/or delete a row
+            in this table. When a row in this table is in active(1)
+            state, no objects in that row can be modified by SET
+            operations except mplsTeP2mpTunnelDestAdminStatus and
+            mplsTeP2mpTunnelDestStorageType."
+      ::= { jnxMplsTeP2mpTunnelDestEntry 23 }
+
+   jnxMplsTeP2mpTunnelDestStorageType OBJECT-TYPE
+      SYNTAX        StorageType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The storage type for this table entry.
+
+                    Conceptual rows having the value 'permanent' need
+                    not allow write-access to any columnar objects in
+                    the row."
+      DEFVAL { volatile }
+      ::= { jnxMplsTeP2mpTunnelDestEntry 24 }
+
+   -- End of mplsTeP2mpTunnelDestTable
+
+   -- MPLS Tunnel Branch Performance Table.
+
+   jnxMplsTeP2mpTunnelBranchPerfTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF JnxMplsTeP2mpTunnelBranchPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides per-tunnel branch MPLS performance
+            information.
+
+            This table is not valid for switching types other than
+            packet."
+
+
+      ::= { jnxMplsTeP2mpObjects 4 }
+
+   jnxMplsTeP2mpTunnelBranchPerfEntry OBJECT-TYPE
+      SYNTAX        JnxMplsTeP2mpTunnelBranchPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the LSR for each
+            downstream branch (out-segment) from this LSR for this P2MP
+            tunnel.
+
+            More than one destination as represented by an entry in the
+            mplsTeP2mpTunnelDestTable may be reached through a single
+            out-segment. More than one out-segment may belong to a
+            single P2MP tunnel represented by an entry in
+            mplsTeP2mpTunnelTable.
+
+            Each entry in the table is indexed by the four identifiers
+            of the P2MP tunnel, and the out-segment that identifies the
+            outgoing branch."
+      INDEX {  mplsTunnelIndex,
+               mplsTunnelInstance,
+               mplsTunnelIngressLSRId,
+               mplsTunnelEgressLSRId,
+               jnxMplsTeP2mpTunnelBranchPerfBranch
+            }
+      ::= { jnxMplsTeP2mpTunnelBranchPerfTable 1 }
+
+   JnxMplsTeP2mpTunnelBranchPerfEntry ::= SEQUENCE {
+         jnxMplsTeP2mpTunnelBranchPerfBranch        MplsIndexType,
+         jnxMplsTeP2mpTunnelBranchPerfPackets       Counter32,
+         jnxMplsTeP2mpTunnelBranchPerfHCPackets     Counter64,
+         jnxMplsTeP2mpTunnelBranchPerfErrors        Counter32,
+         jnxMplsTeP2mpTunnelBranchPerfBytes         Counter32,
+         jnxMplsTeP2mpTunnelBranchPerfHCBytes       Counter64,
+         jnxMplsTeP2mpTunnelBranchDiscontinuityTime TimeStamp
+   }
+
+   jnxMplsTeP2mpTunnelBranchPerfBranch OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This object identifies an outgoing branch from this LSR
+            for this tunnel. Its value is unique within the context of
+            the tunnel.
+
+            If MPLS-LSR-STD-MIB is implemented, this object should
+
+
+            contain an index into mplsOutSegmentTable.
+
+            Under all circumstances, this object should contain
+            the same value as mplsTeP2mpTunnelDestBranchOutSegment for
+            destinations reached on this branch."
+         ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 1 }
+
+   jnxMplsTeP2mpTunnelBranchPerfPackets OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Number of packets forwarded by the tunnel onto this branch.
+            This object should represents the 32-bit value of the least
+            significant part of the 64-bit value if both
+            mplsTeP2mpTunnelBranchPerfHCPackets is returned.
+            This object should be read in conjunction with
+            mplsTeP2mpTunnelBranchDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 2 }
+
+   jnxMplsTeP2mpTunnelBranchPerfHCPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "High capacity counter for number of packets forwarded by the
+            tunnel onto this branch.
+            This object should be read in conjunction with
+            mplsTeP2mpTunnelBranchDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 3 }
+
+   jnxMplsTeP2mpTunnelBranchPerfErrors OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Number of packets dropped because of errors or for other
+            reasons, that were supposed to be forwarded onto this
+            branch for this tunnel. This object should be read in
+            conjunction with mplsTeP2mpTunnelBranchDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 4 }
+
+   jnxMplsTeP2mpTunnelBranchPerfBytes OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Number of bytes forwarded by the tunnel onto this branch.
+
+
+            This object should represents the 32-bit value of the least
+            significant part of the 64-bit value if both
+            mplsTeP2mpTunnelBranchPerfHCBytes is returned.
+            This object should be read in conjunction with
+            mplsTeP2mpTunnelBranchDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 5 }
+
+   jnxMplsTeP2mpTunnelBranchPerfHCBytes OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "High capacity counter for number of bytes forwarded
+            by the tunnel onto this branch.
+            This object should be read in conjunction with
+            mplsTeP2mpTunnelBranchDiscontinuityTime."
+      ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 6 }
+
+   jnxMplsTeP2mpTunnelBranchDiscontinuityTime OBJECT-TYPE
+      SYNTAX      TimeStamp
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           "The value of sysUpTime on the most recent occasion at which
+            any one or more of this row's Counter32 or Counter64 objects
+            experienced a discontinuity. If no such discontinuity has
+            occurred since the last re-initialization of the local
+            management subsystem, then this object contains a zero
+            value."
+      ::= { jnxMplsTeP2mpTunnelBranchPerfEntry 7 }
+
+   -- End of mplsTeP2mpTunnelBranchPerfTable
+
+   -- Notifications.
+
+   jnxMplsTeP2mpTunnelNotificationEnable OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+           "If this object is true(1), then it enables the generation of
+            mplsTeP2mpTunnelDestUp and mplsTeP2mpTunnelDestDown
+            notifications. Otherwise these notifications are not
+            emitted.
+
+            Note that when tunnels have large numbers of destinations,
+            setting this object to true(1) may result in the generation
+            of large numbers of notifications."
+
+
+      DEFVAL { false }
+      ::= { jnxMplsTeP2mpObjects 5 }
+
+   jnxMplsTeP2mpTunnelDestUp NOTIFICATION-TYPE
+      OBJECTS     {
+         jnxMplsTeP2mpTunnelDestAdminStatus,
+         jnxMplsTeP2mpTunnelDestOperStatus
+      }
+      STATUS      current
+      DESCRIPTION
+           "This notification is generated when a
+            mplsTeP2mpTunnelDestOperStatus object for one of the
+            destinations of one of the configured tunnels is about to
+            leave the down(2) state and transition into some other
+            state.  This other state is indicated by the included value
+            of mplsTeP2mpTunnelDestOperStatus.
+
+            This reporting of state transitions mirrors mplsTunnelUp."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpNotifications 1 }
+
+   jnxMplsTeP2mpTunnelDestDown NOTIFICATION-TYPE
+      OBJECTS     {
+         jnxMplsTeP2mpTunnelDestAdminStatus,
+         jnxMplsTeP2mpTunnelDestOperStatus
+      }
+      STATUS      current
+      DESCRIPTION
+           "This notification is generated when a
+            mplsTeP2mpTunnelDestOperStatus object for one of the
+            destinations of one of the configured tunnels is about to
+            enter the down(2) state from some other state. This other
+            state is indicated by the included value of
+            mplsTeP2mpTunnelDestOperStatus.
+
+            This reporting of state transitions mirrors mplsTunnelDown."
+      REFERENCE
+           "RFC 3812 - Multiprotocol Label Switching (MPLS) Traffic
+            Engineering (TE) Management Information Base (MIB),
+            Srinivasan, C., Viswanathan, A., and T. Nadeau, June 2004."
+      ::= { jnxMplsTeP2mpNotifications 2 }
+
+   -- End of notifications.
+
+
+
+
+
+   --****************************************************************
+   -- Module Conformance Statement
+   --****************************************************************
+
+   jnxMplsTeP2mpGroups
+      OBJECT IDENTIFIER ::= { jnxMplsTeP2mpConformance 1 }
+
+   jnxMplsTeP2mpCompliances
+      OBJECT IDENTIFIER ::= { jnxMplsTeP2mpConformance 2 }
+
+   --
+   -- Full Compliance
+   -- Compliance requirement for fully compliant implementations.
+   -- Such implementations allow configuration of P2MP tunnels at
+   -- head-end LSRs via SNMP, and monitoring of P2MP tunnels at all
+   -- LSRs via SNMP.
+   --
+
+   jnxMplsTeP2mpModuleFullCompliance MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION
+           "Compliance statement for agents that provide full support
+            for MPLS-TE-P2MP-STD-MIB. Such devices can be monitored and
+            also be configured using this MIB module.
+            The Module is implemented with support for read-create and
+            read-write. In other words, both monitoring and
+            configuration are available when using this
+            MODULE-COMPLIANCE."
+
+      MODULE -- this module
+
+      MANDATORY-GROUPS {
+         jnxMplsTeP2mpGeneralGroup,
+         jnxMplsTeP2mpNotifGroup,
+         jnxMplsTeP2mpScalarGroup
+      }
+
+      -- mplsTeP2mpTunnelTable
+
+      OBJECT       jnxMplsTeP2mpTunnelRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION
+          "Support for createAndWait and notInService is not
+           required."
+
+   ::= { jnxMplsTeP2mpCompliances 1 }
+
+
+   jnxMplsTeP2mpModuleReadOnlyCompliance MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION
+           "Compliance statement for agents that provide read-only
+            support for MPLS-TE-P2MP-STD-MIB. Such devices can only be
+            monitored using this MIB module.
+            The Module is implemented with support for read-only. In
+            other words, only monitoring is available by implementing
+            this MODULE-COMPLIANCE."
+
+      MODULE -- this module
+
+      MANDATORY-GROUPS {
+         jnxMplsTeP2mpGeneralGroup,
+         jnxMplsTeP2mpScalarGroup,
+         jnxMplsTeP2mpNotifGroup
+      }
+
+      -- mplsTeP2mpTunnelTable
+
+      OBJECT      jnxMplsTeP2mpTunnelP2mpIntegrity
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+      OBJECT      jnxMplsTeP2mpTunnelBranchRole
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+      OBJECT      jnxMplsTeP2mpTunnelP2mpXcIndex
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+      OBJECT      jnxMplsTeP2mpTunnelRowStatus
+      SYNTAX      RowStatus { active(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required, and active(1) is the
+           only status that needs to be supported."
+
+      OBJECT      jnxMplsTeP2mpTunnelStorageType
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+      -- mplsTeP2mpTunnelDestTable
+
+      OBJECT      jnxMplsTeP2mpTunnelDestHopTableIndex
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+
+      OBJECT      jnxMplsTeP2mpTunnelDestPathInUse
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+      OBJECT      jnxMplsTeP2mpTunnelDestAdminStatus
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+      OBJECT      jnxMplsTeP2mpTunnelDestRowStatus
+      SYNTAX      RowStatus { active(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required, and active(1) is the
+           only status that needs to be supported."
+
+      OBJECT      jnxMplsTeP2mpTunnelDestStorageType
+      MIN-ACCESS  read-only
+      DESCRIPTION "Write access is not required."
+
+   ::= { jnxMplsTeP2mpCompliances 2 }
+
+   -- Units of conformance.
+
+   jnxMplsTeP2mpGeneralGroup OBJECT-GROUP
+      OBJECTS {
+         jnxMplsTeP2mpTunnelConfigured,
+         jnxMplsTeP2mpTunnelActive,
+         jnxMplsTeP2mpTunnelTotalMaxHops,
+         jnxMplsTeP2mpTunnelP2mpIntegrity,
+         jnxMplsTeP2mpTunnelBranchRole,
+         jnxMplsTeP2mpTunnelP2mpXcIndex,
+         jnxMplsTeP2mpTunnelRowStatus,
+         jnxMplsTeP2mpTunnelStorageType,
+         jnxMplsTeP2mpTunnelSubGroupIDNext,
+         --mplsTeP2mpTunnelDestSrcSubGroupOriginType,
+         --mplsTeP2mpTunnelDestSrcSubGroupOrigin,
+         --mplsTeP2mpTunnelDestSrcSubGroupID,
+         --mplsTeP2mpTunnelDestSubGroupOriginType,
+         --mplsTeP2mpTunnelDestSubGroupOrigin,
+         --mplsTeP2mpTunnelDestSubGroupID,
+         --mplsTeP2mpTunnelDestDestinationType,
+         --mplsTeP2mpTunnelDestDestination,
+         jnxMplsTeP2mpTunnelDestBranchOutSegment,
+         jnxMplsTeP2mpTunnelDestHopTableIndex,
+         jnxMplsTeP2mpTunnelDestPathInUse,
+         jnxMplsTeP2mpTunnelDestCHopTableIndex,
+         jnxMplsTeP2mpTunnelDestARHopTableIndex,
+         jnxMplsTeP2mpTunnelDestTotalUpTime,
+
+
+         jnxMplsTeP2mpTunnelDestInstanceUpTime,
+         jnxMplsTeP2mpTunnelDestPathChanges,
+         jnxMplsTeP2mpTunnelDestLastPathChange,
+         jnxMplsTeP2mpTunnelDestCreationTime,
+         jnxMplsTeP2mpTunnelDestStateTransitions,
+         jnxMplsTeP2mpTunnelDestDiscontinuityTime,
+         jnxMplsTeP2mpTunnelDestAdminStatus,
+         jnxMplsTeP2mpTunnelDestOperStatus,
+         jnxMplsTeP2mpTunnelDestRowStatus,
+         jnxMplsTeP2mpTunnelDestStorageType,
+         jnxMplsTeP2mpTunnelBranchPerfPackets,
+         jnxMplsTeP2mpTunnelBranchPerfHCPackets,
+         jnxMplsTeP2mpTunnelBranchPerfErrors,
+         jnxMplsTeP2mpTunnelBranchPerfBytes,
+         jnxMplsTeP2mpTunnelBranchPerfHCBytes,
+         jnxMplsTeP2mpTunnelBranchDiscontinuityTime,
+         jnxMplsTeP2mpTunnelNotificationEnable
+      }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects needed for MPLS P2MP."
+   ::= { jnxMplsTeP2mpGroups 1 }
+
+   jnxMplsTeP2mpNotifGroup NOTIFICATION-GROUP
+      NOTIFICATIONS {
+         jnxMplsTeP2mpTunnelDestUp,
+         jnxMplsTeP2mpTunnelDestDown
+      }
+   STATUS  current
+   DESCRIPTION
+        "Notifications implemented in this module."
+   ::= { jnxMplsTeP2mpGroups 2 }
+
+   jnxMplsTeP2mpScalarGroup OBJECT-GROUP
+      OBJECTS {
+         jnxMplsTeP2mpTunnelConfigured,
+         jnxMplsTeP2mpTunnelActive,
+         jnxMplsTeP2mpTunnelTotalMaxHops
+      }
+      STATUS  current
+      DESCRIPTION
+           "Scalar objects needed to implement P2MP MPLS tunnels."
+      ::= { jnxMplsTeP2mpGroups 3 }
+
+   END

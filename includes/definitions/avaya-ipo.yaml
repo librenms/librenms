@@ -1,0 +1,9 @@
+os: avaya-ipo
+text: 'IP Office Firmware'
+type: network
+icon: avaya
+mib_dir:
+    - nortel
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.6889.

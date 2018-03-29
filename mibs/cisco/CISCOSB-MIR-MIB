@@ -1,0 +1,221 @@
+CISCOSB-MIR-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private MIR MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
+    RowStatus                                               FROM SNMPv2-TC
+    InterfaceIndex                                          FROM IF-MIB;
+
+rlMir MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines MIR private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 61 }
+
+rlMirMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlMir 1 }
+
+rlMirMaxNumOfMRIsAfterReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The maximun instanses of IP Multi Instance Routers after the
+         following reset."
+    DEFVAL { 1 }
+    ::= { rlMir 2 }
+
+rlMirMaxNumOfMRIs OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximun instanses of IP Multi Instance Routers."
+    ::= { rlMir 3 }
+
+rlMirCurMriNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The number of the MRI of which MIB variables are treated at
+        the same time by the SNMP agent."
+    ::= { rlMir 4 }
+
+rlMirInterfaceTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlMirInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of the assignment ifinterfaces to IP Router instances."
+    ::= { rlMir 5 }
+
+rlMirInterfaceEntry OBJECT-TYPE
+    SYNTAX  RlMirInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry of this table specifies the MRID assignement to a L2
+        interfrace."
+    INDEX  { rlMirInterfaceIfIndex }
+    ::= { rlMirInterfaceTable 1 }
+
+RlMirInterfaceEntry ::= SEQUENCE {
+    rlMirInterfaceIfIndex       InterfaceIndex,
+    rlMirInterfaceMrid          INTEGER
+}
+
+rlMirInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "The L2 interface for which this entry contains information."
+    ::= { rlMirInterfaceEntry 1 }
+
+rlMirInterfaceMrid OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Multi IP Router Instance Identifier to which the
+         interface is assgned."
+    DEFVAL { 0 }
+    ::= { rlMirInterfaceEntry 2 }
+
+rlMirVlanBaseReservedPortsTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlMirVlanBaseReservedPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list VLAN based reserved physical ports."
+    ::= { rlMir 6 }
+
+rlMirVlanBaseReservedPortsEntry OBJECT-TYPE
+    SYNTAX  RlMirVlanBaseReservedPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A VLAN based reserved physical port."
+    INDEX  { rlMirVlanBaseReservedPortsIfIndex }
+    ::= { rlMirVlanBaseReservedPortsTable 1 }
+
+RlMirVlanBaseReservedPortsEntry ::= SEQUENCE {
+    rlMirVlanBaseReservedPortsIfIndex       InterfaceIndex,
+    rlMirVlanBaseReservedPortsStatus        RowStatus
+}
+
+rlMirVlanBaseReservedPortsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "IfIndex of VLAN based reserved physical port."
+    ::= { rlMirVlanBaseReservedPortsEntry 1 }
+
+rlMirVlanBaseReservedPortsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "It is used to delete an entry"
+    ::= { rlMirVlanBaseReservedPortsEntry 2 }
+
+rlMirVlanBaseLogicalPortsTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlMirVlanBaseLogicalPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list VLAN based logical ports."
+    ::= { rlMir 7 }
+
+rlMirVlanBaseLogicalPortsEntry OBJECT-TYPE
+    SYNTAX  RlMirVlanBaseLogicalPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A VLAN based logical point-to-point port."
+    INDEX  { rlMirVlanBaseLogicalPortsIfIndex }
+    ::= { rlMirVlanBaseLogicalPortsTable 1 }
+
+RlMirVlanBaseLogicalPortsEntry ::= SEQUENCE {
+    rlMirVlanBaseLogicalPortsIfIndex                InterfaceIndex,
+    rlMirVlanBaseLogicalPortsReservedIfIndex        InterfaceIndex,
+    rlMirVlanBaseLogicalPortsVlanTag                INTEGER,
+    rlMirVlanBaseLogicalPortsStatus                 RowStatus
+}
+
+rlMirVlanBaseLogicalPortsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "IfIndex of VLAN based Logical point-to-point port."
+    ::= { rlMirVlanBaseLogicalPortsEntry 1 }
+
+rlMirVlanBaseLogicalPortsReservedIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "IfIndex of VLAN based reserved physical port on which the logical
+         port is defined."
+    ::= { rlMirVlanBaseLogicalPortsEntry 2 }
+
+rlMirVlanBaseLogicalPortsVlanTag OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "VLAN tag."
+    ::= { rlMirVlanBaseLogicalPortsEntry 3 }
+
+rlMirVlanBaseLogicalPortsStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "It is used to add, update and delete an entry"
+    ::= { rlMirVlanBaseLogicalPortsEntry 4 }
+
+rlMirCurMriNumRouter OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Returns Router Mri Number."
+    ::= { rlMir 8 }
+
+rlMirCurMriNumOob OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Returns Router Mri Number."
+    ::= { rlMir 9 }
+
+END
+

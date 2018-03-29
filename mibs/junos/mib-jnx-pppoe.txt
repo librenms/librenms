@@ -1,0 +1,1377 @@
+
+--
+-- Juniper Enterprise Specifics MIB
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JNX-PPPOE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Unsigned32 ,Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    jnxPppoeMibRoot
+        FROM JUNIPER-SMI;
+
+jnxPPPoEMIB  MODULE-IDENTITY
+    LAST-UPDATED "201007220942Z"  -- 22-Jul-10 03:12 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  support@Juniper.net"
+    DESCRIPTION
+        "The Point-to-Point Protocol over Ethernet (PPPoE) MIB for the Junos
+        product family.  This MIB contains managed objects for each of
+        two interface layers: PPPoE interfaces, and PPPoE subinterfaces.  For
+        each of these layers, management objects are provided to query for an
+        available interface index, and to create/delete interfaces of that type."
+
+    -- Revision History
+
+    REVISION    "201306130000Z"  -- 13-Jun-13 05:32 AM EST  - JUNOS 13.1
+    DESCRIPTION
+        "Deprecated InterfaceIndex type and added InterfaceIndexOrZero type 
+         for jnxPPPoENextIfIndex and jnxPPPoESubIfNextIfIndex.
+         Modified minimum range for jnxPPPoEIfServiceNameTable."
+
+    REVISION    "201007220942Z"  -- 22-Jul-10 03:12 PM EST  - JUNOS 11.0
+    DESCRIPTION
+        "Initial version."
+    ::= { jnxPppoeMibRoot 1 }
+
+
+
+
+JnxPPPoEServiceNameAction  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of Service-name action types.
+            drop        no PADO packet will be sent.
+            terminate   a PADO packet will be sent."
+    SYNTAX      INTEGER {
+                    drop(0),
+                    terminate(1) }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jnxPPPoEObjects        OBJECT IDENTIFIER ::= { jnxPPPoEMIB 1 }
+jnxPPPoEIfLayer        OBJECT IDENTIFIER ::= { jnxPPPoEObjects 1 }
+jnxPPPoESubIfLayer     OBJECT IDENTIFIER ::= { jnxPPPoEObjects 2 }
+jnxPPPoESummary        OBJECT IDENTIFIER ::= { jnxPPPoEObjects 3 }
+jnxPPPoEServices       OBJECT IDENTIFIER ::= { jnxPPPoEObjects 4 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+
+--
+-- This layer is managed with the following elements:
+--  o NextIfIndex (generator for PPPoEIfIndex selection)
+--  o Interface Table (creation/configuration/deletion of PPPoEinterfaces)
+--  o Statistics Table (PPPoEinterface statistics)
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new PPPoEinterfaces
+--
+jnxPPPoENextIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in jnxPPPoEIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { jnxPPPoEIfLayer 1 }
+
+--
+-- The PPPoEInterface Table
+--
+jnxPPPoEIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoEIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the PPPoEservice on this interface."
+    REFERENCE
+        "RFC 2156 A method for transmitting PPP over Ethernet"
+    ::= { jnxPPPoEIfLayer 2 }
+
+jnxPPPoEIfEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoEIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular PPPoEinterface.
+
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/jnxIfTable, and
+        jnxPPPoEIfStatsTable."
+    INDEX     { jnxPPPoEIfIfIndex }
+    ::= { jnxPPPoEIfTable 1 }
+
+JnxPPPoEIfEntry ::= SEQUENCE {
+    jnxPPPoEIfIfIndex           InterfaceIndex,
+    jnxPPPoEIfMaxNumSessions    INTEGER,
+    jnxPPPoEIfRowStatus         RowStatus,
+    jnxPPPoEIfLowerIfIndex      InterfaceIndexOrZero,
+    jnxPPPoEIfAcName            DisplayString,
+    jnxPPPoEIfDupProtect        INTEGER,
+    jnxPPPoEIfPADIFlag          INTEGER,
+    jnxPPPoEIfAutoconfig        INTEGER,
+    jnxPPPoEIfServiceNameTable  DisplayString,
+    jnxPPPoEIfPadrRemoteCircuitIdCapture INTEGER,
+    jnxPPPoEIfMtu               Integer32,
+    jnxPPPoEIfLockoutMin        Integer32,
+    jnxPPPoEIfLockoutMax        Integer32 ,
+    jnxPPPoEIfDynamicProfile   DisplayString}
+
+jnxPPPoEIfIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the corresponding ifEntry."
+    ::= { jnxPPPoEIfEntry 1 }
+
+jnxPPPoEIfMaxNumSessions OBJECT-TYPE
+    SYNTAX      INTEGER (0..65335)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions allowed on the PPPoEinterface, zero indicates
+        unlimited."
+    DEFVAL    { 0 }
+    ::= { jnxPPPoEIfEntry 2 }
+
+jnxPPPoEIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with READ-CREATE
+         maximum access, according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            jnxPPPoEIfRowStatus
+            jnxPPPoEIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+            A value for jnxPPPoEIfIndex must have been determined previously,
+            by reading jnxPPPoENextIfIndex.
+
+            The interface identified by jnxPPPoEIfLowerIfIndex must exist, and
+            must be an interface type that permits layering of PPPoEabove it.
+
+        A corresponding entry in ifTable/ifXTable/jnxIfTable is created or
+        destroyed as a result of creating or destroying an entry in this table.
+
+         The following values can be read from this object:
+             active(1)"
+    ::= { jnxPPPoEIfEntry 3 }
+
+jnxPPPoEIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this PPPoEinterface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { jnxPPPoEIfEntry 4 }
+
+jnxPPPoEIfAcName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name to use for the AC-NAME tag that is sent in any PADO that is
+        sent on this interface."
+    ::= { jnxPPPoEIfEntry 5 }
+
+jnxPPPoEIfDupProtect OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flag to allow duplicate MAC addresses."
+    DEFVAL    { disable }
+    ::= { jnxPPPoEIfEntry 6 }
+
+jnxPPPoEIfPADIFlag OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This flag controls whether we always respond to a PADI with a PADO
+        regardless of the ability to create the session and allows the session
+        establish phase to resolve it."
+    DEFVAL    { disable }
+    ::= { jnxPPPoEIfEntry 7 }
+
+jnxPPPoEIfAutoconfig OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This flags determines whether the upper PPPoEinterface is created
+        dynamically or statically.  When enable(1) the interface is created
+        dynamically."
+    DEFVAL    {disable  }
+    ::= { jnxPPPoEIfEntry 8 }
+
+jnxPPPoEIfServiceNameTable OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associate a PPPoEService Name Table with this interface for PADI
+        processing."
+    ::= { jnxPPPoEIfEntry 9 }
+
+jnxPPPoEIfPadrRemoteCircuitIdCapture OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This flags determines whether the remote circuit id string will
+        be captured and subsequently used as the NAS-PORT-ID radius
+        attribute when it arrives as a tag in the PADR packet."
+    DEFVAL    { disable }
+    ::= { jnxPPPoEIfEntry 10 }
+
+jnxPPPoEIfMtu OBJECT-TYPE
+    SYNTAX      Integer32 (1|2|66..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The initial Maximum Transmit Unit (MTU) that the PPPoEmajor interface
+        entity will advertise to the remote entity.
+
+        If the value of this variable is 1 then the local PPPoEentity will
+        use an MTU value determined by its underlying media interface.
+
+        If the value of this variable is 2 then the local PPPoEentity will
+        use a value determined by the PPPoEMax-Mtu-Tag transmitted from the
+        client in the PADR packet.  If no Max-Mtu-Tag is received, the value
+        defaults to a maximum of 1494.
+
+		The operational MTU is limited by the MTU of the underlying media
+        interface minus the PPPoEframe overhead."
+    DEFVAL    { 1494 }
+    ::= { jnxPPPoEIfEntry 11 }
+
+jnxPPPoEIfLockoutMin OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lower bound, in seconds, of the time range used to specify 
+        the duration of the lockout of the client from recognition for
+        the specified interface.  This only takes effect if
+        jnxPPPoEIfAutoconfig is set for this interface.
+
+        The ability to lockout the client in the event of an error in
+        creating a PPP interface is enabled by default.  The initial lockout
+        duration is this object's value and increases exponentially for
+        each failure that occurs for the client creating a PPP interface
+        for the PPPoEinterface within the greater of 15 minutes
+        and jnxPPPoEIfLockoutMax.
+
+        The lockout duration for the client will not exceed jnxPPPoEIfLockoutMax.
+        If the time between creation errors for the PPP interface for this
+        interface is greater than the greater of 15 minutes and
+        jnxPPPoEIfLockoutMax, then the lockout duration reverts to this
+        object's value.
+
+
+        To disable the ability to lockout the client from recognition in the
+        event of an error in creating a PPP interface for the specified interface,
+        the value of this object and jnxPPPoEIfLockoutMin must be set to 0.
+        It is not recommended that this lockout feature be disabled except for 
+        debugging purposes or when this interface supports more than one session."
+    DEFVAL    { 0 }
+    ::= { jnxPPPoEIfEntry 12 }
+
+jnxPPPoEIfLockoutMax OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The upper bound, in seconds, of the time range used to specify 
+        the duration of the lockout of the client from recognition for
+        the specified interface.  This only takes effect if
+        jnxPPPoEIfAutoconfig is set for this interface.
+
+        The ability to lockout the client from recognition in the event
+        of an error in creating a PPP interface is enabled by default.
+        The initial lockout duration is jnxPPPoEIfLockoutMin and
+        increases exponentially for each failure that occurs for the client
+        interface within the greater of 15 minutes and this object's value.
+
+        The lockout duration for the client will not exceed jnxPPPoEIfLockoutMax.
+        If the time between creation errors for the PPP interface for this
+        interface is greater than the greater of 15 minutes and
+        jnxPPPoEIfLockoutMax, then the lockout duration reverts to
+        jnxPPPoEIfLockoutMin.
+
+        To disable the ability to lockout the client from recognition in the
+        event of an error in creating a PPP interface for the specified interface,
+        the value of this object and jnxPPPoEIfLockoutMin must be set to 0.
+        It is not recommended that this lockout feature be disabled except for 
+        debugging purposes or when this interface supports more than one session."
+    DEFVAL    { 0 }
+	::= { jnxPPPoEIfEntry 13 }
+
+jnxPPPoEIfDynamicProfile OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Attach dynamic-profile to this interface"
+    DEFVAL    { " " }
+    ::= { jnxPPPoEIfEntry 14 }
+
+--
+-- The PPPoEInterface Statistics Table
+--
+jnxPPPoEIfStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoEIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics for the PPP over Ethernet Interface for the PPPoE
+        service on this interface."
+    ::= { jnxPPPoEIfLayer 3 }
+
+jnxPPPoEIfStatsEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoEIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics for a particular PPPoEInterface."
+    INDEX     { jnxPPPoEIfIfIndex }
+    ::= { jnxPPPoEIfStatsTable 1 }
+
+JnxPPPoEIfStatsEntry ::= SEQUENCE {
+    jnxPPPoEIfStatsRxPADI                   Counter32,
+    jnxPPPoEIfStatsTxPADO                   Counter32,
+    jnxPPPoEIfStatsRxPADR                   Counter32,
+    jnxPPPoEIfStatsTxPADS                   Counter32,
+    jnxPPPoEIfStatsRxPADT                   Counter32,
+    jnxPPPoEIfStatsTxPADT                   Counter32,
+    jnxPPPoEIfStatsRxInvVersion             Counter32,
+    jnxPPPoEIfStatsRxInvCode                Counter32,
+    jnxPPPoEIfStatsRxInvTags                Counter32,
+    jnxPPPoEIfStatsRxInvSession             Counter32,
+    jnxPPPoEIfStatsRxInvTypes               Counter32,
+    jnxPPPoEIfStatsRxInvPackets             Counter32,
+    jnxPPPoEIfStatsRxInsufficientResources  Counter32,
+    jnxPPPoEIfStatsTxPADM                   Counter32,
+    jnxPPPoEIfStatsTxPADN                   Counter32,
+    jnxPPPoEIfStatsRxInvTagLength           Counter32,
+    jnxPPPoEIfStatsRxInvLength              Counter32,
+    jnxPPPoEIfStatsRxInvPadISession         Counter32,
+    jnxPPPoEIfStatsRxInvPadRSession         Counter32 }
+
+jnxPPPoEIfStatsRxPADI OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADI packets received."
+    ::= { jnxPPPoEIfStatsEntry 1 }
+
+jnxPPPoEIfStatsTxPADO OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADO packets transmitted."
+    ::= { jnxPPPoEIfStatsEntry 2 }
+
+jnxPPPoEIfStatsRxPADR OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADR packets received."
+    ::= { jnxPPPoEIfStatsEntry 3 }
+
+jnxPPPoEIfStatsTxPADS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADS packets transmitted."
+    ::= { jnxPPPoEIfStatsEntry 4 }
+
+jnxPPPoEIfStatsRxPADT OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADT packets received."
+    ::= { jnxPPPoEIfStatsEntry 5 }
+
+jnxPPPoEIfStatsTxPADT OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADT packets transmitted."
+    ::= { jnxPPPoEIfStatsEntry 6 }
+
+jnxPPPoEIfStatsRxInvVersion OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with invalid version."
+    ::= { jnxPPPoEIfStatsEntry 7 }
+
+jnxPPPoEIfStatsRxInvCode OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with invalid code."
+    ::= { jnxPPPoEIfStatsEntry 8 }
+
+jnxPPPoEIfStatsRxInvTags OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with invalid tags."
+    ::= { jnxPPPoEIfStatsEntry 9 }
+
+jnxPPPoEIfStatsRxInvSession OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of packets received with invalid session identifiers.
+
+        This object became obsolete when separate counters were added for PADI
+        and PADR packets."
+    ::= { jnxPPPoEIfStatsEntry 10 }
+
+jnxPPPoEIfStatsRxInvTypes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with invalid types."
+    ::= { jnxPPPoEIfStatsEntry 11 }
+
+jnxPPPoEIfStatsRxInvPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of invalid packets received."
+    ::= { jnxPPPoEIfStatsEntry 12 }
+
+jnxPPPoEIfStatsRxInsufficientResources OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session requests that could not be honored due to invalid
+        resources."
+    ::= { jnxPPPoEIfStatsEntry 13 }
+
+jnxPPPoEIfStatsTxPADM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADM packets transmitted."
+    ::= { jnxPPPoEIfStatsEntry 14 }
+
+jnxPPPoEIfStatsTxPADN OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADN packets transmitted."
+    ::= { jnxPPPoEIfStatsEntry 15 }
+
+jnxPPPoEIfStatsRxInvTagLength OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with invalid tag length."
+    ::= { jnxPPPoEIfStatsEntry 16 }
+
+jnxPPPoEIfStatsRxInvLength OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with invalid length."
+    ::= { jnxPPPoEIfStatsEntry 17 }
+
+jnxPPPoEIfStatsRxInvPadISession OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADI packets received with invalid session identifiers."
+    ::= { jnxPPPoEIfStatsEntry 18 }
+
+jnxPPPoEIfStatsRxInvPadRSession OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PADR packets received with invalid session identifiers."
+    ::= { jnxPPPoEIfStatsEntry 19 }
+
+--
+-- The PPPoEInterface Client Lockout Table
+--
+jnxPPPoEIfLockoutTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoEIfLockoutEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The lockout configuration and state of a PPPoEclient on this interface."
+    ::= { jnxPPPoEIfLayer 4 }
+
+jnxPPPoEIfLockoutEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoEIfLockoutEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the configuration and state of a particular
+         PPPoEinterface client lockout."
+    INDEX     { jnxPPPoEIfIfIndex, jnxPPPoEIfLockoutClientAddress }
+    ::= { jnxPPPoEIfLockoutTable 1 }
+
+JnxPPPoEIfLockoutEntry ::= SEQUENCE {
+	jnxPPPoEIfLockoutClientAddress     MacAddress,
+	jnxPPPoEIfLockoutTime              Integer32,
+	jnxPPPoEIfLockoutElapsedTime       Integer32,
+	jnxPPPoEIfLockoutNextTime          Integer32 }
+
+jnxPPPoEIfLockoutClientAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address if the client."
+    ::= { jnxPPPoEIfLockoutEntry 1 }
+
+jnxPPPoEIfLockoutTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time duration, in seconds, currently used to lockout the
+        specified encapsulation type from recognition for the specified
+        interface.  The reported value is within the range specified by
+        jnxPPPoEIfLockoutMin and jnxPPPoEIfLockoutMax.  A value of 0 
+        indicates that no lockout is occurring for the encapsulation type
+        for the specified interface."
+    ::= { jnxPPPoEIfLockoutEntry 2 }
+
+jnxPPPoEIfLockoutElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The elapsed time, in seconds, that the specified encapsulation type
+        has been locked-out from recognition for the specified interface. 
+        Its value will not exceed that of jnxPPPoEIfLockoutTime.  A value of 
+        0 indicates that no lockout is occurring for the encapsulation type
+        for the specified interface."
+    ::= { jnxPPPoEIfLockoutEntry 3 }
+
+jnxPPPoEIfLockoutNextTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time duration, in seconds, that will be used to lockout the 
+        specified encapsulation type from recognition for the specified
+        interface for the next event that results in a lockout condition.
+        The reported value is within the range specified by
+        jnxPPPoEIfLockoutMin and jnxPPPoEIfLockoutMax.  When
+        jnxPPPoEIfEnable is set to enable, a value of 0 indicates that
+        lockout is prevented from occurring for the encapsulation type
+        for the specified interface (i.e., jnxPPPoEIfLockoutMin and
+        jnxPPPoEIfLockoutMax are both set to 0)."
+    ::= { jnxPPPoEIfLockoutEntry 4 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPPoESubinterface Layer
+--
+-- This layer is managed with the following elements:
+--  o NextIfIndex (generator for PPPoEsubinterface IfIndex selection)
+--  o SubIf Table (creation/configuration/deletion of PPPoEsubinterfaces)
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new PPPoESubinterfaces
+--
+jnxPPPoESubIfNextIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in jnxPPPoESubIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { jnxPPPoESubIfLayer 1 }
+
+
+--
+-- The PPPoESubinterface Table
+--
+jnxPPPoESubIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoESubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for PPPoESubinterfaces present in the
+        system."
+    ::= { jnxPPPoESubIfLayer 2 }
+
+jnxPPPoESubIfEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoESubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPPoESubinterface.
+        With READ-CREATE maximum access ,creating/deleting entries in this 
+        table causes corresponding entries for
+        be created /deleted in ifTable/ifXTable/jnxIfTable."
+    INDEX     { jnxPPPoESubIfIndex }
+    ::= { jnxPPPoESubIfTable 1 }
+
+JnxPPPoESubIfEntry ::= SEQUENCE {
+    jnxPPPoESubIfIndex          InterfaceIndex,
+    jnxPPPoESubIfRowStatus      RowStatus,
+    jnxPPPoESubIfLowerIfIndex   InterfaceIndexOrZero,
+    jnxPPPoESubIfId             Unsigned32,
+    jnxPPPoESubIfSessionId      Integer32,
+    jnxPPPoESubIfMotm           DisplayString,
+    jnxPPPoESubIfUrl            DisplayString }
+
+jnxPPPoESubIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the PPPoESubinterface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        jnxPPPoESubNextIfIndex."
+    ::= { jnxPPPoESubIfEntry 1 }
+
+jnxPPPoESubIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with READ-CREATE
+         maximum access ,according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            jnxPPPoESubIfRowStatus
+            jnxPPPoESubIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+            A value for jnxPPPoESubIfIndex must have been determined
+            previously, by reading jnxPPPoESubIfNextIfIndex.
+
+            The interface identified by jnxPPPoESubIfLowerIfIndex must exist,
+            and must be a PPPoEinterface.
+
+            A positive value configured for jnxPPPoESubIfId must not already be
+            assigned to another subinterface layered onto the same underlying
+            PPPoEinterface.
+
+        A corresponding entry in ifTable/ifXTable/jnxIfTable is created or
+        destroyed as a result of creating or destroying an entry in this table.
+
+        The following values can be read from this object:
+             active(1) "
+    ::= { jnxPPPoESubIfEntry 2 }
+
+jnxPPPoESubIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a PPPoEinterface over which this PPPoESubinterface is
+        to be layered.  A value of zero indicates no layering.  An
+        implementation may choose to require that a nonzero value be configured
+        at entry creation."
+    ::= { jnxPPPoESubIfEntry 3 }
+
+jnxPPPoESubIfId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer identifier for the PPPoEsubinterface, used in conjunction
+        with the command-line interface.  It is provided here for
+        cross-reference purposes only.
+
+        The value must be unique among subinterfaces configured on the same
+        underlying PPPoEinterface.
+
+        If this object is not configured, or is configured with a value of -1, a
+        nonzero value will be allocated internally and can be retrieved from
+        this object after table entry creation has succeeded.
+
+        A value of zero for this object is reserved for future use."
+    DEFVAL    { -1 }
+    ::= { jnxPPPoESubIfEntry 4 }
+
+jnxPPPoESubIfSessionId OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current sessionId associated with this sub-interface."
+    ::= { jnxPPPoESubIfEntry 5 }
+
+jnxPPPoESubIfMotm OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A message to send via a PADM on the sub-interface when the
+        sub-interface transitions to the ifOperStatusUp state.  The client may
+        choose to display this message to the user."
+    ::= { jnxPPPoESubIfEntry 6 }
+
+jnxPPPoESubIfUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A URL to be sent via a PADM on the sub-interface when the sub-interface
+        transitions to the ifOperStatusUp state.  The client may use this URL as
+        the initial web-page for the user."
+    ::= { jnxPPPoESubIfEntry 7 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPPoEInterface per queue stats table.
+-- This is a new table added in addition to existing 
+-- JUNOSe PPPoEMIB.
+-- /////////////////////////////////////////////////////////////////////////////
+
+jnxPppoeSubIfQueueStatsTable OBJECT-TYPE
+   SYNTAX	                    SEQUENCE OF JnxPppoeSubIfPerQueueStatsEntry
+   MAX-ACCESS                       not-accessible
+   STATUS                                  current
+   DESCRIPTION
+    "Table containing the Queue parameters for the PPPoEsessions."
+::=  { jnxPPPoESubIfLayer 3 }   
+
+jnxPppoeSubIfPerQueueStatsEntry OBJECT-TYPE
+    SYNTAX      JnxPppoeSubIfPerQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+               "The statistics for a particular trrafic class queue for 
+                PPPoEsub Interface(i.e. session). ). Forwarding class to
+                 queue number mapping is not always one-to-one. Forwarding
+                  classes and queues are the same only when default 
+                  forwarding-class-to-queue mapping is in effect "
+    INDEX     { jnxPPPoESubIfIndex,
+                jnxPppoeSubIfQueueIndex }
+    ::= { jnxPppoeSubIfQueueStatsTable 1 }
+
+JnxPppoeSubIfPerQueueStatsEntry ::= SEQUENCE {
+jnxPppoeSubIfQueueIndex                                 INTEGER(0..7),
+jnxPppoeSubIfQueueStatsPacketSent                       Counter64,
+jnxPppoeSubIfQueueStatsBytesSent                        Counter64,
+jnxPppoeSubIfQueueStatsPacketDropped                    Counter64,
+jnxPppoeSubIfQueueStatsBytesDropped                     Counter64,
+jnxPppoeSubIfQueueStatsActualBitRate                    Counter32,
+jnxPppoeSubIfQueueStatsActualDroppedBitRate             Counter32 }
+
+jnxPppoeSubIfQueueIndex                OBJECT-TYPE
+      SYNTAX               INTEGER(0..7)
+      MAX-ACCESS           not-accessible
+      STATUS               current
+      DESCRIPTION
+      "This attribute returns the queue index ranging from 0 to 7 of the
+      queue configure on the PPPoEsubinterface to support the traffic class for 
+      PPPoEsession configured on that subinterface. Forwarding class to queue
+      number mapping is not always one-to-one. Forwarding classes and queues are
+       the same only when default forwarding-class-to-queue mapping is in effect."
+::= { jnxPppoeSubIfPerQueueStatsEntry 1}
+
+jnxPppoeSubIfQueueStatsPacketSent  OBJECT-TYPE
+       SYNTAX            Counter64
+       MAX-ACCESS   read-only
+       STATUS             current
+       DESCRIPTION   
+                  "This attribute returns the counts of number of packet sent
+                   per PPPoEsession and per queue."
+       ::= { jnxPppoeSubIfPerQueueStatsEntry 2} 
+
+jnxPppoeSubIfQueueStatsBytesSent   OBJECT-TYPE
+       SYNTAX            Counter64
+       MAX-ACCESS   read-only
+       STATUS             current
+       DESCRIPTION   
+                  "This attribute returns the counts of number of bytes sent 
+                  per PPPoEsession and per queue." 
+       ::= { jnxPppoeSubIfPerQueueStatsEntry 3 }
+
+jnxPppoeSubIfQueueStatsPacketDropped   OBJECT-TYPE
+       SYNTAX            Counter64
+       MAX-ACCESS   read-only
+       STATUS             current
+       DESCRIPTION   
+                  "This attribute returns the number of packet dropped per 
+                  PPPoEsession and per queue."
+       ::= { jnxPppoeSubIfPerQueueStatsEntry 4}
+
+ jnxPppoeSubIfQueueStatsBytesDropped   OBJECT-TYPE
+       SYNTAX            Counter64
+       MAX-ACCESS   read-only
+       STATUS             current
+       DESCRIPTION   
+                  "This attribute returns the number of bytes dropped per 
+                  PPPoEsession and per queue."
+        ::= { jnxPppoeSubIfPerQueueStatsEntry 5 }
+
+jnxPppoeSubIfQueueStatsActualBitRate   OBJECT-TYPE
+       SYNTAX            Counter32
+       MAX-ACCESS   read-only
+       STATUS             current
+       DESCRIPTION   
+                  "This attribute returns the actual bit rate for per
+                   PPPoEsession and per queue."
+       ::= { jnxPppoeSubIfPerQueueStatsEntry  6 }
+             
+jnxPppoeSubIfQueueStatsActualDroppedBitRate    OBJECT-TYPE
+       SYNTAX            Counter32
+       MAX-ACCESS   read-only
+       STATUS             current
+       DESCRIPTION   
+                  "This attribute returns the actual dropped bit rate for per 
+                  PPPoEsession and per queue."
+      ::= { jnxPppoeSubIfPerQueueStatsEntry 7 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPPoEService-name tables
+--
+--  The service-name tables are non interface based objects
+-- This layer is managed with the following elements:
+--
+--  o Service-name table table (table if service-name tables)
+--  o Service-name table (service-name table entries) indexed by Service-name
+--    table name and service-name string value.
+--  o Service-name AciAri table (service-name AciAri table entries) indexed by 
+--    Service-name table name,service-name string value, Agent circuit
+-- Id( Aci string value)
+--    and Agent Remote Id (ari string value)
+--
+-- ///////////////////////////////////////////////////////////////
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Service-name table table
+--
+-- /////////////////////////////////////////////////////////////////////////////
+jnxPPPoEServiceNameTableTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoEServiceNameTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for the PPPoEService-name tables."
+    ::= { jnxPPPoEServices 1 }
+
+jnxPPPoEServiceNameTableEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoEServiceNameTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the PPPoEservice-name table."
+    INDEX     { jnxPPPoEServiceNameTableName }
+    ::= { jnxPPPoEServiceNameTableTable 1 }
+
+JnxPPPoEServiceNameTableEntry ::= SEQUENCE {
+    jnxPPPoEServiceNameTableName        DisplayString,
+    jnxPPPoEServiceNameTableRowStatus   RowStatus }
+
+jnxPPPoEServiceNameTableName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Service-name table name."
+    ::= { jnxPPPoEServiceNameTableEntry 1 }
+
+
+jnxPPPoEServiceNameTableRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with READ-CREATE
+         maximum access,according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            jnxPPPoEServiceNameTableRowStatus
+            jnxPPPoEServiceNameTableName
+           
+
+        The Empty Service and  Any  service will be automatically configured 
+       for each Service Name Table created. On creating or deleting an entry in 
+        this table will create/destroy an entry for <Empty >Service and <Any> 
+        service in jnxServiceNameTable.
+
+        A corresponding entry in jnxServiceNameTable gets created or destroyed
+        as a result of creating or destroying an entry in this table.
+         The following values can be read from this object:
+             active(1) "
+    ::= { jnxPPPoEServiceNameTableEntry 2 }
+
+-- ==========================================================================
+
+-- Service-name Table
+
+-- ========================================================================
+jnxPPPoEServiceNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoEServiceNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for the PPPoEService-names."
+    ::= { jnxPPPoEServices 2 }
+
+jnxPPPoEServiceNameEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoEServiceNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the PPPoEservice-name table entry."
+    INDEX     { jnxPPPoEServiceNameTableName,
+                jnxPPPoEServiceName }
+    ::= { jnxPPPoEServiceNameTable 1 }
+
+JnxPPPoEServiceNameEntry ::= SEQUENCE {
+    jnxPPPoEServiceName                DisplayString,
+    jnxPPPoEServiceNameAction          JnxPPPoEServiceNameAction,
+    jnxPPPoEServiceNameDynamicProfile  DisplayString,
+    jnxPPPoEServiceNameRoutingInstance DisplayString,
+    jnxPPPoEServiceNameMaxSessions     Unsigned32,
+    jnxPPPoEServiceNameRowStatus       RowStatus }
+
+jnxPPPoEServiceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Service-name tag value."
+    ::= { jnxPPPoEServiceNameEntry 1 }
+
+jnxPPPoEServiceNameAction OBJECT-TYPE
+    SYNTAX      JnxPPPoEServiceNameAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the behavior when the the Service-name tag is received in a
+        PADI frame."
+    ::= { jnxPPPoEServiceNameEntry 2 }
+
+jnxPPPoEServiceNameDynamicProfile OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Dynamic Profile associated with a Service-name."
+    ::= { jnxPPPoEServiceNameEntry 3 }
+
+jnxPPPoEServiceNameRoutingInstance OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Routing Instance associated with a Service-name."
+    ::= { jnxPPPoEServiceNameEntry 4 }
+
+jnxPPPoEServiceNameMaxSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Max Sessions value used to cap the number of active PPPoEssessions 
+        that may be established with the specified Service entry."
+    ::= { jnxPPPoEServiceNameEntry 5 }
+
+
+jnxPPPoEServiceNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with READ-CREATE 
+        maximum access  ,according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            jnxPPPoEServiceNameRowStatus
+
+        The Service name is configured via the INDEX specified.
+
+        A corresponding entry in jnxPPPoEServiceNameAciAriTable is destroyed
+        as a result of destroying an entry in this table.
+
+        The following values can be read from this object:
+             active(1)"
+    ::= { jnxPPPoEServiceNameEntry 6 }
+
+-- ===========================================================================
+
+
+--Service-name ACI ARI Table
+
+-- ==============================================
+jnxPPPoEServiceNameAciAriTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPPPoEServiceNameAciAriEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for the PPPoEServicename AciAri entries."
+    ::= { jnxPPPoEServices 3 }
+
+jnxPPPoEServiceNameAciAriEntry OBJECT-TYPE
+    SYNTAX      JnxPPPoEServiceNameAciAriEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the PPPoEservice-name AciAri table entry."
+    INDEX     { jnxPPPoEServiceNameTableName,
+                jnxPPPoEServiceName, 
+                jnxPPPoEServiceNameAgentCircuitId,
+                jnxPPPoEServiceNameAgentRemoteId
+                }
+    ::= { jnxPPPoEServiceNameAciAriTable 1 }
+
+JnxPPPoEServiceNameAciAriEntry ::= SEQUENCE {
+    jnxPPPoEServiceNameAgentCircuitId                DisplayString,
+    jnxPPPoEServiceNameAgentRemoteId                 DisplayString,
+    jnxPPPoEServiceNameAciAriAction                  JnxPPPoEServiceNameAction,
+    jnxPPPoEServiceNameAciAriDynamicProfile          DisplayString,
+    jnxPPPoEServiceNameAciAriRoutingInstance         DisplayString,
+    jnxPPPoEServiceNameAciAriStaticInterface         DisplayString,
+    jnxPPPoEServiceNameAciAriRowStatus               RowStatus }
+
+jnxPPPoEServiceNameAgentCircuitId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACI tag values that the PPPoEclient would send in the PADI/PADR 
+        control packet."
+    ::= { jnxPPPoEServiceNameAciAriEntry 1 }
+
+jnxPPPoEServiceNameAgentRemoteId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACI tag values that the PPPoEclient would send in the PADI/PADR 
+        control packet."
+    ::= { jnxPPPoEServiceNameAciAriEntry 2 }
+
+
+jnxPPPoEServiceNameAciAriAction OBJECT-TYPE
+    SYNTAX      JnxPPPoEServiceNameAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the behavior when the the Service-name with ACI/ARI pairs 
+        is received in a PADI frame."
+    ::= { jnxPPPoEServiceNameAciAriEntry 3 }
+
+jnxPPPoEServiceNameAciAriDynamicProfile OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Dynamic Profile associated with a Service-name and ACI/ARI pairs"
+    ::= { jnxPPPoEServiceNameAciAriEntry 4 }
+
+jnxPPPoEServiceNameAciAriRoutingInstance OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Routing-Instance associated with a Service-name and ACI/ARI pairs"
+    ::= { jnxPPPoEServiceNameAciAriEntry 5 }
+
+jnxPPPoEServiceNameAciAriStaticInterface OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Static Interface associated with each ACI/ARI Entry."
+    ::= { jnxPPPoEServiceNameAciAriEntry 6 }
+
+
+jnxPPPoEServiceNameAciAriRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with READ-CREATE
+         maximum access, according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            jnxPPPoEServiceNameAciAriRowStatus
+
+        The ACIARI Entry is configured via the INDEX specified.
+
+        The following values can be read from this object:
+             active(1)"
+    ::= { jnxPPPoEServiceNameAciAriEntry 7 }
+
+-- 
+-- ////////////////////////////////////////////////////////////////////////////
+--
+-- PPP Interface Summary Counts
+--
+-- /////////////////////////////////////////////////////////////////////////////
+jnxPPPoEMajorInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces configured and created in
+        the system."
+    ::= { jnxPPPoESummary 1 }
+
+jnxPPPoESummaryMajorIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces in the system that are
+        administratively configured to up(1)."
+    REFERENCE
+        "ifAdminStatus from IF-MIB"
+    ::= { jnxPPPoESummary 2 }
+
+jnxPPPoESummaryMajorIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces in the system that are
+        administrateively configued to down(2)."
+    REFERENCE
+        "ifAdminStatus from IF-MIB"
+    ::= { jnxPPPoESummary 3 }
+
+jnxPPPoESummaryMajorIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces in the system with an
+        operational state of up(1)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 4 }
+
+jnxPPPoESummaryMajorIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces in the system with an
+        operational state of down(2)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 5 }
+
+jnxPPPoESummaryMajorIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces in the system with an
+        operational state of lowerLayerDown(7)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 6 }
+
+jnxPPPoESummaryMajorIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEmajor interfaces in the system with an
+        operational state of notPresent(6)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 7 }
+
+jnxPPPoESummarySubInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces configured in the system."
+    ::= { jnxPPPoESummary 8 }
+
+jnxPPPoESummarySubIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces in the system that are
+        administratively configured to up(1)."
+    REFERENCE
+        "ifAdminStatus from IF-MIB"
+    ::= { jnxPPPoESummary 9 }
+
+jnxPPPoESummarySubIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces in the system that are
+        administrateively configued to down(2)."
+    REFERENCE
+        "ifAdminStatus from IF-MIB"
+    ::= { jnxPPPoESummary 10 }
+
+jnxPPPoESummarySubIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces in the system with an
+        operational state of up(1)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 11 }
+
+jnxPPPoESummarySubIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces in the system with an
+        operational state of down(2)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 12 }
+
+jnxPPPoESummarySubIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces in the system with an
+        operational state of lowerLayerDown(7)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 13 }
+
+jnxPPPoESummarySubIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPPoEsubinterfaces in the system with an
+        operational state of notPresent(6)."
+    REFERENCE
+        "ifOperStatus from IF-MIB"
+    ::= { jnxPPPoESummary 14 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- jnxPPPoETrapControl      OBJECT IDENTIFIER ::= { jnxPPPoEMIB 2 }
+-- jnxPPPoETraps            OBJECT IDENTIFIER ::= { jnxPPPoEMIB 3 }
+-- jnxPPPoETrapPrefix       OBJECT IDENTIFIER ::= { jnxPPPoETraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jnxPPPoEConformance OBJECT IDENTIFIER ::= { jnxPPPoEMIB 4 }
+jnxPPPoECompliances OBJECT IDENTIFIER ::= { jnxPPPoEConformance 1 }
+jnxPPPoEGroups      OBJECT IDENTIFIER ::= { jnxPPPoEConformance 2 }
+
+
+END
+
+

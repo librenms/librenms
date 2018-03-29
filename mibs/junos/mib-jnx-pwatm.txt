@@ -1,0 +1,823 @@
+ -- extracted from pw-atm-draft-06
+
+  JUNIPER-PW-ATM-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE,
+      Counter32, Counter64, Unsigned32, mib-2
+            FROM SNMPv2-SMI
+
+      MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+      TruthValue, RowStatus, RowPointer
+            FROM SNMPv2-TC
+
+      PerfCurrentCount, PerfIntervalCount
+            FROM PerfHist-TC-MIB
+
+      -- Juniper Specific ATM MIB
+     jnxMibs
+        FROM JUNIPER-SMI                       -- *** JNX ***
+
+     jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex
+        FROM JUNIPER-VPN-MIB
+
+      InterfaceIndex
+            FROM IF-MIB
+
+      AtmVpIdentifier, AtmVcIdentifier
+            FROM ATM-TC-MIB;
+
+
+        jnxPWAtmMIB MODULE-IDENTITY
+        LAST-UPDATED "200909010000Z"  -- 2008
+        ORGANIZATION "Pseudo-Wire Emulation Edge-to-Edge (PWE3)
+                      Working Group"
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+
+        DESCRIPTION
+            "This MIB module defines objects used for managing 
+            the atm pseudowires in Juniper products."
+
+        -- Revision history.
+
+        REVISION "200909010000Z"  -- 2008
+        DESCRIPTION " This mib is a modified version of RFC 5605"
+
+           ::= { jnxMibs 57}
+
+
+      jnxpwAtmNotifications OBJECT IDENTIFIER ::= { jnxPWAtmMIB 0 }
+      jnxpwAtmObjects       OBJECT IDENTIFIER ::= { jnxPWAtmMIB 1 }
+      jnxpwAtmConformance   OBJECT IDENTIFIER ::= { jnxPWAtmMIB 2 }
+
+  --Generic ATM PW table for all types of ATM PW connection.
+
+  jnxpwAtmCfgTable OBJECT-TYPE
+      SYNTAX    SEQUENCE OF JnxPwAtmCfgEntry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+          "This table specifies generic information for an ATM PW
+           to be carried over PSN in any mode."
+      ::= { jnxpwAtmObjects 1 }
+
+      jnxpwAtmCfgEntry OBJECT-TYPE
+      SYNTAX        JnxPwAtmCfgEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+             "This table contains a set of parameters for
+           the ATM PW that needs to be adapted and carried
+           over PSN. This table is indexed by pwIndex from
+           pwTable. An entry is created for every newly ATM
+           type associated pwIndex in the pwTable. Unless
+           otherwise specified, all read-write objects in
+           this table MAY be changed when the PW is defined
+           as not active and all RW objects values must
+           persist after reboot"
+      REFERENCE
+        "See [PWMIB] "
+
+      INDEX { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+      ::= { jnxpwAtmCfgTable 1 }
+
+  JnxPwAtmCfgEntry ::= SEQUENCE {
+          jnxpwAtmCfgMaxCellConcatenation       Unsigned32,
+          jnxpwAtmCfgFarEndMaxCellConcatenation Unsigned32,
+          jnxpwAtmCfgTimeoutMode                INTEGER,
+          jnxpwAtmClpQosMapping                 TruthValue
+                  }
+
+  jnxpwAtmCfgMaxCellConcatenation OBJECT-TYPE
+       SYNTAX        Unsigned32 (1..29)
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The maximum number of ATM cells that can be
+            concatenated into one PW packet towards PSN.
+            In non LDP or other signaling protocol environment,
+            this object MAY be changed at anytime, but traffic
+            might be interuppted, otherwise, it may be changed
+            when PW is not active."
+      ::= { jnxpwAtmCfgEntry 1 }
+
+  jnxpwAtmCfgFarEndMaxCellConcatenation OBJECT-TYPE
+       SYNTAX        Unsigned32 (1..29)
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The maximum number of ATM cells that can be
+            concatenated into one PW packet towards PSN as reported by
+            the far end. If no LDP in use, the object will either
+            return value 0 or allow setting it for calculating
+            protocol overhead."
+      ::= { jnxpwAtmCfgEntry 2 }
+
+  jnxpwAtmCfgTimeoutMode OBJECT-TYPE
+       SYNTAX        INTEGER
+                          {
+                           notApplicable (1),
+                           disabled      (2),
+                           enabled       (3)
+                          }
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "This objects determines whether a packet can be
+            transmitted to the PSN based on time out expiration
+            for collecting cells or not. The actual handling of the
+            time out is implementation specific-as such this object
+            may be changed at any time under proper consideration of
+            traffic interupption effect."
+      ::= { jnxpwAtmCfgEntry 3 }
+
+  jnxpwAtmClpQosMapping OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This Object indicates whether the CLP bits should be
+           considered when setting the value in the Quality
+           of Service fields of the encapsulating protocol
+           (e.g. EXP fields of the MPLS Label Stack).  Selecting
+           True allows the drop precedence to be preserved
+           across the PSN. In transparent cell transport,
+           the value of this object MUST be false(2), in other
+           cases it can be changed at any time."
+      REFERENCE
+        "See [ATMENCAP] section 12"
+      ::= { jnxpwAtmCfgEntry 4 }
+
+
+
+  -- Device capable of implementing N:1, 1:1 and transparent cell
+  -- mode assumes to support the N:1 table for all
+  -- modes with respective applicable setting.
+  -- In such implementation, user can create an entry for either
+  -- 1:1 or transparent cell transport modes only
+  -- in pwAtmInboundNto1Table. The side effect of such
+  -- will be an automatic create of the respective line in the
+  -- pwAtmOutboundNto1Table.
+
+  -- ATM PW Outbound Table for N to 1 connection
+
+  jnxpwAtmOutboundNto1Table OBJECT-TYPE
+      SYNTAX    SEQUENCE OF JnxPwAtmOutboundNto1Entry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+          "This table specifies the information for an ATM PW to
+          be carried over PSN in the outbound direction. Up to
+          N entries can be created in this table for every
+          entry in the pwTable with a pwType equal to:
+          atmCellNto1Vcc(9), or atmCellNto1Vpc(10).
+            An entry can be created only when the VP/VC are known.
+          A single entry will be created in this table for every
+          entry in the pwTable with a pwType equal to
+          one of the following: atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13), or atmAal5PduVcc(14), or
+          atmAal5SduVcc(2), or atmTransparent(3).
+          "
+      ::= { jnxpwAtmObjects 2 }
+
+  jnxpwAtmOutboundNto1Entry OBJECT-TYPE
+      SYNTAX        JnxPwAtmOutboundNto1Entry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "A row in this table represents an ATM PW that needs to be
+           adapted and carried over PSN. This table is indexed by
+           pwIndex from pwTable and the ATM interface with VPL/ VCLs.
+           In atmTransparent(3), Vpi and VCi will be 0xFFFF
+           during set operation.
+           Unless otherwise specified, all read-create objects in this
+           table MUST NOT be changed after row activation
+           and SHOULD remain unchanged after reboot."
+      INDEX { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+      ::= { jnxpwAtmOutboundNto1Table 1 }
+
+  JnxPwAtmOutboundNto1Entry ::= SEQUENCE {
+        jnxpwAtmOutboundNto1AtmIf                    InterfaceIndex,
+        jnxpwAtmOutboundNto1Vpi                      AtmVpIdentifier,
+        jnxpwAtmOutboundNto1Vci                      AtmVcIdentifier,
+        jnxpwAtmOutboundNto1RowStatus                RowStatus,
+        jnxpwAtmOutboundNto1TrafficParamDescr        RowPointer,
+        jnxpwAtmOutboundNto1MappedVpi                AtmVpIdentifier,
+        jnxpwAtmOutboundNto1MappedVci                AtmVcIdentifier
+       }
+
+  jnxpwAtmOutboundNto1AtmIf OBJECT-TYPE
+      SYNTAX        InterfaceIndex
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "The ATM Interface that receives cells from the ATM network."
+      ::= { jnxpwAtmOutboundNto1Entry 1 }
+
+  jnxpwAtmOutboundNto1Vpi OBJECT-TYPE
+      SYNTAX        AtmVpIdentifier
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "VPI value of this ATM PW. In atmTransparent(3),
+           Vpi will be the equivalent of 0xFFFF"
+      ::= { jnxpwAtmOutboundNto1Entry 2 }
+
+  jnxpwAtmOutboundNto1Vci OBJECT-TYPE
+      SYNTAX        AtmVcIdentifier
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "VCI value of this ATM PW. In atmTransparent(3), or
+           VP case, the value will be the equivalent of
+           0xFFFF"
+      ::= { jnxpwAtmOutboundNto1Entry 3 }
+
+  jnxpwAtmOutboundNto1RowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This Object is used to create, modify or delete a row in
+           this table."
+      ::= { jnxpwAtmOutboundNto1Entry 4 }
+
+  jnxpwAtmOutboundNto1TrafficParamDescr OBJECT-TYPE
+      SYNTAX        RowPointer
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represents a pointer to a ATM traffic parameter
+           specific row in either private or standard table which will
+           be employed while receiving cells from the ATM network.
+           This table should contain a set
+           of self-consistent ATM traffic parameters including the ATM
+           traffic service category. A value of 0.0 indicates Best
+           Effort."
+
+      ::= { jnxpwAtmOutboundNto1Entry 5 }
+
+  jnxpwAtmOutboundNto1MappedVpi         OBJECT-TYPE
+      SYNTAX        AtmVpIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The egress generated VPI value of this ATM PW. The
+          entry is valid for PW type of atmCellNto1Vcc(9),
+          atmCellNto1Vpc(10), atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13). In other types, the value will be the
+          equivalent of 0xFFFF. Value MAY be changed when the
+          PW is defined as not active "
+      ::= { jnxpwAtmOutboundNto1Entry 6 }
+
+  jnxpwAtmOutboundNto1MappedVci      OBJECT-TYPE
+      SYNTAX        AtmVcIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The egress generated VCI value of this ATM PW. The
+          entry is valid for PW type of atmCellNto1Vcc(9),
+          atmCellNto1Vpc(10), atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13. In VP case or other types, the
+          value will be the equivalent of 0xFFFF.
+          Value MAY be changed when the PW is defined
+          as not active."
+      ::= { jnxpwAtmOutboundNto1Entry 7 }
+
+
+  -- ATM PW Inbound Table for N to 1 connection
+
+  jnxpwAtmInboundNto1Table OBJECT-TYPE
+      SYNTAX    SEQUENCE OF JnxPwAtmInboundNto1Entry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+          "This table specifies the information for an ATM PW to
+          be carried over PSN in the Inbound direction. Up to
+          N entries can be created in this table for every
+          entry in the pwTable with a pwType equal to:
+          atmCellNto1Vcc(9), or atmCellNto1Vpc(10).
+            An entry can be created only when the VP/VC are known.
+          A single entry will be created in this table for every
+          entry in the pwTable with a pwType equal to
+          one of the following:atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13), or atmAal5PduVcc(14), or
+          atmAal5SduVcc(2), or atmTransparent(3)."
+      ::= { jnxpwAtmObjects 3 }
+
+  jnxpwAtmInboundNto1Entry OBJECT-TYPE
+      SYNTAX        JnxPwAtmInboundNto1Entry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "A row in this table represents an ATM PW that needs to be
+           adapted and carried over PSN. This table is indexed by
+           pwIndex from pwTable and the ATM interface with VPL/ VCLs.
+           In atmTransparent(3), Vpi and VCi will be 0xFFFF
+           during set operation.
+           Unless otherwise specified, all Read-Creat objects in this
+           table MUST NOT be changed after row activation
+           and SHOULD remain unchanged after reboot."
+      INDEX { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+      ::= { jnxpwAtmInboundNto1Table 1 }
+
+  JnxPwAtmInboundNto1Entry ::= SEQUENCE {
+        jnxpwAtmInboundNto1AtmIf                InterfaceIndex,
+        jnxpwAtmInboundNto1Vpi                  AtmVpIdentifier,
+        jnxpwAtmInboundNto1Vci                  AtmVcIdentifier,
+        jnxpwAtmInboundNto1RowStatus            RowStatus,
+        jnxpwAtmInboundNto1TrafficParamDescr    RowPointer,
+        jnxpwAtmInboundNto1MappedVpi            AtmVpIdentifier,
+        jnxpwAtmInboundNto1MappedVci            AtmVcIdentifier
+      }
+
+  jnxpwAtmInboundNto1AtmIf OBJECT-TYPE
+      SYNTAX        InterfaceIndex
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "The ATM Interface that receives cells from the ATM network."
+      ::= { jnxpwAtmInboundNto1Entry 1 }
+
+  jnxpwAtmInboundNto1Vpi OBJECT-TYPE
+      SYNTAX        AtmVpIdentifier
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "VPI value of this ATM PW. In atmTransparent(3),
+           Vpi will be the equivalent of 0xFFFF."
+      ::= { jnxpwAtmInboundNto1Entry 2 }
+
+  jnxpwAtmInboundNto1Vci OBJECT-TYPE
+      SYNTAX        AtmVcIdentifier
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "VCI value of this ATM PW. In atmTransparent(3), or
+           VP case, the value will be the equivalent of
+           0xFFFF"
+      ::= { jnxpwAtmInboundNto1Entry 3 }
+
+  jnxpwAtmInboundNto1RowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This Object is used to create, modify or delete a row in
+          this table."
+      ::= { jnxpwAtmInboundNto1Entry 4 }
+
+  jnxpwAtmInboundNto1TrafficParamDescr OBJECT-TYPE
+      SYNTAX        RowPointer
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represents a pointer to a ATM traffic parameter
+           specific row in either private or standard table which will
+           be employed while receiving cells from the ATM network.
+           This table should contain a set
+           of self-consistent ATM traffic parameters including the ATM
+           traffic service category. A value of 0.0 indicates Best
+           Effort."
+
+      ::= { jnxpwAtmInboundNto1Entry 5 }
+
+  jnxpwAtmInboundNto1MappedVpi    OBJECT-TYPE
+      SYNTAX        AtmVpIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The generated VPI value of this ATM PW. The
+          entry is valid for PW type of atmCellNto1Vcc(9),
+          atmCellNto1Vpc(10), atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13). In other types, the value will be the
+          equivalent of 0xFFFF. Value MAY be changed when the
+          PW is defined as not active."
+      ::= { jnxpwAtmInboundNto1Entry 6 }
+
+  jnxpwAtmInboundNto1MappedVci     OBJECT-TYPE
+      SYNTAX        AtmVcIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The generated VCI value of this ATM PW. The
+          entry is valid for PW type of atmCellNto1Vcc(9),
+          atmCellNto1Vpc(10), atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13. In VP case or other types, the
+          value will be the equivalent of 0xFFFF.
+          Value MAY be changed when the
+          PW is defined as not active."
+      ::= { jnxpwAtmInboundNto1Entry 7 }
+
+
+  -- ATM PW Outbound Perf Table
+
+  -- The following supplement the counters presented in the
+  -- PW generic MIB
+  -- ATM PW Performance Current Table.
+
+  jnxpwAtmPerfCurrentTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPwAtmPerfCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The current 15 minute interval counts are in
+         this table.
+         This table provides performance information per ATM PW."
+    ::= { jnxpwAtmObjects 4 }
+
+  jnxpwAtmPerfCurrentEntry OBJECT-TYPE
+    SYNTAX        JnxPwAtmPerfCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created by the agent for every
+         pwAtmCfgTable entry. After 15 minutes, the contents of this
+         table entry are copied to a new entry in the
+         pwAtmPerfInterval table and the counts in this entry
+         are reset to zero."
+    INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+    ::= { jnxpwAtmPerfCurrentTable 1 }
+
+  JnxPwAtmPerfCurrentEntry ::= SEQUENCE {
+       jnxpwAtmPerfCurrentMissingPkts    PerfCurrentCount,
+       jnxpwAtmPerfCurrentPktsReOrder    PerfCurrentCount,
+       jnxpwAtmPerfCurrentPktsMisOrder   PerfCurrentCount,
+       jnxpwAtmPerfCurrentPktsTimeout    PerfCurrentCount,
+       jnxpwAtmPerfCurrentPktsXmit       Counter64,
+       jnxpwAtmPerfCurrentCellsDropped   PerfCurrentCount,
+       jnxpwAtmPerfCurrentPktsReceived   Counter64,
+       jnxpwAtmPerfCurrentUnknownCells   Counter64 
+    }
+
+  jnxpwAtmPerfCurrentMissingPkts OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of missing packets (as detected via control word
+         sequence number gaps)."
+    ::= { jnxpwAtmPerfCurrentEntry 1 }
+
+  jnxpwAtmPerfCurrentPktsReOrder OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of sequence (via control
+         word sequence number), but successfully re-ordered.
+         Note: some implementations may not support this Feature."
+    ::= { jnxpwAtmPerfCurrentEntry 2 }
+
+  jnxpwAtmPerfCurrentPktsMisOrder OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of order (via control word
+         sequence numbers)."
+     ::= { jnxpwAtmPerfCurrentEntry 3 }
+
+  jnxpwAtmPerfCurrentPktsTimeout OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets transmitted due to timeout expiration
+         while attempting to collect cells."
+     ::= { jnxpwAtmPerfCurrentEntry 4 }
+
+  jnxpwAtmPerfCurrentPktsXmit OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of transmitted packets."
+     ::= { jnxpwAtmPerfCurrentEntry 5 }
+
+  jnxpwAtmPerfCurrentCellsDropped OBJECT-TYPE
+    SYNTAX       PerfCurrentCount 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of dropped cells."
+     ::= { jnxpwAtmPerfCurrentEntry 6 }
+
+  jnxpwAtmPerfCurrentPktsReceived OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of received packets."
+     ::= { jnxpwAtmPerfCurrentEntry 7 }
+
+  jnxpwAtmPerfCurrentUnknownCells OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cells received from the PSN with unknown VPI or
+        VCI values. This object is relevant only in N:1 mode."
+     ::= { jnxpwAtmPerfCurrentEntry 8 }
+
+  -- End ATM PW Performance Current Interval Table
+
+
+  -- ATM PW Performance Interval Table.
+
+  jnxpwAtmPerfIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPwAtmPerfIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides performance information per ATM PW
+         similar to the pwAtmPerfCurrentTable above. However,
+         these counts represent historical 15 minute intervals.
+         Typically, this table will have a maximum of 96 entries
+         for a 24 hour period. "
+    ::= { jnxpwAtmObjects 5 }
+
+  jnxpwAtmPerfIntervalEntry OBJECT-TYPE
+    SYNTAX        JnxPwAtmPerfIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created by the agent for
+         every pwAtmPerfCurrentEntry that is 15 minutes old.
+         The contents of the Current entry are copied to the new
+         entry here. The Current entry, then resets its counts
+         to zero for the next current 15 minute interval. "
+    INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex, jnxpwAtmPerfIntervalNumber }
+    ::= { jnxpwAtmPerfIntervalTable 1 }
+
+  JnxPwAtmPerfIntervalEntry ::= SEQUENCE {
+       jnxpwAtmPerfIntervalNumber         Unsigned32,
+       jnxpwAtmPerfIntervalValidData      TruthValue,
+       jnxpwAtmPerfIntervalDuration       Unsigned32,
+       jnxpwAtmPerfIntervalMissingPkts    PerfIntervalCount,
+       jnxpwAtmPerfIntervalPktsReOrder    PerfIntervalCount,
+       jnxpwAtmPerfIntervalPktsMisOrder   PerfIntervalCount,
+       jnxpwAtmPerfIntervalPktsTimeout    PerfIntervalCount,
+       jnxpwAtmPerfIntervalPktsXmit       Counter64,
+       jnxpwAtmPerfIntervalCellsDropped   PerfIntervalCount,
+       jnxpwAtmPerfIntervalPktsReceived   Counter64,
+       jnxpwAtmPerfIntervalUnknownCells   Counter64 
+       }
+
+  jnxpwAtmPerfIntervalNumber OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..96)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A number (normally between 1 and 96 to cover a 24 hour
+         period) which identifies the interval for which the set
+         of statistics is available. The interval identified by 1
+         is the most recently completed 15 minute interval, and
+         the interval identified by N is the interval immediately
+         preceding the one identified by N-1. The minimum range of
+         N is 1 through 4. The default range is 1 through 32. The
+         maximum value of N is 96."
+    ::= { jnxpwAtmPerfIntervalEntry 1 }
+
+  jnxpwAtmPerfIntervalValidData OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates if the data for this interval
+         is valid."
+    ::= { jnxpwAtmPerfIntervalEntry 2 }
+
+  jnxpwAtmPerfIntervalDuration OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+       "The duration of a particular interval in seconds,
+        Adjustments in the system's time-of-day clock, may
+        cause the interval to be greater or less than, the
+        normal value. Therefore this actual interval value
+        is provided."
+     ::= { jnxpwAtmPerfIntervalEntry 3 }
+
+  jnxpwAtmPerfIntervalMissingPkts OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of missing packets (as detected via control
+         word sequence number gaps)."
+    ::= { jnxpwAtmPerfIntervalEntry 4 }
+
+  jnxpwAtmPerfIntervalPktsReOrder OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of sequence (via control
+         word sequence number), but successfully re-ordered.
+         Note: some implementations may not support this
+         Feature."
+    ::= { jnxpwAtmPerfIntervalEntry 5 }
+
+   jnxpwAtmPerfIntervalPktsMisOrder OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of order (via control word
+         sequence numbers)."
+    ::= { jnxpwAtmPerfIntervalEntry 6 }
+
+  jnxpwAtmPerfIntervalPktsTimeout OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets transmitted due to timeout expiration."
+     ::= { jnxpwAtmPerfIntervalEntry 7 }
+
+  jnxpwAtmPerfIntervalPktsXmit OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of transmitted packets."
+     ::= { jnxpwAtmPerfIntervalEntry 8 }
+
+  jnxpwAtmPerfIntervalCellsDropped OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of dropped cells."
+     ::= { jnxpwAtmPerfIntervalEntry 9 }
+
+  jnxpwAtmPerfIntervalPktsReceived OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of received packets."
+     ::= { jnxpwAtmPerfIntervalEntry 10 }
+
+  jnxpwAtmPerfIntervalUnknownCells OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cells received from the PSN  with unknown VPI or
+        VCI values. This object is relevant only in N:1 mode."
+     ::= { jnxpwAtmPerfIntervalEntry 11 }
+
+  -- End ATM PW Performance Interval Table
+
+
+  -- ATM PW 1day Performance Table
+
+  jnxpwAtmPerf1DayIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxPwAtmPerf1DayIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides performance information per ATM PW
+         similar to the pwAtmPerfIntervalTable above. However,
+         these counters represent historical 1 day intervals up to
+         one full month."
+    ::= { jnxpwAtmObjects 6 }
+
+  jnxpwAtmPerf1DayIntervalEntry OBJECT-TYPE
+    SYNTAX        JnxPwAtmPerf1DayIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry is created in this table by the agent
+         for every entry in the pwAtmCfgTable table."
+    INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex, jnxpwAtmPerf1DayIntervalNumber }
+       ::= { jnxpwAtmPerf1DayIntervalTable 1 }
+
+  JnxPwAtmPerf1DayIntervalEntry ::= SEQUENCE {
+       jnxpwAtmPerf1DayIntervalNumber          Unsigned32,
+       jnxpwAtmPerf1DayIntervalValidData       TruthValue,
+       jnxpwAtmPerf1DayIntervalDuration        Unsigned32,
+       jnxpwAtmPerf1DayIntervalMissingPkts     Counter32,
+       jnxpwAtmPerf1DayIntervalPktsReOrder     Counter32,
+       jnxpwAtmPerf1DayIntervalPktsMisOrder    Counter32,
+       jnxpwAtmPerf1DayIntervalPktsTimeout     Counter32,
+       jnxpwAtmPerf1DayIntervalPktsXmit        Counter64,
+       jnxpwAtmPerf1DayIntervalCellsDropped    Counter32,
+       jnxpwAtmPerf1DayIntervalPktsReceived    Counter64,
+       jnxpwAtmPerf1DayIntervalUnknownCells    Counter64
+       }
+
+  jnxpwAtmPerf1DayIntervalNumber OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..365)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The number of interval, where 1 indicates current day
+         measured period and 2 and above indicate previous days
+         respectively"
+    ::= { jnxpwAtmPerf1DayIntervalEntry 1 }
+
+  jnxpwAtmPerf1DayIntervalValidData OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates if the data for this interval
+         is valid."
+    ::= { jnxpwAtmPerf1DayIntervalEntry 2 }
+
+  jnxpwAtmPerf1DayIntervalDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The duration of a particular interval in seconds,
+       Adjustments in the system's time-of-day clock, may
+       cause the interval to be greater or less than, the
+       normal value. Therefore this actual interval value
+       is provided."
+    ::= { jnxpwAtmPerf1DayIntervalEntry 3 }
+
+  jnxpwAtmPerf1DayIntervalMissingPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "Number of missing packets (as detected via control word
+       sequence number gaps)."
+    ::= { jnxpwAtmPerf1DayIntervalEntry 4 }
+
+  jnxpwAtmPerf1DayIntervalPktsReOrder OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of sequence (via control
+         word sequence number), but successfully re-ordered.
+         Note: some implementations may not support this
+         feature."
+    ::= { jnxpwAtmPerf1DayIntervalEntry 5 }
+
+  jnxpwAtmPerf1DayIntervalPktsMisOrder OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of order(via control word
+         sequence numbers), and could not be re-ordered."
+    ::= { jnxpwAtmPerf1DayIntervalEntry 6 }
+
+  jnxpwAtmPerf1DayIntervalPktsTimeout OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets transmitted due to timeout expiration."
+     ::= { jnxpwAtmPerf1DayIntervalEntry 7 }
+
+  jnxpwAtmPerf1DayIntervalPktsXmit OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of transmitted packets."
+     ::= { jnxpwAtmPerf1DayIntervalEntry 8 }
+
+  jnxpwAtmPerf1DayIntervalCellsDropped OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of dropped cells."
+     ::= { jnxpwAtmPerf1DayIntervalEntry 9 }
+
+  jnxpwAtmPerf1DayIntervalPktsReceived OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of received packets."
+     ::= { jnxpwAtmPerf1DayIntervalEntry 10 }
+
+  jnxpwAtmPerf1DayIntervalUnknownCells OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cells received from the PSN  with unknown VPI
+        or VCI value. This object is relevant only in N:1 mode."
+     ::= { jnxpwAtmPerf1DayIntervalEntry 11 }
+
+  -- End of ATM PW Performance table
+      
+  END

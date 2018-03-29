@@ -1,0 +1,10 @@
+os: netbotz
+text: 'NetBotz Environment Sensor'
+type: environment
+icon: apc
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.5528.100.20.10

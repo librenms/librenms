@@ -1,0 +1,88 @@
+       ADTRAN-AOS-MEF-MIB DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           adShared, adIdentityShared
+               FROM ADTRAN-MIB
+          adGenAOS, adGenAOSMef
+               FROM ADTRAN-AOS;
+
+       adGenAOSMefMib MODULE-IDENTITY
+        LAST-UPDATED "201409100000Z" -- September 10, 2014
+	ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                        "This MIB defines the Adtran OS Common enterprise tree node.  It
+                         provides a basis for the definition of all other Adtran OS MEF
+                         MIBs."
+
+            REVISION    "201409100000Z" -- September 10, 2014
+            DESCRIPTION
+                    "Initial version of this MIB module."
+
+           ::= { adGenAOS 9 }
+
+          adGenAosMefPerUniPerfHistoryMib         OBJECT IDENTIFIER ::= { adGenAOSMef 1 }
+          adGenAosMefPerCosPerUniPerfHistoryMib   OBJECT IDENTIFIER ::= { adGenAOSMef 2 }
+          adGenAosMefPerEvcPerfHistoryMib         OBJECT IDENTIFIER ::= { adGenAOSMef 3 }
+          adGenAosMefPerCosPerEvcPerfHistoryMib   OBJECT IDENTIFIER ::= { adGenAOSMef 4 }
+
+    --
+    -- adGenAOS
+    --
+    -- The features in Adtran OS products that support SNMP
+    -- management appear in a list under the "adGenAOS" node.
+    --
+
+    --
+    -- AOS Common Section - adGenAOSMef
+    --
+    -- Contains MEF information and config for AOS products
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9
+    --
+
+    --
+    -- AOS Common Section - adGenAosMefPerUniPerfHistoryMib
+    --
+    -- Contains performance history information for UNI interfaces.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.1
+    --
+    --
+
+    --
+    -- AOS Common Section - adGenAosMefPerCosPerUniPerfHistoryMib
+    --
+    -- Contains performance history information for UNI interfaces per queue number.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.2
+    --
+    --
+
+    --
+    -- AOS Common Section - adGenAosMefPerEvcPerfHistoryMib
+    --
+    -- Contains performance history information for EVCs.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.3
+    --
+    --
+
+    --
+    -- AOS Common Section - adGenAosMefPerCosPerEvcPerfHistoryMib
+    --
+    -- Contains performance history information for EVCs per queue number.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.4
+    --
+    --
+
+       END
+
+

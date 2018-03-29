@@ -1,0 +1,108 @@
+WATCHGUARD-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY     FROM    SNMPv2-SMI
+    watchguard          FROM    WATCHGUARD-SMI;
+
+wgProducts MODULE-IDENTITY
+    LAST-UPDATED "200811100000Z"
+    ORGANIZATION "WatchGuard Technologies, Inc."
+    CONTACT-INFO
+               "  WatchGuard Technologies, Inc.
+
+                  505 Fifth Avenue South
+                  Suite 500
+                  Seattle, WA 98104
+                  United States
+                  
+                  +1.206.613.6600 " 
+                     
+    DESCRIPTION
+            "This MIB module definesthe object identifiers  
+            for WatchGuard Technologies Products."
+    REVISION
+            "200811100000Z"
+    DESCRIPTION
+            "Initial version."
+    ::= { watchguard 1 }
+
+fbXSeries OBJECT IDENTIFIER ::= { wgProducts 4 }
+xtmSeries OBJECT IDENTIFIER ::= { wgProducts 5 }
+
+-- fbX series
+fbX500     OBJECT IDENTIFIER ::= { fbXSeries 1 }
+fbX550e    OBJECT IDENTIFIER ::= { fbXSeries 2 }
+fbX700     OBJECT IDENTIFIER ::= { fbXSeries 3 }
+fbX750e    OBJECT IDENTIFIER ::= { fbXSeries 4 }
+fbX750e-4  OBJECT IDENTIFIER ::= { fbXSeries 5 }
+fbX1000    OBJECT IDENTIFIER ::= { fbXSeries 6 }
+fbX1250e   OBJECT IDENTIFIER ::= { fbXSeries 7 }
+fbX1250e-4 OBJECT IDENTIFIER ::= { fbXSeries 8 }
+fbX2500    OBJECT IDENTIFIER ::= { fbXSeries 9 }
+fbX5000    OBJECT IDENTIFIER ::= { fbXSeries 10 }
+fbX5500e   OBJECT IDENTIFIER ::= { fbXSeries 11 }
+fbX6000    OBJECT IDENTIFIER ::= { fbXSeries 12 }
+fbX6500e   OBJECT IDENTIFIER ::= { fbXSeries 13 }
+fbX8000    OBJECT IDENTIFIER ::= { fbXSeries 14 }
+fbX8500e   OBJECT IDENTIFIER ::= { fbXSeries 15 }
+fbX8500e-F OBJECT IDENTIFIER ::= { fbXSeries 16 }
+fbX10e     OBJECT IDENTIFIER ::= { fbXSeries 17 }
+fbX10e-W   OBJECT IDENTIFIER ::= { fbXSeries 18 }
+fbX20e     OBJECT IDENTIFIER ::= { fbXSeries 19 }
+fbX20e-W   OBJECT IDENTIFIER ::= { fbXSeries 20 }
+fbX55e     OBJECT IDENTIFIER ::= { fbXSeries 21 }
+fbX55e-W   OBJECT IDENTIFIER ::= { fbXSeries 22 }
+
+-- xtm series
+xtm1050    OBJECT IDENTIFIER ::= { xtmSeries 1 }
+xtm1050-F  OBJECT IDENTIFIER ::= { xtmSeries 2 }
+xtm830-F   OBJECT IDENTIFIER ::= { xtmSeries 3 }
+xtm830     OBJECT IDENTIFIER ::= { xtmSeries 4 }
+xtm820     OBJECT IDENTIFIER ::= { xtmSeries 5 }
+xtm810     OBJECT IDENTIFIER ::= { xtmSeries 6 }
+xtm530     OBJECT IDENTIFIER ::= { xtmSeries 7 }
+xtm520     OBJECT IDENTIFIER ::= { xtmSeries 8 }
+xtm510     OBJECT IDENTIFIER ::= { xtmSeries 9 }
+xtm505     OBJECT IDENTIFIER ::= { xtmSeries 10 }
+xtm23      OBJECT IDENTIFIER ::= { xtmSeries 11 }
+xtm22      OBJECT IDENTIFIER ::= { xtmSeries 12 }
+xtm21      OBJECT IDENTIFIER ::= { xtmSeries 13 }
+xtm23-W    OBJECT IDENTIFIER ::= { xtmSeries 14 }
+xtm22-W    OBJECT IDENTIFIER ::= { xtmSeries 15 }
+xtm21-W    OBJECT IDENTIFIER ::= { xtmSeries 16 }
+xtm2050    OBJECT IDENTIFIER ::= { xtmSeries 17 }
+xtm25      OBJECT IDENTIFIER ::= { xtmSeries 18 }
+xtm25-W    OBJECT IDENTIFIER ::= { xtmSeries 19 }
+xtm26      OBJECT IDENTIFIER ::= { xtmSeries 20 }
+xtm26-W    OBJECT IDENTIFIER ::= { xtmSeries 21 }
+xtm33      OBJECT IDENTIFIER ::= { xtmSeries 22 }
+xtm33-W    OBJECT IDENTIFIER ::= { xtmSeries 23 }
+xtm330     OBJECT IDENTIFIER ::= { xtmSeries 24 }
+xtm545     OBJECT IDENTIFIER ::= { xtmSeries 25 }
+xtm535     OBJECT IDENTIFIER ::= { xtmSeries 26 }
+xtm525     OBJECT IDENTIFIER ::= { xtmSeries 27 }
+xtm515     OBJECT IDENTIFIER ::= { xtmSeries 28 }
+xtm2050A   OBJECT IDENTIFIER ::= { xtmSeries 29 }
+xtm850     OBJECT IDENTIFIER ::= { xtmSeries 30 }
+xtm860     OBJECT IDENTIFIER ::= { xtmSeries 31 }
+xtm870     OBJECT IDENTIFIER ::= { xtmSeries 32 }
+xtm870-F   OBJECT IDENTIFIER ::= { xtmSeries 33 }
+xtm1520    OBJECT IDENTIFIER ::= { xtmSeries 34 }
+xtm1525    OBJECT IDENTIFIER ::= { xtmSeries 35 }
+xtm2520    OBJECT IDENTIFIER ::= { xtmSeries 36 }
+xtmv-SM    OBJECT IDENTIFIER ::= { xtmSeries 37 }
+xtmv-MED   OBJECT IDENTIFIER ::= { xtmSeries 38 }
+xtmv-LG    OBJECT IDENTIFIER ::= { xtmSeries 39 }
+xtmv-DC    OBJECT IDENTIFIER ::= { xtmSeries 40 }
+xtmv-EXP   OBJECT IDENTIFIER ::= { xtmSeries 41 }
+xtmv       OBJECT IDENTIFIER ::= { xtmSeries 42 }
+xtm1520-RP OBJECT IDENTIFIER ::= { xtmSeries 43 }
+xtm1525-RP OBJECT IDENTIFIER ::= { xtmSeries 44 }
+T10        OBJECT IDENTIFIER ::= { xtmSeries 45 }
+M440       OBJECT IDENTIFIER ::= { xtmSeries 46 }
+T10-D      OBJECT IDENTIFIER ::= { xtmSeries 47 }
+T10-W      OBJECT IDENTIFIER ::= { xtmSeries 48 }
+M400       OBJECT IDENTIFIER ::= { xtmSeries 49 }
+M500       OBJECT IDENTIFIER ::= { xtmSeries 50 }
+END

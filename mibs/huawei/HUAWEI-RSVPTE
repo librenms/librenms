@@ -1,0 +1,3268 @@
+--   =================================================================
+--  Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved
+--  
+--  Description the HUAWEI-RSVPTE-MIB provides information about RSVPTE. 
+--  Reference:
+--  Version: V1.0
+--  History:
+--  zhuguangdong 2007-04-16 publish
+--  =================================================================
+-- 
+
+        HUAWEI-RSVPTE-MIB DEFINITIONS ::= BEGIN
+ 
+                IMPORTS
+                        hwDatacomm                        
+                                FROM HUAWEI-MIB                        
+                        ifIndex                        
+                                FROM IF-MIB                        
+                        SessionType, BitRate, BurstSize, MessageSize, QosService                        
+                                FROM INTEGRATED-SERVICES-MIB                        
+                        OBJECT-GROUP, MODULE-COMPLIANCE                        
+                                FROM SNMPv2-CONF                        
+                        IpAddress, Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY            
+                                FROM SNMPv2-SMI                        
+                        TruthValue, TimeStamp, RowStatus, TimeInterval                        
+                                FROM SNMPv2-TC;
+        
+        
+--  Thu Apri 16 15:03:53 PDT 2007
+                hwRsvpTe MODULE-IDENTITY 
+                        LAST-UPDATED "200704101000Z"        -- April 10, 2007 at 10:00 GMT
+                        ORGANIZATION 
+                                "Huawei Technologies Co.,Ltd."
+                        CONTACT-INFO 
+                                "R&D BeiJing, Huawei Technologies co.,Ltd.
+                                Huawei Bld.,NO.3 Xinxi Rd., 
+                                Shang-Di Information Industry Base,
+                                Hai-Dian District Beijing P.R. China
+                                Zip:100085 
+                                Http://www.huawei.com                                       
+                                E-mail:support@huawei.com
+                                 "
+                        DESCRIPTION 
+                                "The MIB module to describe the RSVP Protocol"
+                        ::= { hwDatacomm 148 }
+
+                
+        
+        
+--
+-- Node definitions
+--
+        
+                hwRsvpTeObjects OBJECT IDENTIFIER ::= { hwRsvpTe 1 }
+
+                
+--       The RSVP Session Statistics Database displays statistics
+-- relating to the number of senders and receivers in each
+-- session.
+                hwRsvpTeSessionTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeSessionEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "A table of all sessions seen by a  given  sys-
+                                tem."
+                        ::= { hwRsvpTeObjects 1 }
+
+                
+                hwRsvpTeSessionEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeSessionEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "A single session seen by a given system."
+                        INDEX { hwRsvpTeSessionNumber }
+                        ::= { hwRsvpTeSessionTable 1 }
+
+                
+                HwRsvpTeSessionEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeSessionNumber
+                                        Gauge32,
+                                hwRsvpTeSessionType
+                                        SessionType,
+                                hwRsvpTeSessionDestAddr
+                                        OCTET STRING,
+                                hwRsvpTeSessionDestAddrLength
+                                        Integer32,
+                                hwRsvpTeSessionSenders
+                                        Gauge32,
+                                hwRsvpTeSessionReceivers
+                                        Gauge32,
+                                hwRsvpTeSessionRequests
+                                        Gauge32,
+                                hwRsvpTeSessionTunnelId
+                                        Integer32,
+                                hwRsvpTeSessionTunnelExtId
+                                    IpAddress,
+                                hwRsvpTeSessionLspsNumber
+                                        Gauge32,
+                                hwRsvpTeSessionStyle
+                                        INTEGER
+                         }
+
+                hwRsvpTeSessionNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this session.  This is for  SNMP
+                                Indexing  purposes  only and has no relation to
+                                any protocol value."
+                        ::= { hwRsvpTeSessionEntry 1 }
+
+                
+                hwRsvpTeSessionType OBJECT-TYPE
+                        SYNTAX SessionType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The type of session (IP4, IP6, IP6  with  flow
+                                information, etc)."
+                        ::= { hwRsvpTeSessionEntry 2 }
+
+                
+                hwRsvpTeSessionDestAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The destination address used by all senders in
+                                this  session."
+                        ::= { hwRsvpTeSessionEntry 3 }
+
+                
+                hwRsvpTeSessionDestAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The CIDR prefix length of the session address,
+                                which  is  32  for  IP4  host and multicast ad-
+                                dresses, and 128 for IP6 addresses."
+                        ::= { hwRsvpTeSessionEntry 4 }
+
+                
+                hwRsvpTeSessionSenders OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of distinct senders currently known
+                                to be part of this session."
+                        ::= { hwRsvpTeSessionEntry 5 }
+
+                
+                hwRsvpTeSessionReceivers OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of reservations being requested  of
+                                this system for this session."
+                        ::= { hwRsvpTeSessionEntry 6 }
+
+                
+                hwRsvpTeSessionRequests OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of reservation requests this system
+                                is sending upstream for this session."
+                        ::= { hwRsvpTeSessionEntry 7 }
+
+                
+                hwRsvpTeSessionTunnelId OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 16-bit identifier used in the SESSION that remains 
+                                constant over the life of the tunnel."
+                        ::= { hwRsvpTeSessionEntry 8 }
+
+                
+                hwRsvpTeSessionTunnelExtId OBJECT-TYPE
+                SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An identifier used in the SESSION that remains
+                                constant over the life of the tunnel.  Normally
+                                the identifier is set to all zeros. Ingress nodes
+                                that wish to narrow the scope of a SESSION to the
+                                ingress-egress pair may place their IPv4 address
+                                here as a globally unique identifier. "
+                        ::= { hwRsvpTeSessionEntry 9 }
+
+                
+                hwRsvpTeSessionLspsNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of LSPs that belong to this session."
+                        ::= { hwRsvpTeSessionEntry 10 }
+
+                
+                hwRsvpTeSessionStyle OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                ff(10),
+                                wf(17),
+                                se(18)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An enumerable value to identify the treatment of 
+                                reservations for different senders within the 
+                                same session: WF 10001b, FF01010b, SE 10010b."
+                        ::= { hwRsvpTeSessionEntry 11 }
+
+                
+                hwRsvpTeSenderTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeSenderEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the  state  information
+                                displayed by senders in PATH messages."
+                        ::= { hwRsvpTeObjects 2 }
+
+                
+                hwRsvpTeSenderEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeSenderEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the  state  information
+                                displayed by a single sender's PATH message."
+                        INDEX { hwRsvpTeSessionNumber, hwRsvpTeSenderNumber }
+                        ::= { hwRsvpTeSenderTable 1 }
+
+                
+                HwRsvpTeSenderEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeSenderNumber
+                                        Gauge32,
+                                hwRsvpTeSenderType
+                                        SessionType,
+                                hwRsvpTeSenderDestAddr
+                                        OCTET STRING,
+                                hwRsvpTeSenderAddr
+                                        OCTET STRING,
+                                hwRsvpTeSenderDestAddrLength
+                                        Integer32,
+                                hwRsvpTeSenderAddrLength
+                                        Integer32,
+                                hwRsvpTeSenderHopAddr
+                                        OCTET STRING,
+                                hwRsvpTeSenderHopLih
+                                        Integer32,
+                                hwRsvpTeSenderInterface
+                                        Integer32,
+                                hwRsvpTeSenderTSpecRate
+                                        BitRate,
+                                hwRsvpTeSenderTSpecPeakRate
+                                        BitRate,
+                                hwRsvpTeSenderTSpecBurst
+                                        BurstSize,
+                                hwRsvpTeSenderTSpecMinTu
+                                        MessageSize,
+                                hwRsvpTeSenderTSpecMaxTu
+                                        MessageSize,
+                                hwRsvpTeSenderInterval
+                                        Integer32,
+                                hwRsvpTeSenderRsvpHop
+                                        TruthValue,
+                                hwRsvpTeSenderPolicy
+                                        OCTET STRING,
+                                hwRsvpTeSenderAdspecBreak
+                                        TruthValue,
+                                hwRsvpTeSenderAdspecHopCount
+                                        Integer32,
+                                hwRsvpTeSenderAdspecPathBw
+                                        BitRate,
+                                hwRsvpTeSenderAdspecMinLatency
+                                        Integer32,
+                                hwRsvpTeSenderAdspecMtu
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedSvc
+                                        TruthValue,
+                                hwRsvpTeSenderAdspecGuaranteedBreak
+                                        TruthValue,
+                                hwRsvpTeSenderAdspecGuaranteedCtot
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedDtot
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedCsum
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedDsum
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedHopCount
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedPathBw
+                                        BitRate,
+                                hwRsvpTeSenderAdspecGuaranteedMinLatency
+                                        Integer32,
+                                hwRsvpTeSenderAdspecGuaranteedMtu
+                                        Integer32,
+                                hwRsvpTeSenderAdspecCtrlLoadSvc
+                                        TruthValue,
+                                hwRsvpTeSenderAdspecCtrlLoadBreak
+                                        TruthValue,
+                                hwRsvpTeSenderAdspecCtrlLoadHopCount
+                                        Integer32,
+                                hwRsvpTeSenderAdspecCtrlLoadPathBw
+                                        BitRate,
+                                hwRsvpTeSenderAdspecCtrlLoadMinLatency
+                                        Integer32,
+                                hwRsvpTeSenderAdspecCtrlLoadMtu
+                                        Integer32,
+                                hwRsvpTeSenderTtl
+                                        Integer32,
+                                hwRsvpTeLspId
+                                        Integer32,
+                                hwRsvpTeSenderMsgIdSndFlag
+                                        Integer32,
+                                hwRsvpTeSenderMsgIdSndEpoch
+                                        Gauge32,
+                                hwRsvpTeSenderMsgIdSndNumber
+                                        Gauge32,
+                                hwRsvpTeSenderMsgIdRcvFlag
+                                        Integer32,
+                                hwRsvpTeSenderMsgIdRcvEpoch
+                                        Gauge32,
+                                hwRsvpTeSenderMsgIdRcvNumber
+                                        Gauge32,
+                                hwRsvpTeSenderClassType
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestCtype
+                                        INTEGER,
+                                hwRsvpTeSenderLabelRequestL3pid
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestAtmMinVpi
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestAtmMinVci
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestAtmMaxVpi
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestAtmMaxVci
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestFrMinDlci
+                                        Integer32,
+                                hwRsvpTeSenderLabelRequestFrMaxDlci
+                                        Integer32,
+                                hwRsvpTeSenderSessionAttrType
+                                        INTEGER,
+                                hwRsvpTeSenderSessionAttrSetupPrio
+                                        Integer32,
+                                hwRsvpTeSenderSessionAttrHoldPrio
+                                        Integer32,
+                                hwRsvpTeSenderSessionAttrFlag
+                                        Integer32,
+                                hwRsvpTeSenderSessionAttrName
+                                        OCTET STRING,
+                                hwRsvpTeSenderSessionAttrExcludeAny
+                                        Gauge32,
+                                hwRsvpTeSenderSessionAttrIncludeAny
+                                        Gauge32,
+                                hwRsvpTeSenderSessionAttrIncludeAll
+                                        Gauge32,
+                                hwRsvpTeSenderFrrSetupPrio
+                                        Integer32,
+                                hwRsvpTeSenderFrrHoldPrio
+                                        Integer32,
+                                hwRsvpTeSenderFrrHopLimit
+                                        Integer32,
+                                hwRsvpTeSenderFrrFlag
+                                        INTEGER,
+                                hwRsvpTeSenderFrrBandwidth
+                                        BitRate,
+                                hwRsvpTeSenderFrrExcludeAny
+                                        Gauge32,
+                                hwRsvpTeSenderFrrIncludeAny
+                                        Gauge32,
+                                hwRsvpTeSenderFrrIncludeAll
+                                        Gauge32,
+                                hwRsvpTeSenderFrrInuseFlag
+                                        INTEGER,
+                                hwRsvpTeSenderDiffServPsc
+                                        Integer32
+                         }
+
+                hwRsvpTeSenderNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this sender.  This is  for  SNMP
+                                Indexing  purposes  only and has no relation to
+                                any protocol value."
+                        ::= { hwRsvpTeSenderEntry 1 }
+
+                
+                hwRsvpTeSenderType OBJECT-TYPE
+                        SYNTAX SessionType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The type of session (IP4, IP6, IP6  with  flow
+                                information, etc)."
+                        ::= { hwRsvpTeSenderEntry 2 }
+
+                
+                hwRsvpTeSenderDestAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The destination address used by all senders in
+                                this  session."
+                        ::= { hwRsvpTeSenderEntry 3 }
+
+                
+                hwRsvpTeSenderAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The source address used by this sender in this
+                                session."
+                        ::= { hwRsvpTeSenderEntry 4 }
+
+                
+                hwRsvpTeSenderDestAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The length of the destination address in bits.
+                                This  is  the CIDR Prefix Length, which for IP4
+                                hosts and multicast addresses is 32 bits."
+                        ::= { hwRsvpTeSenderEntry 5 }
+
+                
+                hwRsvpTeSenderAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The length of the sender's  address  in  bits.
+                                This  is  the CIDR Prefix Length, which for IP4
+                                hosts and multicast addresses is 32 bits."
+                        ::= { hwRsvpTeSenderEntry 6 }
+
+                
+                hwRsvpTeSenderHopAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The address used  by  the  previous  RSVP  hop
+                                (which may be the original sender)."
+                        ::= { hwRsvpTeSenderEntry 7 }
+
+                
+                hwRsvpTeSenderHopLih OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Logical Interface Handle used by the  pre-
+                                vious  RSVP  hop  (which  may  be  the original
+                                sender)."
+                        ::= { hwRsvpTeSenderEntry 8 }
+
+                
+                hwRsvpTeSenderInterface OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The ifIndex value of the  interface  on  which
+                                this PATH message was most recently received."
+                        ::= { hwRsvpTeSenderEntry 9 }
+
+                
+                hwRsvpTeSenderTSpecRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Average Bit  Rate  of  the  sender's  data
+                                stream.   Within  a transmission burst, the ar-
+                                rival rate may be as fast  as  hwRsvpTeSenderTSpec-
+                                PeakRate  (if  supported by the service model);
+                                however, averaged across two or more burst  in-
+                                tervals,  the  rate  should not exceed hwRsvpTeSen-
+                                derTSpecRate.
+                                
+                                Note that this is a prediction, often based  on
+                                the  general  capability  of a type of codec or
+                                particular encoding; the measured average  rate
+                                may be significantly lower."
+                        ::= { hwRsvpTeSenderEntry 10 }
+
+                
+                hwRsvpTeSenderTSpecPeakRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Peak Bit Rate of the sender's data stream.
+                                Traffic  arrival is not expected to exceed this
+                                rate at any time, apart  from  the  effects  of
+                                jitter in the network.  If not specified in the
+                                TSpec, this returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 11 }
+
+                
+                hwRsvpTeSenderTSpecBurst OBJECT-TYPE
+                        SYNTAX BurstSize
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The size of the largest  burst  expected  from
+                                the sender at a time."
+                        ::= { hwRsvpTeSenderEntry 12 }
+
+                
+                hwRsvpTeSenderTSpecMinTu OBJECT-TYPE
+                        SYNTAX MessageSize
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The minimum message size for  this  flow.  The
+                                policing  algorithm will treat smaller messages
+                                as though they are this size."
+                        ::= { hwRsvpTeSenderEntry 13 }
+
+                
+                hwRsvpTeSenderTSpecMaxTu OBJECT-TYPE
+                        SYNTAX MessageSize
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The maximum message size for  this  flow.  The
+                                admission  algorithm  will  reject TSpecs whose
+                                Maximum Transmission Unit, plus  the  interface
+                                headers, exceed the interface MTU."
+                        ::= { hwRsvpTeSenderEntry 14 }
+
+                
+                hwRsvpTeSenderInterval OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The interval between refresh messages  as  ad-
+                                vertised by the previous hop."
+                        ::= { hwRsvpTeSenderEntry 15 }
+
+                
+                hwRsvpTeSenderRsvpHop OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the node believes that  the  previous
+                                IP  hop is an RSVP hop.  If FALSE, the node be-
+                                lieves that the previous IP hop may not  be  an
+                                RSVP hop."
+                        ::= { hwRsvpTeSenderEntry 16 }
+
+                
+                hwRsvpTeSenderPolicy OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..65532))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The contents of the policy  object,  displayed
+                                as an uninterpreted string of octets, including
+                                the object header.  In the absence of  such  an
+                                object, this should be of zero length."
+                        ::= { hwRsvpTeSenderEntry 17 }
+
+                
+                hwRsvpTeSenderAdspecBreak OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The global break bit general  characterization
+                                parameter  from  the ADSPEC.  If TRUE, at least
+                                one non-IS hop was detected in  the  path.   If
+                                FALSE, no non-IS hops were detected."
+                        ::= { hwRsvpTeSenderEntry 18 }
+
+                
+                hwRsvpTeSenderAdspecHopCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The hop count general characterization parame-
+                                ter  from  the  ADSPEC.   A  return  of zero or
+                                noSuchValue indicates one of the following con-
+                                ditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present"
+                        ::= { hwRsvpTeSenderEntry 19 }
+
+                
+                hwRsvpTeSenderAdspecPathBw OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The path bandwidth estimate general character-
+                                ization parameter from the ADSPEC.  A return of
+                                zero or noSuchValue indicates one of  the  fol-
+                                lowing conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present"
+                        ::= { hwRsvpTeSenderEntry 20 }
+
+                
+                hwRsvpTeSenderAdspecMinLatency OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The minimum path latency general characteriza-
+                                tion  parameter  from  the ADSPEC.  A return of
+                                zero or noSuchValue indicates one of  the  fol-
+                                lowing conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present"
+                        ::= { hwRsvpTeSenderEntry 21 }
+
+                
+                hwRsvpTeSenderAdspecMtu OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The composed Maximum Transmission Unit general
+                                characterization  parameter from the ADSPEC.  A
+                                return of zero or noSuchValue indicates one  of
+                                the following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present"
+                        ::= { hwRsvpTeSenderEntry 22 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedSvc OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the ADSPEC contains a Guaranteed Ser-
+                                vice  fragment.   If FALSE, the ADSPEC does not
+                                contain a Guaranteed Service fragment."
+                        ::= { hwRsvpTeSenderEntry 23 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedBreak OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the Guaranteed Service  fragment  has
+                                its  'break'  bit  set,  indicating that one or
+                                more nodes along the path do  not  support  the
+                                guaranteed  service.   If  FALSE,  and hwRsvpTe-
+                                SenderAdspecGuaranteedSvc is TRUE, the 'break' 
+                                bit is not set.
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, 
+                                this returns FALSE or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 24 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedCtot OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is   the  end-to-end  composed  value  for  the
+                                guaranteed service 'C' parameter.  A return  of
+                                zero  or  noSuchValue indicates one of the fol-
+                                lowing conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 25 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedDtot OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is   the  end-to-end  composed  value  for  the
+                                guaranteed service 'D' parameter.  A return  of
+                                zero  or  noSuchValue indicates one of the fol-
+                                lowing conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 26 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedCsum OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is  the  composed value for the guaranteed ser-
+                                vice 'C' parameter  since  the  last  reshaping
+                                point.   A  return of zero or noSuchValue indi-
+                                cates one of the following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 27 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedDsum OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is  the  composed value for the guaranteed ser-
+                                vice 'D' parameter  since  the  last  reshaping
+                                point.   A  return of zero or noSuchValue indi-
+                                cates one of the following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 28 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedHopCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is  the  service-specific  override  of the hop
+                                count general characterization  parameter  from
+                                the  ADSPEC.   A  return of zero or noSuchValue
+                                indicates one of the following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 29 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedPathBw OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is  the  service-specific  override of the path
+                                bandwidth  estimate  general   characterization
+                                parameter from the ADSPEC.  A return of zero or
+                                noSuchValue indicates one of the following con-
+                                ditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 30 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedMinLatency OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is the service-specific override of the minimum
+                                path latency general characterization parameter
+                                from  the  ADSPEC.  A return of zero or noSuch-
+                                Value indicates one  of  the  following  condi-
+                                tions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 31 }
+
+                
+                hwRsvpTeSenderAdspecGuaranteedMtu OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecGuaranteedSvc is TRUE, this
+                                is  the  service-specific  override of the com-
+                                posed Maximum Transmission Unit general charac-
+                                terization parameter from the ADSPEC.  A return
+                                of zero or noSuchValue  indicates  one  of  the
+                                following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecGuaranteedSvc is FALSE, this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 32 }
+
+                
+                hwRsvpTeSenderAdspecCtrlLoadSvc OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the ADSPEC contains a Controlled Load
+                                Service  fragment.   If  FALSE, the ADSPEC does
+                                not contain a  Controlled  Load  Service  frag-
+                                ment."
+                        ::= { hwRsvpTeSenderEntry 33 }
+
+                
+                hwRsvpTeSenderAdspecCtrlLoadBreak OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the Controlled Load Service  fragment
+                                has its 'break' bit set, indicating that one or
+                                more nodes along the path do  not  support  the
+                                controlled   load   service.    If  FALSE,  and
+                                hwRsvpTeSenderAdspecCtrlLoadSvc   is   TRUE,    the
+                                'break' bit is not set.
+                                
+                                If hwRsvpTeSenderAdspecCtrlLoadSvc is  FALSE,  this
+                                returns FALSE or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 34 }
+
+                
+                hwRsvpTeSenderAdspecCtrlLoadHopCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecCtrlLoadSvc is  TRUE,  this
+                                is  the  service-specific  override  of the hop
+                                count general characterization  parameter  from
+                                the  ADSPEC.   A  return of zero or noSuchValue
+                                indicates one of the following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecCtrlLoadSvc is  FALSE,  this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 35 }
+
+                
+                hwRsvpTeSenderAdspecCtrlLoadPathBw OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecCtrlLoadSvc is  TRUE,  this
+                                is  the  service-specific  override of the path
+                                bandwidth  estimate  general   characterization
+                                parameter from the ADSPEC.  A return of zero or
+                                noSuchValue indicates one of the following con-
+                                ditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecCtrlLoadSvc is  FALSE,  this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 36 }
+
+                
+                hwRsvpTeSenderAdspecCtrlLoadMinLatency OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecCtrlLoadSvc is  TRUE,  this
+                                is the service-specific override of the minimum
+                                path latency general characterization parameter
+                                from  the  ADSPEC.  A return of zero or noSuch-
+                                Value indicates one  of  the  following  condi-
+                                tions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecCtrlLoadSvc is  FALSE,  this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 37 }
+
+                
+                hwRsvpTeSenderAdspecCtrlLoadMtu OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeSenderAdspecCtrlLoadSvc is  TRUE,  this
+                                is  the  service-specific  override of the com-
+                                posed Maximum Transmission Unit general charac-
+                                terization parameter from the ADSPEC.  A return
+                                of zero or noSuchValue  indicates  one  of  the
+                                following conditions:
+                                
+                                   the invalid bit was set
+                                   the parameter was not present
+                                
+                                If hwRsvpTeSenderAdspecCtrlLoadSvc is  FALSE,  this
+                                returns zero or noSuchValue."
+                        ::= { hwRsvpTeSenderEntry 38 }
+
+                
+                hwRsvpTeSenderTtl OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The TTL value in the RSVP header that was last
+                                received."
+                        ::= { hwRsvpTeSenderEntry 39 }
+
+                
+                hwRsvpTeLspId OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 16-bit identifier used in the SENDER_TEMPLATE
+                                 and the FILTER_SPEC that can be changed to 
+                                allow a sender to share resources with itself."
+                        ::= { hwRsvpTeSenderEntry 40 }
+
+                
+                hwRsvpTeSenderMsgIdSndFlag OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Indicates that the message sender requests the 
+                                peer to send an acknowledgment for the message.
+                                (0x01: ACK desired.)"
+                        ::= { hwRsvpTeSenderEntry 41 }
+
+                
+                hwRsvpTeSenderMsgIdSndEpoch OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A value that indicates when the Message_Identi-
+                                fier sequence has been reset."
+                        ::= { hwRsvpTeSenderEntry 42 }
+
+                
+                hwRsvpTeSenderMsgIdSndNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "When combined with the message generator's IP 
+                                address, the Message_Identifier field uniquely 
+                                identifies a message.  The values placed in this
+                                 field change incrementally and only decrease 
+                                when the Epoch changes or when the value wraps.
+                                A return of 0 indicates the absence of the 
+                                MESSAGE_ID object to be sent."
+                        ::= { hwRsvpTeSenderEntry 43 }
+
+                
+                hwRsvpTeSenderMsgIdRcvFlag OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The message ID flag of the message latest received.
+                                It is used to identify whether ACK is desired or 
+                                not. And it can be extended. (0x01: ACK desired.)"
+                        ::= { hwRsvpTeSenderEntry 44 }
+
+                
+                hwRsvpTeSenderMsgIdRcvEpoch OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The message ID epoch of the message latest 
+                                received form the interface."
+                        ::= { hwRsvpTeSenderEntry 45 }
+
+                
+                hwRsvpTeSenderMsgIdRcvNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The message ID number of the message latest 
+                                received form the interface. A return of 0 
+                                indicates the absence of the MESSAGE_ID 
+                                object received."
+                        ::= { hwRsvpTeSenderEntry 46 }
+
+                
+                hwRsvpTeSenderClassType OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Indicates the class-type. A return of zero
+                                indicates the absence of the object."
+                        ::= { hwRsvpTeSenderEntry 47 }
+
+                
+                hwRsvpTeSenderLabelRequestCtype OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                withoutLabelRange(1),
+                                withAtmLabelRange(2),
+                                withFrameRelayLabelRange(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The type of label request (without label range,
+                                 with ATM label range, with frame relay label 
+                                range, etc)."
+                        ::= { hwRsvpTeSenderEntry 48 }
+
+                
+                hwRsvpTeSenderLabelRequestL3pid OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An identifier of the layer 3 protocol using 
+                                this path. Standard Ethertype values are used."
+                        ::= { hwRsvpTeSenderEntry 49 }
+
+                
+                hwRsvpTeSenderLabelRequestAtmMinVpi OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 12 bit field specifies the lower bound of 
+                                a block of Virtual Path Identifiers that is 
+                                supported on the originating switch.  If the VPI
+                                 is less than 12-bits it must be right justified
+                                 in this field and preceding bits must be set to
+                                 zero."
+                        ::= { hwRsvpTeSenderEntry 50 }
+
+                
+                hwRsvpTeSenderLabelRequestAtmMinVci OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 16 bit field specifies the lower bound of 
+                                a block of Virtual Connection Identifiers that 
+                                is supported on the originating switch.  If the
+                                 VCI is less than 16-bits it must be right 
+                                justified in this field and preceding bits must
+                                 be set to zero."
+                        ::= { hwRsvpTeSenderEntry 51 }
+
+                
+                hwRsvpTeSenderLabelRequestAtmMaxVpi OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 12 bit field specifies the upper bound of 
+                                a block of Virtual Path Identifiers that is 
+                                supported on the originating switch.  If the 
+                                VPI is less than 12-bits it must be right 
+                                justified in this field and preceding bits must 
+                                be set to zero."
+                        ::= { hwRsvpTeSenderEntry 52 }
+
+                
+                hwRsvpTeSenderLabelRequestAtmMaxVci OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 16 bit field specifies the upper bound of 
+                                a block of Virtual Connection Identifiers that 
+                                is supported on the originating switch.  If the
+                                 VCI is less than 16-bits it must be right 
+                                justified in this field and preceding bits must 
+                                be set to zero."
+                        ::= { hwRsvpTeSenderEntry 53 }
+
+                
+                hwRsvpTeSenderLabelRequestFrMinDlci OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 23-bit field specifies the lower bound of 
+                                a block of Data Link Connection Identifiers 
+                                (DLCIs) that is supported on the originating 
+                                switch.  The DLCI must be right justified in 
+                                this field and unused bits must be set to 0."
+                        ::= { hwRsvpTeSenderEntry 54 }
+
+                
+                hwRsvpTeSenderLabelRequestFrMaxDlci OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 23-bit field specifies the upper bound of 
+                                a block of Data Link Connection Identifiers 
+                                (DLCIs) that is supported on the originating 
+                                switch.  The DLCI must be right justified in 
+                                this field and unused bits must be set to 0."
+                        ::= { hwRsvpTeSenderEntry 55 }
+
+                
+                hwRsvpTeSenderSessionAttrType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                withRa(1),
+                                withoutRa(7)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The type of the session_attribute (without 
+                                resource affinities or with resource affinities)."
+                        ::= { hwRsvpTeSenderEntry 56 }
+
+                
+                hwRsvpTeSenderSessionAttrSetupPrio OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The priority of the session with respect to 
+                                taking resources, in the range of 0 to 7.  The 
+                                value 0 is the highest priority. The Setup 
+                                Priority is used in deciding whether this 
+                                session can preempt another session."
+                        DEFVAL { 7 }
+                        ::= { hwRsvpTeSenderEntry 57 }
+
+                
+                hwRsvpTeSenderSessionAttrHoldPrio OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The priority of the session with respect to 
+                                holding resources, in the range of 0 to 7.  The
+                                 value 0 is the highest priority. Holding 
+                                Priority is used in deciding whether this 
+                                session can be preempted by another session."
+                        DEFVAL { 7 }
+                        ::= { hwRsvpTeSenderEntry 58 }
+
+                
+                hwRsvpTeSenderSessionAttrFlag OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A mixed value. (0x01: Local protection desired;
+                                0x02: Label recording desired; 0x04: SE Style
+                                 desired; 0x08: bandwidth protection desired;
+                                0x10: node protection desired; 0x20: Path 
+                                re-evaluation request; 0x40: Soft preemption
+                                 desired)"
+                        ::= { hwRsvpTeSenderEntry 59 }
+
+                
+                hwRsvpTeSenderSessionAttrName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..64))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Session name, a null padded string of characters."
+                        ::= { hwRsvpTeSenderEntry 60 }
+
+                
+                hwRsvpTeSenderSessionAttrExcludeAny OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 32-bit vector representing a set of attribute
+                                 filters associated with a tunnel any of which 
+                                renders a link unacceptable."
+                        ::= { hwRsvpTeSenderEntry 61 }
+
+                
+                hwRsvpTeSenderSessionAttrIncludeAny OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 32-bit vector representing a set of attribute
+                                 filters associated with a tunnel any of which 
+                                renders a link acceptable (with respect to this
+                                 test).  A null set (all bits set to zero) 
+                                automatically passes."
+                        ::= { hwRsvpTeSenderEntry 62 }
+
+                
+                hwRsvpTeSenderSessionAttrIncludeAll OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 32-bit vector representing a set of attribute
+                                 filters associated with a tunnel all of which 
+                                must be present for a link to be acceptable 
+                                (with respect to this test).  A null set (all 
+                                bits set to zero) automatically passes."
+                        ::= { hwRsvpTeSenderEntry 63 }
+
+                
+                hwRsvpTeSenderFrrSetupPrio OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The priority of the backup path with respect to
+                                 taking resources, in the range 0 to 7.  The 
+                                value 0 is the highest priority.  Setup Priority
+                                 is used in deciding whether this session can 
+                                preempt another session.  See [RSVP-TE] for the 
+                                usage on priority."
+                        DEFVAL { 7 }
+                        ::= { hwRsvpTeSenderEntry 64 }
+
+                
+                hwRsvpTeSenderFrrHoldPrio OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The priority of the backup path with respect to
+                                 holding resources, in the range 0 to 7.  The 
+                                value 0 is the highest priority.  Holding 
+                                Priority is used in deciding whether this 
+                                session can be preempted by another session.  "
+                        DEFVAL { 7 }
+                        ::= { hwRsvpTeSenderEntry 65 }
+
+                
+                hwRsvpTeSenderFrrHopLimit OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The maximum number of extra hops the backup path
+                                 is allowed to take, from current node (a PLR) 
+                                to an MP, with PLR and MP excluded from the count.
+                                  For example, hop-limit of 0 means that only 
+                                direct links between PLR and MP can be considered."
+                        DEFVAL { 16 }
+                        ::= { hwRsvpTeSenderEntry 66 }
+
+                
+                hwRsvpTeSenderFrrFlag OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                oneToOneDesired(1),
+                                facilityDesired(2),
+                                noBackupDesired(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An enumerable value to indicate the protection
+                                 schema desired (0x01, One-to-One Backup Desired;
+                                 0x02, Facility Backup Desired; 0x03, No Backup 
+                                Desired)."
+                        ::= { hwRsvpTeSenderEntry 67 }
+
+                
+                hwRsvpTeSenderFrrBandwidth OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Bandwidth estimate; 32-bit IEEE floating point 
+                                integer, in bits per second."
+                        ::= { hwRsvpTeSenderEntry 68 }
+
+                
+                hwRsvpTeSenderFrrExcludeAny OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 32-bit vector representing a set of attribute
+                                 filters associated with a backup path, any of 
+                                which renders a link unacceptable."
+                        ::= { hwRsvpTeSenderEntry 69 }
+
+                
+                hwRsvpTeSenderFrrIncludeAny OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 32-bit vector representing a set of attribute
+                                 filters associated with a backup path, any of 
+                                which renders a link acceptable (with respect 
+                                to this test).  A null set (all bits set to zero)
+                                 automatically passes."
+                        ::= { hwRsvpTeSenderEntry 70 }
+
+                
+                hwRsvpTeSenderFrrIncludeAll OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 32-bit vector representing a set of attribute
+                                 filters associated with a backup path, all of 
+                                which must be present for a link to be 
+                                acceptable (with respect to this test).  A null
+                                 set (all bits set to zero) automatically passes."
+                        ::= { hwRsvpTeSenderEntry 71 }
+
+                
+                hwRsvpTeSenderFrrInuseFlag OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(1),
+                                plrInUse(2),
+                                mpInUse(3),
+                                plrAndMpInUse(4),
+                                underProtection(5)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An enumerable value to indicate the fast-reroute
+                                state of this sender (normal, PLR in use, MP in
+                                use, PLR in use and MP in use, under protection)."
+                        ::= { hwRsvpTeSenderEntry 72 }
+
+                
+                hwRsvpTeSenderDiffServPsc OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This 16 bits field indicates a PHB Scheduling 
+                                Class to be supported by the LSP."
+                        ::= { hwRsvpTeSenderEntry 73 }
+
+                
+                hwRsvpTeResvTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeResvEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the  state  information
+                                displayed by receivers in RESV messages."
+                        ::= { hwRsvpTeObjects 3 }
+
+                
+                hwRsvpTeResvEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeResvEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the  state  information
+                                displayed  by  a single receiver's RESV message
+                                concerning a single sender."
+                        INDEX { hwRsvpTeSessionNumber, hwRsvpTeResvNumber }
+                        ::= { hwRsvpTeResvTable 1 }
+
+                
+                HwRsvpTeResvEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeResvNumber
+                                        Gauge32,
+                                hwRsvpTeResvType
+                                        SessionType,
+                                hwRsvpTeResvDestAddr
+                                        OCTET STRING,
+                                hwRsvpTeResvSenderAddr
+                                        OCTET STRING,
+                                hwRsvpTeResvDestAddrLength
+                                        Integer32,
+                                hwRsvpTeResvSenderAddrLength
+                                        Integer32,
+                                hwRsvpTeResvHopAddr
+                                        OCTET STRING,
+                                hwRsvpTeResvHopLih
+                                        Integer32,
+                                hwRsvpTeResvInterface
+                                        Integer32,
+                                hwRsvpTeResvService
+                                        QosService,
+                                hwRsvpTeResvTSpecRate
+                                        BitRate,
+                                hwRsvpTeResvTSpecPeakRate
+                                        BitRate,
+                                hwRsvpTeResvTSpecBurst
+                                        BurstSize,
+                                hwRsvpTeResvTSpecMinTu
+                                        MessageSize,
+                                hwRsvpTeResvTSpecMaxTu
+                                        MessageSize,
+                                hwRsvpTeResvRSpecRate
+                                        BitRate,
+                                hwRsvpTeResvRSpecSlack
+                                        Integer32,
+                                hwRsvpTeResvInterval
+                                        Integer32,
+                                hwRsvpTeResvScope
+                                        OCTET STRING,
+                                hwRsvpTeResvShared
+                                        TruthValue,
+                                hwRsvpTeResvExplicit
+                                        TruthValue,
+                                hwRsvpTeResvRsvpHop
+                                        TruthValue,
+                                hwRsvpTeResvPolicy
+                                        OCTET STRING,
+                                hwRsvpTeResvTtl
+                                        Integer32,
+                                hwRsvpTeResvConfirm
+                                        OCTET STRING
+                         }
+
+                hwRsvpTeResvNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this reservation request.   This
+                                is  for  SNMP Indexing purposes only and has no
+                                relation to any protocol value."
+                        ::= { hwRsvpTeResvEntry 1 }
+
+                
+                hwRsvpTeResvType OBJECT-TYPE
+                        SYNTAX SessionType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The type of session (IP4, IP6, IP6  with  flow
+                                information, etc)."
+                        ::= { hwRsvpTeResvEntry 2 }
+
+                
+                hwRsvpTeResvDestAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The destination address used by all senders in
+                                this  session."
+                        ::= { hwRsvpTeResvEntry 3 }
+
+                
+                hwRsvpTeResvSenderAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The source address of the sender  selected  by
+                                this  reservation.  The value of all zeroes in-
+                                dicates 'all senders'."
+                        ::= { hwRsvpTeResvEntry 4 }
+
+                
+                hwRsvpTeResvDestAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The length of the destination address in bits.
+                                This  is  the CIDR Prefix Length, which for IP4
+                                hosts and multicast addresses is 32 bits."
+                        ::= { hwRsvpTeResvEntry 5 }
+
+                
+                hwRsvpTeResvSenderAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The length of the sender's  address  in  bits.
+                                This  is  the CIDR Prefix Length, which for IP4
+                                hosts and multicast addresses is 32 bits."
+                        ::= { hwRsvpTeResvEntry 6 }
+
+                
+                hwRsvpTeResvHopAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The address used by the next RSVP  hop  (which
+                                may be the ultimate receiver)."
+                        ::= { hwRsvpTeResvEntry 7 }
+
+                
+                hwRsvpTeResvHopLih OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Logical Interface Handle received from the
+                                previous  RSVP  hop  (which may be the ultimate
+                                receiver)."
+                        ::= { hwRsvpTeResvEntry 8 }
+
+                
+                hwRsvpTeResvInterface OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The ifIndex value of the  interface  on  which
+                                this RESV message was most recently received."
+                        ::= { hwRsvpTeResvEntry 9 }
+
+                
+                hwRsvpTeResvService OBJECT-TYPE
+                        SYNTAX QosService
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The QoS Service  classification  requested  by
+                                the receiver."
+                        ::= { hwRsvpTeResvEntry 10 }
+
+                
+                hwRsvpTeResvTSpecRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Average Bit  Rate  of  the  sender's  data
+                                stream.   Within  a transmission burst, the ar-
+                                rival rate may be  as  fast  as  hwRsvpTeResvTSpec-
+                                PeakRate  (if  supported by the service model);
+                                however, averaged across two or more burst  in-
+                                tervals,    the    rate   should   not   exceed
+                                hwRsvpTeResvTSpecRate.
+                                
+                                Note that this is a prediction, often based  on
+                                the  general  capability  of a type of codec or
+                                particular encoding; the measured average  rate
+                                may be significantly lower."
+                        ::= { hwRsvpTeResvEntry 11 }
+
+                
+                hwRsvpTeResvTSpecPeakRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Peak Bit Rate of the sender's data stream.
+                                Traffic  arrival is not expected to exceed this
+                                rate at any time, apart  from  the  effects  of
+                                jitter in the network.  If not specified in the
+                                TSpec, this returns zero or noSuchValue."
+                        ::= { hwRsvpTeResvEntry 12 }
+
+                
+                hwRsvpTeResvTSpecBurst OBJECT-TYPE
+                        SYNTAX BurstSize
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The size of the largest  burst  expected  from
+                                the sender at a time.
+                                
+                                If this is less than  the  sender's  advertised
+                                burst  size, the receiver is asking the network
+                                to provide flow pacing  beyond  what  would  be
+                                provided  under normal circumstances. Such pac-
+                                ing is at the network's option."
+                        ::= { hwRsvpTeResvEntry 13 }
+
+                
+                hwRsvpTeResvTSpecMinTu OBJECT-TYPE
+                        SYNTAX MessageSize
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The minimum message size for  this  flow.  The
+                                policing  algorithm will treat smaller messages
+                                as though they are this size."
+                        ::= { hwRsvpTeResvEntry 14 }
+
+                
+                hwRsvpTeResvTSpecMaxTu OBJECT-TYPE
+                        SYNTAX MessageSize
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The maximum message size for  this  flow.  The
+                                admission  algorithm  will  reject TSpecs whose
+                                Maximum Transmission Unit, plus  the  interface
+                                headers, exceed the interface MTU."
+                        ::= { hwRsvpTeResvEntry 15 }
+
+                
+                hwRsvpTeResvRSpecRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If the requested  service  is  guaranteed,  as
+                                specified   by  hwRsvpTeResvService,  this  is  the
+                                clearing rate that is being requested.   Other-
+                                wise,  it  is  zero,  or  the  agent may return
+                                noSuchValue."
+                        ::= { hwRsvpTeResvEntry 16 }
+
+                
+                hwRsvpTeResvRSpecSlack OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If the requested  service  is  guaranteed,  as
+                                specified by hwRsvpTeResvService, this is the delay
+                                slack.  Otherwise, it is zero, or the agent may
+                                return noSuchValue."
+                        ::= { hwRsvpTeResvEntry 17 }
+
+                
+                hwRsvpTeResvInterval OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The interval between refresh messages  as  ad-
+                                vertised by the Next Hop."
+                        ::= { hwRsvpTeResvEntry 18 }
+
+                
+                hwRsvpTeResvScope OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The contents of the scope object, displayed as
+                                an  uninterpreted  string  of octets, including
+                                the object header.  In the absence of  such  an
+                                object, this should be of zero length.
+                                
+                                If the length  is  non-zero,  this  contains  a
+                                series of IP4 or IP6 addresses."
+                        ::= { hwRsvpTeResvEntry 19 }
+
+                
+                hwRsvpTeResvShared OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, a reservation shared among senders is
+                                requested.  If FALSE, a reservation specific to
+                                this sender is requested."
+                        ::= { hwRsvpTeResvEntry 20 }
+
+                
+                hwRsvpTeResvExplicit OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, individual senders are  listed  using
+                                Filter  Specifications.   If FALSE, all senders
+                                are implicitly selected.  The Scope Object will
+                                contain  a list of senders that need to receive
+                                this reservation request  for  the  purpose  of
+                                routing the RESV message."
+                        ::= { hwRsvpTeResvEntry 21 }
+
+                
+                hwRsvpTeResvRsvpHop OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the node believes that  the  previous
+                                IP  hop is an RSVP hop.  If FALSE, the node be-
+                                lieves that the previous IP hop may not  be  an
+                                RSVP hop."
+                        ::= { hwRsvpTeResvEntry 22 }
+
+                
+                hwRsvpTeResvPolicy OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The contents of the policy  object,  displayed
+                                as an uninterpreted string of octets, including
+                                the object header.  In the absence of  such  an
+                                object, this should be of zero length."
+                        ::= { hwRsvpTeResvEntry 23 }
+
+                
+                hwRsvpTeResvTtl OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The TTL value in the RSVP header that was last
+                                received."
+                        ::= { hwRsvpTeResvEntry 24 }
+
+                
+                hwRsvpTeResvConfirm OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Receiver's address."
+                        ::= { hwRsvpTeResvEntry 25 }
+
+                
+                hwRsvpTeResvFwdTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeResvFwdEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the  state  information
+                                displayed upstream in RESV messages."
+                        ::= { hwRsvpTeObjects 4 }
+
+                
+                hwRsvpTeResvFwdEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeResvFwdEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the  state  information
+                                displayed  upstream in an RESV message concern-
+                                ing a single sender."
+                        INDEX { hwRsvpTeSessionNumber, hwRsvpTeResvFwdNumber }
+                        ::= { hwRsvpTeResvFwdTable 1 }
+
+                
+                HwRsvpTeResvFwdEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeResvFwdNumber
+                                        Gauge32,
+                                hwRsvpTeResvFwdType
+                                        SessionType,
+                                hwRsvpTeResvFwdDestAddr
+                                        OCTET STRING,
+                                hwRsvpTeResvFwdSenderAddr
+                                        OCTET STRING,
+                                hwRsvpTeResvFwdDestAddrLength
+                                        Integer32,
+                                hwRsvpTeResvFwdSenderAddrLength
+                                        Integer32,
+                                hwRsvpTeResvFwdHopAddr
+                                        OCTET STRING,
+                                hwRsvpTeResvFwdHopLih
+                                        Integer32,
+                                hwRsvpTeResvFwdInterface
+                                        Integer32,
+                                hwRsvpTeResvFwdService
+                                        QosService,
+                                hwRsvpTeResvFwdTSpecRate
+                                        BitRate,
+                                hwRsvpTeResvFwdTSpecPeakRate
+                                        BitRate,
+                                hwRsvpTeResvFwdTSpecBurst
+                                        BurstSize,
+                                hwRsvpTeResvFwdTSpecMinTu
+                                        MessageSize,
+                                hwRsvpTeResvFwdTSpecMaxTu
+                                        MessageSize,
+                                hwRsvpTeResvFwdRSpecRate
+                                        BitRate,
+                                hwRsvpTeResvFwdRSpecSlack
+                                        Integer32,
+                                hwRsvpTeResvFwdInterval
+                                        Integer32,
+                                hwRsvpTeResvFwdScope
+                                        OCTET STRING,
+                                hwRsvpTeResvFwdShared
+                                        TruthValue,
+                                hwRsvpTeResvFwdExplicit
+                                        TruthValue,
+                                hwRsvpTeResvFwdRsvpHop
+                                        TruthValue,
+                                hwRsvpTeResvFwdPolicy
+                                        OCTET STRING,
+                                hwRsvpTeResvFwdTtl
+                                        Integer32,
+                                hwRsvpTeResvFwdMsgIdFlag
+                                        Integer32,
+                                hwRsvpTeResvFwdMsgIdEpoch
+                                        Gauge32,
+                                hwRsvpTeResvFwdMsgIdNumber
+                                        Gauge32
+                         }
+
+                hwRsvpTeResvFwdNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this reservation request.   This
+                                is  for  SNMP Indexing purposes only and has no
+                                relation to any protocol value."
+                        ::= { hwRsvpTeResvFwdEntry 1 }
+
+                
+                hwRsvpTeResvFwdType OBJECT-TYPE
+                        SYNTAX SessionType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The type of session (IP4, IP6, IP6  with  flow
+                                information, etc)."
+                        ::= { hwRsvpTeResvFwdEntry 2 }
+
+                
+                hwRsvpTeResvFwdDestAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The destination address used by all senders in
+                                this  session."
+                        ::= { hwRsvpTeResvFwdEntry 3 }
+
+                
+                hwRsvpTeResvFwdSenderAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The source address of the sender  selected  by
+                                this  reservation.  The value of all zeroes in-
+                                dicates 'all senders'."
+                        ::= { hwRsvpTeResvFwdEntry 4 }
+
+                
+                hwRsvpTeResvFwdDestAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The length of the destination address in bits.
+                                This  is  the CIDR Prefix Length, which for IP4
+                                hosts and multicast addresses is 32 bits."
+                        ::= { hwRsvpTeResvFwdEntry 5 }
+
+                
+                hwRsvpTeResvFwdSenderAddrLength OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The length of the sender's  address  in  bits.
+                                This  is  the CIDR Prefix Length, which for IP4
+                                hosts and multicast addresses is 32 bits."
+                        ::= { hwRsvpTeResvFwdEntry 6 }
+
+                
+                hwRsvpTeResvFwdHopAddr OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The address of the (previous) RSVP  that  will
+                                receive this message."
+                        ::= { hwRsvpTeResvFwdEntry 7 }
+
+                
+                hwRsvpTeResvFwdHopLih OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Logical Interface Handle sent to the (pre-
+                                vious) RSVP that will receive this message."
+                        ::= { hwRsvpTeResvFwdEntry 8 }
+
+                
+                hwRsvpTeResvFwdInterface OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The ifIndex value of the  interface  on  which
+                                this RESV message was most recently sent."
+                        ::= { hwRsvpTeResvFwdEntry 9 }
+
+                
+                hwRsvpTeResvFwdService OBJECT-TYPE
+                        SYNTAX QosService
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The QoS Service classification requested."
+                        ::= { hwRsvpTeResvFwdEntry 10 }
+
+                
+                hwRsvpTeResvFwdTSpecRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Average Bit  Rate  of  the  sender's  data
+                                stream.   Within  a transmission burst, the ar-
+                                rival rate may be as fast as  hwRsvpTeResvFwdT-
+                                SpecPeakRate  (if  supported by the service 
+                                model);however, averaged across two or more 
+                                burst  intervals,    the    rate   should   not
+                                exceed hwRsvpTeResvFwdTSpecRate.
+                                
+                                Note that this is a prediction, often based  on
+                                the  general  capability  of a type of codec or
+                                particular encoding; the measured average  rate
+                                may be significantly lower."
+                        ::= { hwRsvpTeResvFwdEntry 11 }
+
+                
+                hwRsvpTeResvFwdTSpecPeakRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bits per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Peak Bit Rate of the sender's data  stream
+                                Traffic  arrival is not expected to exceed this
+                                rate at any time, apart  from  the  effects  of
+                                jitter in the network.  If not specified in the
+                                TSpec, this returns zero or noSuchValue."
+                        ::= { hwRsvpTeResvFwdEntry 12 }
+
+                
+                hwRsvpTeResvFwdTSpecBurst OBJECT-TYPE
+                        SYNTAX BurstSize
+                        UNITS "bytes"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The size of the largest  burst  expected  from
+                                the sender at a time.
+                                
+                                If this is less than  the  sender's  advertised
+                                burst  size, the receiver is asking the network
+                                to provide flow pacing  beyond  what  would  be
+                                provided  under normal circumstances. Such pac-
+                                ing is at the network's option."
+                        ::= { hwRsvpTeResvFwdEntry 13 }
+
+                
+                hwRsvpTeResvFwdTSpecMinTu OBJECT-TYPE
+                        SYNTAX MessageSize
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The minimum message size for  this  flow.  The
+                                policing  algorithm will treat smaller messages
+                                as though they are this size."
+                        ::= { hwRsvpTeResvFwdEntry 14 }
+
+                
+                hwRsvpTeResvFwdTSpecMaxTu OBJECT-TYPE
+                        SYNTAX MessageSize
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The maximum message size for  this  flow.  The
+                                admission  algorithm  will  reject TSpecs whose
+                                Maximum Transmission Unit, plus  the  interface
+                                headers, exceed the interface MTU."
+                        ::= { hwRsvpTeResvFwdEntry 15 }
+
+                
+                hwRsvpTeResvFwdRSpecRate OBJECT-TYPE
+                        SYNTAX BitRate
+                        UNITS "bytes per second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If the requested  service  is  Guaranteed,  as
+                                specified   by  hwRsvpTeResvService,  this  is  the
+                                clearing rate that is being requested.   Other-
+                                wise,  it  is  zero,  or  the  agent may return
+                                noSuchValue."
+                        ::= { hwRsvpTeResvFwdEntry 16 }
+
+                
+                hwRsvpTeResvFwdRSpecSlack OBJECT-TYPE
+                        SYNTAX Integer32
+                        UNITS "microseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If the requested  service  is  Guaranteed,  as
+                                specified by hwRsvpTeResvService, this is the delay
+                                slack.  Otherwise, it is zero, or the agent may
+                                return noSuchValue."
+                        ::= { hwRsvpTeResvFwdEntry 17 }
+
+                
+                hwRsvpTeResvFwdInterval OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The interval between refresh  messages  adver-
+                                tised to the Previous Hop."
+                        ::= { hwRsvpTeResvFwdEntry 18 }
+
+                
+                hwRsvpTeResvFwdScope OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The contents of the scope object, displayed as
+                                an  uninterpreted  string  of octets, including
+                                the object header.  In the absence of  such  an
+                                object, this should be of zero length."
+                        ::= { hwRsvpTeResvFwdEntry 19 }
+
+                
+                hwRsvpTeResvFwdShared OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, a reservation shared among senders is
+                                requested.  If FALSE, a reservation specific to
+                                this sender is requested."
+                        ::= { hwRsvpTeResvFwdEntry 20 }
+
+                
+                hwRsvpTeResvFwdExplicit OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, individual senders are  listed  using
+                                Filter  Specifications.   If FALSE, all senders
+                                are implicitly selected.  The Scope Object will
+                                contain  a list of senders that need to receive
+                                this reservation request  for  the  purpose  of
+                                routing the RESV message."
+                        ::= { hwRsvpTeResvFwdEntry 21 }
+
+                
+                hwRsvpTeResvFwdRsvpHop OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, the node believes that  the  next  IP
+                                hop  is  an  RSVP  hop.  If FALSE, the node be-
+                                lieves that the next IP hop may not be an  RSVP
+                                hop."
+                        ::= { hwRsvpTeResvFwdEntry 22 }
+
+                
+                hwRsvpTeResvFwdPolicy OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The contents of the policy  object,  displayed
+                                as an uninterpreted string of octets, including
+                                the object header.  In the absence of  such  an
+                                object, this should be of zero length."
+                        ::= { hwRsvpTeResvFwdEntry 23 }
+
+                
+                hwRsvpTeResvFwdTtl OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The TTL value in the RSVP header that was last
+                                received."
+                        ::= { hwRsvpTeResvFwdEntry 24 }
+
+                
+                hwRsvpTeResvFwdMsgIdFlag OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Indicates that the message sender requests the 
+                                peer to send an acknowledgment for the message.
+                                 (0x01: ACK desired.)"
+                        ::= { hwRsvpTeResvFwdEntry 25 }
+
+                
+                hwRsvpTeResvFwdMsgIdEpoch OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A value that indicates when the Message_Identi-
+                                fier sequence has been reset."
+                        ::= { hwRsvpTeResvFwdEntry 26 }
+
+                
+                hwRsvpTeResvFwdMsgIdNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "When combined with the message generator's IP 
+                                address, the Message_Identifier field uniquely 
+                                identifies a message.  The values placed in this
+                                 field change incrementally and only decrease 
+                                when the epoch changes or when the value wraps.
+                                A return of 0 indicates the absence of the 
+                                MESSAGE_ID object."
+                        ::= { hwRsvpTeResvFwdEntry 27 }
+
+                
+--       The RSVP Interface Attributes Database contains the
+-- RSVP-specific information for an interface. Information
+-- that is shared with other reservation procedures such
+-- as ST-II is in the Integrated Interface Attributes
+-- Database.
+                hwRsvpTeIfTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeIfEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The RSVP-specific attributes of  the  system's
+                                interfaces."
+                        ::= { hwRsvpTeObjects 5 }
+
+                
+                hwRsvpTeIfEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeIfEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The RSVP-specific attributes of  the  a  given
+                                interface."
+                        INDEX { ifIndex }
+                        ::= { hwRsvpTeIfTable 1 }
+
+                
+                HwRsvpTeIfEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeIfUdpNbrs
+                                        Gauge32,
+                                hwRsvpTeIfIpNbrs
+                                        Gauge32,
+                                hwRsvpTeIfNbrs
+                                        Gauge32,
+                                hwRsvpTeIfRefreshBlockadeMultiple
+                                        Integer32,
+                                hwRsvpTeIfRefreshMultiple
+                                        Integer32,
+                                hwRsvpTeIfTtl
+                                        Integer32,
+                                hwRsvpTeIfRefreshInterval
+                                        TimeInterval,
+                                hwRsvpTeIfRouteDelay
+                                        TimeInterval,
+                                hwRsvpTeIfEnabled
+                                        TruthValue,
+                                hwRsvpTeIfUdpRequired
+                                        TruthValue,
+                                hwRsvpTeIfStatus
+                                        RowStatus,
+                                hwRsvpTeIfHelloEnabled
+                                        TruthValue,
+                                hwRsvpTeIfSrefreshEnabled
+                                        TruthValue,
+                                hwRsvpTeIfSrefreshInterval
+                                        TimeInterval,
+                                hwRsvpTeIfRetranIncDelta
+                                        Integer32,
+                                hwRsvpTeIfRetranInterval
+                                        TimeInterval,
+                                hwRsvpTeIfAuthEnabled
+                                        TruthValue,
+                                hwRsvpTeIfAuthEncrypted 
+                                        TruthValue,
+                                hwRsvpTeIfAuthHandshake
+                                        TruthValue,
+                                hwRsvpTeIfAuthLifeTime
+                                        TimeInterval,
+                                hwRsvpTeIfAuthKey
+                                        OCTET STRING,
+                                hwRsvpTeIfWindowSize
+                                        Integer32
+                         }
+
+                hwRsvpTeIfUdpNbrs OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of neighbors perceived to be  using
+                                only the RSVP UDP Encapsulation."
+                        ::= { hwRsvpTeIfEntry 1 }
+
+                
+                hwRsvpTeIfIpNbrs OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of neighbors perceived to be  using
+                                only the RSVP IP Encapsulation."
+                        ::= { hwRsvpTeIfEntry 2 }
+
+                
+                hwRsvpTeIfNbrs OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of neighbors  currently  perceived;
+                                this  will  exceed hwRsvpTeIfIpNbrs + hwRsvpTeIfUdpNbrs
+                                by the number of neighbors using both  encapsu-
+                                lations."
+                        ::= { hwRsvpTeIfEntry 3 }
+
+                
+                hwRsvpTeIfRefreshBlockadeMultiple OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the RSVP value 'Kb', Which is the
+                                minimum   number   of  refresh  intervals  that
+                                blockade state will last once entered."
+                        ::= { hwRsvpTeIfEntry 4 }
+
+                
+                hwRsvpTeIfRefreshMultiple OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the RSVP value 'K', which is  the
+                                number  of  refresh intervals which must elapse
+                                (minimum) before a PATH or RESV  message  which
+                                is not being refreshed will be aged out."
+                        ::= { hwRsvpTeIfEntry 5 }
+
+                
+--  which is to say, no override
+                hwRsvpTeIfTtl OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of SEND_TTL used on  this  interface
+                                for  messages  this node originates.  If set to
+                                zero, the node determines  the  TTL  via  other
+                                means."
+                        ::= { hwRsvpTeIfEntry 6 }
+
+                
+--  30 seconds
+                hwRsvpTeIfRefreshInterval OBJECT-TYPE
+                        SYNTAX TimeInterval
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the RSVP value 'R', which is  the
+                                minimum period between refresh transmissions of
+                                a given PATH or RESV message on an interface."
+                        DEFVAL { 30000 }
+                        ::= { hwRsvpTeIfEntry 7 }
+
+                
+--  2 seconds
+                hwRsvpTeIfRouteDelay OBJECT-TYPE
+                        SYNTAX TimeInterval
+                        UNITS "hundredths of a second"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The approximate period from the time  a  route
+                                is  changed to the time a resulting message ap-
+                                pears on the interface."
+                        DEFVAL { 200 }
+                        ::= { hwRsvpTeIfEntry 8 }
+
+                
+                hwRsvpTeIfEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Its value is always TRUE, if RSVP is enabled  
+                                on this Interface."
+                        ::= { hwRsvpTeIfEntry 9 }
+
+                
+                hwRsvpTeIfUdpRequired OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, manual configuration forces  the  use
+                                of  UDP  encapsulation  on  the  interface.  If
+                                FALSE, UDP encapsulation is only used if hwRsvpTeI-
+                                fUdpNbrs is not zero."
+                        ::= { hwRsvpTeIfEntry 10 }
+
+                
+                hwRsvpTeIfStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "'active' on interfaces that are configured for
+                                RSVP."
+                        ::= { hwRsvpTeIfEntry 11 }
+
+                
+                hwRsvpTeIfHelloEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, RSVPTE hello is enabled on this 
+                                Interface.  If  FALSE, RSVPTE hello is not
+                                enabled on this interface"
+                        ::= { hwRsvpTeIfEntry 12 }
+
+                
+                hwRsvpTeIfSrefreshEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, srefresh is enabled on this interface.
+                                 If FALSE, srefresh  is not enabled on this 
+                                interface."
+                        ::= { hwRsvpTeIfEntry 13 }
+
+                
+                hwRsvpTeIfSrefreshInterval OBJECT-TYPE
+                        SYNTAX TimeInterval
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The srefresh interval. I.e. time difference 
+                                between 2 refreshes."
+                        DEFVAL { 30000 }
+                        ::= { hwRsvpTeIfEntry 14 }
+
+                
+                hwRsvpTeIfRetranIncDelta OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Delta governs the speed with which the sender 
+                                increases the retransmission interval.  The 
+                                ratio of two successive retransmission intervals
+                                 is (1 + Delta)."
+                        ::= { hwRsvpTeIfEntry 15 }
+
+                
+                hwRsvpTeIfRetranInterval OBJECT-TYPE
+                        SYNTAX TimeInterval
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The retransmission interval."
+                        DEFVAL { 500 }
+                        ::= { hwRsvpTeIfEntry 16 }
+
+                
+                hwRsvpTeIfAuthEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, authentication is enabled on this 
+                                interface. If FALSE, authentication is not 
+                                enabled on this interface."
+                        ::= { hwRsvpTeIfEntry 17 }
+
+                
+                hwRsvpTeIfAuthEncrypted  OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This states that authentication key is encrypted
+                                 or not."
+                        ::= { hwRsvpTeIfEntry 18 }
+
+                
+                hwRsvpTeIfAuthHandshake OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Handshaking is enabled authentications."
+                        ::= { hwRsvpTeIfEntry 19 }
+
+                
+                hwRsvpTeIfAuthLifeTime OBJECT-TYPE
+                        SYNTAX TimeInterval
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Authentication life time."
+                        DEFVAL { 1800000 }
+                        ::= { hwRsvpTeIfEntry 20 }
+
+                
+                hwRsvpTeIfAuthKey OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..64))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Authentication key, used for authentication 
+                                processing. "
+                        ::= { hwRsvpTeIfEntry 21 }
+
+                
+                hwRsvpTeIfWindowSize OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Administrators can specify a message window 
+                                corresponding to the worst case reordering 
+                                behavior.  For example, one might specify that 
+                                packets reordered within a 32 message window 
+                                would be accepted.  If no reordering can occur, 
+                                the window is set to one. The maximum value is 
+                                64."
+                        DEFVAL { 1 }
+                        ::= { hwRsvpTeIfEntry 22 }
+
+                
+--       The RSVP Neighbor Database lists the neighbors the RSVP
+-- process currently is receiving messages from.
+                hwRsvpTeNbrTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeNbrEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing  the  Neighbors  of  an
+                                RSVP system."
+                        ::= { hwRsvpTeObjects 6 }
+
+                
+                hwRsvpTeNbrEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeNbrEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing a  single  RSVP  Neigh-
+                                bor."
+                        INDEX { ifIndex, hwRsvpTeNbrAddress }
+                        ::= { hwRsvpTeNbrTable 1 }
+
+                
+                HwRsvpTeNbrEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeNbrAddress
+                                        OCTET STRING,
+                                hwRsvpTeNbrProtocol
+                                        INTEGER,
+                                hwRsvpTeNbrStatus
+                                        RowStatus,
+                                hwRsvpTeNbrSendersNumber
+                                        Gauge32,
+                                hwRsvpTeNbrReceiversNumber
+                                        Gauge32,
+                                hwRsvpTeNbrHelloEnabled
+                                        TruthValue,
+                                hwRsvpTeNbrHelloSrcInstance
+                                        Gauge32,
+                                hwRsvpTeNbrHelloDstInstance
+                                        Gauge32,
+                                hwRsvpTeNbrHelloLostCounter
+                                        Gauge32,
+                                hwRsvpTeNbrHelloType
+                                        INTEGER,
+                                hwRsvpTeNbrGrCapability
+                                        Integer32,
+                                hwRsvpTeNbrGrRestartTime
+                                        TimeStamp,
+                                hwRsvpTeNbrGrRecoveryTime
+                                        TimeStamp,
+                                hwRsvpTeNbrGrStatus
+                                        INTEGER,
+                                hwRsvpTeNbrAuthKeyId
+                                        OCTET STRING,
+                                hwRsvpTeNbrReductionEnabled
+                                        TruthValue,
+                                hwRsvpTeNbrReliabilityEnabled
+                                        TruthValue
+                         }
+
+                hwRsvpTeNbrAddress OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The IP4 or IP6 Address used by this  neighbor.
+                                This  object  may not be changed when the value
+                                of the RowStatus object is 'active'."
+                        ::= { hwRsvpTeNbrEntry 1 }
+
+                
+                hwRsvpTeNbrProtocol OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                ip(1),
+                                udp(2),
+                                both(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The encapsulation being used  by  this  neigh-
+                                bor."
+                        ::= { hwRsvpTeNbrEntry 2 }
+
+                
+                hwRsvpTeNbrStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "'active' for all neighbors.  This  object  may
+                                be  used  to configure neighbors.  In the pres-
+                                ence of configured neighbors,  the  implementa-
+                                tion may (but is not required to) limit the set
+                                of valid neighbors to those configured."
+                        ::= { hwRsvpTeNbrEntry 3 }
+
+                
+                hwRsvpTeNbrSendersNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of senders on the neighbor."
+                        ::= { hwRsvpTeNbrEntry 4 }
+
+                
+                hwRsvpTeNbrReceiversNumber OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of receivers on the neighbor."
+                        ::= { hwRsvpTeNbrEntry 5 }
+
+                
+                hwRsvpTeNbrHelloEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE, hello is enabled on the neighbor."
+                        ::= { hwRsvpTeNbrEntry 6 }
+
+                
+                hwRsvpTeNbrHelloSrcInstance OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Source instance of the neighbor."
+                        ::= { hwRsvpTeNbrEntry 7 }
+
+                
+                hwRsvpTeNbrHelloDstInstance OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Destination instance of the neighbor."
+                        ::= { hwRsvpTeNbrEntry 8 }
+
+                
+                hwRsvpTeNbrHelloLostCounter OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of times the hello messages have been
+                                 sent to the neighbor for which hello ACK has 
+                                not received yet."
+                        ::= { hwRsvpTeNbrEntry 9 }
+
+                
+                hwRsvpTeNbrHelloType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                request(1),
+                                ack(2),
+                                none(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Hello type that is being  sent to the neighbor.
+                                A  return of 3[none] indicates that hello is
+                                disabled on the nbr."
+                        ::= { hwRsvpTeNbrEntry 10 }
+
+                
+                hwRsvpTeNbrGrCapability OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Gives neighbor capability to support GR or 
+                                undergo GR, in case of control plane restart.
+                                A mixed value. (0x01: Self GR capability of 
+                                neighbor; 0x02: GR support capability of 
+                                neighbor; 0x04: Neighbor capable of receiving 
+                                RecoveryPath message; 0x08: Neighbor capable 
+                                of sending RecoveryPath message)"
+                        ::= { hwRsvpTeNbrEntry 11 }
+
+                
+                hwRsvpTeNbrGrRestartTime OBJECT-TYPE
+                        SYNTAX TimeStamp
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Neighbor nodes GR restart time value."
+                        ::= { hwRsvpTeNbrEntry 12 }
+
+                
+                hwRsvpTeNbrGrRecoveryTime OBJECT-TYPE
+                        SYNTAX TimeStamp
+                        UNITS "milliseconds"
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Neighbor nodes GR recovery time value."
+                        ::= { hwRsvpTeNbrEntry 13 }
+
+                
+                hwRsvpTeNbrGrStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(1),
+                                supporting(2),
+                                restarting(3),
+                                restartTimerRunning(4),
+                                recoveryTimerRunning(5),
+                                grEnd(6)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Neighbor nodes GR status. (0x01, No GR activity;
+                                0x02, Neighbor router is supporting GR; 0x03, 
+                                Neighbor router is restarting; 0x04, Restart 
+                                timer is running; 0x05, Recovery timer is 
+                                running; 0x06, Neighbor GR end.)"
+                        ::= { hwRsvpTeNbrEntry 14 }
+
+                
+                hwRsvpTeNbrAuthKeyId OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0 | 6))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Neighbor's authentication key, used for 
+                                authentication processing. A return of null
+                                string indicates the absence of the item."
+                        ::= { hwRsvpTeNbrEntry 15 }
+
+                
+                hwRsvpTeNbrReductionEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE srefresh is enabled on the neighbor, 
+                                else srefresh is not enabled on the neighbor."
+                        ::= { hwRsvpTeNbrEntry 16 }
+
+                
+                hwRsvpTeNbrReliabilityEnabled OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If TRUE reliability is enabled on the neighbor,
+                                else reliability is not enabled on the neighbor."
+                        ::= { hwRsvpTeNbrEntry 17 }
+
+                
+                hwRsvpTeMessageIdTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeMessageIdEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describes the MessageIds of an 
+                                RSVP system."
+                        ::= { hwRsvpTeObjects 7 }
+
+                
+                hwRsvpTeMessageIdEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeMessageIdEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Description."
+                        INDEX { ifIndex, hwRsvpTeNbrAddress, hwRsvpTeMessageIdEpoch, hwRsvpTeMessageIdNumber  }
+                        ::= { hwRsvpTeMessageIdTable 1 }
+
+                
+                HwRsvpTeMessageIdEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeMessageIdEpoch
+                                        Gauge32,
+                                hwRsvpTeMessageIdNumber 
+                                        Gauge32,
+                                hwRsvpTeMessageIdFlag
+                                        INTEGER
+                         }
+
+                hwRsvpTeMessageIdEpoch OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "A value that indicates when the Message_Identi-
+                                fier sequence has been reset."
+                        ::= { hwRsvpTeMessageIdEntry 1 }
+
+                
+                hwRsvpTeMessageIdNumber  OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "When combined with the message generator's IP 
+                                address, the Message_Identifier field uniquely 
+                                identifies a message.  The values placed in this
+                                 field change incrementally and only decrease 
+                                when the epoch changes or when the value wraps."
+                        ::= { hwRsvpTeMessageIdEntry 2 }
+
+                
+                hwRsvpTeMessageIdFlag OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                senderIncoming(1),
+                                senderOutgoing(2),
+                                resv(3),
+                                resvFwd(4),
+                                rtBuff(5)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A enumerable value to indicate the type of this 
+                                Message_Identifier. (1: SenderIncoming; 2: 
+                                SenderOutgoing; 3: Resv; 4: ResvFwd; 5: RtBuff)"
+                        ::= { hwRsvpTeMessageIdEntry 3 }
+
+                
+                hwRsvpTeFilterSpecTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeFilterSpecEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describes the FilterSpecs of an 
+                                RSVP system."
+                        ::= { hwRsvpTeObjects 8 }
+
+                
+                hwRsvpTeFilterSpecEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeFilterSpecEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Description."
+                        INDEX { hwRsvpTeSessionNumber, hwRsvpTeResvNumber, hwRsvpTeFilterSpecNumber  }
+                        ::= { hwRsvpTeFilterSpecTable 1 }
+
+                
+                HwRsvpTeFilterSpecEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeFilterSpecNumber 
+                                        Gauge32,
+                                hwRsvpTeFilterSpecLspId 
+                                        Integer32,
+                                hwRsvpTeFilterSpecIngressLsrId 
+                                        OCTET STRING,
+                                hwRsvpTeFilterSpecLabel 
+                                        Gauge32
+                         }
+
+                hwRsvpTeFilterSpecNumber  OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this Filter_Spec.   This is for 
+                                SNMP Indexing purposes only and has no relation
+                                 to any protocol value."
+                        ::= { hwRsvpTeFilterSpecEntry 1 }
+
+                
+                hwRsvpTeFilterSpecLspId  OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "A 16-bit identifier used in the SENDER_TEMPLATE
+                                 and the FILTER_SPEC that can be changed to 
+                                allow a sender to share resources with itself."
+                        ::= { hwRsvpTeFilterSpecEntry 2 }
+
+                
+                hwRsvpTeFilterSpecIngressLsrId  OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "IP address for a sender node."
+                        ::= { hwRsvpTeFilterSpecEntry 3 }
+
+                
+                hwRsvpTeFilterSpecLabel  OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the label arranged by next hop.
+                                A return of 4294967295 indicates the absence 
+                                of the item."
+                        ::= { hwRsvpTeFilterSpecEntry 4 }
+
+                
+                hwRsvpTeRroTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeRroEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describes the RRO sub-objects of 
+                                an RSVP system."
+                        ::= { hwRsvpTeObjects 9 }
+
+                
+                hwRsvpTeRroEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeRroEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Description."
+                        INDEX { hwRsvpTeSessionNumber, hwRsvpTeSenderNumber, hwRsvpTeRroNumber  }
+                        ::= { hwRsvpTeRroTable 1 }
+
+                
+                HwRsvpTeRroEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeRroNumber 
+                                        Gauge32,
+                                hwRsvpTeRroType 
+                                        INTEGER,
+                                hwRsvpTeRroIpAddr 
+                                        OCTET STRING,
+                                hwRsvpTeRroIpPrefixLen 
+                                        Integer32,
+                                hwRsvpTeRroLabel 
+                                        Gauge32,
+                                hwRsvpTeRroFlag 
+                                        Integer32
+                         }
+
+                hwRsvpTeRroNumber  OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this RRO sub-object.   This is 
+                                for SNMP Indexing purposes only and has no 
+                                relation to any protocol value."
+                        ::= { hwRsvpTeRroEntry 1 }
+
+                
+                hwRsvpTeRroType  OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                ipv4(1),
+                                ipv6(2),
+                                label(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An enumerable value that indicates the type of 
+                                this sub-object. (0x01: IPv4 address; 0x02: 
+                                IPv6 address; 0x03: Label.)"
+                        ::= { hwRsvpTeRroEntry 2 }
+
+                
+                hwRsvpTeRroIpAddr  OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "IP address for this sub-object if the type is 
+                                'IPv4 address' of 'IPv6 address'. A return of
+                                null string indicates the absence of the item."
+                        ::= { hwRsvpTeRroEntry 3 }
+
+                
+                hwRsvpTeRroIpPrefixLen  OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "IP prefix length for this sub-object if the 
+                                type is 'IPv4 address' of 'IPv6 address'. A
+                                return of 0 indicates the absence of the 
+                                item."
+                        ::= { hwRsvpTeRroEntry 4 }
+
+                
+                hwRsvpTeRroLabel  OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the label if the type is 'Label'.
+                                A return of 4294967295 indicates the absence 
+                                of the item."
+                        ::= { hwRsvpTeRroEntry 5 }
+
+                
+                hwRsvpTeRroFlag  OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "If hwRsvpTeRroType is IPv4 or IPv6, it is a 
+                                mixed value. (0x01: Local protection 
+                                available; 0x02: Local protection in use; 0x04:
+                                 bandwidth protection; 0x08: node protection; 
+                                0x10: preemption pending; 0x20: node ID.) If
+                                hwRsvpTeRroType is Label, 0x01 means global
+                                label. A  return of zero indicates no bit was
+                                set."
+                        ::= { hwRsvpTeRroEntry 6 }
+
+                
+                hwRsvpTeEroTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTeEroEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describes the ERO sub-objects 
+                                of an RSVP system."
+                        ::= { hwRsvpTeObjects 10 }
+
+                
+                hwRsvpTeEroEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTeEroEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Description."
+                        INDEX { hwRsvpTeSessionNumber, hwRsvpTeSenderNumber, hwRsvpTeEroNumber  }
+                        ::= { hwRsvpTeEroTable 1 }
+
+                
+                HwRsvpTeEroEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTeEroNumber 
+                                        Gauge32,
+                                hwRsvpTeEroType 
+                                        INTEGER,
+                                hwRsvpTeEroIpAddr 
+                                        OCTET STRING,
+                                hwRsvpTeEroIpPrefixLen 
+                                        Integer32
+                         }
+
+                hwRsvpTeEroNumber  OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of this ERO sub-object. This is for 
+                                SNMP Indexing purposes only and has no relation
+                                 to any protocol value."
+                        ::= { hwRsvpTeEroEntry 1 }
+
+                
+                hwRsvpTeEroType  OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                ipv4(1),
+                                ipv6(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "An enumerable value that indicates the type of 
+                                this sub-object. (0x01: IPv4 address; 0x02: 
+                                IPv6 address.)"
+                        ::= { hwRsvpTeEroEntry 2 }
+
+                
+                hwRsvpTeEroIpAddr  OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "IP address for this sub-object."
+                        ::= { hwRsvpTeEroEntry 3 }
+
+                
+                hwRsvpTeEroIpPrefixLen  OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "IP prefix length for this sub-object."
+                        ::= { hwRsvpTeEroEntry 4 }
+
+                
+--  traps
+                hwRsvpTeConformance OBJECT IDENTIFIER ::= { hwRsvpTe 2 }
+
+                
+--  conformance information
+                hwRsvpTeGroups OBJECT IDENTIFIER ::= { hwRsvpTeConformance 1 }
+
+                
+                hwRsvpTeSessionGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeSessionType, hwRsvpTeSessionDestAddr, hwRsvpTeSessionDestAddrLength, hwRsvpTeSessionSenders, hwRsvpTeSessionReceivers, 
+                                hwRsvpTeSessionRequests, hwRsvpTeSessionTunnelId, hwRsvpTeSessionTunnelExtId, hwRsvpTeSessionLspsNumber, hwRsvpTeSessionStyle
+                                 }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are required for RSVP Systems."
+                        ::= { hwRsvpTeGroups 1 }
+
+                
+                hwRsvpTeSenderGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeSenderType, hwRsvpTeSenderDestAddr, hwRsvpTeSenderAddr, hwRsvpTeSenderDestAddrLength, hwRsvpTeSenderAddrLength, 
+                                hwRsvpTeSenderHopAddr, hwRsvpTeSenderHopLih, hwRsvpTeSenderInterface, hwRsvpTeSenderTSpecRate, hwRsvpTeSenderTSpecPeakRate, 
+                                hwRsvpTeSenderTSpecBurst, hwRsvpTeSenderTSpecMinTu, hwRsvpTeSenderTSpecMaxTu, hwRsvpTeSenderInterval, hwRsvpTeSenderRsvpHop, 
+                                hwRsvpTeSenderPolicy, hwRsvpTeSenderAdspecBreak, hwRsvpTeSenderAdspecHopCount, hwRsvpTeSenderAdspecPathBw, hwRsvpTeSenderAdspecMinLatency, 
+                                hwRsvpTeSenderAdspecMtu, hwRsvpTeSenderAdspecGuaranteedSvc, hwRsvpTeSenderAdspecGuaranteedBreak, hwRsvpTeSenderAdspecGuaranteedCtot, hwRsvpTeSenderAdspecGuaranteedDtot, 
+                                hwRsvpTeSenderAdspecGuaranteedCsum, hwRsvpTeSenderAdspecGuaranteedDsum, hwRsvpTeSenderAdspecGuaranteedHopCount, hwRsvpTeSenderAdspecGuaranteedPathBw, hwRsvpTeSenderAdspecGuaranteedMinLatency, 
+                                hwRsvpTeSenderAdspecGuaranteedMtu, hwRsvpTeSenderAdspecCtrlLoadSvc, hwRsvpTeSenderAdspecCtrlLoadBreak, hwRsvpTeSenderAdspecCtrlLoadHopCount, hwRsvpTeSenderAdspecCtrlLoadPathBw, 
+                                hwRsvpTeSenderAdspecCtrlLoadMinLatency, hwRsvpTeSenderAdspecCtrlLoadMtu, hwRsvpTeSenderTtl, hwRsvpTeLspId, hwRsvpTeSenderMsgIdSndFlag, 
+                                hwRsvpTeSenderMsgIdSndEpoch, hwRsvpTeSenderMsgIdSndNumber, hwRsvpTeSenderMsgIdRcvFlag, hwRsvpTeSenderMsgIdRcvEpoch, hwRsvpTeSenderMsgIdRcvNumber, 
+                                hwRsvpTeSenderClassType, hwRsvpTeSenderLabelRequestCtype, hwRsvpTeSenderLabelRequestL3pid, hwRsvpTeSenderLabelRequestAtmMinVpi, hwRsvpTeSenderLabelRequestAtmMinVci, 
+                                hwRsvpTeSenderLabelRequestAtmMaxVpi, hwRsvpTeSenderLabelRequestAtmMaxVci, hwRsvpTeSenderLabelRequestFrMinDlci, hwRsvpTeSenderLabelRequestFrMaxDlci, hwRsvpTeSenderSessionAttrType, 
+                                hwRsvpTeSenderSessionAttrSetupPrio, hwRsvpTeSenderSessionAttrHoldPrio, hwRsvpTeSenderSessionAttrFlag, hwRsvpTeSenderSessionAttrName, hwRsvpTeSenderSessionAttrExcludeAny, 
+                                hwRsvpTeSenderSessionAttrIncludeAny, hwRsvpTeSenderSessionAttrIncludeAll, hwRsvpTeSenderFrrSetupPrio, hwRsvpTeSenderFrrHoldPrio, hwRsvpTeSenderFrrHopLimit, 
+                                hwRsvpTeSenderFrrFlag, hwRsvpTeSenderFrrBandwidth, hwRsvpTeSenderFrrExcludeAny, hwRsvpTeSenderFrrIncludeAny, hwRsvpTeSenderFrrIncludeAll, 
+                                hwRsvpTeSenderFrrInuseFlag, hwRsvpTeSenderDiffServPsc }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are required for RSVP Systems."
+                        ::= { hwRsvpTeGroups 2 }
+
+                
+                hwRsvpTeResvGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeResvType, hwRsvpTeResvDestAddr, hwRsvpTeResvSenderAddr, hwRsvpTeResvDestAddrLength, hwRsvpTeResvSenderAddrLength, 
+                                hwRsvpTeResvHopAddr, hwRsvpTeResvHopLih, hwRsvpTeResvInterface, hwRsvpTeResvService, hwRsvpTeResvTSpecRate, 
+                                hwRsvpTeResvTSpecPeakRate, hwRsvpTeResvTSpecBurst, hwRsvpTeResvTSpecMinTu, hwRsvpTeResvTSpecMaxTu, hwRsvpTeResvRSpecRate, 
+                                hwRsvpTeResvRSpecSlack, hwRsvpTeResvInterval, hwRsvpTeResvScope, hwRsvpTeResvShared, hwRsvpTeResvExplicit, 
+                                hwRsvpTeResvRsvpHop, hwRsvpTeResvPolicy, hwRsvpTeResvTtl, hwRsvpTeResvConfirm }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are required for RSVP Systems."
+                        ::= { hwRsvpTeGroups 3 }
+
+                
+                hwRsvpTeResvFwdGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeResvFwdType, hwRsvpTeResvFwdDestAddr, hwRsvpTeResvFwdSenderAddr, hwRsvpTeResvFwdDestAddrLength, hwRsvpTeResvFwdSenderAddrLength, 
+                                hwRsvpTeResvFwdHopAddr, hwRsvpTeResvFwdHopLih, hwRsvpTeResvFwdInterface, hwRsvpTeResvFwdService, hwRsvpTeResvFwdTSpecRate, 
+                                hwRsvpTeResvFwdTSpecPeakRate, hwRsvpTeResvFwdTSpecBurst, hwRsvpTeResvFwdTSpecMinTu, hwRsvpTeResvFwdTSpecMaxTu, hwRsvpTeResvFwdRSpecRate, 
+                                hwRsvpTeResvFwdRSpecSlack, hwRsvpTeResvFwdInterval, hwRsvpTeResvFwdScope, hwRsvpTeResvFwdShared, hwRsvpTeResvFwdExplicit, 
+                                hwRsvpTeResvFwdPolicy, hwRsvpTeResvFwdTtl, hwRsvpTeResvFwdMsgIdFlag, hwRsvpTeResvFwdMsgIdEpoch, hwRsvpTeResvFwdMsgIdNumber, 
+                                hwRsvpTeResvFwdRsvpHop }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are optional, used for some RSVP
+                                Systems."
+                        ::= { hwRsvpTeGroups 4 }
+
+                
+                hwRsvpTeIfGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeIfUdpNbrs, hwRsvpTeIfIpNbrs, hwRsvpTeIfNbrs, hwRsvpTeIfRefreshBlockadeMultiple, hwRsvpTeIfRefreshMultiple, 
+                                hwRsvpTeIfTtl, hwRsvpTeIfRefreshInterval, hwRsvpTeIfRouteDelay, hwRsvpTeIfEnabled, hwRsvpTeIfUdpRequired, 
+                                hwRsvpTeIfStatus, hwRsvpTeIfHelloEnabled, hwRsvpTeIfSrefreshEnabled, hwRsvpTeIfSrefreshInterval, hwRsvpTeIfRetranIncDelta, 
+                                hwRsvpTeIfRetranInterval, hwRsvpTeIfAuthEnabled, hwRsvpTeIfAuthEncrypted , hwRsvpTeIfAuthHandshake, hwRsvpTeIfAuthKey, 
+                                hwRsvpTeIfWindowSize, hwRsvpTeIfAuthLifeTime }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are required for RSVP Systems."
+                        ::= { hwRsvpTeGroups 5 }
+
+                
+                hwRsvpTeNbrGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeNbrHelloSrcInstance, hwRsvpTeNbrHelloDstInstance, hwRsvpTeNbrHelloLostCounter, hwRsvpTeNbrHelloType, hwRsvpTeNbrHelloEnabled, 
+                                hwRsvpTeNbrSendersNumber, hwRsvpTeNbrReceiversNumber, hwRsvpTeNbrGrCapability, hwRsvpTeNbrGrRestartTime, hwRsvpTeNbrGrRecoveryTime, 
+                                hwRsvpTeNbrGrStatus, hwRsvpTeNbrAuthKeyId, hwRsvpTeNbrReductionEnabled, hwRsvpTeNbrReliabilityEnabled, hwRsvpTeNbrProtocol, 
+                                hwRsvpTeNbrStatus }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are required for RSVP Systems."
+                        ::= { hwRsvpTeGroups 6 }
+
+                
+                hwRsvpTeMessageIdGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeMessageIdFlag }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwRsvpTeGroups 7 }
+
+                
+                hwRsvpTeFilterSpecGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeFilterSpecLspId , hwRsvpTeFilterSpecIngressLsrId , hwRsvpTeFilterSpecLabel  }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwRsvpTeGroups 8 }
+
+                
+                hwRsvpTeRroGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeRroType , hwRsvpTeRroIpAddr , hwRsvpTeRroIpPrefixLen , hwRsvpTeRroLabel , hwRsvpTeRroFlag 
+                                 }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwRsvpTeGroups 9 }
+
+                
+                hwRsvpTeEroGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeEroType , hwRsvpTeEroIpAddr , hwRsvpTeEroIpPrefixLen  }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwRsvpTeGroups 10 }
+
+                
+                hwRsvpTeCompliances OBJECT IDENTIFIER ::= { hwRsvpTeConformance 2 }
+
+                
+--  compliance statements
+-- this module
+                hwRsvpTeCompliance MODULE-COMPLIANCE
+                        STATUS current
+                        DESCRIPTION 
+                                "The compliance statement.  Note that  the  im-
+                                plementation  of this module requires implemen-
+                                tation of the Integrated Services MIB as well."
+                        MODULE HUAWEI-RSVPTE-MIB
+                                MANDATORY-GROUPS { hwRsvpTeSessionGroup, hwRsvpTeSenderGroup, hwRsvpTeResvGroup, hwRsvpTeIfGroup, hwRsvpTeNbrGroup, 
+                                        hwRsvpTeFilterSpecGroup, hwRsvpTeRroGroup, hwRsvpTeEroGroup }
+                                GROUP hwRsvpTeResvFwdGroup
+                                        DESCRIPTION 
+                                                "The Reservation Requests table  is  appropriate
+                                                 in  implementations that store upstream reserva-
+                                                 tion messages, but not appropriate in  implemen-
+                                                 tations  which  calculate them on each transmis-
+                                                 sion."
+                                GROUP hwRsvpTeMessageIdGroup
+                                        DESCRIPTION 
+                                                "This is optional."
+                        ::= { hwRsvpTeCompliances 1 }
+
+                
+        
+        END
+
+--
+-- HUAWEI-RSVPTE-MIB.mib
+--

@@ -1,0 +1,52 @@
+CISCOSB-WeightedRandomTailDrop-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Switch Interfaces Private
+-- Version:    7.50
+-- Date:       29 Sep 2009
+
+IMPORTS
+    switch001                                    FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                 FROM SNMPv2-SMI;
+
+rlWeightedRandomTailDrop MODULE-IDENTITY
+        LAST-UPDATED "200909290000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+            "<description>"
+        REVISION "200909290000Z"
+        DESCRIPTION
+            "The private MIB module definition for Weighted Random Tail Drop MIB."
+        ::= { switch001 146 }
+
+rlWeightedRandomTailDropCurrentStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(0),
+        disable(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Show the current Weighted Random Tail Drop status"
+    ::= { rlWeightedRandomTailDrop 1 }
+
+rlWeightedRandomTailDropStatusAfterReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(0),
+        disable(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set the Weighted Random Tail Drop status after reset"
+    ::= { rlWeightedRandomTailDrop 2 }
+
+END

@@ -1,0 +1,1303 @@
+
+-- *****************************************************************************
+-- Juniper-OSPF-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for OSPF Protocol Management
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-OSPF-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    ospfAreaEntry, ospfIfEntry, ospfIfIpAddress, ospfAddressLessIf,
+    ospfVirtIfEntry, ospfNbrEntry
+        FROM OSPF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniOspfMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The OSPF Protocol MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200204052120Z"  -- 05-Apr-02 04:20 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added juniOspfVpnRouteTag, juniOspfDomainId, juniOspfAreaTeCapable and
+        juniOspfMplsTeRtrIdIfIndex objects."
+    REVISION    "200005230000Z"  -- 23-May-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Key revisions include:
+         o Corrected description for juniOspfProcessId.
+         o Added juniOspfNetworkRangeTable.
+         o Added juniOspfOperState."
+    REVISION      "9909280000Z"  -- 28-Sep-99               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 14 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniOspfObjects       OBJECT IDENTIFIER ::= { juniOspfMIB 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF General Group attributes (scalars)
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniOspfGeneralGroup  OBJECT IDENTIFIER ::= { juniOspfObjects 1 }
+
+juniOspfProcessId OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An identifier having special semantics when set.
+
+        When this object's value is zero, OSPF is disabled and cannot be
+        configured.  Setting this object to a nonzero value enables OSPF
+        operation and permits further OSPF configuration to be performed.
+
+        Once set to a nonzero value, this object cannot be modified."
+    ::= { juniOspfGeneralGroup 1 }
+
+juniOspfMaxPathSplits OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of equal-cost routes that will be maintained by the
+        OSPF protocol.
+
+        A change in this value will be taken into account at the next
+        shortest-path-first recalculation."
+    ::= { juniOspfGeneralGroup 2 }
+
+juniOspfSpfHoldInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum amount of time that must elapse between shortest-path-first
+        recalculations.
+
+        Reducing this value can cause an immediate SPF recalulation if the new
+        value is less than the current value of juniOspfSpfHoldTimeRemaining and
+        other SPF-inducing protocol events have occurred."
+    ::= { juniOspfGeneralGroup 3 }
+
+juniOspfNumActiveAreas OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of active areas."
+    ::= { juniOspfGeneralGroup 4 }
+
+juniOspfSpfTime OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The SPF schedule delay."
+    ::= { juniOspfGeneralGroup 5 }
+
+juniOspfRefBw OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..4294967295)
+    UNITS        "bits per second"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The reference bandwith, in bits per second.  This object is used when
+        OSPF automatic interface cost calculation is used."
+    DEFVAL     { 100 }
+    ::= { juniOspfGeneralGroup 6 }
+
+juniOspfAutoVlink OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Set this object to true(1) in order to have virtual links automatically
+        configured."
+    ::= { juniOspfGeneralGroup 7 }
+
+juniOspfIntraDistance OBJECT-TYPE
+    SYNTAX       Integer32 (1..255)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Default distance for intra-area routes."
+    ::= { juniOspfGeneralGroup 8 }
+
+juniOspfInterDistance OBJECT-TYPE
+    SYNTAX       Integer32 (1..255)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Default distance for inter-area routes."
+    ::= { juniOspfGeneralGroup 9 }
+
+juniOspfExtDistance OBJECT-TYPE
+    SYNTAX       Integer32 (1..255)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Default distance for external type 5 and type 7 routes."
+    ::= { juniOspfGeneralGroup 10 }
+
+juniOspfHelloPktsRcv OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of hello packets received."
+    ::= { juniOspfGeneralGroup 11 }
+
+juniOspfDDPktsRcv OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of database description packets received."
+    ::= { juniOspfGeneralGroup 12 }
+
+juniOspfLsrPktsRcv OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of link state request packets received."
+    ::= { juniOspfGeneralGroup 13 }
+
+juniOspfLsuPktsRcv OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of link state update packets received."
+    ::= { juniOspfGeneralGroup 14 }
+
+juniOspfLsAckPktsRcv OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of link state ACK packets received."
+    ::= { juniOspfGeneralGroup 15 }
+
+juniOspfTotalRcv OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of OSPF packets received."
+    ::= { juniOspfGeneralGroup 16 }
+
+juniOspfLsaDiscardCnt OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of LSA packets discarded."
+    ::= { juniOspfGeneralGroup 17 }
+
+juniOspfHelloPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of hello packets sent."
+    ::= { juniOspfGeneralGroup 18 }
+
+juniOspfDDPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of database description packets sent."
+    ::= { juniOspfGeneralGroup 19 }
+
+juniOspfLsrPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of link state request packets sent."
+    ::= { juniOspfGeneralGroup 20 }
+
+juniOspfLsuPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of link state update packets sent."
+    ::= { juniOspfGeneralGroup 21 }
+
+juniOspfLsAckPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of link state ACK packets sent."
+    ::= { juniOspfGeneralGroup 22 }
+
+juniOspfErrPktsSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of packets dropped."
+    ::= { juniOspfGeneralGroup 23 }
+
+juniOspfTotalSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of OSPF packets sent."
+    ::= { juniOspfGeneralGroup 24 }
+
+juniOspfCsumErrPkts OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of packets received with a checksum error."
+    ::= { juniOspfGeneralGroup 25 }
+
+juniOspfAllocFailNbr OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of neighbor allocation failures."
+    ::= { juniOspfGeneralGroup 26 }
+
+juniOspfAllocFailLsa OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of LSA allocation failures."
+    ::= { juniOspfGeneralGroup 27 }
+
+juniOspfAllocFailLsd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of LSA HDR allocation failures."
+    ::= { juniOspfGeneralGroup 28 }
+
+juniOspfAllocFailDbRequest OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of database request allocation failures."
+    ::= { juniOspfGeneralGroup 29 }
+
+juniOspfAllocFailRtx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of RTX allocation failures."
+    ::= { juniOspfGeneralGroup 30 }
+
+juniOspfAllocFailAck OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of LS ACK allocation failures."
+    ::= { juniOspfGeneralGroup 31 }
+
+juniOspfAllocFailDbPkt OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of DD packet allocation failures."
+    ::= { juniOspfGeneralGroup 32 }
+
+juniOspfAllocFailCirc OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of OSPF interface allocation failures."
+    ::= { juniOspfGeneralGroup 33 }
+
+juniOspfAllocFailPkt OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of OSPF general packet allocation failures."
+    ::= { juniOspfGeneralGroup 34 }
+
+juniOspfOperState OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A flag to note whether this router is operational."
+    ::= { juniOspfGeneralGroup 35 }
+
+juniOspfVpnRouteTag OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..4294967295)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "VPN route tag value."
+    ::= { juniOspfGeneralGroup 36 }
+
+juniOspfDomainId OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..4294967295)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "OSPF domain ID."
+    ::= { juniOspfGeneralGroup 37 }
+
+juniOspfMplsTeRtrIdIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndexOrZero
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Configure the stable router interface id to designate it as TE
+        capable."
+    ::= { juniOspfGeneralGroup 38 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Area attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Area Table
+--
+juniOspfAreaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF area table describes the OSPF-specific
+        characteristics of areas."
+    ::= { juniOspfObjects 2 }
+
+juniOspfAreaEntry OBJECT-TYPE
+    SYNTAX      JuniOspfAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF area entry describes OSPF-specific characteristics of one
+        area."
+    AUGMENTS  { ospfAreaEntry }
+    ::= { juniOspfAreaTable 1 }
+
+JuniOspfAreaEntry ::= SEQUENCE {
+    juniOspfAreaType         INTEGER,
+    juniOspfAreaTeCapable    TruthValue }
+
+juniOspfAreaType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    transitArea(1),
+                    stubArea(2),
+                    nssaArea(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of this area."
+    ::= { juniOspfAreaEntry 1 }
+
+juniOspfAreaTeCapable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Configure the specified area TE capable to flood the TE information."
+    ::= { juniOspfAreaEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Interface attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Interface Table
+--
+juniOspfIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF interface table describes the OSPF-specific
+        characteristics of interfaces."
+    ::= { juniOspfObjects 7 }
+
+juniOspfIfEntry OBJECT-TYPE
+    SYNTAX      JuniOspfIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF interface entry describes OSPF-specific characteristics of one
+        interface."
+    AUGMENTS  { ospfIfEntry }
+    ::= { juniOspfIfTable 1 }
+
+JuniOspfIfEntry ::= SEQUENCE {
+    juniOspfIfCost           Integer32,
+    juniOspfIfMask           IpAddress,
+    juniOspfIfPassiveFlag    INTEGER,
+    juniOspfIfNbrCount       Counter32,
+    juniOspfIfAdjNbrCount    Counter32,
+    juniOspfIfMd5AuthKey     OCTET STRING,
+    juniOspfIfMd5AuthKeyId   Integer32 }
+
+juniOspfIfCost OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The cost value for this interface."
+    DEFVAL    { 10 }
+    ::= { juniOspfIfEntry 1 }
+
+juniOspfIfMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The mask used to derive the network range of this interface."
+    ::= { juniOspfIfEntry 2 }
+
+juniOspfIfPassiveFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Flag to indicate whether routing updates should be suppressed on this
+        interface.  To actively perform routing updates, set this object to
+        disabled(0)."
+    ::= { juniOspfIfEntry 3 }
+
+juniOspfIfNbrCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of OSPF neighbors from this interface."
+    ::= { juniOspfIfEntry 4 }
+
+juniOspfIfAdjNbrCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of OSPF adjacent neighbors from this interface."
+    ::= { juniOspfIfEntry 5 }
+
+juniOspfIfMd5AuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MD5 authentication key.  When setting this object, the
+        juniOspfIfMd5AuthKeyId must be specified on the same PDU.  For simple
+        text authentication type, use ospfIfAuthKey.  Setting this object will
+        have the side effect of adding or updating the correspondent entry in
+        juniOspfMd5IntfKeyTable.  If key given has less than 16 octets, such
+        value will be appended with zeros to complete 16 octets.  The zeros will
+        appended to the right of the given key.  Reading this object always
+        results in an OCTET STRING of length zero."
+    ::= { juniOspfIfEntry 6 }
+
+juniOspfIfMd5AuthKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MD5 authentication key ID.  When setting this object,
+        juniOspfIfMd5AuthKey must be specified on the same PDU."
+    ::= { juniOspfIfEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Virtual Interface attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Virtual Interface Table
+--
+juniOspfVirtIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfVirtIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF virtual interface table describes the OSPF-specific
+        characteristics of virtual interfaces."
+    ::= { juniOspfObjects 9 }
+
+juniOspfVirtIfEntry OBJECT-TYPE
+    SYNTAX      JuniOspfVirtIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF virtual interface entry describes OSPF-specific
+        characteristics of one virtual interface."
+    AUGMENTS  { ospfVirtIfEntry }
+    ::= { juniOspfVirtIfTable 1 }
+
+JuniOspfVirtIfEntry ::= SEQUENCE {
+    juniOspfVirtIfMd5AuthKey     OCTET STRING,
+    juniOspfVirtIfMd5AuthKeyId   Integer32 }
+
+juniOspfVirtIfMd5AuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MD5 authentication key.  When setting this object, the
+        juniOspfVirtIfMd5AuthKeyId must be specified on the same PDU.  For
+        simple text authentication type, use ospfVirtIfAuthKey.  Setting this
+        object will have the side effect of adding or updating the correspondent
+        entry in juniOspfMd5IntfKeyTable.  If key given has less than 16 octets,
+        such value will be appended with zeros to complete 16 octets.  The zeros
+        will appended to the right of the given key.  Reading this object always
+        results in an OCTET STRING of length zero."
+    ::= { juniOspfVirtIfEntry 1 }
+
+juniOspfVirtIfMd5AuthKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MD5 authentication key id. When setting this object,
+        juniOspfVirtIfMd5AuthKey must be specified on the same psu."
+    ::= { juniOspfVirtIfEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Neighbor attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Neighbor Table
+--
+juniOspfNbrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF neighbor table describes the OSPF-specific
+        characteristics of neighbors."
+    ::= { juniOspfObjects 10 }
+
+juniOspfNbrEntry OBJECT-TYPE
+    SYNTAX      JuniOspfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF neighbor entry describes OSPF-specific characteristics of one
+        neighbor."
+    AUGMENTS  { ospfNbrEntry }
+    ::= { juniOspfNbrTable 1 }
+
+JuniOspfNbrEntry ::= SEQUENCE {
+    juniOspfNbrLocalIpAddr   IpAddress,
+    juniOspfNbrDR            IpAddress,
+    juniOspfNbrBDR           IpAddress }
+
+juniOspfNbrLocalIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local IP address on this OSPF circuit."
+    ::= { juniOspfNbrEntry 1 }
+
+juniOspfNbrDR OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The neighbor's idea of designated router."
+    ::= { juniOspfNbrEntry 2 }
+
+juniOspfNbrBDR OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The neighbor's idea of backup designated router."
+    ::= { juniOspfNbrEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Summary Import attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Summary Import Table
+--
+juniOspfSummImportTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfSummImportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF summary import table describes the OSPF-specific
+        characteristics of network aggregation into the OSPF autonomous system.
+        With this table, the load of advertising many external routes can be
+        reduced by specifying a range which includes some or all of the external
+        routes."
+    ::= { juniOspfObjects 15 }
+
+juniOspfSummImportEntry OBJECT-TYPE
+    SYNTAX      JuniOspfSummImportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF summary import entry describes OSPF-specific characteristics
+        of one summary report."
+    INDEX     { juniOspfSummAggNet,
+                juniOspfSummAggMask }
+    ::= { juniOspfSummImportTable 1 }
+
+JuniOspfSummImportEntry ::= SEQUENCE {
+    juniOspfSummAggNet       IpAddress,
+    juniOspfSummAggMask      IpAddress,
+    juniOspfSummAdminStat    INTEGER,
+    juniOspfSummRowStatus    RowStatus }
+
+juniOspfSummAggNet OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The summary address for a range of addresses."
+    ::= { juniOspfSummImportEntry 1 }
+
+juniOspfSummAggMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subnet mask used for the summary route."
+    ::= { juniOspfSummImportEntry 2 }
+
+juniOspfSummAdminStat OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The admin status of this summary aggregation."
+    ::= { juniOspfSummImportEntry 3 }
+
+juniOspfSummRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable displays the status of the entry."
+    ::= { juniOspfSummImportEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Interface MD5 Key attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Interface MD5 Key Table
+--
+juniOspfMd5IntfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfMd5IntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF interface MD5 key table describes OSPF-specific
+        characteristics of the MD5 authentication key for the OSPF interfaces.
+        This table is not to be used for the simple password authentication."
+    ::= { juniOspfObjects 16 }
+
+juniOspfMd5IntfEntry OBJECT-TYPE
+    SYNTAX      JuniOspfMd5IntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF interface MD5 key entry describes OSPF-specific
+        characteristics of one MD5 authentication's interface."
+    INDEX     { ospfIfIpAddress,
+                ospfAddressLessIf,
+                juniOspfMd5IntfKeyId }
+    ::= { juniOspfMd5IntfTable 1 }
+
+JuniOspfMd5IntfEntry ::= SEQUENCE {
+    juniOspfMd5IntfKeyId     Integer32,
+    juniOspfMd5IntfKeyActive TruthValue,
+    juniOspfMd5IntfAuthKey   OCTET STRING,
+    juniOspfMd5IntfRowStatus RowStatus }
+
+juniOspfMd5IntfKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF interface this key belongs to."
+    ::= { juniOspfMd5IntfEntry 1 }
+
+juniOspfMd5IntfKeyActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Set this object to true(1) in order to have this key active."
+    ::= { juniOspfMd5IntfEntry 2 }
+
+juniOspfMd5IntfAuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MD5 authentication key.  If key given has less than 16 octets, such
+        value will be appended with zeros to complete 16 octets.  The zeros will
+        appended to the right of the given key.  Reading this object always
+        results in an OCTET STRING of length zero."
+    ::= { juniOspfMd5IntfEntry 3 }
+
+juniOspfMd5IntfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable displays the status of the entry."
+    ::= { juniOspfMd5IntfEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Vitural Interface MD5 Key attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Virual Interface MD5 Key Table
+--
+juniOspfMd5VirtIntfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfMd5VirtIntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF interface MD5 key table describes OSPF-specific
+        characteristics of the MD5 authentication key for the OSPF interfaces.
+        This table is not to be used for the simple password authentication."
+    ::= { juniOspfObjects 17 }
+
+juniOspfMd5VirtIntfEntry OBJECT-TYPE
+    SYNTAX      JuniOspfMd5VirtIntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OSPF Interface MD5  Key entry describes OSPF-specific
+        characteristics of one MD5 authentication's interface."
+    INDEX     { juniOspfMd5VirtIntfAreaId,
+                juniOspfMd5VirtIntfNeighbor,
+                juniOspfMd5VirtIntfKeyId }
+    ::= { juniOspfMd5VirtIntfTable 1 }
+
+JuniOspfMd5VirtIntfEntry ::= SEQUENCE {
+    juniOspfMd5VirtIntfAreaId    IpAddress,
+    juniOspfMd5VirtIntfNeighbor  IpAddress,
+    juniOspfMd5VirtIntfKeyId     Integer32,
+    juniOspfMd5VirtIntfKeyActive TruthValue,
+    juniOspfMd5VirtIntfAuthKey   OCTET STRING,
+    juniOspfMd5VirtIntfRowStatus RowStatus }
+
+juniOspfMd5VirtIntfAreaId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF area ID this key belongs to."
+    ::= { juniOspfMd5VirtIntfEntry 1 }
+
+juniOspfMd5VirtIntfNeighbor OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF neightbor this key belongs to."
+    ::= { juniOspfMd5VirtIntfEntry 2 }
+
+juniOspfMd5VirtIntfKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF virtual interface this key belongs to."
+    ::= { juniOspfMd5VirtIntfEntry 3 }
+
+juniOspfMd5VirtIntfKeyActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Set this object to true(1) in order to have this key active."
+    ::= { juniOspfMd5VirtIntfEntry 4 }
+
+juniOspfMd5VirtIntfAuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MD5 authentication key.  If key given has less than 16 octets, such
+        value will be appended with zeros to complete 16 octets.  The zeros will
+        appended to the right of the given key.  Reading this object always
+        results in an OCTET STRING of length zero."
+    ::= { juniOspfMd5VirtIntfEntry 5 }
+
+juniOspfMd5VirtIntfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable displays the status of the entry."
+    ::= { juniOspfMd5VirtIntfEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF Network Range attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  OSPF Network Range Table
+--
+juniOspfNetworkRangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfNetworkRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF network range table describes the OSPF-specific
+        characteristics of network ranges, encompassing one or multiple OSPF
+        interfaces."
+    ::= { juniOspfObjects 18 }
+
+juniOspfNetworkRangeEntry OBJECT-TYPE
+    SYNTAX      JuniOspfNetworkRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF network range entry describes OSPF-specific
+        characteristics of one OSPF network range."
+    INDEX     { juniOspfNetRangeNet,
+                juniOspfNetRangeMask,
+                juniOspfNetRangeAreaId }
+    ::= { juniOspfNetworkRangeTable 1 }
+
+JuniOspfNetworkRangeEntry ::= SEQUENCE {
+    juniOspfNetRangeNet          IpAddress,
+    juniOspfNetRangeMask         IpAddress,
+    juniOspfNetRangeAreaId       IpAddress,
+    juniOspfNetRangeRowStatus    RowStatus }
+
+juniOspfNetRangeNet OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The network range address."
+    ::= {juniOspfNetworkRangeEntry  1 }
+
+juniOspfNetRangeMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subnet mask used for the network range.  Unlike the mask used under
+        the command line interface (CLI), this object is set in the non-inversed
+        format (i.e. not a wild-card mask)."
+    ::= {juniOspfNetworkRangeEntry  2 }
+
+juniOspfNetRangeAreaId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF area ID this network range belongs to."
+    ::= { juniOspfNetworkRangeEntry 3 }
+
+juniOspfNetRangeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable displays the status of the entry."
+    ::= { juniOspfNetworkRangeEntry 4 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- OSPF BFD Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniOspfIfBFDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniOspfIfBFDEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF interface table describes the BFD-specific
+        characteristics of interfaces."
+    ::= { juniOspfObjects 8 }
+
+juniOspfIfBFDEntry OBJECT-TYPE
+    SYNTAX      JuniOspfIfBFDEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper OSPF interface table describes the BFD-specific
+        characteristics of one interface."
+    AUGMENTS  { ospfIfEntry}
+    ::= { juniOspfIfBFDTable 1 }
+
+JuniOspfIfBFDEntry ::= SEQUENCE {
+    juniOspfIfBfdEnable	TruthValue,
+    juniOspfIfBfdMinRxInterval	Integer32,
+    juniOspfIfBfdMinTxInterval	Integer32,
+    juniOspfIfBfdMultiplier	Integer32
+}
+
+juniOspfIfBfdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether BFD session on the interface is active or not"
+    DEFVAL    { false }
+    ::= { juniOspfIfBFDEntry 1 }
+    
+juniOspfIfBfdMinRxInterval   OBJECT-TYPE
+    SYNTAX      Integer32 (100..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies upper-limit on rate local-system requires remote-system to
+         transmit bfd control-packets [milliseconds]"
+    DEFVAL    { 300 }
+    ::= { juniOspfIfBFDEntry 2 }
+
+juniOspfIfBfdMinTxInterval OBJECT-TYPE
+    SYNTAX      Integer32 (100..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies lower-limit on rate local-system requires remote-system to 
+         transmit bfd control-packets [milliseconds]"
+    DEFVAL    { 300 }                 
+    ::= { juniOspfIfBFDEntry 3 }
+
+juniOspfIfBfdMultiplier OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies detection-multiplier "
+    DEFVAL    { 3 }                         
+    ::= { juniOspfIfBFDEntry 4 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniOspfTrapEnables OBJECT IDENTIFIER ::= { juniOspfMIB 2 }
+-- juniOspfTraps       OBJECT IDENTIFIER ::= { juniOspfMIB 19 }
+-- juniOspfTrapPrefix  OBJECT IDENTIFIER ::= { juniOspfTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniOspfConformance     OBJECT IDENTIFIER ::= { juniOspfMIB 4 }
+juniOspfCompliances     OBJECT IDENTIFIER ::= { juniOspfConformance 1 }
+juniOspfGroups          OBJECT IDENTIFIER ::= { juniOspfConformance 2 }
+
+--
+-- compliance statements
+--
+juniOspfCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        OSPF MIB.  This statement became obsolete when juniOspfVpnRouteTag,
+        juniOspfDomainId, juniOspfAreaTeCapable and juniOspfMplsTeRtrIdIfIndex
+        were added to the basic group."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniOspfBasicGroup,
+            juniOspfAreaGroup,
+            juniOspfIfGroup,
+            juniOspfVirtIfGroup,
+            juniOspfNbrGroup,
+            juniOspfSummImportGroup,
+            juniOspfMd5IntfGroup,
+            juniOspfMd5VirtIntfGroup,
+            juniOspfNetRangeGroup }
+    ::= { juniOspfCompliances 1 }                                  -- JUNOSe 2.0
+
+juniOspfCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper OSPF
+        MIB. This statement became obsolete when juniOspfIfBFDTable was implemented."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniOspfBasicGroup2,
+            juniOspfAreaGroup,
+            juniOspfIfGroup,
+            juniOspfVirtIfGroup,
+            juniOspfNbrGroup,
+            juniOspfSummImportGroup,
+            juniOspfMd5IntfGroup,
+            juniOspfMd5VirtIntfGroup,
+            juniOspfNetRangeGroup }
+    ::= { juniOspfCompliances 2 }                                  -- JUNOSe 4.0
+
+juniOspfCompliance3  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper OSPF
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniOspfBasicGroup2,
+            juniOspfAreaGroup,
+            juniOspfIfGroup,
+            juniOspfVirtIfGroup,
+            juniOspfNbrGroup,
+            juniOspfSummImportGroup,
+            juniOspfMd5IntfGroup,
+            juniOspfMd5VirtIntfGroup,
+            juniOspfNetRangeGroup,
+            juniOspfIfBFDGroup }
+    ::= { juniOspfCompliances 3 }                                  -- JUNOSe x.y    
+
+--
+-- units of conformance
+--
+juniOspfBasicGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfProcessId,
+        juniOspfMaxPathSplits,
+        juniOspfSpfHoldInterval,
+        juniOspfNumActiveAreas,
+        juniOspfSpfTime,
+        juniOspfRefBw,
+        juniOspfAutoVlink,
+        juniOspfIntraDistance,
+        juniOspfInterDistance,
+        juniOspfExtDistance,
+        juniOspfHelloPktsRcv,
+        juniOspfDDPktsRcv,
+        juniOspfLsrPktsRcv,
+        juniOspfLsuPktsRcv,
+        juniOspfLsAckPktsRcv,
+        juniOspfTotalRcv,
+        juniOspfLsaDiscardCnt,
+        juniOspfHelloPktsSent,
+        juniOspfDDPktsSent,
+        juniOspfLsrPktsSent,
+        juniOspfLsuPktsSent,
+        juniOspfLsAckPktsSent,
+        juniOspfErrPktsSent,
+        juniOspfTotalSent,
+        juniOspfCsumErrPkts,
+        juniOspfAllocFailNbr,
+        juniOspfAllocFailLsa,
+        juniOspfAllocFailLsd,
+        juniOspfAllocFailDbRequest,
+        juniOspfAllocFailRtx,
+        juniOspfAllocFailAck,
+        juniOspfAllocFailDbPkt,
+        juniOspfAllocFailCirc,
+        juniOspfAllocFailPkt,
+        juniOspfOperState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing general OSPF capabilities
+        in a Juniper product.  This group became obsolete when
+        juniOspfVpnRouteTag, juniOspfDomainId, juniOspfAreaTeCapable and
+        juniOspfMplsTeRtrIdIfIndex were added."
+    ::= { juniOspfGroups 1 }
+
+juniOspfIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfIfCost,
+        juniOspfIfMask,
+        juniOspfIfPassiveFlag,
+        juniOspfIfNbrCount,
+        juniOspfIfAdjNbrCount,
+        juniOspfIfMd5AuthKey,
+        juniOspfIfMd5AuthKeyId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects which augments the standard MIB objects for
+        managing OSPF Interface capabilities in a Juniper product."
+    ::= { juniOspfGroups 2 }
+
+juniOspfAreaGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfAreaType,
+        juniOspfAreaTeCapable }
+    STATUS      current
+    DESCRIPTION
+        "An object which augments the standard MIB objects for managing OSPF
+        areas capabilities in a Juniper product."
+    ::= { juniOspfGroups 3 }
+
+juniOspfVirtIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfVirtIfMd5AuthKey,
+        juniOspfVirtIfMd5AuthKeyId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects which augments the standard MIB objects for
+        managing OSPF virtual interface capabilities in a Juniper product."
+    ::= { juniOspfGroups 4 }
+
+juniOspfNbrGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfNbrLocalIpAddr,
+        juniOspfNbrDR,
+        juniOspfNbrBDR }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects which augments the standard MIB objects for
+        managing OSPF neighbor capabilities in a Juniper product."
+    ::= { juniOspfGroups 5 }
+
+juniOspfSummImportGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfSummAggNet,
+        juniOspfSummAggMask,
+        juniOspfSummAdminStat,
+        juniOspfSummRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing OSPF summary report capabilities
+        in a Juniper product."
+    ::= { juniOspfGroups 6 }
+
+juniOspfMd5IntfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfMd5IntfKeyId,
+        juniOspfMd5IntfKeyActive,
+        juniOspfMd5IntfAuthKey,
+        juniOspfMd5IntfRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing OSPF MD5 interfaces capabilities
+        in a Juniper product."
+    ::= { juniOspfGroups 7 }
+
+juniOspfMd5VirtIntfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfMd5VirtIntfAreaId,
+        juniOspfMd5VirtIntfNeighbor,
+        juniOspfMd5VirtIntfKeyId,
+        juniOspfMd5VirtIntfKeyActive,
+        juniOspfMd5VirtIntfAuthKey,
+        juniOspfMd5VirtIntfRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing OSPF MD5 virtual interfaces
+        capabilities in a Juniper product."
+    ::= { juniOspfGroups 8 }
+
+juniOspfNetRangeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfNetRangeNet,
+        juniOspfNetRangeMask,
+        juniOspfNetRangeAreaId,
+        juniOspfNetRangeRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing OSPF network range capabilities in
+        a Juniper product."
+    ::= { juniOspfGroups 9 }
+
+juniOspfBasicGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniOspfProcessId,
+        juniOspfMaxPathSplits,
+        juniOspfSpfHoldInterval,
+        juniOspfNumActiveAreas,
+        juniOspfSpfTime,
+        juniOspfRefBw,
+        juniOspfAutoVlink,
+        juniOspfIntraDistance,
+        juniOspfInterDistance,
+        juniOspfExtDistance,
+        juniOspfHelloPktsRcv,
+        juniOspfDDPktsRcv,
+        juniOspfLsrPktsRcv,
+        juniOspfLsuPktsRcv,
+        juniOspfLsAckPktsRcv,
+        juniOspfTotalRcv,
+        juniOspfLsaDiscardCnt,
+        juniOspfHelloPktsSent,
+        juniOspfDDPktsSent,
+        juniOspfLsrPktsSent,
+        juniOspfLsuPktsSent,
+        juniOspfLsAckPktsSent,
+        juniOspfErrPktsSent,
+        juniOspfTotalSent,
+        juniOspfCsumErrPkts,
+        juniOspfAllocFailNbr,
+        juniOspfAllocFailLsa,
+        juniOspfAllocFailLsd,
+        juniOspfAllocFailDbRequest,
+        juniOspfAllocFailRtx,
+        juniOspfAllocFailAck,
+        juniOspfAllocFailDbPkt,
+        juniOspfAllocFailCirc,
+        juniOspfAllocFailPkt,
+        juniOspfOperState,
+        juniOspfVpnRouteTag,
+        juniOspfDomainId,
+        juniOspfMplsTeRtrIdIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing general OSPF capabilities in a
+        Juniper product."
+    ::= { juniOspfGroups 10 }
+    
+juniOspfIfBFDGroup  OBJECT-GROUP
+    OBJECTS {
+        juniOspfIfBfdEnable,
+    	juniOspfIfBfdMinRxInterval,
+    	juniOspfIfBfdMinTxInterval,
+    	juniOspfIfBfdMultiplier }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for OSPFv2 BFD client configuration."
+    ::= { juniOspfGroups 11 }
+END
+

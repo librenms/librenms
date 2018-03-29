@@ -1,0 +1,316 @@
+RAPID-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,  
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, Unsigned32, TimeTicks   FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        rapidstream                        FROM RAPID-MIB;
+        
+    rsInfoModule MODULE-IDENTITY
+        LAST-UPDATED "0103061200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes client information
+             of RapidStream system."
+
+        REVISION      "200104201200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        ::= { rapidstream 6 }
+
+    rsClientMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for DHCP Server, DHCP Client
+         and PPPoE Client"
+        ::= { rsInfoModule 2 }
+
+    rsClientDHCPServer OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all DHCP server related information."
+        ::= { rsClientMIB 1 }
+
+    rsClientDHCPClient OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all DHCP client related information."
+        ::= { rsClientMIB 2 }
+
+    rsClientPPPoEClient OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all PPPoE client related information."
+        ::= { rsClientMIB 3 }
+
+    rsClientDHCPServerEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1),
+                        relay(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether if DHCP Server has been enabled. "
+        ::= { rsClientDHCPServer 1 }
+
+    rsClientDHCPServerStartIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The starting IP address of the range of IP addresses leased by the DHCP server."
+        ::= { rsClientDHCPServer 2 }
+
+    rsClientDHCPServerEndIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The last IP address of the range of IP addresses leased by the DHCP Server. "
+        ::= { rsClientDHCPServer 3 }
+
+    rsClientDHCPServerLeaseTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The lease time of an address assigned to a DHCP client. "
+        ::= { rsClientDHCPServer 4 }
+
+    rsClientDHCPServerNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of entries in the rsClientDHCPServerTable. "
+        ::= { rsClientDHCPServer 5 }
+
+    rsClientDHCPServerConnTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSClientDHCPServerConnEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the client lease table of the DHCP Server."
+        ::= { rsClientDHCPServer 6 }
+
+    rsClientDHCPServerRelayServer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of remote DHCP server to which
+             DHCP requests should be relayed."
+        ::= { rsClientDHCPServer 7 }
+
+    rsClientDHCPServerConnEntry OBJECT-TYPE
+        SYNTAX      RSClientDHCPServerConnEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the leasing
+            information of an assigned address by the DHCP Server."
+        INDEX {
+            rsClientDHCPServerConnIPAddr
+        }
+        ::= { rsClientDHCPServerConnTable 1 }
+
+    RSClientDHCPServerConnEntry ::= SEQUENCE {
+
+        rsClientDHCPServerConnIPAddr            IpAddress,
+
+        rsClientDHCPServerConnClientHostName    OCTET STRING,
+        rsClientDHCPServerConnMACAddr           OCTET STRING (SIZE(6)),
+        rsClientDHCPServerConnLeaseTimeStart    DateAndTime,
+        rsClientDHCPServerConnLeaseTimeEnd      DateAndTime
+    
+    }
+
+    rsClientDHCPServerConnClientHostName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The hostname of the client."
+        ::= { rsClientDHCPServerConnEntry 1 }
+
+    rsClientDHCPServerConnIPAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address assigned to the client."
+        ::= { rsClientDHCPServerConnEntry 2 }
+
+    rsClientDHCPServerConnMACAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC address of the client."
+        ::= { rsClientDHCPServerConnEntry 3 }
+
+
+    rsClientDHCPServerConnLeaseTimeStart OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time when the lease starts." 
+        ::= { rsClientDHCPServerConnEntry 4 }
+
+    rsClientDHCPServerConnLeaseTimeEnd OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time when the lease ends." 
+        ::= { rsClientDHCPServerConnEntry 5 }
+
+   -- DHCP Client information
+
+    rsClientDHCPClientEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether interface 1 (public) is configured to obtain IP address through DHCP."
+        ::= { rsClientDHCPClient 1 }
+
+    rsClientDHCPClientDomainName  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The domain name of the DHCP Client."
+        ::= { rsClientDHCPClient 2 }
+
+    rsClientDHCPClientDefaultGateway  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the default gateway obtained by the DHCP client."
+        ::= { rsClientDHCPClient 3 }
+
+    rsClientDHCPClientDNSOne  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the primary DNS server obtained by the DHCP client."
+        ::= { rsClientDHCPClient 4 }
+
+    rsClientDHCPClientDNSTwo  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the secondary DNS server obtained by the DHCP client."
+        ::= { rsClientDHCPClient 5 }
+
+
+   -- PPPoE Client information
+
+    rsClientPPPoEClientEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the interface 1 (public) is configured to use PPPoE."
+        ::= { rsClientPPPoEClient 1 }
+
+    rsClientPPPoEClientADSLStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    disconnect(0),       -- ADSL is disconnected
+                    initialize(1),       -- ADSL is initializing
+                    establish(2),        -- ASDL is established
+                    authenticate(3),     -- ASDL is authenticated
+                    network(4),
+                    running(5)           -- ASDL is running
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current ADSL status of the PPPoE Client. "
+        ::= { rsClientPPPoEClient 2 }
+ 
+    rsClientPPPoEClientLocalIPAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address obtained by the PPPoE Client."
+        ::= { rsClientPPPoEClient 3 }
+
+    rsClientPPPoEClientRemoteIPAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP Address of the PPP server this PPPoE client connects to."
+        ::= { rsClientPPPoEClient 4 }
+
+    rsClientPPPoEClientNetMask   OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+
+        DESCRIPTION
+            "The subnet mask of the PPPoE client."    
+        ::= { rsClientPPPoEClient 5 }
+
+    rsClientPPPoEClientDNSOne  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the primary DNS server obtained."
+        ::= { rsClientPPPoEClient 6 }
+
+    rsClientPPPoEClientDNSTwo  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the secondary DNS server obtained."
+        ::= { rsClientPPPoEClient 7 }
+
+    rsClientPPPoEADSLPeerMACAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC Address of the PPP server this client connects to."
+        ::= { rsClientPPPoEClient 8 }
+
+    rsClientPPPoEClientConnTime  OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The connection time of the PPPoE connection."
+        ::= { rsClientPPPoEClient 9 }
+
+END

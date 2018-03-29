@@ -1,0 +1,1730 @@
+
+F5-BIGIP-COMMON-MIB DEFINITIONS ::= BEGIN
+--================================================================
+-- F5-MIB 
+--     A private enterprise MIB for F5 Networks.
+--     VERSION: 11.6.1
+--================================================================
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    enterprises, Integer32
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+--================================================================
+f5 MODULE-IDENTITY
+    LAST-UPDATED "201603022024Z" -- Wed Mar  2 20:24:18 UTC 2016
+    ORGANIZATION "F5 Networks, Inc."
+    CONTACT-INFO
+         "postal: F5 Networks, Inc. 
+                  401 Elliott Ave. West
+                  Seattle,  WA 98119
+          phone:  (206) 272-5555
+          email:  support@f5.com"
+
+    DESCRIPTION
+        "Top-level infrastructure of the F5 enterprise MIB tree." 
+    ::= { enterprises  3375 }
+
+--================================================================
+bigipTrafficMgmt      OBJECT IDENTIFIER ::= { f5 2 }
+
+bigipNotification     OBJECT IDENTIFIER ::= { bigipTrafficMgmt 4 }
+bigipCompliance       OBJECT IDENTIFIER ::= { bigipTrafficMgmt 5 }
+
+bigipNotifications    OBJECT IDENTIFIER ::= { bigipNotification 0 }
+bigipNotifyObjects    OBJECT IDENTIFIER ::= { bigipNotification 1 }
+ 
+bigipCompliances      OBJECT IDENTIFIER ::= { bigipCompliance 1 }
+bigipGroups           OBJECT IDENTIFIER ::= { bigipCompliance 2 }
+
+bigipNotificationGroups     OBJECT IDENTIFIER ::= { bigipGroups 4 } 
+
+--================================================================
+-- bigipNotifyObjects
+--
+bigipNotifyObjMsg OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The additional information about the related notification."
+        ::= { bigipNotifyObjects 1 }
+
+bigipNotifyObjNode OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The user-assigned name or IP address of the node."
+        ::= { bigipNotifyObjects 2 }
+
+bigipNotifyObjPort OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The port or service name."
+        ::= { bigipNotifyObjects 3 }
+
+--================================================================
+-- bigipNotifications 
+--
+bigipAgentStart        NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION 
+		"An indication that the agent has started running."
+	::= { bigipNotifications 1 }
+
+bigipAgentShutdown     NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"An indication that the agent is in the process of being shut down."
+	::= { bigipNotifications 2 }
+
+bigipAgentRestart      NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"An indication that the agent has been restarted.
+		(eg. It happens when a SIGHUP is received.)
+		This does not imply anything about whether the configuration has
+		changed (unlike the standard coldStart or warmStart traps)"
+	::= { bigipNotifications 3 }
+--==================================================================
+bigipCpuTempHigh      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"CPU temperature is too high."
+	::= { bigipNotifications 4 }
+
+bigipCpuFanSpeedLow      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"CPU fan speed is too low."
+	::= { bigipNotifications 5 }
+
+bigipCpuFanSpeedBad      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"CPU fan speed signal not received."
+	::= { bigipNotifications 6 }
+
+bigipChassisTempHigh      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"Chassis temperature is too high."
+	::= { bigipNotifications 7 }
+
+bigipChassisFanBad      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"Chassis fan status is bad."
+	::= { bigipNotifications 8 }
+
+bigipChassisPowerSupplyBad      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"Chassis power supply status is bad."
+	::= { bigipNotifications 9 }
+
+bigipServiceDown      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg,
+		bigipNotifyObjNode,
+		bigipNotifyObjPort
+	}
+	STATUS      current
+	DESCRIPTION
+		"A service is detected DOWN."
+	::= { bigipNotifications 10 }
+
+bigipServiceUp      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg,
+		bigipNotifyObjNode,
+		bigipNotifyObjPort
+	}
+	STATUS      current
+	DESCRIPTION
+		"A service is detected UP."
+	::= { bigipNotifications 11 }
+
+bigipNodeDown      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg,
+		bigipNotifyObjNode
+	}
+	STATUS      current
+	DESCRIPTION
+		"A node is detected DOWN."
+	::= { bigipNotifications 12 }
+
+bigipNodeUp      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg,
+		bigipNotifyObjNode
+	}
+	STATUS      current
+	DESCRIPTION
+		"A node is detected UP."
+	::= { bigipNotifications 13 }
+
+bigipStandby      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system is going into standby mode."
+	::= { bigipNotifications 14 }
+
+bigipActive      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system is going into active mode."
+	::= { bigipNotifications 15 }
+
+bigipActiveActive      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system is going into active-active mode."
+	::= { bigipNotifications 16 }
+
+bigipFeatureFailed      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A high availability feature triggered action failed."
+	::= { bigipNotifications 17 }
+
+bigipFeatureOnline      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A high availability feature is now responding."
+	::= { bigipNotifications 18 }
+
+bigipLicenseFailed      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The license validation failed."
+	::= { bigipNotifications 19 }
+
+bigipLicenseExpired      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The license has expired."
+	::= { bigipNotifications 20 }
+
+bigipTamdAlert      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Too many authentication failures (> 60) in 1 second to
+		TMM (Traffic Management Module)."
+	::= { bigipNotifications 21 }
+
+bigipAggrReaperStateChange     NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The aggressive reaper state changed. Aggressive reaper 
+		state changes indicate the system is moving into distress-mode 
+		for DOS prevention."
+	::= { bigipNotifications 22 }
+
+bigipARPConflict      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"There is an ARP conflict."
+	::= { bigipNotifications 23 }
+
+bigipNetLinkDown      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"An internal interface link is down. This is for L1 and L2. 
+		These are internal links within the box connecting the CPU 
+		and Switch subsystems, which should never lose link. 
+		If they do, it indicates a serious problem."
+	::= { bigipNotifications 24 }
+
+bigipDiskPartitionWarn      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The disk partition free space is very limited, which is   
+		less than a specified limit. By default, the limit is set
+		to 30% of total disk space."
+	::= { bigipNotifications 25 }
+
+bigipDiskPartitionGrowth      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The disk partition exceeds the specified growth limit. 
+		By default, the limit is set to 5% of the total disk space.
+		The growth is difference of two consecutive monitoring data."
+	::= { bigipNotifications 26 }
+
+bigipAuthFailed      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The login/sshd authentication has failed."
+	::= { bigipNotifications 27 }
+
+bigipConfigLoaded      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      deprecated
+	DESCRIPTION
+		"Deprecated! The compoent which created this event has been
+deprecated.  The configuration was loaded."
+	::= { bigipNotifications 28 }
+
+bigipLogEmerg      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system is in an unusable situation."
+	::= { bigipNotifications 29 }
+
+bigipLogAlert      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Action must be taken immediately for the system to work
+properly."
+	::= { bigipNotifications 30 }
+
+bigipLogCrit      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system is in a critical condition." 
+	::= { bigipNotifications 31 }
+
+bigipLogErr      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system has some error conditions." 
+	::= { bigipNotifications 32 }
+
+bigipLogWarning      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The system is experiencing some warning conditions." 
+	::= { bigipNotifications 33 }
+
+bigipPacketRejected      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The packets are rejected." 
+	::= { bigipNotifications 34 }
+
+bigipCompLimitExceeded  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The compression license limit is exceeded." 
+	::= { bigipNotifications 35 }
+
+bigipSslLimitExceeded  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The SSL license limits are exceeded, 
+		either for TPS (Transactions Per Second) or 
+		for MPS (Megabits Per Second)." 
+	::= { bigipNotifications 36 }
+
+bigipExternalLinkChange  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"An external interface link status changes.  
+		For a fixed port, this is an occurrence when network cables 
+		are connected  or removed, and the network is reconfigured; 
+		for a pluggable port (such as a SFP or XFP port), this happens 
+		when the pluggable unit is plugged in or unplugged, 
+		or when a cable is connected or removed from a plugged port.  
+		The possible values are UP, DOWN, or UNPOPULATED."
+	::= { bigipNotifications 37 }
+
+bigipAsmRequestBlocked  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The HTTP request was blocked because it issued (at least one)
+		violation(s) which is marked as blocking at the current active 
+		policy in Application Security Module."
+	::= { bigipNotifications 38 }
+
+bigipAsmRequestViolation  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The HTTP request issued a violation to the current active policy. 
+		This violation is marked as an alerting violation in that policy
+		in Application Security Module." 
+	::= { bigipNotifications 39 }
+
+bigipGtmPoolAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool is becoming available in global traffic management module." 
+	::= { bigipNotifications 40 }
+
+bigipGtmPoolNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 41 }
+
+bigipGtmPoolDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool is disabled in global traffic management module." 
+	::= { bigipNotifications 42 }
+
+bigipGtmPoolEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool is enabled in global traffic management module." 
+	::= { bigipNotifications 43 }
+
+bigipGtmLinkAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A link is becoming available in global traffic management module." 
+	::= { bigipNotifications 44 }
+
+bigipGtmLinkNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A link is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 45 }
+
+bigipGtmLinkDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A link is disabled in global traffic management module." 
+	::= { bigipNotifications 46 }
+
+bigipGtmLinkEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A link is enabled in global traffic management module." 
+	::= { bigipNotifications 47 }
+
+bigipGtmWideIpAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A wide IP is becoming available in global traffic management module." 
+	::= { bigipNotifications 48 }
+
+bigipGtmWideIpNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A wide IP is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 49 }
+
+bigipGtmWideIpDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A wide IP is disabled in global traffic management module." 
+	::= { bigipNotifications 50 }
+
+bigipGtmWideIpEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A wide IP is enabled in global traffic management module." 
+	::= { bigipNotifications 51 }
+
+bigipGtmPoolMbrAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool member is becoming available in global traffic management module." 
+	::= { bigipNotifications 52 }
+
+bigipGtmPoolMbrNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool member is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 53 }
+
+bigipGtmPoolMbrDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool member is disabled in global traffic management module." 
+	::= { bigipNotifications 54 }
+
+bigipGtmPoolMbrEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool member is enabled in global traffic management module." 
+	::= { bigipNotifications 55 }
+
+bigipGtmServerAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A server is becoming available in global traffic management module." 
+	::= { bigipNotifications 56 }
+
+bigipGtmServerNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A server is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 57 }
+
+bigipGtmServerDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A server is disabled in global traffic management module." 
+	::= { bigipNotifications 58 }
+
+bigipGtmServerEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A server is enabled in global traffic management module." 
+	::= { bigipNotifications 59 }
+
+bigipGtmVsAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A virtual server is becoming available in global traffic management module." 
+	::= { bigipNotifications 60 }
+
+bigipGtmVsNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A virtual server is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 61 }
+
+bigipGtmVsDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A virtual server is disabled in global traffic management module." 
+	::= { bigipNotifications 62 }
+
+bigipGtmVsEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A virtual server is enabled in global traffic management module." 
+	::= { bigipNotifications 63 }
+
+bigipGtmDcAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A data center is becoming available in global traffic management module." 
+	::= { bigipNotifications 64 }
+
+bigipGtmDcNotAvail NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A data center is becoming unavailable in global traffic management module." 
+	::= { bigipNotifications 65 }
+
+bigipGtmDcDisabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A data center is disabled in global traffic management module." 
+	::= { bigipNotifications 66 }
+
+bigipGtmDcEnabled  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A data center is enabled in global traffic management module." 
+	::= { bigipNotifications 67 }
+
+bigipHardDiskFailure  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      deprecated
+	DESCRIPTION
+		"Deprecated!  This object has been eliminated.
+                The hard disk is failing." 
+	::= { bigipNotifications 68 }
+
+bigipGtmAppObjAvail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"An application object is becoming available in global management module." 
+	::= { bigipNotifications 69 }
+
+bigipGtmAppObjNotAvail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"An application object is becoming unavailable in global management module." 
+	::= { bigipNotifications 70 }
+
+bigipGtmAppAvail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"An application is becoming available in global management module." 
+	::= { bigipNotifications 71 }
+
+bigipGtmAppNotAvail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"An application is becoming unavailable in global management module." 
+	::= { bigipNotifications 72 }
+
+bigipGtmJoinedGroup  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"BIG-IP GTM joined sync group." 
+	::= { bigipNotifications 73 }
+
+bigipGtmLeftGroup  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"BIG-IP GTM left sync group." 
+	::= { bigipNotifications 74 }
+
+bigipStandByFail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"In failover condition, this standby will not be able to go active." 
+	::= { bigipNotifications 75 }
+
+bigipInetPortExhaustion  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+            "The TMM has run out of source ports and cannot open new communications channels with other machines."
+	::= { bigipNotifications 76 }
+
+bigipGtmBoxAvail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A gtm machine (which equates to an iquery connect to a gtm machine) has gone UP" 
+	::= { bigipNotifications 77 }
+
+bigipGtmBoxNotAvail  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A gtm machine (which equates to an iquery connect to a gtm machine) has gone DOWN" 
+	::= { bigipNotifications 78 }
+
+bigipAsmFtpRequestBlocked  NOTIFICATION-TYPE
+	OBJECTS {
+		bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The FTP request was blocked because it issued (at least one)
+		violation(s) which is marked as blocking at the current active
+		policy in Application Security Module."
+	::= { bigipNotifications 79 }
+
+bigipAsmFtpRequestViolation  NOTIFICATION-TYPE
+	OBJECTS {
+		bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The FTP request issued a violation to the current active
+		policy. This violation is marked as an alerting violation 
+		in that policy in Application Security Module."
+	::= { bigipNotifications 80 }
+
+bigipGtmBig3dSslCertExpired  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "BIG-IP GTM BIG3D SSL Cert has expired."
+        ::= { bigipNotifications 81 }
+
+bigipGtmBig3dSslCertWillExpire  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "BIG-IP GTM BIG3D SSL Cert will expire."
+        ::= { bigipNotifications 82 }
+
+bigipGtmSslCertExpired  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "BIG-IP GTM SSL Cert has expired."
+        ::= { bigipNotifications 83 }
+
+bigipGtmSslCertWillExpire  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "BIG-IP GTM SSL Cert will expire."
+        ::= { bigipNotifications 84 }
+
+bigipAsmSmtpRequestBlocked  NOTIFICATION-TYPE
+	OBJECTS {
+		bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The SMTP request was blocked because it issued (at least one)
+		violation(s) which is marked as blocking at the current active
+		policy in Application Security Module."
+	::= { bigipNotifications 85 }
+
+bigipAsmSmtpRequestViolation  NOTIFICATION-TYPE
+	OBJECTS {
+		bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The SMTP request issued a violation to the current active
+		policy. This violation is marked as an alerting violation 
+		in that policy in Application Security Module."
+	::= { bigipNotifications 86 }
+
+bigipBladeTempHigh      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"Blade temperature is too high."
+	::= { bigipNotifications 87 }
+
+bigipBladeNoPower      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"A blade lost power. The blade may be pulled out"
+	::= { bigipNotifications 88 }
+
+bigipClusterdNoResponse      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"The cluster daemon failed to respond for 10 or more seconds."
+	::= { bigipNotifications 89 }
+
+bigipBladeOffline      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+        }
+	STATUS      current
+	DESCRIPTION
+		"A blade has failed - offline."
+	::= { bigipNotifications 90 }
+
+bigipAsmDosAttackDetected  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "DoS attack detected by Application Security Module."
+        ::= { bigipNotifications 91 }
+
+bigipAsmBruteForceAttackDetected  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Brute force attack detected by Application Security Module."
+        ::= { bigipNotifications 92 }
+
+bigipAomCpuTempTooHigh  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "AOM reports the air temperature near the host CPU too high."
+        ::= { bigipNotifications 93 }
+
+bigipGtmKeyGenerationRollover  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "DNSSEC Key generation has rolled over."
+        ::= { bigipNotifications 94 }
+
+bigipGtmKeyGenerationExpiration  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "DNSSEC Key generation has expired."
+        ::= { bigipNotifications 95 }
+
+bigipRaidDiskFailure  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Disk failure in a RAID disk array."
+        ::= { bigipNotifications 96 }
+
+bigipGtmProberPoolStatusChange  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Status Change."
+        ::= { bigipNotifications 97 }
+
+bigipGtmProberPoolStatusChangeReason  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Status Change Reason."
+        ::= { bigipNotifications 98 }
+
+bigipGtmProberPoolDisabled  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Disabled."
+        ::= { bigipNotifications 99 }
+
+bigipGtmProberPoolEnabled  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Enabled."
+        ::= { bigipNotifications 100 }
+
+bigipGtmProberPoolMbrStatusChange  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Member Status Change."
+        ::= { bigipNotifications 101 }
+
+bigipGtmProberPoolMbrStatusChangeReason  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Member Status Change Reason."
+        ::= { bigipNotifications 102 }
+
+bigipGtmProberPoolMbrDisabled  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Member Disabled."
+        ::= { bigipNotifications 103 }
+
+bigipGtmProberPoolMbrEnabled  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Prober Pool Member Enabled."
+        ::= { bigipNotifications 104 }
+
+bigipAvrAlertsMetricSnmp  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "AVR alert metric state changed - notification for SNMP."
+        ::= { bigipNotifications 105 }
+
+bigipAvrAlertsMetricSmtp  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS     deprecated 
+        DESCRIPTION
+                "Deprecated! AVR alert metric state changed - notification for SMTP (based on SNMP)."
+        ::= { bigipNotifications 106 }
+
+bigipVcmpAlertsVcmpPowerOn  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "A VCMP guest is powered on from a suspended or powered off state."
+        ::= { bigipNotifications 107 }
+
+bigipVcmpAlertsVcmpPowerOff  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "A VCMP guest is powered off."
+        ::= { bigipNotifications 108 }
+
+bigipVcmpAlertsVcmpHBLost  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "A VCMP guest heartbeat is lost."
+        ::= { bigipNotifications 109 }
+
+bigipVcmpAlertsVcmpHBDetected  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "A VCMP guest heartbeat is detected or regained."
+        ::= { bigipNotifications 110 }
+
+bigipSsdMwiNearThreshold NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "SSD disk wear-out indicator is near its threshold."
+        ::= { bigipNotifications 111 }
+
+bigipSsdMwiReachedThreshold NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "SSD disk wear-out indicator has reached its threshold."
+        ::= { bigipNotifications 112 }
+
+bigipSystemCheckAlertTempHigh  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Temperature is too high."
+        ::= { bigipNotifications 113 }
+
+bigipSystemCheckAlertVoltageHigh  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Voltage is too high."
+        ::= { bigipNotifications 114 }
+
+bigipSystemCheckAlertFanSpeedLow  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Fan speed is too low."
+        ::= { bigipNotifications 115 }
+
+bigipLibhalSsdPhysicalDiskRemoved  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "SSD physical disk was removed."
+        ::= { bigipNotifications 116 }
+
+bigipLibhalSsdLogicalDiskRemoved  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "SSD logical disk was removed."
+        ::= { bigipNotifications 117 }
+
+bigipLibhalDiskBayRemoved  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Disk sled was removed from a bay."
+        ::= { bigipNotifications 118 }
+
+bigipLibhalBladePoweredOff  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Blade is about to be powered off."
+        ::= { bigipNotifications 119 }
+
+bigipLibhalSensorAlarmCritical  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Blade hardware sensor indicated critical alarm."
+        ::= { bigipNotifications 120 }
+
+bigipChmandAlertFanTrayBad  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Chassis fan tray is bad or removed."
+        ::= { bigipNotifications 121 }
+
+bigipUnsolicitedRepliesExceededThreshold  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "The DNS cache object received unsolicited query replies
+                exceeding a configured threshold."
+        ::= { bigipNotifications 122 }
+
+bigipSystemCheckAlertVoltageLow  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Voltage is too low."
+        ::= { bigipNotifications 123 }
+
+bigipSystemCheckAlertMilliVoltageHigh  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Milli-Voltage is too high."
+        ::= { bigipNotifications 124 }
+
+bigipSystemCheckAlertCurrentHigh  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Current is too high."
+        ::= { bigipNotifications 125 }
+
+bigipSystemCheckAlertPowerHigh  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Power is too high."
+        ::= { bigipNotifications 126 }
+
+bigipSystemCheckAlertMilliVoltageLow  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Milli-Voltage is too low."
+        ::= { bigipNotifications 127 }
+
+bigipSystemCheckAlertCurrentLow  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Current is too low."
+        ::= { bigipNotifications 128 }
+
+bigipSystemCheckAlertPowerLow  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Power is too low."
+        ::= { bigipNotifications 129 }
+
+bigipNodeRate      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A node has exceeded the allowed rate."
+	::= { bigipNotifications 130 }
+
+bigipMemberRate      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A pool member has exceeded the allowed rate."
+	::= { bigipNotifications 131 }
+
+bigipVirtualRate      NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A virtual has exceeded the allowed rate."
+	::= { bigipNotifications 132 }
+
+bigipDosAttackStart      NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "A DOS attack start was detected."
+        ::= { bigipNotifications 133 }
+
+bigipDosAttackStop      NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "A DOS attack stop was detected."
+        ::= { bigipNotifications 134 }
+
+bigipLtmVsAvail NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A virtual has become available."
+        ::= { bigipNotifications 135 }
+
+bigipLtmVsUnavail NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A virtual has become unavailable."
+        ::= { bigipNotifications 136 }
+
+bigipLtmVsEnabled  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A virtual has become enabled."
+        ::= { bigipNotifications 137 }
+
+bigipLtmVsDisabled  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A virtual has become disabled."
+        ::= { bigipNotifications 138 }
+
+bigipDnsRequestRateLimiterEngaged  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "The DNS Services request rate limiter has been engaged."
+        ::= { bigipNotifications 139 }
+        
+bigipGtmRequestRateLimiterEngaged  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "The GTM request rate limiter has been engaged."
+        ::= { bigipNotifications 140 }
+
+bigipTrafficGroupStandby  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A traffic group is going into standby mode on the system."
+        ::= { bigipNotifications 141 }
+
+bigipTrafficGroupActive  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A traffic group is going into active mode on the system."
+        ::= { bigipNotifications 142 }
+
+bigipTrafficGroupOffline  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A traffic group is going into offline mode on the system."
+        ::= { bigipNotifications 143 }
+        
+bigipTrafficGroupForcedOffline  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A traffic group is going into forced offline mode on the system."
+        ::= { bigipNotifications 144 }
+        
+bigipTrafficGroupDeactivate  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A traffic group is being deactivated on the system."
+        ::= { bigipNotifications 145 }
+
+bigipTrafficGroupActivate  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "A traffic group is being activated on the system."
+        ::= { bigipNotifications 146 }
+
+bigipPsPowerOn  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Power supply unit has powered on."
+        ::= { bigipNotifications 147 }
+
+bigipPsPowerOff  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Power supply unit has powered off."
+        ::= { bigipNotifications 148 }
+
+bigipPsAbsent  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Power supply unit is absent."
+        ::= { bigipNotifications 149 }
+
+bigipClusterPrimaryChanged  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "The primary blade has been changed in the cluster system."
+        ::= { bigipNotifications 150 }
+
+bigipSystemShutdown  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "The system is shutting down."
+        ::= { bigipNotifications 151 }
+
+bigipFipsDeviceError  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Encountered error in the FIPS card operation."
+        ::= { bigipNotifications 152 }
+
+bigipUpdatePriority  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "There is a high priority software update available."
+        ::= { bigipNotifications 153 }
+
+bigipUpdateServer  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Unable to connect to the F5 Update Check server."
+        ::= { bigipNotifications 154 }
+
+bigipUpdateError  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "There was an error checking for updates."
+        ::= { bigipNotifications 155 }
+
+bigipFipsFault  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "The FIPS card is currently in faulty state."
+        ::= { bigipNotifications 156 }
+
+--================================================================
+-- Compliance & Groups  
+--
+bigipNotificationCompliance   MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+                "This specifies the objects that are required to claim
+                 compliance to F5 Traffic Management System."
+        MODULE
+          MANDATORY-GROUPS { 
+		bigipNotifyObjectsGroup,
+		bigipAgentNotifyGroup 
+	  }
+        ::= { bigipCompliances 4 }
+
+bigipNotifyObjectsGroup OBJECT-GROUP
+         OBJECTS {
+                bigipNotifyObjMsg,
+                bigipNotifyObjNode,
+		bigipNotifyObjPort
+        }
+        STATUS   current
+        DESCRIPTION
+                "A collection of objects used for the notification MIB."
+        ::= { bigipNotificationGroups 1 }
+
+bigipAgentNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { 
+		bigipAgentStart, 
+		bigipAgentShutdown, 
+		bigipAgentRestart 
+	}
+	STATUS      current
+	DESCRIPTION
+		"The notifications relating to the basic operation of 
+		the BIGIP agent."
+    ::= { bigipNotificationGroups 2 }
+
+bigipSystemNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { 
+		bigipCpuTempHigh,
+		bigipCpuFanSpeedLow,
+		bigipCpuFanSpeedBad,
+		bigipChassisTempHigh,
+		bigipChassisFanBad,
+		bigipChassisPowerSupplyBad,
+		bigipServiceDown,
+		bigipServiceUp,
+		bigipNodeDown,
+		bigipNodeUp,
+		bigipStandby,
+ 		bigipActive,
+		bigipActiveActive,
+		bigipFeatureFailed,
+		bigipFeatureOnline,
+		bigipLicenseFailed,
+		bigipLicenseExpired,
+		bigipTamdAlert,
+		bigipAggrReaperStateChange,
+		bigipARPConflict,
+		bigipNetLinkDown,
+		bigipDiskPartitionWarn,
+		bigipDiskPartitionGrowth,
+		bigipAuthFailed,
+		bigipConfigLoaded,
+		bigipLogEmerg,
+		bigipLogAlert,
+		bigipLogCrit,
+		bigipLogErr,
+		bigipLogWarning,
+		bigipPacketRejected, 
+		bigipCompLimitExceeded, 
+		bigipSslLimitExceeded,
+		bigipExternalLinkChange,
+		bigipAsmRequestBlocked,
+		bigipAsmRequestViolation,
+		bigipGtmPoolAvail,
+		bigipGtmPoolNotAvail,
+		bigipGtmPoolDisabled,
+		bigipGtmPoolEnabled,
+		bigipGtmLinkAvail,
+		bigipGtmLinkNotAvail,
+		bigipGtmLinkDisabled,
+		bigipGtmLinkEnabled,
+		bigipGtmWideIpAvail,
+		bigipGtmWideIpNotAvail,
+		bigipGtmWideIpDisabled,
+		bigipGtmWideIpEnabled,
+		bigipGtmPoolMbrAvail,
+		bigipGtmPoolMbrNotAvail,
+		bigipGtmPoolMbrDisabled,
+		bigipGtmPoolMbrEnabled,
+		bigipGtmServerAvail,
+		bigipGtmServerNotAvail,
+		bigipGtmServerDisabled,
+		bigipGtmServerEnabled,
+		bigipGtmVsAvail,
+		bigipGtmVsNotAvail,
+		bigipGtmVsDisabled,
+		bigipGtmVsEnabled,
+		bigipGtmDcAvail,
+		bigipGtmDcNotAvail,
+		bigipGtmDcDisabled,
+		bigipGtmDcEnabled,
+		bigipHardDiskFailure,
+		bigipGtmAppObjAvail,
+		bigipGtmAppObjNotAvail,
+		bigipGtmAppAvail,
+		bigipGtmAppNotAvail,
+		bigipGtmJoinedGroup,
+		bigipGtmLeftGroup,
+	 	bigipStandByFail,
+		bigipInetPortExhaustion,
+		bigipGtmBoxAvail,
+		bigipGtmBoxNotAvail,
+		bigipAsmFtpRequestBlocked,
+		bigipAsmFtpRequestViolation,
+		bigipGtmBig3dSslCertExpired,
+		bigipGtmBig3dSslCertWillExpire,
+		bigipGtmSslCertExpired,
+		bigipGtmSslCertWillExpire,
+		bigipAsmSmtpRequestBlocked,
+		bigipAsmSmtpRequestViolation,
+		bigipBladeTempHigh,
+		bigipBladeNoPower,
+		bigipClusterdNoResponse,
+		bigipBladeOffline,
+		bigipAsmDosAttackDetected,
+		bigipAsmBruteForceAttackDetected,
+		bigipAomCpuTempTooHigh,
+		bigipGtmKeyGenerationRollover,
+		bigipGtmKeyGenerationExpiration,
+		bigipRaidDiskFailure,
+		bigipGtmProberPoolStatusChange,
+		bigipGtmProberPoolStatusChangeReason,
+		bigipGtmProberPoolDisabled,
+		bigipGtmProberPoolEnabled,
+		bigipGtmProberPoolMbrStatusChange,
+		bigipGtmProberPoolMbrStatusChangeReason,
+		bigipGtmProberPoolMbrDisabled,
+		bigipGtmProberPoolMbrEnabled,
+		bigipAvrAlertsMetricSnmp,
+		bigipAvrAlertsMetricSmtp,
+		bigipVcmpAlertsVcmpPowerOn,
+		bigipVcmpAlertsVcmpPowerOff,
+		bigipVcmpAlertsVcmpHBLost,
+		bigipVcmpAlertsVcmpHBDetected,
+		bigipSsdMwiNearThreshold,
+		bigipSsdMwiReachedThreshold,
+		bigipSystemCheckAlertTempHigh,
+		bigipSystemCheckAlertVoltageHigh,
+		bigipSystemCheckAlertFanSpeedLow,
+		bigipLibhalSsdPhysicalDiskRemoved,
+		bigipLibhalSsdLogicalDiskRemoved,
+		bigipLibhalDiskBayRemoved,
+		bigipLibhalBladePoweredOff,
+		bigipLibhalSensorAlarmCritical,
+		bigipChmandAlertFanTrayBad,
+		bigipUnsolicitedRepliesExceededThreshold,
+		bigipSystemCheckAlertVoltageLow,
+		bigipSystemCheckAlertMilliVoltageHigh,
+		bigipSystemCheckAlertCurrentHigh,
+		bigipSystemCheckAlertPowerHigh,
+		bigipSystemCheckAlertMilliVoltageLow,
+		bigipSystemCheckAlertCurrentLow,
+		bigipSystemCheckAlertPowerLow,
+		bigipNodeRate,
+		bigipMemberRate,
+		bigipVirtualRate,
+		bigipDosAttackStart,
+		bigipDosAttackStop,
+		bigipLtmVsAvail,
+		bigipLtmVsUnavail,
+		bigipLtmVsEnabled,
+		bigipLtmVsDisabled,
+		bigipDnsRequestRateLimiterEngaged,
+		bigipGtmRequestRateLimiterEngaged,
+                bigipTrafficGroupStandby,
+                bigipTrafficGroupActive,
+                bigipTrafficGroupOffline,
+                bigipTrafficGroupForcedOffline,
+                bigipTrafficGroupDeactivate,
+                bigipTrafficGroupActivate,
+		bigipPsPowerOn,
+		bigipPsPowerOff,
+		bigipPsAbsent,
+		bigipClusterPrimaryChanged,
+		bigipSystemShutdown,
+                bigipFipsDeviceError,
+                bigipUpdatePriority,
+                bigipUpdateServer,
+                bigipUpdateError,
+                bigipFipsFault
+	}
+	STATUS      current
+	DESCRIPTION
+		"The notifications relating to the operation of 
+		the BIGIP system."
+    ::= { bigipNotificationGroups 3 }
+
+--================================================================
+--  
+LongDisplayString ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "1024a"
+	STATUS       current
+	DESCRIPTION  "A longer version of SNMPv2-TC::DisplayString."
+	SYNTAX       OCTET STRING (SIZE (0..1024))
+
+END
+
+
+
+
+

@@ -1,0 +1,516 @@
+CISCOSB-TRUNK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    OBJECT-TYPE, IpAddress, Unsigned32,Counter32, TimeTicks,
+    MODULE-IDENTITY                         FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, TruthValue, RowStatus,
+    PhysAddress
+                                            FROM SNMPv2-TC
+    dot3adAggIndex, dot3adAggPortIndex      FROM IEEE8023-LAG-MIB;
+
+
+ rlDot3adAgg   MODULE-IDENTITY
+          LAST-UPDATED "200612020000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition for trunk support in CISCOSB devices."
+          REVISION "200612020000Z"
+          DESCRIPTION
+                  "Initial version of this MIB."
+          ::= { switch001 65 }
+
+rlDot3adAggMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlDot3adAgg 1 }
+
+--
+-- rlDot3adAggBalanceTable
+--
+rlDot3adAggBalanceTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlDot3adAggBalanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies a balancing criterion used
+         for the corresponding dot3adAggIndex."
+    ::= { rlDot3adAgg 2 }
+
+rlDot3adAggBalanceEntry OBJECT-TYPE
+    SYNTAX  RlDot3adAggBalanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of information for each dot3adAggIndex."
+    INDEX  { dot3adAggIndex, rlDot3adAggBalanceForwardType }
+    ::= { rlDot3adAggBalanceTable 1 }
+
+RlDot3adAggBalanceEntry ::= SEQUENCE {
+    rlDot3adAggBalanceForwardType       INTEGER,
+    rlDot3adAggBalanceLayer             INTEGER,
+    rlDot3adAggBalanceUsedAddresses     INTEGER,
+    rlDot3adAggBalanceBroadcastType     INTEGER
+}
+
+rlDot3adAggBalanceForwardType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        bridging(1),
+        routing(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Forwarding type: Bridging or Routing."
+    ::= { rlDot3adAggBalanceEntry 1 }
+
+rlDot3adAggBalanceLayer OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Network Layer Number, may have the following values: 2, 3 or 4.
+         The default value is:
+           Bridging: 2
+           Routing:  3."
+    ::= { rlDot3adAggBalanceEntry 2 }
+
+rlDot3adAggBalanceUsedAddresses  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        notApplied(0),
+        dstAddr(1),
+        srcAddr(2),
+        dstAndSrcAddr(3),
+        vlanId(4),
+        ethType(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the Network Layer addresses used for Balancing of
+         unicast frames.
+         The function sets the criterion (by layer and used address in it)."
+    DEFVAL { dstAddr }
+    ::= { rlDot3adAggBalanceEntry 3 }
+
+rlDot3adAggBalanceBroadcastType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        common(0),
+        dedicated(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies a balancing criterion used for L2 broadcast and unknown
+         frames:
+            common:
+                a link allocated for broadcast and unknown frames is used
+                for unicast frames too
+            dedicated:
+                a link allocated for broadcast and unknown frames is not used
+                for unicast frames"
+    DEFVAL { common }
+    ::= { rlDot3adAggBalanceEntry 4 }
+
+rlDot3adAggNumOfTrunks OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of trunks supported by the device."
+    ::= { rlDot3adAgg 3 }
+
+rlDot3adAggMaxPortsInTrunks OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximun number of ports in a trunk."
+    ::= { rlDot3adAgg 4 }
+
+rlDot3adAggTrunkCreationSupport OBJECT-TYPE
+    SYNTAX  INTEGER {
+        notSupported(0),
+        supportsTrunkOrLacp(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies if there is support to rldot3adAggCreationTable,
+         and the type of the support:
+         supportedTrunkOrLacp - ports that are members in some trunk
+         are belongs to it by manual configuration or by lacp,
+         but not togther.
+         notSupported - there is not support to rldot3adAggCreationTable."
+    ::= { rlDot3adAgg 5 }
+
+--
+-- rlDot3adAggCreationTable
+--
+rlDot3adAggCreationTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlDot3adAggCreationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table is for creation of an aggregator
+         for the corresponding dot3adAggIndex, when the value of the
+         rlDot3adAggCreationSupport is diffrent from notSupported."
+    ::= { rlDot3adAgg 6 }
+
+rlDot3adAggCreationEntry OBJECT-TYPE
+    SYNTAX  RlDot3adAggCreationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An information for each dot3adAggIndex."
+    INDEX  { dot3adAggIndex }
+    ::= { rlDot3adAggCreationTable 1 }
+
+RlDot3adAggCreationEntry ::= SEQUENCE {
+    rlDot3adAggCreationTrunk       TruthValue,
+    rlDot3adAggCreationLacp        TruthValue
+}
+
+rlDot3adAggCreationTrunk OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The aggregator can aggregate ports in manual configuration."
+    ::= { rlDot3adAggCreationEntry 1 }
+
+rlDot3adAggCreationLacp OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The aggregator can aggregate ports by lacp."
+    ::= { rlDot3adAggCreationEntry 2 }
+
+rlDot3adAggLoadBalancingPerTrunk OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies if load balancing is defined per trunk
+         or per device."
+    ::= { rlDot3adAgg 7 }
+
+--
+-- rlDot3adAggPortLacpTable
+--
+rlDot3adAggPortLacpTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlDot3adAggPortLacpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies lacp protocol state and
+         statistics for the corresponding dot3adAggPortIndex."
+    ::= { rlDot3adAgg 8 }
+
+rlDot3adAggPortLacpEntry OBJECT-TYPE
+    SYNTAX  RlDot3adAggPortLacpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of information for each dot3adAggPortIndex."
+    INDEX  { dot3adAggPortIndex }
+    ::= { rlDot3adAggPortLacpTable 1 }
+
+RlDot3adAggPortLacpEntry ::= SEQUENCE {
+    rlDot3adAggPortLacpPdusRx               Counter32,
+    rlDot3adAggPortLacpPDUsTx               Counter32,
+    rlDot3adAggPortLacpRxState              INTEGER,
+    rlDot3adAggPortLacpMuxState             INTEGER,
+    rlDot3adAggPortLacpPeriodicState        INTEGER,
+    rlDot3adAggPortLacpSelected             INTEGER,
+    rlDot3adAggPortLacpReady                TruthValue,
+    rlDot3adAggPortLacpPortMoved            TruthValue,
+    rlDot3adAggPortLacpNNT                  TruthValue,
+    rlDot3adAggPortLacpPeriodicTxTimer      INTEGER,
+    rlDot3adAggPortLacpCurrentWhileTimer    INTEGER,
+    rlDot3adAggPortLacpWaitWhileTimer       INTEGER
+}
+
+rlDot3adAggPortLacpPdusRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid LACPDUs received on this
+         Aggregation Port. This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 1 }
+
+rlDot3adAggPortLacpPDUsTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of LACPDUs transmitted on this
+         Aggregation Port. This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 2 }
+
+rlDot3adAggPortLacpRxState OBJECT-TYPE
+    SYNTAX INTEGER {
+        current(1),
+        expired(2),
+        defaulted(3),
+        initialize(4),
+        portDisabled(5),
+        lacpDisabled(6)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This attribute holds the value 'current' if the Receive
+         state machine for the Aggregation Port is in the
+         CURRENT state, 'expired' if the Receive state machine
+         is in the EXPIRED state, 'defaulted' if the Receive state
+         machine is in the DEFAULTED state, 'initialize' if the
+         Receive state machine is in the INITIALIZE state,
+         'portDisabled' if the Receive state machine is in the
+         PORT_DISABLED state, or 'lacpDisabled' if the Receive state
+         machine is in the LACP_DISABLED state.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 3 }
+
+rlDot3adAggPortLacpMuxState OBJECT-TYPE
+    SYNTAX INTEGER {
+        detached(1),
+        waiting(2),
+        attached(3),
+        collecting(4),
+        distributing(5),
+        collectingDistributing(6)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This attribute holds the value 'detached' if the Mux
+         state machine for the Aggregation Port is
+         in the DETACHED state, 'waiting' if the Mux state machine
+         is in the WAITING state, 'attached' if the Mux state
+         machine for the Aggregation Port is in the ATTACHED
+         state, 'collecting' if the Mux state machine for the
+         Aggregation Port is in the COLLECTING state, 'distributing'
+         if the Mux state machine for the Aggregation Port is
+         in the DISTRIBUTING state, and 'collecting_ distributing'
+         if the Mux state machine for the Aggregation Port is in
+         the COLLECTING_DISTRIBUTING state.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 4 }
+
+rlDot3adAggPortLacpPeriodicState OBJECT-TYPE
+    SYNTAX INTEGER {
+        noPeriodic(1),
+        fastPeriodic(2),
+        slowPeriodic(3),
+        periodicTx(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This attribute holds the value 'noPeriodic' if the Periodic
+         state machine for the Aggregation Port is
+         in the NO_PERIODIC state, 'fastPeriodic' if the Mux state machine
+         is in the FAST_PERIODIC state, 'slowPeriodic' if the Mux state
+         machine for the Aggregation Port is in the SLOW_PERIODIC
+         state, or 'periodicTx' if the Periodic state machine
+         for the Aggregation Port is in the PERIODIC_TX state.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 5 }
+
+rlDot3adAggPortLacpSelected OBJECT-TYPE
+    SYNTAX INTEGER {
+        unselected(1),
+        selected(2),
+        waiting(3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This attribute holds the value 'unselected' if the Selected variable
+         for the Aggregation Port is set to UNSELECTED, 'selected' if the
+         Selected variable for the Aggregation Port is set to SELECTED,
+         or 'waiting' if the Selected variable for the Aggregation Port
+         is set to WAITING.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 6 }
+
+rlDot3adAggPortLacpReady OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A read-only Boolean value indicating whether the
+         Aggregation Port is in the WAITING state in the Mux state machine
+         and its wait_while_timer has expired ('TRUE').
+         otherwise, its valus is 'FALSE'."
+    ::= { rlDot3adAggPortLacpEntry 7 }
+
+rlDot3adAggPortLacpPortMoved OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A read-only Boolean value indicating whether the
+         Partner_Oper_System or Partner_Oper_Port_Number in use by the
+         Aggregation Port has been changed in an incoming LACPDU ('TRUE').
+         otherwise, its valus is 'FALSE'."
+    ::= { rlDot3adAggPortLacpEntry 8 }
+
+rlDot3adAggPortLacpNNT OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A read-only Boolean value indicating whether there is a new protocol
+         information that should be transmitted on the link, or that the Partner
+         needs to be reminded of the old information.
+         otherwise, its valus is 'FALSE'."
+    ::= { rlDot3adAggPortLacpEntry 9 }
+
+rlDot3adAggPortLacpPeriodicTxTimer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The amount of time in seconds remaining before the Periodeic Tx timer
+         will expire.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 10 }
+
+rlDot3adAggPortLacpCurrentWhileTimer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The amount of time in seconds remaining before the Current While timer
+         will expire.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 11 }
+
+rlDot3adAggPortLacpWaitWhileTimer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The amount of time in seconds remaining before the Wait While timer
+         will expire.
+         This value is read-only."
+    ::= { rlDot3adAggPortLacpEntry 12 }
+
+rlDot3adAggLacpMembershipRestrictionsSupport OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies if there is support to
+         rlDot3adAggLacpMembershipRestrictionsTable."
+    ::= { rlDot3adAgg 9 }
+
+--
+-- rlDot3adAggLacpMembershipRestrictionsTable
+--
+rlDot3adAggLacpMembershipRestrictionsTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlDot3adAggLacpMembershipRestrictionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies membership restrictions
+         for ports that lacp is enbaled on them, and try to attach to
+         the corresponding dot3adAggIndex."
+    ::= { rlDot3adAgg 10 }
+
+rlDot3adAggLacpMembershipRestrictionsEntry OBJECT-TYPE
+    SYNTAX  RlDot3adAggLacpMembershipRestrictionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of information for each dot3adAggIndex."
+    INDEX  { dot3adAggIndex }
+    ::= { rlDot3adAggLacpMembershipRestrictionsTable 1 }
+
+RlDot3adAggLacpMembershipRestrictionsEntry ::= SEQUENCE {
+    rlDot3adAggLacpMembershipRestrictionsPartnerAdminKey            Unsigned32,
+    rlDot3adAggLacpMembershipRestrictionsSpeedAdminMode             Unsigned32,
+    rlDot3adAggLacpMembershipRestrictionsPartnerAdminSystemId       PhysAddress,
+    rlDot3adAggLacpMembershipRestrictionsPartnerAdminSystemPriority Unsigned32,
+    rlDot3adAggLacpMembershipRestrictionsIndividualAggregator       TruthValue
+}
+
+rlDot3adAggLacpMembershipRestrictionsPartnerAdminKey OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This variable specifies the administrative key
+         of the remote LACP aggregator.
+         A value of 0 is returned if the value of the variable
+         hasn't been set."
+    DEFVAL { 0 }
+    ::= { rlDot3adAggLacpMembershipRestrictionsEntry 1 }
+
+rlDot3adAggLacpMembershipRestrictionsSpeedAdminMode OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This variable specifies the required speed of the LACP aggregator
+         in bits per second.
+         A value of 10 is returned for 10G.
+         A value of 0 is returned if the value of the variable
+         hasn't been set."
+    DEFVAL { 0 }
+    ::= { rlDot3adAggLacpMembershipRestrictionsEntry 2 }
+
+rlDot3adAggLacpMembershipRestrictionsPartnerAdminSystemId OBJECT-TYPE
+    SYNTAX PhysAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This variable specifies the administrative MAC Address
+         of the remote LACP aggregator.
+         A null mac address is returned if the value of the variable
+         hasn't been set."
+    ::= { rlDot3adAggLacpMembershipRestrictionsEntry 3 }
+
+rlDot3adAggLacpMembershipRestrictionsPartnerAdminSystemPriority OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This variable specifies the administrative System Priority
+         of the remote LACP aggregator.
+         A value of 0 is returned if the value of the variable
+         hasn't been set."
+    DEFVAL { 0 }
+    ::= { rlDot3adAggLacpMembershipRestrictionsEntry 4 }
+
+rlDot3adAggLacpMembershipRestrictionsIndividualAggregator OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This variable specifies if the lacp aggregator represents an
+         Aggregate ('FALSE') or an Individual link ('TRUE')."
+    DEFVAL { false }
+    ::= { rlDot3adAggLacpMembershipRestrictionsEntry 5 }
+
+
+
+END
+
+

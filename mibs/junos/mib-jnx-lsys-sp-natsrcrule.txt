@@ -1,0 +1,199 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-NATSRCRULE-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpNATsrcrule                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpNATsrcruleMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- May 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the NAT-source-rule-specific MIB for 
+             Juniper Enterprise Logical-System (LSYS) security profiles.  
+             Juniper documentation is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security NAT-source-rule resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpNATsrcrule 1 }
+
+    jnxLsysSpNATsrcruleObjects  OBJECT IDENTIFIER ::= { jnxLsysSpNATsrcruleMIB 1 }
+    jnxLsysSpNATsrcruleSummary  OBJECT IDENTIFIER ::= { jnxLsysSpNATsrcruleMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular NAT-source-rule resource information objects per LSYS:
+--   Below are NAT-source-rule resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- The NAT-source-rule resource table per LSYS
+
+    jnxLsysSpNATsrcruleTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpNATsrcruleEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE NAT-source-rule objects for NAT-source-rule 
+             resource consumption per LSYS."  
+    ::= { jnxLsysSpNATsrcruleObjects 1 }
+    
+    jnxLsysSpNATsrcruleEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpNATsrcruleEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in NAT-source-rule resource table."
+    INDEX { IMPLIED jnxLsysSpNATsrcruleLsysName }          
+    ::= { jnxLsysSpNATsrcruleTable 1 }          
+
+    JnxLsysSpNATsrcruleEntry ::= 
+       SEQUENCE {
+          jnxLsysSpNATsrcruleLsysName    DisplayString,
+          jnxLsysSpNATsrcruleProfileName DisplayString,
+          jnxLsysSpNATsrcruleUsage       Unsigned32,
+          jnxLsysSpNATsrcruleReserved    Unsigned32,
+          jnxLsysSpNATsrcruleMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the NAT-source-rule resource table
+ 
+    jnxLsysSpNATsrcruleLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which NAT-source-rule 
+             resource information is retrieved. "
+        ::= { jnxLsysSpNATsrcruleEntry 1 }
+
+    jnxLsysSpNATsrcruleProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpNATsrcruleEntry 2 }
+
+    jnxLsysSpNATsrcruleUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpNATsrcruleEntry 3 }
+    
+    jnxLsysSpNATsrcruleReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpNATsrcruleEntry 4 } 
+
+    jnxLsysSpNATsrcruleMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpNATsrcruleEntry 5 }
+
+
+-- **********************************************************************
+-- The NAT-source-rule resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpNATsrcruleUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The NAT-source-rule resource consumption over all LSYS."
+    ::= { jnxLsysSpNATsrcruleSummary 1 }          
+
+    jnxLsysSpNATsrcruleMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-source-rule resource maximum quota for the whole 
+            device for all LSYS."
+    ::= { jnxLsysSpNATsrcruleSummary 2 }
+    
+    jnxLsysSpNATsrcruleAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-source-rule resource available in the whole device."
+    ::= { jnxLsysSpNATsrcruleSummary 3 }
+    
+    jnxLsysSpNATsrcruleHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of NAT-source-rule resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpNATsrcruleSummary 4 }
+    
+    jnxLsysSpNATsrcruleHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most NAT-source-rule resource."
+    ::= { jnxLsysSpNATsrcruleSummary 5 }
+    
+    jnxLsysSpNATsrcruleLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of NAT-source-rule resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpNATsrcruleSummary 6 }
+    
+    jnxLsysSpNATsrcruleLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least NAT-source-rule resource."
+    ::= { jnxLsysSpNATsrcruleSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of NAT-source-rule resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

@@ -1,0 +1,3067 @@
+--  ====================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei Acl MIB Definition
+-- Reference:   Huawei Enterprise MIB
+-- Version:     V2.0
+-- History:
+--              Wang Ning,2002-11-29,Reunification version based on the Fix-Net MIBs 
+--              baseline by the MIB Standard community.
+-- Version:     V2.1
+-- History:
+--              Yang Hongjie,2003-04-11,Reunification version based on V2.0.
+-- Version:     V2.2
+-- History:
+--              Yang Yuhui,2004-05-17,Reunification version based on V2.1.
+-- Version:     V2.3
+-- History:
+--              Xu xinjun, 2009-04-13, Add three new rule tables based on V2.2.
+--              hwAclEthernetFrameRuleTable, hwAclIpv6BasicRuleTable,
+--              hwAclIpv6AdvanceRuleTable.
+-- ========================================================================
+
+HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        huaweiMgmt            
+            FROM HUAWEI-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, Gauge32, Counter32, OBJECT-TYPE, 
+        MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        RowStatus, TruthValue, MacAddress  FROM SNMPv2-TC
+        EnabledStatus                      FROM P-BRIDGE-MIB
+        Ipv6Address                        FROM IPV6-TC;
+
+    hwAcl MODULE-IDENTITY 
+        LAST-UPDATED "200904131600Z"        -- April 13, 2009 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com"
+        DESCRIPTION 
+            "The HUAWEI-ACL-MIB contains objects to configure ACL module, 
+            including ACL group, rule and acl accelerate,
+            and query the current ACL configuration and status.
+            This MIB module objects indicate hwAclNumGroupTable, hwAclBasicRuleTable,
+            hwAclAdvanceRuleTable, hwAclIfRuleTable, hwAclEthernetFrameRuleTable, 
+            hwAclIpv6BasicRuleTable, hwAclIpv6AdvanceRuleTable, hwAclCompileEnableFlag, 
+            hwAclCompileNumGroupTable and acl trap.
+                  
+            To filter data packets, a series of rules need to be configured 
+            on the device. These rules are defined by ACL (Access Control List), 
+            which are a series of sequential rules consisting of rule 
+            permit or deny statements. The rules are described by source 
+            address, destination address and port number of data packets. 
+            ACL classifies data packets through these device interface applied
+            rules, by which the device decides which packets can be received 
+            and which should be rejected."
+        ::= { huaweiMgmt 1 }
+
+    --
+    -- Node definitions
+    --
+    
+    -- 1.3.6.1.4.1.2011.5.1.1
+    hwAclMibObjects OBJECT IDENTIFIER ::= { hwAcl 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2
+    hwAclNumGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclNumGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of ACL group information including
+            match order, step, description and so on"
+        ::= { hwAclMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1
+    hwAclNumGroupEntry OBJECT-TYPE
+        SYNTAX HwAclNumGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry containing characters of an acl group "
+        INDEX { hwAclNumGroupAclNum }
+        ::= { hwAclNumGroupTable 1 }
+    
+    HwAclNumGroupEntry ::=
+        SEQUENCE { 
+            hwAclNumGroupAclNum
+                Integer32,   
+            hwAclNumGroupMatchOrder
+                INTEGER,
+            hwAclNumGroupSubitemNum
+                Counter32,
+            hwAclNumGroupStep
+                Integer32,
+            hwAclNumGroupDescription
+                OCTET STRING,
+            hwAclNumGroupCountClear
+                INTEGER,
+            hwAclNumGroupRowStatus
+                RowStatus,
+            hwAclNumGroupAclName
+                OCTET STRING
+        }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.1
+    hwAclNumGroupAclNum OBJECT-TYPE       
+        SYNTAX Integer32 (700..799|1000..3999|4000..4999|6000..9999|42768..45767)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of acl group, identifying an ACL. 
+             The object specifies the range of an ACL number. 
+             The basic ACL is represented by the number 
+             in the range 2000 through 2999. The advanced ACL is 
+             represented by the number in the range 3000 through 
+             3999. The interface-based ACL is represented by the 
+             number in the range 1000 to 1999. The User ACL is 
+             represented by the number in the range 6000 through 
+             9999. The name ACL is represented by the number 
+             in the range 42768 through 45767."
+        ::= { hwAclNumGroupEntry 1 }  
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.2
+    hwAclNumGroupMatchOrder OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            config(1),
+            auto(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the match order of rules. 
+            'config' means matching ACL rules in the configuration sequence,
+            'auto' means the ACL rules are matched following the 'Depth-first' principle."
+        DEFVAL { config }
+        ::= { hwAclNumGroupEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.3
+    hwAclNumGroupSubitemNum OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the rules in the acl group."
+        ::= { hwAclNumGroupEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.4
+    hwAclNumGroupStep OBJECT-TYPE
+        SYNTAX Integer32 (1..20)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the step value of number acl.
+            Step here refers to the difference between each ID. 
+            For instance, given the step is set to 5, 
+            the IDs are the multiples of 5 beginning with 5.
+            The ACL IDs change along with the step. When the step is 5, 
+            the ACL IDs are 5, 10, and 15 and so on. 
+            However, when the step is set to 2, the IDs turn to 2, 4, 
+            and 6 and so on."
+        ::= { hwAclNumGroupEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.5
+    hwAclNumGroupDescription OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..127))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the description of this acl group.
+            The object describes the usage of an ACL with a word or a sentence."
+        ::= { hwAclNumGroupEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.6
+    hwAclNumGroupCountClear OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            cleared(1),
+            notUsed(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Reset the statistics of ACL group."
+        ::= { hwAclNumGroupEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.2.1.7
+    hwAclNumGroupRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support three value:CreateAndGo,Active,Destroy."
+        ::= { hwAclNumGroupEntry 7 }  
+        
+      -- 1.3.6.1.4.1.2011.5.1.1.2.1.8
+    hwAclNumGroupAclName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the name of an acl group,
+            The first character must be start with a to z or A to Z, 
+            and the length cannot exceed 32 character."
+        ::= { hwAclNumGroupEntry 8 }
+  
+    -- 1.3.6.1.4.1.2011.5.1.1.4
+    hwAclBasicRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclBasicRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for basic acl group."
+        ::= { hwAclMibObjects 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1
+    hwAclBasicRuleEntry OBJECT-TYPE
+        SYNTAX HwAclBasicRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry is a rule of basic acl."
+        INDEX { hwAclBasicAclNum, hwAclBasicSubitem }
+        ::= { hwAclBasicRuleTable 1 }
+    
+    HwAclBasicRuleEntry ::=
+        SEQUENCE { 
+            hwAclBasicAclNum
+                Integer32,
+            hwAclBasicSubitem
+                Integer32,
+            hwAclBasicAct
+                INTEGER,
+            hwAclBasicSrcIp
+                IpAddress,
+            hwAclBasicSrcWild
+                IpAddress,
+            hwAclBasicTimeRangeIndex
+                Integer32,
+            hwAclBasicFragments
+                INTEGER,
+            hwAclBasicLog
+                TruthValue,
+            hwAclBasicEnable
+                TruthValue,
+            hwAclBasicCount
+                Counter32,
+            hwAclBasicVrfName
+                OCTET STRING,
+            hwAclBasicRowStatus
+                RowStatus
+            }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.1
+    hwAclBasicAclNum OBJECT-TYPE
+        SYNTAX Integer32 (1..99 | 2000..2999 )
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of basic acl group"
+        ::= { hwAclBasicRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.2
+    hwAclBasicSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The objects specifies the number of an ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle.
+            When ACL rules are following the 'Depth-first' principle,
+            the number of an ACL rule must be given 0 ,but it will be assigned
+            by step automatically;otherwise,this rule will not be created."
+        ::= { hwAclBasicRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.3
+    hwAclBasicAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of a basic acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclBasicRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.4
+    hwAclBasicSrcIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IP-address of a basic acl rule."
+        ::= { hwAclBasicRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.5
+    hwAclBasicSrcWild OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IP-address wild of a basic acl rule."
+        ::= { hwAclBasicRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.6
+    hwAclBasicTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of a basic acl rule.
+            When the current time is in time range, the rule is valid.
+            Zero value declares that the acl rule has no time range.
+            The invalid value is 0."
+        ::= { hwAclBasicRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.7
+    hwAclBasicFragments OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            fragmentSubseq(0),
+            fragment(1), 
+            nonFragment(2),             
+            nonSubseq(3),
+            none(255) 
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of the packet.     
+            0: fragmentSubseq, indicating that the packet is a subsequent fragment
+            1: fragment, indicating that the packet is a fragment
+            2: nonFragment, indicating that the packet is not a fragment
+            3: nonSubseq, indicating that the packet is not a subsequent fragment
+            255: none, invalid value
+        This object cannot be modified once a rule is created."
+        ::= { hwAclBasicRuleEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.8
+    hwAclBasicLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. 
+            The log contents include sequence number of ACL rule, packets passed
+            or discarded, upper layer protocol type    over IP, source/destination 
+            address, source/destination port number, and number of packets."
+        ::= { hwAclBasicRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.9
+    hwAclBasicEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclBasicRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.10
+    hwAclBasicCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by the rule."
+        ::= { hwAclBasicRuleEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.11
+    hwAclBasicVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the VRF name of this rule. 
+            It specifies the VPN-instance to which the packet belongs."
+        ::= { hwAclBasicRuleEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.12
+    hwAclBasicRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support three value:CreateAndGo,Active and Destroy."
+        ::= { hwAclBasicRuleEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5
+    hwAclAdvancedRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclAdvancedRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for advanced acl group."
+        ::= { hwAclMibObjects 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1
+    hwAclAdvancedRuleEntry OBJECT-TYPE
+        SYNTAX HwAclAdvancedRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains a rule of advanced acl group."
+        INDEX { hwAclAdvancedAclNum, hwAclAdvancedSubitem }
+        ::= { hwAclAdvancedRuleTable 1 }
+    
+    HwAclAdvancedRuleEntry ::=
+        SEQUENCE { 
+            hwAclAdvancedAclNum
+                Integer32,
+            hwAclAdvancedSubitem
+                Integer32,
+            hwAclAdvancedAct
+                INTEGER,
+            hwAclAdvancedProtocol
+                Integer32,
+            hwAclAdvancedSrcIp
+                IpAddress,
+            hwAclAdvancedSrcWild
+                IpAddress,
+            hwAclAdvancedSrcOp
+                INTEGER,
+            hwAclAdvancedSrcPort1
+                Integer32,
+            hwAclAdvancedSrcPort2
+                Integer32,
+            hwAclAdvancedDestIp
+                IpAddress,
+            hwAclAdvancedDestWild
+                IpAddress,
+            hwAclAdvancedDestOp
+                INTEGER,
+            hwAclAdvancedDestPort1
+                Integer32,
+            hwAclAdvancedDestPort2
+                Integer32,
+            hwAclAdvancedPrecedence
+                Integer32,
+            hwAclAdvancedTos
+                Integer32,
+            hwAclAdvancedDscp
+                Integer32,
+            hwAclAdvancedEstablish
+                TruthValue,
+            hwAclAdvancedTimeRangeIndex
+                Integer32,
+            hwAclAdvancedIcmpType
+                Integer32,
+            hwAclAdvancedIcmpCode
+                Integer32,
+            hwAclAdvancedFragments
+                INTEGER,
+            hwAclAdvancedLog
+                TruthValue,
+            hwAclAdvancedEnable
+                TruthValue,
+            hwAclAdvancedCount
+                Counter32,
+            hwAclAdvancedVrfName
+                OCTET STRING,
+            hwAclAdvancedRowStatus
+                RowStatus,
+            hwAclAdvancedTcpSyncFlag
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.1
+    hwAclAdvancedAclNum OBJECT-TYPE
+        SYNTAX Integer32 (100..199 | 3000..3999 | 42768..45767)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of advanced acl table."
+        ::= { hwAclAdvancedRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.2
+    hwAclAdvancedSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object specifies the number of an advanced ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle.
+            When ACL rules are following the 'Depth-first' principle,
+            the number of an ACL rule must be given 0 ,but it will be assigned
+            by step automatically;otherwise,this rule will not be created."
+        ::= { hwAclAdvancedRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.3
+    hwAclAdvancedAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of an advanced acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclAdvancedRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.4
+    hwAclAdvancedProtocol OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the protocol type of the rule.
+            It specifies the protocol type over IP.The number of IP protocol is 0."
+        ::= { hwAclAdvancedRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.5
+    hwAclAdvancedSrcIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IP-address of an advanced acl rule."
+        ::= { hwAclAdvancedRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.6
+    hwAclAdvancedSrcWild OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IP-address wild of an advanced acl rule."
+        ::= { hwAclAdvancedRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.7
+    hwAclAdvancedSrcOp OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lt(1),
+            eq(2),
+            gt(3),
+            neq(4),
+            invalid(0),
+            range(5)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source Port operation symbol of an advanced acl
+            rule. It compares the port operators of source address.
+            'lt' means less than,
+            'eq' means equal to,
+            'gt' means greater than,
+            'neq' means not equal to,
+            'range' means between,
+            'invalid' means this operation of the rule is invalid."
+        ::= { hwAclAdvancedRuleEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.8
+    hwAclAdvancedSrcPort1 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer sourec port 1.
+            It specifies the source port information of UDP or TCP packets."
+        ::= { hwAclAdvancedRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.9
+    hwAclAdvancedSrcPort2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer source port2."
+        ::= { hwAclAdvancedRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.10
+    hwAclAdvancedDestIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination IP-address of an advanced acl rule."
+        ::= { hwAclAdvancedRuleEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.11
+    hwAclAdvancedDestWild OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination IP-address wild of an advanced acl rule."
+        ::= { hwAclAdvancedRuleEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.12
+    hwAclAdvancedDestOp OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lt(1),
+            eq(2),
+            gt(3),
+            neq(4),
+            invalid(0),
+            range(5)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination Port operation symbol of an advanced
+            acl group. It compares the port operators of destination address.
+            'lt' means less than,
+            'eq' means equal to,
+            'gt' means greater than,
+            'neq' means not equal to,
+            'range' means between,
+            'invalid' means this operation of the rule is invalid."
+        ::= { hwAclAdvancedRuleEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.13
+    hwAclAdvancedDestPort1 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer destination port1."
+        ::= { hwAclAdvancedRuleEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.14
+    hwAclAdvancedDestPort2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer destination port2."
+        ::= { hwAclAdvancedRuleEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.15
+    hwAclAdvancedPrecedence OBJECT-TYPE
+        SYNTAX Integer32 (0..7|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of IP-packet's precedence, 
+            It filters packets according to precedence field.The invalid
+            value is 255."
+        ::= { hwAclAdvancedRuleEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.16
+    hwAclAdvancedTos OBJECT-TYPE
+        SYNTAX Integer32 (0..15|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of IP-packet's TOS,
+            It filters packets according to type of service.The invalid
+            value is 255."
+        ::= { hwAclAdvancedRuleEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.17
+    hwAclAdvancedDscp OBJECT-TYPE
+        SYNTAX Integer32 (0..63|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of frame.The invalid 
+            value is 255."
+        ::= { hwAclAdvancedRuleEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.18
+    hwAclAdvancedEstablish OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether or not establishing."
+        DEFVAL { False }
+        ::= { hwAclAdvancedRuleEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.19
+    hwAclAdvancedTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of an advanced acl rule. 
+            When the current time is in the time range, the rule is valid.
+            Zero value declares that the acl rule has no time range.The 
+            invalid value is 0."
+        ::= { hwAclAdvancedRuleEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.20
+    hwAclAdvancedIcmpType OBJECT-TYPE
+        SYNTAX Integer32 (0..255|65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of ICMP packet. 
+            It filters ICMP packets according to the ICMP message type.
+            The invalid value is 65535."
+        ::= { hwAclAdvancedRuleEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.21
+    hwAclAdvancedIcmpCode OBJECT-TYPE
+        SYNTAX Integer32 (0..255|65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of ICMP packet.
+            It filters ICMP packets according to the message code.
+            The invalid value is 65535."
+        ::= { hwAclAdvancedRuleEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.22
+    hwAclAdvancedFragments OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            fragmentSubseq(0),
+            fragment(1), 
+            nonFragment(2),             
+            nonSubseq(3),   
+            fragmentSpeFirst(4),
+            none(255)            
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of the packet.     
+            0: fragmentSubseq, indicating that the packet is a subsequent fragment
+         1: fragment, indicating that the packet is a fragment
+         2: nonFragment, indicating that the packet is not a fragment
+         3: nonSubseq, indicating that the packet is not a subsequent fragment
+         4: fragmentSpeFirst, indicating that the packet is the first fragment
+         255: none, invalid value
+         This object cannot be modified once a rule is created."
+        ::= { hwAclAdvancedRuleEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.23
+    hwAclAdvancedLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. The log 
+            contents include sequence number of ACL rule, 
+            packets passed or discarded, upper layer protocol type over IP, 
+            source/destination address, source/destination port number, 
+            and number of packets"
+        ::= { hwAclAdvancedRuleEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.24
+    hwAclAdvancedEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclAdvancedRuleEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.25
+    hwAclAdvancedCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only        
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by the rule."
+        ::= { hwAclAdvancedRuleEntry 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.26
+    hwAclAdvancedVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the VRF name of this rule, 
+            It specifies the VPN-instance to which the packet belongs."
+        ::= { hwAclAdvancedRuleEntry 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.27
+    hwAclAdvancedRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support three state:CreateAndGo,Active,Destroy."
+        ::= { hwAclAdvancedRuleEntry 27 }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.5.1.28   
+    hwAclAdvancedTcpSyncFlag OBJECT-TYPE
+        SYNTAX Integer32 (-1|0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of TCP Sync flag(0~63),
+             The invalid value is -1."
+        ::= { hwAclAdvancedRuleEntry 28 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6
+    hwAclIfRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclIfRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for interface-based acl group."
+        ::= { hwAclMibObjects 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1
+    hwAclIfRuleEntry OBJECT-TYPE
+        SYNTAX HwAclIfRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains a rule of interface-based acl group."
+        INDEX { hwAclIfAclNum, hwAclIfSubitem }
+        ::= { hwAclIfRuleTable 1 }
+    
+    HwAclIfRuleEntry ::=
+        SEQUENCE { 
+            hwAclIfAclNum
+                Integer32,
+            hwAclIfSubitem
+                Integer32,
+            hwAclIfAct
+                INTEGER,
+            hwAclIfIndex
+                Integer32,
+            hwAclIfAny
+                TruthValue,
+            hwAclIfTimeRangeIndex
+                Integer32,
+            hwAclIfLog
+                TruthValue,
+            hwAclIfEnable
+                TruthValue,
+            hwAclIfCount
+                Counter32,
+            hwAclIfRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.1
+    hwAclIfAclNum OBJECT-TYPE
+        SYNTAX Integer32 (1000..1999)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of interface-based acl group."
+        ::= { hwAclIfRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.2
+    hwAclIfSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object specifies the number of an ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle.
+            When ACL rules are following the 'Depth-first' principle,
+            the number of an ACL rule must be given 0 ,but it will be assigned
+            by step automatically;otherwise,this rule will not be created."
+        ::= { hwAclIfRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.3
+    hwAclIfAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of an interface-based acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclIfRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.4
+    hwAclIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the index of an interface. 
+            It specifies the interface information of the packets.The invalid
+            interface index is 0."
+        ::= { hwAclIfRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.5
+    hwAclIfAny OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether or not matching any interface."
+        ::= { hwAclIfRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.6
+    hwAclIfTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of an interface-based acl rule. 
+            when the current time is in time range, the rule is valid.
+            Zero value declares that the acl rule has no time range.
+            The invalid value is 0."
+        ::= { hwAclIfRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.7
+    hwAclIfLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. 
+            The log contents include sequence number of ACL rule, 
+            packets passed or discarded, upper layer protocol type over IP, 
+            source/destination address, source/destination port number, 
+            and number of packets."
+        ::= { hwAclIfRuleEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.8
+    hwAclIfEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclIfRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.9
+    hwAclIfCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by basic rule."
+        ::= { hwAclIfRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.6.1.11
+    hwAclIfRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+        ::= { hwAclIfRuleEntry 11 }
+    
+ --user acl 
+    -- 1.3.6.1.4.1.2011.5.1.1.7
+    hwAclUserRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclUserRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for user acl group."
+        ::= { hwAclMibObjects 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1
+    hwAclUserRuleEntry OBJECT-TYPE
+        SYNTAX HwAclUserRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains a rule of user acl group."
+        INDEX { hwAclUserAclNum, hwAclUserSubitem }
+        ::= { hwAclUserRuleTable 1 }
+    
+    HwAclUserRuleEntry ::=
+        SEQUENCE { 
+            hwAclUserAclNum
+                Integer32,
+            hwAclUserSubitem
+                Integer32,
+            hwAclUserAct
+                INTEGER,
+            hwAclUserProtocol
+                Integer32,
+            hwAclUserSrcIp
+                IpAddress,
+            hwAclUserSrcWild
+                IpAddress,
+            hwAclUserSrcOp
+                INTEGER,
+            hwAclUserSrcPort1
+                Integer32,
+            hwAclUserSrcPort2
+                Integer32,
+            hwAclUserDestIp
+                IpAddress,
+            hwAclUserDestWild
+                IpAddress,
+            hwAclUserDestOp
+                INTEGER,
+            hwAclUserDestPort1
+                Integer32,
+            hwAclUserDestPort2
+                Integer32,
+            hwAclUserPrecedence
+                Integer32,
+            hwAclUserTos
+                Integer32,
+            hwAclUserDscp
+                Integer32,
+            hwAclUserEstablish
+                TruthValue,
+            hwAclUserTimeRangeIndex
+                Integer32,
+            hwAclUserIcmpType
+                Integer32,
+            hwAclUserIcmpCode
+                Integer32,
+            hwAclUserFragments
+                TruthValue,
+            hwAclUserLog
+                TruthValue,
+            hwAclUserEnable
+                TruthValue,
+            hwAclUserCount
+                Counter32,
+            hwAclUserVrfName
+                OCTET STRING,
+            hwAclUserSrcUserGroupName
+                OCTET STRING,
+            hwAclUserDestUserGroupName
+                OCTET STRING,          
+            hwAclUserSrcModeType
+                Integer32,   
+            hwAclUserDestModeType
+                Integer32,                          
+            hwAclUserRowStatus
+                RowStatus,
+            hwAclUserTcpSyncFlag
+                Integer32    
+         }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.1
+    hwAclUserAclNum OBJECT-TYPE
+        SYNTAX Integer32 (6000..9999)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of user acl table."
+        ::= { hwAclUserRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.2
+    hwAclUserSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object specifies the number of an User ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle"
+        ::= { hwAclUserRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.3
+    hwAclUserAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of an User acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclUserRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.4
+    hwAclUserProtocol OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the protocol type of the rule.
+            It specifies the protocol type over IP.The number of IP protocol is 0."
+        ::= { hwAclUserRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.5
+    hwAclUserSrcIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IP-address of an User acl rule."
+        ::= { hwAclUserRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.6
+    hwAclUserSrcWild OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IP-address wild of an User acl rule."
+        ::= { hwAclUserRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.7
+    hwAclUserSrcOp OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lt(1),
+            eq(2),
+            gt(3),
+            neq(4),
+            invalid(0),
+            range(5)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source Port operation symbol of an User acl
+            rule. It compares the port operators of source address.
+            'lt' means less than,
+            'eq' means equal to,
+            'gt' means greater than,
+            'neq' means not equal to,
+            'range' means between,
+            'invalid' means this operation of the rule is invalid."
+        ::= { hwAclUserRuleEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.8
+    hwAclUserSrcPort1 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer sourec port 1.
+            It specifies the source port information of UDP or TCP packets."
+        ::= { hwAclUserRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.9
+    hwAclUserSrcPort2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer source port2."
+        ::= { hwAclUserRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.10
+    hwAclUserDestIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination IP-address of an User acl rule."
+        ::= { hwAclUserRuleEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.11
+    hwAclUserDestWild OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination IP-address wild of an User acl rule."
+        ::= { hwAclUserRuleEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.12
+    hwAclUserDestOp OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lt(1),
+            eq(2),
+            gt(3),
+            neq(4),
+            invalid(0),
+            range(5)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination Port operation symbol of an User
+            acl group. It compares the port operators of destination address.
+            'lt' means less than,
+            'eq' means equal to,
+            'gt' means greater than,
+            'neq' means not equal to,
+            'range' means between,
+            'invalid' means this operation of the rule is invalid."
+        ::= { hwAclUserRuleEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.13
+    hwAclUserDestPort1 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer destination port1."
+        ::= { hwAclUserRuleEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.14
+    hwAclUserDestPort2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer destination port2."
+        ::= { hwAclUserRuleEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.15
+    hwAclUserPrecedence OBJECT-TYPE
+        SYNTAX Integer32 (0..7|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of IP-packet's precedence, 
+            It filters packets according to precedence field.The invalid
+            value is 255."
+        ::= { hwAclUserRuleEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.16
+    hwAclUserTos OBJECT-TYPE
+        SYNTAX Integer32 (0..15|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of IP-packet's TOS,
+            It filters packets according to type of service.The invalid
+            value is 255."
+        ::= { hwAclUserRuleEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.17
+    hwAclUserDscp OBJECT-TYPE
+        SYNTAX Integer32 (0..63|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of frame.The invalid 
+            value is 255."
+        ::= { hwAclUserRuleEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.18
+    hwAclUserEstablish OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether or not establishing."
+        DEFVAL { False }
+        ::= { hwAclUserRuleEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.19
+    hwAclUserTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of an User acl rule. 
+            When the current time is in the time range, the rule is valid.
+            Zero value declares that the acl rule has no time range.The 
+            invalid value is 0."
+        ::= { hwAclUserRuleEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.20
+    hwAclUserIcmpType OBJECT-TYPE
+        SYNTAX Integer32 (0..255|65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of ICMP packet. 
+            It filters ICMP packets according to the ICMP message type.
+            The invalid value is 65535."
+        ::= { hwAclUserRuleEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.21
+    hwAclUserIcmpCode OBJECT-TYPE
+        SYNTAX Integer32 (0..255|65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of ICMP packet.
+            It filters ICMP packets according to the message code.
+            The invalid value is 65535."
+        ::= { hwAclUserRuleEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.22
+    hwAclUserFragments OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether or not matching fragmented packet,
+            It specifies that this rule is only valid for 
+            the non-first fragment packets."
+        ::= { hwAclUserRuleEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.23
+    hwAclUserLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. The log 
+            contents include sequence number of ACL rule, 
+            packets passed or discarded, upper layer protocol type over IP, 
+            source/destination address, source/destination port number, 
+            and number of packets"
+        ::= { hwAclUserRuleEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.24
+    hwAclUserEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclUserRuleEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.25
+    hwAclUserCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by the rule."
+        ::= { hwAclUserRuleEntry 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.26
+    hwAclUserVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the VRF name of this rule, 
+            It specifies the VPN-instance to which the packet belongs."
+        ::= { hwAclUserRuleEntry 26 }
+    
+     -- 1.3.6.1.4.1.2011.5.1.1.7.1.27
+    hwAclUserSrcUserGroupName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source user group name of this rule.
+             if modetype source is user, null sting means any user"
+        ::= { hwAclUserRuleEntry 27 }
+        
+   -- 1.3.6.1.4.1.2011.5.1.1.7.1.28
+    hwAclUserDestUserGroupName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination user group name of this rule.
+             if modetype destination is user, null sting means any user"
+        ::= { hwAclUserRuleEntry 28 }   
+        
+   -- 1.3.6.1.4.1.2011.5.1.1.7.1.29
+    hwAclUserSrcModeType OBJECT-TYPE
+        SYNTAX Integer32 (0..4)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates ACL's mode type,
+            Now support four state 
+            0 Any        match rule from any user group or any ip subnet,
+            1 NetAny     match rule from any ip subnet,
+            2 UserAny    match rule from any user group,
+            3 Net        match rule from an ip subnet,
+            4 User       match rule from a user group"
+        ::= { hwAclUserRuleEntry 29 }
+
+   -- 1.3.6.1.4.1.2011.5.1.1.7.1.30
+    hwAclUserDestModeType OBJECT-TYPE
+        SYNTAX Integer32 (0..4)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates ACL's mode type,
+            Now support four state 
+            0 Any        match rule from any user group or any ip subnet,
+            1 NetAny     match rule from any ip subnet,
+            2 UserAny    match rule from any user group,
+            3 Net        match rule from an ip subnet,
+            4 User       match rule from a user group"
+        ::= { hwAclUserRuleEntry 30 }
+      
+    -- 1.3.6.1.4.1.2011.5.1.1.7.1.31
+    hwAclUserRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support three state:CreateAndGo,Active,Destroy."
+        ::= { hwAclUserRuleEntry 31 }
+    
+    
+    hwAclUserTcpSyncFlag OBJECT-TYPE
+        SYNTAX Integer32 (-1|0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of TCP Sync flag(0~63),
+             The invalid value is -1."
+        ::= { hwAclUserRuleEntry 32 }
+    
+    
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.10
+    hwAclCompileEnableFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether acl compiler is enabled. when acl compiler
+            is enabled, and ACL accelerate function is enabled, then matching packets
+            by rule is efficient."
+        ::= { hwAclMibObjects 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.11
+    hwAclCompileNumGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclCompileNumGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ACL compiler table extending the Acl-number-group table"
+        ::= { hwAclMibObjects 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.11.1
+    hwAclCompileNumGroupEntry OBJECT-TYPE
+        SYNTAX HwAclCompileNumGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of Acl-number-group compiler extended table"
+        AUGMENTS { hwAclNumGroupEntry }
+        ::= { hwAclCompileNumGroupTable 1 }
+    
+    HwAclCompileNumGroupEntry ::=
+        SEQUENCE { 
+            hwAclCompileNumGroupStatus
+                INTEGER
+         }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.11.1.1
+    hwAclCompileNumGroupStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            notCompile(1),
+            compiled(2),
+            changeAfterCompile(3)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The object indicates the status of Acl-number-group compiler.
+            'notCompile' means acl accelerate function is disabled,
+            'compiled' means acl accelerate function is enabled,
+            'changeAfterCompile' means acl is changed after compiled."
+        DEFVAL { notCompile }
+        ::= { hwAclCompileNumGroupEntry 1 }
+        
+    -- 1.3.6.1.4.1.2011.5.1.1.12
+    hwAclIpv6BasicRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclIpv6BasicRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for ipv6 basic acl group."
+        ::= { hwAclMibObjects 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1
+    hwAclIpv6BasicRuleEntry OBJECT-TYPE
+        SYNTAX HwAclIpv6BasicRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry is a rule of ipv6 basic acl."
+        INDEX { hwAclIpv6BasicAclNum, hwAclIpv6BasicSubitem }
+        ::= { hwAclIpv6BasicRuleTable 1 }
+    
+    HwAclIpv6BasicRuleEntry ::=
+        SEQUENCE { 
+            hwAclIpv6BasicAclNum
+                Integer32,
+            hwAclIpv6BasicSubitem
+                Integer32,
+            hwAclIpv6BasicAct
+                INTEGER,
+            hwAclIpv6BasicSrcIp
+                Ipv6Address,
+            hwAclIpv6BasicSrcWild
+                Ipv6Address,
+            hwAclIpv6BasicTimeRangeIndex
+                Integer32,
+            hwAclIpv6BasicFragment
+                INTEGER,
+            hwAclIpv6BasicLog
+                TruthValue,
+            hwAclIpv6BasicEnable
+                EnabledStatus,
+            hwAclIpv6BasicCount
+                Counter64,
+            hwAclIpv6BasicVrfName
+                OCTET STRING,
+            hwAclIpv6BasicRowStatus
+                RowStatus
+            }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.1
+    hwAclIpv6BasicAclNum OBJECT-TYPE
+        SYNTAX Integer32 (2000..2999 )
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of ipv6 basic acl group"
+        ::= { hwAclIpv6BasicRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.4.1.2
+    hwAclIpv6BasicSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The objects specifies the number of an ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle.
+            When ACL rules are following the 'Depth-first' principle,
+            the number of an ACL rule must be given 0 ,but it will be assigned
+            by step automatically; otherwise, this rule will not be created."
+        ::= { hwAclIpv6BasicRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.3
+    hwAclIpv6BasicAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of a ipv6 basic acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclIpv6BasicRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.4
+    hwAclIpv6BasicSrcIp OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IPv6-address of a ipv6 basic acl rule."
+        ::= { hwAclIpv6BasicRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.5
+    hwAclIpv6BasicSrcWild OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IPv6-address wild of a ipv6 basic acl rule."
+        ::= { hwAclIpv6BasicRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.6
+    hwAclIpv6BasicTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of a ipv6 basic acl rule.
+            When the current time is in time range, the rule is valid.
+            Zero value declares that the acl rule has no time range.
+            The invalid value is 0."
+        ::= { hwAclIpv6BasicRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.7
+    hwAclIpv6BasicFragment OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            fragment(1), 
+            none(255) 
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of the packet.     
+           1: fragment, indicating that the packet is a fragment
+           255: none, invalid value
+        This object cannot be modified once a rule is created."
+        ::= { hwAclIpv6BasicRuleEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.8
+    hwAclIpv6BasicLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. 
+            The log contents include sequence number of ACL rule, packets passed
+            or discarded, upper layer protocol type over IP, source/destination 
+            address, source/destination port number, and number of packets."
+        ::= { hwAclIpv6BasicRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.9
+    hwAclIpv6BasicEnable OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclIpv6BasicRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.10
+    hwAclIpv6BasicCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by the rule."
+        ::= { hwAclIpv6BasicRuleEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.11
+    hwAclIpv6BasicVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the VRF name of this rule. 
+            It specifies the VPN-instance to which the packet belongs."
+        ::= { hwAclIpv6BasicRuleEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.12
+    hwAclIpv6BasicRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support three value: CreateAndGo, Active and Destroy."
+        ::= { hwAclIpv6BasicRuleEntry 12 }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.13
+    hwAclIpv6AdvancedRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclIpv6AdvancedRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for ipv6 advanced acl group."
+        ::= { hwAclMibObjects 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1
+    hwAclIpv6AdvancedRuleEntry OBJECT-TYPE
+        SYNTAX HwAclIpv6AdvancedRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains a rule of ipv6 advanced acl group."
+        INDEX { hwAclIpv6AdvancedAclNum, hwAclIpv6AdvancedSubitem }
+        ::= { hwAclIpv6AdvancedRuleTable 1 }
+    
+    HwAclIpv6AdvancedRuleEntry ::=
+        SEQUENCE { 
+            hwAclIpv6AdvancedAclNum
+                Integer32,
+            hwAclIpv6AdvancedSubitem
+                Integer32,
+            hwAclIpv6AdvancedAct
+                INTEGER,
+            hwAclIpv6AdvancedProtocol
+                Integer32,
+            hwAclIpv6AdvancedSrcIp
+                Ipv6Address,
+            hwAclIpv6AdvancedSrcWild
+                Ipv6Address,
+            hwAclIpv6AdvancedSrcOp
+                INTEGER,
+            hwAclIpv6AdvancedSrcPort1
+                Integer32,
+            hwAclIpv6AdvancedSrcPort2
+                Integer32,
+            hwAclIpv6AdvancedDestIp
+                Ipv6Address,
+            hwAclIpv6AdvancedDestWild
+                Ipv6Address,
+            hwAclIpv6AdvancedDestOp
+                INTEGER,
+            hwAclIpv6AdvancedDestPort1
+                Integer32,
+            hwAclIpv6AdvancedDestPort2
+                Integer32,
+            hwAclIpv6AdvancedPrecedence
+                Integer32,
+            hwAclIpv6AdvancedTos
+                Integer32,
+            hwAclIpv6AdvancedDscp
+                Integer32,
+            hwAclIpv6AdvancedEstablish
+                TruthValue,
+            hwAclIpv6AdvancedTimeRangeIndex
+                Integer32,
+            hwAclIpv6AdvancedIcmpType
+                Integer32,
+            hwAclIpv6AdvancedIcmpCode
+                Integer32,
+            hwAclIpv6AdvancedFragment
+                INTEGER,
+            hwAclIpv6AdvancedLog
+                TruthValue,
+            hwAclIpv6AdvancedEnable
+                EnabledStatus,
+            hwAclIpv6AdvancedCount
+                Counter64,
+            hwAclIpv6AdvancedVrfName
+                OCTET STRING,
+            hwAclIpv6AdvancedRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.1
+    hwAclIpv6AdvancedAclNum OBJECT-TYPE
+        SYNTAX Integer32 (3000..3999 | 42768..45767)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of ipv6 advanced acl table."
+        ::= { hwAclIpv6AdvancedRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.2
+    hwAclIpv6AdvancedSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The object specifies the number of an ipv6 advanced ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle.
+            When ACL rules are following the 'Depth-first' principle,
+            the number of an ACL rule must be given 0 ,but it will be assigned
+            by step automatically;otherwise,this rule will not be created."
+        ::= { hwAclIpv6AdvancedRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.3
+    hwAclIpv6AdvancedAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of an ipv6 advanced acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclIpv6AdvancedRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.4
+    hwAclIpv6AdvancedProtocol OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the protocol type of the rule.
+            It specifies the protocol type over IP.The number of IPv6 protocol is 0."
+        ::= { hwAclIpv6AdvancedRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.5
+    hwAclIpv6AdvancedSrcIp OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IPv6-address of an ipv6 advanced acl rule."
+        ::= { hwAclIpv6AdvancedRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.6
+    hwAclIpv6AdvancedSrcWild OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source IPv6-address wild of an ipv6 advanced acl rule."
+        ::= { hwAclIpv6AdvancedRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.7
+    hwAclIpv6AdvancedSrcOp OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lt(1),
+            eq(2),
+            gt(3),
+            neq(4),
+            range(5),
+            invalid(255)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source Port operation symbol of an ipv6 advanced acl
+            rule. It compares the port operators of source address.
+            'lt' means less than,
+            'eq' means equal to,
+            'gt' means greater than,
+            'neq' means not equal to,
+            'range' means between,
+            'invalid' means this operation of the rule is invalid."
+        ::= { hwAclIpv6AdvancedRuleEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.8
+    hwAclIpv6AdvancedSrcPort1 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer sourec port 1.
+            It specifies the source port information of UDP or TCP packets."
+        ::= { hwAclIpv6AdvancedRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.9
+    hwAclIpv6AdvancedSrcPort2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer source port2."
+        ::= { hwAclIpv6AdvancedRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.10
+    hwAclIpv6AdvancedDestIp OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination IPv6-address of an ipv6 advanced acl rule."
+        ::= { hwAclIpv6AdvancedRuleEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.11
+    hwAclIpv6AdvancedDestWild OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination IPv6-address wild of an ipv6 advanced acl rule."
+        ::= { hwAclIpv6AdvancedRuleEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.12
+    hwAclIpv6AdvancedDestOp OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            lt(1),
+            eq(2),
+            gt(3),
+            neq(4),
+            range(5),
+            invalid(255)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination Port operation symbol of an ipv6 advanced
+            acl group. It compares the port operators of destination address.
+            'lt' means less than,
+            'eq' means equal to,
+            'gt' means greater than,
+            'neq' means not equal to,
+            'range' means between,
+            'invalid' means this operation of the rule is invalid."
+        ::= { hwAclIpv6AdvancedRuleEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.13
+    hwAclIpv6AdvancedDestPort1 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer destination port1."
+        ::= { hwAclIpv6AdvancedRuleEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.14
+    hwAclIpv6AdvancedDestPort2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the fourth layer destination port2."
+        ::= { hwAclIpv6AdvancedRuleEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.15
+    hwAclIpv6AdvancedPrecedence OBJECT-TYPE
+        SYNTAX Integer32 (0..7|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of IPv6-packet's precedence, 
+            It filters packets according to precedence field. The invalid
+            value is 255."
+        ::= { hwAclIpv6AdvancedRuleEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.16
+    hwAclIpv6AdvancedTos OBJECT-TYPE
+        SYNTAX Integer32 (0..15|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of IPv6-packet's TOS,
+            It filters packets according to type of service. The invalid
+            value is 255."
+        ::= { hwAclIpv6AdvancedRuleEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.17
+    hwAclIpv6AdvancedDscp OBJECT-TYPE
+        SYNTAX Integer32 (0..63|255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the value of frame.The invalid 
+            value is 255."
+        ::= { hwAclIpv6AdvancedRuleEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.18
+    hwAclIpv6AdvancedEstablish OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether or not establishing."
+        DEFVAL { False }
+        ::= { hwAclIpv6AdvancedRuleEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.19
+    hwAclIpv6AdvancedTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of an ipv6 advanced acl rule. 
+            When the current time is in the time range, the rule is valid.
+            Zero value declares that the acl rule has no time range.The 
+            invalid value is 0."
+        ::= { hwAclIpv6AdvancedRuleEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.20
+    hwAclIpv6AdvancedIcmpType OBJECT-TYPE
+        SYNTAX Integer32 (0..255|65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of ICMPv6 packet. 
+            It filters ICMP packets according to the ICMPv6 message type.
+            The invalid value is 65535."
+        ::= { hwAclIpv6AdvancedRuleEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.21
+    hwAclIpv6AdvancedIcmpCode OBJECT-TYPE
+        SYNTAX Integer32 (0..255|65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of ICMPv6 packet.
+            It filters ICMPv6 packets according to the message code.
+            The invalid value is 65535."
+        ::= { hwAclIpv6AdvancedRuleEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.22
+    hwAclIpv6AdvancedFragment OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            fragment(1), 
+            none(255)            
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of the packet.     
+         1: fragment, indicating that the packet is a fragment
+         255: none, invalid value
+         This object cannot be modified once a rule is created."
+        ::= { hwAclIpv6AdvancedRuleEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.23
+    hwAclIpv6AdvancedLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. The log 
+            contents include sequence number of ACL rule, 
+            packets passed or discarded, upper layer protocol type over IP, 
+            source/destination address, source/destination port number, 
+            and number of packets"
+        ::= { hwAclIpv6AdvancedRuleEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.24
+    hwAclIpv6AdvancedEnable OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclIpv6AdvancedRuleEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.25
+    hwAclIpv6AdvancedCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only        
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by the rule."
+        ::= { hwAclIpv6AdvancedRuleEntry 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.26
+    hwAclIpv6AdvancedVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the VRF name of this rule, 
+            It specifies the VPN-instance to which the packet belongs."
+        ::= { hwAclIpv6AdvancedRuleEntry 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.27
+    hwAclIpv6AdvancedRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus, Now support three state:CreateAndGo,Active,Destroy."
+        ::= { hwAclIpv6AdvancedRuleEntry 27 }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.14
+    hwAclEthernetFrameRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAclEthernetFrameRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Configure the rule for ethernet-frame-based acl group."
+        ::= { hwAclMibObjects 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1
+    hwAclEthernetFrameRuleEntry OBJECT-TYPE
+        SYNTAX HwAclEthernetFrameRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains a rule of ethernet-frame-based acl group."
+        INDEX { hwAclEthernetFrameAclNum, hwAclEthernetFrameSubitem }
+        ::= { hwAclEthernetFrameRuleTable 1 }
+    
+    HwAclEthernetFrameRuleEntry ::=
+        SEQUENCE { 
+            hwAclEthernetFrameAclNum
+                Integer32,
+            hwAclEthernetFrameSubitem
+                Integer32,
+            hwAclEthernetFrameAct
+                INTEGER,
+            hwAclEthernetFrameType
+                Integer32,
+            hwAclEthernetFrameTypeMask
+                Integer32,
+            hwAclEthernetFrameSrcMac
+                MacAddress,
+            hwAclEthernetFrameSrcMacMask
+                MacAddress,
+            hwAclEthernetFrameDstMac
+                MacAddress,
+            hwAclEthernetFrameDstMacMask
+                MacAddress,
+            hwAclEthernetFrameTimeRangeIndex
+                Integer32,
+            hwAclEthernetFrameLog
+                TruthValue,
+            hwAclEthernetFrameEnable
+                EnabledStatus,
+            hwAclEthernetFrameCount
+                Counter64,
+            hwAclEthernetFrameRowStatus
+				RowStatus,
+			hwAclEthernetFrameEncapType
+				INTEGER,
+			hwAclEthernetFrameDoubleTag
+				TruthValue,
+			hwAclEthernetFrameVlanId
+				Integer32,
+			hwAclEthernetFrameVlanIdMask
+				Integer32,
+			hwAclEthernetFrameCVlanId
+				Integer32,
+			hwAclEthernetFrameCVlanIdMask
+				Integer32,
+			hwAclEthernetFrameRule8021p
+				Integer32,
+			hwAclEthernetFrameRuleCVlan8021p
+				Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.1
+    hwAclEthernetFrameAclNum OBJECT-TYPE
+        SYNTAX Integer32 (4000..4999)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of ethernet-frame-based acl group."
+        ::= { hwAclEthernetFrameRuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.2
+    hwAclEthernetFrameSubitem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The object specifies the number of an ACL rule.
+            If the number specified has been assigned to an ACL rule, 
+            the new rule will overwrite the old one, 
+            which is equal to editing the old rule. 
+            If the number is not assigned, the system will define 
+            a rule with the number and insert it to the place 
+            corresponding to its number. If no number is specified, 
+            the system will define a rule, assign a number to it and 
+            add it into the ACL. It will be placed at the end of the 
+            ACL when configuration sequence is adopted; otherwise, 
+            it will be placed based on the 'Depth-first' principle.
+            When ACL rules are following the 'Depth-first' principle,
+            the number of an ACL rule must be given 0 ,but it will be assigned
+            by step automatically;otherwise,this rule will not be created."
+        ::= { hwAclEthernetFrameRuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.3
+    hwAclEthernetFrameAct OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            permit(1),
+            deny(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the action of an ethernet-frame-based acl rule.
+            'deny' means discarding the packets that meet the condition,
+            'permit' means permitting the packets that meet the condition."
+        ::= { hwAclEthernetFrameRuleEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.4
+    hwAclEthernetFrameType OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the type of an ethernet frame. 
+            It specifies the interface information of the packets. The invalid
+            ethernet frame type is 0."
+        ::= { hwAclEthernetFrameRuleEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.5
+    hwAclEthernetFrameTypeMask OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the mask of ethernet frame."
+        ::= { hwAclEthernetFrameRuleEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.6
+    hwAclEthernetFrameSrcMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source mac address of rule."
+        ::= { hwAclEthernetFrameRuleEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.7
+    hwAclEthernetFrameSrcMacMask OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the source mac mask of rule."
+        ::= { hwAclEthernetFrameRuleEntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.8
+    hwAclEthernetFrameDstMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination mac address of rule."
+        ::= { hwAclEthernetFrameRuleEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.9
+    hwAclEthernetFrameDstMacMask OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the destination mac mask of rule."
+        ::= { hwAclEthernetFrameRuleEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.10
+    hwAclEthernetFrameTimeRangeIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..256)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the time range of a ethernet frame
+            acl rule. When the current time is in time range, the rule
+            is valid. Zero value declares that the acl rule has no 
+            time range. The invalid value is 0."
+        ::= { hwAclEthernetFrameRuleEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.11
+    hwAclEthernetFrameLog OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether to log the matched packets. 
+            The log contents include sequence number of ACL rule, 
+            packets passed or discarded, source/destination mac addr, 
+            protocol of ethernet frame, and number of packets."
+        ::= { hwAclEthernetFrameRuleEntry 11 }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.12
+    hwAclEthernetFrameEnable OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates whether the rule is valid or invalid."
+        ::= { hwAclEthernetFrameRuleEntry 12 }
+                            
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.13
+    hwAclEthernetFrameCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object indicates the statistics of matched packets by rule."
+        ::= { hwAclEthernetFrameRuleEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.1.14.1.14
+    hwAclEthernetFrameRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+        ::= { hwAclEthernetFrameRuleEntry 14 }
+        
+		hwAclEthernetFrameEncapType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ether2(1),
+				ieee802dot3(2),
+				snap(3),
+				none(255)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the encapsulation type of rule."  
+			DEFVAL { none }
+			::= { hwAclEthernetFrameRuleEntry 15 }
+	
+		hwAclEthernetFrameDoubleTag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates two tags of rule. False value do not 
+			care the number of tags."   
+			DEFVAL { False }
+			::= { hwAclEthernetFrameRuleEntry 16 }
+
+		hwAclEthernetFrameVlanId OBJECT-TYPE
+			SYNTAX Integer32 (0..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the vlan ID of rule. The invalid
+            vlan ID is 0."   
+            DEFVAL { 0 }
+			::= { hwAclEthernetFrameRuleEntry 17 }
+
+		hwAclEthernetFrameVlanIdMask OBJECT-TYPE
+			SYNTAX Integer32 (0..4095)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the vlan ID mask of rule."  
+			DEFVAL { 4095 }
+			::= { hwAclEthernetFrameRuleEntry 18 }
+
+		hwAclEthernetFrameCVlanId OBJECT-TYPE
+			SYNTAX Integer32 (0..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the ce-vlan ID of rule. The invalid
+            vlan ID is 0." 
+            DEFVAL { 0 }
+			::= { hwAclEthernetFrameRuleEntry 19 }
+		
+		hwAclEthernetFrameCVlanIdMask OBJECT-TYPE
+			SYNTAX Integer32 (0..4095)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the ce-vlan ID mask of rule."
+			DEFVAL { 4095 }
+			::= { hwAclEthernetFrameRuleEntry 20 }
+        
+        hwAclEthernetFrameRule8021p OBJECT-TYPE
+			SYNTAX Integer32 (0..7 | 255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the 8021p value of S-tag."
+			::= { hwAclEthernetFrameRuleEntry 21 } 
+			
+		hwAclEthernetFrameRuleCVlan8021p OBJECT-TYPE
+			SYNTAX Integer32 (0..7 | 255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the 8021p value of C-tag."
+			::= { hwAclEthernetFrameRuleEntry 22 }
+        
+		hwAclAppliedTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwAclAppliedEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Configure the applied ACL."
+			::= { hwAclMibObjects 15 }
+
+		hwAclAppliedEntry OBJECT-TYPE
+			SYNTAX HwAclAppliedEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Each entry contains a applied ACL."
+			INDEX { hwAclAppliedOperation, hwAclAppliedScopeType, hwAclAppliedScopeIndex, hwAclAppliedDirection, hwAclAppliedAclNum, 
+		hwAclAppliedSubitem, hwAclAppliedAclNum2, hwAclAppliedSubitem2, hwAclAppliedIsIPv6Acl }
+			::= { hwAclAppliedTable 1 }
+
+		
+		HwAclAppliedEntry ::=
+			SEQUENCE { 
+				hwAclAppliedOperation
+					INTEGER,
+				hwAclAppliedScopeType
+					INTEGER,
+				hwAclAppliedScopeIndex
+					Integer32,
+				hwAclAppliedDirection
+					INTEGER,
+				hwAclAppliedAclNum
+					Integer32,
+				hwAclAppliedSubitem
+					Integer32,
+				hwAclAppliedAclNum2
+					Integer32,
+				hwAclAppliedSubitem2
+					Integer32,
+				hwAclAppliedStatMode
+					INTEGER,
+				hwAclAppliedStatCount
+					Counter64,
+				hwAclAppliedLimitCir
+					Integer32,
+				hwAclAppliedLimitPir
+					Integer32,
+				hwAclAppliedLimitCbs
+					Integer32,
+				hwAclAppliedLimitPbs
+					Integer32,
+				hwAclAppliedLimitGreenAction
+					INTEGER,
+				hwAclAppliedLimitGreenValue
+					Integer32,
+				hwAclAppliedLimitYellowAction
+					INTEGER,
+				hwAclAppliedLimitYellowValue
+					Integer32,
+				hwAclAppliedLimitRedAction
+					INTEGER,
+				hwAclAppliedLimitRedValue
+					Integer32,
+				hwAclAppliedMirrObservedPort
+					Integer32,
+				hwAclAppliedMirrRspanVlan
+					Integer32,
+				hwAclAppliedRedirectIfIndex
+					Integer32,
+				hwAclAppliedRedirectIpAddr
+					IpAddress,
+				hwAclAppliedRedirectIpv6Addr
+					Ipv6Address,
+				hwAclAppliedRemarkVlan
+					Integer32,
+				hwAclAppliedRemarkCVlan
+					Integer32,
+				hwAclAppliedRemark8021p
+					Integer32,
+				hwAclAppliedRemarkDscp
+					Integer32,
+				hwAclAppliedRemarkIpPre
+					Integer32,
+				hwAclAppliedRemarkLocalPre
+					Integer32,
+				hwAclAppliedRemarkMacAddr
+					MacAddress,
+				hwAclAppliedIsIPv6Acl
+					TruthValue,			
+				hwAclAppliedRowStatus
+					RowStatus
+			 }
+
+		hwAclAppliedOperation OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				filter(1),
+				limit(2),
+				mirror(3),
+				redirectCpu(4),
+				redirectInterface(5),
+				redirectIpNextHop(6),
+				redirectIpv6NextHop(7),
+				remark8021p(8),
+				remarkDscp(9),
+				remarkIpPrecedence(10),
+				remarkLocalPrecedence(11),
+				remarkVlanId(12),
+				remarkCVlanId(13),
+				remarkDestMac(14),
+				statistic(15)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The actions taken when packets conforming or exceeding the configured."
+			::= { hwAclAppliedEntry 1 }
+
+		hwAclAppliedScopeType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				global(1),
+				vlan(2),
+				interface(3)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The scope that ACL apply on."
+			::= { hwAclAppliedEntry 2 }
+
+		hwAclAppliedScopeIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"When the scope is global, this field is invalid;
+				When the scope is vlan, this field is vlan ID;
+				When the scope is interface, this field is interface index."
+			::= { hwAclAppliedEntry 3 }
+
+		
+		hwAclAppliedDirection OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inbound(1),
+				outbound(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The direction acl apply on."
+			::= { hwAclAppliedEntry 4 }
+
+		hwAclAppliedAclNum OBJECT-TYPE
+			SYNTAX Integer32 (2000..4999)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of ACL group.
+				Basic ACL in range 2000~2999;
+				Advance ACL in range 3000~3999;
+				Link ACL in range 4000~4999;"
+			::= { hwAclAppliedEntry 5 }
+			
+		hwAclAppliedSubitem OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object specifies the number of an ACL rule."
+			::= { hwAclAppliedEntry 6 }
+
+		hwAclAppliedAclNum2 OBJECT-TYPE
+			SYNTAX Integer32 (2000..3999|65535)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of ACL group. 
+				65535 means this field is valid."	
+		::= { hwAclAppliedEntry 7 }
+
+		hwAclAppliedSubitem2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object specifies the number of an ACL rule."
+			::= { hwAclAppliedEntry 8 }
+
+		hwAclAppliedStatMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				byPackets(1),
+				byBytes(2)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the mode of statistics. 
+			When action is statistic, this field is valid."  
+			DEFVAL { byPackets }
+			::= { hwAclAppliedEntry 9 }
+
+		hwAclAppliedStatCount OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the statistics of matched packets by the policy.
+			When action is statistic or limit, this field is valid."
+			::= { hwAclAppliedEntry 10 }
+
+		
+		hwAclAppliedLimitCir OBJECT-TYPE
+			SYNTAX Integer32 (0 | 64..10000000)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Committed information rate. Unit: kbps." 
+			DEFVAL { 0 }
+			::= { hwAclAppliedEntry 11 }
+
+		
+		hwAclAppliedLimitPir OBJECT-TYPE
+			SYNTAX Integer32 (0 | 64..10000000)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Peak information rate. Unit: kbps.
+				0 is the default value."  
+			DEFVAL { 0 }
+			::= { hwAclAppliedEntry 12 }
+
+		hwAclAppliedLimitCbs OBJECT-TYPE
+			SYNTAX Integer32 (0 | 4096..16773120)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Committed burst size. Unit: byte.
+				0 is the default value." 
+			DEFVAL { 0 }
+			::= { hwAclAppliedEntry 13 }
+
+		hwAclAppliedLimitPbs OBJECT-TYPE
+			SYNTAX Integer32 (0 | 4096..16773120)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Peak burst size. Unit: byte.
+				0 is the default value." 
+			DEFVAL { 0 }
+			::= { hwAclAppliedEntry 14 }
+
+		hwAclAppliedLimitGreenAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				pass(1),
+				drop(2),
+				passRemarkDscp(3),
+				passRemark8021p(4)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Green action." 
+			DEFVAL { pass }
+			::= { hwAclAppliedEntry 15 }
+
+		hwAclAppliedLimitGreenValue OBJECT-TYPE
+			SYNTAX Integer32 (0..63)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The value is to remark When green action is remarking.
+                For remarking DSCP, the range is 0~63;
+                For remarking 8021p, the range is 0~7."
+			::= { hwAclAppliedEntry 16 }
+
+		hwAclAppliedLimitYellowAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				pass(1),
+				drop(2),
+				passRemarkDscp(3),
+				passRemark8021p(4)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Yellow action." 
+			DEFVAL { pass }
+			::= { hwAclAppliedEntry 17 }
+
+		hwAclAppliedLimitYellowValue OBJECT-TYPE
+			SYNTAX Integer32 (0..63)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The value is to remark When yellow action is remarking.
+                For remarking DSCP, the range is 0~63;
+                For remarking 8021p, the range is 0~7."
+			::= { hwAclAppliedEntry 18 }
+
+		hwAclAppliedLimitRedAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				pass(1),
+				drop(2),
+				passRemarkDscp(3),
+				passRemark8021p(4)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Red action." 
+			DEFVAL { drop }
+			::= { hwAclAppliedEntry 19 }
+
+		hwAclAppliedLimitRedValue OBJECT-TYPE
+			SYNTAX Integer32 (0..63)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The value is to remark When red action is remarking.
+                For remarking DSCP, the range is 0~63;
+                For remarking 8021p, the range is 0~7."
+			::= { hwAclAppliedEntry 20 }
+
+		
+		hwAclAppliedMirrObservedPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The mirror observe port number."
+			::= { hwAclAppliedEntry 21 }
+
+		hwAclAppliedMirrRspanVlan OBJECT-TYPE
+			SYNTAX Integer32 (0..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object specifies the RSPAN vlan. 
+			0 means mirror to local port."			
+			::= { hwAclAppliedEntry 22 }
+
+		hwAclAppliedRedirectIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The redirect output interface."
+			::= { hwAclAppliedEntry 23 }
+
+		hwAclAppliedRedirectIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The redirect IP next hop address."
+			::= { hwAclAppliedEntry 24 }
+
+		hwAclAppliedRedirectIpv6Addr OBJECT-TYPE
+			SYNTAX Ipv6Address
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The redirect IPv6 next hop address."
+			::= { hwAclAppliedEntry 25 }
+
+		hwAclAppliedRemarkVlan OBJECT-TYPE
+			SYNTAX Integer32 (0..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked vlan ID."
+			::= { hwAclAppliedEntry 26 }
+
+		hwAclAppliedRemarkCVlan OBJECT-TYPE
+			SYNTAX Integer32 (0..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked ce-vlan ID."
+			::= { hwAclAppliedEntry 27 }
+
+		hwAclAppliedRemark8021p OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked 8021p value."
+			::= { hwAclAppliedEntry 28 }
+
+		hwAclAppliedRemarkDscp OBJECT-TYPE
+			SYNTAX Integer32 (0..63)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked DSCP value."
+			::= { hwAclAppliedEntry 29 }
+
+		hwAclAppliedRemarkIpPre OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked IP precedence value."
+			::= { hwAclAppliedEntry 30 }
+
+		hwAclAppliedRemarkLocalPre OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked local precedence value."
+			::= { hwAclAppliedEntry 31 }
+
+		hwAclAppliedRemarkMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The remarked MAC address."
+			::= { hwAclAppliedEntry 32 }		
+		    
+	    hwAclAppliedIsIPv6Acl OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates whether is IPv6 ACL."
+			::= { hwAclAppliedEntry 33 }
+						
+	    hwAclAppliedRowStatus OBJECT-TYPE
+	        SYNTAX RowStatus
+	        MAX-ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	            "RowStatus,Now support three state:CreateAndGo,Active,Destroy."
+	        ::= { hwAclAppliedEntry 51 }      
+
+		hwAclIpv6NumGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwAclIpv6NumGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table of IPv6 ACL group information."
+			::= { hwAclMibObjects 16 }
+
+		hwAclIpv6NumGroupEntry OBJECT-TYPE
+			SYNTAX HwAclIpv6NumGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry containing characters of an IPv6 ACL group."
+			INDEX { hwAclIpv6NumGroupAclNum }
+			::= { hwAclIpv6NumGroupTable 1 }
+
+		
+		HwAclIpv6NumGroupEntry ::=
+			SEQUENCE { 
+				hwAclIpv6NumGroupAclNum
+					Integer32,
+				hwAclIpv6NumGroupMatchOrder
+					INTEGER,
+				hwAclIpv6NumGroupSubitemNum
+					Counter32,
+				hwAclIpv6NumGroupCountClear
+					INTEGER,
+				hwAclIpv6NumGroupRowStatus
+					RowStatus
+			 }
+
+		hwAclIpv6NumGroupAclNum OBJECT-TYPE
+			SYNTAX Integer32 (2000..3999)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of IPv6 ACL group, identifying an IPv6 ACL."
+			::= { hwAclIpv6NumGroupEntry 1 }
+
+		
+		hwAclIpv6NumGroupMatchOrder OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			config(1),
+			auto(2),
+			default(3)
+			}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the match order of rules. 
+				'config' means matching ACL rules in the configuration sequence,
+				'auto' means the ACL rules are matched following the 'Depth-first' principle."
+			DEFVAL { default }
+			::= { hwAclIpv6NumGroupEntry 2 }
+
+		
+		hwAclIpv6NumGroupSubitemNum OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of the rules in the ACL group."
+			::= { hwAclIpv6NumGroupEntry 3 }
+
+		
+		hwAclIpv6NumGroupCountClear OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				cleared(1),
+				notUsed(2)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Reset the statistics of ACL group."
+			::= { hwAclIpv6NumGroupEntry 4 }
+
+		
+		hwAclIpv6NumGroupRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"RowStatus, Now support three value:CreateAndGo,Active,Destroy."
+			::= { hwAclIpv6NumGroupEntry 51 }
+
+    --    Acl Trap MIB definition
+    -- 
+    -- 1.3.6.1.4.1.2011.5.1.2
+    hwAclMibTrap OBJECT IDENTIFIER ::= { hwAcl 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.2.1
+    hwAclTrapOid OBJECT IDENTIFIER ::= { hwAclMibTrap 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.2.2
+    hwAclTrapsDefine OBJECT IDENTIFIER ::= { hwAclMibTrap 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1
+    hwAclTraps OBJECT IDENTIFIER ::= { hwAclTrapsDefine 1 }
+    
+    --    Acl MIB Conformance definition
+    -- 
+    -- 1.3.6.1.4.1.2011.5.1.3
+    hwAclMibConformance OBJECT IDENTIFIER ::= { hwAcl 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.3.1
+    hwAclMibCompliances OBJECT IDENTIFIER ::= { hwAclMibConformance 1 }
+    
+    -- this module
+    -- 1.3.6.1.4.1.2011.5.1.3.1.1
+    hwAclMibCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which 
+            implement the Huawei acl MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwAclGroup }
+            OBJECT hwAclBasicRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destory(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+            OBJECT hwAclAdvancedRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destory(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+            OBJECT hwAclIfRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destroy(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+            OBJECT hwAclIpv6BasicRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destroy(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+            OBJECT hwAclIpv6AdvancedRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destroy(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+            OBJECT hwAclEthernetFrameRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destroy(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."   
+            OBJECT hwAclAppliedRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destroy(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+            OBJECT hwAclIpv6NumGroupRowStatus
+                SYNTAX INTEGER
+                    {
+                    active(1),
+                    createAndGo(4),
+                    destroy(6)
+                    }
+                DESCRIPTION 
+                    "The value of creatAndWaite, notInservice and notReady are not required."
+
+        ::= { hwAclMibCompliances 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.3.2
+    hwAclMibGroups OBJECT IDENTIFIER ::= { hwAclMibConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.3.2.1
+		hwAclGroup OBJECT-GROUP
+			OBJECTS { hwAclNumGroupMatchOrder, hwAclNumGroupSubitemNum, hwAclNumGroupAclName, hwAclBasicAct, hwAclBasicSrcIp, 
+		hwAclBasicSrcWild, hwAclBasicTimeRangeIndex, hwAclBasicFragments, hwAclBasicLog, hwAclBasicEnable, 
+		hwAclBasicCount, hwAclBasicRowStatus, hwAclAdvancedAct, hwAclAdvancedProtocol, hwAclAdvancedSrcIp, 
+		hwAclAdvancedSrcWild, hwAclAdvancedSrcOp, hwAclAdvancedSrcPort1, hwAclAdvancedSrcPort2, hwAclAdvancedDestIp, 
+		hwAclAdvancedDestWild, hwAclAdvancedDestOp, hwAclAdvancedDestPort1, hwAclAdvancedDestPort2, hwAclAdvancedPrecedence, 
+		hwAclAdvancedTos, hwAclAdvancedDscp, hwAclAdvancedEstablish, hwAclAdvancedTimeRangeIndex, hwAclAdvancedIcmpType, 
+		hwAclAdvancedIcmpCode, hwAclAdvancedFragments, hwAclAdvancedLog, hwAclAdvancedEnable, hwAclAdvancedCount, 
+		hwAclAdvancedRowStatus, hwAclAdvancedTcpSyncFlag, hwAclIfAct, hwAclIfIndex, hwAclIfAny, 
+		hwAclIfTimeRangeIndex, hwAclIfLog, hwAclIfEnable, hwAclIfCount, hwAclIfRowStatus, 
+		hwAclUserAct, hwAclUserProtocol, hwAclUserSrcIp, hwAclUserSrcWild, hwAclUserSrcOp, 
+		hwAclUserSrcPort1, hwAclUserSrcPort2, hwAclUserDestIp, hwAclUserDestWild, hwAclUserDestOp, 
+		hwAclUserDestPort1, hwAclUserDestPort2, hwAclUserPrecedence, hwAclUserTos, hwAclUserDscp, 
+		hwAclUserEstablish, hwAclUserTimeRangeIndex, hwAclUserIcmpType, hwAclUserIcmpCode, hwAclUserFragments, 
+		hwAclUserLog, hwAclUserEnable, hwAclUserCount, hwAclUserSrcUserGroupName, hwAclUserDestUserGroupName, 
+		hwAclUserSrcModeType, hwAclUserDestModeType, hwAclUserRowStatus, hwAclCompileEnableFlag, hwAclNumGroupAclNum, 
+		hwAclBasicAclNum, hwAclBasicSubitem, hwAclAdvancedAclNum, hwAclAdvancedSubitem, hwAclIfAclNum, 
+		hwAclIfSubitem, hwAclUserAclNum, hwAclUserSubitem, hwAclUserVrfName, hwAclUserTcpSyncFlag, 
+		hwAclEthernetFrameEncapType, hwAclEthernetFrameDoubleTag, hwAclEthernetFrameVlanId, hwAclEthernetFrameVlanIdMask, hwAclEthernetFrameCVlanId, 
+		hwAclEthernetFrameCVlanIdMask, hwAclAppliedStatMode, hwAclAppliedStatCount, hwAclAppliedLimitCir, hwAclAppliedLimitPir, 
+		hwAclAppliedLimitCbs, hwAclAppliedLimitPbs, hwAclAppliedLimitGreenAction, hwAclAppliedLimitGreenValue, hwAclAppliedLimitYellowAction, 
+		hwAclAppliedLimitYellowValue, hwAclAppliedLimitRedAction, hwAclAppliedLimitRedValue, hwAclAppliedMirrObservedPort, hwAclAppliedMirrRspanVlan, 
+		hwAclAppliedRedirectIfIndex, hwAclAppliedRedirectIpAddr, hwAclAppliedRedirectIpv6Addr, hwAclAppliedRemarkVlan, hwAclAppliedRemarkCVlan, 
+		hwAclAppliedRemark8021p, hwAclAppliedRemarkDscp, hwAclAppliedRemarkIpPre, hwAclAppliedRemarkLocalPre, hwAclAppliedRemarkMacAddr, 
+		hwAclAppliedRowStatus, hwAclCompileNumGroupStatus, hwAclNumGroupStep, hwAclNumGroupDescription, hwAclNumGroupCountClear, 
+		hwAclNumGroupRowStatus, hwAclBasicVrfName, hwAclAdvancedVrfName, hwAclIpv6BasicAct, hwAclIpv6BasicSrcIp, 
+		hwAclIpv6BasicSrcWild, hwAclIpv6BasicTimeRangeIndex, hwAclIpv6BasicFragment, hwAclIpv6BasicLog, hwAclIpv6BasicEnable, 
+		hwAclIpv6BasicCount, hwAclIpv6BasicVrfName, hwAclIpv6BasicRowStatus, hwAclIpv6AdvancedAct, hwAclIpv6AdvancedProtocol, 
+		hwAclIpv6AdvancedSrcIp, hwAclIpv6AdvancedSrcWild, hwAclIpv6AdvancedSrcOp, hwAclIpv6AdvancedSrcPort1, hwAclIpv6AdvancedSrcPort2, 
+		hwAclIpv6AdvancedDestIp, hwAclIpv6AdvancedDestWild, hwAclIpv6AdvancedDestOp, hwAclIpv6AdvancedDestPort1, hwAclIpv6AdvancedDestPort2, 
+		hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos, hwAclIpv6AdvancedDscp, hwAclIpv6AdvancedEstablish, hwAclIpv6AdvancedTimeRangeIndex, 
+		hwAclIpv6AdvancedIcmpType, hwAclIpv6AdvancedIcmpCode, hwAclIpv6AdvancedFragment, hwAclIpv6AdvancedLog, hwAclIpv6AdvancedEnable, 
+		hwAclIpv6AdvancedCount, hwAclIpv6AdvancedVrfName, hwAclIpv6AdvancedRowStatus, hwAclEthernetFrameAct, hwAclEthernetFrameType, 
+		hwAclEthernetFrameTypeMask, hwAclEthernetFrameSrcMac, hwAclEthernetFrameSrcMacMask, hwAclEthernetFrameDstMac, hwAclEthernetFrameDstMacMask, 
+		hwAclEthernetFrameTimeRangeIndex, hwAclEthernetFrameLog, hwAclEthernetFrameEnable, hwAclEthernetFrameCount,  
+		hwAclIpv6NumGroupMatchOrder, hwAclIpv6NumGroupSubitemNum, hwAclIpv6NumGroupCountClear, hwAclIpv6NumGroupRowStatus, hwAclEthernetFrameRowStatus, 
+		hwAclEthernetFrameRule8021p, hwAclEthernetFrameRuleCVlan8021p }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing mandatory acl information."
+        ::= { hwAclMibGroups 1 }
+
+END 

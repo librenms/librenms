@@ -1,0 +1,559 @@
+CISCOSB-EVENTS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE                       FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString,
+    TruthValue, RowStatus                              FROM SNMPv2-TC
+    switch001                                          FROM CISCOSB-MIB
+    Counter                                            FROM RFC1155-SMI
+    InterfaceIndex, InterfaceIndexOrZero               FROM IF-MIB
+    SnmpAdminString                                    FROM SNMP-FRAMEWORK-MIB
+    RlSmartPortsMacroNameOrZero FROM CISCOSB-SMARTPORTS-MIB;
+
+rlEventsMib MODULE-IDENTITY
+        LAST-UPDATED "201009110000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "MTS events MIB."
+        REVISION "201009110000Z"
+        DESCRIPTION
+                "Initial revision."
+    ::= { switch001 150 }
+
+--
+-- rlEvents MIB
+--
+
+SmartPortType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Supported smart port types."
+    SYNTAX  INTEGER {
+        unknown(1),
+        default(2),
+        printer(3),
+        desktop(4),
+        guest(5),
+        server(6),
+        host(7),
+        ip-camera(8),
+        ip-phone(9),
+        ip-phone-desktop(10),
+        switch(11),
+        router(12),
+        ap(13)
+}
+SmartPortMacroParameterName ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Smart macro parameter name."
+    SYNTAX  DisplayString(SIZE(1..32))
+
+SmartPortMacroParameterValue ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Smart macro parameter value."
+    SYNTAX  DisplayString(SIZE(1..80))
+
+SmartPortMacroType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Smart macro type - built-in or user-defined."
+    SYNTAX  INTEGER {built-in(1), user-defined(2)}
+
+SmartPortMacroParameterOrder ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Smart macro parameter order."
+    SYNTAX  INTEGER {single(1),  first(2), middle(3), last(4)}
+
+    rlPortEvents OBJECT IDENTIFIER ::= { rlEventsMib 1}
+
+    rlAutoSmartPortAdminStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+           enabled  (1),
+           disabled (2),
+           controlled(3)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "disabled    - Auto Smart port feature is administratively disabled.
+            enabled     - Auto Smart port feature is administratively enabled.
+            controlled  - Auto Smart port feature is administratively controlled by VOICE VLAN.
+             "
+       DEFVAL {controlled}
+    ::= { rlPortEvents 1 }
+
+    rlAutoSmartPortOperStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+           enabled  (1),
+           disabled (2)
+       }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "disabled    - Auto Smart port feature is operationally disabled.
+            enabled     - Auto Smart port feature is operationally enabled.
+             "
+       DEFVAL {disabled}
+    ::= { rlPortEvents 2 }
+
+    rlAutoSmartPortLastVoiceVlanStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+           enabled  (1),
+           disabled (2)
+       }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Indicated last status set by VOICE VLAN feature.
+            If rlAutoSmartPortAdminStatus has 'controlled' value then the value of this object is the same as rlAutoSmartPortOperStatus.
+
+            enabled   - Auto Smart port feature should be operationally enabled, if rlAutoSmartPortAdminStatus has 'controlled' value.
+            disabled  - Auto Smart port feature should be operationally disabled, if rlAutoSmartPortAdminStatus has 'controlled' value
+             "
+       DEFVAL {disabled}
+    ::= { rlPortEvents 3}
+
+    rlAutoSmartPortLastVoiceVlanId OBJECT-TYPE
+       SYNTAX  INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Indicated last VOICE VLAN ID set by VOICE VLAN feature."
+    ::= { rlPortEvents 4}
+
+    rlAutoSmartPortLearningProtocols OBJECT-TYPE
+       SYNTAX  BITS {
+           cdp  (0),
+           lldp (1)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "cdp  - Information about device type of neighboring devices(s) is learnt
+                   via CDP (Cisco Discovery Protocol) advertisements.
+            lldp - Information about device type of neighboring devices(s) is learnt
+                    via LLDP (Link Layer Discovery Protocol ) advertisements. "
+    ::= { rlPortEvents 5 }
+
+
+     rlAutoSmartPortTypesTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF RlAutoSmartPortTypesEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "The table is used to keep all the information related to a specific port type."
+    ::=  { rlPortEvents  6 }
+
+    rlAutoSmartPortTypesEntry OBJECT-TYPE
+       SYNTAX     RlAutoSmartPortTypesEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "An entry (conceptual row) in the rlAutoSmartPortTypesTable."
+       INDEX  { rlAutoSmartPortTypesType }
+    ::= { rlAutoSmartPortTypesTable 1 }
+
+    RlAutoSmartPortTypesEntry ::= SEQUENCE {
+        rlAutoSmartPortTypesType                  SmartPortType,
+        rlAutoSmartPortTypeStatus                 INTEGER,
+        rlAutoSmartPortMacro                      RlSmartPortsMacroNameOrZero,
+        rlAutoSmartPortTypesRevertToDefaultMacro  TruthValue,
+        rlAutoSmartPortTypesRevertToDefaultParams TruthValue,
+        rlAutoSmartPortTypesBuiltinMacro          SmartPortMacroType
+
+
+    }
+
+    rlAutoSmartPortTypesType OBJECT-TYPE
+        SYNTAX  SmartPortType
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Smart port type."
+        ::= { rlAutoSmartPortTypesEntry 1 }
+
+    rlAutoSmartPortTypeStatus OBJECT-TYPE
+        SYNTAX  INTEGER { enabled(1), disabled(2), default(3) }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Smart port type global status. "
+        ::= { rlAutoSmartPortTypesEntry 2 }
+
+     rlAutoSmartPortMacro OBJECT-TYPE
+        SYNTAX  RlSmartPortsMacroNameOrZero
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Macro to be activated when a port is set to the smart port type indicated
+             by rlAutoSmartPortTypesType. The macro whose name is 'no_'<rlAutoSmartPortMacro>
+             is activated when a port ceases to be of this smart port type. "
+        ::= { rlAutoSmartPortTypesEntry 3 }
+
+
+     rlAutoSmartPortTypesRevertToDefaultMacro OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Setting this object will cause the smart port type macro associated with this smart port type
+            to revert to the default macro. "
+     ::= { rlAutoSmartPortTypesEntry 4 }
+
+     rlAutoSmartPortTypesRevertToDefaultParams OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Setting this object will cause the default smart port type parameter values associated with the built-in macro
+            of this smart port type to revert to their default values."
+     ::= { rlAutoSmartPortTypesEntry 5 }
+
+     rlAutoSmartPortTypesBuiltinMacro OBJECT-TYPE
+        SYNTAX  SmartPortMacroType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Indicates whether the macro is built-in or user defined."
+     ::= { rlAutoSmartPortTypesEntry 6 }
+
+
+    rlAutoSmartPortMacrosParamTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF RlAutoSmartPortMacrosParamEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "The table is used to keep all the default parameter values related to a specific port type."
+    ::=  { rlPortEvents  7 }
+
+    rlAutoSmartPortMacrosParamEntry OBJECT-TYPE
+       SYNTAX     RlAutoSmartPortMacrosParamEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A parameter name & default value pair for a smart port type macro."
+       INDEX  { rlAutoSmartPortTypesType, rlAutoSmartPortMacroType, IMPLIED rlAutoSmartPortMacrosParamName }
+    ::= { rlAutoSmartPortMacrosParamTable 1 }
+
+    RlAutoSmartPortMacrosParamEntry ::= SEQUENCE {
+        rlAutoSmartPortMacroType        SmartPortMacroType,
+        rlAutoSmartPortMacrosParamName  SmartPortMacroParameterName,
+        rlAutoSmartPortMacrosParamOrder SmartPortMacroParameterOrder,
+        rlAutoSmartPortMacrosParamValue SmartPortMacroParameterValue
+
+    }
+
+      rlAutoSmartPortMacroType OBJECT-TYPE
+        SYNTAX  SmartPortMacroType
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Macro type - built-in or user defined."
+        ::= { rlAutoSmartPortMacrosParamEntry 1 }
+
+      rlAutoSmartPortMacrosParamName OBJECT-TYPE
+        SYNTAX  SmartPortMacroParameterName
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Name of the parameter to be supplied at smart port macro activation. "
+        ::= { rlAutoSmartPortMacrosParamEntry 2 }
+
+      rlAutoSmartPortMacrosParamOrder OBJECT-TYPE
+        SYNTAX  SmartPortMacroParameterOrder
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Setting this object to 'first' instructs the system to erase all previous information associated
+             with the rlAutoSmartPortTypesType and rlAutoSmartPortMacroType associated with this conceptual row.
+             Setting this object to 'middle' instructs the system to wait for further parameters.
+             Setting this object to 'last' informs the system that no further parameters will be sent and
+             therefore it can start the macro or builtin parameters change process.
+             Setting this object to 'single' instructs the system to erase all previous information associated
+             with the rlAutoSmartPortTypesType and rlAutoSmartPortMacroType associated with this conceptual row and
+             informs the system that no further parameters will be sent and therefore it can start macro or builtin
+             parameters change process."
+        ::= { rlAutoSmartPortMacrosParamEntry 3 }
+
+
+      rlAutoSmartPortMacrosParamValue OBJECT-TYPE
+        SYNTAX  SmartPortMacroParameterValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Default value of the parameter to be supplied at smart port macro activation. "
+        ::= { rlAutoSmartPortMacrosParamEntry 4 }
+
+
+
+     rlAutoSmartPortPortsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF RlAutoSmartPortPortsEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "The table is used to keep all the auto smart port information related to a specific port."
+    ::=  { rlPortEvents  8 }
+
+    rlAutoSmartPortPortsEntry OBJECT-TYPE
+       SYNTAX     RlAutoSmartPortPortsEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "An entry (conceptual row) in the rlAutoSmartPortPortsTable."
+       INDEX  { rlAutoSmartPortPort }
+    ::= { rlAutoSmartPortPortsTable 1 }
+
+    RlAutoSmartPortPortsEntry ::= SEQUENCE {
+        rlAutoSmartPortPort                 InterfaceIndex,
+        rlAutoSmartPortPortStatus           INTEGER,
+        rlAutoSmartPortPortType             SmartPortType,
+        rlAutoSmartPortPersistency          INTEGER,
+        rlAutoSmartPortLearntPortType       SmartPortType,
+        rlAutoSmartPortPortAcquiringType    INTEGER,
+        rlAutoSmartPortLastActivatedMacro   RlSmartPortsMacroNameOrZero,
+        rlAutoSmartPortFailedCommandNumber  INTEGER,
+        rlAutoSmartPortSetLearntPortType   TruthValue
+
+
+    }
+
+    rlAutoSmartPortPort OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The port to which the smartport information is associated."
+        ::= { rlAutoSmartPortPortsEntry 1 }
+
+    rlAutoSmartPortPortStatus OBJECT-TYPE
+        SYNTAX  INTEGER {enabled(1), disabled(2)}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates whether auto smart port feature is enabled or not on this port."
+        DEFVAL { enabled }
+        ::= { rlAutoSmartPortPortsEntry 2 }
+
+    rlAutoSmartPortPortType OBJECT-TYPE
+        SYNTAX  SmartPortType
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Smart port type associated with this port. If set by user, the port will retain
+             the smart port type at link down, link not present and reboot events."
+        DEFVAL { default }
+    ::= { rlAutoSmartPortPortsEntry 3 }
+
+
+    rlAutoSmartPortPersistency OBJECT-TYPE
+        SYNTAX  INTEGER {persistent(1), not-persistent(2)}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "If set to persistent then, if the system concludes, according to
+             the information learnt there is no relevant device connected to the port,
+             the rlAutoSmartPortPortType will not be changed (as if the user set this
+             rlAutoSmartPortPortType himself), except on learning another rlAutoSmartPortPortType."
+        DEFVAL { not-persistent }
+    ::= { rlAutoSmartPortPortsEntry 4 }
+
+
+    rlAutoSmartPortLearntPortType OBJECT-TYPE
+        SYNTAX  SmartPortType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Smart port type learnt via the learning protocols. This value will
+             be different from rlAutoSmartPortPortType only if rlAutoSmartPortPortType
+             was manually configured (i.e. if the value of
+             rlAutoSmartPortPortAcquiringType is 'configuration'). The value of the object
+             is used to set the value of rlAutoSmartPortPortType
+             if the user removes the configuration."
+        DEFVAL { default }
+        ::= { rlAutoSmartPortPortsEntry 5 }
+
+    rlAutoSmartPortPortAcquiringType OBJECT-TYPE
+        SYNTAX  INTEGER {default(1), configuration(2), persistency(3), learning(4)}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the way that the value of rlAutoSmartPortPortType was acquired. This object can be
+             set only during configuration download."
+        ::= { rlAutoSmartPortPortsEntry 6 }
+
+     rlAutoSmartPortLastActivatedMacro OBJECT-TYPE
+        SYNTAX  RlSmartPortsMacroNameOrZero
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Indicates macro name of last activated macro or 'no macro' if no macro was run."
+     ::= { rlAutoSmartPortPortsEntry 7 }
+
+     rlAutoSmartPortFailedCommandNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Indicates number of command (starting with 1) that caused the macro
+             failure or 0 if the macro succeeded or no macro was run."
+     ::= { rlAutoSmartPortPortsEntry 8 }
+
+     rlAutoSmartPortSetLearntPortType OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Instructs the system to set the port type to the learnt port type."
+     ::= { rlAutoSmartPortPortsEntry 9 }
+
+    rlAutoSmartPortParamsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF RlAutoSmartPortActionParamsEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "This table optionally determines the parameter values for the macro that is activated when the smartport type is
+           manually changed for a specific port or trunk via the rlAutoSmartPortPortType object."
+    ::=  { rlPortEvents  9 }
+
+    rlAutoSmartPortParamsEntry OBJECT-TYPE
+       SYNTAX     RlAutoSmartPortActionParamsEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A parameter name & immediate value."
+       INDEX  { rlAutoSmartPortIfIndex, IMPLIED rlAutoSmartPortParamName }
+    ::= { rlAutoSmartPortParamsTable 1 }
+
+    RlAutoSmartPortActionParamsEntry ::= SEQUENCE {
+        rlAutoSmartPortIfIndex    InterfaceIndex,
+        rlAutoSmartPortParamName  SmartPortMacroParameterName,
+       rlAutoSmartPortParamOrder SmartPortMacroParameterOrder,
+        rlAutoSmartPortParamValue SmartPortMacroParameterValue
+
+    }
+
+   rlAutoSmartPortIfIndex OBJECT-TYPE
+     SYNTAX  InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "The port or trunk that this entry is associated with. "
+     ::= { rlAutoSmartPortParamsEntry 1 }
+
+   rlAutoSmartPortParamName OBJECT-TYPE
+     SYNTAX  SmartPortMacroParameterName
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "Name of the parameter whose value must be supplied at a smart port macro activation. "
+     ::= { rlAutoSmartPortParamsEntry 2 }
+
+  rlAutoSmartPortParamOrder OBJECT-TYPE
+     SYNTAX  SmartPortMacroParameterOrder
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+            "Setting this object to 'first' instructs the system to erase all previous information associated
+             with the rlAutoSmartPortTypesType and rlAutoSmartPortMacroType associated with this conceptual row.
+             Setting this object to 'middle' instructs the system to wait for further parameters.
+             Setting this object to 'last' informs the system that no further parameters will be sent and
+             therefore it can start applying the smartport type.
+             Setting this object to 'single' instructs the system to erase all previous information associated
+             with the rlAutoSmartPortTypesType and rlAutoSmartPortMacroType associated with this conceptual row and
+             informs the system that no further parameters will be sent and informs the system that no further parameters will be sent and
+             therefore it can start applying the smartport type."
+     ::= { rlAutoSmartPortParamsEntry 3 }
+
+   rlAutoSmartPortParamValue OBJECT-TYPE
+     SYNTAX  SmartPortMacroParameterValue
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+         "Value of the parameter whose value must be supplied at a smart port macro activation. "
+     ::= { rlAutoSmartPortParamsEntry 4 }
+
+
+
+    rlAutoSmartTrunkRefreshTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlAutoSmartTrunkRefreshEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+           "Setting this object causes running the SmartPort macros of the
+           following types: router, switch and ap. This operation is called the trunk refresh operation."
+    ::= { rlPortEvents 10 }
+
+
+    rlAutoSmartTrunkRefreshEntry OBJECT-TYPE
+       SYNTAX     RlAutoSmartTrunkRefreshEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "An entry (conceptual row) in the rlAutoSmartTrunkRefreshTable."
+       INDEX  { rlAutoSmartTrunkRefreshSmartPortType, rlAutoSmartTrunkRefreshIfIndex }
+    ::= { rlAutoSmartTrunkRefreshTable 1 }
+
+    RlAutoSmartTrunkRefreshEntry ::= SEQUENCE {
+        rlAutoSmartTrunkRefreshSmartPortType  INTEGER,
+        rlAutoSmartTrunkRefreshIfIndex        InterfaceIndexOrZero,
+        rlAutoSmartTrunkRefreshRowStatus      RowStatus
+    }
+
+    rlAutoSmartTrunkRefreshSmartPortType OBJECT-TYPE
+        SYNTAX  INTEGER {default(1), switch(11), router(12), ap(13)}
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "If not default the trunk refresh operation will be carried out on all ports of this smart port type if
+             rlAutoSmartTrunkRefreshIfIndex is nonzero, or on the port specifed by rlAutoSmartTrunkRefreshIfIndex if it's type
+             matches the given  this smart port type (if not matching a wrong-value error will be return).
+             If default the trunk refresh operation will be carried out on all ports of router, switch and ap smart port type if
+             rlAutoSmartTrunkRefreshIfIndex is nonzero, or on the port specifed by rlAutoSmartTrunkRefreshIfIndex."
+        ::= { rlAutoSmartTrunkRefreshEntry 1 }
+
+    rlAutoSmartTrunkRefreshIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndexOrZero
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "If 0 the trunk refresh operation will be carried out on all ports of the smart port type as specified in the
+             rlAutoSmartTrunkRefreshSmartPortType. If nonzero the trunk refresh operation will be carried out
+             on the specified port, if rlAutoSmartTrunkRefreshSmartPortType is default or matches the smart port type of
+             the specified port. Any other case will result in a wrong-value error."
+        ::= { rlAutoSmartTrunkRefreshEntry 2 }
+
+    rlAutoSmartTrunkRefreshRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Since this an action table only createAndGo will be accepted and the conceptual row will vanish immediately
+             after the action execution."
+        ::= { rlAutoSmartTrunkRefreshEntry 3 }
+
+
+       rlAutoSmartBusy OBJECT-TYPE
+           SYNTAX  TruthValue
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "If true indicates that the autosmartports system is temporarily busy performing a multiport
+                operation and therefore can not service management requests for the time-being."
+    ::= { rlPortEvents 11 }
+
+
+
+ END

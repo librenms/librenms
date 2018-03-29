@@ -1,0 +1,905 @@
+CISCOSB-BRIDGE-SECURITY DEFINITIONS ::= BEGIN
+
+-- Version:    7.43
+-- Date:       02-Apr-2006
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, IpAddress, Counter32                FROM SNMPv2-SMI
+    InterfaceIndex, ifIndex                         FROM IF-MIB
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    DisplayString, TruthValue                       FROM SNMPv2-TC
+    VlanId                                          FROM Q-BRIDGE-MIB
+    switch001                                       FROM CISCOSB-MIB;
+
+rlBridgeSecurity MODULE-IDENTITY
+        LAST-UPDATED "200604020000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for DHCP Snoop, ARP Inspection
+                and Ip source Guard features."
+        ::= { switch001  112}
+
+rlIpDhcpSnoop OBJECT IDENTIFIER ::= { rlBridgeSecurity  1}
+
+rlIpSourceGuard OBJECT IDENTIFIER ::= { rlBridgeSecurity  2}
+
+rlIpArpInspect OBJECT IDENTIFIER ::= { rlBridgeSecurity  3}
+
+rlProtocolFiltering OBJECT IDENTIFIER ::= { rlBridgeSecurity  4}
+--
+-- DHCP Snoop
+--
+rlIpDhcpSnoopMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlIpDhcpSnoop 1 }
+
+rlIpDhcpSnoopEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies a system DHCP Snoop enable state."
+   ::= { rlIpDhcpSnoop 2 }
+
+rlIpDhcpSnoopFileEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies a system DHCP Snoop file enable state."
+   ::= { rlIpDhcpSnoop 3 }
+
+rlIpDhcpSnoopClearAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+       noAction(1),  -- for get only
+       clearNow(2)
+     }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to clear DHCP Snoop Table."
+    ::= { rlIpDhcpSnoop 4 }
+
+rlIpDhcpSnoopFileUpdateTime OBJECT-TYPE
+    SYNTAX      INTEGER(600..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configures in seconds the period of time between file updates.
+        The valid range is 600 - 86400."
+    ::= { rlIpDhcpSnoop 5 }
+
+rlIpDhcpSnoopVerifyMacAddress OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configures on an un-trusted port whether the source MAC address in a DHCP packet matches
+         the client hardware address."
+    ::= { rlIpDhcpSnoop 6 }
+
+rlIpDhcpSnoopCurrentEntiresNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contain the current number of DHCP snooping entries for all types."
+    ::= { rlIpDhcpSnoop 7 }
+
+rlIpDhcpOpt82InsertionEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies a DHCP option 82 insertion enable state."
+   ::= { rlIpDhcpSnoop 8 }
+
+rlIpDhcpOpt82RxOnUntrustedEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies a DHCP option 82 receive on untrusted port enable state."
+   ::= { rlIpDhcpSnoop 9 }
+
+--
+-- Dhcp Snoop Static table
+--
+rlIpDhcpSnoopStaticTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpDhcpSnoopStaticEntry
+  MAX-ACCESS  not-accessible
+  STATUS current
+  DESCRIPTION      "The table specifies all DHCP Snoop Static (configured by user) entries.
+                   The entry contains a local IP address of the DHCP client, a Port interface to which a DHCP client is connected to the switch."
+  ::= { rlIpDhcpSnoop 10 }
+
+rlIpDhcpSnoopStaticEntry OBJECT-TYPE
+   SYNTAX  RlIpDhcpSnoopStaticEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {rlIpDhcpSnoopStaticVLANTag,
+           rlIpDhcpSnoopStaticMACAddress}
+::= { rlIpDhcpSnoopStaticTable 1 }
+
+RlIpDhcpSnoopStaticEntry ::= SEQUENCE {
+   rlIpDhcpSnoopStaticVLANTag          VlanId,
+   rlIpDhcpSnoopStaticMACAddress       MacAddress,
+   rlIpDhcpSnoopStaticIPAddress        IpAddress,
+   rlIpDhcpSnoopStaticPortInterface    InterfaceIndex,
+   rlIpDhcpSnoopStaticRowStatus        RowStatus
+}
+rlIpDhcpSnoopStaticVLANTag OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A DHCP Snoop Static entry vlan tag."
+    ::= { rlIpDhcpSnoopStaticEntry 1 }
+
+rlIpDhcpSnoopStaticMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A DHCP Snoop Static entry mac address"
+    ::= { rlIpDhcpSnoopStaticEntry 2 }
+
+rlIpDhcpSnoopStaticIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A DHCP Snoop Static entry IP address."
+  ::= { rlIpDhcpSnoopStaticEntry  3 }
+
+rlIpDhcpSnoopStaticPortInterface OBJECT-TYPE
+  SYNTAX       InterfaceIndex
+  MAX-ACCESS   read-write
+  STATUS       current
+  DESCRIPTION
+     "A DHCP Snoop Static entry Port interface."
+  ::= { rlIpDhcpSnoopStaticEntry  4 }
+
+rlIpDhcpSnoopStaticRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A status can be destroy, active or createAndGo"
+  ::= { rlIpDhcpSnoopStaticEntry  5 }
+
+--
+-- Dhcp Snoop table
+--
+
+RlIpDhcpSnoopType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip Dhcp Snoop entry type."
+   SYNTAX INTEGER {
+      learnedByProtocol(1),
+      deletedByTimeout(2),
+      static(3)
+}
+
+rlIpDhcpSnoopTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpDhcpSnoopEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION      "DHCP Snoop entry. Use to add/delete a dynamic entries and to view all entries (dynamic and static)"
+  ::= { rlIpDhcpSnoop 11 }
+
+rlIpDhcpSnoopEntry OBJECT-TYPE
+   SYNTAX      RlIpDhcpSnoopEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {rlIpDhcpSnoopVLANTag,
+           rlIpDhcpSnoopMACAddress}
+::= { rlIpDhcpSnoopTable 1 }
+
+RlIpDhcpSnoopEntry ::= SEQUENCE {
+   rlIpDhcpSnoopVLANTag          VlanId,
+   rlIpDhcpSnoopMACAddress       MacAddress,
+   rlIpDhcpSnoopType             RlIpDhcpSnoopType,
+   rlIpDhcpSnoopLeaseTime        Unsigned32,
+   rlIpDhcpSnoopIPAddress        IpAddress,
+   rlIpDhcpSnoopPortInterface    InterfaceIndex,
+   rlIpDhcpSnoopRowStatus        RowStatus
+}
+rlIpDhcpSnoopVLANTag OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A DHCP Snoop entry vlan tag."
+    ::= { rlIpDhcpSnoopEntry 1 }
+
+rlIpDhcpSnoopMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A DHCP Snoop entry mac address"
+    ::= { rlIpDhcpSnoopEntry 2 }
+
+rlIpDhcpSnoopType OBJECT-TYPE
+   SYNTAX       RlIpDhcpSnoopType
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         "A DHCP Snoop entry type: static or dynamic."
+   ::= { rlIpDhcpSnoopEntry 3 }
+
+rlIpDhcpSnoopLeaseTime OBJECT-TYPE
+  SYNTAX        Unsigned32
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+        "A DHCP Snoop lease time. For static entry the lease time is 0xFFFFFFFF"
+  ::= { rlIpDhcpSnoopEntry  4 }
+
+rlIpDhcpSnoopIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the DHCP client referred to in this table entry."
+  ::= { rlIpDhcpSnoopEntry  5 }
+
+rlIpDhcpSnoopPortInterface OBJECT-TYPE
+  SYNTAX        InterfaceIndex
+  MAX-ACCESS    read-write
+   STATUS       current
+  DESCRIPTION
+        "Identifies the port Interface ifindex, which connected to DHCP client identified with the entry."
+  ::= { rlIpDhcpSnoopEntry  6 }
+
+rlIpDhcpSnoopRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+       "Entry status. A valid status is CreateandGo or Delete."
+  ::= { rlIpDhcpSnoopEntry  7 }
+
+--
+-- Dhcp Snoop Enable VLAN Table
+--
+rlIpDhcpSnoopEnableVlanTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpDhcpSnoopEnableVlanEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION      "An Ip Dhcp Snooping enabled VLAN table."
+  ::= { rlIpDhcpSnoop 12 }
+
+rlIpDhcpSnoopEnableVlanEntry OBJECT-TYPE
+   SYNTAX      RlIpDhcpSnoopEnableVlanEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "An Ip Dhcp Snooping enabled VLAN entry."
+   INDEX {rlIpDhcpSnoopEnableVlanTag}
+::= { rlIpDhcpSnoopEnableVlanTable 1 }
+
+RlIpDhcpSnoopEnableVlanEntry ::= SEQUENCE {
+   rlIpDhcpSnoopEnableVlanTag          VlanId,
+   rlIpDhcpSnoopEnableVlanRowStatus    RowStatus
+}
+rlIpDhcpSnoopEnableVlanTag OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A DHCP Snoop entry vlan tag."
+    ::= { rlIpDhcpSnoopEnableVlanEntry 1 }
+
+rlIpDhcpSnoopEnableVlanRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+       "Entry status. A valid status is CreateandGo and Delete."
+  ::= { rlIpDhcpSnoopEnableVlanEntry  2 }
+
+--
+-- Dhcp Snoop Trusted ports Table
+--
+rlIpDhcpSnoopTrustedPortTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpDhcpSnoopTrustedPortEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "DHCP Snoop Trusted ports entry. The entry created when port is configured as trusted."
+  ::= { rlIpDhcpSnoop 13 }
+
+rlIpDhcpSnoopTrustedPortEntry OBJECT-TYPE
+   SYNTAX      RlIpDhcpSnoopTrustedPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {ifIndex}
+::= { rlIpDhcpSnoopTrustedPortTable 1 }
+
+RlIpDhcpSnoopTrustedPortEntry ::= SEQUENCE {
+   rlIpDhcpSnoopTrustedPortRowStatus       RowStatus
+}
+
+rlIpDhcpSnoopTrustedPortRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Entry status. A valid status is CreateandGo or Delete."
+  ::= { rlIpDhcpSnoopTrustedPortEntry  2 }
+
+--
+--  IP Source Guard
+--
+
+rlIpSourceGuardMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlIpSourceGuard 1 }
+
+rlIpSourceGuardEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "FALSE - There is no Ip Source Guard in the system.
+        TRUE - Ip Source Guard is enabled on system."
+    ::= { rlIpSourceGuard 2 }
+
+rlIpSourceGuardRetryToInsert OBJECT-TYPE
+    SYNTAX      INTEGER {
+       noAction(0),  -- for get only
+       retryToInsertNow(1)
+     }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When setted to retryToInsertNow all IP Source Guard inactive entries
+        due to resource problem reinserted in the Policy.
+        On get always return noAction."
+    ::= { rlIpSourceGuard 3 }
+
+rlIpSourceGuardRetryTime OBJECT-TYPE
+    SYNTAX      INTEGER (0..600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configures in seconds the period of time the application retries to
+        insert inactive by resource problem rules. The actual range is 10-600.
+        0 used to sign that the timer is not active."
+    ::= { rlIpSourceGuard 4 }
+
+--
+--  IP Source Guard Ports table
+--
+
+rlIpSourceGuardPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlIpSourceGuardPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP Source Guard ports entry. The entry created when IP Source Guard
+        enabled on port."
+  ::= { rlIpSourceGuard 5 }
+
+rlIpSourceGuardPortEntry OBJECT-TYPE
+   SYNTAX      RlIpSourceGuardPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {ifIndex}
+::= { rlIpSourceGuardPortTable 1 }
+
+RlIpSourceGuardPortEntry ::= SEQUENCE {
+   rlIpSourceGuardPortRowStatus       RowStatus
+}
+rlIpSourceGuardPortRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Entry status. A valid status is CreateAndGo or Delete."
+  ::= { rlIpSourceGuardPortEntry  2 }
+
+--
+--  IP Source Guard table
+--
+
+RlIpSourceGuardType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip IP Source Guard entry type."
+   SYNTAX INTEGER {
+      dynamic(1),
+      static(2)
+}
+RlIpSourceGuardStatus  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip IP Source Guard entry status."
+   SYNTAX INTEGER {
+      active(1),
+      inactive(2)
+}
+RlIpSourceGuardFailReason  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip IP Source Guard entry reason."
+   SYNTAX INTEGER {
+      noProblem(1),
+      noResource(2),
+      noSnoopVlan(3),
+      trustPort(4)
+}
+
+rlIpSourceGuardTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpSourceGuardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP Source Guard entry. Use to view all entries (dynamic and static)"
+  ::= { rlIpSourceGuard 6 }
+
+rlIpSourceGuardEntry OBJECT-TYPE
+   SYNTAX      RlIpSourceGuardEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {ifIndex,
+          rlIpSourceGuardIPAddress,
+          rlIpSourceGuardVLANTag}
+::= { rlIpSourceGuardTable 1 }
+
+RlIpSourceGuardEntry ::= SEQUENCE {
+   rlIpSourceGuardIPAddress         IpAddress,
+   rlIpSourceGuardVLANTag           VlanId,
+   rlIpSourceGuardMACAddress        MacAddress,
+   rlIpSourceGuardType              RlIpSourceGuardType,
+   rlIpSourceGuardStatus            RlIpSourceGuardStatus,
+   rlIpSourceGuardFailReason        RlIpSourceGuardFailReason
+}
+
+rlIpSourceGuardIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the Ip Source Guard entry."
+  ::= { rlIpSourceGuardEntry  1 }
+
+rlIpSourceGuardVLANTag OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A Ip Source Guard entry vlan tag."
+    ::= { rlIpSourceGuardEntry 2 }
+
+rlIpSourceGuardMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "A Ip Source Guard entry mac address"
+    ::= { rlIpSourceGuardEntry 3 }
+
+rlIpSourceGuardType OBJECT-TYPE
+   SYNTAX       RlIpSourceGuardType
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+         "A Ip Source Guard entry type: static or dynamic."
+   ::= { rlIpSourceGuardEntry 4 }
+
+rlIpSourceGuardStatus OBJECT-TYPE
+  SYNTAX        RlIpSourceGuardStatus
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+        "Identifies the status of Ip Source Guard entry."
+  ::= { rlIpSourceGuardEntry 5 }
+
+rlIpSourceGuardFailReason OBJECT-TYPE
+  SYNTAX        RlIpSourceGuardFailReason
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+        "Identifies the reason for in-activity of Ip Source Guard entry."
+  ::= { rlIpSourceGuardEntry 6 }
+
+--
+--  IP Source Guard Permitted rules counter table
+--
+
+rlIpSourceGuardPermittedRuleCounterTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlIpSourceGuardPermittedRuleCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table includes, per vlan, the IP Source Guard permitted rules counters."
+  ::= { rlIpSourceGuard 7 }
+
+rlIpSourceGuardPermittedRuleCounterEntry OBJECT-TYPE
+   SYNTAX      RlIpSourceGuardPermittedRuleCounterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {rlIpSourceGuardPermittedRuleCounterVLANTag}
+::= { rlIpSourceGuardPermittedRuleCounterTable 1 }
+
+RlIpSourceGuardPermittedRuleCounterEntry ::= SEQUENCE {
+   rlIpSourceGuardPermittedRuleCounterVLANTag           VlanId,
+   rlIpSourceGuardPermittedRuleCounterNumOfStaticRules  Counter32,
+   rlIpSourceGuardPermittedRuleCounterNumOfDhcpRules    Counter32
+}
+rlIpSourceGuardPermittedRuleCounterVLANTag OBJECT-TYPE
+   SYNTAX       VlanId
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       "Ip Source Guard permitted rules counters entry Vlan tag."
+  ::= { rlIpSourceGuardPermittedRuleCounterEntry  1 }
+
+rlIpSourceGuardPermittedRuleCounterNumOfStaticRules OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of static rules added by IP Source Guard for the permitted Hosts"
+  ::= { rlIpSourceGuardPermittedRuleCounterEntry  2 }
+
+rlIpSourceGuardPermittedRuleCounterNumOfDhcpRules OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of rules added by IP Source Guard for the permitted Hosts,
+        as a result of DHCP Snooping dynamic information."
+  ::= { rlIpSourceGuardPermittedRuleCounterEntry  3 }
+
+--
+-- ARP Inspection
+--
+RlIpArpInspectListNameType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ip arp inspection list name type."
+   SYNTAX DisplayString(SIZE(1..32))
+
+rlIpArpInspectMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlIpArpInspect 1 }
+
+rlIpArpInspectEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Specifies a system ARP Inspection enable state."
+   ::= { rlIpArpInspect 2 }
+
+rlIpArpInspectLogInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the minimal interval between successive ARP SYSLOG messages.
+         0 - message is immediately generated.
+         0xFFFFFFFF - messages would not be generated. A legal range is 0-86400."
+    ::= { rlIpArpInspect 3 }
+
+rlIpArpInspectValidation OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defined a specific check on incoming ARP packets:
+         Source MAC: Compare the source MAC address in the Ethernet header against
+         the sender MAC address in the ARP body. This check is performed on both ARP requests and responses.
+         Destination MAC: Compare the destination MAC address in the Ethernet header against
+         the target MAC address in ARP body. This check is performed for ARP responses.
+         IP addresses: Compare the ARP body for invalid and unexpected IP addresses.
+         Addresses include 0.0.0.0, 255.255.255.255, and all IP multicast addresses."
+    ::= { rlIpArpInspect 4 }
+
+--
+-- ARP Inspection List table
+--
+rlIpArpInspectListTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpArpInspectListEntry
+  MAX-ACCESS  not-accessible
+  STATUS current
+  DESCRIPTION      "The table specifies all ARP Inspection List entries.
+                   The entry contains a list name, list IP address, a list Mac address."
+  ::= { rlIpArpInspect 5 }
+
+rlIpArpInspectListEntry OBJECT-TYPE
+   SYNTAX  RlIpArpInspectListEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {rlIpArpInspectListName,
+           rlIpArpInspectListIPAddress}
+::= { rlIpArpInspectListTable 1 }
+
+RlIpArpInspectListEntry ::= SEQUENCE {
+    rlIpArpInspectListName         RlIpArpInspectListNameType,
+    rlIpArpInspectListIPAddress    IpAddress,
+    rlIpArpInspectListMACAddress   MacAddress,
+    rlIpArpInspectListRowStatus    RowStatus
+}
+
+rlIpArpInspectListName OBJECT-TYPE
+    SYNTAX  RlIpArpInspectListNameType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Name of the Access List."
+    ::= { rlIpArpInspectListEntry 1}
+
+rlIpArpInspectListIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ARP Inspection List IP address."
+  ::= { rlIpArpInspectListEntry  2 }
+
+rlIpArpInspectListMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "ARP Inspection List mac address"
+    ::= { rlIpArpInspectListEntry 3 }
+
+rlIpArpInspectListRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "A status can be destroy, active or createAndGo"
+  ::= { rlIpArpInspectListEntry  4 }
+
+--
+-- Arp Inspection Enable VLAN Table
+--
+rlIpArpInspectEnableVlanTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpArpInspectEnableVlanEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION      "An Ip ARP Inspection enabled VLAN table."
+  ::= { rlIpArpInspect 6 }
+
+rlIpArpInspectEnableVlanEntry OBJECT-TYPE
+   SYNTAX      RlIpArpInspectEnableVlanEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "An Ip ARP Inspection enabled VLAN entry."
+   INDEX {rlIpArpInspectEnableVlanTag}
+::= { rlIpArpInspectEnableVlanTable 1 }
+
+RlIpArpInspectEnableVlanEntry ::= SEQUENCE {
+   rlIpArpInspectEnableVlanTag              VlanId,
+   rlIpArpInspectAssignedListName           RlIpArpInspectListNameType,
+   rlIpArpInspectEnableVlanRowStatus        RowStatus,
+   rlIpArpInspectVlanNumOfArpForwarded      Counter32,
+   rlIpArpInspectVlanNumOfArpDropped        Counter32,
+   rlIpArpInspectVlanNumOfArpMismatched     Counter32,
+   rlIpArpInspectVlanClearCountersAction    TruthValue
+}
+
+rlIpArpInspectEnableVlanTag OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "An Ip ARP Inspection entry vlan tag."
+    ::= { rlIpArpInspectEnableVlanEntry 1 }
+
+rlIpArpInspectAssignedListName OBJECT-TYPE
+  SYNTAX        RlIpArpInspectListNameType
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "An Ip ARP Inspection assigned ACL name."
+  ::= { rlIpArpInspectEnableVlanEntry 2 }
+
+rlIpArpInspectEnableVlanRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+       "Entry status. A valid status is CreateandGo and Delete."
+  ::= { rlIpArpInspectEnableVlanEntry  3 }
+
+rlIpArpInspectVlanNumOfArpForwarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of forwarded ARP packets, packets which were validated by ARP inspection "
+    ::= { rlIpArpInspectEnableVlanEntry 4 }
+
+rlIpArpInspectVlanNumOfArpDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped ARP packets, which were validated by ARP inspection
+        (mismatch , not-found and dropped for any reason)"
+    ::= { rlIpArpInspectEnableVlanEntry 5 }
+
+rlIpArpInspectVlanNumOfArpMismatched OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped ARP packets, which were validated by ARP inspection
+        and inconsistency was found for IP and MAC (mismatch)"
+    ::= { rlIpArpInspectEnableVlanEntry 6 }
+
+rlIpArpInspectVlanClearCountersAction OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, clear (set to zero) all Arp Inspection counters: rlIpArpInspectVlanNumOfArpForwarded ,
+        rlIpArpInspectVlanNumOfArpDropped and rlIpArpInspectVlanNumOfArpMismatched"
+    DEFVAL{ false }
+    ::= { rlIpArpInspectEnableVlanEntry 7 }
+
+
+--
+-- ARP Inspection Trusted ports Table
+--
+rlIpArpInspectTrustedPortTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpArpInspectTrustedPortEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION      "ARP Inspection Trusted ports entry. The entry created when port is configured as trusted."
+  ::= { rlIpArpInspect 7 }
+
+rlIpArpInspectTrustedPortEntry OBJECT-TYPE
+   SYNTAX      RlIpArpInspectTrustedPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {ifIndex}
+::= { rlIpArpInspectTrustedPortTable 1 }
+
+RlIpArpInspectTrustedPortEntry ::= SEQUENCE {
+   rlIpArpInspectTrustedPortRowStatus       RowStatus
+}
+rlIpArpInspectTrustedPortRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+       "Entry status. A valid status is CreateandGo or Delete."
+  ::= { rlIpArpInspectTrustedPortEntry  2 }
+
+
+rlIpArpInspectClearCountersAction OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, clear (set to zero) on all vlans: all Arp Inspection counters: rlIpArpInspectVlanNumOfArpForwarded ,
+        rlIpArpInspectVlanNumOfArpDropped and rlIpArpInspectVlanNumOfArpMismatched"
+    DEFVAL{ false }
+    ::= { rlIpArpInspect 8 }
+
+--
+-- Protocol Filtering
+--
+ProtocolFilteringMap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "This TC describes the list of protocol to be filtered.
+     The bit 'all(0)' indicates all Cisco protocols in range 0100.0ccc.ccc0 - 0100.0ccc.cccf
+     The bit 'cdp(1)' indicates Cisco CDP protocol.
+        Identified by destination mac address: 0100.0ccc.cccc and protocol type:0x2000.
+
+    The bit 'vtp(2)' indicates Cisco VTP protocol.
+        Identified by destination mac address: 0100.0ccc.cccc and protocol type:0x2003.
+
+    The bit 'dtp(3)' indicates Cisco DTP protocol.
+        Identified by destination mac address: 0100.0ccc.cccc and protocol type:0x2004.
+
+    The bit 'udld (4)' indicates Cisco UDLD protocol.
+        Identified by destination mac address: 0100.0ccc.cccc and protocol type:0x0111.
+
+    The bit 'pagp(5)' indicates Cisco PAGP protocol.
+        Identified by destination mac address: 0100.0ccc.cccc and protocol type: 0x0104.
+
+    The bit 'sstp(6)' indicates Cisco SSTP protocol.
+        Identified by destination mac address: 0100.0ccc.cccd.
+
+     "
+    SYNTAX  BITS {
+            all(0),
+            cdp(1),
+            vtp(2),
+            dtp(3),
+            udld(4),
+            pagp(5),
+            sstp(6)
+    }
+
+rlProtocolFilteringTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlProtocolFilteringEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Protocol filter configuration entry"
+  ::= { rlProtocolFiltering 1 }
+
+rlProtocolFilteringEntry OBJECT-TYPE
+   SYNTAX      RlProtocolFilteringEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {ifIndex}
+::= { rlProtocolFilteringTable  1 }
+
+RlProtocolFilteringEntry::= SEQUENCE {
+   rlProtocolFilteringList                      ProtocolFilteringMap,
+   rlProtocolFilteringRowStatus                 RowStatus
+}
+
+rlProtocolFilteringList       OBJECT-TYPE
+    SYNTAX      ProtocolFilteringMap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of protocol to be filtered."
+  ::= { rlProtocolFilteringEntry 1 }
+rlProtocolFilteringRowStatus       OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "A status can be destroy, active or createAndGo"
+  ::= { rlProtocolFilteringEntry 2 }
+
+END
+

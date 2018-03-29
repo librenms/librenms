@@ -1,0 +1,239 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-SERIAL-PORT.MIB:  NMS ONU SERIAL PORT MIB file
+-- AUG 2010
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-SERIAL-PORT DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOnuSerialPort         OBJECT IDENTIFIER ::= { nmsEPONGroup 27 }
+               
+               nmsEponOnuSerialPortTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuSerialPortEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU serial port table entries."
+                   ::= { nmsEponOnuSerialPort 1 }
+
+               nmsEponOnuSerialPortEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuSerialPortEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU serial port table."
+                   INDEX { llidIfIndex,onuSerialPortSeqNo }
+               ::= { nmsEponOnuSerialPortTable 1 }
+
+               NMSEponOnuSerialPortEntry ::=
+                   SEQUENCE {
+                       llidIfIndex
+                           INTEGER,
+                       onuSerialPortSeqNo
+                           INTEGER,
+		       onuSerialPortSpeed
+                           INTEGER,
+		       onuSerialPortDataBits
+                           INTEGER,
+		       onuSerialPortHaltBits
+                           INTEGER,
+		       onuSerialPortParity
+                           INTEGER,
+		       onuSerialPortFlowControl
+                           INTEGER,
+		       onuSerialPortPropRowStatus
+                           RowStatus,
+		       onuSerialPortDataReadInterval
+                           INTEGER,
+		       onuSerialPortDataReadBytes
+                           INTEGER,
+		       onuSerialPortBufferRowStatus
+                           RowStatus,
+		       onuSerialPortKeepaliveMode
+                           INTEGER,
+		       onuSerialPortKeepaliveIdle
+                           INTEGER,
+		       onuSerialPortKeepaliveTimeout
+                           INTEGER,
+		       onuSerialPortKeepaliveProbeCount
+                           INTEGER,
+		       onuSerialPortKeepaliveRowStatus
+                           RowStatus,
+                       onuSerialPortLoopback
+                           TruthValue
+               }
+               
+               
+
+               llidIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID interface id, unique in system. The same value as NMS-EPON-LLID mib index."
+                   ::= { nmsEponOnuSerialPortEntry 1 } 
+               
+               onuSerialPortSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER(224..239)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port sequence number, unique in one ONU."
+                   ::= { nmsEponOnuSerialPortEntry 2 } 
+               
+               onuSerialPortSpeed OBJECT-TYPE
+                   SYNTAX  INTEGER(300..115200)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port speed. Default value is 9600."
+                   ::= { nmsEponOnuSerialPortEntry 3 } 
+               
+               onuSerialPortDataBits OBJECT-TYPE
+                   SYNTAX  INTEGER(5..8)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port data bits. Default value is 8."
+                   ::= { nmsEponOnuSerialPortEntry 4 } 
+               
+               onuSerialPortHaltBits OBJECT-TYPE
+                   SYNTAX  INTEGER(1..2)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port halt bits. Default value is 1."
+                   ::= { nmsEponOnuSerialPortEntry 5 } 
+               
+               onuSerialPortParity OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 none(0),
+                                 odd(1),
+                                 even(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port parity. Default value is 0-none."
+                   ::= { nmsEponOnuSerialPortEntry 6 } 
+                   
+               onuSerialPortFlowControl OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                 none(0),
+                                 software(1),
+                                 hardware(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port parity. Default value is 0-none."
+                   ::= { nmsEponOnuSerialPortEntry 7 } 
+                   
+               onuSerialPortPropRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port properties row status.These five item are set together: onuSerialPortSpeed, onuSerialPortDataBits, onuSerialPortHaltBits, onuSerialPortParity, onuSerialPortFlowControl. "
+                   ::= { nmsEponOnuSerialPortEntry 8 } 
+                   
+               onuSerialPortDataReadInterval OBJECT-TYPE
+                   SYNTAX  INTEGER(10..100000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port buffer data read interval. Unit is mili-second, and default value is 100 ms."
+                   ::= { nmsEponOnuSerialPortEntry 9 } 
+               
+               onuSerialPortDataReadBytes OBJECT-TYPE
+                   SYNTAX  INTEGER(10..1000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port buffer data read bytes. When storage is up to limit, the bytes must be sent out. Default value is 100."
+                   ::= { nmsEponOnuSerialPortEntry 10 }                
+                   
+               onuSerialPortBufferRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port buffer setting row status.These two item are set together: onuSerialPortDataReadInterval, onuSerialPortDataReadBytes. "
+                   ::= { nmsEponOnuSerialPortEntry 11 } 
+
+               onuSerialPortKeepaliveMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    disable(0),
+                                    enable(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port keepalive mode. 0-disable, 1-enable."
+                   ::= { nmsEponOnuSerialPortEntry 12 } 
+               
+               onuSerialPortKeepaliveIdle OBJECT-TYPE
+                   SYNTAX  INTEGER(1..10000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port keepalive idle. if there is no r/x package in time of onuSerialPortKeepaliveIdle, system will send keepalive package to probe. Unit is second, and default value is 100 s."
+                   ::= { nmsEponOnuSerialPortEntry 13 } 
+               
+               onuSerialPortKeepaliveTimeout OBJECT-TYPE
+                   SYNTAX  INTEGER(1..10000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port keepalive timeout. if there is no r/x package in time of onuSerialPortKeepaliveIdle, system will send keepalive package to probe. And if there is no rsponse package in onuSerialPortKeepaliveTimeout, this keepalive package is timeout. Unit is second, and default value is 100 s."
+                   ::= { nmsEponOnuSerialPortEntry 14 } 
+
+               onuSerialPortKeepaliveProbeCount OBJECT-TYPE
+                   SYNTAX  INTEGER(1..1000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port keepalive probing package sending count. Default value is 3."
+                   ::= { nmsEponOnuSerialPortEntry 15 } 
+                   
+               onuSerialPortKeepaliveRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port keepalive setting value row status. These three items are set together: onuSerialPortKeepaliveIdle, onuSerialPortKeepaliveTimeout, onuSerialPortKeepaliveProbeCount."
+                   ::= { nmsEponOnuSerialPortEntry 16 } 
+                   
+               onuSerialPortLoopback OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port loopback test."
+                   ::= { nmsEponOnuSerialPortEntry 17 } 
+                   
+
+
+		       
+                           
+		       
+                           
+                       
+                           
+
+               
+               
+END

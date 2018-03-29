@@ -1,0 +1,414 @@
+
+-- *****************************************************************************
+-- Juniper-DS3-CONF
+--
+-- SNMP Agent Capabilities definitions for the DS3 MIBs.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-DS3-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniDs3Agent  MODULE-IDENTITY
+    LAST-UPDATED "200309292105Z"  -- 29-Sep-03 05:05 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the DS3 component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200309292105Z"  -- 29-Sep-03 05:05 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "DS3-MIB:
+         Replaced SMIv1 'groups' (RFC1407-MIB) with SMIv2 conformance groups
+         (DS3-MIB)."
+    REVISION    "200301301908Z"  -- 30-Jan-03 02:08 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-DS3-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200301301637Z"  -- 30-Jan-03 11:37 AM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Juniper-DS3-MIB:
+         Added far end port number, generator number and carrier support."
+    REVISION    "200208271848Z"  -- 27-Aug-02 02:48 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "DS3-MIB:
+         Added far end support.
+         Juniper-DS3-MIB:
+         Added far end support."
+    REVISION    "200104181941Z"  -- 18-Apr-01 03:41 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 11 }
+
+
+-- *****************************************************************************
+-- DS3 SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniDs3AgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the DS3 component of the JUNOSe SNMP agent.  This version
+        of the DS3 component was supported in JUNOSe 1.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS3 application in JUNOSe.
+        These capabilities became obsolete when support was added for line type
+        and cell scrambler objects."
+    SUPPORTS    DS3-MIB
+        INCLUDES {
+            ds3NearEndConfigGroup,
+            ds3NearEndStatisticsGroup,
+            ds3DeprecatedGroup }
+        VARIATION   dsx3SendCode
+            ACCESS      not-implemented
+            DESCRIPTION
+                "Management of the type of code being sent across the DS3/E3
+                interface is not implemented."
+        VARIATION   dsx3InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported." 
+        VARIATION   dsx3LineStatusLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineStatusChangeTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Ds1ForRemoteLoop
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS3-MIB
+        INCLUDES {
+            juniDs3Group }
+    ::= { juniDs3Agent 1 }
+
+juniDs3AgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the DS3 component of the JUNOSe SNMP agent.  This version
+        of the DS3 component was supported in JUNOSe 1.1 thru JUNOSe 2.5 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS3 application in JUNOSe.
+        These capabilities became obsolete when support was added for DSU
+        configuration objects."
+    SUPPORTS    DS3-MIB
+        INCLUDES {
+            ds3NearEndConfigGroup,
+            ds3NearEndStatisticsGroup,
+            ds3DeprecatedGroup }
+        VARIATION   dsx3SendCode
+            ACCESS      not-implemented
+            DESCRIPTION
+                "Management of the type of code being sent across the DS3/E3
+                interface is not implemented."
+        VARIATION   dsx3InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported." 
+        VARIATION   dsx3LineStatusLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineStatusChangeTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Ds1ForRemoteLoop
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS3-MIB
+        INCLUDES {
+            juniDs3Group2 }
+    ::= { juniDs3Agent 2 }
+
+juniDs3AgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the DS3 component of the JUNOSe SNMP agent.  This version
+        of the DS3 component was supported in JUNOSe 2.6 and subsequent JUNOSe
+        2.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS3 application in JUNOSe.
+        These capabilities became obsolete when support was added for dynamic
+        DS3 interface objects."
+    SUPPORTS    DS3-MIB
+        INCLUDES {
+            ds3NearEndConfigGroup,
+            ds3NearEndStatisticsGroup,
+            ds3DeprecatedGroup }
+        VARIATION   dsx3SendCode
+            ACCESS      not-implemented
+            DESCRIPTION
+                "Management of the type of code being sent across the DS3/E3
+                interface is not implemented."
+        VARIATION   dsx3InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported." 
+        VARIATION   dsx3LineStatusLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineStatusChangeTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Ds1ForRemoteLoop
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS3-MIB
+        INCLUDES {
+            juniDs3Group3 }
+    ::= { juniDs3Agent 3 }
+
+juniDs3AgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the DS3 component of the JUNOSe SNMP agent.  This version
+        of the DS3 component was supported in JUNOSe 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS3 application in JUNOSe.
+        These capabilities became obsolete when far end support was added to the
+        Juniper-DS3-MIB."
+    SUPPORTS    DS3-MIB
+        INCLUDES {
+            ds3NearEndConfigGroup,
+            ds3NearEndStatisticsGroup,
+            ds3DeprecatedGroup }
+        VARIATION   dsx3SendCode
+            ACCESS      not-implemented
+            DESCRIPTION
+                "Management of the type of code being sent across the DS3/E3
+                interface is not implemented."
+        VARIATION   dsx3InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported." 
+        VARIATION   dsx3LineStatusLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineStatusChangeTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Ds1ForRemoteLoop
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS3-MIB
+        INCLUDES {
+            juniDs3Group4 }
+    ::= { juniDs3Agent 4 }
+
+juniDs3AgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the DS3 component of the JUNOSe SNMP agent.  This version
+        of the DS3 component was supported in JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS3 application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-DS3-MIB for far end port number, generator number and carrier."
+    SUPPORTS    DS3-MIB
+        INCLUDES {
+            ds3NearEndConfigGroup,
+            ds3NearEndStatisticsGroup,
+            ds3FarEndGroup,
+            ds3DeprecatedGroup }
+        VARIATION   dsx3SendCode
+            ACCESS      not-implemented
+            DESCRIPTION
+                "Management of the type of code being sent across the DS3/E3
+                interface is not implemented."
+        VARIATION   dsx3InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported." 
+        VARIATION   dsx3LineStatusLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineStatusChangeTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Ds1ForRemoteLoop
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3FarEndInvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS3-MIB
+        INCLUDES {
+            juniDs3Group5,
+            juniDs3FarEndGroup }
+    ::= { juniDs3Agent 5 }
+
+juniDs3AgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the DS3 component of the JUNOSe SNMP agent.  This version
+        of the DS3 component is supported in JUNOSe 4.1 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the DS3 application in
+        JUNOSe."
+    SUPPORTS    DS3-MIB
+        INCLUDES {
+            ds3NearEndConfigGroup,
+            ds3NearEndStatisticsGroup,
+            ds3FarEndGroup,
+            ds3DeprecatedGroup }
+        VARIATION   dsx3SendCode
+            ACCESS      not-implemented
+            DESCRIPTION
+                "Management of the type of code being sent across the DS3/E3
+                interface is not implemented."
+        VARIATION   dsx3InvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineLength
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported." 
+        VARIATION   dsx3LineStatusLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LineStatusChangeTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3LoopbackStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Channelization
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3Ds1ForRemoteLoop
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3IntervalValidData
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+        VARIATION   dsx3FarEndInvalidIntervals
+            ACCESS      not-implemented
+            DESCRIPTION
+                "This object is not supported."
+    SUPPORTS    Juniper-DS3-MIB
+        INCLUDES {
+            juniDs3Group5,
+            juniDs3FarEndGroup2 }
+    ::= { juniDs3Agent 6 }
+
+END

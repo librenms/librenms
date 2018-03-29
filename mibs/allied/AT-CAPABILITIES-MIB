@@ -1,0 +1,264 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis MIB: capability for Rapier
+--
+-- Copied from ATR-CAPABILITY.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-CAPABILITIES-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+           AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+           atRouter, atAgents
+                FROM AT-SMI-MIB;           
+        
+    atrRapier AGENT-CAPABILITIES
+        PRODUCT-RELEASE      "AT Rapier switch, release 2.9.1"
+        STATUS               current
+        DESCRIPTION          "Capabilities of AT Rapier switch, release 2.9.1 and later releases."
+
+        SUPPORTS             IF-MIB
+            INCLUDES         { ifGeneralGroup }
+
+--            VARIATION        ifAdminStatus
+--                ACCESS       read-only
+--                DESCRIPTION  "Can't set ifAdminStatus via SNMP."
+
+        SUPPORTS             RFC1213-MIB
+            INCLUDES         { at, ip }
+
+            VARIATION        atIfIndex
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        atPhysAddress
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        atNetAddress
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteDest
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteIfIndex
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteMetric1
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteMetric2
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteMetric3
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteMetric4
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteNextHop
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteType
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteAge
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteMask
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipRouteMetric5
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipNetToMediaIfIndex
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipNetToMediaPhysAddress
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipNetToMediaNetAddress
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipNetToMediaType
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+        SUPPORTS             IP-FORWARD-MIB
+            INCLUDES         { ipForwardMultiPathGroup, ipForwardCidrRouteGroup }
+
+            VARIATION        ipForwardMask
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardIfIndex
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardType
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardInfo
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardNextHopAS
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardMetric1
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardMetric2
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardMetric3
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardMetric4
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipForwardMetric5
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteIfIndex
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteType
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteInfo
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteNextHopAS
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteMetric1
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteMetric2
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteMetric3
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteMetric4
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteMetric5
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ipCidrRouteStatus
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+        SUPPORTS             Q-BRIDGE-MIB
+            INCLUDES         { dot1qBase, dot1qVlan }
+
+            VARIATION        dot1qGvrpStatus
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this variable."
+
+            VARIATION        dot1qVlanStaticName
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        dot1qVlanStaticEgressPorts
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        dot1qVlanForbiddenEgressPorts
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        dot1qVlanStaticUntaggedPorts
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        dot1qVlanStaticRowStatus
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+        SUPPORTS             HOST-RESOURCES-MIB
+            INCLUDES         { hrSystem, hrStorage }
+
+            VARIATION        hrSystemDate
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this variable."
+
+            VARIATION        hrSystemInitialLoadParameters
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this variable."
+
+            VARIATION        hrStorageSize
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this variable."
+
+        SUPPORTS             MAU-MIB
+            INCLUDES         { dot3IfMauBasicGroup, dot3IfMauAutoNegGroup }
+
+            VARIATION        ifMauStatus
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ifMauDefaultType
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ifMauAutoNegAdminStatus
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ifMauAutoNegCapAdvertised
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+            VARIATION        ifMauAutoNegRestart
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+        SUPPORTS             IF-MIB
+            INCLUDES         { ifMIBObjects }
+
+            VARIATION        ifPromiscuousMode
+                ACCESS       read-only
+				DESCRIPTION  "Don't allow writes of this table."
+
+        ::= { atAgents 1 }
+END

@@ -1,0 +1,2023 @@
+CTRON-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+    --  ctbridge-mib.txt
+    --  Revision: 1.06.03
+    --  Part Number: 2170552-01
+    --  Date: "200202212231Z"  Thu Feb 21 22:31 GMT 2002
+
+    --  Cabletron Systems, Inc.
+    --  35 Industrial Way, P.O. Box 5005
+    --  Rochester, NH 03867-0505
+    --  (603) 332-9400
+    --  support@ctron.com
+
+    --  This module provides authoritative definitions for Cabletron's
+    --  enterprise-specific bridge MIB.
+    --
+    --  This module will be extended, as required.
+    --
+
+    --  Cabletron Systems reserves the right to make changes in 
+    --  specification and other information contained in this document 
+    --  without prior notice.  The reader should consult Cabletron Systems
+    --  to determine whether any such changes have been made.
+    --
+    --  In no event shall Cabletron Systems be liable for any incidental, 
+    --  indirect, special, or consequential damages whatsoever (including 
+    --  but not limited to lost profits) arising out of or related to this
+    --  document or the information contained in it, even if Cabletron
+    --  Systems has been advised of, known, or should have known, the 
+    --  possibility of such damages.
+    --
+    --  Cabletron grants vendors, end-users, and other interested parties
+    --  a non-exclusive license to use this Specification in connection
+    --  with the management of Cabletron products.
+
+    --  Copyright August 95 Cabletron Systems
+
+
+
+    --  Abstract
+ 
+    --  This memo defines bridging management objects that are not defined
+    --  in the IETF RFC:1286 - Definitions of Managed Objects for Bridges,
+    --  but are supported by Cabletron bridges.
+ 
+ 
+    --  Structure of MIB
+ 
+    --  Objects, in this MIB, are arranged into groups.  Each group is organized
+    --  as a set of related objects and is described below.
+ 
+    --  The ctBridgeBase Group
+ 
+    --  This group contains objects that are common to all types of bridges.
+    --  No current objects are defined in this group.
+ 
+
+    --  The ctBridgeStp Group
+ 
+    --  This group contains the objects that are specific to the Spanning
+    --  Tree Protocol.  If the bridge does not support the Spanning Tree
+    --  Protocol, this group will not be implemented.  This group is
+    --  applicable to any transparent only, source route only, or SRT bridge
+    --  which implements the Spanning Tree Protocol.
+ 
+    --  The ctBridgeSr Group
+ 
+    --  This group contains the objects that are specific to source route
+    --  bridging.  If source routing is not supported this group will not
+    --  be implemented.  This group is applicable to source route only, and
+    --  SRT bridges.
+ 
+    --  The ctBridgeTp Group
+ 
+    --  This group contains objects that are specific to transparent
+    --  bridging.  If transparent bridging is not supported this group
+    --  will not be implemented.  This group is applicable to transparent
+    --  only, and SRT bridges.
+
+    --  The ctBridgeSdbEnet Group
+ 
+    --  This group contains objects that are specific to transparent
+    --  Ethernet/802.3 bridging using Cabletron's proprietary special
+    --  filter database.  If Ethernet/802.3 transparent bridging is not
+    --  supported this group will not be implemented.  This group is
+    --  applicable to transparent only, and SRT bridges that support
+    --  Ethernet/802.3 networks.
+ 
+    --  The ctBridgeSdbTr Group
+ 
+    --  This group contains objects that are specific to transparent
+    --  Token Ring bridging using Cabletron's proprietary special filter
+    --  database.  If Token Ring transparent bridging is not supported
+    --  this group will not be implemented.  This group is applicable
+    --  to transparent only, and SRT bridges that support Token Ring
+    --  networks.
+
+    --  The ctBridgeTransTrEnet Group
+
+    --  This group contains objects that are specific to the translation
+    --  of packets between Token Ring and Ethernet for transparent or
+    --  source route bridging.  If Token Ring to Ethernet bridging is not
+    --  supported this group will not be implemented. 
+
+    --  The ctBridgeExtendedControl Group
+
+    --  This group contains objects that control extended functionality.
+    --  This includes turning off chassis managment functionality.
+    --  This group is only supported on those devices that support
+    --  extended control functionality.
+
+    --  The ctBridgeLoadShare Group
+
+    --  This group contains objects that control load sharing.
+    --  This concept is also known as Multi-Link Spanning Tree.  
+    --  This group is optional. 
+
+
+    IMPORTS
+
+             OBJECT-TYPE         FROM RFC-1212
+             DisplayString       FROM RFC1213-MIB
+             BridgeId            FROM BRIDGE-MIB
+             ctBridge            FROM CTRON-MIB-NAMES
+             Counter, TimeTicks  FROM RFC1155-SMI;
+
+
+    -- DisplayString ::= OCTET STRING
+    -- This data type is used to model textual information taken
+    -- from the NVT ASCII character set.  By convention, objects
+    -- with this syntax are declared as having
+    --
+    --      SIZE (0..255)
+
+    --========       group definitions           =============
+
+
+    ctBridgeStp            OBJECT IDENTIFIER ::= { ctBridge 2 }
+
+    ctBridgeSr             OBJECT IDENTIFIER ::= { ctBridge 3 }
+
+    ctBridgeTp             OBJECT IDENTIFIER ::= { ctBridge 4 }
+
+    ctBridgeSdbEnet        OBJECT IDENTIFIER ::= { ctBridge 5 }
+
+    ctBridgeSdbTr          OBJECT IDENTIFIER ::= { ctBridge 6 }
+
+    ctBridgeTransTrEnet    OBJECT IDENTIFIER ::= { ctBridge 7 }
+
+    ctBridgeExtendedControl OBJECT IDENTIFIER ::= { ctBridge 8 }
+
+    ctBridgeSdbGeneric      OBJECT IDENTIFIER ::= { ctBridge 9 }
+
+    ctBridgeLoadShare       OBJECT IDENTIFIER ::= { ctBridge 10 }
+
+
+    --========        ctBridgeStp group           =============
+
+
+    ctBridgeStpProtocolSpecification OBJECT-TYPE
+         SYNTAX  INTEGER {
+                    none(1),
+                    decLb100(2),
+                    ieee8021d(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+                "This object allows the network manager to select
+                 which Spanning Tree Protocol will be operational on
+                 the bridge.  The value 'decLb100(2)' indicates the
+                 DEC LANbridge 100 Spanning Tree protocol. The value
+                 'ieee8021d(3)' indicates the IEEE 802.1d Spanning
+                 Tree Protocol. The value 'none(1)' indicates no
+                 Spanning Tree Protocol is operational."
+         ::= { ctBridgeStp 1 }
+
+
+    -- This group is for management of switches that implement the
+    -- Per-VLAN Spanning Tree (PVST) functionality, as described
+    -- in Cabletron's PVST architecture specification.
+ 
+    ctBridgePvst  OBJECT IDENTIFIER ::=  { ctBridgeStp 2 }
+
+    ctPvstStpMode OBJECT-TYPE
+        SYNTAX INTEGER {
+               dot1qMode(1),
+               pvstMode(2) 
+        }
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "Specifies whether the switch is in 802.1D/Q single spanning
+                tree mode, or PVST mode. If the switch is configured with PVST
+                information for some VLANs, setting this object to dot1qMode(1)
+                will cause it to ignore the PVST settings and move all VLANs
+                into the single 802.1Q spanning tree."
+        ::= { ctBridgePvst 1 }
+
+    ctPvstMaxNumStp OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "Returns maximum number of spanning trees that this device
+                can implement. This will limit the number of VLANs
+                that can be configured with distinct spanning trees."
+        ::= { ctBridgePvst 2 }
+
+    ctPvstNumStps OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "When read, this returns the number of PVST spanning trees
+                active in the switch, which should correspond to the number
+                of entries in ctPvstStpTable.  When written with 4094, it
+                should create a spanning tree for each currently configured
+                VLAN. If a switch cannot create as many spanning trees as
+                configured VLANs, this write should return an error.
+                Writing any value other than 4094 should return an
+                error."
+        ::= { ctBridgePvst 3 }
+
+    ctPvstLastTopologyChange OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "This summary object contains the value of sysUpTime when
+                any of the rows in ctPvstStpTable last incremented
+                ctPvstStpTopChanges. Poll this object to determine if
+                any of the STP instances had topology changes."
+        ::= { ctBridgePvst 4 }
+
+
+    -- The Per-Vlan Global Spanning Tree Table
+
+    -- Indexed by VLAN-ID, this is information about the
+    -- spanning tree running on a VLAN.
+    -- This table is empty when cvPvstStpMode is set
+    -- to dot1qMode(1).
+
+    ctPvstStpTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPvstStpEntry
+        ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+               "A collection of spanning tree objects per VLAN."
+        ::= { ctBridgePvst 5 }
+
+    ctPvstStpEntry OBJECT-TYPE
+        SYNTAX  CtPvstStpEntry
+        ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+               "An entry related to a specific spanning tree."
+        INDEX  { ctPvstStpVlanId }
+        ::= { ctPvstStpTable 1 }
+
+    CtPvstStpEntry ::=
+        SEQUENCE {
+            ctPvstStpVlanId   
+                 INTEGER,
+            ctPvstStpProtocolSpecification
+                 INTEGER,
+            ctPvstStpPriority      
+                 INTEGER,
+            ctPvstStpTimeSinceTopologyChange  
+                 TimeTicks,
+            ctPvstStpTopChanges 
+                 Counter,
+            ctPvstStpDesignatedRoot 
+                 BridgeId,
+            ctPvstStpRootCost 
+                 INTEGER,
+            ctPvstStpRootPort  
+                 INTEGER,
+            ctPvstStpMaxAge 
+                 INTEGER,
+            ctPvstStpHelloTime 
+                 INTEGER,
+            ctPvstStpHoldTime 
+                 INTEGER,
+            ctPvstStpForwardDelay
+                 INTEGER,
+            ctPvstStpBridgeMaxAge 
+                 INTEGER,
+            ctPvstStpBridgeHelloTime
+                 INTEGER,
+            ctPvstStpBridgeForwardDelay 
+                 INTEGER
+        }
+
+
+    ctPvstStpVlanId OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The VLAN-ID of the VLAN on which this spanning tree is
+                running. Writing a VLAN-ID will create
+                a separate spanning tree for that VLAN, if it previously
+                was part of the single 802.1Q VLAN."
+        ::= { ctPvstStpEntry 1 }
+
+    ctPvstStpProtocolSpecification OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    unknown(1),
+                    decLb100(2),
+                    ieee8021d(3)
+                }
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "An indication of what version of the Spanning
+                Tree Protocol is being run.  The value
+                'decLb100(2)' indicates the DEC LANbridge 100
+                Spanning Tree protocol.  IEEE 802.1d
+                implementations will return 'ieee8021d(3)'.  If
+                future versions of the IEEE Spanning Tree Protocol
+                are released that are incompatible with the
+                current version a new value will be defined."
+        ::= { ctPvstStpEntry 2 }
+
+    ctPvstStpPriority OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The value of the write-able portion of the Bridge
+                ID, i.e., the first two octets of the (8 octet
+                long) Bridge ID."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.7"
+        ::= { ctPvstStpEntry 3 }
+
+    ctPvstStpTimeSinceTopologyChange OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The time (in hundredths of a second) since the
+                last time a topology change was detected by the
+                bridge entity."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 6.8.1.1.3"
+        ::= { ctPvstStpEntry 4 }
+
+    ctPvstStpTopChanges OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The total number of topology changes detected by
+                this bridge since the management entity was last
+                reset or initialized."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 6.8.1.1.3"
+        ::= { ctPvstStpEntry 5 }
+
+    ctPvstStpDesignatedRoot OBJECT-TYPE
+        SYNTAX  BridgeId
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The bridge identifier of the root of the spanning
+                tree as determined by the Spanning Tree Protocol
+                as executed by this node.  This value is used as
+                the Root Identifier parameter in all Configuration
+                Bridge PDUs originated by this node."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.1"
+        ::= { ctPvstStpEntry 6 }
+
+    ctPvstStpRootCost OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The cost of the path to the root as seen from
+                this bridge."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.2"
+        ::= { ctPvstStpEntry 7 }
+
+    ctPvstStpRootPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The port number of the port which offers the
+                lowest cost path from this bridge to the root
+                bridge."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.3"
+        ::= { ctPvstStpEntry 8 }
+
+    ctPvstStpMaxAge OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The maximum age of Spanning Tree Protocol
+                information learned from the network on any port
+                before it is discarded, in units of hundredths of
+                a second.  This is the actual value that this
+                bridge is currently using."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.4"
+        ::= { ctPvstStpEntry 9 }
+
+    ctPvstStpHelloTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The amount of time between the transmission of
+                Configuration bridge PDUs by this node on any port
+                when it is the root of the spanning tree or trying
+                to become so, in units of hundredths of a second.
+                This is the actual value that this bridge is
+                currently using."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.5"
+        ::= { ctPvstStpEntry 10 }
+
+    ctPvstStpHoldTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "This time value determines the interval length
+                during which no more than two Configuration bridge
+                PDUs shall be transmitted by this node, in units
+                of hundredths of a second."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.14"
+        ::= { ctPvstStpEntry 11 }
+
+    ctPvstStpForwardDelay OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "This time value, measured in units of hundredths
+                of a second, controls how fast a port changes its
+                spanning state when moving towards the Forwarding
+                state.  The value determines how long the port
+                stays in each of the Listening and Learning
+                states, which precede the Forwarding state.  This
+                value is also used, when a topology change has
+                been detected and is underway, to age all dynamic
+                entries in the Forwarding Database.  [Note that
+                this value is the one that this bridge is
+                currently using, in contrast to
+                ctPvstStpBridgeForwardDelay which is the value that
+                this bridge and all others would start using
+                if/when this bridge were to become the root.]"
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.6"
+        ::= { ctPvstStpEntry 12 }
+
+    ctPvstStpBridgeMaxAge OBJECT-TYPE
+        SYNTAX  INTEGER (600..4000)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The value that all bridges use for MaxAge when
+                this bridge is acting as the root.  Note that
+                802.1D-1990 specifies that the range for this
+                parameter is related to the value of
+                ctPvstStpBridgeHelloTime. The granularity of this
+                timer is specified by 802.1D-1990 to be 1 second.
+                An agent may return a badValue error if a set is
+                attempted to a value which is not a whole number
+                of seconds."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.8"
+        ::= { ctPvstStpEntry 13 }
+
+    ctPvstStpBridgeHelloTime OBJECT-TYPE
+        SYNTAX  INTEGER (100..1000)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The value that all bridges use for HelloTime when
+                this bridge is acting as the root.  The
+                granularity of this timer is specified by 802.1D-
+                1990 to be 1 second.  An agent may return a
+                badValue error if a set is attempted to a value
+                which is not a whole number of seconds."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.9"
+        ::= { ctPvstStpEntry 14 }
+
+    ctPvstStpBridgeForwardDelay OBJECT-TYPE
+        SYNTAX  INTEGER (400..3000)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The value that all bridges use for ForwardDelay
+                when this bridge is acting as the root.  Note that
+                802.1D-1990 specifies that the range for this
+                parameter is related to the value of
+                ctPvstStpBridgeMaxAge.  The granularity of this
+                timer is specified by 802.1D-1990 to be 1 second.
+                An agent may return a badValue error if a set is
+                attempted to a value which is not a whole number
+                of seconds."
+        REFERENCE
+               "IEEE 802.1D-1990: Section 4.5.3.10"
+        ::= { ctPvstStpEntry 15 }
+
+
+    -- The Per-Vlan Per-Port Spanning Tree Table
+
+    -- Indexed by VLAN-ID and bridge port number, this is per-port
+    -- information about the spanning tree running on a VLAN.
+
+    ctPvstStpPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPvstStpPortEntry
+        ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+               "A collection of per-port spanning tree objects per VLAN."
+        ::= { ctBridgePvst 6 }
+
+    ctPvstStpPortEntry OBJECT-TYPE
+        SYNTAX  CtPvstStpPortEntry
+        ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+               "A port entry related to a specific spanning tree. Only
+                ports which are in a VLAN which is running a PVST should
+                be reported for that VLAN."
+        INDEX  { ctPvstStpVlanId, ctPvstStpPort }
+        ::= { ctPvstStpPortTable 1 }
+
+    CtPvstStpPortEntry ::=
+        SEQUENCE {
+            ctPvstStpPortVlanId 
+                 INTEGER,
+            ctPvstStpPort 
+                 INTEGER,
+            ctPvstStpPortPriority 
+                 INTEGER,
+            ctPvstStpPortState 
+                 INTEGER,
+            ctPvstStpPortEnable 
+                 INTEGER,
+            ctPvstStpPortPathCost 
+                 INTEGER,
+            ctPvstStpPortDesignatedRoot 
+                 BridgeId,
+            ctPvstStpPortDesignatedCost 
+                 INTEGER,
+            ctPvstStpPortDesignatedBridge 
+                 BridgeId,
+            ctPvstStpPortDesignatedPort 
+                 OCTET STRING,
+            ctPvstStpPortForwardTransitions 
+                 Counter
+        }
+
+
+    ctPvstStpPortVlanId OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The VLAN-ID of the VLAN on which this spanning tree is
+                running."
+        ::= { ctPvstStpPortEntry 1 }
+
+    ctPvstStpPort OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The port number of the port for which this entry
+                contains Spanning Tree Protocol management information."
+        ::= { ctPvstStpPortEntry 2 }
+
+    ctPvstStpPortPriority OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The value of the priority field which is
+                contained in the first (in network byte order)
+                octet of the (2 octet long) Port ID.  The other
+                octet of the Port ID is given by the value of
+                ctPvstStpPort."
+        ::= { ctPvstStpPortEntry 3 }
+
+    ctPvstStpPortState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    disabled(1),
+                    blocking(2),
+                    listening(3),
+                    learning(4),
+                    forwarding(5),
+                    broken(6)
+                }
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The port's current state as defined by
+                application of the Spanning Tree Protocol.  This
+                state controls what action a port takes on
+                reception of a frame.  If the bridge has detected
+                a port that is malfunctioning it will place that
+                port into the broken(6) state.  For ports which
+                are disabled (see ctPvstStpPortEnable), this object
+                will have a value of disabled(1)."
+        ::= { ctPvstStpPortEntry 4 }
+
+    ctPvstStpPortEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The enabled/disabled status of the port."
+        ::= { ctPvstStpPortEntry 5 }
+
+    ctPvstStpPortPathCost OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+               "The contribution of this port to the path cost of
+                paths towards the spanning tree root which include
+                this port.  802.1D-1990 recommends that the
+                default value of this parameter be in inverse
+                proportion to the speed of the attached LAN."
+        ::= { ctPvstStpPortEntry 6 }
+
+    ctPvstStpPortDesignatedRoot OBJECT-TYPE
+        SYNTAX  BridgeId
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The unique Bridge Identifier of the Bridge
+                recorded as the Root in the Configuration BPDUs
+                transmitted by the Designated Bridge for the
+                segment to which the port is attached."
+        ::= { ctPvstStpPortEntry 7 }
+
+    ctPvstStpPortDesignatedCost OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The path cost of the Designated Port of the
+                segment connected to this port.  This value is
+                compared to the Root Path Cost field in received
+                bridge PDUs."
+        ::= { ctPvstStpPortEntry 8 }
+
+    ctPvstStpPortDesignatedBridge OBJECT-TYPE
+        SYNTAX  BridgeId
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The Bridge Identifier of the bridge which this
+                port considers to be the Designated Bridge for
+                this port's segment."
+        ::= { ctPvstStpPortEntry 9 }
+
+    ctPvstStpPortDesignatedPort OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (2))
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The Port Identifier of the port on the Designated
+                Bridge for this port's segment."
+        ::= { ctPvstStpPortEntry 10 }
+
+    ctPvstStpPortForwardTransitions OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+               "The number of times this port has transitioned
+                from the Learning state to the Forwarding state."
+        ::= { ctPvstStpPortEntry 11 }
+
+
+    --========        ctBridgeSr group            =============
+
+
+
+    ctBridgeSrPortPairTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSrPortPairEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing information of source and
+              destination port pairs for source routing."
+         ::= { ctBridgeSr 1 }
+
+    ctBridgeSrPortPairEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSrPortPairEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "An entry consisting of objects specifying information
+              for the source and destination port pairs used for source 
+              routing."
+
+         INDEX    { ctBridgeSrPortPairSrcPort, ctBridgeSrPortPairDestPort }
+         ::= { ctBridgeSrPortPairTable 1 }
+
+    CtBridgeSrPortPairEntry ::=
+         SEQUENCE {
+             ctBridgeSrPortPairSrcPort
+                  INTEGER,
+             ctBridgeSrPortPairDestPort
+                  INTEGER,
+             ctBridgeSrPortPairPackets
+                  Counter,
+             ctBridgeSrPortPairState
+                  INTEGER
+         }
+
+    ctBridgeSrPortPairSrcPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The source port (ie the port which received the packets)
+              for which this entry has source routing information."
+         ::= { ctBridgeSrPortPairEntry 1 }
+
+    ctBridgeSrPortPairDestPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The destination port (ie the port which transmitted the
+              packets) for which this entry has source routing information."
+         ::= { ctBridgeSrPortPairEntry 2 }
+
+    ctBridgeSrPortPairPackets OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The number of packets forward by the source route bridge
+              from the SrcPort to the DestPort."
+         ::= { ctBridgeSrPortPairEntry 3 }
+
+    ctBridgeSrPortPairState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of source route bridging on this port pair.  
+              This is the desired state of the administrator.  The
+              operational state of the port pair is determined by this 
+              state along with the states of dot1dStpPortState within 
+              the IETF Bridge MIB and ifOperStatus of the IETF MIB II
+              for each port."
+         ::= { ctBridgeSrPortPairEntry 4 }
+
+    ctBridgeSrConfigPortType OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     transparentonly(1),
+                     sourcerouteonly(2),
+                     srt(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the type of Bridging performed on a
+              given bridge port. It is used by the bridge to determine
+              if conversion from a Source Routing packet to a Transparent
+              packet or vice verse is required."
+         ::= { ctBridgeSr 2 } 
+
+
+    --=========        ctBridgeTp group            ============
+
+
+
+    ctBridgeTpPortPairTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeTpPortPairEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing information of source and
+              destination port pairs for transparent MAC briding."
+         ::= { ctBridgeTp 1 }
+
+    ctBridgeTpPortPairEntry OBJECT-TYPE
+         SYNTAX  CtBridgeTpPortPairEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "An entry consisting of objects specifying information 
+              for the source and destination port pairs used for 
+              transparent bridging."
+
+         INDEX    { ctBridgeTpPortPairSrcPort, ctBridgeTpPortPairDestPort }
+         ::= { ctBridgeTpPortPairTable 1 }
+
+    CtBridgeTpPortPairEntry ::=
+         SEQUENCE {
+             ctBridgeTpPortPairSrcPort
+                  INTEGER,
+             ctBridgeTpPortPairDestPort
+                  INTEGER,
+             ctBridgeTpPortPairPackets
+                  Counter,
+             ctBridgeTpPortPairState
+                  INTEGER
+         }
+
+    ctBridgeTpPortPairSrcPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The source port (ie the port which received the packets)
+              for which this entry has transparent bridge information." 
+         ::= { ctBridgeTpPortPairEntry 1 }
+
+    ctBridgeTpPortPairDestPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The destination port (ie the port which the packets
+              were transmitted out) for which this entry has 
+              transparent bridge information."
+         ::= { ctBridgeTpPortPairEntry 2 }
+
+    ctBridgeTpPortPairPackets OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The number of packets transparently forwarded by the bridge
+              from the SrcPort to the DestPort."
+         ::= { ctBridgeTpPortPairEntry 3 }
+
+    ctBridgeTpPortPairState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of transparent bridging on this port pair.
+              This is the desired state of the administrator.  The
+              operational state of the port pair is determined by this
+              state along with the states of dot1dStpPortState within
+              the IETF Bridge MIB and ifOperStatus of the IETF MIB II
+              for each port."
+         ::= { ctBridgeTpPortPairEntry 4 }
+
+
+
+
+
+    --========        ctBridgeSdbEnet group       =============
+
+
+
+    ctBridgeSdbEnetTotFtrs OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The total number of Ethernet filters in the special
+              database."
+         ::= { ctBridgeSdbEnet 1 }
+
+
+    ctBridgeSdbEnetNoMatch OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     filter(1),
+                     forward(2),
+                     searchFDB(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The process to be performed if no match is found
+              in the Ethernet special database.  The process of 
+              filtering or forwarding is for all ports.  searchFDB
+              results in searching the IEEE 802.1D transparent filter
+              database referenced by the IETF Bridge MIB. "
+         ::= { ctBridgeSdbEnet 2 }
+
+
+    ctBridgeSdbEnetTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSdbEnetEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing filtering information configured into
+              the bridge by (local or network) management specifying
+              the specific packet string (destination address, source 
+              address, type/length field as well as a window of 64 bytes 
+              of packet data beginning at a data offset) to be used 
+              for filtering decisions.  The filters are to be searched in
+              the order of incrementing filter number."
+         ::= { ctBridgeSdbEnet 3 }
+
+    ctBridgeSdbEnetEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSdbEnetEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "Filtering information which extends the filtering
+              capability of IEEE 802.1d."
+         REFERENCE
+              " IETF RFC:1286 "
+         INDEX    { ctBridgeSdbEnetFtrNo }
+         ::= { ctBridgeSdbEnetTable 1 }
+
+    CtBridgeSdbEnetEntry ::=
+         SEQUENCE {
+             ctBridgeSdbEnetFtrNo
+                  INTEGER,
+             ctBridgeSdbEnetState
+                  INTEGER,
+             ctBridgeSdbEnetFtrData
+                  DisplayString,
+             ctBridgeSdbEnetDataOffset
+                  INTEGER
+         }
+
+    ctBridgeSdbEnetFtrNo OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Filter number for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbEnetEntry 1 }
+
+    ctBridgeSdbEnetState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of the filter for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbEnetEntry 2 }
+
+    ctBridgeSdbEnetFtrData OBJECT-TYPE
+         SYNTAX  DisplayString (SIZE (0..78))
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The specific packet string representing the
+              destination address, source address, type/length 
+              field and a window of 64 bytes of packet data 
+              beginning at DataOffset to be used for filtering 
+              decisions. Each ASCII character of the string 
+              represents a nibble of packet data, therefore the 
+              packet string should be (14+64) * 2 = 156 characters
+              long.  A value of 'x' in the packet string is
+              used to indicate a 'Don't care' and no filtering is 
+              to be performed on that nibble.  The string may be 
+              be of size 0 to 78 bytes.  If a size less than 78 
+              bytes is used, the string will still begin at the 
+              destination address."
+
+         ::= { ctBridgeSdbEnetEntry 3 }
+
+    ctBridgeSdbEnetDataOffset OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The offset into a packet from which the bridge begins
+              its filtering decisions on the 64 byte data window. The 
+              value '0' indicates that the window begins at the first
+              byte after the Ethernet MAC header. The largest value of
+              DataOffset is  max_Enet_pkt - MAC header - window - 1
+              (1514 - 14 - 64 - 1 = 1435)."
+         ::= { ctBridgeSdbEnetEntry 4 }
+
+
+    ctBridgeSdbEnetIOTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSdbEnetIOEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing the set of ports to which
+              frames received from specific ports and containing the
+              specific packet string (destination address, source address,
+              type/length field as well as a window of 64 bytes of
+              packet data beginning at a data offset) of the corresponding 
+              filter number of SdbEnetTable are allowed to be forwarded. 
+              The value of '0' in this table as the RcvPort is used to
+              specify all ports which are not already specified in this 
+              table for a particular entry."
+         ::= { ctBridgeSdbEnet 4 }
+
+
+    ctBridgeSdbEnetIOEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSdbEnetIOEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "The set of ports to which frames received by the RcvPort
+              and containing the specific packet string of the 
+              corresponding filter number of SdbEnetTable are allowed
+              to be forwarded."
+         INDEX    { ctBridgeSdbEnetIOFtrNo, ctBridgeSdbEnetIORcvPort }
+         ::= { ctBridgeSdbEnetIOTable 1 }
+         
+    CtBridgeSdbEnetIOEntry ::=
+         SEQUENCE {
+             ctBridgeSdbEnetIOFtrNo
+                  INTEGER,
+             ctBridgeSdbEnetIORcvPort
+                  INTEGER,
+             ctBridgeSdbEnetIOAllowedToGoTo
+                  OCTET STRING,
+             ctBridgeSdbEnetIODelEntry
+                  INTEGER
+         }
+
+    ctBridgeSdbEnetIOFtrNo OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Filter number for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbEnetIOEntry 1 }
+
+    ctBridgeSdbEnetIORcvPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Either the value '0', or the port number of the port
+              from which a frame must be received in order for this
+              entry's filtering information to apply.  A value of
+              '0' indicates that this entry applies on all ports of
+              the bridge for which there is no other applicable entry."
+         ::= { ctBridgeSdbEnetIOEntry 2 }
+
+    ctBridgeSdbEnetIOAllowedToGoTo OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The set of ports to which frames received from a
+              specific port and containing the specific packet
+              string of the corresponding filter number are allowed
+              to be forwarded.  Each octet within the value of this
+              object specifies a set of eight ports, with the first
+              octet specifying ports 1 through 8, the second octet
+              specifying ports 9 through 16, etc.  Within each octet,
+              the most significant bit represents the lowest numbered
+              port, and the least significant bit represents the
+              highest numbered port.  Thus, each port of the bridge is
+              represented by a single bit within the value of this
+              object.  If that bit has a value of '1' then that port
+              is included in the set of ports; the port is not
+              included if its bit has a value of '0'.  (Note that the
+              setting of the bit corresponding to the port from which
+              a frame is received is irrelevant.)"
+         ::= { ctBridgeSdbEnetIOEntry 3 }
+
+
+    ctBridgeSdbEnetIODelEntry OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     deleteEntry(1)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Writing a '1' to this object deletes this entry from the
+              Ethernet special database. This object will always return
+              a '1' when read."
+         ::= { ctBridgeSdbEnetIOEntry 4 }
+
+
+
+
+    --========        ctBridgeSdbTr group       =============
+
+
+
+    ctBridgeSdbTrTotFtrs OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The total number of Token Ring filters in the special
+              database."
+         ::= { ctBridgeSdbTr 1 }
+
+
+    ctBridgeSdbTrNoMatch OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     filter(1),
+                     forward(2),
+                     searchFDB(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The process to be performed if no match is found
+              in the Token Ring special database.  The process of
+              filtering or forwarding is for all ports. searchFDB
+              results in searching the IEEE 802.1D transparent filter
+              database referenced by the IETF Bridge MIB. "
+         ::= { ctBridgeSdbTr 2 }
+
+
+    ctBridgeSdbTrTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSdbTrEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing filtering information configured into
+              the bridge by (local or network) management specifying
+              the specific packet string (AC, FC, destination address, 
+              source address, as well as a window of 64 bytes of packet 
+              data beginning at a data offset) to be used for filtering
+              decisions.  The filters are to be searched in the order of
+              incrementing filter number."
+         ::= { ctBridgeSdbTr 3 }
+
+    ctBridgeSdbTrEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSdbTrEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "Filtering information which extends the filtering
+              capability of IEEE 802.1d."
+         REFERENCE
+              " IETF RFC:1286 "
+         INDEX    { ctBridgeSdbTrFtrNo }
+         ::= { ctBridgeSdbTrTable 1 }
+
+    CtBridgeSdbTrEntry ::=
+         SEQUENCE {
+             ctBridgeSdbTrFtrNo
+                  INTEGER,
+             ctBridgeSdbTrState
+                  INTEGER,
+             ctBridgeSdbTrFtrData
+                  DisplayString,
+             ctBridgeSdbTrDataOffset
+                  INTEGER
+         }
+
+    ctBridgeSdbTrFtrNo OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Filter number for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbTrEntry 1 }
+
+    ctBridgeSdbTrState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of the filter for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbTrEntry 2 }
+
+    ctBridgeSdbTrFtrData OBJECT-TYPE
+         SYNTAX  DisplayString ( SIZE (0..78))
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The specific packet string consisting of the AC, FC,
+              destination address, source address, and a window of 
+              64 bytes of packet data beginning at DataOffset
+              to be used for filtering decisions.  Each ASCII 
+              character of the string represents a nibble of 
+              packet data, therefore the packet string should be 
+              (14+64) * 2 = 156 characters long.  A value of 'x' in
+              the packet string is used to indicate a 'Don't care' 
+              and no filtering is to be performed on that nibble.
+              If a size less than 78 bytes is used, the string 
+              will still begin at the AC field."
+         ::= { ctBridgeSdbTrEntry 3 }
+
+    ctBridgeSdbTrDataOffset OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The offset into a packet from which the bridge begins
+              its filtering decisions on the 64 byte data window. The 
+              value '0' indicates that the window begins at the first
+              byte after the Token Ring MAC header. The largest value of
+              DataOffset is max_TR_pkt - MAC header - window - 1 
+              (17800 - 14 - 64 - 1 = 17721). "
+         ::= { ctBridgeSdbTrEntry 4 }
+
+
+    ctBridgeSdbTrIOTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSdbTrIOEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing the set of ports to which frames 
+              received from specific ports and containing the specific
+              packet string (AC, FC, destination address, source address,
+              as well as a window of 64 bytes of packet data beginning 
+              at a data offset) of the corresponding filter number of 
+              SdbTrTable are allowed to be forwarded.  The value of '0' 
+              in this table as the RcvPort is used to specify all ports
+              which are not already specified in this table for a 
+              particular entry."
+         ::= { ctBridgeSdbTr 4 }
+
+
+    ctBridgeSdbTrIOEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSdbTrIOEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "The set of ports to which frames received by the RcvPort
+              and containing the specific packet string of the 
+              corresponding filter number of SdbTrTable are allowed
+              to be forwarded."
+         INDEX    { ctBridgeSdbTrIOFtrNo, ctBridgeSdbTrIORcvPort }
+         ::= { ctBridgeSdbTrIOTable 1 }
+         
+    CtBridgeSdbTrIOEntry ::=
+         SEQUENCE {
+             ctBridgeSdbTrIOFtrNo
+                  INTEGER,
+             ctBridgeSdbTrIORcvPort
+                  INTEGER,
+             ctBridgeSdbTrIOAllowedToGoTo
+                  OCTET STRING,
+             ctBridgeSdbTrIODelEntry
+                  INTEGER
+         }
+
+    ctBridgeSdbTrIOFtrNo OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Filter number for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbTrIOEntry 1 }
+
+    ctBridgeSdbTrIORcvPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Either the value '0', or the port number of the port
+              from which a frame must be received in order for this
+              entry's filtering information to apply.  A value of
+              '0' indicates that this entry applies on all ports of
+              the bridge for which there is no other applicable entry."
+         ::= { ctBridgeSdbTrIOEntry 2 }
+
+    ctBridgeSdbTrIOAllowedToGoTo OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The set of ports to which frames received from a
+              specific port and containing the specific packet
+              string of the corresponding filter number are allowed
+              to be forwarded.  Each octet within the value of this
+              object specifies a set of eight ports, with the first
+              octet specifying ports 1 through 8, the second octet
+              specifying ports 9 through 16, etc.  Within each octet,
+              the most significant bit represents the lowest numbered
+              port, and the least significant bit represents the
+              highest numbered port.  Thus, each port of the bridge is
+              represented by a single bit within the value of this
+              object.  If that bit has a value of '1' then that port
+              is included in the set of ports; the port is not
+              included if its bit has a value of '0'.  (Note that the
+              setting of the bit corresponding to the port from which
+              a frame is received is irrelevant.)"
+         ::= { ctBridgeSdbTrIOEntry 3 }
+
+    ctBridgeSdbTrIODelEntry OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     deleteEntry(1)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Writing a '1' to this object deletes this entry from the
+              Token Ring special database. This object will always return
+              a '1' when read."
+         ::= { ctBridgeSdbTrIOEntry 4 }
+
+
+
+    --=========     ctBridgeTransTrEnet group     =============
+
+    --  This group defines manage objects used in configuring
+    --  the translation of a Token Ring to CSMA/CD bridge.
+
+    --  This group is necessary while there is still widespread
+    --  use of the Ethernet frame format.  The finalization IEEE 802.3
+    --  and 802.2 standards may cause the extinction of the Ethernet
+    --  frame format.
+
+
+    ctBridgeTransTrEnetAutoMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects whether the auto translation mode
+              is enabled.  Auto translation means a bridge learns, from
+              the CSMA/CD ports,  which frame format (ie Ethernet or
+              IEEE 802.3 w/snap) a source address is using.  Subsequently,
+              the bridge will translate a Token Ring packet, destined to
+              the learned address, with the learned format. "
+         ::= { ctBridgeTransTrEnet 1 }
+
+    ctBridgeTransTrEnetDualMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects whether dual mode is enabled.  Dual
+              mode means a bridge translates a Token Ring broadcast or 
+              multicast packet to both CSMA/CD frame formats (ie Ethernet
+              and IEEE 802.3 w/snap) when the format has not previously
+              been learned."
+         ::= { ctBridgeTransTrEnet 2 }
+
+    ctBridgeTransTrEnetNovell OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     ethernet(1),
+                     ieee8023snap(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the CSMA/CD frame format (ie Ethernet
+              or IEEE 802.3 w/snap) to which the bridge translates a 
+              Novell Token Ring packet.  This selection is overidden 
+              by the learned format when ctBridgeTransTrEnetAutoMode is
+              enabled and the format has been learned."
+         ::= { ctBridgeTransTrEnet 3 }
+
+    ctBridgeTransTrEnetIP OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     ethernet(1),
+                     ieee8023snap(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the CSMA/CD frame format (ie Ethernet 
+              or IEEE 802.3 w/snap) to which the bridge translates an IP
+              Token Ring packet including ARP packets.  This selection is 
+              overidden by the learned format when ctBridgeTransTrEnetAutoMode
+              is enabled and the format has been learned."
+         ::= { ctBridgeTransTrEnet 4 }
+
+    ctBridgeTransTrEnetAARP OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     ethernet(1),
+                     ieee8023snap(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the CSMA/CD frame format (ie Ethernet or
+              IEEE 802.3 w/snap) to which the bridge translates an Appletalk
+              ARP Token Ring packet.  This selection is overidden by the
+              learned format when ctBridgeTransTrEnetAutoMode is enabled
+              and the format has been learned."
+         ::= { ctBridgeTransTrEnet 5 }
+
+    ctBridgeTransTrEnetNovAdd OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     msb(1),        
+                     lsb(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the bit ordering of the Hardware Addresses 
+              located in the 'data field' of a Token Ring NOVELL packet. The 
+              'data field' includes all bytes of the packet excluding the MAC 
+              Header and CRC. The Hardware Addresses in the MAC Header are
+              always MSB for Token Ring packets. The default value is 2." 
+         ::= { ctBridgeTransTrEnet 6 } 
+
+    ctBridgeTransTrEnetIBMTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeTransTrEnetIBMEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing SAP (Service Access Point) values of 
+              IBM protocols that the bridge will translate from Token Ring 
+              (802.5 w/o snap) to Ethernet."
+         ::= { ctBridgeTransTrEnet 7 }
+
+
+    ctBridgeTransTrEnetIBMEntry OBJECT-TYPE
+         SYNTAX  CtBridgeTransTrEnetIBMEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "This entry contains the SAP value of an IBM protocol
+              that is to be translated to Ethernet. The value of the
+              Ethernet type field used in the translation is 80D5.
+              Only SAP values whose entry is enabled will be translated
+              to Ethernet. All other Token Ring packets not having a 
+              snap will be translated as an 802.3/802.2 formatted packet."
+         INDEX    { ctBridgeTransTrEnetIBMIndex }
+         ::= { ctBridgeTransTrEnetIBMTable 1 }
+
+
+
+    CtBridgeTransTrEnetIBMEntry ::=
+         SEQUENCE {
+             ctBridgeTransTrEnetIBMIndex
+                  INTEGER,
+             ctBridgeTransTrEnetIBMSap
+                  OCTET STRING,
+             ctBridgeTransTrEnetIBMState
+                  INTEGER
+         }
+
+    ctBridgeTransTrEnetIBMIndex OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The index of an entry in the Token Ring to Ethernet Translation
+              table for IBM protocols. The index ranges from 1 to 20."
+         ::= { ctBridgeTransTrEnetIBMEntry 1 }
+
+    ctBridgeTransTrEnetIBMSap OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The SAP value of an IBM protocol. The bridge will translate
+              all Token Ring/802.5 packets without a snap header having 
+              this SAP value to Ethernet packets with the Ethernet type
+              field set to 80D5. The SAP value is one octet."
+         ::= { ctBridgeTransTrEnetIBMEntry 2 }
+
+    ctBridgeTransTrEnetIBMState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of this entry. A value of 2 indicates that this
+              entry will not be used in the bridge's translation decisions."
+         ::= { ctBridgeTransTrEnetIBMEntry 3 }
+
+    ctBridgeTransTrEnetSnapFormat OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     ethernet(1),
+                     ieee8023snap(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the CSMA/CD frame format (ie Ethernet or
+              IEEE 802.3 w/snap) to which the bridge translates all
+              Token Ring packets with a snap header whose Ethernet type
+              resides in the ctBridgeTransTrEnetSnapTable and is enabled. 
+              This selection is overidden by the learned format when
+              ctBridgeTransTrEnetAutoMode is enable and the format has
+              been learned."
+         ::= { ctBridgeTransTrEnet 8 }
+
+    ctBridgeTransTrEnetSnapTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeTransTrEnetSnapEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing Ethernet type field entries that the 
+              bridge will use to determine how to translate a Token Ring 
+              (802.5 w/snap) packet to a CSMA/CD packet. If a received 
+              Token Ring packet matches the Ethernet type field of an 
+              enabled entry, the bridge will translate the Token Ring
+              packet to the frame format specified by
+              ctBridgeTransTrEnetSnapFormat. Else, it will translate the
+              packet to the opposite frame format."
+         ::= { ctBridgeTransTrEnet 9 }
+
+
+    ctBridgeTransTrEnetSnapEntry OBJECT-TYPE
+         SYNTAX  CtBridgeTransTrEnetSnapEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "This entry contains an Ethernet type field value and its
+              associated state."
+         INDEX    { ctBridgeTransTrEnetSnapIndex }
+         ::= { ctBridgeTransTrEnetSnapTable 1 }
+
+
+
+    CtBridgeTransTrEnetSnapEntry ::=
+         SEQUENCE {
+             ctBridgeTransTrEnetSnapIndex
+                  INTEGER,
+             ctBridgeTransTrEnetSnapType
+                  OCTET STRING,
+             ctBridgeTransTrEnetSnapState
+                  INTEGER
+         }
+
+    ctBridgeTransTrEnetSnapIndex OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The index of an entry in the Token Ring to Ethernet Translation
+              table for Ethernet type fields. The index ranges from 1 to 20."
+         ::= { ctBridgeTransTrEnetSnapEntry 1 }
+
+
+    ctBridgeTransTrEnetSnapType OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The Ethernet type field value which the bridge will translate
+              all Token Ring/802.5 packets with a snap header having
+              this type to the format specified by 
+              ctBridgeTransTrEnetSnapFormat.  The Ethernet type field value
+              is two octets."
+         ::= { ctBridgeTransTrEnetSnapEntry 2 }
+
+    ctBridgeTransTrEnetSnapState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of this entry. A value of 2 indicates that this
+              entry will not be used in the bridge's translation decisions."
+         ::= { ctBridgeTransTrEnetSnapEntry 3 }
+
+--================      ctBridgeExtendedControl     ==================
+
+   ctBridgeBaseChassisMgr OBJECT-TYPE
+   SYNTAX  INTEGER {
+           notSupported(1),
+           managementDisabled(2),
+           managementEnabled(3)
+          }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object reports the chassis management capability of
+        the bridging device.  Chassis management is defined as the
+        ability of the device to report status on MIM boards which
+        the device might be responsible for managing, modifying the
+        state of the MIM boards and the ports residing on the MIM
+        board, and tracking and reporting on the status of the networks
+        being bridged and the stations generating traffic on those
+        networks.  Note that this is not a comprehensive list of the
+        activities which comprise chassis management.
+
+        If chassis management is unsupported by this device, then the
+        value notSupported is returned.  If chassis management is
+        supported by this device and the device is, in fact, operating
+        as a chassis manager, then the value managementEnabled is re-
+        turned.  If chassis management is supported by this device but
+        the device is not functioning as a chassis manager, the value
+        managementDisabled is returned."
+    ::= { ctBridgeExtendedControl 1 }
+
+    --========        ctBridgeSdbGeneric group       =============
+
+
+
+    ctBridgeSdbGenericTotFtrs OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The total number of Generic filters in the special
+              database."
+         ::= { ctBridgeSdbGeneric 1 }
+
+
+    ctBridgeSdbGenericNoMatch OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     filter(1),
+                     forward(2),
+                     searchFDB(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The process to be performed if no match is found
+              in the Generic special database.  The process of 
+              filtering or forwarding is for all ports.  searchFDB
+              results in searching the IEEE 802.1D transparent filter
+              database referenced by the IETF Bridge MIB. "
+         ::= { ctBridgeSdbGeneric 2 }
+
+
+    ctBridgeSdbGenericTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSdbGenericEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing filtering information configured into
+              the bridge by (local or network) management specifying
+              the specific packet string (destination address, source 
+              address, type/length field as well as a window of 64 bytes 
+              of packet data beginning at a data offset) to be used 
+              for filtering decisions.  The filters are to be searched in
+              the order of incrementing filter number."
+         ::= { ctBridgeSdbGeneric 3 }
+
+    ctBridgeSdbGenericEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSdbGenericEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "Filtering information which extends the filtering
+              capability of IEEE 802.1d."
+         REFERENCE
+              " IETF RFC:1286 "
+         INDEX    { ctBridgeSdbGenericFtrNo }
+         ::= { ctBridgeSdbGenericTable 1 }
+
+    CtBridgeSdbGenericEntry ::=
+         SEQUENCE {
+             ctBridgeSdbGenericFtrNo
+                  INTEGER,
+             ctBridgeSdbGenericState
+                  INTEGER,
+             ctBridgeSdbGenericFtrData
+                  DisplayString,
+             ctBridgeSdbGenericDataOffset
+                  INTEGER,
+             ctBridgeSdbGenericFilterType
+                  INTEGER
+         }
+
+    ctBridgeSdbGenericFtrNo OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Filter number for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbGenericEntry 1 }
+
+    ctBridgeSdbGenericState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The state of the filter for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbGenericEntry 2 }
+
+    ctBridgeSdbGenericFtrData OBJECT-TYPE
+         SYNTAX  DisplayString (SIZE (0..78))
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The specific packet string representing the
+              destination address, source address, type/length 
+              field and a window of 64 bytes of packet data 
+              beginning at DataOffset to be used for filtering 
+              decisions. Each ASCII character of the string 
+              represents a nibble of packet data, therefore the 
+              packet string should be (14+64) * 2 = 156 characters
+              long.  A value of 'x' in the packet string is
+              used to indicate a 'Don't care' and no filtering is 
+              to be performed on that nibble.  The string may be 
+              be of size 0 to 78 bytes.  If a size less than 78 
+              bytes is used, the string will still begin at the 
+              destination address."
+
+         ::= { ctBridgeSdbGenericEntry 3 }
+
+    ctBridgeSdbGenericDataOffset OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The offset into a packet from which the bridge begins
+              its filtering decisions on the 64 byte data window. The 
+              value '0' indicates that the window begins at the first
+              byte after the Generic MAC header. The largest value of
+              DataOffset dependent upon the media type."
+         ::= { ctBridgeSdbGenericEntry 4 }
+
+    ctBridgeSdbGenericFilterType        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object specifies the type of media for which this
+                special filter entry applies.  The value of this object
+                is a bit encoding which allows for multiple medias to
+                share the same filter.  The bit numbers are defined as
+                follows, note that bit 0 is considered to be least significant:
+
+                        ethernet        - bit 0
+                        Token Ring      - bit 1
+                        FDDI            - bit 2
+                There for a filter that was enabled for both FDDI and
+                ethernet would have a value of 5."
+        ::= { ctBridgeSdbGenericEntry 5 }
+
+
+    ctBridgeSdbGenericIOTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeSdbGenericIOEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing the set of ports to which
+              frames received from specific ports and containing the
+              specific packet string (destination address, source address,
+              type/length field as well as a window of 64 bytes of
+              packet data beginning at a data offset) of the corresponding 
+              filter number of SdbGenericTable are allowed to be forwarded. 
+              The value of '0' in this table as the RcvPort is used to
+              specify all ports which are not already specified in this 
+              table for a particular entry."
+         ::= { ctBridgeSdbGeneric 4 }
+
+
+    ctBridgeSdbGenericIOEntry OBJECT-TYPE
+         SYNTAX  CtBridgeSdbGenericIOEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "The set of ports to which frames received by the RcvPort
+              and containing the specific packet string of the 
+              corresponding filter number of SdbGenericTable are allowed
+              to be forwarded."
+         INDEX    { ctBridgeSdbGenericIOFtrNo, ctBridgeSdbGenericIORcvPort }
+         ::= { ctBridgeSdbGenericIOTable 1 }
+         
+    CtBridgeSdbGenericIOEntry ::=
+         SEQUENCE {
+             ctBridgeSdbGenericIOFtrNo
+                  INTEGER,
+             ctBridgeSdbGenericIORcvPort
+                  INTEGER,
+             ctBridgeSdbGenericIOAllowedToGoTo
+                  OCTET STRING,
+             ctBridgeSdbGenericIODelEntry
+                  INTEGER
+         }
+
+    ctBridgeSdbGenericIOFtrNo OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Filter number for which this entry contains
+              filtering information."
+         ::= { ctBridgeSdbGenericIOEntry 1 }
+
+    ctBridgeSdbGenericIORcvPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Either the value '0', or the port number of the port
+              from which a frame must be received in order for this
+              entry's filtering information to apply.  A value of
+              '0' indicates that this entry applies on all ports of
+              the bridge for which there is no other applicable entry."
+         ::= { ctBridgeSdbGenericIOEntry 2 }
+
+    ctBridgeSdbGenericIOAllowedToGoTo OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The set of ports to which frames received from a
+              specific port and containing the specific packet
+              string of the corresponding filter number are allowed
+              to be forwarded.  Each octet within the value of this
+              object specifies a set of eight ports, with the first
+              octet specifying ports 1 through 8, the second octet
+              specifying ports 9 through 16, etc.  Within each octet,
+              the most significant bit represents the lowest numbered
+              port, and the least significant bit represents the
+              highest numbered port.  Thus, each port of the bridge is
+              represented by a single bit within the value of this
+              object.  If that bit has a value of '1' then that port
+              is included in the set of ports; the port is not
+              included if its bit has a value of '0'.  (Note that the
+              setting of the bit corresponding to the port from which
+              a frame is received is irrelevant.)"
+         ::= { ctBridgeSdbGenericIOEntry 3 }
+
+
+    ctBridgeSdbGenericIODelEntry OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     deleteEntry(1)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Writing a '1' to this object deletes this entry from the
+              Generic special database. This object will always return
+              a '1' when read."
+         ::= { ctBridgeSdbGenericIOEntry 4 }
+
+
+    --========        ctBridgeLoadShare group       =============
+
+-- This section defines a table of load share instances 
+
+    ctBridgeLoadShareInstanceTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeLoadShareInstanceEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of load share instance objects."
+         ::= { ctBridgeLoadShare 1 }
+
+    ctBridgeLoadShareInstanceEntry OBJECT-TYPE
+         SYNTAX  CtBridgeLoadShareInstanceEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects for a particular load share instance."
+         INDEX          { ctBridgeLoadShareInstanceId }
+         ::= { ctBridgeLoadShareInstanceTable 1 }
+
+    CtBridgeLoadShareInstanceEntry ::=
+         SEQUENCE {
+                ctBridgeLoadShareInstanceId
+                        INTEGER,
+                ctBridgeLoadShareAdminStatus
+                        INTEGER,
+                ctBridgeLoadShareOperStatus
+                        INTEGER
+                }
+
+    ctBridgeLoadShareInstanceId OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "Returns the instance for a load share member in the
+              table of load share instances."
+         ::= { ctBridgeLoadShareInstanceEntry 1 }
+
+    ctBridgeLoadShareAdminStatus OBJECT-TYPE
+         SYNTAX INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The administrative state of load sharing for this instance."
+         ::= { ctBridgeLoadShareInstanceEntry 2 }
+
+    ctBridgeLoadShareOperStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         enabled(1),
+                         disabled(2)
+                         }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The operational status of load sharing for this instance."
+         ::= { ctBridgeLoadShareInstanceEntry 3 }
+
+-- This section defines a table of load sharing port objects.
+
+    ctBridgeLoadSharePortTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtBridgeLoadSharePortEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of load share port objects."
+         ::= { ctBridgeLoadShare 2 }
+
+    ctBridgeLoadSharePortEntry OBJECT-TYPE
+         SYNTAX  CtBridgeLoadSharePortEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A load share port entry containing objects pertaining to
+              a particular load share port."
+         INDEX  { ctBridgeLoadSharePortInstanceId,
+                  ctBridgeLoadSharePortNum }
+         ::= { ctBridgeLoadSharePortTable 1 }
+
+    CtBridgeLoadSharePortEntry ::=
+         SEQUENCE {
+                ctBridgeLoadSharePortNum
+                        INTEGER,
+                ctBridgeLoadSharePortInstanceId
+                        INTEGER,
+                ctBridgeLoadSharePortAdminStatus
+                        INTEGER,
+                ctBridgeLoadSharePortOperStatus
+                        INTEGER,
+                ctBridgeLoadSharePortForwardMask
+                        INTEGER,
+                ctBridgeLoadSharePortForwardInstance
+                        INTEGER,
+                ctBridgeLoadSharePortNumPorts
+                        INTEGER
+                }
+
+    ctBridgeLoadSharePortNum OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "Returns the port number of a member port belonging to a
+              load share instance."
+         ::= { ctBridgeLoadSharePortEntry 1 }
+
+    ctBridgeLoadSharePortInstanceId OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "A unique value indentifying a member instance in the table
+              of load share instances.  This value is similar to 
+              ctBridgeLoadShareInstanceId."
+         ::= { ctBridgeLoadSharePortEntry 2 }
+
+    ctBridgeLoadSharePortAdminStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         enabled(1),
+                         disabled(2)
+                         }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The administrative state of the port associated with 
+              this instance of load share."
+         ::= { ctBridgeLoadSharePortEntry 3 }
+
+    ctBridgeLoadSharePortOperStatus OBJECT-TYPE
+         SYNTAX INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The operational state of the port associated with
+              this instance of load share."
+         ::= { ctBridgeLoadSharePortEntry 4 }
+
+    ctBridgeLoadSharePortForwardMask OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Mask used to foward unknown packets on."
+         ::= { ctBridgeLoadSharePortEntry 5 }
+
+    ctBridgeLoadSharePortForwardInstance OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The instance that the ctLoadSharePortFowardMask 
+              is running on for this ctLoadSharePortNumber."
+         ::= { ctBridgeLoadSharePortEntry 6 }
+
+    ctBridgeLoadSharePortNumPorts OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "Displays the number of SmartTrunk ports in this redundant path."
+         ::= { ctBridgeLoadSharePortEntry 7 }
+
+END

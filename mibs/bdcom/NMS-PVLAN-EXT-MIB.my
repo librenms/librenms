@@ -1,0 +1,182 @@
+-- *****************************************************************
+-- NMS-PVLAN-EXT-MIB.my: NMS pvlan EXT MIB
+--
+-- September 2012
+-- Edit by shishuaishuai
+-- Copyright (c) 2012 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+NMS-PVLAN-EXT-MIB DEFINITIONS ::= BEGIN 
+	
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32,Counter64             FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TimeStamp,
+    TruthValue                                  FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsMgmt, nmslocal                           FROM NMS-SMI 
+    nmsvlanExt                                  FROM NMS-VLAN-EXT-MIB
+    IpAddress, Counter                          FROM RFC1155-SMI
+    DisplayString, PhysAddress,ifIndex			FROM RFC1213-MIB
+    VlanIndex                                   FROM Q-BRIDGE-MIB
+    EnabledStatus                               FROM P-BRIDGE-MIB;
+    
+--definition of nms device PVLAN extended informations
+
+	
+	                 	
+  pvlanVlanTable  OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF pvlanVlanTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of pvlan Vlan operation."
+                   ::= { nmsvlanExt 6 }
+                   	
+  pvlanVlanTableEntry  OBJECT-TYPE
+                   SYNTAX  pvlanVlanTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of pvlan vlan operation."
+                   INDEX { ifIndex }
+               	   ::= {  pvlanVlanTable 1 }
+               	
+               	   pvlanVlanTableEntry ::=
+                   SEQUENCE {
+                   	   pvlanPrivateVlanType
+                           INTEGER,
+                       pvlanPrivateAssocVlan
+                       	   OCTET STRING,
+                       pvlanPrivateAssocPortlist
+                       	   OCTET STRING,
+             	   }
+             	     
+  pvlanvlanPvid       OBJECT-TYPE
+                   SYNTAX VlanIndex
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "the VLAN ID of the private vlan."
+                   REFERENCE
+                       "IEEE 802.1Q/D11 Section 12.10.1.1, the same name with Q-BRIDGE-MIB"
+                   ::= { pvlanVlanTableEntry 1 }
+                   	
+  pvlanPrivateVlanType OBJECT-TYPE
+                   SYNTAX  INTEGER{RegularVlan(1),
+                   				   PrimaryVlan(2), 
+                                   CommunityVlan(3), 
+                                   IsolatedVlan(4), 
+                                   }
+									 ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Configure the vlan as a private vlan"
+                   ::= { pvlanVlanTableEntry 1 }
+                   	
+ pvlanPrivateAssocVlan OBJECT-TYPE
+                   SYNTAX OCTET STRING
+				   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "configure association between private vlans"
+                   ::= { pvlanVlanTableEntry 2 }
+                   	
+  pvlanPrivateAssocPortlist OBJECT-TYPE
+                   SYNTAX OCTET STRING
+				   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "configure association between private vlans and ports"
+                   ::= { pvlanVlanTableEntry 3}                  	
+
+   pvlanPortTable  OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF pvlanPortTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of pvlan Vlan  port operation."
+                   ::= { nmsvlanExt 7 }	
+                   	
+   pvlanPortTableEntry  OBJECT-TYPE
+                   SYNTAX  pvlanPortTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of pvlan vlan port  operation."
+                   INDEX { ifIndex }
+                   ::= {   pvlanPortTable 1 }
+                   	
+  pvlanPortTableEntry ::=
+                   SEQUENCE {
+                   	   pvlanPrivatePortType
+                   		 		 INTEGER,
+                       pvlanPrivatePortAssocpvlan
+                           OCTET STRING,
+                       pvlanPrivatePortAssocSvlan
+                       	   OCTET STRING,
+                       pvlanPrivatePortBuntag
+                       	   INTEGER,
+                       pvlanPrivatePortTagPvid
+                           VlanIndex,
+                       pvlanPrivatePortTagPri
+                           INTEGER,     
+             	     }
+
+pvlanPrivatePortType       OBJECT-TYPE
+                   SYNTAX  INTEGER {HostPort(1),
+                   				    PromiscuousPort(2),
+                   				    RegularPort(3),
+                   				   }
+				   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "the type of the port which is associated withe the  private vlans."
+                   ::= { pvlanPortTableEntry 1 }
+                   	
+ pvlanPrivatePortAssocpvlan       OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "the vlan id of the primary vlan which is associated with the port."
+                    ::= { pvlanPortTableEntry 2 }
+                   	
+pvlanPrivatePortAssocSvlan      OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "the vlan id of the secondary vlans which is associated with the port."
+                   ::= { pvlanPortTableEntry 3 }                 	
+
+pvlanPrivatePortBuntag      OBJECT-TYPE
+                   SYNTAX  INTEGER{tagged(1),
+                   				   untagged(2),
+                  				  }
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "configure whether the outgoing packet has a tag."
+                   ::= { pvlanPortTableEntry 4 }  
+                   	
+pvlanPrivatePortTagPvid      OBJECT-TYPE
+                   SYNTAX  VlanIndex
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "set the VID field of VLAN for the outgoing packets when pvlanPrivatePortBuntag
+						is not set  ."
+                   ::= { pvlanPortTableEntry 5 } 
+                   	
+pvlanPrivatePortTagPri      OBJECT-TYPE
+                   SYNTAX    INTEGER  
+                   ACCESS read-write
+                   STATUS mandatory
+                   DESCRIPTION
+                       "set the priority field of VLAN for the packet when
+							pvlanPrivatePortBuntag is not set."
+                    ::= { pvlanPortTableEntry 6 } 
+                   	
+END

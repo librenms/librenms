@@ -1,0 +1,279 @@
+-- file: NMS-1705.mib
+-- Apr. 11 2006
+-- yangyuhua@nms.com.cn
+
+NMS-1705 DEFINITIONS ::= BEGIN
+
+               IMPORTS
+			IpAddress
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212
+			DisplayString
+				FROM RFC1213-MIB
+			nmsMgmt
+					FROM NMS-SMI;
+          
+ nms1705MIB  MODULE-IDENTITY
+        LAST-UPDATED    "200604111300Z"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+            "This MIB module defines the generic managed objects
+            for NAT."
+        ::= { nmsMgmt 175 }
+
+nms1705Objects   OBJECT IDENTIFIER ::= { nms1705MIB 1 }
+
+               -- nms1705MIB nms line Service Group       
+               -- nms1705MIB Terminal Service Line Table
+
+          -- This group contains terminal service specific
+          -- information on a per line basis.
+
+	               adslLineTable OBJECT-TYPE
+	                   SYNTAX  SEQUENCE OF AdslLineEntry
+	                   ACCESS  not-accessible
+	                   STATUS  mandatory
+	                   DESCRIPTION
+	                            "A list of terminal server line entries."
+	                   ::= { nms1705Objects 1 }
+	
+	               adslLineEntry OBJECT-TYPE
+	                   SYNTAX AdslLineEntry
+	                   ACCESS  not-accessible
+	                   STATUS  mandatory
+	                   DESCRIPTION
+	                            "A collection of adsl objects in the
+	                            nms Terminal Server implementation."
+	                   INDEX { adslLineNumber }
+	               ::= { adslLineTable 1 }
+
+	               AdslLineEntry ::=
+	                   SEQUENCE {
+	                       adslLineUser
+	                           DisplayString,
+	                       adslProductID
+	                           DisplayString,    
+	                       adslConfigAddr
+	                           IpAddress,
+	                       adslLineNumber
+	                           INTEGER
+	                   }
+	
+          -- The following section describes the components of the
+          -- table.
+					adslLineUser OBJECT-TYPE
+	                   SYNTAX  DisplayString
+	                   ACCESS  read-only
+	                   STATUS  mandatory
+	                   DESCRIPTION
+	                           "line user name, if line enabled, of user
+	                           on this line."
+	                   ::= { adslLineEntry 1 }
+	                   
+					adslProductID OBJECT-TYPE
+	                   SYNTAX  DisplayString
+	                   ACCESS  read-only
+	                   STATUS  mandatory
+	                   DESCRIPTION
+	                           "this is  product id of the device."
+	                   ::= { adslLineEntry 2 }
+	                   
+					adslConfigAddr OBJECT-TYPE
+	                   SYNTAX  IpAddress
+	                   ACCESS  read-only
+	                   STATUS  mandatory
+	                   DESCRIPTION
+	                           "this is  the alloced ip address  of the device."
+	                   ::= { adslLineEntry 3 }
+					adslLineNumber OBJECT-TYPE
+	                   SYNTAX  INTEGER
+	                   ACCESS  read-only
+	                   STATUS  mandatory
+	                   DESCRIPTION
+	                           "this is  the online port number."
+	                   ::= { adslLineEntry 4 }
+	                   
+	                   
+	 -- This group contains terminal service specific
+          -- information on a per line basis.
+	       adslPeriodTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF AdslPeriodEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of terminal server line entries."
+                   ::= { nms1705Objects 2 }
+
+               adslPeriodEntry OBJECT-TYPE
+                   SYNTAX AdslPeriodEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of adsl objects in the
+                            nms Terminal Server implementation."
+                   INDEX { adslLineNumber }
+               ::= { adslPeriodTable 1 }
+
+               AdslPeriodEntry ::=
+                   SEQUENCE {
+                       adslMemLoad
+                           OBJECT IDENTIFIER,
+                       adslCPULoad
+                           OBJECT IDENTIFIER,    
+                       adslPtInCRC
+                           Counter,
+                       adslPtStatus
+                           INTEGER,
+                       adslPtSpeed
+                       	   OBJECT IDENTIFIER,
+                       adslPtOutPkts
+                           Counter,
+                       adslPtInPkts
+                       	   Counter,
+                       adslPtOutError
+                       	   OBJECT IDENTIFIER,
+                       adslPtInError
+                           OBJECT IDENTIFIER,
+                       adslPtOutSpeed
+                           OBJECT IDENTIFIER,
+                       adslPtInSpeed
+                           OBJECT IDENTIFIER,
+                       adslPtOutDrop
+                       	   OBJECT IDENTIFIER,
+                       adslPtInDrop
+                       	   OBJECT IDENTIFIER
+                   }
+
+	 	adslMemLoad OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "This is the memory load infomation. it could assign the
+	                      identifier 1.3.6.1.4.1.3320.9.48.1"
+	              ::= { adslPeriodEntry 1 }
+			
+		 	adslCPULoad OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "This is the CPU load infomation. it could assign the
+	                      identifier 1.3.6.1.4.1.3320.9.109.1.1.1.1.5"
+	              ::= { adslPeriodEntry 2 }
+	              
+			adslPtInCRC OBJECT-TYPE
+	              SYNTAX  Counter
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "The number of input IP datagrams for which no problems were encountered to prevent their
+			 	continued processing, but which were discarded
+			 	(e.g., for lack of buffer space)"
+	              ::= { adslPeriodEntry 3 }	
+			
+			adslPtStatus OBJECT-TYPE
+		       SYNTAX  INTEGER {
+		                   up(1),       -- ready to pass packets
+		                   down(2),
+		                   testing(3)   -- in some test mode
+		               }
+		       MAX-ACCESS  read-write
+		       STATUS      current
+		       DESCRIPTION
+		               "The desired state of the port."
+	              ::= { adslPeriodEntry 4 }
+	              
+	        adslPtSpeed OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "An estimate of the interface's current bandwidth in
+			       bits per second.it could assign the identifier 1.3.6.1.2.1.2.2.1.5£¨ifSpeed£© "
+	              ::= { adslPeriodEntry 5 }   
+	                 	
+			adslPtOutPkts  OBJECT-TYPE
+	              SYNTAX  Counter
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "The total number of packets that higher-level
+		 	protocols requested be transmitted, and which were not
+		 	addressed to a multicast or broadcast address at this
+		 	sub-layer, including those that were discarded or not
+		 	sent."
+	              ::= { adslPeriodEntry 6 } 
+	              
+	        adslPtInPkts OBJECT-TYPE
+	              SYNTAX  Counter
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "The number of packets, delivered by this sub-layer to
+		 	a higher (sub-)layer, which were not addressed to a
+		 	multicast or broadcast address at this sub-layer"
+	              ::= { adslPeriodEntry 7 }    
+	                 
+			adslPtOutError OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "For packet-oriented interfaces, the number of
+		 	outbound packets that could not be transmitted because
+		 	of errors.  For character-oriented or fixed-length
+		 	interfaces, the number of outbound transmission units
+		 	that could not be transmitted because of errors.it could assign the identifier 1.3.6.1.2.1.2.2.1.20£¨ifOutErrors£© "
+	              ::= { adslPeriodEntry 8 } 
+	              
+	        adslPtInError OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "For packet-oriented interfaces, the number of inbound
+		 	packets that contained errors preventing them from
+		 	being deliverable to a higher-layer protocol.  For
+		 	character-oriented or fixed-length interfaces, the
+		 	number of inbound transmission units that contained
+		 	errors preventing them from being deliverable to a
+		 	higher-layer protocol.it could assign the identifier 1.3.6.1.2.1.2.2.1.14£¨ifInErrors£© "
+	              ::= { adslPeriodEntry 9 } 
+	
+		 adslPtOutSpeed	OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "it could assign the identifier 1.3.6.1.4.1.3320.2.2.1.1.9£¨nmslocIfOutPktsSec£© "
+	              ::= { adslPeriodEntry 10 }
+	         
+	        adslPtInSpeed	OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "it could assign the identifier 1.3.6.1.4.1.3320.2.2.1.1.7£¨nmslocIfInPktsSec£© "
+	              ::= { adslPeriodEntry 11 }
+	         
+	        adslPtOutDrop  OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "it could assign the identifier 1.3.6.1.4.1.3320.2.2.1.1.27£¨nmslocIfOutputQueueDrops£© "
+	              ::= { adslPeriodEntry 12 }  
+	        
+	       adslPtInDrop	OBJECT-TYPE
+	              SYNTAX  OBJECT IDENTIFIER
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "it could assign the identifier 1.3.6.1.4.1.3320.2.2.1.1.26£¨nmslocIfInputQueueDrops£©"
+	              ::= { adslPeriodEntry 13 }   
+	     END

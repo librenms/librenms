@@ -1,0 +1,314 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Nortel Networks, 2004
+-- All rights reserved
+-- 
+-- HISTORY
+-- $Log: altroot.mib,v $
+-- Revision 1.3  2007/10/17 01:09:52  jeneric
+-- 10/07 mib updates
+--
+-- Revision submit_cheetah_17123/1 2006/01/14 03:30:02 mp1
+-- EUED type changes
+-- 
+-- Revision submit_cheetah_10393/1 2005/01/05 21:01:22 mmacnt
+-- code reorg - moved from lib/agent
+-- 
+-- Revision submit_cheetah_10344/1 2004/11/22 23:40:04 dillibab
+-- Added mib objects for copper and fiber Zoe modules.
+-- 
+-- Revision submit_cheetah_8623/1 2004/08/03 18:43:55 rrekha
+-- Added new type for ZOE.
+-- 
+-- Revision submit_cheetah_2604/1 2003/04/11 22:41:46 rrekha
+-- Mike's changes : Added node for WLAN Securrity Switch.
+-- 
+-- Revision submit_cheetah_2293/1 2003/03/15 01:04:16 rrekha
+-- Added new line at end of file to keep MIB compiler happy.
+-- 
+-- Revision submit_cheetah_2181/1 2003/03/05 22:34:47 rrekha
+-- Added sysobjectids for 2208 and 2216.
+-- 
+-- Revision ge_latest_margozzi/12 2003/03/05 19:26:40 margozzi
+-- 	Added bobcat sysObjectIds. 2208 and 2216.
+-- 
+-- Revision ge_latest_margozzi/11 2003/01/22 19:28:54 margozzi
+-- 	Do to a coding issue on the switch I had to make
+-- 	the ALO registration nodes have the same OID length
+-- 	as the other tigon series switches.
+-- 
+-- Revision ge_latest_margozzi/10 2003/01/13 21:38:26 margozzi
+-- 	Added entries for the ALO143 and ALO150.
+-- 	Basically made the old sysObjectId the
+-- 	parent node for these two.
+-- 
+-- Revision ge_latest_margozzi/9 2003/01/09 18:36:05 margozzi
+-- 	changed aws2424s to the correct aas2424s. All the aws switches were 
+-- 	rebranded to aas switches. However, we have already shipped this 
+-- 	file to customers. To be safe, we will not go back and rename the
+-- 	registration node even though the OIDs would remain constant.
+-- 
+-- Revision ge_latest_margozzi/8 2003/01/07 22:59:16 margozzi
+-- 	Added entry for Lynx registration.
+-- 
+-- Revision ge_latest_margozzi/7 2002/12/19 19:23:14 margozzi
+-- 	Added registration point for Elmo ( wsm-BladeCenter )
+-- 
+-- Revision ge_latest_margozzi/6 2002/12/12 18:15:00 margozzi
+-- 	Added Alteon Link Optimizer ( ALO ) sysObjectID registration node.
+-- 
+-- Revision ge_latest_margozzi/5 2002/09/23 22:47:58 margozzi
+-- 	Added a sysObjectID for AWS2224.
+-- 
+-- Revision ge_latest_margozzi/4 2002/04/23 21:00:01 margozzi
+-- 	Added on more level to the Cheetah registration hierarchy.
+-- 	aws-switches was inserted between registration and the
+-- 	aws-2000 and aws-300 switches.
+-- 
+-- Revision ge_latest_margozzi/3 2002/04/22 23:03:21 margozzi
+-- 	Added Cheetah switch registration and private mib nodes.
+-- 
+-- Revision ge_latest_margozzi/2 2002/03/18 23:16:06 margozzi
+-- 	Renamed alteonPersonalContentDirector to alteonContentDirector.
+-- 	added a new contentDirector node for use as a root for any
+-- 	Content Director specific MIBs.
+-- 
+-- Revision ge_latest_margozzi/1 2001/08/09 17:46:51 margozzi
+-- 	Added an entry for the WebSwitch Module. The WSM is basically
+-- 	a 184 that has been converted into a blade that plugs into 
+-- 	an 8600 Chassis.
+-- 
+-- Revision gesb1_mmargozzi/6 2001/07/11 22:50:57 mmargozzi
+-- 	moved definition of wsm4Traps from wsm4.mib to here. This removes a dependency of the tigon build to a file that is only used for the 8600 build
+-- 
+-- Revision gesb1_mmargozzi/5 2001/07/10 21:33:16 mmargozzi
+-- 	 Removed the switch-chassis registration node and all of it's children. Also renamed alteon780 to chassis-8600.
+-- 
+-- Revision gesb1_mmargozzi/4 2001/06/19 17:35:53 mmargozzi
+-- 	Added support for the tungsten project. We still need to get the official name for tungsten and correct this MIB later
+-- 
+-- Revision gesb1_mmargozzi/3 2001/03/29 00:50:29 mmargozzi
+-- 	Added in the Volera required entries
+-- 
+-- Revision gesb1_mmargozzi/2 2001/03/22 19:50:42 mmargozzi
+-- 	Added support for AlteonPCC iSD
+-- 
+-- Revision gesb1_mmargozzi/1 2001/03/22 00:15:22 mmargozzi
+-- 	Added support for the 780 switch
+-- 
+-- Revision genie_rekha/4 2001/02/23 18:14:36 rekha
+-- 	Changed 'common' node to 'platform' for ISD platform.
+-- 
+-- Revision genie_rekha/2 2001/02/15 19:23:18 rekha
+-- 	Added SSLOffload MIB registrations.
+-- 
+-- Revision latest_mlin/4 2000/12/28 22:08:55 mlin
+-- 	Removed MIB OIDs for Alteon 714 and 300.
+-- 	Added MIB OIDs to support 1000BT LCM and ISD-PersonalContentDirector.
+-- 
+-- Revision test_smiao/5 1999/10/28 23:04:00 smiao
+-- 	Added Title display, Pre-enabled S/W keys and SNMP ObjId for 
+--      Alteon 184/AD4.
+-- 
+-- Revision latest_mlin/2 1999/06/24 22:06:05 mlin
+-- 	Updated SNMP registrations for GS with latest naming.
+-- 
+-- Revision test_smiao/2 1999/03/30 01:31:40 smiao
+-- 	Implemeted MDA Slot Configuration Table and User-defined Default 
+--      Configurations for MDA Slots Table.
+-- 
+-- Revision 1.1.2.2  1999/02/23  00:14:48  mlin
+-- 	1st checkin to support Entity MIB.
+-- 	[1999/02/23  00:14:19  mlin]
+--
+-- Revision 1.1.2.1  1999/02/07  00:56:47  mlin
+-- 	Restructured MIBs for Genie switches.
+-- 	[1999/02/07  00:56:08  mlin]
+-- 
+-- $EndLog$
+--
+ALTEON-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises 
+		FROM RFC1155-SMI;
+
+
+alteon		        OBJECT IDENTIFIER ::= { enterprises 1872 }
+
+-- textual conventions
+
+-- groups in alteon
+
+registration2		OBJECT IDENTIFIER ::= { alteon 1 }
+private-mibs		OBJECT IDENTIFIER ::= { alteon 2 }
+
+--This only here because the Volera build requires it. 
+--We want to obsolete it some day.
+personalContentCache   	OBJECT IDENTIFIER ::= { alteon 3 }       
+ics         		OBJECT IDENTIFIER ::= { personalContentCache  1 }
+-- End of Volera hack :-(
+
+switch 		        OBJECT IDENTIFIER ::= { private-mibs 1 }
+gs-switch		OBJECT IDENTIFIER ::= { private-mibs 2 }
+isd 	        	OBJECT IDENTIFIER ::= { private-mibs 3 }
+switch-chassis  	OBJECT IDENTIFIER ::= { private-mibs 4 }
+aws-switch			OBJECT IDENTIFIER ::= { private-mibs 5 }
+
+chassis-8600     	OBJECT IDENTIFIER ::= { switch-chassis 1 }
+wsm4Traps		OBJECT IDENTIFIER ::= { chassis-8600 2 }
+
+platform        	OBJECT IDENTIFIER ::= { isd 1 }
+sslOffload      	OBJECT IDENTIFIER ::= { isd 2 }
+firewall      	        OBJECT IDENTIFIER ::= { isd 3 }
+contentDirector	        OBJECT IDENTIFIER ::= { isd 4 }
+
+-- Alteon product object identification
+
+-- TS AceSwitch Registration2
+
+-- AceSwitch 110 - 8 10/100 UTP and 2 1000 Fiber ports
+aceswitch110 OBJECT IDENTIFIER ::= { registration2 1 }
+
+-- AceDirector (110 based) - 8 10/100 UTP ports
+acedirector OBJECT IDENTIFIER ::= { registration2 2 }
+
+-- AceSwitch 180 - 8 10/100 UTP or 1000 Fiber, and 1 1000 Fiber ports
+aceswitch180 OBJECT IDENTIFIER ::= { registration2 3 }
+
+-- AceDirector 2 (180 based) - 8 10/100 UTP ports
+acedirector2 OBJECT IDENTIFIER ::= { registration2 4 }
+
+-- AceSwitch 180e - 8 10/100 UTP or 1000 Fiber, and 1 1000 Fiber ports
+aceswitch180e OBJECT IDENTIFIER ::= { registration2 5 }
+
+-- AceDirector 3 - 8 10/100 UTP and 1 1000 Fiber ports
+acedirector3 OBJECT IDENTIFIER ::= { registration2 6 }
+
+-- CacheDirector - 8 10/100 UTP ports
+cachedirector OBJECT IDENTIFIER ::= { registration2 7 }
+
+-- GS AceSwitch Registration
+gs-switches OBJECT IDENTIFIER ::= { registration2 8 }
+
+-- AceSwitch 184 - 8 10/100 UTP or 1000 Fiber, and 1 1000 Fiber ports
+aceswitch184 OBJECT IDENTIFIER ::= { registration2 9 }
+
+-- AceDirector 4 - 8 10/100 UTP and 1 1000 Fiber ports
+acedirector4 OBJECT IDENTIFIER ::= { registration2 10 }
+
+-- Integrated Service Director Registration
+isd-reg OBJECT IDENTIFIER ::= { registration2 11 }
+
+-- Webswitch Module 4 10/100 UTP or 1000 Fiber
+webswitch-module OBJECT IDENTIFIER ::= { registration2 12 }
+
+-- AWS series switches ( Cheetah )
+aws-switches OBJECT IDENTIFIER ::= { registration2 13 }
+
+-- deprecated, do not use
+-- Alteon Link Optimizer ( ALO )
+alteonLinkOptimizer OBJECT IDENTIFIER ::= { registration2 14 }
+
+-- Web Switch Module for IBM BladeCenter
+wsm-BladeCenter OBJECT IDENTIFIER ::= { registration2 15 }
+
+-- Alteon Link Optimizer ( ALO ) Series Registration
+alteonLinkOptimizer143 OBJECT IDENTIFIER ::= { registration2 16 }
+alteonLinkOptimizer150 OBJECT IDENTIFIER ::= { registration2 17 }
+
+-- Web Switch Module for IBM L2/L3 BladeCenter 
+ibm-BladeCenterL3 OBJECT IDENTIFIER ::= { registration2 18 }
+-- Zoe Copper,Fiber Modules 
+copperModule OBJECT IDENTIFIER ::= { ibm-BladeCenterL3 1 }
+fiberModule OBJECT IDENTIFIER ::= { ibm-BladeCenterL3 2 }
+
+
+-- AWS 2000 series switches 4 Gig plus 24/48 FE
+aws2000-switches OBJECT IDENTIFIER ::= { aws-switches 1 }
+
+-- AWS 3000 series switches 4 Gig plus 8/16 Gig
+aws3000-switches OBJECT IDENTIFIER ::= { aws-switches 2 }
+
+-- AWS 2000 Series Registration
+aws2424 OBJECT IDENTIFIER ::= { aws2000-switches 1 }
+aws2448 OBJECT IDENTIFIER ::= { aws2000-switches 2 }
+-- AWS 2200 series switches 2 Gig plus 24 FE
+aws2224 OBJECT IDENTIFIER ::= { aws2000-switches 3 }
+-- AWS2424 with SSL Acceleration
+aas2424s OBJECT IDENTIFIER ::= { aws2000-switches 4 }
+-- AAWS 2200 series switches 2 Gig plus 8 FE
+aas2208 OBJECT IDENTIFIER ::= { aws2000-switches 5 }
+-- AWS 2200 series switches 2 Gig plus 16 FE
+aas2216 OBJECT IDENTIFIER ::= { aws2000-switches 6 }
+-- AWS 2424E5 Series Registration
+aws2424E5 OBJECT IDENTIFIER ::= { aws2000-switches 7 }
+-- AWS2424 E5 with SSL Acceleration
+aas2424sE5 OBJECT IDENTIFIER ::= { aws2000-switches 8 }
+-- AAWS 2208 E5 series switches 2 Gig plus 8 FE
+aas2208E5 OBJECT IDENTIFIER ::= { aws2000-switches 9 }
+-- AWS 2216 E5 series switches 2 Gig plus 16 FE
+aas2216E5 OBJECT IDENTIFIER ::= { aws2000-switches 10 }
+
+-- AWS 3000 Series Registration
+aws3408 OBJECT IDENTIFIER ::= { aws3000-switches 1 }
+aws3416 OBJECT IDENTIFIER ::= { aws3000-switches 2 }
+aws3408E5 OBJECT IDENTIFIER ::= { aws3000-switches 3 }
+
+-- GS AceSwitch Registration
+-- Chassis Switches
+chas-switch OBJECT IDENTIFIER ::= { gs-switches 1 }
+
+-- Chassis Switch Registration
+chas-switch-reg OBJECT IDENTIFIER ::= { chas-switch 1 }
+
+-- Alteon 708 - Chassis with max. 64 FE or 16 GE ports
+alteon708 OBJECT IDENTIFIER ::= { chas-switch-reg 1 }
+
+-- skipping chas-switch-reg 2
+
+-- Chassis Switch sub-component Registration
+chas-switch-comp-reg OBJECT IDENTIFIER ::= { chas-switch 2 }
+
+-- AC Power Supply 
+alteonACPowerSupply7xx OBJECT IDENTIFIER ::= { chas-switch-comp-reg 1 }
+
+-- DC Power Supply 
+alteonDCPowerSupply7xx OBJECT IDENTIFIER ::= { chas-switch-comp-reg 2 }
+
+-- Fan Tray with four Fans for Alteon 708
+alteonFan708 OBJECT IDENTIFIER ::= { chas-switch-comp-reg 3 }
+
+-- skipping chas-switch-comp-reg 4
+
+-- Management Processor Module 
+alteonModuleMP OBJECT IDENTIFIER ::= { chas-switch-comp-reg 5 }
+
+-- Switching Fabric Module 
+alteonModuleSF OBJECT IDENTIFIER ::= { chas-switch-comp-reg 6 }
+
+-- MDA Module with 16 10/100 UTP ports
+alteonModuleFE-UTP OBJECT IDENTIFIER ::= { chas-switch-comp-reg 7 }
+
+-- Module with 4 1000SX ports
+alteonModuleGE-SX OBJECT IDENTIFIER ::= { chas-switch-comp-reg 8 }
+
+-- Module with 4 1000BT ports
+alteonModuleGE-UTP OBJECT IDENTIFIER ::= { chas-switch-comp-reg 9 }
+
+
+-- Integrated Service Director Registration
+-- Alteon Content Director
+alteonContentDirector OBJECT IDENTIFIER ::= { isd-reg 1 }
+
+alteonSSLOffload 			OBJECT IDENTIFIER ::= { isd-reg 2 }
+
+-- Personal Content Cache
+alteonPersonalContentCache 	OBJECT IDENTIFIER ::= { isd-reg 3 }
+
+-- Tungsten Firewall product ( awaiting the official name! )
+alteonFirewall 	OBJECT IDENTIFIER ::= { isd-reg 4 }
+
+-- Alteon WLAN Security Switch
+alteonWSS	OBJECT IDENTIFIER ::= { isd-reg 5 }
+
+END

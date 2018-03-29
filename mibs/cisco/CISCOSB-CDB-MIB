@@ -1,0 +1,50 @@
+CISCOSB-CDB-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private CDB MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                    FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                 FROM SNMPv2-SMI
+    TruthValue                                   FROM SNMPv2-TC;
+
+rlCDB MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines CDB private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 94 }
+
+rlStartupCDBChanged OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the startup CDB has changed between the router's
+         last two reboots"
+    ::= {rlCDB 1 }
+
+rlManualReboot OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the device was shutdown orderly before reboot or
+         not (i.e. power failure)"
+    ::= {rlCDB 2 }
+
+END

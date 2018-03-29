@@ -1,0 +1,194 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSPAUTHENTRY-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpAuthentry                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpAuthentryMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- July 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the auth-entry-specific MIB for Juniper Enterprise 
+             Logical-System (LSYS) security profiles.  Juniper documentation 
+             is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security auth-entry resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpAuthentry 1 }
+
+    jnxLsysSpAuthentryObjects        OBJECT IDENTIFIER ::= { jnxLsysSpAuthentryMIB 1 }
+    jnxLsysSpAuthentrySummary        OBJECT IDENTIFIER ::= { jnxLsysSpAuthentryMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular auth-entry resource information objects per LSYS:
+--   Below are auth-entry resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- auth-entry resource table per LSYS
+
+    jnxLsysSpAuthentryTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpAuthentryEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE auth-entry objects for auth-entry resource consumption per LSYS."  
+    ::= { jnxLsysSpAuthentryObjects 1 }
+    
+    jnxLsysSpAuthentryEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpAuthentryEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in auth-entry resource table."
+    INDEX { IMPLIED jnxLsysSpAuthentryLsysName }          
+    ::= { jnxLsysSpAuthentryTable 1 }          
+
+    JnxLsysSpAuthentryEntry ::= 
+       SEQUENCE {
+          jnxLsysSpAuthentryLsysName    DisplayString,
+          jnxLsysSpAuthentryProfileName DisplayString,
+          jnxLsysSpAuthentryUsage       Unsigned32,
+          jnxLsysSpAuthentryReserved    Unsigned32,
+          jnxLsysSpAuthentryMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the auth-entry resource table
+ 
+    jnxLsysSpAuthentryLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which auth-entry resource information is retrieved. "
+        ::= { jnxLsysSpAuthentryEntry 1 }
+
+    jnxLsysSpAuthentryProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpAuthentryEntry 2 }
+
+    jnxLsysSpAuthentryUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpAuthentryEntry 3 }
+    
+    jnxLsysSpAuthentryReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpAuthentryEntry 4 } 
+
+    jnxLsysSpAuthentryMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpAuthentryEntry 5 }
+
+
+-- **********************************************************************
+-- auth-entry resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpAuthentryUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The auth-entry resource consumption over all LSYS."
+    ::= { jnxLsysSpAuthentrySummary 1 }          
+
+    jnxLsysSpAuthentryMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The auth-entry resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpAuthentrySummary 2 }
+    
+    jnxLsysSpAuthentryAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The auth-entry resource available in the whole device."
+    ::= { jnxLsysSpAuthentrySummary 3 }
+    
+    jnxLsysSpAuthentryHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of auth-entry resource consumed of a LSYS."
+    ::= { jnxLsysSpAuthentrySummary 4 }
+    
+    jnxLsysSpAuthentryHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most auth-entry resource."
+    ::= { jnxLsysSpAuthentrySummary 5 }
+    
+    jnxLsysSpAuthentryLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of auth-entry resource consumed of a LSYS."
+    ::= { jnxLsysSpAuthentrySummary 6 }
+    
+    jnxLsysSpAuthentryLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least auth-entry resource."
+    ::= { jnxLsysSpAuthentrySummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of auth-entry resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

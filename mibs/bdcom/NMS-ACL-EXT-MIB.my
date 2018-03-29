@@ -1,0 +1,427 @@
+-- *****************************************************************
+-- acl ext MIB -  The MIB for Switch Product
+--
+-- FEB 2012 LIUQIANG
+
+-- Copyright (c) 2012 by  Co., Ltd. 
+-- All rights reserved.
+-- *****************************************************************
+   
+-- ********************************************************************************   
+ 
+NMS-ACL-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, 
+	OBJECT-TYPE, 
+	Counter32,
+	Gauge32,
+	Counter64,
+	Integer32, 
+	TimeTicks, 
+	mib-2, 
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	DisplayString, 
+	PhysAddress, 
+	TruthValue, 
+	RowStatus, 
+	TimeStamp, 
+	AutonomousType, 
+	TestAndIncr,
+	MacAddress
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, 
+	OBJECT-GROUP        
+		FROM SNMPv2-CONF 
+	nmsMacAclMIB
+				FROM NMS-MacAcl;
+
+				
+--aclAppOnIfTable
+          aclAppOnIfTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF AclAppOnIfEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of acl App On interface entries."
+              ::= { nmsMacAclMIB 3 }
+
+          aclAppOnIfEntry OBJECT-TYPE
+              SYNTAX  AclAppOnIfEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An acl App On interface entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifaclAppOnIfIndex }
+              ::= { aclAppOnIfTable 1 }
+
+          AclAppOnIfEntry ::=
+              SEQUENCE {
+                  ifaclAppOnIfIndex
+                      INTEGER,
+                  ingressMacAclOnIf
+                      DisplayString,
+                  egressMacAclOnIf
+                      DisplayString,
+                  ingressIPAclOnIf
+                      DisplayString,
+                  egressIPAclOnIf
+                      DisplayString,
+                  ingressIPV6AclOnIf
+                      DisplayString,
+                  egressIPV6AclOnIf
+                      DisplayString
+              }
+	
+          ifaclAppOnIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { aclAppOnIfEntry 1 }
+
+          ingressMacAclOnIf OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on ingress port."
+              ::= { aclAppOnIfEntry 2 }
+
+          egressMacAclOnIf OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on egress port."
+              ::= { aclAppOnIfEntry 3 }
+
+
+          ingressIPAclOnIf OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on ingress port."
+              ::= { aclAppOnIfEntry 4 }
+
+
+          egressIPAclOnIf OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on egress port."
+              ::= { aclAppOnIfEntry 5 }
+
+
+          ingressIPV6AclOnIf OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on ingress port."
+              ::= { aclAppOnIfEntry 6 }
+
+
+          egressIPV6AclOnIf OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on egress port."
+              ::= { aclAppOnIfEntry 7 }
+
+
+
+--aclAppOnVlanTable
+          aclAppOnVlanTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF AclAppOnVlanEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of acl App On Vlan entries."
+              ::= { nmsMacAclMIB 4 }
+
+          aclAppOnVlanEntry OBJECT-TYPE
+              SYNTAX  AclAppOnVlanEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An acl App On Vlan entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifaclAppOnVlanId }
+              ::= { aclAppOnVlanTable 1 }
+
+          AclAppOnVlanEntry ::=
+              SEQUENCE {
+                  ifaclAppOnVlanId
+                      INTEGER,
+                  ingressMacAclOnVlan
+                      DisplayString,
+                  egressMacAclOnVlan
+                      DisplayString,
+                  ingressIPAclOnVlan
+                      DisplayString,
+                  egressIPAclOnVlan
+                      DisplayString,
+                  ingressIPV6AclOnVlan
+                      DisplayString,
+                  egressIPV6AclOnVlan
+                      DisplayString
+              }
+	
+          ifaclAppOnVlanId OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of vlan. The same value as ifIndex in ifTable of RFC1213."
+              ::= { aclAppOnVlanEntry 1 }
+
+          ingressMacAclOnVlan OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on ingress port."
+              ::= { aclAppOnVlanEntry 2 }
+
+          egressMacAclOnVlan OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on egress port."
+              ::= { aclAppOnVlanEntry 3 }
+
+
+          ingressIPAclOnVlan OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on ingress port."
+              ::= { aclAppOnVlanEntry 4 }
+
+
+          egressIPAclOnVlan OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on egress port."
+              ::= { aclAppOnVlanEntry 5 }
+
+
+          ingressIPV6AclOnVlan OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on ingress port."
+              ::= { aclAppOnVlanEntry 6 }
+
+
+          egressIPV6AclOnVlan OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on egress port."
+              ::= { aclAppOnVlanEntry 7 }
+
+--aclAppOnSlotTable
+          aclAppOnSlotTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF AclAppOnSlotEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of acl App On Slot entries."
+              ::= { nmsMacAclMIB 5 }
+
+          aclAppOnSlotEntry OBJECT-TYPE
+              SYNTAX  AclAppOnSlotEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An acl App On Slot entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifaclAppOnSlotId }
+              ::= { aclAppOnSlotTable 1 }
+
+          AclAppOnSlotEntry ::=
+              SEQUENCE {
+                  ifaclAppOnSlotId
+                      INTEGER,
+                  ingressMacAclOnSlot
+                      DisplayString,
+                  egressMacAclOnSlot
+                      DisplayString,
+                  ingressIPAclOnSlot
+                      DisplayString,
+                  egressIPAclOnSlot
+                      DisplayString,
+                  ingressIPV6AclOnSlot
+                      DisplayString,
+                  egressIPV6AclOnSlot
+                      DisplayString
+              }
+	
+          ifaclAppOnSlotId OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of Slot. The same value as ifIndex in ifTable of RFC1213."
+              ::= { aclAppOnSlotEntry 1 }
+
+          ingressMacAclOnSlot OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on ingress port."
+              ::= { aclAppOnSlotEntry 2 }
+
+          egressMacAclOnSlot OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on egress port."
+              ::= { aclAppOnSlotEntry 3 }
+
+
+          ingressIPAclOnSlot OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on ingress port."
+              ::= { aclAppOnSlotEntry 4 }
+
+
+          egressIPAclOnSlot OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on egress port."
+              ::= { aclAppOnSlotEntry 5 }
+
+
+          ingressIPV6AclOnSlot OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on ingress port."
+              ::= { aclAppOnSlotEntry 6 }
+
+
+          egressIPV6AclOnSlot OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on egress port."
+              ::= { aclAppOnSlotEntry 7 }
+
+--global acl app
+
+
+	 globalaclapp   OBJECT IDENTIFIER ::= { nmsMacAclMIB 6 }  
+
+          ingressMacAcl OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on ingress port."
+              ::= { globalaclapp 1 }
+
+          egressMacAcl OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete mac acl on egress port."
+              ::= { globalaclapp 2 }
+
+
+          ingressIPAcl OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on ingress port."
+              ::= { globalaclapp 3 }
+
+
+          egressIPAcl OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ip acl on egress port."
+              ::= { globalaclapp 4 }
+
+
+          ingressIPV6Acl OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on ingress port."
+              ::= { globalaclapp 5 }
+
+
+          egressIPV6Acl OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete ipv6 acl on egress port."
+              ::= { globalaclapp 6 }
+
+
+
+
+
+END
+
+				
+				
+					

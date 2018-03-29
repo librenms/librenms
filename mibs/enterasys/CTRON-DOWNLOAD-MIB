@@ -1,0 +1,349 @@
+CTRON-DOWNLOAD-MIB DEFINITIONS ::= BEGIN
+
+  --  ctron-download-mib.txt
+  --  Revision: 1.06.02
+  --  Part Number:  2170556-02
+  --  Date: February 2, 1999
+  --  Revised: "200308111858Z"  - Mon Aug 11 18:58 GMT 2003
+
+  --  Enterasys Networks, Inc.
+  --  50 Minuteman Rd.
+  --  Andover, MA 01801-1008
+  --  +1 978 684 1000
+  --  support@enterasys.com
+
+  --  This module provides authoritative definitions for Cabletron's
+  --  enterprise-specific download MIB.
+  --
+  --  This module will be extended, as required.
+  --
+
+  --  Cabletron Systems reserves the right to make changes in 
+  --  specification and other information contained in this document 
+  --  without prior notice.  The reader should consult Cabletron Systems
+  --  to determine whether any such changes have been made.
+  --
+  --  In no event shall Cabletron Systems be liable for any incidental, 
+  --  indirect, special, or consequential damages whatsoever (including 
+  --  but not limited to lost profits) arising out of or related to this
+  --  document or the information contained in it, even if Cabletron
+  --  Systems has been advised of, known, or should have known, the 
+  --  possibility of such damages.
+  --
+  --  Cabletron grants vendors, end-users, and other interested parties
+  --  a non-exclusive license to use this Specification in connection
+  --  with the management of Cabletron products.
+
+  --  Copyright February 1999-2003 Cabletron Systems
+
+  -- This MIB describes objects that are common to all Cabletron
+  -- devices.
+
+  IMPORTS
+    NetworkAddress     FROM RFC1155-SMI
+    ctDownLoad         FROM CTRON-MIB-NAMES
+    DisplayString      FROM RFC1213-MIB
+    OBJECT-TYPE        FROM RFC-1212;
+
+  --  Textual convention
+
+  --  DisplayString   ::= OCTET STRING
+  --  This data type is used to model textual information taken from
+  --  the NVT ASCII character set.  By convention, objects with this
+  --  syntax are declared as having:
+  --
+  --  SIZE (0..255)
+
+  --  The commonDL group
+  --  Implementation of this group is mandatory for systems
+  --  that provide the ability to download firmware."
+
+  ctDL        OBJECT IDENTIFIER ::= { ctDownLoad 1 }
+
+  ctDLForceOnBoot  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "When set to a 1, the system will request a
+      download during the next system restart.
+      If no server is found and the current image
+      in flash memory is valid, the system will boot
+      using the flash-resident image."
+    ::= { ctDL 1 }
+
+  ctDLCommitRAMToFlash  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "When written with a 1, the boot software will erase
+      flash memory, compress the downloaded code if necessary,
+      and save the image into flash memory.  Upon completion
+      of this operation, the flash memory driver resets this
+      object to 0, indicating completion of the programming
+      operation."
+    ::= { ctDL 2 }
+
+  ctDLInitiateColdBoot  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "When written with a 1, the boot software initiates a
+       system reboot.
+
+       When written with a 2, the boot software initiates a
+       soft reboot of the system. The soft reboot does not
+       perform the Boot PROM Power-Up diagnostics.
+
+       If only one form of reboot is supported initiate that
+       reboot in both cases.
+
+       A read always returns a 0."
+    ::= { ctDL 3 }
+
+  ctDLTFTPRequestHost  OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "The IP address of the TFTP server to be used when
+      firmware is to be loaded across the network."
+    ::= { ctDL 4 }
+
+  ctDLTFTPRequest  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "The filename requested of the server when firmware
+      is to be loaded across the network."
+    ::= { ctDL 5 }
+
+  ctDLLastImageFilename  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The value of ctDLFileName during the last successful image
+       download.  This is the name of the file, on the TFTP server,
+       that was download to become the current image."
+    ::= { ctDL 6 }
+
+  ctDLLastServerIPAddress  OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The value of ctDLNetAddress during the last successful image
+       download.  This is the IP address of the TFTP server used to
+       download the current image."
+    ::= { ctDL 7 }
+
+  ctDLFlashSize  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Denotes the size, in bytes, of flash memory
+      contained on this module."
+    ::= { ctDL 8 }
+
+  ctDLFlashCount  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Denotes the number of times that flash memory has
+      been reprogrammed.  This value is initialized to 1,
+      when the module is initially powered up."
+    ::= { ctDL 9 }
+
+  ctDLFirmwareBase  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Denotes the starting RAM address of the firmware."
+    ::= { ctDL 10 }
+
+  ctDLFirmwareTop  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Denotes the ending RAM address of firmware."
+    ::= { ctDL 11 }
+
+  ctDLFirmwareStart  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Denotes the RAM entry point of the firmware
+      as established by the boot process."
+    ::= { ctDL 12 }
+
+  ctDLBootRev  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(9))
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Denotes the revision of boot firmware in the module.
+      The first octet provides the version, and the
+      second provides the revision."
+    ::= { ctDL 13 }
+
+  ctDLForceBootp  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "When set to 1, this object forces the client to send a
+      BOOTP request packet when rebooting.  The client will
+      make several attempts before timing out if a BOOTP server
+      does not respond.  This object remains set."
+    ::= { ctDL 14 }
+
+  ctDLServerName   OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "This OID is reserved for future use of the BOOTP server
+      name.  This field can be used when a client wants to get
+      boot information from a particular BOOTP server."
+    ::= { ctDL 15 }
+
+  ctDLOnLineDownLoad  OBJECT-TYPE
+    SYNTAX  INTEGER {
+      normalOperation(1),
+      forceDownLoad(2),
+      forceDownLoadReset(3),
+      downLoadConfiguration(4),
+      upLoadConfiguration(5)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "During normal operation this object has the value of 1.
+
+      By setting this object to a value of forceDownLoad(2) an
+      image download via TFTP will be performed, ctDLNetAddress
+      specifies the TFTP server and ctDLFileName specifies the
+      file name of the image on the TFTP server.
+
+      By setting this object to a value of forceDownLoadReset(3)
+      an image download via TFTP will be performed, ctDLNetAddress
+      specifies the TFTP server and ctDLFileName specifies the
+      file name of the image on the TFTP server.  A reset will be
+      forced upon successful completion of the download.
+
+      By setting this object to a value of downLoadConfiguration(4)
+      the specified configuration file will be downloaded, verified,
+      and, if valid, committed to NVRAM, if valid.  A reset will be
+      forced upon successful completion.  ctDLNetAddress specifies
+      the TFTP server and ctDLFileName specifies the name of the
+      configuration file on the TFTP server.
+
+      By setting this object to upLoadConfiguration(5), the
+      contents of NVRAM will be uploaded via TFTP to the specified
+      file on the specified TFTP server.  ctDLNetAddress specifies
+      the TFTP server and ctDLFileName specifies the name of the
+      configuration file."
+    ::= { ctDL 16 }
+
+  ctDLOperStatus  OBJECT-TYPE
+    SYNTAX  INTEGER {
+      other(1),       -- none of the following
+      unknown(2),
+      normalOperation(3),
+      downLoadActive(4),
+      downLoadCompleteError(5)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "This object reflects the status of the download code.
+
+      normalOperation(3) -
+          Indicates that either no download has been started, or that a
+          download was started and has finished normally.
+
+      downLoadActive(4) -
+          indicates a download is currently in progress.
+
+      downLoadCompleteError(5) -
+          Indicates that a download was started but an error was detected."
+    ::= { ctDL 17 }
+
+  ctDLNetAddress  OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The IP Address of the TFTP server to be used for uploading
+       and downloading configuration files and for downloading
+       images."
+    ::= { ctDL 18 }
+
+  ctDLFileName    OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The file name to be used to specify the image or configuration
+       file on the TFTP server specified by ctDLNetAddress.
+       This should be a complete path filename."
+    ::= { ctDL 19 }
+
+  ctDLErrorString OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "If the value of ctDLOperStatus is downloadCompleteError(5)
+      then this object will provide a more complete description of
+      the error.  Otherwise this object will be the zero length
+      string."
+     ::= { ctDL 20 }
+
+  ctDLTftpServerGatewayIPAddress  OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+      "The IP address of the gateway/router which connects
+      this SNMP agent to the TFTP server."
+    ::= { ctDL 21 }
+
+  ctDLBlockCount OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Current TFTP block count of an active session. If no
+      TFTP transfer is in progress, zero is returned."
+    ::= { ctDL 22 }
+
+  ctDLBootPartitionStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+      good(1),
+      bad(2),
+      inProgress(3)
+    }
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+      "Status of the boot partition or partitions. A value of
+      good(1) indicates that all boot partitions contain a 
+      valid checksum. A value of bad(2) indicates that one or
+      more boot partitions contain an invalid checksum and the
+      the image was not able to fix the invalid boot partition.
+      A value of inProgress(3) indicates that the image is 
+      attempting to fix an invalid boot partition and this 
+      status will change to either good(1) or bad(2)."
+    ::= { ctDL 23 }
+
+END

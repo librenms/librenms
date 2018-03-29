@@ -1,0 +1,168 @@
+-- extracted from rfc4801.txt
+-- at Thu Mar  1 06:08:21 2007
+
+   GMPLS-TC-STD-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+     MODULE-IDENTITY
+       FROM SNMPv2-SMI                                    -- RFC 2578
+     TEXTUAL-CONVENTION
+       FROM SNMPv2-TC                                     -- RFC 2579
+     mplsStdMIB
+       FROM MPLS-TC-STD-MIB                               -- RFC 3811
+   ;
+
+   gmplsTCStdMIB MODULE-IDENTITY
+     LAST-UPDATED
+       "200702280000Z" -- 28 February 2007 00:00:00 GMT
+     ORGANIZATION
+       "IETF Common Control and Measurement Plane (CCAMP) Working Group"
+     CONTACT-INFO
+       "       Thomas D. Nadeau
+               Cisco Systems, Inc.
+        Email: tnadeau@cisco.com
+
+               Adrian Farrel
+               Old Dog Consulting
+        Email: adrian@olddog.co.uk
+
+        Comments about this document should be emailed directly to the
+        CCAMP working group mailing list at ccamp@ops.ietf.org"
+     DESCRIPTION
+       "Copyright (C) The IETF Trust (2007).  This version of
+        this MIB module is part of RFC 4801; see the RFC itself for
+        full legal notices.
+
+        This MIB module defines TEXTUAL-CONVENTIONs for concepts used in
+        Generalized Multiprotocol Label Switching (GMPLS) networks."
+     REVISION
+        "200702280000Z" -- 28 February 2007 00:00:00 GMT
+     DESCRIPTION
+       "Initial version published as part of RFC 4801."
+   ::= { mplsStdMIB 12 }
+
+   GmplsFreeformLabelTC ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+       "This TEXTUAL-CONVENTION can be used as the syntax of an object
+        that contains any GMPLS Label.  Objects with this syntax can be
+        used to represent labels that have label types that are not
+        defined in any RFCs.  The freeform GMPLS Label may also be used
+        by systems that do not wish to represent labels that have
+        label types defined in RFCs using type-specific syntaxes."
+     REFERENCE
+       "1. Generalized Multi-Protocol Label Switching (GMPLS) Signaling
+           Functional Description, RFC 3471, section 3.2."
+     SYNTAX OCTET STRING (SIZE (0..64))
+
+   GmplsLabelTypeTC ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+       "Determines the interpretation that should be applied to an
+        object that encodes a label.  The possible types are:
+
+        gmplsMplsLabel(1)           - The label is an MPLS Packet, Cell,
+                                      or Frame Label and is encoded as
+                                      described for the TEXTUAL-
+                                      CONVENTION MplsLabel defined in
+                                      RFC 3811.
+
+        gmplsPortWavelengthLabel(2) - The label is a Port or Wavelength
+                                      Label as defined in RFC 3471.
+
+        gmplsFreeformLabel(3)       - The label is any form of label
+                                      encoded as an OCTET STRING using
+                                      the TEXTUAL-CONVENTION
+                                      GmplsFreeformLabel.
+
+        gmplsSonetLabel(4)          - The label is a Synchronous Optical
+                                      Network (SONET) Label as
+                                      defined in RFC 4606.
+
+        gmplsSdhLabel(5)            - The label is a Synchronous Digital
+                                      Hierarchy (SDH) Label as defined
+                                      in RFC 4606.
+
+        gmplsWavebandLabel(6)       - The label is a Waveband Label as
+                                      defined in RFC 3471."
+     REFERENCE
+       "1. Generalized Multi-Protocol Label Switching (GMPLS) Signaling
+           Functional Description, RFC 3471, section 3.
+        2. Definition of Textual Conventions and for Multiprotocol Label
+           Switching (MPLS) Management, RFC 3811, section 3.
+        3. Generalized Multi-Protocol Label Switching (GMPLS) Extensions
+           for Synchronous Optical Network (SONET) and Synchronous
+           Digital Hierarchy (SDH) Control, RFC 4606."
+      SYNTAX INTEGER {
+        gmplsMplsLabel(1),
+        gmplsPortWavelengthLabel(2),
+        gmplsFreeformGeneralizedLabel(3),
+        gmplsSonetLabel(4),
+        gmplsSdhLabel(5),
+        gmplsWavebandLabel(6)
+      }
+
+   GmplsSegmentDirectionTC ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+       "The direction of data flow on an Label Switched Path (LSP)
+        segment with respect to the head of the LSP.
+
+        Where an LSP is signaled using a conventional signaling
+        protocol, the 'head' of the LSP is the source of the signaling
+        (also known as the ingress) and the 'tail' is the destination
+        (also known as the egress).  For unidirectional LSPs, this
+        usually matches the direction of flow of data.
+
+        For manually configured unidirectional LSPs, the direction of
+        the LSP segment matches the direction of flow of data.  For
+        manually configured bidirectional LSPs, an arbitrary decision
+        must be made about which LER is the 'head'."
+     SYNTAX  INTEGER {
+       forward(1),   -- data flows from head-end of LSP toward tail-end
+       reverse(2)    -- data flows from tail-end of LSP toward head-end
+     }
+
+   END
+
+-- 
+--    Copyright (C) The IETF Trust (2007).
+-- 
+--    This document is subject to the rights, licenses and restrictions
+--    contained in BCP 78, and except as set forth therein, the authors
+--    retain all their rights.
+-- 
+--    This document and the information contained herein are provided on an
+--    "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+--    OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+--    THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+--    OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+--    THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+--    WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+-- Intellectual Property
+-- 
+--    The IETF takes no position regarding the validity or scope of any
+--    Intellectual Property Rights or other rights that might be claimed to
+--    pertain to the implementation or use of the technology described in
+--    this document or the extent to which any license under such rights
+--    might or might not be available; nor does it represent that it has
+--    made any independent effort to identify any such rights.  Information
+--    on the procedures with respect to rights in RFC documents can be
+--    found in BCP 78 and BCP 79.
+-- 
+--    Copies of IPR disclosures made to the IETF Secretariat and any
+--    assurances of licenses to be made available, or the result of an
+--    attempt made to obtain a general license or permission for the use of
+--    such proprietary rights by implementers or users of this
+--    specification can be obtained from the IETF on-line IPR repository at
+--    http://www.ietf.org/ipr.
+-- 
+--    The IETF invites any interested party to bring to its attention any
+--    copyrights, patents or patent applications, or other proprietary
+--    rights that may cover technology that may be required to implement
+--    this standard.  Please address the information to the IETF at
+--    ietf-ipr@ietf.org.
+-- 
+
+

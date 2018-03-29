@@ -1,0 +1,347 @@
+-- ============================================================================
+-- AT-DHCPSN-MIB, Allied Telesis enterprise MIB: DHCP Snooping
+--
+-- Copyright (c) 2009 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+
+    AT-DHCPSN-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+
+        atDhcpsn MODULE-IDENTITY
+            LAST-UPDATED "201009070000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "Added two more violation types for DHCP Snooping."
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006140445Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201002090130Z"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects for DHCP
+                Snooping in AlliedWare Plus."
+            REVISION "200912100130Z"
+            DESCRIPTION
+                "Initial Revision"
+            ::= { modules 537 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        atDhcpsnEvents OBJECT IDENTIFIER ::= { atDhcpsn 0 }
+
+
+        atDhcpsnTrap NOTIFICATION-TYPE
+            OBJECTS { atDhcpsnIfIndex, atDhcpsnVid, atDhcpsnSmac, atDhcpsnOpcode, atDhcpsnCiaddr,
+                atDhcpsnYiaddr, atDhcpsnGiaddr, atDhcpsnSiaddr, atDhcpsnChaddr, atDhcpsnVioType
+                 }
+            STATUS current
+            DESCRIPTION
+                "DHCP Snooping violation trap."
+            ::= { atDhcpsnEvents 1 }
+
+
+        atArpsecTrap NOTIFICATION-TYPE
+            OBJECTS { atArpsecIfIndex, atArpsecClientIP, atArpsecSrcMac, atArpsecVid, atArpsecVioType
+                 }
+            STATUS current
+            DESCRIPTION
+                "DHCP Snooping ARP Security violation trap."
+            ::= { atDhcpsnEvents 2 }
+
+
+        atDhcpsnVariablesTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtDhcpsnVariablesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains rows of DHCP Snooping information."
+            ::= { atDhcpsn 1 }
+
+
+        atDhcpsnVariablesEntry OBJECT-TYPE
+            SYNTAX AtDhcpsnVariablesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A set of parameters that describe the DHCP Snooping features."
+            INDEX { atDhcpsnIfIndex }
+            ::= { atDhcpsnVariablesTable 1 }
+
+
+        AtDhcpsnVariablesEntry ::=
+            SEQUENCE {
+                atDhcpsnIfIndex
+                    INTEGER,
+                atDhcpsnVid
+                    INTEGER,
+                atDhcpsnSmac
+                    DisplayString,
+                atDhcpsnOpcode
+                    INTEGER,
+                atDhcpsnCiaddr
+                    IpAddress,
+                atDhcpsnYiaddr
+                    IpAddress,
+                atDhcpsnGiaddr
+                    IpAddress,
+                atDhcpsnSiaddr
+                    IpAddress,
+                atDhcpsnChaddr
+                    DisplayString,
+                atDhcpsnVioType
+                    INTEGER
+             }
+
+        atDhcpsnIfIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Ifindex of the port that the packet was received on."
+            ::= { atDhcpsnVariablesEntry 1 }
+
+
+        atDhcpsnVid OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VLAN ID of the port that the packet was received on."
+            ::= { atDhcpsnVariablesEntry 2 }
+
+
+        atDhcpsnSmac OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Source MAC address of the packet that caused the trap."
+            ::= { atDhcpsnVariablesEntry 3 }
+
+
+        atDhcpsnOpcode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                bootpRequest(1),
+                bootpReply(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Opcode value of the BOOTP packet that caused the trap. Only
+                bootpRequest(1) or bootpReply(2) is valid."
+            ::= { atDhcpsnVariablesEntry 4 }
+
+
+        atDhcpsnCiaddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Ciaddr value of the BOOTP packet that caused the trap."
+            ::= { atDhcpsnVariablesEntry 5 }
+
+
+        atDhcpsnYiaddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Yiaddr value of the BOOTP packet that caused the trap."
+            ::= { atDhcpsnVariablesEntry 6 }
+
+
+        atDhcpsnGiaddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Giaddr value of the BOOTP packet that caused the trap."
+            ::= { atDhcpsnVariablesEntry 7 }
+
+
+        atDhcpsnSiaddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Siaddr value of the BOOTP packet that caused the trap."
+            ::= { atDhcpsnVariablesEntry 8 }
+
+
+        atDhcpsnChaddr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Chaddr value of the BOOTP packet that caused the trap."
+            ::= { atDhcpsnVariablesEntry 9 }
+
+
+        atDhcpsnVioType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalidBootp(1),
+                invalidDhcpAck(2),
+                invalidDhcpRelDec(3),
+                invalidIp(4),
+                maxBindExceeded(5),
+                opt82InsertErr(6),
+                opt82RxInvalid(7),
+                opt82RxUntrusted(8),
+                opt82TxUntrusted(9),
+                replyRxUntrusted(10),
+                srcMacChaddrMismatch(11),
+                staticEntryExisted(12),
+                dbAddErr(13)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason that the trap was generated. invalidBootp(1) indicates
+                that the received BOOTP packet was invalid. For example, it is
+                neither BootpRequest nor BootpReply. invalidDhcpAck(2) indicates
+                that the received DHCP ACK was invalid. invalidDhcpRelDec(3) indicates
+                the DHCP Release or Decline was invalid. invalidIp(4) indicates
+                that the received IP packet was invalid. maxBindExceeded(5) indicates
+                that if the entry was added, the maximum bindings configured for
+                the port would be exceeded. opt82InsertErr(6) indicates that the
+                insertion of Option 82 failed. opt82RxInvalid(7) indicates that
+                the received Option 82 information was invalid. opt82RxUntrusted(8)
+                indicates that Option 82 information was received on an untrusted
+                port. opt82TxUntrusted(9) indicates that Option 82 would have been
+                transmitted out an untrusted port. replyRxUntrusted(10) indicates
+                that a BOOTP Reply was received on an untrusted port.
+                srcMacChaddrMismatch(11) indicates that the source MAC address of
+                the packet did not match the BOOTP CHADDR of the packet.
+                staticEntryExisted(12) indicates that the static entry to be added
+                already exists. dbAddErr(13) indicates that adding an entry to the
+                database failed."
+            ::= { atDhcpsnVariablesEntry 10 }
+
+--  --------------------------------------------  --
+-- The ARP Security violation table
+--  --------------------------------------------  --
+        atArpsecVariablesTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtArpsecVariablesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains rows of DHCP Snooping ARP Security information."
+            ::= { atDhcpsn 2 }
+
+
+        atArpsecVariablesEntry OBJECT-TYPE
+            SYNTAX AtArpsecVariablesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A set of parameters that describe the DHCP Snooping ARP Security features."
+            INDEX { atArpsecIfIndex }
+            ::= { atArpsecVariablesTable 1 }
+
+
+        AtArpsecVariablesEntry ::=
+            SEQUENCE {
+                atArpsecIfIndex
+                    INTEGER,
+                atArpsecClientIP
+                    IpAddress,
+                atArpsecSrcMac
+                    DisplayString,
+                atArpsecVid
+                    INTEGER,
+                atArpsecVioType
+                    INTEGER
+             }
+
+        atArpsecIfIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Ifindex of the port that the ARP packet was received on."
+            ::= { atArpsecVariablesEntry 1 }
+
+
+        atArpsecClientIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Source IP address of the ARP packet."
+            ::= { atArpsecVariablesEntry 2 }
+
+
+        atArpsecSrcMac OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Source MAC address of the ARP packet."
+            ::= { atArpsecVariablesEntry 3 }
+
+
+        atArpsecVid OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VLAN ID of the port that the ARP packet was received on."
+            ::= { atArpsecVariablesEntry 4 }
+
+
+        atArpsecVioType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                srcIpNotFound(1),
+                badVLAN(2),
+                badPort(3),
+                srcIpNotAllocated(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason that the trap was generated. srcIpNotFound(1) indicates
+                that the Sender IP address of the ARP packet was not found in the
+                DHCP Snooping database. badVLAN(2) indicates that the VLAN of the
+                DHCP Snooping binding entry associated with the Sender IP address
+                of the ARP packet does not match the VLAN that the ARP packet was
+                received on. badPort(3) indicates that the port of the DHCP
+                Snooping binding entry associated with the Sender IP address of the
+                ARP packet does not match the port that the ARP packet was received
+                on. srcIpNotAllocated(4) indicates that the CHADDR of the DHCP
+                Snooping binding entry associated with the Sender IP address of
+                the ARP packet does not match the Source MAC and/or the ARP source
+                MAC of the ARP packet."
+            ::= { atArpsecVariablesEntry 5 }
+
+
+
+    END
+
+--
+-- at-dhcpsn.mib
+--
+

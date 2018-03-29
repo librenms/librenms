@@ -1,0 +1,11 @@
+ALTER TABLE `storage` ADD UNIQUE  `index_unique` (  `device_id` ,  `storage_mib` ,  `storage_index` );
+ALTER TABLE `bgpPeers_cbgp` ADD  `AcceptedPrefixes` INT NOT NULL ,ADD  `DeniedPrefixes` INT NOT NULL ,ADD  `PrefixAdminLimit` INT NOT NULL ,ADD  `PrefixThreshold` INT NOT NULL ,ADD  `PrefixClearThreshold` INT NOT NULL ,ADD  `AdvertisedPrefixes` INT NOT NULL ,ADD  `SuppressedPrefixes` INT NOT NULL ,ADD  `WithdrawnPrefixes` INT NOT NULL;
+ALTER TABLE `bgpPeers_cbgp` ADD UNIQUE  `unique_index` (  `device_id` ,  `bgpPeerIdentifier` ,  `afi` ,  `safi` );
+ALTER TABLE `devices` CHANGE  `port`  `port` SMALLINT( 5 ) UNSIGNED NOT NULL DEFAULT  '161';
+CREATE TABLE IF NOT EXISTS `ipsec_tunnels` (  `tunnel_id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `peer_port` int(11) NOT NULL,  `peer_addr` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  `local_addr` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  `local_port` int(11) NOT NULL,  `tunnel_name` varchar(96) COLLATE utf8_unicode_ci NOT NULL,  `tunnel_status` varchar(11) COLLATE utf8_unicode_ci NOT NULL,  PRIMARY KEY (`tunnel_id`),  UNIQUE KEY `unique_index` (`device_id`,`peer_addr`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+ALTER TABLE `syslog` ADD INDEX ( `program` );
+ALTER TABLE `devices` ADD  `sysObjectID` VARCHAR( 64 ) NULL DEFAULT NULL AFTER  `bgpLocalAs`;
+ALTER TABLE `ports` CHANGE  `ifSpeed`  `ifSpeed` BIGINT NULL DEFAULT NULL;
+ALTER TABLE  `sensors` CHANGE  `sensor_oid`  `sensor_oid` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+CREATE TABLE IF NOT EXISTS `entPhysical_state` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` varchar(64) NOT NULL,  `subindex` varchar(64) DEFAULT NULL,  `group` varchar(64) NOT NULL,  `key` varchar(64) NOT NULL,  `value` varchar(255) NOT NULL,  KEY `device_id_index` (`device_id`,`entPhysicalIndex`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `ports_vlans` ( `port_vlan_id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `interface_id` int(11) NOT NULL,  `vlan` int(11) NOT NULL,  `baseport` int(11) NOT NULL,  `priority` bigint(32) NOT NULL,  `state` varchar(16) NOT NULL,  `cost` int(11) NOT NULL,  PRIMARY KEY (`port_vlan_id`),  UNIQUE KEY `unique` (`device_id`,`interface_id`,`vlan`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;

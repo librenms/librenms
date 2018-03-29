@@ -1,0 +1,225 @@
+CISCOSB-GREEN-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCO GREEN ETHERNET MIB
+-- Version:    7.47
+-- Date:       25 Aug 2008
+--
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32    FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue              FROM SNMPv2-TC
+    PortList                                    FROM Q-BRIDGE-MIB
+    ifIndex                                     FROM IF-MIB;
+
+rlGreenEth MODULE-IDENTITY  -- August 15, 2008
+
+        LAST-UPDATED  "200808150000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION   "The private MIB module definition for Green Ethernet Energy Detect feature."
+        REVISION      "200808150000Z"
+        DESCRIPTION   "Add Green Ethernet Energy Detect and Short Reach support per port and per system rlGreenEthernet"
+::= { switch001  134}
+
+rlGreenEthEnergyDetectEnable OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "This scalar defines Green Ethernet Enrgy-Detect Globaly"
+    ::= { rlGreenEth 1 }
+
+rlGreenEthShortReachEnable OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "This scalar defines Green Ethernet Short-Reach Globaly"
+    ::= { rlGreenEth 2 }
+
+rlGreenEthCurrentEnergyConsumption OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "mWatt"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "This scalar define Green Ethernet all modes current Energy consumption per system in mWatt
+         in order to calculate current energy consumption in percent proportional to Consumption without Green Ethernet feature
+         please use the following formula:
+         (rlGreenEthCurrentEnergyConsumption/rlGreenEthCurrentMaxEnergyConsumption)*100"
+    ::= { rlGreenEth 3 }
+
+rlGreenEthCurrentMaxEnergyConsumption OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "mWatt"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "This scalar define Green Ethernet current maximum consumption Energy consumption per system in mWatt,
+         as it was without Green Ethernet feature."
+    ::= { rlGreenEth 4 }
+
+rlGreenEthCumulativePowerSaveMeter OBJECT-TYPE
+    SYNTAX           Unsigned32
+    UNITS            "Watt*Hour"
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "This scalar define Green Ethernet cumulative power save per system in Watt*Hour"
+    ::= { rlGreenEth 5 }
+
+rlGreenEthShortReachThreshold OBJECT-TYPE
+       SYNTAX      Unsigned32  (0..70)
+       UNITS      "meter"
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The usage threshold expressed in meter for
+                determinate the cable length for Short-Reach"
+       ::= { rlGreenEth 6 }
+
+rlGreenEthCumulativePowerSaveMeterReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The rlGreenEthCumulativePowerSaveMeterReset indicates that rlGreenEthCumulativePowerSaveMeter
+            should be set to ziro.
+
+            This object behaviors as write-only than
+            reading this object will always return 'false'."
+    DEFVAL{ false }
+    ::= { rlGreenEth 7 }
+
+RlGreenSavingType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Green saving types:
+         energyDetect(1)  uses energy detect
+         shortReach(2)  uses Short Reach"
+ SYNTAX  INTEGER {
+        energyDetect (1),
+        shortReach   (2)
+    }
+
+NonOperReasonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Reason why Green Ethernet is not activated saving on a port
+         NP(1)                  Port is not present - Applicable in ED & SR
+         LT(2)                  Link Type is not supported(fiber, auto media setect) - Applicable in ED & SR
+         LU(3)                  Port link is up - Applicable only in ED
+         LS(4)                  Link speed is not supported (100M,10M,10G) - Applicable only in SR
+         LL(5)                  Link length received from VCT test exceed threshold - Applicable only in SR
+         ER(6)                  Errors detected on line and port revered back to Long Reach(only in enhanced mode) - Applicable only in SR
+         LD(7)                  Port link is Down - Applicable only in SR
+         unknown(8)             In case that green Active or disable on port"
+
+
+    SYNTAX  INTEGER {
+        np(1),
+        lt(2),
+        lu(3),
+        ls(4),
+        ll(5),
+        er(6),
+        ld(7),
+        unknown(8)
+    }
+
+
+rlGreenEthPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlGreenEthPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of green state of ports"
+    ::= { rlGreenEth 8 }
+
+rlGreenEthPortEntry OBJECT-TYPE
+    SYNTAX      RlGreenEthPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of green state of port"
+    INDEX   { ifIndex,
+              rlGreenEthPortSavingTypeValue  }
+    ::= { rlGreenEthPortTable 1 }
+
+
+
+RlGreenEthPortEntry ::= SEQUENCE {
+    rlGreenEthPortSavingTypeValue         RlGreenSavingType,
+    rlGreenEthPortAdminState              TruthValue,
+    rlGreenEthPortOperState               TruthValue,
+    rlGreenEthPortNonOperReason           NonOperReasonType
+}
+
+rlGreenEthPortSavingTypeValue OBJECT-TYPE
+    SYNTAX      RlGreenSavingType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Green saving types"
+    ::= { rlGreenEthPortEntry 1 }
+
+rlGreenEthPortAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Active\non Active"
+    ::= { rlGreenEthPortEntry 2 }
+
+rlGreenEthPortOperState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active\non Active"
+    ::= { rlGreenEthPortEntry 3 }
+
+
+rlGreenEthPortNonOperReason OBJECT-TYPE
+    SYNTAX      NonOperReasonType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason why saving mode is not activated"
+    ::= { rlGreenEthPortEntry 4 }
+
+rlGreenEthForceShortReachIfIndexList OBJECT-TYPE
+    SYNTAX           PortList
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION
+        "The ports that forced enable the Green Ethernet Short Reach configuration
+          not considering VCT results."
+    DEFVAL  { ''H } -- empty octet string
+    ::= { rlGreenEth 9 }
+
+
+rlGreenEthMaskLedStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        off       (0),
+        on        (1)
+
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Mask all ports led  according to the configuration."
+    DEFVAL{ off }
+    ::= { rlGreenEth 10 }
+
+END
+
+

@@ -1,0 +1,53 @@
+RAPID-INFO-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        OBJECT-IDENTITY, enterprises       FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        rapidstream                        FROM RAPID-MIB;
+        
+    rsInfoModule MODULE-IDENTITY
+        LAST-UPDATED "0103061200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes general information
+            of RapidStream system.  Mainly, the information 
+            obtained from this MIB is used by rsInfoSystemMIB,
+            rsClientMIB, rsSystemStatisticsMIB, rsIpsecTunnelMIB."
+
+
+        REVISION      "200104201200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        ::= { rapidstream 6 }
+
+
+    rsInfoSystem OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base system information for all rs Client
+             branches."
+        ::= { rsInfoModule 1 }
+
+    rsInfoSystemCurrentTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The host's notion of the local date and time of day." 
+        ::= {rsInfoSystem 1}
+
+END

@@ -1,0 +1,1049 @@
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition
+
+-- $Log: zyxel-AS.mib $
+-- Revision 1.2  2006/06/08 09:18:11  niceguy
+-- Revision 1.1  2005/11/23 12:47:58  niceguy
+-- Initial revision
+-- Revision 1.1  2005/08/18 13:30:38  Jeff
+-- Initial revision
+-- Revision 1.12  2004/06/08 10:12:38  jenny
+-- Revision 1.11  2004/05/05 08:33:35  jennyhsu
+-- Revision 1.10  2004/01/29 03:41:26  jennyhsu
+-- Define DHCP option 82 setting
+-- Revision 1.9  2003/09/19 04:57:58  jennyhsu
+-- Add thermalSensorFailure trap. Change the syntax of 
+-- asDhcpRelayOption82Info to be DisplayString
+-- Revision 1.8  2003/09/10 12:26:16  jennyhsu
+-- add DHCP setup
+-- Revision 1.7  2003/06/06 09:15:18  jennyhsu
+-- Revise the descriptions of accessSwitchDSLConfTarget
+-- Revision 1.6  2003/06/06 01:39:28  jennyhsu
+-- Add objects for DSL configuration in batch mode
+-- Revision 1.5  2003/05/27 08:12:45  jennyhsu
+-- Add asPacketForwardingTable
+-- Revision 1.4  2003/03/21 06:57:38  jennyhsu
+-- remove the mask of accessSwitchSystemTemperature
+-- Revision 1.3  2002/12/03 07:49:00  jennyhsu
+-- Add accessSwitchSystemCurrentStatus into the variable binding of 
+-- temp, fan and voltage trap
+-- Revision 1.2  2002/11/12 07:48:00  jennyhsu
+-- Revision 1.1  2002/11/12 07:40:49  jennyhsu
+-- Initial revision
+
+
+ZYXEL-AS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	enterprises, IpAddress	FROM RFC1155-SMI
+	OBJECT-TYPE 		FROM RFC-1212	
+	DisplayString, ifIndex, PhysAddress
+				FROM RFC1213-MIB	  	
+	TRAP-TYPE 		FROM RFC-1215
+	PortList		FROM Q-BRIDGE-MIB
+	RowStatus		FROM SNMPv2-TC
+	MacAddress, Timeout, BridgeId
+				FROM BRIDGE-MIB;
+	
+
+	zyxel			OBJECT IDENTIFIER ::= { enterprises 890 }
+	products		OBJECT IDENTIFIER ::= { zyxel 1 }
+	accessSwitch  		OBJECT IDENTIFIER ::= { products 5 }
+	
+	-- accessSwitch generic managed objects
+	accessSwitchCommon	OBJECT IDENTIFIER ::= { accessSwitch 1 }
+	accessSwitchMgnt	OBJECT IDENTIFIER ::= { accessSwitchCommon 1 }
+	
+	accessSwitchStats  	OBJECT IDENTIFIER ::= { accessSwitchCommon 2 }
+	asMacStats    		OBJECT IDENTIFIER ::= { accessSwitchStats 1 }
+	
+	-- accessSwitchMgnt subtree
+	
+	-- System Status	
+	accessSwitchSystemCurrentStatus OBJECT-TYPE
+    	SYNTAX  INTEGER(0..255)
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION "This variable indicates the status of the system.
+       		     The sysCurrentStatus is a bit map represented
+       		     as a sum, therefore, it can represent multiple defects
+       		     simultaneously. The sysNoDefect should be set if and only if
+       		     no other flag is set.
+
+       		     The various bit positions are:
+                     1   sysNoDefect
+             	     2   sysOverHeat
+		     3	 sysFanRpmLow
+		     4	 sysVoltageLow
+		     5   sysThermalSensorFailure"
+     	::= { accessSwitchMgnt 1 }
+	
+	-- System traps related managed objects
+	
+	accessSwitchProblemCause	OBJECT-TYPE
+        SYNTAX	DisplayString 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               		"The variable is the description of sytsem problem."
+     	::= { accessSwitchMgnt 2 }
+     	
+     	-- For AES-100, IES-1000 (SAM1008, AAM1008) only
+ 	accessSwitchSystemTemperature	OBJECT-TYPE
+        SYNTAX	DisplayString 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+              		"The variable is the current temperature in Celsius of the system."
+     	::= { accessSwitchMgnt 3 }
+
+
+	-- Fan rpm table
+
+        accessSwitchFanRpmTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AccessSwitchFanRpmEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                      	"A table that contains rpm information about the fans."
+        ::= { accessSwitchMgnt 4 }
+
+        accessSwitchFanRpmEntry OBJECT-TYPE
+        SYNTAX  AccessSwitchFanRpmEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        		"A list of rpm information for each fan."
+        INDEX  { accessSwitchFanRpmIndex }
+        ::= { accessSwitchFanRpmTable 1 }
+
+        AccessSwitchFanRpmEntry ::=
+           SEQUENCE {
+        	accessSwitchFanRpmIndex		INTEGER,
+		accessSwitchFanRpmCurValue	INTEGER,
+		accessSwitchFanRpmMaxValue	INTEGER,
+		accessSwitchFanRpmMinValue	INTEGER,
+		accessSwitchFanRpmLowThresh	INTEGER,
+		accessSwitchFanRpmDescr		DisplayString
+           }
+
+        accessSwitchFanRpmIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The identity of the fan."
+        ::= { accessSwitchFanRpmEntry 1 }
+
+        accessSwitchFanRpmCurValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The current rpm of the fan."
+        ::= { accessSwitchFanRpmEntry 2 }
+
+        accessSwitchFanRpmMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The maximum rpm ever performed by the fan."
+        ::= { accessSwitchFanRpmEntry 3 }
+
+        accessSwitchFanRpmMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The minimum rpm ever performed by the fan."
+        ::= { accessSwitchFanRpmEntry 4 }
+
+        accessSwitchFanRpmLowThresh OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The low threshold of the rpm of the fan. If the current rpm is less than
+			the threshold, the device will initiate the fanRpmLow trap."
+        ::= { accessSwitchFanRpmEntry 5 }
+
+        accessSwitchFanRpmDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The description of the fan (e.g. location, function, etc.)."
+        ::= { accessSwitchFanRpmEntry 6 }
+
+
+	-- Voltage table
+
+        accessSwitchVoltageTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AccessSwitchVoltageEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                      	"A table that contains voltage information about the system."
+        ::= { accessSwitchMgnt 5 }
+
+        accessSwitchVoltageEntry OBJECT-TYPE
+        SYNTAX  AccessSwitchVoltageEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        		"A list of voltage information for each sensor."
+        INDEX  { accessSwitchVoltageIndex }
+        ::= { accessSwitchVoltageTable 1 }
+
+        AccessSwitchVoltageEntry ::=
+           SEQUENCE {
+        	accessSwitchVoltageIndex		INTEGER,
+		accessSwitchVoltageCurValue		INTEGER,
+		accessSwitchVoltageMaxValue		INTEGER,
+		accessSwitchVoltageMinValue		INTEGER,
+		accessSwitchVoltageNominalValue		INTEGER,
+		accessSwitchVoltageLowThresh		INTEGER,
+		accessSwitchVoltageDescr		DisplayString
+           }
+
+        accessSwitchVoltageIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The identity of the sensor."
+        ::= { accessSwitchVoltageEntry 1 }
+
+        accessSwitchVoltageCurValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The current voltage detected by the sensor (in milli-voltage)."
+        ::= { accessSwitchVoltageEntry 2 }
+
+        accessSwitchVoltageMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The maximum voltage ever detected by the sensor (in milli-voltage)."
+        ::= { accessSwitchVoltageEntry 3 }
+
+        accessSwitchVoltageMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The minimum voltage ever detected by the sensor (in milli-voltage)."
+        ::= { accessSwitchVoltageEntry 4 }
+
+        accessSwitchVoltageNominalValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The nominal voltage which the power should supply (in milli-voltage)."
+        ::= { accessSwitchVoltageEntry 5 }
+
+        accessSwitchVoltageLowThresh OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The low threshold of the voltage. If the current voltage is less than
+			the threshold, the device will initiate the voltageLow trap."
+        ::= { accessSwitchVoltageEntry 6 }
+
+        accessSwitchVoltageDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The description of the voltage (e.g. location, nominal value, etc.)."
+        ::= { accessSwitchVoltageEntry 7 }
+
+    
+	-- System temperature table
+
+        accessSwitchSysTempTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AccessSwitchSysTempEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                      	"A table that contains temperature information about system."
+        ::= { accessSwitchMgnt 6 }
+
+        accessSwitchSysTempEntry OBJECT-TYPE
+        SYNTAX  AccessSwitchSysTempEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        		"A list of temperature information for each sensor."
+        INDEX  { accessSwitchSysTempIndex }
+        ::= { accessSwitchSysTempTable 1 }
+
+        AccessSwitchSysTempEntry ::=
+           SEQUENCE {
+        	accessSwitchSysTempIndex	INTEGER,
+		accessSwitchSysTempCurValue	INTEGER,
+		accessSwitchSysTempMaxValue	INTEGER,
+		accessSwitchSysTempMinValue	INTEGER,
+		accessSwitchSysTempHighThresh	INTEGER,
+		accessSwitchSysTempDescr	DisplayString
+           }
+
+        accessSwitchSysTempIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The identity of the sensor."
+        ::= { accessSwitchSysTempEntry 1 }
+
+        accessSwitchSysTempCurValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The current temperature detected in Celsius by the sensor."
+        ::= { accessSwitchSysTempEntry 2 }
+
+        accessSwitchSysTempMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The maximum temperature ever detected in Celsius by the sensor."
+        ::= { accessSwitchSysTempEntry 3 }
+
+        accessSwitchSysTempMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The minimum temperature ever detected in Celsius by the sensor."
+        ::= { accessSwitchSysTempEntry 4 }
+
+        accessSwitchSysTempHighThresh OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The high threshold of the temperature in Celsius. If the current temperature
+			is higher than the threshold, the device will initiate the overheat trap."
+        ::= { accessSwitchSysTempEntry 5 }
+
+        accessSwitchSysTempDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The description of the temperature sensor (e.g. location, function, etc.)."
+
+        ::= { accessSwitchSysTempEntry 6 }
+
+        accessSwitchMaintenance OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The managed object is for system maintenance. When the EMS
+                      	 wants to trigger the system maitenance operation, the EMS
+                      	 shall send SNMP-SET message to set the corresponding bit value 
+                      	 to be 1. The various bit positions are:
+                      	 BIT 1: config save
+                      	 BIT 2: reset
+			 BIT 3: local loopback test
+			 BIT 4: remote loopback test"
+        ::= { accessSwitchMgnt 7 }
+
+        accessSwitchMaintenancePort OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The port which the maintenance operation should be performed on.
+			 The value of 0 means the maintenance should be performed on the system."
+        ::= { accessSwitchMgnt 8 }
+
+        accessSwitchMaxNumOfStaticVlans OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The maximum number of static VLANs which the system supports"
+        ::= { accessSwitchMgnt 9 }
+ 
+-- Chassis information
+        
+        ASSlotNum ::= INTEGER {
+		slot1(1),
+		slot2(2)
+	}
+		
+	ASModuleType ::= INTEGER {
+		aes-100(1),
+		aes-100-1(2),
+		aam1008-61(3),
+		aam1008-63(4), 
+		sam1008(5)
+	}
+	
+		
+	acccessSwitchChassisId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The chassis Id of the module"
+        ::= { accessSwitchMgnt 10 }
+        
+        accessSwitchSlotId OBJECT-TYPE
+        SYNTAX  ASSlotNum
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The slot Id of the module"
+        ::= { accessSwitchMgnt 11 }
+        
+        accessSwitchModuleType OBJECT-TYPE
+        SYNTAX  ASModuleType
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The type of the module"
+        ::= { accessSwitchMgnt 12 }
+        
+               
+        accessSwitchFWVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The firmware version of the access switch."
+        ::= { accessSwitchMgnt 13 }
+        
+        accessSwitchDriverVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The driver version of the access port in this access switch"
+        ::= { accessSwitchMgnt 14 }
+        
+        accessSwitchModemCodeVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The modem code version of the access port in this access switch"
+        ::= { accessSwitchMgnt 15 }
+       
+        -- variables for provisioning DSL line in batch mode
+        
+        accessSwitchDSLConfOps OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The managed object is for xDSL line configuration. When the EMS
+                      	 wants to issue the desired operation, the EMS
+                      	 shall send SNMP-SET message to set the corresponding bit value 
+                      	 to be 1. The various bit positions are:
+                      	 BIT 1: enable port
+                      	 BIT 2: disable port
+			 BIT 3: set DSL mode			 
+			 BIT 4: set profile"
+        ::= { accessSwitchMgnt 16 }
+
+        accessSwitchDSLConfTarget OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The managed object is used for identify the target on which 
+			 the line configuration should be performed. The target is encoded 
+		         as:
+		         Byte 1~4: reserved
+		         Byte 5~7: each octet specifies a set of eight ports, with the first
+		                   octet specifying ports 1 through 8, etc.
+		         Byte 8~10: reserved"
+        ::= { accessSwitchMgnt 17 }
+        
+        accessSwitchDSLConfProfileName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The DSL profile name"
+        ::= { accessSwitchMgnt 18 }
+        
+        accessSwitchDSLConfMode OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The DSL mode. The semantic for each bit is:
+                      	Bit 1: ADSL, G.lite
+                      	Bit 2: ADSL, G.dmt
+                      	Bit 3: ADSL, T1.413
+                      	Bit 4: ADSL, Auto"
+        ::= { accessSwitchMgnt 19 }
+
+	-- Packet Forwarding Table
+
+        asPacketForwardingTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsPacketForwardingEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        	"This table includes the configuration of packet forwarding."
+        ::= { accessSwitchMgnt 20 }
+
+	asPacketForwardingEntry OBJECT-TYPE
+        SYNTAX	AsPacketForwardingEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asPacketForwardingTable."
+        INDEX   { ifIndex }
+        ::= { asPacketForwardingTable 1 }
+
+        AsPacketForwardingEntry ::=
+           SEQUENCE {
+		asPacketForwardingPortList	PortList
+           }
+
+        asPacketForwardingPortList    OBJECT-TYPE
+        SYNTAX	PortList
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The list defines the ports to which the packets
+		will be forwarded."
+         ::= { asPacketForwardingEntry 1 }
+
+
+	-- DHCP Setup
+
+	asDhcpRelayEnable OBJECT-TYPE
+         SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+          ACCESS  read-write
+          STATUS  mandatory
+          DESCRIPTION
+                      	"Enable/disable DHCP relay function."
+          ::= { accessSwitchMgnt 21 }
+
+         asDhcpRelayOption82Enable OBJECT-TYPE
+          SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+          ACCESS  read-write
+          STATUS  mandatory
+          DESCRIPTION
+                        	"Enable/disable the relay agent information option."
+          ::= { accessSwitchMgnt 22 }
+
+         asDhcpRelayOption82Info OBJECT-TYPE
+          SYNTAX  DisplayString
+          ACCESS  read-write
+          STATUS  mandatory
+          DESCRIPTION
+                      	"User specific relay agent information."
+          ::= { accessSwitchMgnt 23 }
+
+  	asMaxNumOfDhcpServers OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+          DESCRIPTION
+                      	"The maximum number of DHCP servers."
+          ::= { accessSwitchMgnt 24 }
+
+	asDhcpServerTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF AsDhcpServerEntry
+          ACCESS  not-accessible
+          STATUS  mandatory
+         DESCRIPTION
+                "A table that contains DHCP server information."
+          ::= { accessSwitchMgnt 25 }
+
+          asDhcpServerEntry OBJECT-TYPE
+          SYNTAX  AsDhcpServerEntry
+          ACCESS  not-accessible
+          STATUS  mandatory
+          DESCRIPTION
+        		"The entry of DHCP server table."
+          INDEX  { asDhcpServerIp }
+          ::= { asDhcpServerTable 1 }
+
+          AsDhcpServerEntry ::=
+             SEQUENCE {
+        	asDhcpServerIp		 	IpAddress,
+		asDhcpServerRowStatus		RowStatus
+           }
+	
+	asDhcpServerIp OBJECT-TYPE
+	SYNTAX IpAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The IP address of the DHCP server."
+	::= { asDhcpServerEntry 1 }
+
+	asDhcpServerRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The row status of the DHCP server entry."
+	::= { asDhcpServerEntry 2 }
+
+
+
+
+	-- SNMP setup, Trap Destination
+	
+--	asMaxNumberOfTrapDestinations OBJECT-TYPE
+--	SYNTAX INTEGER
+--	ACCESS	read-only
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"The max number of the trap destinations."
+--	::= { accessSwitchMgnt 26 }
+--
+--	asSNMPTrapDestTable	OBJECT-TYPE
+-- 	SYNTAX  SEQUENCE OF AsSNMPTrapDestEntry
+--    	ACCESS  not-accessible
+--    	STATUS  mandatory
+--    	DESCRIPTION
+--              "A table that contains SNMP trap destination information."
+--    	::= { accessSwitchMgnt 27 }
+
+--    	asSNMPTrapDestEntry OBJECT-TYPE
+--        SYNTAX  AsSNMPTrapDestEntry
+--        ACCESS  not-accessible
+--        STATUS  mandatory
+--        DESCRIPTION
+--        		"The entry of SNMP trap destination table."
+--        INDEX  { asTrapDestIp, asTrapDestPort }
+--        ::= { asSNMPTrapDestTable 1 }
+
+--   	AsSNMPTrapDestEntry ::=
+--           SEQUENCE {
+--            asTrapDestIp		 	IpAddress,
+--            asTrapDestPort			INTEGER,
+--	    asTrapDestRowStatus			RowStatus
+--    	   } 
+           	
+--	asTrapDestIp OBJECT-TYPE
+--	SYNTAX IpAddress
+--	ACCESS	read-write
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"The IP address of the trap destination."
+--	::= { asSNMPTrapDestEntry 1 }
+
+
+--	asTrapDestPort OBJECT-TYPE
+--	SYNTAX INTEGER
+--	ACCESS	read-write
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"The UDP port of the trap destination."
+--	::= { asSNMPTrapDestEntry 2 }
+	
+--	asTrapDestRowStatus OBJECT-TYPE
+--	SYNTAX 	RowStatus
+--	ACCESS	read-write
+--	STATUS	mandatory
+--	DESCRIPTION
+--		"The row status of the trap destination entry."
+--	::= { asSNMPTrapDestEntry 3}
+
+
+
+
+         
+-- RADIUS Server setup
+	
+	asMaxNumberOfRadiusServers OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The max number of the RADIUS Servers."
+	::= { accessSwitchMgnt 28 }
+
+	asRadiusServerTable	OBJECT-TYPE
+   	SYNTAX  SEQUENCE OF AsRadiusServerEntry
+    	ACCESS  not-accessible
+    	STATUS  mandatory
+    	DESCRIPTION
+                "A table that contains Radius Server information."
+    	::= { accessSwitchMgnt 29 }
+
+    	asRadiusServerEntry OBJECT-TYPE
+        SYNTAX  AsRadiusServerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        		"The entry of Radius Server table."
+        INDEX  { asRadiusServerIndex }
+        ::= { asRadiusServerTable 1 }
+
+   	AsRadiusServerEntry ::=
+           SEQUENCE {
+            asRadiusServerIndex			INTEGER,
+            asRadiusServerIp		 	IpAddress,
+            asRadiusServerPort			INTEGER,
+            asRadiusSharedSecret		DisplayString,
+	    asRadiusServerRowStatus		RowStatus
+    	   } 
+        
+        asRadiusServerIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                      	"The identity of the RADIUS server."
+        ::= { asRadiusServerEntry 1 }
+        
+	asRadiusServerIp OBJECT-TYPE
+	SYNTAX IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The IP address of the Radius Server."
+	::= { asRadiusServerEntry 2 }
+
+
+	asRadiusServerPort OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The UDP port of the Radius Server."
+	::= { asRadiusServerEntry 3 }
+	
+	asRadiusSharedSecret OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The shared secret of the Radius Server."
+	::= { asRadiusServerEntry 4 }
+	
+	asRadiusServerRowStatus OBJECT-TYPE
+	SYNTAX 	RowStatus
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The row status of the Radius Server entry."
+	::= { asRadiusServerEntry 5 } 
+         
+         
+         
+         
+-- 802.1x option
+	
+	asDot1xEnable OBJECT-TYPE
+	SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        ACCESS  read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Enable/disable the 802.1x function."
+	::= { accessSwitchMgnt 30 } 
+         
+         
+
+-- 802.1x Table
+
+        asDot1xPortTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF AsDot1xPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        	"This table includes the configuration of 802.1x."
+        ::= { accessSwitchMgnt 31 }
+
+	asDot1xPortEntry OBJECT-TYPE
+        SYNTAX	AsDot1xPortEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+		"An entry in asDot1xPortTable."
+        INDEX   { ifIndex }
+        ::= { asDot1xPortTable 1 }
+
+        AsDot1xPortEntry ::=
+           SEQUENCE {
+		asDot1xPortEnable	  	INTEGER,
+		asDot1xPortControl	  	INTEGER,
+		asDot1xPortReAuthEnable		INTEGER,
+		asDot1xPortReAuthPeriod		INTEGER
+           }
+
+        asDot1xPortEnable    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+			}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The option defines if the port enables 802.1x
+		settings."
+         ::= { asDot1xPortEntry 1 }
+         
+         asDot1xPortControl    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				auto(1),
+				forceAuth(2),
+				forceUnAuth(3)
+			}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The configuration defines the 802.1x port control
+		type."
+         ::= { asDot1xPortEntry 2 }
+
+	asDot1xPortReAuthEnable    OBJECT-TYPE
+        SYNTAX  INTEGER {
+				on(1),
+				off(2)
+			}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The option defines if the port enables 802.1x
+		re-authentication."
+         ::= { asDot1xPortEntry 3 }
+         
+        asDot1xPortReAuthPeriod    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The configuration defines the 802.1x
+		re-authentication period for each port."
+         ::= { asDot1xPortEntry 4 }
+ 
+         
+--------------------
+--  Statistics
+--------------------
+		
+	asMacDisplayTarget OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This managed object is a filter used for identify the target from which 
+		the MAC addresses are learned in macTable. The target should be
+		IfIndex which is used for identifying subscriber ports 
+		(e.g. 300 means all ports in slot 3 and 301 means port 1 in slot 3)."
+	::= { asMacStats 1 }
+
+-- macTable
+         
+        asMacTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AsMacEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        	"A table that contains information about unicast
+                entries for which the bridge has forwarding and/or
+                filtering information. This information is used
+                by the transparent bridging function in
+                determining how to propagate a received frame."
+        ::= { asMacStats 2 }
+
+        asMacEntry OBJECT-TYPE
+        SYNTAX AsMacEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        	"An entry of asMacTable."
+        INDEX { asMacAddress }
+        ::= { asMacTable 1 }
+
+        AsMacEntry ::=
+        	SEQUENCE {
+                  	asMacAddress	MacAddress,
+                  	asMacPort	INTEGER,
+                  	asMacStatus	INTEGER
+              	}
+
+        asMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"A unicast MAC address for which the bridge has
+                forwarding and/or filtering information."
+        ::= { asMacEntry 1 }
+
+        asMacPort OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"The port from which the mac address has been learned."
+        ::= { asMacEntry 2 }
+
+        asMacStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          learned(3),
+                          self(4),
+                          mgmt(5)
+        	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"The status of this entry."
+	::= { asMacEntry 3 }         
+         
+         
+         
+         
+         
+
+   -- accessSwitch specific traps
+   
+ 	reboot	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is going to reboot.
+	                 The variable is the reason why the system reboots."
+	::= 1
+	
+	systemShutdown	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchProblemCause 
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is going to shutdown.
+	                 The variable is the reason that causes the system to shutdown."
+	::= 2
+	    
+	overheat	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchSysTempIndex,
+                        accessSwitchSysTempCurValue,
+                        accessSwitchSystemCurrentStatus 
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is overheated.
+	                 The variable in the binding list is the current temperature in Celsius 
+	                 of the system."
+	::= 3
+		
+	overheatOver	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchSysTempIndex,
+                        accessSwitchSysTempCurValue,
+                        accessSwitchSystemCurrentStatus
+                        }
+	DESCRIPTION	"Send a message to the manager that the overheated condition is over.
+	                 The variable in the binding list is the current temperature in Celsius 
+	                 of the system."
+	::= 4
+
+ 	errLog		TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that an error log is created in system.
+			The variable in the binding list is the content of the error log."
+	::= 5	
+
+	fanRpmLow	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchFanRpmIndex,
+                        accessSwitchFanRpmCurValue,
+                        accessSwitchSystemCurrentStatus 
+                        }
+	DESCRIPTION	"Send a message to the manager that the rpm of the fan is too low.
+	                 The variable in the binding list is the current rpm of the fan."
+	::= 6
+		
+	fanRpmNormal	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchFanRpmIndex,
+                        accessSwitchFanRpmCurValue,
+                        accessSwitchSystemCurrentStatus
+                        }
+	DESCRIPTION	"Send a message to the manager that the low-rpm condition of the fan is over.
+	                 The variable in the binding list is the current rpm of the fan."
+	::= 7
+
+	voltageOutOfRange	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchVoltageIndex,
+                        accessSwitchVoltageCurValue,
+                        accessSwitchSystemCurrentStatus
+                        }
+	DESCRIPTION	"Send a message to the manager that the voltage of the system is out of range.
+	                 The variable in the binding list is the current voltage in volt 
+	                 of the system."
+	::= 8
+		
+	voltageNormal	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchVoltageIndex,
+                        accessSwitchVoltageCurValue,
+                        accessSwitchSystemCurrentStatus
+                        }
+	DESCRIPTION	"Send a message to the manager that the low-voltage condition is over.
+	                 The variable in the binding list is the current voltage in volt 
+	                 of the system."
+	::= 9
+	
+	systemMaintenanceFailure	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that the system maintence operation
+	                 fail. The variable in the variable binding indicates the problem."
+	::= 10	
+	
+	configChange	TRAP-TYPE
+	ENTERPRISE	accessSwitch
+        VARIABLES       { 
+                        accessSwitchProblemCause
+                        }
+	DESCRIPTION	"Send a message to the manager that the system configuration 
+			data is changed."
+	::= 11	
+	
+      	thermalSensorFailure TRAP-TYPE
+	ENTERPRISE	accessSwitch
+	VARIABLES	{
+      			accessSwitchProblemCause	
+      			}
+      	DESCRIPTION	"The trap signifies that the thermal sensor failed."
+      	::= 12		
+
+END 	

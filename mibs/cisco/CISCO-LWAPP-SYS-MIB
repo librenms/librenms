@@ -1,0 +1,2149 @@
+-- *******************************************************************
+-- CISCO-LWAPP-SYS-MIB.my
+-- March 2007, Devesh Pujari, Srinath Candadai
+-- Feb 2011, Suja Thangaveluchamy
+--   
+-- Copyright (c) 2007-2012 by Cisco Systems Inc.
+-- All rights reserved.
+-- *******************************************************************
+
+CISCO-LWAPP-SYS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    Counter32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    RowStatus,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InetAddressType,
+    InetAddress,
+    InetPortNumber
+        FROM INET-ADDRESS-MIB
+    cldcClientAccessVLAN,
+    cldcClientMacAddress
+        FROM CISCO-LWAPP-DOT11-CLIENT-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+-- *******************************************************************
+-- *  MODULE IDENTITY
+-- *******************************************************************
+
+ciscoLwappSysMIB MODULE-IDENTITY
+    LAST-UPDATED    "201208060000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems,
+            Customer Service
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553-NETS
+
+            Email: cs-wnbu-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB is intended to be implemented on all those
+        devices operating as Central controllers, that
+        terminate the Light Weight Access Point Protocol
+        tunnel from Cisco Light-weight LWAPP Access Points.
+
+        This MIB provides global configuration and status 
+        information for the controller. All general system 
+        related information is presented in this MIB.
+
+        The relationship between CC and the LWAPP APs
+        can be depicted as follows:
+
+              +......+     +......+     +......+
+              +      +     +      +     +      +
+              +  CC  +     +  CC  +     +  CC  +
+              +      +     +      +     +      +
+              +......+     +......+     +......+
+                ..            .             .
+                ..            .             .
+               .  .            .             .
+              .    .            .             .
+             .      .            .             .
+            .        .            .             .
+        +......+ +......+     +......+      +......+
+        +      + +      +     +      +      +      +
+        +  AP  + +  AP  +     +  AP  +      +  AP  +
+        +      + +      +     +      +      +      +
+        +......+ +......+     +......+      +......+
+                   .              .             .
+                 .  .              .             .
+                .    .              .             .
+               .      .              .             .
+              .        .              .             .
+           +......+ +......+     +......+      +......+
+           +      + +      +     +      +      +      +
+           +  MN  + +  MN  +     +  MN  +      +  MN  +
+           +      + +      +     +      +      +      +
+           +......+ +......+     +......+      +......+
+
+
+        The LWAPP tunnel exists between the controller and
+        the APs.  The MNs communicate with the APs through
+        the protocol defined by the 802.11 standard.
+
+        LWAPP APs, upon bootup, discover and join one of the
+        controllers and the controller pushes the configuration,
+        that includes the WLAN parameters, to the LWAPP APs.
+        The APs then encapsulate all the 802.11 frames from
+        wireless clients inside LWAPP frames and forward
+        the LWAPP frames to the controller.
+
+                           GLOSSARY
+
+        Access Point ( AP )
+
+        An entity that contains an 802.11 medium access
+        control ( MAC ) and physical layer ( PHY ) interface
+        and provides access to the distribution services via
+        the wireless medium for associated clients.  
+
+        LWAPP APs encapsulate all the 802.11 frames in
+        LWAPP frames and sends them to the controller to which
+        it is logically connected.
+
+        Light Weight Access Point Protocol ( LWAPP )
+
+        This is a generic protocol that defines the 
+        communication between the Access Points and the
+        Central Controller. 
+
+        Mobile Node ( MN )
+
+        A roaming 802.11 wireless device in a wireless
+        network associated with an access point. Mobile Node 
+        and client are used interchangeably. 
+
+        Extensible Authentication Protocol ( EAP )
+
+        EAP is a universal authentication protocol used in
+        wireless and PPP networks. It is defined by RFC 3748.
+
+        EAP-Flexible Authentication ( EAP-FAST )
+
+        This protocol is used via secure tunneling for 802.1X EAP.
+
+        PAC
+
+        PAC (Protected Access Credential) is a meachanism for 
+        mutual authentication in EAP-FAST.
+
+
+        REFERENCE
+
+        [1] Wireless LAN Medium Access Control ( MAC ) and
+            Physical Layer ( PHY ) Specifications.
+
+        [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
+            Weight Access Point Protocol.
+
+        [3] IEEE 802.1X - Authentication for Wireless and 
+            Wired Connections."
+    REVISION        "201208060000Z"
+    DESCRIPTION
+        "Added ciscoLwappSysConfigGroupSup1,
+        ciscoLwappSysMldConfigGroup, ciscoLwappSysConfigStatsGroup,
+        ciscoLwappSysAlarmObjectGroup, ciscoLwappSysThresholdGroup,
+        ciscoLwappSysHeartBeatGroup and ciscoLwappSysInfoGroup.
+        Deprecated ciscoLwappSysMIBComplianceRev2 and added 
+        ciscoLwappSysMIBComplianceRev3"
+    REVISION        "201206180000Z"
+    DESCRIPTION
+        "Added ciscoLwappSysPortConfigGroup,
+        ciscoLwappSysSecurityConfigGroup, ciscoLwappSysIgmpConfigGroup,
+        ciscoLwappSysSecNotifObjsGroup, ciscoLwappSysNotifsGroup and 
+        ciscoLwappSysNotifControlGroup.
+        Deprecated ciscoLwappSysMIBComplianceRev1 and added 
+        ciscoLwappSysMIBComplianceRev2"
+    REVISION        "201002090000Z"
+    DESCRIPTION
+        "Updated clsTransferConfigGroup, ciscoLwappSysConfigGroupSup1.
+        Deprecate ciscoLwappSysMIBCompliance.
+        Added clsTransferConfig, clsSysArpProxyEnabled."
+    REVISION        "200703140000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 618 }
+
+
+ciscoLwappSysMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIB 0 }
+
+ciscoLwappSysMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIB 1 }
+
+ciscoLwappSysMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIB 2 }
+
+-- This is reserved for objects in CISCO-LWAPP-LBS-MIB
+-- ciscoLwappLbsMIB  OBJECT IDENTIFIER ::= { ciscoLwappSysMIB 3 }
+
+clsConfig  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 1 }
+
+clsStatus  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 2 }
+
+clsImageInfo  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 3 }
+
+clsCpuInfo  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 4 }
+
+clsSecurityGroup  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 5 }
+
+ciscoLwappSysMIBNotifObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 6 }
+
+ciscoLwappSysMIBNotifControlObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 7 }
+
+clsSysInfo  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBObjects 8 }
+
+
+clsDot3BridgeEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether 803.2 bridging
+        mode is enabled or disabled on the controller.
+        A value of 'true' specifies that the bridging 
+        mode is enabled. A value of 'false' specifies 
+        that the bridging mode is disabled." 
+    ::= { clsConfig 1 }
+clsConfigDownload  OBJECT IDENTIFIER
+    ::= { clsConfig 2 }
+
+clsConfigUpload  OBJECT IDENTIFIER
+    ::= { clsConfig 3 }
+
+
+clsDownloadFileType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        code(2),
+                        config(3),
+                        webAuthCert(4),
+                        webAdminCert(5),
+                        signatures(6),
+                        customWebAuth(7),
+                        vendorDeviceCert(8),
+                        vendorCaCert(9)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the file types that
+        can be downloaded to the controller.
+        The file types for download are:
+          unknown          -   Unknown file type
+          code             -   Code file
+          config           -   Configuration file
+          webAuthCert      -   Web authentication certificates 
+          webAdminCert     -   Web administrative certificates
+          signatures       -   Signature file
+          customWebAuth    -   Custom web authentication 
+                               tar file
+          vendorDeviceCert -   Vendor device certificates
+          vendorCaCert     -   Vendor certificate authority 
+                               certificates" 
+    ::= { clsConfigDownload 1 }
+
+clsDownloadCertificateKey OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..255))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the key used
+        to encrypt the EAP certificate, specified
+        by IEEE 802.1X standard, during upload from 
+        the controller and for decrypting the file 
+        after its downloaded to the controller. 
+        This object is relevant only when 
+        clsDownloadFileType is  'vendorDeviceCert'. 
+        For all other values of clsDownloadFileType 
+        object this will return an empty string." 
+    ::= { clsConfigDownload 2 }
+
+clsUploadFileType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        config(2),
+                        errorLog(3),
+                        systemTrace(4),
+                        trapLog(5),
+                        crashFile(6),
+                        signatures(7),
+                        pac(8),
+                        radioCoreDump(9),
+                        invalidConfig(10),
+                        debugfile(11),
+                        pktCapture(12),
+                        watchdogCrash(13),
+                        panicCrash(14),
+                        vendorDevCert(15),
+                        vendorCaCert(16),
+                        webAdminCert(17),
+                        webAuthCert(18)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the file types that
+        can be uploaded to the controller.
+        The file types for upload are:
+          unknown     -   Unknown file
+          config      -   Configuration file
+          errorLog    -   Error log
+          systemTrace -   System trace
+          trapLog     -   Trap log
+          crashFile   -   Crash file
+          signatures  -   Signature file
+          pac         -   PAC file
+          radioCoreDump -   AP's Radio core dump file
+          invalidConfig - Upload the file which contains the 
+                          invalid configuration commands feeded
+                          by the downloaded Config file.
+          debugfile     -   Debug file.
+          pktCapture    - Packet Capture File
+          watchdogCrash - Watchdog Crash Information File
+          panicCrash    - Panic Crash Information File.
+          vendorDevCert - EAP ca certificate.
+          vendorCaCert  - EAP dev certificate.
+          webAdminCert  - Web Admin  certificate.
+          webAuthCert   - Web Auth certificate." 
+    ::= { clsConfigUpload 1 }
+
+clsUploadPacUsername OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..63))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the upload user name
+        for protected access credential (PAC). This 
+        object needs to be set before setting 
+        clsUploadFileType to 'pac'.  For all other 
+        values of clsUploadFileType this will return 
+        an empty string." 
+    ::= { clsConfigUpload 2 }
+
+clsUploadPacPassword OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the upload password for
+        protected access credential (PAC). This object 
+        needs to be set before setting clsUploadFileType 
+        to 'pac'. For all other values of 
+        clsUploadFileType this will return an empty 
+        string." 
+    ::= { clsConfigUpload 3 }
+
+clsUploadPacValidity OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    UNITS           "days"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the upload validity in
+        days for protected access credential (PAC). 
+        This object is relevant only when 
+        clsUploadFileType is set to 'pac'. 
+        For all other values of clsUploadFileType 
+        this will return an empty string." 
+    ::= { clsConfigUpload 4 }
+clsTransferConfigGroup  OBJECT IDENTIFIER
+    ::= { clsConfig 4 }
+
+
+clsTransferConfigFileEncryption OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        disable(1),
+                        enable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The configuration file can be encrypted before
+        upload from the controller and then decrypted
+        before downloading to the controller when this
+        option is enabled.
+        This is applicable only when clsDownloadFileType, 
+        clsUploadFileType is set to Config." 
+    ::= { clsTransferConfigGroup 1 }
+
+clsTransferConfigFileEncryptionKey OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..16))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This is the key to be used when encrypting the
+        configuration file while upload from the controller
+        or while decrypting the file after download to
+        the controller.
+        This is applicable only when clsDownloadFileType, 
+        clsUploadFileType is set to Config." 
+    ::= { clsTransferConfigGroup 2 }
+clsTransferConfig  OBJECT IDENTIFIER
+    ::= { clsConfig 8 }
+
+
+clsTransferConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ClsTransferConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table is used to configure the server details
+        which will be used
+        by the controller to upload/download files."
+    ::= { clsTransferConfig 1 }
+
+clsTransferConfigEntry OBJECT-TYPE
+    SYNTAX          ClsTransferConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table provides information about
+        the server to which the controller will 
+                upload/download files."
+    INDEX           {
+                        clsTransferType,
+                        clsTransferMode
+                    } 
+    ::= { clsTransferConfigTable 1 }
+
+ClsTransferConfigEntry ::= SEQUENCE {
+        clsTransferType              INTEGER,
+        clsTransferMode              INTEGER,
+        clsTransferServerAddressType InetAddressType,
+        clsTransferServerAddress     InetAddress,
+        clsTransferPath              SnmpAdminString,
+        clsTransferFilename          SnmpAdminString,
+        clsTransferFtpUsername       SnmpAdminString,
+        clsTransferFtpPassword       SnmpAdminString,
+        clsTransferFtpPortNum        InetPortNumber,
+        clsTransferTftpMaxRetries    Unsigned32,
+        clsTransferTftpTimeout       Unsigned32,
+        clsTransferStart             INTEGER,
+        clsTransferStatus            INTEGER,
+        clsTransferStatusString      SnmpAdminString
+}
+
+clsTransferType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        download(1),
+                        upload(2)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Transfer type configures the type of operation
+        with the server by the controller. The mode is
+        either Upload or Download." 
+    ::= { clsTransferConfigEntry 1 }
+
+clsTransferMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        tftp(1),
+                        ftp(2),
+                        sftp(3)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Transfer mode configures the mode of transfer used
+        by the controller with the server. The mode is
+        either TFTP or FTP/SFTP." 
+    ::= { clsTransferConfigEntry 2 }
+
+clsTransferServerAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the address type of
+        the Server to which the controller will transfer the file." 
+    ::= { clsTransferConfigEntry 3 }
+
+clsTransferServerAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the address of the Server to
+        which the controller will transfer the file." 
+    ::= { clsTransferConfigEntry 4 }
+
+clsTransferPath OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Transfer path configures the directory
+        path for file transfer. The controller 
+        remembers the last file path used." 
+    ::= { clsTransferConfigEntry 5 }
+
+clsTransferFilename OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Transfer filename configures the file name for the
+        file being transferred from the controller. 
+                The controller remembers the last file
+        name used. An example would be File Path
+        set to c:\tftp\code\ and File Name set to
+        e1r1v1.opr." 
+    ::= { clsTransferConfigEntry 6 }
+
+clsTransferFtpUsername OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..31))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to store the FTP username for
+        transferring file on the server.
+        This is valid only for FTP transfer mode." 
+    ::= { clsTransferConfigEntry 7 }
+
+clsTransferFtpPassword OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..31))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to store the FTP password for
+        transferring file on the server.
+        This is valid only for FTP transfer mode." 
+    ::= { clsTransferConfigEntry 8 }
+
+clsTransferFtpPortNum OBJECT-TYPE
+    SYNTAX          InetPortNumber
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to store the port number to be used
+        by the FTP protocol while connecting to the server.
+        This is valid only for FTP transfer mode."
+    DEFVAL          { 21 } 
+    ::= { clsTransferConfigEntry 9 }
+
+clsTransferTftpMaxRetries OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..254)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Maximum number of retries to be allowed for a
+        TFTP message packet.
+        This is valid only for TFTP transfer mode."
+    DEFVAL          { 10 } 
+    ::= { clsTransferConfigEntry 10 }
+
+clsTransferTftpTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..254)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Timeout in seconds for a TFTP message packet.
+        This is valid only for TFTP transfer mode."
+    DEFVAL          { 6 } 
+    ::= { clsTransferConfigEntry 11 }
+
+clsTransferStart OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        initiate(2),
+                        initiatePeer(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Transfer start will start the file transfer operation
+        on Active when it is set to initiate(2), it will
+                return none(1) for GET. Transfer start will start 
+                the file transfer operation on Standby when it
+                is set to initiatePeer(3)," 
+    ::= { clsTransferConfigEntry 12 }
+
+clsTransferStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        notInitiated(1),
+                        transferStarting(2),
+                        errorStarting(3),
+                        wrongFileType(4),
+                        updatingConfig(5),
+                        invalidConfigFile(6),
+                        writingToFlash(7),
+                        failureWritingToFlash(8),
+                        checkingCRC(9),
+                        failedCRC(10),
+                        unknownDirection(11),
+                        transferSuccessful(12),
+                        transferFailed(13),
+                        bootBreakOff(14),
+                        invalidTarFile(15),
+                        unknown(99)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the current status of a transfer.
+
+        Following are valid only when clsTransferType 
+        is 'download' :-
+        bootBreakOff(14), invalidTarFile(15)." 
+    ::= { clsTransferConfigEntry 13 }
+
+clsTransferStatusString OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates in string format about the current
+        status of a transfer." 
+    ::= { clsTransferConfigEntry 14 }
+ 
+
+clsConfigGeneral  OBJECT IDENTIFIER
+    ::= { clsConfig 5 }
+
+
+clsTimeZone OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object timezone for the controller.
+        Enter the timezone location index. 
+               1. (GMT-12:00) International Date Line West
+               2. (GMT-11:00) Samoa
+               3. (GMT-10:00) Hawaii
+               4. (GMT -9:00) Alaska
+               5. (GMT -8:00) Pacific Time (US and Canada)
+               6. (GMT -7:00) Mountain Time (US and Canada)
+               7. (GMT -6:00) Central Time (US and Canada)
+               8. (GMT -5:00) Eastern Time (US and Canada)
+               9. (GMT -4:00) Altantic Time (Canada)
+              10. (GMT -3:00) Buenos Aires (Agentina)
+              11. (GMT -2:00) Mid-Atlantic 
+              12. (GMT -1:00) Azores 
+              13. (GMT) London, Lisbon, Dublin, Edinburgh 
+              14. (GMT +1:00) Amsterdam, Berlin, Rome, Vienna 
+              15. (GMT +2:00) Jerusalem 
+              16. (GMT +3:00) Baghdad 
+              17. (GMT +4:00) Muscat, Abu Dhabi 
+              18. (GMT +4:30) Kabul 
+              19. (GMT +5:00) Karachi, Islamabad, Tashkent 
+              20. (GMT +5:30) Colombo, Kolkata, Mumbai, New Delhi 
+              21. (GMT +5:45) Katmandu 
+              22. (GMT +6:00) Almaty, Novosibirsk 
+              23. (GMT +6:30) Rangoon 
+              24. (GMT +7:00) Saigon, Hanoi, Bangkok, Jakatar
+              25. (GMT +8:00) HongKong, Bejing, Chongquing 
+              26. (GMT +9:00) Tokyo, Osaka, Sapporo 
+              27. (GMT +9:30) Darwin 
+              28. (GMT+10:00) Sydney, Melbourne, Canberra 
+              29. (GMT+11:00) Magadan, Solomon Is., New Caledonia
+              30. (GMT+12:00) Kamchatka, Marshall Is., Fiji" 
+    ::= { clsConfigGeneral 1 }
+
+clsTimeZoneDescription OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the timezone description
+        for the controller." 
+    ::= { clsConfigGeneral 2 }
+
+clsMaxClientsTrapThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the threshold number
+        of clients on the controller to trigger a trap.
+        The trap ciscoLwappMaxClientsReached
+        will be triggered once the count of clients
+        on the controller  reaches this limit and the
+        clsMaxClientsTrapEnabled is enabled." 
+    ::= { clsConfigGeneral 3 }
+
+clsMaxRFIDTagsTrapThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the threshold number
+        of RFID tags on the controller to trigger a trap.
+        The trap ciscoLwappMaxRFIDTagsReached
+        will be triggered once the count of RFID tags 
+        on the controller reaches this limit and the  
+        clsMaxRFIDTagsTrapEnabled is enabled." 
+    ::= { clsConfigGeneral 4 }
+clsSyslogIpConfig  OBJECT IDENTIFIER
+    ::= { clsConfig 6 }
+
+
+cLSysLogConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLSysLogConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table is used to configure multiple syslog servers
+        to which the the syslog messages will be sent to by the
+        controller."
+    ::= { clsSyslogIpConfig 1 }
+
+cLSysLogConfigEntry OBJECT-TYPE
+    SYNTAX          CLSysLogConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table provides information about
+        the host to which the syslog messages will be sent to."
+    INDEX           { cLSysLogServerIndex } 
+    ::= { cLSysLogConfigTable 1 }
+
+CLSysLogConfigEntry ::= SEQUENCE {
+        cLSysLogServerIndex   Unsigned32,
+        cLSysLogAddressType   InetAddressType,
+        cLSysLogAddress       InetAddress,
+        cLSysLogHostRowStatus RowStatus
+}
+
+cLSysLogServerIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents the index of the host to
+        which syslog messages will be sent." 
+    ::= { cLSysLogConfigEntry 1 }
+
+cLSysLogAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the address type of
+        the host to which syslog messages will be sent.
+        'dns' is used when the hostname of the server
+        is configured." 
+    ::= { cLSysLogConfigEntry 2 }
+
+cLSysLogAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the ipaddress or hostname
+        of the host to which syslog messages will be sent." 
+    ::= { cLSysLogConfigEntry 3 }
+
+cLSysLogHostRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is the status column for this row and is used
+        to create and delete specific instances of rows in
+        this table." 
+    ::= { cLSysLogConfigEntry 4 }
+ 
+
+
+cLSysArpUnicastEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether ARP unicast
+        is enabled or disabled on the controller.
+        A value of 'true' specifies that the ARP 
+        unicast is enabled. A value of 'false' specifies 
+        that the ARP unicast is disabled." 
+    ::= { clsConfig 7 }
+
+cLSysBroadcastForwardingEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether broadcast forwarding
+        is enabled or disabled on the controller.
+        A value of 'true' specifies that the broadcast
+        forwarding is enabled. A value of 'false' specifies
+        that the broadcast forwarding  is disabled." 
+    ::= { clsConfig 9 }
+
+cLSysLagModeEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether Link Aggregation(LAG)
+        mode is enabled or disabled on the controller.
+        A value of 'true' specifies that the LAG mode
+        is enabled. A value of 'false' specifies
+        that the LAG mode is disabled on the controller." 
+    ::= { clsConfig 10 }
+
+clsConfigProductBranchVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This string contains the branch name of the specific
+        controller branch. For Mesh branches, this string has
+        the value M(Mesh). Zero length string is returned if
+        there is no branch name. This string is append to the
+        product version for display purposes.  For example,
+        if the mesh product version is 4.1.191.10, a manager
+        application may display the version string as
+        4.1.191.10M (Mesh)" 
+    ::= { clsConfig 11 }
+
+clsConfigDhcpProxyEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents whether the DHCP proxy option is
+        enabled or disabled.
+        A value of 'true' specifies that the proxy option is enabled
+        on the controller.
+        A value of 'false' specifies that the proxy option 
+        is disabled on the controller."
+    DEFVAL          { false } 
+    ::= { clsConfig 12 }
+cLSysMulticastIGMP  OBJECT IDENTIFIER
+    ::= { clsConfig 13 }
+
+
+cLSysMulticastIGMPSnoopingEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether Multicast IGMP
+        Snooping is enabled or disabled on the controller.
+        A value of 'true' specifies that 
+        the Multicast IGMP Snooping is enabled. To enable this, 
+        agentNetworkMulticastMode/clsConfigMulticastEnabled must
+        not be in disabled state.  A value of 'false' 
+        specifies that the Multicast IGMP Snooping is 
+        disabled on the controller."
+    DEFVAL          { false } 
+    ::= { cLSysMulticastIGMP 1 }
+
+cLSysMulticastIGMPSnoopingTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IGMP timeout, in seconds.
+        To set this value, cLSysMulticastIGMPSnoopingEnabled
+        must be set to True.  When the timeout expires, 
+        the controller sends a query on all WLANs, causing 
+        all clients that are listening to a multicast group 
+        to send a packet back to the controller." 
+    ::= { cLSysMulticastIGMP 2 }
+
+cLSysMulticastIGMPQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IGMP query interval, in seconds.
+        To set this value, cLSysMulticastIGMPSnoopingEnabled must
+        be set to True." 
+    ::= { cLSysMulticastIGMP 3 }
+-- ******************************************************************
+-- clsPortModeConfigTable
+--   
+-- ******************************************************************
+
+cLSPortModeConfig  OBJECT IDENTIFIER
+    ::= { clsConfig 14 }
+
+
+clsPortModeConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ClsPortModeConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the entries for physical
+        port related parameters"
+    ::= { cLSPortModeConfig 1 }
+
+clsPortModeConfigEntry OBJECT-TYPE
+    SYNTAX          ClsPortModeConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry contains the Switch's physical
+        port phyical mode related attribues"
+    INDEX           { clsPortDot1dBasePort } 
+    ::= { clsPortModeConfigTable 1 }
+
+ClsPortModeConfigEntry ::= SEQUENCE {
+        clsPortDot1dBasePort      Unsigned32,
+        clsPortModePhysicalMode   INTEGER,
+        clsPortModePhysicalStatus INTEGER,
+        clsPortModeSfpType        SnmpAdminString,
+        clsPortUpDownCount        Counter32
+}
+
+clsPortDot1dBasePort OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object is a unique unsigned integer value which identifies
+        the base port number." 
+    ::= { clsPortModeConfigEntry 1 }
+
+clsPortModePhysicalMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        autoNegotiate(1),
+                        half10(2),
+                        full10(3),
+                        half100(4),
+                        full100(5),
+                        full1000sx(6),
+                        half1000(7),
+                        full1000(8),
+                        half10000(9),
+                        full10000(10)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The switch's Port Speed Mode.  This is the
+        configured physical mode." 
+    ::= { clsPortModeConfigEntry 2 }
+
+clsPortModePhysicalStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        autonegotiate(2),
+                        half10(3),
+                        full10(4),
+                        half100(5),
+                        full100(6),
+                        full1000sx(7),
+                        half1000(8),
+                        full1000(9),
+                        half10000(10),
+                        full10000(11)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The switch's Port Physical Speed Status.This
+        is the current actual speed." 
+    ::= { clsPortModeConfigEntry 3 }
+
+clsPortModeSfpType OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the SFP's type
+        of the port." 
+    ::= { clsPortModeConfigEntry 4 }
+
+clsPortUpDownCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the total number
+        of up/down count of the port. Every time 
+        the value of ifOperStatus is changed,
+        this MIB should be incremented." 
+    ::= { clsPortModeConfigEntry 5 }
+ 
+
+clsCoreDump  OBJECT IDENTIFIER
+    ::= { clsConfig 15 }
+
+
+clsCoreDumpTransferEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the core dump
+        file transfer is enabled or disabled. If the 
+                value is True the core-dump feature is Enabled 
+        otherwise Disabled."
+    DEFVAL          { false } 
+    ::= { clsCoreDump 1 }
+
+clsCoreDumpTransferMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        ftp(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This Object specifies the Core Dump Transfer Mode.
+        If the value is FTP then only FTP attributes 
+        clsCoreDumpServerIPAddress, clsCoreDumpFileName, 
+        clsCoreDumpUserName, clsCoreDumpPassword can be set,
+        unknown value is not SETable." 
+    ::= { clsCoreDump 2 }
+
+clsCoreDumpServerIPAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This Object Id Specifies the IP Address Type of Server." 
+    ::= { clsCoreDump 3 }
+
+clsCoreDumpServerIPAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IP Address of the Server
+        where the core-dump will be uploaded." 
+    ::= { clsCoreDump 4 }
+
+clsCoreDumpFileName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the File Name of the core-dump by
+        which you want to save it on the
+        Server." 
+    ::= { clsCoreDump 5 }
+
+clsCoreDumpUserName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Login Name at the FTP server." 
+    ::= { clsCoreDump 6 }
+
+clsCoreDumpPassword OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Login Password of the FTP server." 
+    ::= { clsCoreDump 7 }
+
+clsConfigMulticastEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents whether global multicast  is
+        enabled or disabled.
+        A value of 'true' specifies that the multicast option 
+        is enabled on the controller.
+        A value of 'false' specifies that the multicast option
+        is disabled on the controller."
+    DEFVAL          { false } 
+    ::= { clsConfig 16 }
+cLSysMulticastMLD  OBJECT IDENTIFIER
+    ::= { clsConfig 17 }
+
+
+cLSysMulticastMLDSnoopingEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether Multicast MLD Snooping
+        is enabled or disabled on the controller. A value of 
+        'true' specifies that the Multicast MLD Snooping is 
+        enabled. To enable this, agentNetworkMulticastMode/
+        clsConfigMulticastEnabled must not be
+        in disabled state.  A value of 'false' specifies 
+        that the Multicast MLD Snooping is disabled 
+        on the controller."
+    DEFVAL          { false } 
+    ::= { cLSysMulticastMLD 1 }
+
+cLSysMulticastMLDSnoopingTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the MLD timeout, in seconds.
+        To set this value, cLSysMulticastMLDSnoopingEnabled
+                must be set to True. When the timeout expires, 
+                the controller sends a query on all WLANs, causing all 
+                clients that are listening to a multicast group
+        to send a packet back to the controller." 
+    ::= { cLSysMulticastMLD 2 }
+
+cLSysMulticastMLDQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the MLD query interval, in seconds.
+        To set this value, cLSysMulticastMLDSnoopingEnabled 
+                must be set to True." 
+    ::= { cLSysMulticastMLD 3 }
+-- stats-timer config.
+
+clsConfigStats  OBJECT IDENTIFIER
+    ::= { clsConfig 18 }
+
+
+-- ********************************************************************
+-- *     System Realtime Stats Timer Interval
+-- ********************************************************************
+
+clsSysRealtimeStatsTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (2..5)
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the realtime stats interval
+        of the system. There are 2 stats modes: realtime and 
+        normal. realtime interval is much less than normal mode."
+    DEFVAL          { 5 } 
+    ::= { clsConfigStats 1 }
+
+-- ********************************************************************
+-- *     System Normal Stats Timer Interval
+-- ********************************************************************
+
+clsSysNormalStatsTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (10..180)
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the normal stats interval
+        of the system. There are 2 stats modes: realtime 
+        and normal. realtime interval is much less than 
+        normal mode."
+    DEFVAL          { 180 } 
+    ::= { clsConfigStats 2 }
+
+-- ********************************************************************
+-- *     System Sampling Statistics Interval
+-- ********************************************************************
+
+clsSysStatsSamplingInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the sampling interval of the system,
+        which is applied to WLC and APs connected to this WLC.
+        WLC and APs poll specific data every sampling interval." 
+    ::= { clsConfigStats 3 }
+
+-- ********************************************************************
+-- *     System Average Statistics Interval
+-- ********************************************************************
+
+clsSysStatsAverageInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the average statistics interval of
+        the system, which is applied to WLC and APs connected to 
+        this WLC. This interval works as a time window for 
+        calculating the average value of the data polled by WLC/AP 
+        every sampling interval." 
+    ::= { clsConfigStats 4 }
+-- Alarm service config.
+
+clsAlarmObjects  OBJECT IDENTIFIER
+    ::= { clsConfig 19 }
+
+
+-- ********************************************************************
+-- *     Alarm Hold Time
+-- ********************************************************************
+
+clsAlarmHoldTime OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..3600)
+    UNITS           "second"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the time in seconds for which
+        an alarm object should be soaked when its on/off
+        state is changed."
+    DEFVAL          { 6 } 
+    ::= { clsAlarmObjects 1 }
+
+-- ********************************************************************
+-- *     Alarm Retransmit Interval
+-- ********************************************************************
+
+clsAlarmTrapRetransmitInterval OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    UNITS           "second"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the interval in seconds in
+        which alarm traps, if any, are retransmitted.
+        Setting this value to 0 means no retransmission."
+    DEFVAL          { 0 } 
+    ::= { clsAlarmObjects 2 }
+-- System-wide thresholds config.
+
+clsSysThresholdConfig  OBJECT IDENTIFIER
+    ::= { clsConfig 20 }
+
+
+-- ********************************************************************
+-- *     Controller CPU usage threshold
+-- ********************************************************************
+
+clsSysControllerCpuUsageThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the CPU usage threshold on a
+        controller.
+        Setting this value to 0 means no threshold."
+    DEFVAL          { 0 } 
+    ::= { clsSysThresholdConfig 1 }
+
+-- ********************************************************************
+-- *     Controller memory usage threshold
+-- ********************************************************************
+
+clsSysControllerMemoryUsageThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the memory usage threshold on a
+        controller.
+        Setting this value to 0 means no threshold."
+    DEFVAL          { 0 } 
+    ::= { clsSysThresholdConfig 2 }
+
+-- ********************************************************************
+-- *     AP CPU usage threshold
+-- ********************************************************************
+
+clsSysApCpuUsageThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the CPU usage threshold on a
+        AP.
+        Setting this value to 0 means no threshold."
+    DEFVAL          { 0 } 
+    ::= { clsSysThresholdConfig 3 }
+
+-- ********************************************************************
+-- *     AP memory usage threshold
+-- ********************************************************************
+
+clsSysApMemoryUsageThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the memory usage threshold on a
+        AP.
+        Setting this value to 0 means no threshold."
+    DEFVAL          { 0 } 
+    ::= { clsSysThresholdConfig 4 }
+clsNMHeartBeat  OBJECT IDENTIFIER
+    ::= { clsConfig 21 }
+
+
+clsNMHeartBeatEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether heart beat trap to network
+        manager is enabled or disabled. If the value is True the
+        Network Manager Heart Beat feature is Enabled otherwise
+        Disabled."
+    DEFVAL          { false } 
+    ::= { clsNMHeartBeat 1 }
+
+clsNMHeartBeatInterval OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    UNITS           "Seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the interval in seconds in heart beat
+        traps to network manager."
+    DEFVAL          { 180 } 
+    ::= { clsNMHeartBeat 2 }
+
+clsCrashSystem OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object resets the switch with a crash.
+        If a value of of 'true' is set, the swicth would crash. 
+        GET on this object would return 'false'." 
+    ::= { clsConfig 99 }
+
+-- ********************************************************************
+-- *    Status Objects
+-- ********************************************************************
+
+cLSysLagModeInTransition OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the LAG mode is
+        in transition on the controller.
+        A value of 'true' specifies that the LAG mode
+        is in transition and the controller has to be rebooted 
+        to take effect.A value of 'false' specifies
+        that the LAG mode is not in transition." 
+    ::= { clsStatus 1 }
+
+-- ********************************************************************
+-- *    Emergency Image Version
+-- ********************************************************************
+
+clsEmergencyImageVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Cisco recommends installing Cisco Unified Wireless Network
+        Controller Boot Software , (*_ER.aes , where star denotes
+        the version of the controller image ) on all controller
+        platforms. If this ER.aes is not installed, the controller
+        would not be able to show the Emergency Image Version
+        correctly(or Field Recovery Image Version), and would be shown
+        as 'N/A'. The ER.aes files are independent from the controller
+        software files. Any controller software file can be run 
+        with any ER.aes file. However, installing the latest boot 
+        software file (*_ER.aes , where star denotes the controller 
+        version) ensures that the boot software modifications in 
+        all of the previous and current 
+        boot software ER.aes files are installed." 
+    ::= { clsImageInfo 1 }
+
+-- ********************************************************************
+-- Security oids
+-- ********************************************************************
+
+clsSecStrongPwdCaseCheck OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable/disable the case check for the
+        passwords configured in controller.
+        When enabled, the new password must contain characters from 
+        at least three of the following classes : lowercase letters, 
+        uppercase letters, digits and special characters." 
+    ::= { clsSecurityGroup 1 }
+
+clsSecStrongPwdConsecutiveCheck OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable/disable the consecutive
+        check for the passwords configured in controller.
+        When enabled, the password provided should not have 
+        a character repeated more than thrice consecutively." 
+    ::= { clsSecurityGroup 2 }
+
+clsSecStrongPwdDefaultCheck OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable/disable the default check
+        for the passwords configured in controller.
+        When enabled, the new password must not be 'cisco', 
+        'ocsic', 'admin', 'nimda' or any variant obtained by 
+        changing the capitalization of letters therein, 
+        or by substituting '1' '|' or '!' for i, and/or 
+        substituting '0' for 'o', 
+        and/or substituting '$' for 's'" 
+    ::= { clsSecurityGroup 3 }
+
+clsSecStrongPwdAsUserNameCheck OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable/disable the username check
+        for the password configured in controller.
+        When enabled the new password must not be same as 
+        the associated username or the reversed username." 
+    ::= { clsSecurityGroup 4 }
+
+-- ********************************************************************
+-- *     System Flash Size
+-- ********************************************************************
+
+clsSysFlashSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the total flash memory size in Kbytes." 
+    ::= { clsSysInfo 1 }
+
+-- ********************************************************************
+-- *     System Memory Type
+-- ********************************************************************
+
+clsSysMemoryType OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the system memory type." 
+    ::= { clsSysInfo 2 }
+
+-- ********************************************************************
+-- *     System Supported MAX Clients
+-- ********************************************************************
+
+clsSysMaxClients OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies max associated clients
+        supported per WLC" 
+    ::= { clsSysInfo 3 }
+
+-- ********************************************************************
+-- *    Number of connected AP's
+-- ********************************************************************
+
+clsSysApConnectCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the count of AP's that are
+        connected with WLC" 
+    ::= { clsSysInfo 4 }
+
+clsSysNetId OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the SysNetId which is the
+        numeric string to identify the system information 
+        like SysName" 
+    ::= { clsSysInfo 5 }
+
+-- ********************************************************************
+-- *     WLC System Current Memory Usage
+-- ********************************************************************
+
+clsSysCurrentMemoryUsage OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the current percent usage
+        of system memory. This MIB should be updated 
+        every clsSysStatsSamplingInterval." 
+    ::= { clsSysInfo 6 }
+
+-- ********************************************************************
+-- *     WLC System Average Memory Usage
+-- ********************************************************************
+
+clsSysAverageMemoryUsage OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the average percent usage
+        of system memory. The memory average usage should be 
+        the average of memory-Usage during the time window 
+        specified by clsSysStatsAverageInterval." 
+    ::= { clsSysInfo 7 }
+
+-- ********************************************************************
+-- *     WLC System Current CPU Usage
+-- ********************************************************************
+
+clsSysCurrentCpuUsage OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the current percent usage of all CPUs.
+        This MIB should be updated every clsSysStatsSamplingInterval." 
+    ::= { clsSysInfo 8 }
+
+-- ********************************************************************
+-- *     WLC System Average CPU Usage
+-- ********************************************************************
+
+clsSysAverageCpuUsage OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the average percent CPU usage.
+        The average CPU usage should be the average of CPU-Usage
+        during the time window specified by 
+        clsSysStatsAverageInterval." 
+    ::= { clsSysInfo 9 }
+
+-- ********************************************************************
+-- *     System Cpu Type
+-- ********************************************************************
+
+clsSysCpuType OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the cpu type." 
+    ::= { clsSysInfo 10 }
+
+clsMaxRFIDTagsCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the maximum RFID tags present
+        on the controller." 
+    ::= { clsSysInfo 11 }
+
+clsMaxClientsCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the maximum clients present
+        on the controller." 
+    ::= { clsSysInfo 12 }
+
+-- ********************************************************************
+-- *  Notification Control Object
+-- ********************************************************************
+
+clsSecStrongPwdCheckTrapEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the
+        ciscoLwappStrongPwdCheck notification would be generated.
+
+        A value of 'true' indicates that the agent generates
+        ciscoLwappStrongPwdCheck notification.
+
+        A value of 'false' indicates that the agent doesn't
+        generate ciscoLwappStrongPwdCheck notification."
+    DEFVAL          { true } 
+    ::= { ciscoLwappSysMIBNotifControlObjects 1 }
+
+clsMaxClientsTrapEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the
+        ciscoLwappMaxClientsReached notification would be generated.
+
+        A value of 'true' indicates that the agent generates
+        ciscoLwappMaxClientsReached notification.
+
+        A value of 'false' indicates that the agent doesn't
+        generate ciscoLwappMaxClientsReached notification."
+    DEFVAL          { true } 
+    ::= { ciscoLwappSysMIBNotifControlObjects 2 }
+
+clsMaxRFIDTagsTrapEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the
+        ciscoLwappMaxRFIDTagsReached notification would be generated.
+
+        A value of 'true' indicates that the agent generates
+        ciscoLwappMaxRFIDTagsReached notification.
+
+        A value of 'false' indicates that the agent doesn't
+        generate ciscoLwappMaxRFIDTagsReached notification."
+    DEFVAL          { true } 
+    ::= { ciscoLwappSysMIBNotifControlObjects 3 }
+
+-- ********************************************************************
+-- *  Notification Objects
+-- ********************************************************************
+
+clsSecStrongPwdManagementUser OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (1..24))
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the management user who
+        enabled/disabled the strong password checks." 
+    ::= { ciscoLwappSysMIBNotifObjects 1 }
+
+clsSecStrongPwdCheckType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        caseCheck(1),
+                        consecutiveCheck(2),
+                        defaultCheck(3),
+                        usernameCheck(4),
+                        allChecks(5)
+                    }
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the type of the check that was
+        enabled/disabled by the management user." 
+    ::= { ciscoLwappSysMIBNotifObjects 2 }
+
+clsSecStrongPwdCheckOption OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the strong password check
+        was enabled/disabled." 
+    ::= { ciscoLwappSysMIBNotifObjects 3 }
+
+clsSysAlarmSet OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether this system alarm is
+        raise or clear.
+        A value of 'true' indicates this event is set.
+        A value of 'false' indicates this even is cleared." 
+    ::= { ciscoLwappSysMIBNotifObjects 4 }
+
+-- ********************************************************************
+-- *  Notifications
+-- ********************************************************************
+
+ciscoLwappSysInvalidXmlConfig NOTIFICATION-TYPE
+    STATUS          current
+    DESCRIPTION
+        "This  notification will be sent whenever invalid
+        configuration detected by XML"
+   ::= { ciscoLwappSysMIBNotifs 1 }
+
+ciscoLwappNoVlanConfigured NOTIFICATION-TYPE
+    OBJECTS         {
+                        cldcClientAccessVLAN,
+                        cldcClientMacAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This  notification will be sent whenever wired client
+        tries to associate without interface for specified vlan"
+   ::= { ciscoLwappSysMIBNotifs 2 }
+
+ciscoLwappStrongPwdCheck NOTIFICATION-TYPE
+    OBJECTS         {
+                        clsSecStrongPwdManagementUser,
+                        clsSecStrongPwdCheckType,
+                        clsSecStrongPwdCheckOption
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This  notification will be sent whenever the management
+        user enables/disables the strong password rules."
+   ::= { ciscoLwappSysMIBNotifs 3 }
+
+ciscoLwappSysCpuUsageHigh NOTIFICATION-TYPE
+    OBJECTS         {
+                        clsSysCurrentCpuUsage,
+                        clsSysAlarmSet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "When a WLC detects its CPU usage is higher than the
+        threshold configured in clsSysControllerCpuUsageThreshold,
+        this notification is generated with clsSysAlarmSet set 
+        to true. When its CPU usage falls below the threshold
+        lately, this notification is generated with
+        clsSysAlarmSet set to false."
+   ::= { ciscoLwappSysMIBNotifs 4 }
+
+ciscoLwappSysMemoryUsageHigh NOTIFICATION-TYPE
+    OBJECTS         {
+                        clsSysCurrentMemoryUsage,
+                        clsSysAlarmSet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "When a WLC detects its memory usage is higher than the
+        threshold configured in clsSysControllerMemoryUsageThreshold,
+        this notification is generated with clsSysAlarmSet set
+        to true. When its memory usage falls below the threshold
+        lately, this notification is generated with
+        clsSysAlarmSet set to false."
+   ::= { ciscoLwappSysMIBNotifs 5 }
+
+ciscoLwappMaxRFIDTagsReached NOTIFICATION-TYPE
+    OBJECTS         {
+                        clsMaxRFIDTagsTrapThreshold,
+                        clsMaxRFIDTagsCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the number of
+        RFID tags on the controller exceeds the limit defined by
+        clsMaxRFIDTagsTrapThreshold."
+   ::= { ciscoLwappSysMIBNotifs 6 }
+
+ciscoLwappMaxClientsReached NOTIFICATION-TYPE
+    OBJECTS         {
+                        clsMaxClientsTrapThreshold,
+                        clsMaxClientsCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the number of
+        clients on the controller exceeds the limit defined by
+        clsMaxClientsTrapThreshold."
+   ::= { ciscoLwappSysMIBNotifs 7 }
+
+ciscoLwappNMHeartBeat NOTIFICATION-TYPE
+    STATUS          current
+    DESCRIPTION
+        "This  notification will be sent when Network Mamager
+        Heart Beat Enable."
+   ::= { ciscoLwappSysMIBNotifs 8 }
+
+-- ********************************************************************
+-- *    Individual CPU Usage
+-- ********************************************************************
+
+clsAllCpuUsage OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the CPU usage string." 
+    ::= { clsCpuInfo 1 }
+-- ********************************************************************
+
+ciscoLwappSysMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBConform 1 }
+
+ciscoLwappSysMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoLwappSysMIBConform 2 }
+
+
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
+
+ciscoLwappSysMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappSysMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappSysConfigGroup }
+    ::= { ciscoLwappSysMIBCompliances 1 }
+
+ciscoLwappSysMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappSysMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappSysConfigGroup }
+
+    GROUP           ciscoLwappSysConfigFileEncryptionGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support Config
+        Encryption."
+
+    GROUP           ciscoLwappSysTransferOperationConfigGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        configuration of Transfer operation."
+    ::= { ciscoLwappSysMIBCompliances 2 }
+
+ciscoLwappSysMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappSysMIB module. This deprecates
+        ciscoLwappSysMIBComplianceRev1."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappSysConfigGroup,
+                        ciscoLwappSysPortConfigGroup,
+                        ciscoLwappSysSecurityConfigGroup,
+                        ciscoLwappSysIgmpConfigGroup,
+                        ciscoLwappSysSecNotifObjsGroup,
+                        ciscoLwappSysNotifsGroup,
+                        ciscoLwappSysNotifControlGroup,
+                        ciscoLwappSysConfigGroupVer1
+                    }
+
+    GROUP           ciscoLwappSysConfigFileEncryptionGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support Config
+        Encryption."
+
+    GROUP           ciscoLwappSysTransferOperationConfigGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        configuration of Transfer operation."
+    ::= { ciscoLwappSysMIBCompliances 3 }
+
+ciscoLwappSysMIBComplianceRev3 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappSysMIB module. This deprecates
+        ciscoLwappSysMIBComplianceRev2."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappSysConfigGroup,
+                        ciscoLwappSysPortConfigGroup,
+                        ciscoLwappSysSecurityConfigGroup,
+                        ciscoLwappSysIgmpConfigGroup,
+                        ciscoLwappSysSecNotifObjsGroup,
+                        ciscoLwappSysNotifsGroup,
+                        ciscoLwappSysNotifControlGroup,
+                        ciscoLwappSysConfigGroupVer1,
+                        ciscoLwappSysConfigGroupSup1,
+                        ciscoLwappSysMldConfigGroup,
+                        ciscoLwappSysConfigStatsGroup,
+                        ciscoLwappSysAlarmObjectGroup,
+                        ciscoLwappSysThresholdGroup,
+                        ciscoLwappSysHeartBeatGroup,
+                        ciscoLwappSysInfoGroup
+                    }
+
+    GROUP           ciscoLwappSysConfigFileEncryptionGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support Config
+        Encryption."
+
+    GROUP           ciscoLwappSysTransferOperationConfigGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        configuration of Transfer operation."
+    ::= { ciscoLwappSysMIBCompliances 4 }
+
+ciscoLwappSysConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsDot3BridgeEnabled,
+                        clsDownloadFileType,
+                        clsDownloadCertificateKey,
+                        clsUploadFileType,
+                        clsUploadPacUsername,
+                        clsUploadPacPassword,
+                        clsUploadPacValidity,
+                        cLSysBroadcastForwardingEnabled,
+                        clsConfigProductBranchVersion,
+                        clsConfigDhcpProxyEnabled,
+                        clsCrashSystem
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the system wide
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 1 }
+
+ciscoLwappSysConfigFileEncryptionGroup OBJECT-GROUP
+    OBJECTS         { clsTransferConfigFileEncryptionKey }
+    STATUS          current
+    DESCRIPTION
+        "This object represents the System encryption configuration on
+        the controller."
+    ::= { ciscoLwappSysMIBGroups 2 }
+
+ciscoLwappSysTransferOperationConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsTransferServerAddressType,
+                        clsTransferServerAddress,
+                        clsTransferPath,
+                        clsTransferFilename,
+                        clsTransferFtpUsername,
+                        clsTransferFtpPassword,
+                        clsTransferFtpPortNum,
+                        clsTransferTftpMaxRetries,
+                        clsTransferTftpTimeout,
+                        clsTransferStart,
+                        clsTransferStatus,
+                        clsTransferStatusString,
+                        clsTransferConfigFileEncryption
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This object represents the System Transfer operation
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 3 }
+
+ciscoLwappSysPortConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsPortModePhysicalMode,
+                        clsPortModePhysicalStatus,
+                        clsPortModeSfpType,
+                        clsPortUpDownCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the system wide
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 4 }
+
+ciscoLwappSysSecurityConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsSecStrongPwdCaseCheck,
+                        clsSecStrongPwdConsecutiveCheck,
+                        clsSecStrongPwdDefaultCheck,
+                        clsSecStrongPwdAsUserNameCheck
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the system security
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 5 }
+
+ciscoLwappSysIgmpConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cLSysMulticastIGMPSnoopingEnabled,
+                        cLSysMulticastIGMPSnoopingTimeout,
+                        cLSysMulticastIGMPQueryInterval
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the IGMP multicast
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 6 }
+
+ciscoLwappSysSecNotifObjsGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsSecStrongPwdManagementUser,
+                        clsSecStrongPwdCheckType,
+                        clsSecStrongPwdCheckOption,
+                        clsSysAlarmSet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the information carried
+        by the security related notifications sent by the agent to a 
+        network management station."
+    ::= { ciscoLwappSysMIBGroups 7 }
+
+ciscoLwappSysNotifsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoLwappSysInvalidXmlConfig,
+                        ciscoLwappNoVlanConfigured,
+                        ciscoLwappStrongPwdCheck,
+                        ciscoLwappSysCpuUsageHigh,
+                        ciscoLwappSysMemoryUsageHigh,
+                        ciscoLwappMaxRFIDTagsReached,
+                        ciscoLwappMaxClientsReached,
+                        ciscoLwappNMHeartBeat
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the system config related
+        notifications sent by the agent to a network management 
+        station."
+    ::= { ciscoLwappSysMIBGroups 8 }
+
+ciscoLwappSysNotifControlGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsSecStrongPwdCheckTrapEnabled,
+                        clsMaxClientsTrapEnabled,
+                        clsMaxRFIDTagsTrapEnabled
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the flags to control the
+        generation of notification."
+    ::= { ciscoLwappSysMIBGroups 9 }
+
+ciscoLwappSysConfigGroupVer1 OBJECT-GROUP
+    OBJECTS         {
+                        cLSysBroadcastForwardingEnabled,
+                        cLSysLagModeEnabled,
+                        clsConfigProductBranchVersion,
+                        clsConfigDhcpProxyEnabled,
+                        clsCoreDumpTransferEnable,
+                        clsCoreDumpTransferMode,
+                        clsCoreDumpServerIPAddressType,
+                        clsCoreDumpServerIPAddress,
+                        clsCoreDumpFileName,
+                        clsCoreDumpUserName,
+                        clsCoreDumpPassword,
+                        clsConfigMulticastEnabled,
+                        cLSysLagModeInTransition,
+                        clsEmergencyImageVersion,
+                        clsAllCpuUsage
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the system wide
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 10 }
+
+ciscoLwappSysConfigGroupSup1 OBJECT-GROUP
+    OBJECTS         {
+                        clsTimeZone,
+                        clsTimeZoneDescription,
+                        cLSysLogAddressType,
+                        cLSysLogAddress,
+                        cLSysLogHostRowStatus,
+                        cLSysArpUnicastEnabled,
+                        clsMaxClientsTrapThreshold,
+                        clsMaxRFIDTagsTrapThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        timzone and syslog configuration on the 
+        controller."
+    ::= { ciscoLwappSysMIBGroups 11 }
+
+ciscoLwappSysMldConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cLSysMulticastMLDSnoopingEnabled,
+                        cLSysMulticastMLDSnoopingTimeout,
+                        cLSysMulticastMLDQueryInterval
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the MLD multicast
+        configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 12 }
+
+ciscoLwappSysConfigStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsSysRealtimeStatsTimer,
+                        clsSysNormalStatsTimer,
+                        clsSysStatsSamplingInterval,
+                        clsSysStatsAverageInterval
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        statistics intervals configuration
+        on the controller."
+    ::= { ciscoLwappSysMIBGroups 13 }
+
+ciscoLwappSysAlarmObjectGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsAlarmHoldTime,
+                        clsAlarmTrapRetransmitInterval
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        alarm objetcs configurations on the controller."
+    ::= { ciscoLwappSysMIBGroups 14 }
+
+ciscoLwappSysThresholdGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsSysControllerCpuUsageThreshold,
+                        clsSysControllerMemoryUsageThreshold,
+                        clsSysApCpuUsageThreshold,
+                        clsSysApMemoryUsageThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        Threshold configuration on the controller."
+    ::= { ciscoLwappSysMIBGroups 15 }
+
+ciscoLwappSysHeartBeatGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsNMHeartBeatEnable,
+                        clsNMHeartBeatInterval
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        heart beat configurations on the controller."
+    ::= { ciscoLwappSysMIBGroups 16 }
+
+ciscoLwappSysInfoGroup OBJECT-GROUP
+    OBJECTS         {
+                        clsSysFlashSize,
+                        clsSysMemoryType,
+                        clsSysMaxClients,
+                        clsSysApConnectCount,
+                        clsSysNetId,
+                        clsSysCurrentMemoryUsage,
+                        clsSysAverageMemoryUsage,
+                        clsSysCurrentCpuUsage,
+                        clsSysAverageCpuUsage,
+                        clsSysCpuType,
+                        clsMaxRFIDTagsCount,
+                        clsMaxClientsCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group of object represents the
+        system information of the controller."
+    ::= { ciscoLwappSysMIBGroups 17 }
+
+END
+
+
+

@@ -1,0 +1,314 @@
+CISCOSB-CLI-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private CLI MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                    FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY,
+    Unsigned32                                   FROM SNMPv2-SMI
+    TruthValue, DisplayString, RowStatus         FROM SNMPv2-TC;
+
+rlCli MODULE-IDENTITY
+                LAST-UPDATED "201005250000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "Remote CLI branch has been added."
+                REVISION "201005250000Z"
+                DESCRIPTION
+                      "This private MIB module defines CLI private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 52 }
+
+rlCliMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 3."
+    ::= { rlCli 1 }
+
+rlCliPassword OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "CLI Password"
+   ::= { rlCli 2 }
+
+rlCliTimer OBJECT-TYPE
+   SYNTAX INTEGER (5..3600)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "CLI Timer"
+   ::= { rlCli 3 }
+
+rlCliFileEnable OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "CLI File Enable/Disable"
+   ::= { rlCli 4 }
+
+rlCliFileEnableAfterReset OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "CLI File Enable/Disable After Reset"
+   ::= { rlCli 5 }
+
+rlCLIremoteCLIsupport OBJECT IDENTIFIER ::= { rlCli 6 }
+
+
+--- Remote CLI Scalars
+
+rlCLIremoteCLIcommand OBJECT-TYPE
+   SYNTAX INTEGER  { takeRemoteCLI(1),
+                     releaseRemoteCLI(2),
+                     applySentCLI(3),
+                     deleteCommandsCLI(4),
+                     setEchoModeCLI(5),
+                     unsetEchoModeCLI(6)
+                   }
+
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "Commands that can be given for execution of CLI from remote:
+            takeRemoteCLI:      take resources of remote CLI activation
+            releaseRemoteCLI:   free resources of remote CLI activation
+            applySentCLI:       apply the CLI commands that are currently in
+                                rlCLIremoteCLIcommandsTable.
+            deleteCommandsCLI:  delete all the CLI commands that are currently in
+                                rlCLIremoteCLIcommandsTable.
+            setEchoModeCLI:     entered commands will appear before its output
+                                in rlCLIremoteCLIoutputsTable.
+            unsetEchoModeCLI:   entered commands will not appear
+                                in rlCLIremoteCLIoutputsTable."
+   ::= { rlCLIremoteCLIsupport 1 }
+
+
+rlCLIremoteCLIexecutionState OBJECT-TYPE
+    SYNTAX INTEGER  { free(1),
+                      notActive(2),
+                      inProcess(3),
+                      outputAvailable(4),
+                      waitingForOutputRetrieval(5),
+                      done(6)
+                    }
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The execution state of remote CLI:
+            notActive: no 'applySentCLI' command has been given.
+                       This is the default state. The remote CLI reverts to
+                       this state each time when the 1st entry is added to
+                       rlCLIremoteCLIcommandsTable.
+            inProcess: Executing commands - no output available
+            outputAvailable: Some output is already available, although
+                             the commands execution may not be finished yet.
+            waitingForOutputRetrieval: The rlCLIremoteCLIoutputsTable is full
+                                       and remote CLI is waiting for the manager
+                                       to retrieve the output.
+            done: All the commands in rlCLIremoteCLIcommandsTable
+                  have been executed."
+
+    ::= { rlCLIremoteCLIsupport 2 }
+
+
+rlCLIremoteCLIexecutionCommandIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Index of command, which is currently in execution. 0 if none."
+   ::= { rlCLIremoteCLIsupport 3 }
+
+
+rlCLIremoteCLImode OBJECT-TYPE
+    SYNTAX INTEGER  { deleteCLIOutputOnGet(1),
+                      keepCLIOutputOnGet(2)
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Operation mode of remote CLI:
+            deleteCLIOutputOnGet: output row will be deleted after GET.
+                                  Recommended for reliable management channels.
+            keepCLIOutputOnGet:   output row will be kept after GET,
+                                  will be deleted only explicitly by remote
+                                  CLI client or upon release of remote CLI
+                                  resources. Recommended for non-reliable
+                                  management channels."
+    DEFVAL  {deleteCLIOutputOnGet}
+    ::= { rlCLIremoteCLIsupport 4 }
+
+
+--- Remote CLI Tables
+
+---  rlCLIremoteCLIcommandsTable
+
+rlCLIremoteCLIcommandsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCLIremoteCLIcommandsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of CLI commands to execute."
+    ::= { rlCLIremoteCLIsupport 5 }
+
+rlCLIremoteCLIcommandsEntry OBJECT-TYPE
+    SYNTAX      RlCLIremoteCLIcommandsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a part of a CLI command."
+    INDEX   { rlCLIremoteCLIcommandIndex, rlCLIremoteCLIcommandPartNumber }
+
+    ::= { rlCLIremoteCLIcommandsTable 1 }
+
+RlCLIremoteCLIcommandsEntry ::=
+    SEQUENCE { rlCLIremoteCLIcommandIndex        Unsigned32 (1..4294967295),
+               rlCLIremoteCLIcommandPartNumber   Unsigned32 (1..4294967295),
+               rlCLIremoteCLIcommandPart         OCTET STRING,
+               rlCLIremoteCLIcommandStatus       RowStatus,
+               rlCLIremoteCLIactivationStatus    INTEGER }
+
+rlCLIremoteCLIcommandIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+               MAX-ACCESS  not-accessible
+               STATUS      current
+               DESCRIPTION
+                    "The index of the command. The commands will be executed
+                    in order of their indexes."
+               ::= { rlCLIremoteCLIcommandsEntry 1 }
+
+rlCLIremoteCLIcommandPartNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+               MAX-ACCESS  not-accessible
+               STATUS      current
+               DESCRIPTION
+                    "The part of the command. Long commands will be divided in
+                    several parts, which will be concatenated before execution."
+               ::= { rlCLIremoteCLIcommandsEntry 2 }
+
+rlCLIremoteCLIcommandPart OBJECT-TYPE
+               SYNTAX      OCTET STRING
+               MAX-ACCESS  read-create
+               STATUS      current
+               DESCRIPTION
+                       "The text of the command part."
+               ::= { rlCLIremoteCLIcommandsEntry 3 }
+
+rlCLIremoteCLIcommandStatus OBJECT-TYPE
+               SYNTAX      RowStatus
+               MAX-ACCESS  read-create
+               STATUS      current
+               DESCRIPTION
+                       "The status of this entry."
+               ::= { rlCLIremoteCLIcommandsEntry 4 }
+
+rlCLIremoteCLIactivationStatus OBJECT-TYPE
+               SYNTAX      INTEGER
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                       "Activation status of the command. Any value greater than 0
+                        indicates that the command has been activated and failed"
+               ::= { rlCLIremoteCLIcommandsEntry 5 }
+
+---  rlCLIremoteCLIoutputsTable
+
+rlCLIremoteCLIoutputsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCLIremoteCLIoutputsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of CLI output rows."
+    ::= { rlCLIremoteCLIsupport 6 }
+
+rlCLIremoteCLIoutputsEntry OBJECT-TYPE
+    SYNTAX      RlCLIremoteCLIoutputsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a part of a CLI output row."
+    INDEX   { rlCLIremoteCLIoutputRowIndex,
+              rlCLIremoteCLIoutputRowPartNumber }
+
+    ::= { rlCLIremoteCLIoutputsTable 1 }
+
+RlCLIremoteCLIoutputsEntry ::=
+    SEQUENCE { rlCLIremoteCLIoutputRowIndex       Unsigned32 (1..4294967295),
+               rlCLIremoteCLIoutputRowPartNumber  Unsigned32 (1..4294967295),
+               rlCLIremoteCLIoutputRowPart        OCTET STRING,
+               rlCLIremoteCLIoutputRowStatus      RowStatus,
+               rlCLIremoteCLIoutputCommandNumber  INTEGER    }
+
+rlCLIremoteCLIoutputRowIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+               MAX-ACCESS  not-accessible
+               STATUS      current
+               DESCRIPTION
+                       "The index of the output row."
+               ::= { rlCLIremoteCLIoutputsEntry 1 }
+
+rlCLIremoteCLIoutputRowPartNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+               MAX-ACCESS  not-accessible
+               STATUS      current
+    DESCRIPTION "The part of the output row."
+               ::= { rlCLIremoteCLIoutputsEntry 2 }
+
+rlCLIremoteCLIoutputRowPart OBJECT-TYPE
+               SYNTAX      OCTET STRING
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                       "The text of the output row part."
+               ::= { rlCLIremoteCLIoutputsEntry 3 }
+
+rlCLIremoteCLIoutputRowStatus OBJECT-TYPE
+               SYNTAX      RowStatus
+               MAX-ACCESS  read-write
+               STATUS      current
+               DESCRIPTION
+                "The status of the command part. Only destroy will be accepted
+                 as value for SET."
+               ::= { rlCLIremoteCLIoutputsEntry 4 }
+
+rlCLIremoteCLIoutputCommandNumber OBJECT-TYPE
+               SYNTAX      INTEGER
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                "The command index of the command whose activation generated thist output row."
+               ::= { rlCLIremoteCLIoutputsEntry 5 }
+
+rlCLIremoteCLIinstance OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The remote CLI instance. A value of 0xFFFFFFFF indicates that no instance
+         corresponding to the client was found."
+    ::= { rlCLIremoteCLIsupport 7 }
+
+
+END

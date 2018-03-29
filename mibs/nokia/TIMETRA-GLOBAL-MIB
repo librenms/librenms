@@ -1,0 +1,380 @@
+TIMETRA-GLOBAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY,
+    enterprises                             FROM SNMPv2-SMI;
+
+timetraGlobalMIBModule  MODULE-IDENTITY
+    LAST-UPDATED    "0801010000Z"
+    ORGANIZATION    "Alcatel"
+    CONTACT-INFO    
+        "Alcatel 7x50 Support
+         Web: http://www.alcatel.com/comps/pages/carrier_support.jhtml"
+    DESCRIPTION
+        "This  document  is the SNMP MIB module for central registration
+        of object identifiers defined under the Alcatel 'timetra' branch
+        for the Alcatel 7x50 SR series SNMP MIBs.
+
+        Copyright  2003-2008  Alcatel-Lucent. All rights reserved.
+        Reproduction of  this document is  authorized  on  the condition
+        that the foregoing copyright notice is included.
+
+        This   SNMP   MIB   module  (Specification)  embodies  Alcatel's
+        proprietary intellectual property. Alcatel retains all title and
+        ownership in the Specification, including any revisions.
+
+        Alcatel grants all interested parties a non-exclusive license to
+        use  and  distribute an unmodified copy of this Specification in
+        connection with management of Alcatel products, and without fee,
+        provided this copyright notice and license appear on all copies.
+
+        This  Specification  is  supplied  `as is', and Alcatel makes no
+        warranty,  either  express or implied, as to the use, operation,
+        condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "0801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-GLOBAL-MIB."
+
+        REVISION        "0701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-GLOBAL-MIB."
+
+        REVISION        "0508310000Z"   
+        DESCRIPTION     "Rev 3.0                31 Aug 2005 00:00
+                         3.0 release of the TIMETRA-GLOBAL-MIB."
+
+        REVISION        "0501240000Z"   
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-GLOBAL-MIB."
+
+        REVISION        "0401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-GLOBAL-MIB."
+
+        REVISION        "0301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                This is the 1.0 release of the TIMETRA-GLOBAL-MIB."
+
+        REVISION        "0008140000Z"   
+        DESCRIPTION     "Rev 0.1                14 Aug 2000 00:00
+                This is the initial version of the TIMETRA-GLOBAL-MIB."
+        ::= { timetraModules 1 }
+
+--
+-- ----------------------------------------------------------------------------
+-- timetra
+-- ----------------------------------------------------------------------------
+--  The Private Enterprise Number 6527 was assigned to TiMetra Inc.,
+--  previously known as Panthera Networks, by the IANA on July 14, 2000.
+--
+--  TiMetra, Inc. was acquired by Alcatel on July 18, 2003 and has
+--  had the timetra enterprise number, 6527, registered to Alcatel.
+--
+timetra OBJECT IDENTIFIER ::= { enterprises 6527 }
+
+--
+-- ----------------------------------------------------------------------------
+-- timetra 1  : timetra registry
+-- ----------------------------------------------------------------------------
+--  Sub-tree for registrations
+timetraReg      OBJECT IDENTIFIER ::= { timetra 1 }
+
+--
+-- ----------------------------------------------
+-- timetra-reg 1  : Modules
+-- ----------------------------------------------
+--  Note:
+--    The timetraESSMIBModules and alcatelCommonMIBModules have become
+--    deprecated. Henceforward, all new MIB modules will be placed
+--    under timetraModules. 
+--
+    timetraModules  OBJECT IDENTIFIER ::= { timetraReg 1 }
+--      timetraGlobalMIBModule           OBJECT IDENTIFIER ::= { timetraModules 1 }
+--      timetraTCMIBModule               OBJECT IDENTIFIER ::= { timetraModules 2 }
+        timetraSRMIBModules              OBJECT IDENTIFIER ::= { timetraModules 3 }
+--          timetraSysMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 1 }
+--          tmnxChassisMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 2 }
+--          timetraVRtrMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 3 }
+--          timetraServicesMIBModule         OBJECT IDENTIFIER ::= { timetraSRMIBModules 4 }
+--          timetraOspfMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 5 }
+--          timetraMplsMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 6 }
+--          timetraRsvpMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 7 }
+--          timetraLdpMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 8 }
+--          timetraRipMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 9 }
+--          timetraIsisMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 10 }
+--          timetraOamTestMIBModule          OBJECT IDENTIFIER ::= { timetraSRMIBModules 11 }
+--          timetraLogMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 12 }
+--          timetraClearMIBModule            OBJECT IDENTIFIER ::= { timetraSRMIBModules 13 }
+--          timetraBgpMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 14 }
+--          timetraLagMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 15 }
+--          timetraQosMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 16 }
+--          timetraRoutePolicyMIBModule      OBJECT IDENTIFIER ::= { timetraSRMIBModules 17 }
+--          timetraMirrorMIBModule           OBJECT IDENTIFIER ::= { timetraSRMIBModules 18 }
+--          timetraCflowdMIBModule           OBJECT IDENTIFIER ::= { timetraSRMIBModules 19 }
+--          timetraVrrpMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 20 }
+--          timetraFilterMIBModule           OBJECT IDENTIFIER ::= { timetraSRMIBModules 21 }
+--          timetraSecurityMIBModule         OBJECT IDENTIFIER ::= { timetraSRMIBModules 22 }
+--          timetraIgmpMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 23 )
+--          timetraPimMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 24 }
+--          tmnxPortMIBModule                OBJECT IDENTIFIER ::= { timetraSRMIBModules 25 }
+--          tmnxPppMIBModule                 OBJECT IDENTIFIER ::= { timetraSRMIBModules 26 }
+--          timetraATMMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 27 }
+--          timetraAgentCapabilityModule     OBJECT IDENTIFIER ::= { timetraSRMIBModules 28 }
+--          timetraAPSMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 29 }
+--          timetraGmplsMIBModule            OBJECT IDENTIFIER ::= { timetraSRMIBModules 30 }
+--          timetraGmplsRsvpMIBModule        OBJECT IDENTIFIER ::= { timetraSRMIBModules 31 }   
+--          timetraGmplsLmpMIBModule         OBJECT IDENTIFIER ::= { timetraSRMIBModules 32 }
+--          tmnxSubMgmtMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 33 }
+--          timetraNgBgpMIBModule            OBJECT IDENTIFIER ::= { timetraSRMIBModules 34 }
+--          not used. (formerly used by timetraOspfv3MIBModule)
+--          timetraOspfNgMIBModule           OBJECT IDENTIFIER ::= { timetraSRMIBModules 36 }
+--          tmnxSchedulerMIBModule           OBJECT IDENTIFIER ::= { timetraSRMIBModules 37 }
+--          timetraNtpMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 38 }
+--          tmnxGsmpMIBModule                OBJECT IDENTIFIER ::= { timetraSRMIBModules 39 }
+--          timetraMcRedundancyMIBModule     OBJECT IDENTIFIER ::= { timetraSRMIBModules 40 }
+--          timetraMcastCacMIBModule         OBJECT IDENTIFIER ::= { timetraSRMIBModules 41 }
+--          timetraDOT3OAMMIBModule          OBJECT IDENTIFIER ::= { timetraSRMIBModules 42 }
+--          timetraMsdpMIBModule             OBJECT IDENTIFIER ::= { timetraSRMIBModules 43 } 
+--          tmnxBsxMIBModule                 OBJECT IDENTIFIER ::= { timetraSRMIBModules 44 }
+--          timetraMldSnoopingMIBModule      OBJECT IDENTIFIER ::= { timetraSRMIBModules 45 }
+--          timetraMldMIBModule              OBJECT IDENTIFIER ::= { timetraSRMIBModules 46 }
+--          timetraDhcpServerMIBModule       OBJECT IDENTIFIER ::= { timetraSRMIBModules 47 }
+--          timetraIPsecMIBModule            OBJECT IDENTIFIER ::= { timetraSRMIBModules 48 }
+--          timetraPppoeMIBModule            OBJECT IDENTIFIER ::= { timetraSRMIBModules 49 }
+--          timetraPimNgMIBModule            OBJECT IDENTIFIER ::= { timetraSRMIBModules 50 }
+--          timetraLocalUserDbMIBModule      OBJECT IDENTIFIER ::= { timetraSRMIBModules 51 }
+--          timetraIEEE8021CfmMIBModule      OBJECT IDENTIFIER ::= { timetraSRMIBModules 52 }
+--          timetraPimSnoopingMIBModule      OBJECT IDENTIFIER ::= { timetraSRMIBModules 53 }
+--          timetraMcastPathMgmtMIBModule    OBJECT IDENTIFIER ::= { timetraSRMIBModules 54 }
+        timetraCapabilityModule          OBJECT IDENTIFIER ::= { timetraModules 4 }
+            timetra7750CapModule             OBJECT IDENTIFIER ::= { timetraCapabilityModule 1 }
+--              timetra7750V3v0CapModule         OBJECT IDENTIFIER ::= { timetra7750CapModule 1 }
+--              timetra7750V4v0CapModule         OBJECT IDENTIFIER ::= { timetra7750CapModule 2 }
+--              timetra7750V5v0CapModule         OBJECT IDENTIFIER ::= { timetra7750CapModule 3 }
+--              timetra7750V6v0CapModule         OBJECT IDENTIFIER ::= { timetra7750CapModule 4 }
+            timetra7450CapModule             OBJECT IDENTIFIER ::= { timetraCapabilityModule 2 }
+--              timetra7450V3v0CapModule         OBJECT IDENTIFIER ::= { timetra7450CapModule 1 }
+--              timetra7450V4v0CapModule         OBJECT IDENTIFIER ::= { timetra7450CapModule 2 }
+--              timetra7450V5v0CapModule         OBJECT IDENTIFIER ::= { timetra7450CapModule 3 }
+--              timetra7450V6v0CapModule         OBJECT IDENTIFIER ::= { timetra7450CapModule 4 }
+            timetra7710CapModule             OBJECT IDENTIFIER ::= { timetraCapabilityModule 3 }
+--              timetra7710V3v0CapModule         OBJECT IDENTIFIER ::= { timetra7710CapModule 1 }
+--              timetra7710V4v0CapModule         OBJECT IDENTIFIER ::= { timetra7710CapModule 2 }
+--              timetra7710V6v0CapModule         OBJECT IDENTIFIER ::= { timetra7710CapModule 3 }
+        alcatelCommonMIBModules          OBJECT IDENTIFIER ::= { timetraModules 5 }
+--          alcatelGlobalMIBModule           OBJECT IDENTIFIER ::= { alcatelCommonMIBModules 1 }
+
+--
+-- ----------------------------------------------
+-- timetra-reg 3  : 7750 SR hardware products
+-- ----------------------------------------------
+--  Sub-trees for registration of Alcatel 7750 SR series hardware products
+--
+    timetraServiceRouters   OBJECT IDENTIFIER ::= { timetraReg 3 }
+        tmnxModelSR1Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                identify the Alcatel 7750 SR-1 device."
+        ::= { timetraServiceRouters 1 }
+
+        tmnxModelSR4Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7750 SR-4 device."
+        ::= { timetraServiceRouters 2 }
+
+        tmnxModelSR12Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7750 SR-12 device."
+        ::= { timetraServiceRouters 3 }
+
+        tmnxModelSR7Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7750 SR-7 device."
+        ::= { timetraServiceRouters 4 }
+
+        tmnxModelSR6Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7750 SR-6 device."
+        ::= { timetraServiceRouters 5 }
+
+--
+-- ----------------------------------------------
+-- timetra-reg 6  : 7450 ESS hardware products
+-- ----------------------------------------------
+--  Sub-tree for registration of Alcatel 7450 ESS series hardware products
+--
+timetraServiceSwitches    OBJECT IDENTIFIER ::= { timetraReg 6 }
+        tmnxModelESS1Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7450 ESS-1 device."
+        ::= { timetraServiceSwitches 1 }
+
+        tmnxModelESS4Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7450 ESS-4 device."
+        ::= { timetraServiceSwitches 2 }
+
+        tmnxModelESS7Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7450 ESS-7 device."
+        ::= { timetraServiceSwitches 3 }
+
+         tmnxModelESS12Reg        OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7450 ESS-12 device."
+        ::= { timetraServiceSwitches 4 }
+
+         tmnxModelESS6Reg        OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7450 ESS-6 device."
+        ::= { timetraServiceSwitches 5 }
+
+         tmnxModelESS6vReg       OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7450 ESS-6V device."
+        ::= { timetraServiceSwitches 6 }
+
+--
+-- ----------------------------------------------
+-- timetra-reg 9  : 7710 SR hardware products
+-- ----------------------------------------------
+--  Sub-trees for registration of Alcatel 7710 SR series hardware products
+--
+    alcatel7710ServiceRouters   OBJECT IDENTIFIER ::= { timetraReg 9 }
+        tmnxModel7710SRc12Reg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7710 SR-c12 (12 Compact MDA slots)
+                 device."
+        ::= { alcatel7710ServiceRouters 1 }
+
+        tmnxModel7710SRc4Reg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjectID to
+                 identify the Alcatel 7710 SR-c4 (4 Compact MDA slots)
+                 device."
+        ::= { alcatel7710ServiceRouters 2 }
+        
+--
+-- ----------------------------------------------------------------------------
+-- timetra 2  : tree for company-wide common objects
+-- ----------------------------------------------------------------------------
+--      Sub-tree for company-wide objects and events
+--
+timetraGeneric  OBJECT IDENTIFIER ::= { timetra 2 }
+
+--
+-- ----------------------------------------------------------------------------
+-- timetra 3  : product specific objects
+-- ----------------------------------------------------------------------------
+-- Sub-tree for product-specific objects and events.
+-- Note: 
+--   3 products were originally defined:
+--   - SR     : objects for the 7750
+--   - ESS    : objects for the 7450
+--   - Common : objects common to both products
+--   Both the ESS and Common branch are now deprecated.
+--   All MIB modules are placed under tmnxSRMIB node.
+--
+timetraProducts         OBJECT IDENTIFIER ::= { timetra 3 }
+
+--
+-- ----------------------------------------------
+-- timetra-products 1  : 7750 objects
+-- ----------------------------------------------
+--  Sub-tree for Service Router MIBs
+    tmnxSRMIB           OBJECT IDENTIFIER ::= { timetraProducts 1 }
+--      Sub-tree for Service Router conformace
+        tmnxSRConfs          OBJECT IDENTIFIER ::= { tmnxSRMIB 1 }
+--      Sub-tree for Service Router Objects
+        tmnxSRObjs           OBJECT IDENTIFIER ::= { tmnxSRMIB 2 }
+--      Sub-tree for Service Router Notifications (events)
+        tmnxSRNotifyPrefix   OBJECT IDENTIFIER ::= { tmnxSRMIB 3 }
+
+--
+-- ----------------------------------------------
+-- timetra-products 2  : 7450 objects
+-- ----------------------------------------------
+--  Sub-tree for Service switch Router MIBs
+    tmnxESSMIB          OBJECT IDENTIFIER ::= { timetraProducts 2 }
+--      Sub-tree for Service Switch conformace
+        tmnxESSConfs         OBJECT IDENTIFIER ::= { tmnxESSMIB 1 }
+--      Sub-tree for Service Switch Objects
+        tmnxESSObjs          OBJECT IDENTIFIER ::= { tmnxESSMIB 2 }
+--      Sub-tree for Service Switch Notifications (events)
+        tmnxESSNotifyPrefix  OBJECT IDENTIFIER ::= { tmnxESSMIB 3 }
+
+--
+-- ----------------------------------------------
+-- timetra-products 3  : Alcatel objects
+-- ----------------------------------------------
+--  Sub-tree for Common MIBs
+    alcatelCommonMIB    OBJECT IDENTIFIER ::= { timetraProducts 3 }
+--      Sub-tree for Service Switch conformace
+        alcatelConformance   OBJECT IDENTIFIER ::= { alcatelCommonMIB 1 }
+--      Sub-tree for Service Switch Objects
+        alcatelObjects       OBJECT IDENTIFIER ::= { alcatelCommonMIB 2 }
+--      Sub-tree for Service Switch Notifications (events)
+        alcatelNotifyPrefix  OBJECT IDENTIFIER ::= { alcatelCommonMIB 3 }
+
+--
+-- ----------------------------------------------------------------------------
+-- timetra 4  : Agent Capabilities
+-- This capability branch is now obsolete and replaced with the { timetra 5 }
+-- product capabilities branch.
+-- ----------------------------------------------------------------------------
+--
+tmnxAgentCapability        OBJECT IDENTIFIER ::= { timetra 4 }
+    tmnx7750AgentCapability        OBJECT IDENTIFIER ::= { tmnxAgentCapability 1 }
+    tmnx7450AgentCapability        OBJECT IDENTIFIER ::= { tmnxAgentCapability 2 }
+    tmnx7710AgentCapability        OBJECT IDENTIFIER ::= { tmnxAgentCapability 3 }
+
+--
+-- ----------------------------------------------------------------------------
+-- timetra 5  : Product Capabilities
+-- ----------------------------------------------------------------------------
+--
+tmnxProductCapability      OBJECT IDENTIFIER ::= { timetra 5 }
+    tmnx7750Capability         OBJECT IDENTIFIER ::= { tmnxProductCapability 1 }
+        tmnx7750V3v0               OBJECT IDENTIFIER ::= { tmnx7750Capability 1 }
+        tmnx7750V4v0               OBJECT IDENTIFIER ::= { tmnx7750Capability 2 }
+        tmnx7750V5v0               OBJECT IDENTIFIER ::= { tmnx7750Capability 3 }
+        tmnx7750V6v0               OBJECT IDENTIFIER ::= { tmnx7750Capability 4 }
+    tmnx7450Capability         OBJECT IDENTIFIER ::= { tmnxProductCapability 2 }
+        tmnx7450V3v0               OBJECT IDENTIFIER ::= { tmnx7450Capability 1 }
+        tmnx7450V4v0               OBJECT IDENTIFIER ::= { tmnx7450Capability 2 }
+        tmnx7450V5v0               OBJECT IDENTIFIER ::= { tmnx7450Capability 3 }
+        tmnx7450V6v0               OBJECT IDENTIFIER ::= { tmnx7450Capability 4 }
+    tmnx7710Capability         OBJECT IDENTIFIER ::= { tmnxProductCapability 3 }
+        tmnx7710V3v0               OBJECT IDENTIFIER ::= { tmnx7710Capability 1 }
+        tmnx7710V4v0               OBJECT IDENTIFIER ::= { tmnx7710Capability 2 }
+        tmnx7710V5v0               OBJECT IDENTIFIER ::= { tmnx7710Capability 3 }
+        tmnx7710V6v0               OBJECT IDENTIFIER ::= { tmnx7710Capability 4 }
+
+END

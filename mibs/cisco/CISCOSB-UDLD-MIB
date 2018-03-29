@@ -1,0 +1,287 @@
+CISCOSB-UDLD-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB UDLD ROS
+--                       Private UDLD MIB
+-- Version:              7.60
+-- Date:                 06 Dec 2012
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Unsigned32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    switch001, rndNotifications
+        FROM CISCOSB-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndex
+        FROM IF-MIB;
+
+UdldString ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "The Device-ID TLV should contain the switch base MAC address in ACSII format."
+    SYNTAX      SnmpAdminString
+
+
+UdldPortBidirectionalState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Port UDLD current status (shutdown, idle, detection, undetermined, bidirectional)."
+    SYNTAX INTEGER {
+        shutdown(1),
+        idle(2),
+        detection(3),
+        undetermined(4),
+        bidirectional(5)
+}
+
+UdldNeighborCurrentState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Port UDLD Neighbor current status (Disabled, Enabled, Undefined, Bidirectional)."
+    SYNTAX INTEGER {
+        disabled(1),
+        enabled(2),
+        undefined(3),
+        bidirectional(4)
+}
+
+UdldGlobalMode  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Global (fiber) Port UDLD curent status (normal, aggressive, disabled)."
+    SYNTAX INTEGER {
+        normal(1),
+        aggressive(2),
+        disabled(3)
+}
+
+UdldPortMode  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Port UDLD curent status (normal, aggressive, disabled, default)."
+    SYNTAX INTEGER {
+        normal(1),
+        aggressive(2),
+        disabled(3),
+        default(4)
+}
+
+rlUdld MODULE-IDENTITY
+    LAST-UPDATED "201208010000Z"
+    ORGANIZATION "CISCOSB Computer Communications Ltd."
+    CONTACT-INFO
+           "CISCOSB.com"
+    DESCRIPTION
+           "This private MIB module for UDLD (Cisco Systems UniDirectional Link Detection Protocol)."
+    REVISION "201208010000Z"
+    DESCRIPTION
+           "Initial revision."
+     ::= { switch001 218 }
+
+-----------------------------------
+-- UDLD - rlUdldPortTable
+------------------------------------
+
+rlUdldPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlUdldPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds information for Udld Ethernet ports."
+    ::= {rlUdld 1 }
+
+rlUdldPortEntry  OBJECT-TYPE
+    SYNTAX      RlUdldPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlUdldPortTable."
+    INDEX    { rlUdldPortIfIndex  }
+    ::= {rlUdldPortTable 1 }
+
+RlUdldPortEntry ::= SEQUENCE {
+    rlUdldPortIfIndex                   InterfaceIndex,
+    rlUdldPortAdminMode                 UdldPortMode,
+    rlUdldPortOperMode                  UdldPortMode,
+    rlUdldPortDefaultConfiguration      TruthValue,
+    rlUdldBidirectionalState            UdldPortBidirectionalState,
+    rlUdldNumberOfDetectedNeighbors     INTEGER
+}
+
+rlUdldPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface Index. This variable is the key for udld port table.
+         uniquely identifies the udld port information."
+    ::= { rlUdldPortEntry 1 }
+
+rlUdldPortAdminMode OBJECT-TYPE
+    SYNTAX      UdldPortMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies port UDLD admin configured mode (normal, aggressive, disable)."
+    ::= { rlUdldPortEntry 2 }
+
+rlUdldPortOperMode OBJECT-TYPE
+    SYNTAX      UdldPortMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies port UDLD operational mode (normal, aggressive, disable).
+        for fiber ports it is combination of global mode and port mode"
+    ::= { rlUdldPortEntry 3 }
+
+rlUdldPortDefaultConfiguration OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether tne user configure the udld port. to present (default) or not in port configuration."
+    ::= {  rlUdldPortEntry 4 }
+
+rlUdldBidirectionalState OBJECT-TYPE
+    SYNTAX      UdldPortBidirectionalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the port UDLD status (shutdown, idle, detection, undetermined, bidirectional)."
+    ::= { rlUdldPortEntry 5 }
+
+rlUdldNumberOfDetectedNeighbors OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number Of Detected Neighbors for this port."
+    ::= { rlUdldPortEntry 6 }
+
+------------------------------------
+-- UDLD - rlUdldNeighborTable
+------------------------------------
+
+rlUdldNeighborTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlUdldNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds information for Udld Neighbor of ethernet ports."
+    ::= {rlUdld 2 }
+
+rlUdldNeighborEntry  OBJECT-TYPE
+    SYNTAX      RlUdldNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlUdldNeighborTable."
+    INDEX    { rlUdldNeighborPortIfIndex, rlUdldNeighborDeviceID, rlUdldNeighborPortID }
+    ::= {rlUdldNeighborTable  1 }
+
+RlUdldNeighborEntry ::= SEQUENCE {
+    rlUdldNeighborPortIfIndex               InterfaceIndex,
+    rlUdldNeighborDeviceID                  UdldString,
+    rlUdldNeighborPortID                    UdldString,
+    rlUdldNeighborDeviceMACAddress          MacAddress,
+    rlUdldNeighborDeviceName                UdldString,
+    rlUdldNeighborMessageTime               INTEGER,
+    rlUdldNeighborLeftLifeTime              INTEGER,
+    rlUdldNeighborCurrentState              UdldNeighborCurrentState
+}
+
+rlUdldNeighborPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface Index. This variable is the key for udld port Neighbor table.
+         uniquely identifies the udld port index."
+    ::= { rlUdldNeighborEntry 1 }
+
+rlUdldNeighborDeviceID  OBJECT-TYPE
+    SYNTAX      UdldString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Neighbor Device-ID TLV should contain the switch base MAC address in ACSII format."
+    ::= { rlUdldNeighborEntry 2 }
+
+rlUdldNeighborPortID  OBJECT-TYPE
+    SYNTAX      UdldString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port-ID TLV should contain the port ACSII name as it is printed in show CLI commands."
+    ::= { rlUdldNeighborEntry 3 }
+
+rlUdldNeighborDeviceMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The Neighbor mac address"
+    ::= { rlUdldNeighborEntry 4 }
+
+rlUdldNeighborDeviceName  OBJECT-TYPE
+    SYNTAX      UdldString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Neighbor NeighborDevice Name TLV should contain sysName in ACSII."
+    ::= { rlUdldNeighborEntry 5 }
+
+rlUdldNeighborMessageTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Neighbor Message Time is from Message Interval TLV.
+        This time interval value used by a neighbor to send UDLD probes
+        after the linkup or detection phases. Its time unit is 1 second."
+    ::= { rlUdldNeighborEntry 6 }
+
+rlUdldNeighborLeftLifeTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remaining holdtime for Neighbor entry in cache in seconds."
+    ::= { rlUdldNeighborEntry 7 }
+
+rlUdldNeighborCurrentState OBJECT-TYPE
+    SYNTAX      UdldNeighborCurrentState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the Neighbor port UDLD current status (Disabled, Enabled, Undefined, Bidirectional)."
+    ::= { rlUdldNeighborEntry 8 }
+
+------------------------------------
+-- UDLD - Global UDLD Mode
+------------------------------------
+
+rlUdldGlobalUDLDMode OBJECT-TYPE
+    SYNTAX      UdldGlobalMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Define Global UDLD Mode (normal, aggressive, disable)"
+    ::= { rlUdld 3 }
+
+------------------------------------
+-- UDLD - Global Message Time
+------------------------------------
+
+rlUdldGlobalMessageTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Define global value of the interval between two sent probe messages, use the udld
+        message time command in Global Configuration mode."
+    ::= { rlUdld 4 }
+
+END
+

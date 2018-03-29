@@ -1,0 +1,611 @@
+
+-- *****************************************************************************
+-- Juniper-PROFILE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Profile MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 2000, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-PROFILE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniProfileMIB  MODULE-IDENTITY
+    LAST-UPDATED "200301312118Z"  -- 31-Jan-03 04:18 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Profile MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200301312118Z"  -- 31-Jan-03 04:18 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added atm1483(11) to JuniProfileIfEncaps TEXTUAL-CONVENTION.
+         Added support for range indexing of profile assignments."
+    REVISION    "200301312103Z"  -- 31-Jan-03 04:03 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200211192047Z"  -- 19-Nov-02 03:47 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added bridgedEthernet(19) to JuniProfileIfEncaps TEXTUAL-CONVENTION."
+    REVISION    "200104041250Z"  -- 04-Apr-01 08:50 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added ppp(1), pppoe(17) and any(127) to JuniProfileIfEncaps
+        TEXTUAL-CONVENTION."
+    REVISION    "200004200000Z"  -- 20-Apr-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Added juniProfAssignIfTable, juniProfToIfMapTable to configure and
+        report assignments of profiles to interface/encapsulation pairs."
+    REVISION      "9906010000Z"  --  1-Jun-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 25 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniProfileIfEncaps ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Encapsulated protocol type.  The 'any' value is a wildcard value.  The
+        DESCRIPTION clause for an object having this syntax must describe how
+        the 'any' value applies, if at all."
+    SYNTAX      INTEGER {
+                    ip(0),
+                    ppp(1),
+                    atm1483(11),
+                    pppoe(17),
+                    bridgedEthernet(19),
+                    any(127) }
+
+JuniProfileRangeId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An application-specific identifier used to distinguish multiple profile
+        assignments on a given interface/encapsulation pair.  Not all interface
+        applications support this capability.
+
+        The semantics of the identifier are governed by the interface
+        application on which a profile is assigned.  For example, the ATM AAL5
+        application defines the semantics for range identifiers used in profile
+        assignments on ATM AAL5 interfaces; and might choose to associate range
+        identifiers with distinct VPI/VCI ranges.
+
+        The value zero is reserved for use as the range identifier value for
+        profile assignments on interfaces that do not support more than one
+        assignment per encapsulation."
+    SYNTAX      Unsigned32
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniProfileObjects                OBJECT IDENTIFIER ::= {juniProfileMIB 1}
+
+-- Functional groups
+juniProfileName                   OBJECT IDENTIFIER ::= {juniProfileObjects 1}
+juniProfileAssign                 OBJECT IDENTIFIER ::= {juniProfileObjects 2}
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Profile Names
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniProfileNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniProfileNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table provide mappings of configuration profile
+        names to local integer identifiers for those profiles.  These integers
+        are used as indexes into other MIB tables containing profile
+        configuration parameters associated with the same profile name."
+    ::= { juniProfileName 1 }
+
+juniProfileNameEntry OBJECT-TYPE
+    SYNTAX      JuniProfileNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of a profile name to an integer identifier for that name."
+    INDEX     { IMPLIED juniProfileNameName }
+    ::= { juniProfileNameTable 1 }
+
+JuniProfileNameEntry ::= SEQUENCE {
+    juniProfileNameName               DisplayString,
+    juniProfileNameRowStatus          RowStatus,
+    juniProfileNameId                 Unsigned32 }
+
+juniProfileNameName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The profile name uniquely identifying this entry."
+    ::= { juniProfileNameEntry 1 }
+
+juniProfileNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table.  Only the values
+        'createAndGo' and 'destroy' may be SET."
+    ::= { juniProfileNameEntry 2 }
+
+juniProfileNameId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile name.
+
+        This value of this identifier is assigned by the device when an entry in
+        this table is created."
+    ::= { juniProfileNameEntry 3 }
+
+
+juniProfileIdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniProfileIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides inverse mapping of profile IDs to profile names."
+    ::= { juniProfileName 2 }
+
+juniProfileIdEntry OBJECT-TYPE
+    SYNTAX      JuniProfileIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of an integer identifier to a profile name."
+    INDEX     { juniProfileIdId }
+    ::= { juniProfileIdTable 1 }
+
+JuniProfileIdEntry ::= SEQUENCE {
+    juniProfileIdId                  Unsigned32,
+    juniProfileIdName                DisplayString }
+
+juniProfileIdId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile name."
+    ::= { juniProfileIdEntry 1 }
+
+juniProfileIdName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The profile name having the associated identifier."
+    ::= { juniProfileIdEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Profile Assignments
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniProfAssignIf      OBJECT IDENTIFIER ::= { juniProfileAssign 1 }
+juniProfAssignIfRange OBJECT IDENTIFIER ::= { juniProfileAssign 2 }
+
+--
+-- Assign profile to interface/encapsulation pair.
+--
+juniProfAssignIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniProfAssignIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table providing profile assignment to interface/encapsulation pair.
+
+        The entries in this table specify which profile to use when creating and
+        configuring a dynamic interface (whose type is identified by the
+        encapsulation) above a specified interface.
+
+        Each entry in this table is reflected in a juniProfAssignIfTable entry
+        having a zero-valued range identifier."
+    ::= { juniProfAssignIf 1 }
+
+juniProfAssignIfEntry OBJECT-TYPE
+    SYNTAX      JuniProfAssignIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An assignment of a profile to an interface/encapsulation pair."
+    INDEX     { juniProfAssignIfIndex,
+                juniProfAssignIfEncaps }
+    ::= { juniProfAssignIfTable 1 }
+
+JuniProfAssignIfEntry ::= SEQUENCE {
+    juniProfAssignIfIndex               InterfaceIndex,
+    juniProfAssignIfEncaps              JuniProfileIfEncaps,
+    juniProfAssignIfRowStatus           RowStatus,
+    juniProfAssignIfProfileId           Unsigned32 }
+
+juniProfAssignIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface to which the profile is assigned."
+    ::= { juniProfAssignIfEntry 1 }
+
+juniProfAssignIfEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The encapsulated protocol type to which the assigned profile pertains.
+        An interface may have a different profile assigned for each
+        encapsulation it supports.
+
+        If an entry for a specific encapsulation is absent, the profile assigned
+        for the 'any' encapsulation will be used (if that assignment is present
+        in this table)."
+    ::= { juniProfAssignIfEntry 2 }
+
+juniProfAssignIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For SET, supports only createAndGo(4) and destroy(6).  Returns
+        active(1) when read."
+    ::= { juniProfAssignIfEntry 3 }
+
+juniProfAssignIfProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ID of the profile assigned to this interface/encapsulation pair."
+    ::= { juniProfAssignIfEntry 4 }
+
+
+--
+-- Profile-to-interface/encapsulation mappings.
+--
+juniProfToIfMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniProfToIfMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to report the set of interface/encapsulation pairs assigned to
+        each profile."
+    ::= { juniProfAssignIf 2 }
+
+juniProfToIfMapEntry OBJECT-TYPE
+    SYNTAX      JuniProfToIfMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Reports an interface/encapsulation pair assigned to a profile."
+    INDEX     { juniProfToIfMapProfileId,
+                juniProfToIfMapIndex,
+                juniProfToIfMapEncaps }
+    ::= { juniProfToIfMapTable 1 }
+
+JuniProfToIfMapEntry ::= SEQUENCE {
+    juniProfToIfMapProfileId           Unsigned32,
+    juniProfToIfMapIndex               InterfaceIndex,
+    juniProfToIfMapEncaps              JuniProfileIfEncaps }
+
+juniProfToIfMapProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID of the profile assigned to this interface/encapsulation pair."
+    ::= { juniProfToIfMapEntry 1 }
+
+juniProfToIfMapIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface to which the profile is assigned."
+    ::= { juniProfToIfMapEntry 2 }
+
+-- read-only auxiliary object (since all objects are used in index, at least
+-- one must be accessible)
+juniProfToIfMapEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The encapsulation type to which the assigned profile pertains.  An
+        interface may have a different profile assigned for each encapsulation
+        type it supports."
+    ::= { juniProfToIfMapEntry 3 }
+
+
+--
+-- Assign profile to interface/encapsulation/range 3-tuple.
+--
+juniProfAssignIfRangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniProfAssignIfRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table providing profile assignment to interface/encapsulation/range
+        3-tuple.
+
+        The entries in this table specify which profile to use when creating and
+        configuring a dynamic interface (whose type is identified by the
+        encapsulation) above a specified interface, with profile selection being
+        further discriminated by the range identifier.
+
+        Each entry in juniProfAssignIfTable is reflected by an entry in this
+        table having a zero-valued range identifier."
+    ::= { juniProfAssignIfRange 1 }
+
+juniProfAssignIfRangeEntry OBJECT-TYPE
+    SYNTAX      JuniProfAssignIfRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An assignment of a profile to an interface/encapsulation/range
+        3-tuple."
+    INDEX     { juniProfAssignIfRangeIndex,
+                juniProfAssignIfRangeEncaps,
+                juniProfAssignIfRangeRangeId }
+    ::= { juniProfAssignIfRangeTable 1 }
+
+JuniProfAssignIfRangeEntry ::= SEQUENCE {
+    juniProfAssignIfRangeIndex               InterfaceIndex,
+    juniProfAssignIfRangeEncaps              JuniProfileIfEncaps,
+    juniProfAssignIfRangeRangeId             JuniProfileRangeId,
+    juniProfAssignIfRangeRowStatus           RowStatus,
+    juniProfAssignIfRangeProfileId           Unsigned32 }
+
+juniProfAssignIfRangeIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface to which the profile is assigned."
+    ::= { juniProfAssignIfRangeEntry 1 }
+
+juniProfAssignIfRangeEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The encapsulated protocol type to which the assigned profile pertains.
+        An interface may have zero, one or more profiles assigned for each
+        encapsulation it supports.
+
+        If an entry for a specific encapsulation is absent, the profile assigned
+        for the 'any' encapsulation will be used (if that assignment is present
+        in this table)."
+    ::= { juniProfAssignIfRangeEntry 2 }
+
+juniProfAssignIfRangeRangeId OBJECT-TYPE
+    SYNTAX      JuniProfileRangeId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An application-specific range identifier to which the assigned profile
+        pertains.  An interface may have zero, one or more profiles assigned for
+        each encapsulation it supports, distinguished by range identifier.
+
+        A value of zero should be used for an interface that does not support
+        multiple profile assignments per encapsulation."
+    ::= { juniProfAssignIfRangeEntry 3 }
+
+juniProfAssignIfRangeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For SET, supports only createAndGo(4) and destroy(6).  Returns
+        active(1) when read."
+    ::= { juniProfAssignIfRangeEntry 4 }
+
+juniProfAssignIfRangeProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ID of the profile assigned to this interface/encapsulation/range
+        3-tuple."
+    ::= { juniProfAssignIfRangeEntry 5 }
+
+
+--
+-- Profile-to-interface/encapsulation/range mappings.
+--
+juniProfToIfRangeMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniProfToIfRangeMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to report the set of interface/encapsulation/range 3-tuples
+        assigned to each profile."
+    ::= { juniProfAssignIfRange 2 }
+
+juniProfToIfRangeMapEntry OBJECT-TYPE
+    SYNTAX      JuniProfToIfRangeMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Reports an interface/encapsulation/range 3-tuple assigned to a
+        profile."
+    INDEX     { juniProfToIfRangeMapProfileId,
+                juniProfToIfRangeMapIndex,
+                juniProfToIfRangeMapEncaps,
+                juniProfToIfRangeMapRangeId }
+    ::= { juniProfToIfRangeMapTable 1 }
+
+JuniProfToIfRangeMapEntry ::= SEQUENCE {
+    juniProfToIfRangeMapProfileId           Unsigned32,
+    juniProfToIfRangeMapIndex               InterfaceIndex,
+    juniProfToIfRangeMapEncaps              JuniProfileIfEncaps,
+    juniProfToIfRangeMapRangeId             JuniProfileRangeId }
+
+juniProfToIfRangeMapProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID of the profile assigned to this interface/encapsulation pair."
+    ::= { juniProfToIfRangeMapEntry 1 }
+
+juniProfToIfRangeMapIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface to which the profile is assigned."
+    ::= { juniProfToIfRangeMapEntry 2 }
+
+-- read-only auxiliary object (since all objects are used in index, at least
+-- one must be accessible)
+juniProfToIfRangeMapEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The encapsulation type to which the assigned profile pertains.  An
+        interface may have zero, one or more profiles assigned for each
+        encapsulation type it supports."
+    ::= { juniProfToIfRangeMapEntry 3 }
+
+juniProfToIfRangeMapRangeId OBJECT-TYPE
+    SYNTAX      JuniProfileRangeId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An application-specific range identifier to which the assigned profile
+        pertains.  An interface may have zero, one or more profiles assigned for
+        each encapsulation it supports, distinguished by range identifier."
+    ::= { juniProfToIfRangeMapEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  PlaceholderS follow.
+-- juniProfileTrapControl      OBJECT IDENTIFIER ::= { juniProfileMIB 2 }
+-- juniProfileTraps            OBJECT IDENTIFIER ::= { juniProfileMIB 3 }
+-- juniProfileTrapPrefix       OBJECT IDENTIFIER ::= { juniProfileTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniProfileMIBConformance
+             OBJECT IDENTIFIER ::= { juniProfileMIB 4 }
+juniProfileMIBCompliances
+             OBJECT IDENTIFIER ::= { juniProfileMIBConformance 1 }
+juniProfileMIBGroups
+             OBJECT IDENTIFIER ::= { juniProfileMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniProfileCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting naming of
+        configuration profiles.  This statement became obsolete when the
+        interface profile assignment group was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniProfileGroup }
+    ::= { juniProfileMIBCompliances 1 }                            -- JUNOSe 1.1
+
+juniProfileCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting naming of
+        configuration profiles and profile assignment to interfaces.  This
+        statement became obsolete when support for range indexing of profile
+        assignments was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniProfileGroup,
+            juniProfileIfGroup }
+    ::= { juniProfileMIBCompliances 2 }                            -- JUNOSe 2.0
+
+juniProfileCompliance3  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting naming of configuration
+        profiles and profile assignment to interfaces."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniProfileGroup,
+            juniProfileIfGroup2 }
+    ::= { juniProfileMIBCompliances 3 }                            -- JUNOSe 5.1
+
+
+--
+-- units of conformance
+--
+juniProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniProfileNameName,
+        juniProfileNameRowStatus,
+        juniProfileNameId,
+
+        juniProfileIdName }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of Profile naming
+        functionality in a Juniper product."
+    ::= { juniProfileMIBGroups 1 }
+
+juniProfileIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniProfAssignIfRowStatus,
+        juniProfAssignIfProfileId,
+
+        juniProfToIfMapEncaps }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of Profile
+        assignment to interfaces in a Juniper product.  This group became
+        obsolete when support for range indexing of profile assignments was
+        added."
+    ::= { juniProfileMIBGroups 2 }
+
+juniProfileIfGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniProfAssignIfRowStatus,
+        juniProfAssignIfProfileId,
+
+        juniProfToIfMapEncaps,
+
+        juniProfAssignIfRangeRowStatus,
+        juniProfAssignIfRangeProfileId,
+
+        juniProfToIfRangeMapEncaps }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of Profile
+        assignment to interfaces in a Juniper product."
+    ::= { juniProfileMIBGroups 3 }
+
+END

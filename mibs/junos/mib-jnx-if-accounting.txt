@@ -1,0 +1,329 @@
+-- *******************************************************************
+-- Juniper enterprise specific QoS based Interface Accounting MIB. 
+--
+-- Copyright (c) 2001-2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-IF-ACCOUNTING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32, Counter64
+        FROM SNMPv2-SMI
+    CounterBasedGauge64                  
+        FROM HCNUM-TC       		
+    InterfaceIndex                       
+        FROM IF-MIB
+    JnxCosFcIdentifier
+        FROM JUNIPER-COS-MIB   
+    ifJnx
+        FROM JUNIPER-IF-MIB;
+        
+jnxIfAccountingStats        MODULE-IDENTITY
+    LAST-UPDATED "201312250000Z"                -- Wed Dec 25 12:00:00 2013 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+                 "Juniper Technical Assistance Center
+                      Juniper Networks, Inc.
+                      1194 N. Mathilda Avenue
+                      Sunnyvale, CA 94089
+                      E-mail: support@juniper.net"
+
+    DESCRIPTION  "MIB module to define Forwarding Class based Interface statistics.
+                    The statistics will provide protocol specific statistics value
+                    which includes L2 overhead bytes. The mib is currently supported 
+                    only on MX platforms."
+    
+    REVISION     	"201305151223Z"             -- Wed May 25 12:23:51 2013 UTC
+    DESCRIPTION		"MIB module to define QoS based Interface accounting." 
+   
+    REVISION     	"201312250000Z"             -- Wed Dec 25 12:00:00 2013 UTC	
+    DESCRIPTION		"MIB module extended to support inline accounting for Per 
+					 Forwarding-class stats table for Aggregate
+					 (all types of traffic) pkt/byte counters & rate"
+					 
+    ::= { ifJnx 10 }    
+    
+-- ***************************************************************
+--  Per Forwarding-class stats table
+-- ***************************************************************
+    jnxIfFcAccountStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxIfFcAccountStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table presents the per forwarding-class and 
+             per protocol type statistics."
+        ::= { jnxIfAccountingStats 1 }
+
+
+    jnxIfFcAccountStatEntry OBJECT-TYPE
+        SYNTAX      JnxIfFcAccountStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table presents the per forwarding-class and 
+             per protocol type statistics. The indices of the 
+             table are Interface Index, Forwarding class Index
+             and Protocol type"
+        INDEX       { jnxIfFcIfIndex, jnxIfFcFcIndex, jnxIfFcProtocol }
+        ::= { jnxIfFcAccountStatTable 1 }
+        
+
+    JnxIfFcAccountStatEntry ::=
+        SEQUENCE {
+            jnxIfFcIfIndex              InterfaceIndex,
+            jnxIfFcFcIndex              JnxCosFcIdentifier,
+            jnxIfFcProtocol             INTEGER,
+
+            -- input packet/byte stats for unicast traffic
+            jnxIfFcHCInUcastPkts          Counter64,
+            jnxIfFcHCInUcastOctets        Counter64,
+
+            -- output packet/byte stats for unicast traffic
+            jnxIfFcHCOutUcastPkts         Counter64,
+            jnxIfFcHCOutUcastOctets       Counter64,
+
+            -- input packet/byte stats for multicast traffic
+            jnxIfFcHCInMcastPkts        Counter64,
+            jnxIfFcHCInMcastOctets      Counter64,
+
+            -- output packet/byte stats for multicast traffic
+            jnxIfFcHCOutMcastPkts       Counter64,
+            jnxIfFcHCOutMcastOctets     Counter64
+    }
+
+    jnxIfFcIfIndex OBJECT-TYPE 
+        SYNTAX      InterfaceIndex 
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "The ifIndex of the interface." 
+        ::= { jnxIfFcAccountStatEntry 1 }
+        
+        
+    jnxIfFcFcIndex OBJECT-TYPE 
+        SYNTAX      JnxCosFcIdentifier 
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "The Forwarding Class Index of the interface." 
+        ::= { jnxIfFcAccountStatEntry 2 }
+                
+            
+    --Protocol family for accounting all is aggregate of all types
+    jnxIfFcProtocol OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        all (1),
+                        ipv4 (2),
+                        ipv6 (3),
+                        mpls (4),
+                        layer2 (5),
+                        other (6)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The protocol type of the entry's traffic."
+        ::= { jnxIfFcAccountStatEntry 3 }
+        
+    --input packet/byte stats for unicast traffic
+    jnxIfFcHCInUcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of unicast packets ingressed."
+        ::= { jnxIfFcAccountStatEntry 4 }
+
+    --input packet/byte stats for unicast traffic
+    jnxIfFcHCInUcastOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of unicast bytes ingressed."
+        ::= { jnxIfFcAccountStatEntry 5 }
+
+    --output packet/byte stats for unicast traffic
+    jnxIfFcHCOutUcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of unicast packets egressed."
+        ::= { jnxIfFcAccountStatEntry 6 }
+
+    --output packet/byte stats for unicast traffic
+    jnxIfFcHCOutUcastOctets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of unicast bytes egressed."
+        ::= { jnxIfFcAccountStatEntry 7 }
+
+    --input packet/byte stats for multicast traffic
+    jnxIfFcHCInMcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of multicast packets ingressed."
+        ::= { jnxIfFcAccountStatEntry 8 }
+
+    --input packet/byte stats for multicast traffic
+    jnxIfFcHCInMcastOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of multicast bytes ingressed."
+        ::= { jnxIfFcAccountStatEntry 9 }
+
+    --output packet/byte stats for multicast traffic
+    jnxIfFcHCOutMcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of multicast packets egressed."
+        ::= { jnxIfFcAccountStatEntry 10 }
+
+    --output packet/byte stats for multicast traffic
+    jnxIfFcHCOutMcastOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of multicast bytes egressed."
+        ::= { jnxIfFcAccountStatEntry 11 }
+
+
+		
+-- ***************************************************************
+--  Per Forwarding-class stats table for Aggregate(all types of traffic) pkt/byte counters & rate
+-- ***************************************************************
+    jnxIfFcInlineAccountingStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxIfFcInlineAccountingStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table presents the per forwarding-class and per family 
+        statistics without considering the traffic types."
+        ::= { jnxIfAccountingStats 2 }
+
+
+    jnxIfFcInlineAccountingStatEntry OBJECT-TYPE
+        SYNTAX      JnxIfFcInlineAccountingStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table presents the per forwarding-class and 
+             per protocol type statistics. The indices of the 
+             table are Interface Index, Forwarding class Index
+             and protocol(family) type as defined below."
+        INDEX       { jnxIfFcIfIndex, jnxIfFcFcIndex, jnxIfFcProtocol }
+        ::= { jnxIfFcInlineAccountingStatTable 1 }
+        
+
+    JnxIfFcInlineAccountingStatEntry ::=
+        SEQUENCE {
+            -- Indices of the table
+            jnxIfFcIfIndex                    InterfaceIndex,
+            jnxIfFcFcIndex                    JnxCosFcIdentifier,
+            jnxIfFcProtocol                   INTEGER,
+
+            -- input packet & rate stats for all types of traffic
+            jnxIfFcInlineHCInPkts                   Counter64,
+            jnxIfFcInlineHCInPktsSecRate            CounterBasedGauge64,
+            
+            -- input bytes & rate stats for all types of traffic
+            jnxIfFcInlineHCInOctets                 Counter64,
+            jnxIfFcInlineHCInOctetsSecRate          CounterBasedGauge64,
+
+            -- output packet & rate stats for all types of traffic
+            jnxIfFcInlineHCOutPkts                  Counter64,
+            jnxIfFcInlineHCOutPktsSecRate           CounterBasedGauge64,
+
+            -- output bytes & rate stats for all types of traffic            
+            jnxIfFcInlineHCOutOctets                Counter64,
+            jnxIfFcInlineHCOutOctetsSecRate         CounterBasedGauge64
+
+    }
+
+    --input packet stats for all types of traffic 
+    jnxIfFcInlineHCInPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets ingressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 1 }
+
+    --input packets per sec rate 
+    jnxIfFcInlineHCInPktsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The packets rate ingressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 2 }
+
+    --input byte stats for all types of traffic
+    jnxIfFcInlineHCInOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes ingressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 3 }
+
+    --input bytes per sec for all types of traffic
+    jnxIfFcInlineHCInOctetsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The bytes rate ingressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 4 }
+
+    --output packets stats for all types of traffic 
+    jnxIfFcInlineHCOutPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets egressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 5 }
+
+    --output packets per sec for all types of traffic 
+    jnxIfFcInlineHCOutPktsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The packets rate egressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 6 }
+
+    --output byte stats for all types of traffic
+    jnxIfFcInlineHCOutOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes egressed."
+        ::= { jnxIfFcInlineAccountingStatEntry 7 }
+
+    --output bytes per sec for all types of traffic
+    jnxIfFcInlineHCOutOctetsSecRate OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The bytes rate egressed per second."
+        ::= { jnxIfFcInlineAccountingStatEntry 8 }		
+END

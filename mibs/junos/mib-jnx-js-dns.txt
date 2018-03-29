@@ -1,0 +1,97 @@
+--
+-- Juniper Enterprise specific MIB: DNS MIB
+--
+-- Copyright (c) 2006-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+JUNIPER-JS-DNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Counter64
+        FROM SNMPv2-SMI
+    jnxJsDnsRoot
+        FROM JUNIPER-JS-SMI;
+
+jnxJsDns MODULE-IDENTITY
+    LAST-UPDATED "200704141245Z" -- Sat Apr 14 12:45:13 2007 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB provides collated statistics for the 
+			Domain Name System (DNS) proxy collected over all 
+			interfaces on which it is configured to serve"
+    ::= { jnxJsDnsRoot 1 }
+
+jnxJsDnsProxyDataObjects OBJECT IDENTIFIER ::= { jnxJsDns 1}
+
+jnxJsDNSProxyQueriesReceived OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of total number of DNS queries received by the 
+		DNS Proxy."
+    ::= { jnxJsDnsProxyDataObjects 1 }
+
+jnxJsDnsProxyResponsesSent OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of DNS queries answered sent by the DNS Proxy. This includes 
+		DNS cache hits and misses that were answered."
+    ::= { jnxJsDnsProxyDataObjects 2 }
+
+jnxJsDnsProxyQueriesForwarded OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of DNS queries forwarded to other DNS server. This
+		is number of queries that have been proxied due to cache 
+		miss."
+    ::= { jnxJsDnsProxyDataObjects 3 }
+
+jnxJsDnsProxyNegativeResponses OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of Negative DNS query responses. This is the count of 
+		DNS queries that the Proxy could not obtain answers for."
+    ::= { jnxJsDnsProxyDataObjects 4 }
+
+jnxJsDnsProxyRetryRequests OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of DNS retry queries that this proxy received."
+    ::= { jnxJsDnsProxyDataObjects 5 }
+
+jnxJsDnsProxyPendingRequests OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of DNS requests yet to be answered."
+    ::= { jnxJsDnsProxyDataObjects 6 }
+
+jnxJsDnsProxyServerFailures OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of DNS Proxy Failures."
+    ::= { jnxJsDnsProxyDataObjects 7 }
+
+END

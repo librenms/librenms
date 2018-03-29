@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS `plugins` ( `plugin_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY , `plugin_name` VARCHAR( 60 ) NOT NULL , `plugin_active` INT NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

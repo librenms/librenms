@@ -1,0 +1,199 @@
+--
+-- Juniper Enterprise Specific MIB: FRU management for OTN Equipments
+-- 
+-- Copyright (c) 2012-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-FRU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    jnxFruMibRoot, jnxFruTraps
+        FROM JUNIPER-SMI;
+
+
+jnxFruMib MODULE-IDENTITY
+    LAST-UPDATED "201211131414Z" -- Tue Nov 13 14:14:51 PST 2012
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB module defines objects used for managing the
+             OTN FRU's for Juniper products."
+    REVISION      "201201260000Z"
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxFruMibRoot 1 }
+
+--
+-- Textual Conventions
+--
+JnxFruAdminStates ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Admin states for a FRU"
+    SYNTAX       INTEGER {
+                    inService(1),
+                    outOfService(2)
+                 }
+JnxFruOperStates ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Operation states for a FRU"
+    SYNTAX       INTEGER {
+                     unEquipped(1),  -- no FRU
+                     init(2),        -- init state
+                     normal(3),      -- normal state
+                     mismatched(4),  -- does not match configured FRU
+                     fault(5),       -- fru is in fault state
+                     swul(6)         -- ISSU Software upload state
+                 }
+
+jnxFruCfg           OBJECT IDENTIFIER ::= { jnxFruMib 1 }
+
+
+jnxFruCfgTable   OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxFruCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about the otn FRU's. "
+        ::= { jnxFruCfg 1 }
+
+jnxFruCfgEntry OBJECT-TYPE
+        SYNTAX     JnxFruCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                 "Information about the otn FRU's."
+        INDEX   { jnxFruCfgContentsIndex, jnxFruCfgL1Index,
+                  jnxFruCfgL2Index, jnxFruCfgL3Index }
+        ::= { jnxFruCfgTable 1 }
+
+JnxFruCfgEntry ::=
+    SEQUENCE {
+        jnxFruCfgContentsIndex         Integer32,
+        jnxFruCfgL1Index               Integer32,
+        jnxFruCfgL2Index               Integer32,
+        jnxFruCfgL3Index               Integer32,
+        jnxFruCfgType                  OBJECT IDENTIFIER,
+        jnxFruCfgAdminState            JnxFruAdminStates,
+        jnxFruCfgOperState             JnxFruOperStates
+    }
+
+    jnxFruCfgContentsIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..'7fffffff'h)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                "The associated jnxContentsContainerIndex in the 
+                jnxContentsTable."
+        ::= { jnxFruCfgEntry 1 }
+
+    jnxFruCfgL1Index OBJECT-TYPE
+        SYNTAX          Integer32 (0..'7fffffff'h)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                "The level one index associated with this
+                subject.  Zero if unavailable or inapplicable."
+        ::= { jnxFruCfgEntry 2 }
+
+    jnxFruCfgL2Index OBJECT-TYPE
+        SYNTAX          Integer32 (0..'7fffffff'h)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                "The level two index associated with this 
+                subject.  Zero if unavailable or inapplicable."
+        ::= { jnxFruCfgEntry 3 }
+
+    jnxFruCfgL3Index OBJECT-TYPE
+        SYNTAX          Integer32 (0..'7fffffff'h)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                "The level three index associated with this
+                subject.  Zero if unavailable or inapplicable."
+        ::= { jnxFruCfgEntry 4 }
+
+    jnxFruCfgType OBJECT-TYPE
+        SYNTAX           OBJECT IDENTIFIER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The object ID for this FRU"
+        ::= { jnxFruCfgEntry 5 }
+ 
+    jnxFruCfgAdminState OBJECT-TYPE
+        SYNTAX          JnxFruAdminStates
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The Administrative state of this FRU"
+        ::= { jnxFruCfgEntry 6 }
+
+    jnxFruCfgOperState OBJECT-TYPE
+        SYNTAX          JnxFruOperStates
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Operational state of this FRU"
+        ::= { jnxFruCfgEntry 7 }
+
+
+--
+-- Traps for FRU config
+--
+-- This can be moved to jnx-chassis.mib
+jnxFruNotifMismatch NOTIFICATION-TYPE
+        OBJECTS         { jnxFruCfgContentsIndex,
+                          jnxFruCfgL1Index,
+                          jnxFruCfgL2Index,
+                          jnxFruCfgL3Index,
+                          jnxFruCfgType
+                          }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFruInsertion trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified FRU (Field Replaceable Unit)  
+                inserted into the chassis does not match what was
+                configured."
+        ::= { jnxFruTraps 1 }
+
+jnxFruNotifAdminStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxFruCfgContentsIndex,
+                          jnxFruCfgL1Index,
+                          jnxFruCfgL2Index,
+                          jnxFruCfgL3Index,
+                          jnxFruCfgAdminState
+                        }
+        STATUS  current
+        DESCRIPTION
+                "Notification of the Administrative state of the otn interface"
+        ::= { jnxFruTraps 2 }
+
+jnxFruNotifOperStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxFruCfgContentsIndex,
+                          jnxFruCfgL1Index,
+                          jnxFruCfgL2Index,
+                          jnxFruCfgL3Index, 
+                          jnxFruCfgOperState
+                        }
+        STATUS  current
+        DESCRIPTION
+                "Notification of Operational state of the otn interface"
+        ::= { jnxFruTraps 3 }
+
+END

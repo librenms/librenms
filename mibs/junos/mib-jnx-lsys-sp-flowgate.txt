@@ -1,0 +1,194 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-FLOWGATE-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpFlowgate                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpFlowgateMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- July 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the flow-gate-specific MIB for Juniper Enterprise 
+             Logical-System (LSYS) security profiles.  Juniper documentation 
+             is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security flow-gate resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpFlowgate 1 }
+
+    jnxLsysSpFlowgateObjects        OBJECT IDENTIFIER ::= { jnxLsysSpFlowgateMIB 1 }
+    jnxLsysSpFlowgateSummary        OBJECT IDENTIFIER ::= { jnxLsysSpFlowgateMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular flow-gate resource information objects per LSYS:
+--   Below are flow-gate resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- flow-gate resource table per LSYS
+
+    jnxLsysSpFlowgateTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpFlowgateEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE flow-gate objects for flow-gate resource consumption per LSYS."  
+    ::= { jnxLsysSpFlowgateObjects 1 }
+    
+    jnxLsysSpFlowgateEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpFlowgateEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in flow-gate resource table."
+    INDEX { IMPLIED jnxLsysSpFlowgateLsysName }          
+    ::= { jnxLsysSpFlowgateTable 1 }          
+
+    JnxLsysSpFlowgateEntry ::= 
+       SEQUENCE {
+          jnxLsysSpFlowgateLsysName    DisplayString,
+          jnxLsysSpFlowgateProfileName DisplayString,
+          jnxLsysSpFlowgateUsage       Unsigned32,
+          jnxLsysSpFlowgateReserved    Unsigned32,
+          jnxLsysSpFlowgateMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the flow-gate resource table
+ 
+    jnxLsysSpFlowgateLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which flow-gate resource information is retrieved. "
+        ::= { jnxLsysSpFlowgateEntry 1 }
+
+    jnxLsysSpFlowgateProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpFlowgateEntry 2 }
+
+    jnxLsysSpFlowgateUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpFlowgateEntry 3 }
+    
+    jnxLsysSpFlowgateReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpFlowgateEntry 4 } 
+
+    jnxLsysSpFlowgateMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpFlowgateEntry 5 }
+
+
+-- **********************************************************************
+-- flow-gate resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpFlowgateUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The flow-gate resource consumption over all LSYS."
+    ::= { jnxLsysSpFlowgateSummary 1 }          
+
+    jnxLsysSpFlowgateMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The flow-gate resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpFlowgateSummary 2 }
+    
+    jnxLsysSpFlowgateAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The flow-gate resource available in the whole device."
+    ::= { jnxLsysSpFlowgateSummary 3 }
+    
+    jnxLsysSpFlowgateHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of flow-gate resource consumed of a LSYS."
+    ::= { jnxLsysSpFlowgateSummary 4 }
+    
+    jnxLsysSpFlowgateHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most flow-gate resource."
+    ::= { jnxLsysSpFlowgateSummary 5 }
+    
+    jnxLsysSpFlowgateLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of flow-gate resource consumed of a LSYS."
+    ::= { jnxLsysSpFlowgateSummary 6 }
+    
+    jnxLsysSpFlowgateLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least flow-gate resource."
+    ::= { jnxLsysSpFlowgateSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of flow-gate resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

@@ -1,0 +1,211 @@
+ATM-DXI-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	enterprises
+	FROM RFC1155-SMI
+	OBJECT-TYPE
+	FROM RFC-1212;
+
+	atmForum	OBJECT IDENTIFIER ::= { enterprises 353 }
+	atmUniDxi	OBJECT IDENTIFIER ::= { atmForum 3 }
+
+    -- This MIB is intended to be used in either of two scenarios.
+    -- In the first scenario, the DTE acts as a proxy for the DCE(s),
+    -- while, in the second scenario, the DCE contains an independent
+    -- SNMP agent and responds to SNMP requests directly.
+    --
+    -- In both these scenarios, specific DXI interfaces are identified
+    -- by a single integer-valued index.  In the first scenario, the
+    -- DXI interfaces that connect directly to the DTE are identified
+    -- by the DTE's corresponding value of ifIndex.  The DXI interfaces
+    -- that connect to the DCE are assigned interface numbers.
+    -- For example, see the figure below.
+    -- In this example, the numbers 4 and 5 are assigned to those
+    -- DXI interfaces that are connected to the DCE(s).  The assignment
+    -- of numbers to these interfaces is implementation dependent.
+    -- An SNMP management station will see these as interfaces of a
+    -- special type (assigned by the IETF).
+    -- In the second scenario, all the DXI interfaces correspond
+    -- directly to DCE interfaces.  In this case, all corresponding
+    -- instances are identified by IfIndices assigned by the DCE.
+
+--
+
+    -- In the UNI ATM Cell Header, the VPI/VCI fields together
+    -- comprise a 24-bit field.  The eight most significant bits
+    -- constitute the VPI subfield, and the least significant
+    -- sixteen bits constitute the VCI subfield.  All zeros is an
+    -- invalid value and on ATM interfaces is used to designate a
+    -- null (or empty or unassigned) cell.  Thus the valid VPI/VCI
+    -- values are in the range 1 thru 2**24-1 inclusive.  These
+    -- values are used for indexing certain tables in the ATM
+    -- MIB(s).
+
+    -- The ATM Data Exchange Interface (DXI) object reflects
+    -- information about an ATM DXI between an ATM DCE (e.g., a DSU)
+    -- and a DTE (e.g., a Router/Host).  In particular, it contains both
+    -- configuration and performance information specific to the
+    -- DXI. Each DXI instance typically corresponds to several DFAs.
+    -- With a 24-bit DFA, the range of valid DFA index values is
+    -- 1 thru 2**24 inclusive.  Note that the 24-bit binary DFA
+    -- field (with values 0 thru 2**24-1) from the DXI
+    -- header must be incremented by one to yield the DFA index
+    -- for accessing the tables in the MIB.  The DFA consisting of
+    -- all zeros (with corresponding MIB index value of 1) is
+    -- reserved for the DXI Local Management Interface (LMI) with
+    -- the ATM DTE.
+
+	Dfa ::= INTEGER (1..16777215)
+    -- *** For the DCEs, the mapping between the DXI
+    -- *** DFA and the ATM VPI/VCI is fixed.  The LMI DFA has no
+    -- *** corresponding VPI/VCI. (Refer to Annex A for the bit mapping.)
+
+	atmDxi	OBJECT IDENTIFIER ::= { atmUniDxi 2 }
+
+        ---
+        --- This table is mandatory if supporting ATM DXI.
+        ---
+
+	atmDxiConfTable   OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AtmDxiConfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+	"This table contains
+	ATM DXI configuration information
+	including information on the mode supported
+	across the DXI."
+	::= { atmDxi 2 }
+
+	atmDxiConfEntry  OBJECT-TYPE
+	SYNTAX    AtmDxiConfEntry
+	ACCESS    not-accessible
+	STATUS    mandatory
+	DESCRIPTION
+	"This list contains ATM DXI configuration information."
+	INDEX    { atmDxiConfIfIndex }
+	::= { atmDxiConfTable 1 }
+
+	AtmDxiConfEntry  ::=
+	SEQUENCE {
+	atmDxiConfIfIndex
+	INTEGER,
+	atmDxiConfMode
+	INTEGER
+	}
+
+	atmDxiConfIfIndex  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION
+	"The value of this object identifies, for SNMP, the ATM DXI
+	interface for which this entry contains management information.
+	This is the same value as used to identify the IfEntry describing
+	the DCE interface.  Management uses and expects this value.  In
+	the proxy mode of operation, the DCE always treats this as 0, but
+	preserves it in its response to the DTE.  0, the DXI value, means
+	the interface over which the DXI LMI request was received."
+	::= { atmDxiConfEntry 2 }
+
+	atmDxiConfMode OBJECT-TYPE
+	SYNTAX    INTEGER {
+	mode1a  (1),
+	mode1b  (2),
+	mode2   (3)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"This object identifies the dxi mode being
+	used at the atm dxi port."
+	::= { atmDxiConfEntry 3 }
+
+	atmDxiDFAConfTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AtmDxiDFAConfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+	"This table contains configuration information about
+	a particular DFA."
+	::= { atmDxi 3 }
+
+	atmDxiDFAConfEntry  OBJECT-TYPE
+	SYNTAX    AtmDxiDFAConfEntry
+	ACCESS    not-accessible
+	STATUS    mandatory
+	DESCRIPTION
+	"This list contains ATM DXI DFA configuration
+	information."
+	INDEX    { atmDxiDFAConfIfIndex, atmDxiDFAConfDfaIndex }
+	::= { atmDxiDFAConfTable 1 }
+
+	AtmDxiDFAConfEntry  ::=
+	SEQUENCE {
+	atmDxiDFAConfIfIndex
+	INTEGER,
+	atmDxiDFAConfDfaIndex
+	Dfa,
+	atmDxiDFAConfAALType
+	INTEGER
+	}
+
+	atmDxiDFAConfIfIndex   OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION
+	"The value of this object identifies, for SNMP, the ATM DXI
+	interface for which this entry contains management information.
+	This is the same value as used to identify the IfEntry describing
+	the DCE interface.  Management uses and expects this value.  In
+	the proxy mode of operation, the DCE always treats this as 0, but
+	preserves it in its response to the DTE.  0, the DXI value, means
+	the interface over which the DXI LMI request was received."
+	::= { atmDxiDFAConfEntry 1 }
+
+	atmDxiDFAConfDfaIndex   OBJECT-TYPE
+	SYNTAX  Dfa
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	"This object identifies the DFA instance on the DXI
+	identified by atmDxiDFAConfIfIndex."
+	::= { atmDxiDFAConfEntry 2 }
+
+	atmDxiDFAConfAALType OBJECT-TYPE
+	SYNTAX    INTEGER {
+	unknown (1),
+	none    (2),
+	aal34   (3),
+	aal5    (4)
+	}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"This object identifies the AAL type supported at this DFA.
+	Note, if mode 2 is supported on the DXI identified by the
+	corresponding instance of atmDxiDFAConfIfIndex and that
+	instance of atmDxiDFAConfIfIndex identifies the DCE side
+	of the DXI, then this object contains the AAL Type being
+	run on the corresponding VPI/VCI on the corresponding ATM UNI
+	interface."
+	::= { atmDxiDFAConfEntry 3 }
+
+	--  The following definition is for use only in Trap PDUs
+
+	atmDxiEnterprise  OBJECT-TYPE
+	SYNTAX  OBJECT IDENTIFIER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+	"This object is included as the first ID-Value pair
+	in a Trap PDU for which the Generic Trap Type field
+	has the value 'enterpriseSpecific'.  The value of the
+	object identifies the enterprise under whose authority
+	the value of the Enterprise Trap Type field is defined."
+	::= { atmDxi 4 }
+
+
+	-- End of definitions for ATM DXI-MIB
+ END

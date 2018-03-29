@@ -1,0 +1,799 @@
+VPLS-GENERIC-DRAFT-01-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Unsigned32, Counter32, transmission
+         FROM SNMPv2-SMI                    -- RFC2578
+
+      OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                   -- RFC2580
+
+      TruthValue, RowStatus, StorageType, TEXTUAL-CONVENTION
+         FROM SNMPv2-TC                     -- RFC2579
+
+      SnmpAdminString
+         FROM SNMP-FRAMEWORK-MIB            -- RFC3411
+
+      jnxExperiment
+	FROM JUNIPER-SMI
+
+    --  PwIndexType
+    --    FROM PW-TC-STD-MIB
+
+      VPNIdOrZero
+        FROM VPN-TC-STD-MIB;                -- RFC4265
+        
+   jnxVplsGenericDraft01MIB MODULE-IDENTITY
+      LAST-UPDATED "201103261200Z"  -- 26 March 2011 12:00:00 GMT
+      ORGANIZATION "Layer 2 Virtual Private Networks (L2VPN)
+                                 Working  Group"
+      CONTACT-INFO
+          "
+           Thomas D. Nadeau
+           Email:  tnadeau@cisco.com
+
+           The L2VPN Working Group (email distribution l2vpn@ietf.org,
+           http://www.ietf.org/html.charters/l2vpn-charter.html)
+           "
+
+      DESCRIPTION
+          "Copyright (C) The IETF Trust (2010). The initial
+           version of this MIB module was published in RFC XXXX.
+   -- RFC Editor: Please replace XXXX with RFC number & remove
+   --                    this note.
+
+           For full legal notices see the RFC itself or see:
+           http://www.ietf.org/copyrights/ianamib.html
+
+           This MIB module contains generic managed object definitions
+           for Virtual Private LAN Services as in [RFC4762] and
+           [RFC4761]
+
+           This MIB module enables the use of any underlying PseudoWire
+           network."
+
+      -- Revision history.
+      REVISION
+          "201103261200Z"  -- 26 March 2011 12:00:00 GMT
+      DESCRIPTION
+          "Removed inline definition of VPNIdOrZero in favor
+           of importing the definition from VPN-TC-STD-MIB.
+          "
+      REVISION
+          "200608301200Z"  -- 30 August 2006 12:00:00 GMT
+      DESCRIPTION
+          "Changes from previous version:
+           1) Moved LDP Specific information to VPLS-LDP-DRAFT-01-MIB
+           2) Created the vplsStatusTable to store status information.
+           3)
+
+
+
+          "
+      REVISION
+          "200606041200Z"  -- 4 June 2006 12:00:00 GMT
+      DESCRIPTION "Initial version published as part of RFC YYYY."
+   -- RFC Editor: please replace YYYY with IANA assigned value, and
+   -- delete this note.
+
+         ::= { jnxExperiment 8 }
+
+   -- RFC Editor: please replace XXXX with IANA assigne value, and
+   -- delete this note.
+
+   -- Top-level components of this MIB.
+
+    PwIndexType ::= TEXTUAL-CONVENTION
+    STATUS	      current
+    DESCRIPTION
+	"Pseudowire Index. A unique value, greater than zero,
+	 for each locally-defined PW for indexing
+	 several MIB tables associated with the particular PW.
+	 It is recommended that values are assigned contiguously
+	 starting from 1. The value for each PW MUST remain
+	 constant at least from one re-initialization
+	 to the next re-initialization.
+	"
+    SYNTAX  Unsigned32	(1..4294967295)
+
+    -- Vpls BGP Autodiscovery specific Textual Convention
+
+    JnxVplsBgpRouteDistinguisher ::= TEXTUAL-CONVENTION
+      STATUS        current
+      DESCRIPTION
+          "Syntax for a route distinguisher. For a complete
+           definition of a route distinguisher, see [RFC4364].
+           For more details on use of a route distinguisher
+           for a VPLS service, see [RFC4761]"
+      REFERENCE
+          "[RFC4364]"
+      SYNTAX  OCTET STRING(SIZE (0..256))
+
+    JnxVplsBgpRouteTarget ::= TEXTUAL-CONVENTION
+      STATUS        current
+      DESCRIPTION
+          "Syntax for a route target. For a complete
+           definition of a route target, see [RFC4364]."
+      REFERENCE
+          "[RFC4364]"
+      SYNTAX  OCTET STRING(SIZE (0..256))    
+
+    JnxVplsBgpRouteTargetType ::= TEXTUAL-CONVENTION
+      STATUS        current
+      DESCRIPTION
+       "Used to define the type of a route target usage.
+        Route targets can be specified to be imported,
+        exported, or both.  For a complete definition of a
+        route target, see [RFC4364]."
+      REFERENCE
+        "[RFC4364]"
+      SYNTAX INTEGER { import(1), export(2), both(3) }
+
+   -- Notifications
+   jnxVplsNotifications OBJECT IDENTIFIER
+                                 ::= { jnxVplsGenericDraft01MIB 0 }
+   -- Tables, Scalars
+   jnxVplsObjects       OBJECT IDENTIFIER
+                                 ::= { jnxVplsGenericDraft01MIB 1 }
+   -- Conformance
+   jnxVplsConformance   OBJECT IDENTIFIER
+                                 ::= { jnxVplsGenericDraft01MIB 2 }
+
+   -- PW Virtual Connection Table
+
+   jnxVplsConfigIndexNext OBJECT-TYPE
+      SYNTAX            Unsigned32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+          "This object contains an appropriate value to be used
+           for jnxVplsConfigIndex when creating entries in the
+           jnxVplsConfigTable. The value 0 indicates that no
+           unassigned entries are available.  To obtain the
+           value of jnxVplsConfigIndex for a new entry in the
+           jnxVplsConfigTable, the manager issues a management
+           protocol retrieval operation to obtain the current
+           value of jnxVplsConfigIndex.  After each retrieval
+           operation, the agent should modify the value to
+           reflect the next unassigned index.  After a manager
+           retrieves a value the agent will determine through
+           its local policy when this index value will be made
+           available for reuse."
+      ::= { jnxVplsObjects 1 }
+
+      jnxVplsConfigTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF JnxVplsConfigEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "This table specifies information for configuring
+                and monitoring Virtual Private Lan Services(VPLS).
+                "
+          ::= { jnxVplsObjects 2 }
+
+      jnxVplsConfigEntry OBJECT-TYPE
+          SYNTAX          JnxVplsConfigEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+           "A row in this table represents a Virtual Private Lan
+            Service(VPLS) in a packet network. It is indexed by
+            jnxVplsConfigIndex, which uniquely identifies a single VPLS.
+
+            A row is created by the operator or by the agent if a
+            VPLS service is created by non-SNMP application or
+            due to autodiscovery process.
+
+            None of the read-create objects values can be
+            changed when jnxVplsConfigRowStatus is in the active(1)
+            state. Changes are allowed when the jnxVplsConfigRowStatus
+            is in notInService(2) or notReady(3) states only.
+            If the operator need to change one of the values
+            for an active row the jnxVplsConfigRowStatus should be
+            first changed to notInService(2), the objects may
+            be changed now, and later to active(1) in order to
+            re-initiate the signaling process with the new
+            values in effect.
+            "
+          INDEX           { jnxVplsConfigIndex }
+          ::= { jnxVplsConfigTable 1 }
+
+     JnxVplsConfigEntry ::=
+        SEQUENCE {
+         jnxVplsConfigIndex                                Unsigned32,
+         jnxVplsConfigName                                 SnmpAdminString,
+         jnxVplsConfigDescr                                SnmpAdminString,
+         jnxVplsConfigAdminStatus                          INTEGER,
+         jnxVplsConfigMacLearning                          TruthValue,
+         jnxVplsConfigDiscardUnknownDest                   TruthValue,
+         jnxVplsConfigMacAging                             TruthValue,
+         jnxVplsConfigFwdFullHighWatermark                 Unsigned32,
+         jnxVplsConfigFwdFullLowWatermark                  Unsigned32,
+
+         jnxVplsConfigRowStatus                            RowStatus,
+         jnxVplsConfigMtu                                  Unsigned32,
+         jnxVplsConfigVpnId                                VPNIdOrZero,
+         jnxVplsConfigServiceType                          INTEGER,
+         jnxVplsConfigStorageType                          StorageType
+          }
+
+      jnxVplsConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+--          MAX-ACCESS      not-accessible
+          MAX-ACCESS      read-only 
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { jnxVplsConfigEntry 1 }
+
+      jnxVplsConfigName  OBJECT-TYPE
+          SYNTAX          SnmpAdminString
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "A textual name of the VPLS.
+                If there is no local name, or this object is
+                otherwise not applicable, then this object MUST
+                contain a zero-length octet string."
+          DEFVAL           { "" }
+          ::= { jnxVplsConfigEntry 2 }
+
+      jnxVplsConfigDescr  OBJECT-TYPE
+          SYNTAX          SnmpAdminString
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "A textual string containing information about the
+               VPLS service. If there is no information for this VPLS
+               service, then this object MUST contain a zero-length
+               octet string."
+          DEFVAL           { "" }
+          ::= { jnxVplsConfigEntry 3 }
+
+      jnxVplsConfigAdminStatus OBJECT-TYPE
+          SYNTAX          INTEGER {
+                              up(1),
+                              down(2),
+                              testing(3)   -- in some test mode
+
+                          }
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "The desired administrative state of the VPLS
+                service. If the administrative status of the
+                Vpls service is changed to enable then this
+                service is able to utilize the pseudo wire to
+                perform the tasks of a VPLS service.
+                The testing(3) state indicates that no operational
+                packets can be passed. "
+          DEFVAL           { down }
+          ::= { jnxVplsConfigEntry 4 }
+
+      jnxVplsConfigMacLearning OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This object specifies if MAC Learning is enabled
+                in this service. If this object is true then Mac
+                Learning is enabled. If false, then Mac Learning is
+                disabled."
+          DEFVAL          { true }
+          ::= { jnxVplsConfigEntry 6 }
+
+      jnxVplsConfigDiscardUnknownDest OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "If the value of this object is 'true', then frames
+                received with an unknown destination MAC are discarded
+                in this VPLS. If 'false', then the packets are
+                processed."
+          DEFVAL          { false }
+          ::= { jnxVplsConfigEntry 7 }
+
+      jnxVplsConfigMacAging OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "If the value of this object is 'true'
+                then the MAC ageing process is enabled in
+                this VPLS. If 'false', then the MAC ageing process
+                is disabled"
+          DEFVAL          { true }
+          ::= { jnxVplsConfigEntry 8 }
+
+      jnxVplsConfigFwdFullHighWatermark OBJECT-TYPE
+          SYNTAX          Unsigned32 (0..100)
+          UNITS           "percentage"
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This object specifies the utilization of the
+                forwarding database for this VPLS instance at
+                which the jnxVplsFwdFullAlarmRaised notification
+                will be sent."
+          DEFVAL          { 95 }
+          ::= { jnxVplsConfigEntry 10 }
+
+      jnxVplsConfigFwdFullLowWatermark OBJECT-TYPE
+          SYNTAX          Unsigned32 (0..100)
+          UNITS           "percentage"
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This object specifies the utilization of the
+                forwarding database for this VPLS instance
+                at which the jnxVplsFwdFullAlarmCleared
+                notification will be sent."
+          DEFVAL          { 90 }
+          ::= { jnxVplsConfigEntry 11 }
+
+      jnxVplsConfigRowStatus OBJECT-TYPE
+          SYNTAX          RowStatus
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "For creating, modifying, and deleting this row.
+                None of the read-create objects in the
+                conceptual rows may be changed when this
+                object is in the active(1) state."
+          ::= { jnxVplsConfigEntry 12 }
+
+      jnxVplsConfigMtu OBJECT-TYPE
+          SYNTAX          Unsigned32 (64..1518)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "The value of this object specifies the MTU of this
+                vpls instance."
+          DEFVAL          { 1518 }
+          ::= { jnxVplsConfigEntry 13 }
+
+      jnxVplsConfigVpnId OBJECT-TYPE
+          SYNTAX          VPNIdOrZero
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This objects indicates the IEEE 802-1990
+                VPN ID of the associated VPLS service."
+          ::= { jnxVplsConfigEntry 14 }
+
+      jnxVplsConfigServiceType OBJECT-TYPE
+          SYNTAX          INTEGER {
+                           vlan     (1),
+                           ethernet (2)
+                          }
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "The value of this object specifies the type of 
+                service emulated by this vpls instance."
+          DEFVAL          { vlan }
+          ::= { jnxVplsConfigEntry 15 }
+
+  jnxVplsConfigStorageType OBJECT-TYPE   
+          SYNTAX        StorageType  
+          MAX-ACCESS    read-only  
+          STATUS        current  
+          DESCRIPTION  
+               "This variable indicates the storage type for this row."  
+          DEFVAL { volatile }
+          ::= { jnxVplsConfigEntry 16 }  
+
+-- VPLS Status table
+
+      jnxVplsStatusTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF JnxVplsStatusEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+                "This table provides information for monitoring
+                Virtual Private Lan Services(VPLS).
+                "
+          ::= { jnxVplsObjects 3 }
+
+      jnxVplsStatusEntry OBJECT-TYPE
+          SYNTAX          JnxVplsStatusEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+           "A row in this table represents a Virtual Private Lan
+            Service(VPLS) in a packet network. It is indexed by
+            jnxVplsConfigIndex, which uniquely identifies a single VPLS.
+
+            A row in this table is automatically created by the agent
+            when a VPLS service is configured.
+            "
+          INDEX           { jnxVplsConfigIndex }
+          ::= { jnxVplsStatusTable 1 }
+
+     JnxVplsStatusEntry ::=
+        SEQUENCE {
+         jnxVplsStatusOperStatus                        INTEGER,
+         jnxVplsStatusPeerCount                         Counter32
+          }
+
+      jnxVplsStatusOperStatus OBJECT-TYPE
+          SYNTAX          INTEGER {
+                              other(0),
+                              up(1),
+                              down(2)
+                          }
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "The current operational state of this VPLS Service."
+          ::= { jnxVplsStatusEntry 1 }
+
+      jnxVplsStatusPeerCount OBJECT-TYPE
+          SYNTAX          Counter32
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This objects specifies the number of peers
+                present in this vpls instance."
+          ::= { jnxVplsStatusEntry 2 }
+
+      -- VPLS PW Binding Table
+
+      jnxVplsPwBindTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF JnxVplsPwBindEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "This table provides an association between a
+                VPLS service and the corresponding Pseudo
+                Wires. A service can have more than one Pseudo
+                Wire association. Pseudo Wires are defined in
+                the pwTable"
+          ::= { jnxVplsObjects 4 }
+
+      jnxVplsPwBindEntry OBJECT-TYPE
+          SYNTAX          JnxVplsPwBindEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Each row represents an association between a
+                VPLS instance and one or more Pseudo Wires
+                defined in the pwTable. Each index is unique
+                in describing an entry in this table. However
+                both indexes are required to define the one
+                to many association of service to
+                pseudowire."
+          INDEX  { jnxVplsConfigIndex, jnxVplsPwBindIndex }
+          ::= { jnxVplsPwBindTable 1 }
+
+      JnxVplsPwBindEntry ::=
+          SEQUENCE {
+              jnxVplsPwBindConfigType              INTEGER,
+              jnxVplsPwBindType                  INTEGER,
+              jnxVplsPwBindRowStatus             RowStatus,
+              jnxVplsPwBindStorageType             StorageType,
+	      jnxVplsPwBindIndex		      PwIndexType
+          }
+
+      jnxVplsPwBindConfigType   OBJECT-TYPE
+           SYNTAX          INTEGER {
+                                   manual        (1),
+                                   autodiscovery (2)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+                "The value of this object indicates
+                 whether the Pseudo Wire binding was created
+                 manually or via autodiscovery.
+
+                 The value of this object must be
+                 specifed when the row is created and cannot
+                 be changed while the row status is active(1)"
+          ::= { jnxVplsPwBindEntry 1 }
+
+      jnxVplsPwBindType   OBJECT-TYPE
+           SYNTAX          INTEGER {
+                                   mesh  (1),
+                                   spoke (2)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+                "The value of this object indicates
+                 whether the Pseudo Wire binding is of
+                 type mesh or spoke.
+
+                 The value of this object must be
+                 specifed when the row is created and cannot
+                 be changed while the row status is active(1)"
+          ::= { jnxVplsPwBindEntry 2 }
+
+      jnxVplsPwBindRowStatus  OBJECT-TYPE
+           SYNTAX          RowStatus
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+                "For creating, modifying, and deleting this row.
+                 None of the read-create objects in the
+                 conceptual rows may be changed when this
+                 object is in the active(1) state"
+          ::= { jnxVplsPwBindEntry 3 }
+
+      jnxVplsPwBindStorageType OBJECT-TYPE   
+           SYNTAX        StorageType  
+           MAX-ACCESS    read-only 
+           STATUS        current  
+           DESCRIPTION  
+               "This variable indicates the storage type for this row."  
+           DEFVAL { volatile }
+           ::= { jnxVplsPwBindEntry 4 }  
+
+-- Joe Added xxx
+      jnxVplsPwBindIndex	 OBJECT-TYPE   
+           SYNTAX        PwIndexType  
+--           MAX-ACCESS    not-accessible 
+           MAX-ACCESS    read-only 
+           STATUS        current  
+           DESCRIPTION  
+               "Secondary Index for the conceptual row identifying
+		a pseudowire within the PwEntry which MUST 
+		match an entry from the PW-STD-MIB's PwTable
+		which represents an already-provisioned
+	        pseudowire that is then associated with this
+		VPLS instance.
+		"  
+           ::= { jnxVplsPwBindEntry 5 }  
+
+-- jnxVplsBgpADConfigTable 
+
+      jnxVplsBgpADConfigTable OBJECT-TYPE 
+            SYNTAX          SEQUENCE OF JnxVplsBgpADConfigEntry 
+            MAX-ACCESS      not-accessible 
+            STATUS          current 
+            DESCRIPTION 
+            "This table specifies information for configuring 
+             BGP Auto-discovery parameters for a given Vpls service. 
+            " 
+            ::= { jnxVplsObjects 5 } 
+
+      jnxVplsBgpADConfigEntry OBJECT-TYPE 
+            SYNTAX          JnxVplsBgpADConfigEntry 
+            MAX-ACCESS      not-accessible 
+            STATUS          current 
+            DESCRIPTION 
+            "A row in this table represents BGP based autodiscovery 
+             is in use for this instance of Vpls. 
+             A row in this table is indexed by jnxVplsConfigIndex, which 
+             uniquely identifies a single VPLS.  
+             None of the read-create objects can be changed when  
+             jnxVplsBGPADConfigRowStatus is in active(1) state. Changes 
+             are allowed when the jnxVplsBGPADConfigRowStatus is in  
+             notInService(2) or notReady(3) states only.  
+             If the operator need to change one of the values 
+             for an active row the jnxVplsConfigRowStatus should be 
+             first changed to notInService(2), the objects may 
+             be changed now, and later to active(1) in order to 
+             re-initiate the signaling process with the new 
+             values in effect. 
+            " 
+            INDEX      { jnxVplsConfigIndex } 
+            ::= { jnxVplsBgpADConfigTable 1 } 
+
+      JnxVplsBgpADConfigEntry ::= 
+         SEQUENCE { 
+          jnxVplsBgpADConfigRouteDistinguisher   JnxVplsBgpRouteDistinguisher, 
+          jnxVplsBgpADConfigPrefix               Unsigned32, 
+          jnxVplsBgpADConfigVplsId               JnxVplsBgpRouteDistinguisher, 
+          jnxVplsBgpADConfigRowStatus            RowStatus 
+         } 
+
+      jnxVplsBgpADConfigRouteDistinguisher OBJECT-TYPE 
+            SYNTAX          JnxVplsBgpRouteDistinguisher 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+            " The route distinguisher for this VPLS. See [RFC4364]  
+            for a complete definition of a route distinguisher. 
+            for more details on use of a route distinguisher 
+            for a VPLS service, see [RFC4761] 
+            " 
+            ::= { jnxVplsBgpADConfigEntry 1 } 
+
+            jnxVplsBgpADConfigPrefix      OBJECT-TYPE 
+            SYNTAX          Unsigned32 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+            " In case of auto-discovery the default prefix advertised 
+            is the ip address of the loopback. In case the user wants 
+            to override the loopback address, jnxVplsBgpADConfigPrefix  
+            should be set. When this value if non-zero it is used 
+            as the advertised IP address in the NLRI. 
+            " 
+            DEFVAL { 0 } 
+            ::= { jnxVplsBgpADConfigEntry 2 } 
+
+      jnxVplsBgpADConfigVplsId          OBJECT-TYPE 
+            SYNTAX          JnxVplsBgpRouteDistinguisher 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+            " VplsId is a unique identifier for all VSIs belonging to 
+            the same VPLS. It is advertised as an extended community 
+            "
+            ::= { jnxVplsBgpADConfigEntry 3 } 
+
+      jnxVplsBgpADConfigRowStatus OBJECT-TYPE 
+            SYNTAX          RowStatus 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION     
+	    " For creating, modifying, and deleting this row. 
+            None of the read-create objects in the 
+            conceptual rows may be changed when this 
+            object is in the active(1) state. 
+            " 
+            ::= { jnxVplsBgpADConfigEntry 4 } 
+
+
+    -- jnxVplsBgpRteTargetTable 
+
+      jnxVplsBgpRteTargetTable   OBJECT-TYPE 
+            SYNTAX          SEQUENCE OF JnxVplsBgpRteTargetEntry 
+            MAX-ACCESS      not-accessible 
+            STATUS          current 
+            DESCRIPTION 
+            " This table specifies the list of Route Targets 
+              imported or exported by BGP during auto-discovery of VPLS. 
+            "    
+            ::= { jnxVplsObjects 6 } 
+
+      jnxVplsBgpRteTargetEntry   OBJECT-TYPE 
+            SYNTAX          JnxVplsBgpRteTargetEntry 
+            MAX-ACCESS      not-accessible 
+            STATUS          current 
+            DESCRIPTION 
+              "An entry in this table specifies the value of the 
+               Route Target being used by BGP. Depending on the value
+               of jnxVplsBgpRteTargetType an RT might be exported or 
+               imported or both. Every VPLS which 
+              uses auto-discovery for finding peer nodes can import and
+              export multiple Route Targets. This representation allows 
+              support for hierarchical VPLS. 
+            " 
+            INDEX     { jnxVplsConfigIndex, jnxVplsBgpRteTargetIndex } 
+            ::= { jnxVplsBgpRteTargetTable 1 } 
+
+      JnxVplsBgpRteTargetEntry ::=  
+         SEQUENCE { 
+          jnxVplsBgpRteTargetIndex          Unsigned32, 
+          jnxVplsBgpRteTargetRTType         JnxVplsBgpRouteTargetType, 
+          jnxVplsBgpRteTargetRT             JnxVplsBgpRouteTarget, 
+          jnxVplsBgpRteTargetRTRowStatus    RowStatus 
+         } 
+
+      jnxVplsBgpRteTargetIndex   OBJECT-TYPE 
+            SYNTAX          Unsigned32 
+            MAX-ACCESS      not-accessible 
+            STATUS          current 
+            DESCRIPTION 
+            "This index along with jnxVplsConfigIndex,identifies one entry 
+             in the jnxVplsBgpRteTargetTable. By keeping jnxVplsConfigIndex 
+             constant and using new value of jnxVplsBgpRteTargetIndex user 
+              can configure multiple Route Targets for the same Vpls. 
+            " 
+            ::= { jnxVplsBgpRteTargetEntry 1 } 
+
+      jnxVplsBgpRteTargetRTType  OBJECT-TYPE 
+            SYNTAX          JnxVplsBgpRouteTargetType 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+            " Used to define the type of a route target usage. 
+              Route targets can be specified to be imported, 
+              exported, or both.  For a complete definition of a 
+              route target, see [RFC4364]. 
+            " 
+            ::= { jnxVplsBgpRteTargetEntry 2 } 
+
+      jnxVplsBgpRteTargetRT     OBJECT-TYPE 
+            SYNTAX          JnxVplsBgpRouteTarget 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+            " The route target associated with the VPLS service. 
+              For more details on use of route targets 
+              for a VPLS service, see [RFC4761] 
+            " 
+            ::= { jnxVplsBgpRteTargetEntry 3 } 
+
+      jnxVplsBgpRteTargetRTRowStatus     OBJECT-TYPE 
+            SYNTAX          RowStatus 
+            MAX-ACCESS      read-only 
+            STATUS          current 
+            DESCRIPTION 
+            "This variable is used to create, modify, and/or 
+             delete a row in this table.  When a row in this 
+             table is in active(1) state, no objects in that row 
+             can be modified 
+            " 
+            ::= { jnxVplsBgpRteTargetEntry 4 } 
+
+      jnxVplsStatusNotifEnable  OBJECT-TYPE 
+            SYNTAX      TruthValue 
+            MAX-ACCESS  read-write 
+            STATUS      current 
+            DESCRIPTION 
+            "If this object is set to true(1), then it enables 
+             the emission of jnxVplsStatusChanged 
+             notification; otherwise this notification is not 
+             emitted." 
+            REFERENCE 
+            "See also [RFC3413] for explanation that
+            notifications are under the ultimate control of the
+            MIB module in this document."
+            DEFVAL { false }
+            ::= { jnxVplsObjects 7 }
+
+       jnxVplsNotificationMaxRate OBJECT-TYPE
+          SYNTAX       Unsigned32
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+           "This object indicates the maximum number of
+            notifications issued per second. If events occur
+            more rapidly, the implementation may simply fail to
+            emit these notifications during that period, or may
+            queue them until an appropriate time. A value of 0
+            means no throttling is applied and events may be
+            notified at the rate at which they occur."
+          DEFVAL       { 0 }
+          ::= { jnxVplsObjects 8 }
+
+      -- VPLS Service Notifications
+
+      jnxVplsStatusChanged NOTIFICATION-TYPE
+          OBJECTS {
+              jnxVplsConfigVpnId,
+              jnxVplsConfigAdminStatus,
+              jnxVplsStatusOperStatus
+          }
+          STATUS          current
+          DESCRIPTION
+               "The jnxVplsStatusChanged notification is generated
+                when there is a change in the administrative or
+                operating status of a VPLS service."
+          ::= { jnxVplsNotifications 1 }
+
+      jnxVplsFwdFullAlarmRaised NOTIFICATION-TYPE
+          OBJECTS {
+              jnxVplsConfigVpnId,
+              jnxVplsConfigFwdFullHighWatermark,
+              jnxVplsConfigFwdFullLowWatermark
+          }
+          STATUS          current
+          DESCRIPTION
+               "The jnxVplsFwdFullAlarmRaised notification is
+                generated when the utilization of the Forwarding
+                database is above the value specified by
+                jnxVplsConfigFwdFullHighWatermark."
+          ::= { jnxVplsNotifications 2 }
+
+      jnxVplsFwdFullAlarmCleared NOTIFICATION-TYPE
+          OBJECTS {
+              jnxVplsConfigVpnId,
+              jnxVplsConfigFwdFullHighWatermark,
+              jnxVplsConfigFwdFullLowWatermark
+          }
+          STATUS          current
+          DESCRIPTION
+               "The jnxVplsFwdFullAlarmCleared notification is
+                generated when the utilization of the Forwarding
+                database is below the value specified by
+                jnxVplsConfigFwdFullLowWatermark."
+          ::= { jnxVplsNotifications 3 }
+
+       END

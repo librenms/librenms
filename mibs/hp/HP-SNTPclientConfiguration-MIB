@@ -1,0 +1,271 @@
+HP-SNTPclientConfiguration-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE, MODULE-IDENTITY, IpAddress, Integer32
+         FROM SNMPv2-SMI
+      RowStatus
+         FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      hpicfCommon
+         FROM HP-ICF-OID 
+      InetAddressType, InetAddress
+         FROM INET-ADDRESS-MIB;    
+
+   hpSntpConfigMod MODULE-IDENTITY
+      LAST-UPDATED "200011030239Z"  -- November 3, 2000
+      ORGANIZATION "Hewlett-Packard Company
+                    Network Infrastructure Solutions"
+      CONTACT-INFO "Hewlett-Packard Company
+                    8000 Foothills Blvd.
+                    Roseville, CA 95747"
+      DESCRIPTION  "Managment information for configuring the SNTP client
+                   on Hewlett-Packard network devices."
+
+      REVISION     "200011030239Z"  -- November 3, 2000
+      DESCRIPTION  "Initial version of thie MIB module."
+
+      ::= { hpicfCommon 8 }
+
+   hpSntpConfig   OBJECT IDENTIFIER      ::= { hpSntpConfigMod 1 }
+   hpTimeSyncMethodMod OBJECT IDENTIFIER ::= { hpSntpConfigMod 2 }
+
+-- ----------------------------------------------------------------------   
+-- Global TimeSyncMethod
+-- ----------------------------------------------------------------------
+  
+   hpTimeSyncMethod OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      none(1),
+                      sntp(2),
+                      timep(3)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Method to be used for time synchronization."
+      ::= { hpTimeSyncMethodMod 1 }
+
+-- ----------------------------------------------------------------------   
+-- SNTP client configuration parameters
+-- ----------------------------------------------------------------------
+      
+   hpSntpConfigMode OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      disabled(1),
+                      unicast(2),
+                      broadcast(3)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Current operational mode of SNTP client"
+      ::= { hpSntpConfig 1 }
+
+   hpSntpConfigPollInterval OBJECT-TYPE
+      SYNTAX      Integer32 (30..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Period of time (in seconds) between succesive attempts to 
+                  perform an update via SNTP"
+      ::= { hpSntpConfig 2 }
+
+-- ----------------------------------------------------------------------
+-- Table for configuring Servers
+-- ----------------------------------------------------------------------
+
+   hpSntpConfigServerTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF HpSntpServerEntry
+      MAX-ACCESS  not-accessible
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ### A table containing trusted SNTP servers 
+                  to be queried in unicast mode"
+      ::= { hpSntpConfig 3 }
+
+   hpSntpServerEntry OBJECT-TYPE
+      SYNTAX      HpSntpServerEntry
+      MAX-ACCESS  not-accessible
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ### A trusted server and its expected version 
+                  number"
+      INDEX       { hpSntpServerAddress }
+      ::= { hpSntpConfigServerTable 1 }
+
+   HpSntpServerEntry ::=
+      SEQUENCE {
+         hpSntpServerAddress        IpAddress,
+         hpSntpServerVersion        Integer32,
+         hpSntpServerPriority       Integer32,
+         hpSntpServerRowStatus      RowStatus
+      }
+      
+
+   hpSntpServerAddress OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  not-accessible
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ### Ip Address of a trusted SNTP server."
+      ::= { hpSntpServerEntry 1 }
+
+   hpSntpServerVersion OBJECT-TYPE
+      SYNTAX      Integer32 (1..7)
+      MAX-ACCESS  read-create
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ### Protocol version used by this SNTP server"
+      ::= { hpSntpServerEntry 2 }
+
+   hpSntpServerPriority OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ### Priority given to this server."
+      ::= { hpSntpServerEntry 3 }
+
+   hpSntpServerRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ### The Status of this SNTP server information."
+      ::= { hpSntpServerEntry 4 }
+
+   hpSntpInetConfigServerTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF HpSntpInetServerEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A table containing trusted IPv4 and IPv6 SNTP servers to be 
+                   queried in unicast mode"
+      ::= { hpSntpConfig 4 }
+
+   hpSntpInetServerEntry OBJECT-TYPE
+      SYNTAX      HpSntpInetServerEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A trusted server and its expected version number and priority"
+      INDEX       { hpSntpInetServerPriority,
+                    hpSntpInetServerAddressType,
+                    hpSntpInetServerAddress        }
+      ::= { hpSntpInetConfigServerTable 1 }
+
+   HpSntpInetServerEntry ::=
+      SEQUENCE {
+         hpSntpInetServerPriority       Integer32,
+         hpSntpInetServerAddressType    InetAddressType,
+         hpSntpInetServerAddress        InetAddress,         
+         hpSntpInetServerVersion        Integer32,
+         hpSntpInetServerRowStatus      RowStatus
+      }
+      
+   hpSntpInetServerPriority OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Priority given to this server."
+      ::= { hpSntpInetServerEntry 1 }
+
+   hpSntpInetServerAddressType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Ip Address type of a trusted SNTP server."
+      ::= { hpSntpInetServerEntry 2 }
+
+   hpSntpInetServerAddress OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Ip Address (of a trusted SNTP server) to which this entry's
+                   addressing information pertains. hpSntpInetServerAddress is 
+                   always interpreted within the context of     
+                   hpSntpInetServerAddressType"
+      ::= { hpSntpInetServerEntry 3 }
+
+   hpSntpInetServerVersion OBJECT-TYPE
+      SYNTAX      Integer32 (1..7)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "Protocol version used by this SNTP server"
+      ::= { hpSntpInetServerEntry 4 }
+
+   hpSntpInetServerRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "The Status of this SNTP server information."
+      ::= { hpSntpInetServerEntry 5 }
+
+-- --------------------------------------------------------------------------
+-- Compliance Information
+-- --------------------------------------------------------------------------
+   
+   hpSntpConfigConformance
+      OBJECT IDENTIFIER ::= { hpSntpConfigMod 3 }
+
+   hpSntpConfigCompliances
+      OBJECT IDENTIFIER ::= { hpSntpConfigConformance 1 }
+
+   hpSntpConfigGroups
+      OBJECT IDENTIFIER ::= { hpSntpConfigConformance 2 }
+
+   hpSntpConfigCompliance MODULE-COMPLIANCE
+      STATUS         deprecated
+      DESCRIPTION    "###DEPRECATED###The compliance statement for devices implementing
+                     the hpSntpConfig MIB."
+      MODULE
+         MANDATORY-GROUPS  { hpSntpConfigGroup }
+
+         GROUP             hpSntpServerConfigGroup
+         DESCRIPTION       "This group is optional if a device implemnets
+                           the SNTP client in broadcast mode only."
+
+         GROUP             hpTimeSyncMethodGroup
+         DESCRIPTION       "Implementation of this group is mandatory for
+                           devices that implement multiple time
+                           synchronization protocols."
+      ::= { hpSntpConfigCompliances 1 }
+
+   hpSntpInetConfigCompliance MODULE-COMPLIANCE
+      STATUS         current
+      DESCRIPTION    "The compliance statement for devices implementing
+                     the hpSntpConfig MIB."
+      MODULE
+         MANDATORY-GROUPS  { hpSntpConfigGroup }
+
+         GROUP             hpSntpInetServerConfigGroup
+         DESCRIPTION       "This group is optional if a device implemnets
+                           the SNTP client in broadcast mode only."
+
+         GROUP             hpTimeSyncMethodGroup
+         DESCRIPTION       "Implementation of this group is mandatory for
+                           devices that implement multiple time
+                           synchronization protocols."
+      ::= { hpSntpConfigCompliances 2 }
+
+   hpSntpConfigGroup OBJECT-GROUP
+      OBJECTS     { hpSntpConfigMode,
+                    hpSntpConfigPollInterval }
+      STATUS      current
+      DESCRIPTION "A collection of objects for configuring the SNTP
+                  client."
+      ::= { hpSntpConfigGroups 1 }
+
+   hpSntpServerConfigGroup OBJECT-GROUP
+      OBJECTS     { hpSntpServerVersion,
+                    hpSntpServerPriority,
+                    hpSntpServerRowStatus }
+      STATUS      deprecated
+      DESCRIPTION "### DEPRECATED ###This Group definies a server table entry."
+      ::= { hpSntpConfigGroups 2 }
+
+   hpTimeSyncMethodGroup OBJECT-GROUP
+      OBJECTS     { hpTimeSyncMethod }
+      STATUS      current
+      DESCRIPTION "A collection of objects for selecting a time
+                  synchronization protocol to use."
+      ::= { hpSntpConfigGroups 3 }
+
+   hpSntpInetServerConfigGroup OBJECT-GROUP
+      OBJECTS     { hpSntpInetServerVersion,
+                    hpSntpInetServerPriority,
+                    hpSntpInetServerRowStatus }
+      STATUS      current
+      DESCRIPTION "This Group defines a server table entry."
+      ::= { hpSntpConfigGroups 4 }
+END

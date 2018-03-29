@@ -1,0 +1,962 @@
+-- *****************************************************************
+-- CISCO-RTTMON-TC-MIB.my:  IP SLA Textual Conventions MIB file
+--   
+-- August 2005, Katherine Yang
+--   
+-- Copyright (c) 2005-2014 by Cisco Systems Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-RTTMON-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoRttMonTCMIB MODULE-IDENTITY
+    LAST-UPDATED    "201403190000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems, Inc.
+            Customer Service 
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA 95134
+
+            Tel: +1 800 553 NETS
+            Email: cs-ipsla@cisco.com"
+    DESCRIPTION
+        "This MIB contains textual conventions used by
+        CISCO-RTTMON-MIB, CISCO-RTTMON-RTP-MIB and 
+        CISCO-RTTMON-ICMP-MIB, but they are not limited 
+        to only these MIBs. 
+        These textual conventions were originally defined in 
+        CISCO-RTTMON-MIB.
+
+        Acronyms:
+          FEC: Forward Equivalence Class
+          LPD: Label Path Discovery
+          LSP: Label Switched Path
+          MPLS: Multi Protocol Label Switching
+          RTT: Round Trip Time
+          SAA: Service Assurance Agent
+          VPN: Virtual Private Network
+          CFM: Connection Fault Management"
+    REVISION        "201403190000Z"
+    DESCRIPTION
+        "Added new fabricPathEcho type to RttMonRttType and
+        fabricPathEchoAppl type to RttMonProtocol"
+    REVISION        "201311260000Z"
+    DESCRIPTION
+        "Added new RttMonReactVar type named 'protocolSpecificError'"
+    REVISION        "201211020000Z"
+    DESCRIPTION
+        "Added RttMonScheduleStartType TC.
+
+        Added  enumeration y1731dmmv1 to RttMonProtocol.
+
+        Added the following to RttMonReactVar:
+          lpdGroup, lpdTreeTrace, lpdAll,
+          unavailSD, unavailDS, pktLossPctSD,
+          pktLossPctDS, rttPct, maxOfLatencySDPct,
+          maxOfLatencyDSPct, latencySDAvgPct, latencyDSAvgPct,
+          jitterSDAvgPct, jitterDSAvgPct, jitterAvgPct,
+          overThreshold."
+    REVISION        "201205250000Z"
+    DESCRIPTION
+        "Added enumeration y1731slm to RttMonProtocol
+
+        Added the following to RttResopnseSense.
+         statsRetrieveOk, statsRetrieveNoConnect,  
+         statsRetrieveVersionFail, statsRetrieveInternalError,
+         statsRetrieveAbort, statsRetrieveFail,
+         statsRetrieveAuthFail, statsRetrieveFormatError,
+         statsRetrievePortInUse.
+
+        For enumeration from controlOk to controlPortInUse, changed the
+        prefix from control to enable."
+    REVISION        "201109150000Z"
+    DESCRIPTION
+        "Updated following textual conventions to include Y1731
+        and Multicast extensions.
+        -RttMonRttType, RttMonProtocol."
+    REVISION        "201004260000Z"
+    DESCRIPTION
+        "Added enumeration 'video' to RttMonRttType TC."
+    REVISION        "200608110000Z"
+    DESCRIPTION
+        "Added RttMonIdLst and RttMonCtrlIndex textual conventions."
+    REVISION        "200607170000Z"
+    DESCRIPTION
+        "Added enumeration 'lspPingPseudowire' to RttMonRttType TC."
+    REVISION        "200603020000Z"
+    DESCRIPTION
+        "Added ethernetPing and ethernetJitter in RttMonRttType.
+        Added ethernetPingAppl and ethernetJitterAppl 
+        in RttMonProtocol"
+    REVISION        "200508090000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 485 }
+
+
+
+-- Textual Conventions
+
+RttMonScheduleStartType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "These are defined values for scheduling the start time of a
+        probe
+
+        pending(1)    - Pending state
+        now(2)        - Schedule the start time of probe to current time
+                        and probe is immediately started
+        random(3)     - Schedule the start time of probe at a random 
+                        time over a range.
+        after(4)      - Schedule the start time of probe after a certain
+                        amount of time from now.
+        specific(5)   - Schedule the start time of probe at a specific
+                        given time interval"
+    SYNTAX          INTEGER  {
+                        pending(1),
+                        now(2),
+                        random(3),
+                        after(4),
+                        specific(5)
+                    }
+
+RttReset ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "When the value set to 'reset', the entire RTT application
+        goes through a reset sequence, making a best
+        effort to revert to its startup condition. At other times,
+        the value is 'ready'."
+    SYNTAX          INTEGER  {
+                        ready(1),
+                        reset(2)
+                    }
+
+RttMonOperation ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The following are specific RTT operations for a
+        particular probe type:
+        notApplicable(0)         - This object is not applicable for the
+                                   probe type.
+        httpGet(1)               - HTTP get request
+        httpRaw(2)               - HTTP request with user defined payload
+        ftpGet(3)                - FTP get request
+        ftpPassive(4)            - FTP passive mode
+        ftpActive(5)             - FTP active mode
+        voipDTAlertRinging(6)    - Voip post dial delay detect point:
+                                   Alerting / Ringing
+        voipDTConnectOK(7)       - Voip post dial delay detect point:
+                                   Connect /OK"
+    SYNTAX          INTEGER  {
+                        notApplicable(0),
+                        httpGet(1),
+                        httpRaw(2),
+                        ftpGet(3),
+                        ftpPassive(4),
+                        ftpActive(5),
+                        voipDTAlertRinging(6),
+                        voipDTConnectOK(7)
+                    }
+
+-- Operation completion sense code textual convention
+
+RttResponseSense ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "These are the defined values for a completion status
+        of a RTT operation.  
+
+        other(0)         - the operation is not started or completed
+                            or this object is not applicable for
+                            the probe type.  
+        ok(1)            - a valid completion occurred and
+                            timed successfully
+        disconnected(2)  - the operation did not occur because
+                            the connection to the target
+                            was lost
+        overThreshold(3) - a valid completion was received but
+                            the completion time exceeded a
+                            threshold value
+        timeout(4)       - an operation timed out; no completion
+                            time recorded
+        busy(5)          - the operation did not occur because a
+                            previous operation is still
+                            outstanding
+        notConnected(6)  - the operation did not occur because no
+                            connection (session) exists with the
+                            target
+        dropped(7)       - the operation did not occur due to lack
+                            of internal resource
+        sequenceError(8) - a completed operation did not contain 
+                            the correct sequence id; no completion
+                            time recorded
+        verifyError(9)   - a completed operation was received, but
+                            the data it contained did not match
+                            the expected data; no completion time 
+                            recorded
+        applicationSpecific(10) 
+                         - the application generating the operation
+                            had a specific error
+        dnsServerTimeout(11) 
+                         - DNS Server Timeout
+        tcpConnectTimeout(12)
+                         - TCP Connect Timeout
+        httpTransactionTimeout(13)
+                         - HTTP Transaction Timeout
+        dnsQueryError(14)
+                         - DNS Query error (because of unknown address 
+                           etc.,)
+        httpError(15)
+                         - HTTP Response StatusCode is not OK (200),
+                           or permenent redirect(301), temporary redirect
+                           (302) then HTTP error is set.
+        error(16)
+                         - if there are socket failures or some other 
+                           errors not relavant to the actual probe, they 
+                           are recorded under this error
+        mplsLspEchoTxError(17)
+                         - MPLS echo request transmission failure.
+        mplsLspUnreachable(18)
+                         - MPLS Target FEC not reachable or unsupported
+                           mpls echo reply code.
+        mplsLspMalformedReq(19)
+                         - MPLS echo request was malformalformed, pointed
+                           out by the reply router.
+        mplsLspReachButNotFEC(20)
+                         - MPLS echo request processed by the downstream
+                           router but not the target.
+        enableOk(21) 
+                         - Control enable request OK
+        enableNoConnect(22)
+                         - Control enable request fail due to no connection to
+                           the target.
+        enableVersionFail(23)
+                         - Control enable request version fail.
+        enableInternalError(24)
+                         - Control enable request internal error.
+        enableAbort(25)
+                         - Control enable request abort.
+        enableFail(26)
+                         - Control enable request fail.
+        enableAuthFail(27)
+                         - Control enable request fail due to authentication
+                           fail.
+        enableFormatError(28)
+                         - Control enable request fail due to format error.
+        enablePortInUse(29)
+                         - Control enable request fail due to port in use.
+        statsRetrieveOk(30)
+                         - Stats retrieve request OK
+        statsRetrieveNoConnect(31)
+                         - Stats retrieve request fail due to no connection 
+                           to the target.
+        statsRetrieveVersionFail(32)
+                         - Stats retrieve request version fail.
+        statsRetrieveInternalError(33)
+                         - Stats retrieve request internal error.
+        statsRetrieveAbort(34)
+                         - Stats retrieve request abort.
+        statsRetrieveFail(35)
+                         - Stats retrieve request fail.
+        statsRetrieveAuthFail(36)
+                         - Stats retrieve request fail due to authentication fail.
+        statsRetrieveFormatError(37)
+                         - Stats retrieve request fail due to format error.
+        statsRetrievePortInUse(38)
+                         - Stats retrieve request fail due to port in use."
+    SYNTAX          INTEGER  {
+                        other(0),
+                        ok(1),
+                        disconnected(2),
+                        overThreshold(3),
+                        timeout(4),
+                        busy(5),
+                        notConnected(6),
+                        dropped(7),
+                        sequenceError(8),
+                        verifyError(9),
+                        applicationSpecific(10),
+                        dnsServerTimeout(11),
+                        tcpConnectTimeout(12),
+                        httpTransactionTimeout(13),
+                        dnsQueryError(14),
+                        httpError(15),
+                        error(16),
+                        mplsLspEchoTxError(17),
+                        mplsLspUnreachable(18),
+                        mplsLspMalformedReq(19),
+                        mplsLspReachButNotFEC(20),
+                        enableOk(21),
+                        enableNoConnect(22),
+                        enableVersionFail(23),
+                        enableInternalError(24),
+                        enableAbort(25),
+                        enableFail(26),
+                        enableAuthFail(27),
+                        enableFormatError(28),
+                        enablePortInUse(29),
+                        statsRetrieveOk(30),
+                        statsRetrieveNoConnect(31),
+                        statsRetrieveVersionFail(32),
+                        statsRetrieveInternalError(33),
+                        statsRetrieveAbort(34),
+                        statsRetrieveFail(35),
+                        statsRetrieveAuthFail(36),
+                        statsRetrieveFormatError(37),
+                        statsRetrievePortInUse(38)
+                    }
+
+-- Operation type textual convention
+
+RttMonRttType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Specifies the type of RTT operation to be performed.
+
+        The value 'echo' will cause the RTT application to
+        perform a timed echo request/response operation directed
+        at the 'RttMonTargetAddress'.
+
+        The value 'pathEcho' will cause the RTT application
+        to perform path discovery to the 'RttMonTargetAddress', 
+        then it will perform a timed echo request/response 
+        operation directed at the each hop along the path.  
+        This operation will provide two types of information, 
+        first the path and second the time delay along the path.
+
+        NOTE:  The 'pathEcho' time delay operation is a heuristic
+               measurement because an intermediate hop may forward
+               the different echo request/response at different
+               rates.  Thus the time delay difference between two
+               hops along a path may contain very little 'true'
+               statistical meaning. 
+
+        The value 'fileIO' will cause the RTT application to 
+        write, read, or write/read a file to a preconfigured 
+        file server.
+
+        The value 'script' will cause the RTT application to
+        execute a preconfigured script.
+
+        The value 'udpEcho' will cause the RTT application
+        to perform a timed udp packet send/receive operation 
+        directed at the 'RttMonTargetAddress'.
+
+        The value 'tcpConnect' will cause the RTT application
+        to perform a timed tcp connect operation directed at the 
+        'RttMonTargetAddress'.
+
+        The value 'http' will cause the RTT application
+        to perform a download of the object specified in the URL.
+
+        The value 'dns' will cause the RTT application
+        to perform a name lookup of an IP Address or a hostname.
+
+        The value 'jitter' will cause the RTT application
+        to perform delay variance analysis.
+
+        The value 'dlsw' will cause the RTT application
+        to perform a keepalive operation to measure the response 
+        time of a DLSw peer.
+
+        The value 'dhcp' will cause the RTT application
+        to perform an IP Address lease request/teardown operation.
+
+        The value 'voip' will cause the RTT application
+        to perform call set up operation to measure the response.
+
+        The value 'rtp' will cause the RTT application to perform
+        delay variance analysis for RTP packet.
+
+        The value 'lspGroup' will cause the RTT application to logically
+        group Label Switched Paths discovered as part of LSP Path
+        Discovery to the target and perform an RTT operation end to end
+        over each path in the Group. The type of operation configured
+        is determined by rttMplsVpnMonCtrlRttType.
+
+        The value 'icmpjitter' will cause the RTT application
+        to perform delay variance analysis using ICMP timestamp packets.
+
+        The value of 'lspPingIpv4' will cause the RTT application to
+        perform ping over LSP path.
+
+        The value of 'lspTraceIpv4' will cause the RTT application to
+        perform trace over LSP path.
+
+        The value of 'ethernetPing' will cause the RTT application to
+        perform delay variance analysis using regular 802.1ag loopback
+        frame.
+
+        The value of 'ethernetJitter' will cause the RTT application to
+        perform delay variance analysis using CFM frame.
+
+        The value of 'lspPingPseudowire' will cause the RTT application
+        to
+        perform LSP Ping over Pseudowire and measure response time.
+
+        The value 'video' will cause the the RTT application to perform
+        a video stream analysis directed at the 'RttMonTargetAddress
+        The value 'y1731Delay' will cause the RTT application to perform
+        a ITU-T standard Y.1731 delay variance analysis
+        The value 'y1731Loss' will cause the RTT application to perform
+        a ITU-T standard Y.1731 loss measure analysis
+        The value 'mcastJitter' will cause the RTT application to
+        perform 
+        udp jitter stream analysis on a multicast network.
+
+        The value 'fabricPathEcho' will cause the RTT application to
+        perform delay performance measurment and verify connectivity in
+        a Fabric Path Network."
+    SYNTAX          INTEGER  {
+                        echo(1),
+                        pathEcho(2),
+                        fileIO(3),
+                        script(4),
+                        udpEcho(5),
+                        tcpConnect(6),
+                        http(7),
+                        dns(8),
+                        jitter(9),
+                        dlsw(10),
+                        dhcp(11),
+                        ftp(12),
+                        voip(13),
+                        rtp(14),
+                        lspGroup(15),
+                        icmpjitter(16),
+                        lspPing(17),
+                        lspTrace(18),
+                        ethernetPing(19),
+                        ethernetJitter(20),
+                        lspPingPseudowire(21),
+                        video(22),
+                        y1731Delay(23),
+                        y1731Loss(24),
+                        mcastJitter(25),
+                        fabricPathEcho(26)
+                    }
+
+-- Operation type for Auto SAA L3 MPLS VPN textual convention
+
+RttMplsVpnMonRttType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Specifies the type of RTT operation to be performed for
+        Auto SAA L3 MPLS VPN.
+
+        The value 'jitter' will cause the Auto SAA L3 MPLS VPN to
+        automatically configure jitter operations.
+
+        The value 'echo' will cause the Auto SAA L3 MPLS VPN to
+        automatically configure jitter operations.
+
+        The value 'pathEcho' will cause the Auto SAA L3 MPLS VPN to
+        automatically configure jitter operations."
+    SYNTAX          INTEGER  {
+                        jitter(1),
+                        echo(2),
+                        pathEcho(3)
+                    }
+
+-- --
+-- Auto SAA L3 MPLS VPN LSP Path Discovery
+-- Failure Cause textual convention
+
+RttMplsVpnMonLpdFailureSense ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "These are the defined values for the causes of failure in
+        LSP Path Discovery.
+
+        unknown(1)                      - The cause of failure for the
+                                          LSP Path Discovery cannot be
+                                          determined. The discovery for
+                                          the target PE may not have 
+                                          started.
+        noPath(2)                       - No paths were found to the
+                                          target FEC while doing the
+                                          LSP Path Discovery.
+        allPathsBroken(3)               - All paths to the target FEC
+                                          are broken. This means an
+                                          untagged interface on the LSP
+                                          to the target.
+        allPathsUnexplorable(4)         - All paths to the target FEC are
+                                          unexplorable. This identifies
+                                          a case where there is some
+                                          problem in reaching the next
+                                          hop while doing Discovery.
+        allPathsBrokenOrUnexplorable(5) - All paths to the target FEC are
+                                          are either broken or
+                                          unexplorable.
+        timeout(6)                      - The LSP Path Discovery could
+                                          not be completed for the
+                                          target FEC within the
+                                          configured time.
+        error(7)                        - Error occurred while
+                                          performing LSP Path Discovery.
+                                          It might be also due to some
+                                          reasons unrelated to LSP Path
+                                          Discovery."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        noPath(2),
+                        allPathsBroken(3),
+                        allPathsUnexplorable(4),
+                        allPathsBrokenOrUnexplorable(5),
+                        timeout(6),
+                        error(7)
+                    }
+
+-- textual convention
+
+RttMplsVpnMonLpdGrpStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "These are the defined values for the status of the LPD Group.
+
+        unknown(1) - This indicates that some/all of the probes which are
+                     part of the LPD group have not completed even
+                     a single operation, so the group status cannot be
+                     identified.
+             up(2) - This state indicates that all the probes which are
+                     part of the LPD group are up with latest return
+                     code as 'ok'.
+        partial(3) - This state indicates that some probes are up and
+                     running fine and some are not 'ok'.
+           down(4) - This state indicates that all the probes to the
+                     target are not running fine. This state indicates
+                     that there is connectivity problem to the target
+                     PE."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        up(2),
+                        partial(3),
+                        down(4)
+                    }
+
+RttMonProtocol ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Specifies the protocol to be used to perform the timed
+        echo request/response.  The following protocols are
+        defined:
+
+        NOTE: All protocols that end in 'Appl' will support
+              the asymetric request/response (ARR) protocol.  
+              See the DESCRIPTION for ciscoRttMonMIB for a
+              complete description of the asymetric 
+              request/response protocol.
+
+        notApplicable     - no protocol is defined
+        ipIcmpEcho        - uses Echo Request/Reply as defined
+                             in RFC792 for Internet Protocol
+                             networks
+        ipUdpEchoAppl     - uses the UDP based echo server
+        snaRUEcho         - uses the REQECHO and ECHOTEST RU's
+                             to an SSCP over an SNA LU-SSCP
+                             session
+        snaLU0EchoAppl    - uses test RU's sent to the Echo 
+                             Server over an SNA LU0-LU0 session
+        snaLU2EchoAppl    - uses test RU's sent to the Echo 
+                             Server over an SNA LU2-LU2 session
+        snaLU62Echo       - uses the native appn ping ie. aping 
+        snaLU62EchoAppl   - uses test RU's sent to the ARR
+                             Echo Server over an SNA LU6.2-LU6.2
+                             session
+        appleTalkEcho     - uses Echo Request/Reply as defined
+                             for appleTalk networks
+        appleTalkEchoAppl - uses the appleTalk based echo
+                             server
+        decNetEcho        - uses Echo Request/Reply as defined
+                             for DECNet networks
+        decNetEchoAppl    - uses the DECnet based echo server
+        ipxEcho           - uses Echo Request/Reply as defined
+                             for Novell IPX networks
+        ipxEchoAppl       - uses the Novel IPX based echo
+                             server
+        isoClnsEcho       - uses Echo Request/Reply as defined
+                             for ISO CLNS networks
+        isoClnsEchoAppl   - uses the ISO CLNS based echo
+                             server
+        vinesEcho         - uses Echo Request/Reply as defined
+                             for VINES networks
+        vinesEchoAppl     - uses the VINES based echo server
+        xnsEcho           - uses Echo Request/Reply as defined
+                             for XNS networks
+        xnsEchoAppl       - uses the XNS based echo server
+        apolloEcho        - uses Echo Request/Reply as defined
+                             for APOLLO networks
+        apolloEchoAppl    - uses the APOLLO based echo
+                             server
+        netbiosEchoAppl   - uses the netbios based echo
+                             server
+        ipTcpConn         - uses the tcp's connect mechanism
+        httpAppl          - uses udp for name resolution, 
+                            tcp connect and tcp data transfer
+                            mechanisms for HTTP data download
+                            from a particular HTTP Server
+        dnsAppl           - uses udp for name resolution
+        jitterAppl        - uses udp for packet transfers
+        dlswAppl          - uses tcp for sending keepalives
+        dhcpAppl          - uses udp for sending dhcp requests
+        ftpAppl           - uses tcp for connect & data transfer
+        mplsLspPingAppl   - uses MPLS Echo Request/Response as per
+                            draft-ietf-mpls-lsp-ping-04 ietf
+                            standard
+        voipAppl          - uses Symphony infrastructure to measure
+                            H.323/SIP call set up time
+        rtpAppl           - uses Symphony infrastructure to measure
+                            rtp packets delay variance.
+        icmpJitterAppl    - uses ICMP Timestamp for packet transfer 
+                            to measure jitter.
+        ethernetPingAppl    - uses regular 802.1ag loopback frame
+        ethernetJitterAppl  - uses CFM frames .
+        videoAppl           - uses synthetic traffic depending on video 
+                               profile
+        y1731dmm            - used to measure Y1731 delay
+        y17311dm            - used to measure Y1731 1DM
+        y1731lmm            - used to measure Y1731 Loss measurement
+        mcastJitterAppl     - uses udp jitter to measure multicast
+                               network performance
+        y1731slm            - used to measure Y1731 Synthetic Loss
+                               measurement
+        y1731dmmv1          - used to measure Y1731 DMMv1 measurement
+
+        fabricPathEchoAppl  - uses Fabric Path connect mechanism"
+    SYNTAX          INTEGER  {
+                        notApplicable(1),
+                        ipIcmpEcho(2),
+                        ipUdpEchoAppl(3),
+                        snaRUEcho(4),
+                        snaLU0EchoAppl(5),
+                        snaLU2EchoAppl(6),
+                        snaLU62Echo(7),
+                        snaLU62EchoAppl(8),
+                        appleTalkEcho(9),
+                        appleTalkEchoAppl(10),
+                        decNetEcho(11),
+                        decNetEchoAppl(12),
+                        ipxEcho(13),
+                        ipxEchoAppl(14),
+                        isoClnsEcho(15),
+                        isoClnsEchoAppl(16),
+                        vinesEcho(17),
+                        vinesEchoAppl(18),
+                        xnsEcho(19),
+                        xnsEchoAppl(20),
+                        apolloEcho(21),
+                        apolloEchoAppl(22),
+                        netbiosEchoAppl(23),
+                        ipTcpConn(24),
+                        httpAppl(25),
+                        dnsAppl(26),
+                        jitterAppl(27),
+                        dlswAppl(28),
+                        dhcpAppl(29),
+                        ftpAppl(30),
+                        mplsLspPingAppl(31),
+                        voipAppl(32),
+                        rtpAppl(33),
+                        icmpJitterAppl(34),
+                        ethernetPingAppl(35),
+                        ethernetJitterAppl(36),
+                        videoAppl(37),
+                        y1731dmm(38),
+                        y17311dm(39),
+                        y1731lmm(40),
+                        mcastJitterAppl(41),
+                        y1731slm(42),
+                        y1731dmmv1(43),
+                        fabricPathEchoAppl(44)
+                    }
+
+RttMonCodecType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Specifies the codec type to be used with the jitter probe.
+        The following codec types are defined:
+
+        notApplicable     - no CodecType is defined
+        g711ulaw          - uses G.711 U Law 64000 bps
+        g711alaw          - uses G.711 A Law 64000 bps
+        g729a             - uses G.729 8000 bps"
+    SYNTAX          INTEGER  {
+                        notApplicable(0),
+                        g711ulaw(1),
+                        g711alaw(2),
+                        g729a(3)
+                    }
+
+RttMonLSPPingReplyMode ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Specifies the Reply mode for the MPLS LSP Echo request
+        packets. The following reply modes are supported:
+
+        replyIpv4Udp(1)         - an mpls echo request will normally
+                                 have reply via IPv4 UDP packets.
+        replyIpv4UdpRA(2)       - reply via IPv4 UDP Router Alert. Used
+                                 when IPv4 return path is deemed 
+                                 unreliable."
+    SYNTAX          INTEGER  {
+                        replyIpv4Udp(1),
+                        replyIpv4UdpRA(2)
+                    }
+
+RttMonTargetAddress ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A string which specifies the address of the target for
+        the RTT operation; a value of RttMonTargetAddress
+        which corresponds to a 'broadcast' address is disallowed.
+
+        The interpretation of this string depends on the type of
+        RTT operation selected, as specified by RttMonProtocol; 
+        consequently, this object cannot be created until 
+        RttMonProtocol has been created (or must be in the same 
+        PDU).
+
+        SNA addresses will be provided in ASCII, but will be
+        converted to EBCDIC
+
+        It is interpreted as follows, for the specified values of
+        RttMonProtocol:
+
+        ipIcmpEcho, ipUdpEchoAppl, ipTcpConn, jitterAppl, dlswAppl,
+        dnsAppl, httpAppl, and dhcpAppl
+             - 4 octets
+
+        snaRUEcho
+             - N octets, containing the value of the sna
+                HOSTNAME of which the SSCP LU will be used
+                for the operation.  For many systems this value
+                can be empty, and the system will use the
+                implied SSCP LU.  For example 'NSPECHO'.
+
+        snaLU0EchoAppl and snaLU2EchoAppl 
+             - N octets, the first x octets are the HOSTNAME
+                (Alternatively, this could be a PU name defined
+                to transport to the desired HOST), the second
+                y octets are the APPLID, and the last z octets 
+                are the MODENAME of the Echo Server (blank 
+                for a MODENAME default). The address will be 
+                encoded with a size byte preceding each of 
+                the x y and z called s. For example sxsysz 
+                as in '0x06CWBC060x07NSPECHO0x00' where 
+                HOSTNAME = CWBC06, APPLID = NSPECHO, and 
+                MODENAME is defaulted to 8 blanks.  
+                NOTE: MODENAME is either size 0 or 8.
+
+        snaLU62Echo and snaLU62EchoAppl
+             - N octets, the first x octets are the LU-NAME,
+                the second y octets are the TP-NAME, and the 
+                last z octets are the MODENAME of the Echo 
+                Server.  The address will be encoded with a size
+                byte preceding each of the x y and z called s.
+                For example sxsysz (zero size before z for a
+                MODENAME default).  The LU-NAME is composed of
+                8 bytes '.' 8 bytes.  The Transaction Program
+                name (TP-NAME) is 1-64 bytes.  The MODENAME
+                is 8 bytes.
+
+        appleTalkEcho, appleTalkEchoAppl
+
+        decNetEcho, decNetEchoAppl
+
+        ipxEcho, ipxEchoAppl
+
+        isoClnsEcho, isoClnsEchoAppl
+
+        vinesEcho, vinesEchoAppl
+
+        xnsEcho, xnsEchoAppl
+        apolloEcho, apolloEchoAppl
+
+        netbiosEchoAppl, voipAppl
+                - unsupported protocols.
+
+        mplsLspPingAppl
+                - 8 octets, the first 4 octets are the FEC address
+                and the next 4 octets are the FEC address mask."
+    SYNTAX          OCTET STRING
+
+RttMonReactVar ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The following are specific Reaction variables for a
+        particular probe type:
+         rtt(1)            - Round Trip Time
+         jitterSDAvg(2)    - Jitter average from source to Destination
+         jitterDSAvg(3)    - Jitter average from destination to source
+         packetLossSD(4)   - Packet loss from source to destination
+         packetLossDS(5)   - Packet loss from destination to source
+         mos(6)            - Mean Opinion Score
+         timeout(7)        - Timeout of the Operation
+         connectionLoss(8) - Connection Failed to the destination
+         verifyError(9)    - Data corruption occurs
+         jitterAvg(10)     - Jitter Average in both the directions
+         icpif(11)         - Calculated Planning Impairment Factor
+         packetMIA(12)     - Missing In Action
+         packetLateArrival(13)   - Packets arriving Late
+         packetOutOfSequence(14) - Packets arriving out of sequence
+         maxOfPositiveSD(15)     - Maximum positive jitter from
+                                   Source to Destination
+         maxOfNegativeSD(16)     - Maximum negative jitter from
+                                   Source to Destination
+         maxOfPositiveDS(17)     - Maximum positive jitter from
+                                   Destination to Source
+         maxOfNegativeDS(18)     - Maximum negative jitter from
+                                   Destination to Source.
+         iaJitterDS(19)          - Inter arrival jitter from
+                                   Destination to Source
+         frameLossDS(20)         - Number of frame loss recorded
+                                   at source DSP
+         mosLQDS(21)             - Listener quality MOS at Source
+         mosCQDS(22)             - Conversational quality MOS at source
+         rFactorDS(23)           - R-Factor value at Destination.
+         successivePacketLoss(24)- Successive Dropped Packet
+         maxOfLatencyDS(25)      - Maximum Latency from Destination 
+                                   to Source
+         maxOfLatencySD(26)      - Maximum Latency from Source 
+                                   to Destination
+         latencyDSAvg(27)        - Latency average from Destination 
+                                   to Source
+         latencySDAvg(28)        - Latency average from Source 
+                                   to Destination
+         packetLoss(29)          - Packets loss in both directions
+         iaJitterSD(30)          - Inter arrival jitter from
+                                   Source to Destination
+         mosCQSD(31)             - Conversational quality MOS at 
+                                   Destination
+         rFactorSD(32)           - R-Factor value at Destination.
+         lpdGroup(33)            - Label Path Discovery (LPD) group
+         lpdTreeTrace(34)        - LPD Tree Trace
+         lpdAll(35)              - LPD All
+         unavailSD(36)           - Unavailability threshold crossing
+                                   crossing - Source to Destination
+         unavailDS(37)           - Unavailability threshold crossing
+                                   crossing - Destination to source
+         pktLossPctSD(38)        - Loss ratio threshold crossing
+                                   based on percent - Source to
+                                   Destination
+         pktLossPctDS(39)        - Loss ratio threshold crossing
+                                   based on percent - Destination to
+                                   Source
+         rttPct(40)              - Percentile Round Trip Time
+         maxOfLatencySDPct(41)   - Percentile Maximum Latency from
+                                   Source to Destination
+         maxOfLatencyDSPct(42)   - Percentile Maximum Latency from
+                                   Destination to Source
+         latencySDAvgPct(43)     - Percentile Latency Average from
+                                   Source to Destination
+         latencyDSAvgPct(44)     - Percentile Latency Average from
+                                   Destination to Source
+         jitterSDAvgPct(45)      - Percentile Jitter Average from
+                                   Source to Destination
+         jitterDSAvgPct(46)      - Percentile Jitter Average from
+                                   Destination to Source
+         jitterAvgPct(47)        - Percentile Jitter Average in
+                                   both directions
+         overThreshold(48)       - Percent of Round Trip Times
+                                   over threshold.
+         protocolSpecificError(49)-Any protocol specific error."
+    SYNTAX          INTEGER  {
+                        rtt(1),
+                        jitterSDAvg(2),
+                        jitterDSAvg(3),
+                        packetLossSD(4),
+                        packetLossDS(5),
+                        mos(6),
+                        timeout(7),
+                        connectionLoss(8),
+                        verifyError(9),
+                        jitterAvg(10),
+                        icpif(11),
+                        packetMIA(12),
+                        packetLateArrival(13),
+                        packetOutOfSequence(14),
+                        maxOfPositiveSD(15),
+                        maxOfNegativeSD(16),
+                        maxOfPositiveDS(17),
+                        maxOfNegativeDS(18),
+                        iaJitterDS(19),
+                        frameLossDS(20),
+                        mosLQDS(21),
+                        mosCQDS(22),
+                        rFactorDS(23),
+                        successivePacketLoss(24),
+                        maxOfLatencyDS(25),
+                        maxOfLatencySD(26),
+                        latencyDSAvg(27),
+                        latencySDAvg(28),
+                        packetLoss(29),
+                        iaJitterSD(30),
+                        mosCQSD(31),
+                        rFactorSD(32),
+                        lpdGroup(33),
+                        lpdTreeTrace(34),
+                        lpdAll(35),
+                        unavailSD(36),
+                        unavailDS(37),
+                        pktLossPctSD(38),
+                        pktLossPctDS(39),
+                        rttPct(40),
+                        maxOfLatencySDPct(41),
+                        maxOfLatencyDSPct(42),
+                        latencySDAvgPct(43),
+                        latencyDSAvgPct(44),
+                        jitterSDAvgPct(45),
+                        jitterDSAvgPct(46),
+                        jitterAvgPct(47),
+                        overThreshold(48),
+                        protocolSpecificError(49)
+                    }
+
+RttMonIdLst ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A string that specifies a list of the IP SLA probe
+        identifiers or other numeric identifiers.
+        The identifiers will be specified in the following form.
+        (a) Individual identifiers with comma separated as 1,5,3.
+        (b) Range form including hyphens with multiple ranges
+        being 
+           separated by comma as 1-10,12-34.
+        (c) Mix of the above two forms as 1,2,4-10,12,15,19-25."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+RttMonCtrlIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The value of this object identifies the row in the
+        ipslaEthernetGrpCtrlTable and ipslaEthernetGrpReactTable.
+        It can be used for other IP SLA control tables."
+    SYNTAX          Unsigned32 (1..2147483647)
+
+END
+
+
+-- %DNP%  MLC -Submitted MLC
+
+-- %DNP%  MRS -with reviewer MRS
+
+-- %DNP%  MRC - ciscoRttMonTCMIB~2~ - 2014031805:01 PST - vivsreev -11.0 -ACK
+-- %DNP%  - Can we allign the description of mcastJitterAppl into one line or two 
+-- %DNP%lines for better readability? in Line: 633
+-- %DNP%
+-- %DNP% -0 MRC 
+

@@ -1,0 +1,190 @@
+-- HP Enterprise Switch UDP Forwarder configuration MIB 
+
+HP-ICF-UDP-FORWARD DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Integer32, MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC
+        VlanId
+            FROM Q-BRIDGE-MIB
+        hpSwitch
+            FROM HP-ICF-OID
+        InetAddressType, InetAddress, InetPortNumber
+            FROM INET-ADDRESS-MIB;
+
+    hpicfUdpFwd MODULE-IDENTITY
+        LAST-UPDATED "200405190630Z" -- May 19, 2004
+        ORGANIZATION "Hewlett-Packard Company
+                      Network Infrastructure Solutions"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module defines objects for configuring
+                     the UDP Broadcast Forwarding of HP networking
+                     devices."
+
+        REVISION     "200405190630Z" -- May 19, 2004
+        DESCRIPTION  "Initial version of this MIB module."
+        ::= { hpSwitch 23 }
+
+
+hpicfUdpFwdNotification         OBJECT IDENTIFIER ::= {hpicfUdpFwd 0}
+hpicfUdpFwdObjects         OBJECT IDENTIFIER ::= { hpicfUdpFwd 1 }
+
+-- General UDP broadcast forwarding group
+
+hpicfUdpBcastFwdAdminStatus         OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the UDP Broadcast Forward
+                    feature"
+        DEFVAL     { disable }
+        ::= { hpicfUdpFwdObjects 1 }
+
+-- UDP broadcast forwarding table
+
+hpicfUdpFwdServersTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF HpicfUdpFwdServersEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "This table contains a list of UDP Server Address and 
+                 associated port numbers for which forwarding 
+                 is enabled."
+        ::= { hpicfUdpFwdObjects 2}
+
+hpicfUdpFwdServersEntry  OBJECT-TYPE
+        SYNTAX  HpicfUdpFwdServersEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "An entry of the UDP broadcast forwarding
+                table."
+        INDEX   {hpicfUdpFwdVlanId,
+                 hpicfUdpFwdServerIndex}
+
+        ::= { hpicfUdpFwdServersTable 1 }
+
+HpicfUdpFwdServersEntry ::= SEQUENCE {
+        hpicfUdpFwdVlanId                 VlanId,
+        hpicfUdpFwdServerIndex            Integer32,
+        hpicfUdpFwdServerAddressType      InetAddressType,
+        hpicfUdpFwdServerAddress          InetAddress,
+        hpicfUdpFwdPortNumber             InetPortNumber,
+        hpicfUdpFwdRowStatus              RowStatus
+        }
+
+hpicfUdpFwdVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The VLAN index which uniquely identifies a row  
+                    in this table."
+        ::= { hpicfUdpFwdServersEntry 1 }
+
+hpicfUdpFwdServerIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Server table index which uniquely identifies a
+                    position in table of servers (for VlanIndex)."
+        ::= { hpicfUdpFwdServersEntry 2 }
+
+hpicfUdpFwdServerAddressType       OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The type of IP address for the configured server"
+        ::= { hpicfUdpFwdServersEntry 3 }
+
+hpicfUdpFwdServerAddress OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE(0..36))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION " This object contains the server IP address. The
+                  type of address specified by this object is 
+              indicated by the corresponding instance of the 
+              hpicfUdpFwdServerAddressType. 
+
+                    An attempt to create a row in which the length
+                    of this object is not consistent with the type
+                    specified by hpicfUdpFwdServerAddressType must
+                    be rejected."
+
+        ::= { hpicfUdpFwdServersEntry 4 }
+
+hpicfUdpFwdPortNumber     OBJECT-TYPE
+        SYNTAX  InetPortNumber
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION " UDP port number for which UDP broadcast forwarding
+                is enabled."
+        ::= { hpicfUdpFwdServersEntry 5}
+
+
+hpicfUdpFwdRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Status of table row."              
+        ::= { hpicfUdpFwdServersEntry 6 }
+
+
+-- Conformance information
+
+hpicfUdpFwdConformance OBJECT IDENTIFIER ::= { hpicfUdpFwd  2 }
+
+hpicfUdpFwdCompliances OBJECT IDENTIFIER ::= { hpicfUdpFwdConformance 1 }
+hpicfUdpFwdGroups      OBJECT IDENTIFIER ::= { hpicfUdpFwdConformance 2 }
+
+
+
+-- compliance statements
+
+
+hpicfUdpFwdCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with UDP 
+                packet forwarding"
+        MODULE
+        MANDATORY-GROUPS {  hpicfUdpFwdCfgGroup,
+                            hpicfUdpFwdServerTableGroup }
+
+        GROUP       hpicfUdpFwdCfgGroup
+        DESCRIPTION "A Collection of Object(s) that allow  
+                     configuration of UDP Forwarder"
+
+        GROUP       hpicfUdpFwdServerTableGroup
+        DESCRIPTION "A Collection of Object(s) that allow  
+                     configuration of Server Addresses"
+
+        ::= { hpicfUdpFwdCompliances 1 }
+
+
+hpicfUdpFwdCfgGroup OBJECT-GROUP
+        OBJECTS     { hpicfUdpBcastFwdAdminStatus}
+        STATUS      current
+        DESCRIPTION "Enable/Disable the UDP Forwader in the routing switch"
+        ::= { hpicfUdpFwdGroups 1 }
+
+hpicfUdpFwdServerTableGroup OBJECT-GROUP
+        OBJECTS     { 
+                      hpicfUdpFwdVlanId,
+                      hpicfUdpFwdServerAddressType,
+                      hpicfUdpFwdServerAddress,
+                      hpicfUdpFwdPortNumber,
+                      hpicfUdpFwdRowStatus }
+        STATUS      current
+        DESCRIPTION "A collection of objects allowing configuration of
+                    UDP Forwarder Server Address table"
+        ::= { hpicfUdpFwdGroups 2 }
+
+END
+

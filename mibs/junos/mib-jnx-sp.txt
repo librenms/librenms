@@ -1,0 +1,545 @@
+--
+-- Juniper Enterprise Specific MIB: Service PIC MIB
+-- 
+-- Copyright (c) 2003-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-SP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32,
+    NOTIFICATION-TYPE, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ifIndex, InterfaceIndex
+        FROM IF-MIB
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxSpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200504050000Z" -- Apr 5, 2005
+    ORGANIZATION "Juniper Networks, Inc." 
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "Provides data about each of the AS Pics on a router."
+
+    -- revision history
+    REVISION  "200504020000Z"
+    DESCRIPTION
+            "Initial revision."
+    REVISION  "201302230000Z"    --Feb  23, 2013
+    DESCRIPTION
+            "Added OID jnxSpSvcSetFlowLimitUtilised under jnxSpNotificationPrefix 
+            Depreated OID jnxSpSvcSetFlowLimitUtilized ."
+    ::= { jnxMibs 32 }
+
+    jnxSpNotifications    OBJECT IDENTIFIER ::= { jnxSpMIB 0 }
+    jnxFlowLimitTrapVars  OBJECT IDENTIFIER ::= { jnxSpMIB 2 }
+    
+--
+-- Per Service Set information
+--
+
+    jnxSpSvcSet OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Information about Service PIC Service Sets."
+        ::= { jnxSpMIB 1 }
+
+    jnxSpSvcSetTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxSpSvcSetEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Data about each service set on each Service PIC on the router."
+        ::= { jnxSpSvcSet 1 }
+
+    jnxSpSvcSetEntry OBJECT-TYPE
+        SYNTAX       JnxSpSvcSetEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry provides information about a single Service Set.
+            The Service Set is identified by its name and the Service PIC the
+            Service Set is configured on is identified by jnxSpSvcSetIfName."
+        INDEX   { jnxSpSvcSetName }
+        ::= { jnxSpSvcSetTable 1 }
+
+    JnxSpSvcSetEntry ::=
+        SEQUENCE {
+            jnxSpSvcSetName              DisplayString,
+            jnxSpSvcSetSvcType           DisplayString,
+            jnxSpSvcSetTypeIndex         Integer32,
+            jnxSpSvcSetIfName            DisplayString,
+            jnxSpSvcSetIfIndex           InterfaceIndex,
+            jnxSpSvcSetMemoryUsage       Gauge32,
+            jnxSpSvcSetCpuUtil           Gauge32,
+            jnxSpSvcSetSvcStyle          INTEGER, 
+            jnxSpSvcSetMemLimitPktDrops  Counter32,
+            jnxSpSvcSetCpuLimitPktDrops  Counter32,
+            jnxSpSvcSetFlowLimitPktDrops Counter32
+        }
+
+    jnxSpSvcSetName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..96))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The Service Set name."
+        ::= { jnxSpSvcSetEntry 1 }
+
+    jnxSpSvcSetSvcType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the Service Type associated with this table entry."
+        ::= { jnxSpSvcSetEntry 2 }
+
+    jnxSpSvcSetTypeIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A generic integer used to identify the Service Type for this
+            entry."
+        ::= { jnxSpSvcSetEntry 3 }
+
+    jnxSpSvcSetIfName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ifName of the interface identifying the Service PIC.  
+            If more than one interface is associated with the Service PIC, 
+            the name associated with the lowest layer interface is used for 
+            this object."
+        ::= { jnxSpSvcSetEntry 4 }
+
+    jnxSpSvcSetIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ifIndex corresponding to jnxSpSvcSetIfName."
+        ::= { jnxSpSvcSetEntry 5 }
+
+    jnxSpSvcSetMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service Set, expressed in bytes."
+        ::= { jnxSpSvcSetEntry 6 }
+
+    jnxSpSvcSetCpuUtil OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of CPU used by this Service Set, expressed as a
+            percentage of the total."
+        ::= { jnxSpSvcSetEntry 7 }
+
+    jnxSpSvcSetSvcStyle OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown           (1),
+                        interface-service (2),
+                        next-hop-service  (3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of this Service Set. The definitions of each style 
+            being:
+            
+             Unknown            - Service style is not known.
+             Interface-service  - Service style is interface based.
+             Next-hop-service   - Service style is next-hop based."
+        ::= { jnxSpSvcSetEntry 8 }
+
+    jnxSpSvcSetMemLimitPktDrops OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to the Service Set exceeding
+            its memory limits (when in Red Zone)."
+        ::= { jnxSpSvcSetEntry 9 }
+
+    jnxSpSvcSetCpuLimitPktDrops OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to the Service Set exceeding
+            the average cpu limits (when total exceeds 85%)."
+        ::= { jnxSpSvcSetEntry 10 }
+
+    jnxSpSvcSetFlowLimitPktDrops OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets dropped due to the Service Set exceeding
+            the flow limit."
+        ::= { jnxSpSvcSetEntry 11 }
+
+--
+-- Per Service information
+--
+
+    jnxSpSvcSetSvcTypeTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxSpSvcSetSvcTypeEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Data about each service on each Service PIC on the router."
+        ::= { jnxSpSvcSet 2 }
+
+    jnxSpSvcSetSvcTypeEntry OBJECT-TYPE
+        SYNTAX       JnxSpSvcSetSvcTypeEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry provides information about a single Service on
+            each Service PIC.  Each Service PIC is identified by its 
+            corresponding ifIndex, while each Service is identified by 
+            jnxSpSvcSetSvcTypeIndex.  The Service Type associated with 
+            this index is provided by jnxSpSvcSetSvcTypeName."
+        INDEX   { ifIndex, jnxSpSvcSetSvcTypeIndex }
+        ::= { jnxSpSvcSetSvcTypeTable 1 }
+
+    JnxSpSvcSetSvcTypeEntry ::=
+        SEQUENCE {
+            jnxSpSvcSetSvcTypeIndex             Integer32,
+            jnxSpSvcSetSvcTypeIfName            DisplayString,
+            jnxSpSvcSetSvcTypeName              DisplayString,
+            jnxSpSvcSetSvcTypeSvcSets           Gauge32,
+            jnxSpSvcSetSvcTypeMemoryUsage       Gauge32,
+            jnxSpSvcSetSvcTypePctMemoryUsage    Gauge32,
+            jnxSpSvcSetSvcTypeCpuUtil           Gauge32,
+            jnxSpSvcSetSvcTypeMemoryUsage64     CounterBasedGauge64
+        }
+
+    jnxSpSvcSetSvcTypeIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A generic integer used to identify the Service Type for this
+            entry."
+        ::= { jnxSpSvcSetSvcTypeEntry 1 }
+
+    jnxSpSvcSetSvcTypeIfName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ifName of the interface identifying the Service PIC.  If 
+            more than one interface is associated with the Service PIC, the 
+            name associated with the lowest layer interface is used for this 
+            object."
+        ::= { jnxSpSvcSetSvcTypeEntry 2 }
+
+    jnxSpSvcSetSvcTypeName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the Service Type associated with this table entry."
+        ::= { jnxSpSvcSetSvcTypeEntry 3 }
+
+    jnxSpSvcSetSvcTypeSvcSets OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of Service Sets configured on this Service PIC that 
+            use this service type."
+        ::= { jnxSpSvcSetSvcTypeEntry 4 }
+
+    jnxSpSvcSetSvcTypeMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service Type, expressed in
+            bytes."
+        ::= { jnxSpSvcSetSvcTypeEntry 5 }
+
+    jnxSpSvcSetSvcTypePctMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service Type, expressed as a
+            percentage of the total."
+        ::= { jnxSpSvcSetSvcTypeEntry 6 }
+
+    jnxSpSvcSetSvcTypeCpuUtil OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of CPU used by this Service Type, expressed as a
+            percentage of the total."
+        ::= { jnxSpSvcSetSvcTypeEntry 7 }
+
+    jnxSpSvcSetSvcTypeMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service Type, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetSvcTypeEntry 8 }
+
+--
+-- Per Interface information
+--
+
+    jnxSpSvcSetIfTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxSpSvcSetIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Service Set data about each Service PIC on the router."
+        ::= { jnxSpSvcSet 3 }
+
+    jnxSpSvcSetIfEntry OBJECT-TYPE
+        SYNTAX       JnxSpSvcSetIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry provides Service Set information about a single 
+            Service PIC.  Each Service PIC is identified by its corresponding 
+            ifIndex."
+        INDEX   { ifIndex }
+        ::= { jnxSpSvcSetIfTable 1 }
+
+    JnxSpSvcSetIfEntry ::=
+        SEQUENCE {
+            jnxSpSvcSetIfTableName         DisplayString,
+            jnxSpSvcSetIfSvcSets           Gauge32,
+            jnxSpSvcSetIfMemoryUsage       Gauge32,
+            jnxSpSvcSetIfPctMemoryUsage    Gauge32,
+            jnxSpSvcSetIfPolMemoryUsage    Gauge32,
+            jnxSpSvcSetIfPctPolMemoryUsage Gauge32,
+            jnxSpSvcSetIfMemoryZone        INTEGER,
+            jnxSpSvcSetIfCpuUtil           Gauge32,
+            jnxSpSvcSetIfMemoryUsage64     CounterBasedGauge64,
+            jnxSpSvcSetIfPolMemoryUsage64  CounterBasedGauge64
+        }
+
+    jnxSpSvcSetIfTableName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ifName of the interface identifying the Service PIC.  If more 
+            than one interface is associated with the Service PIC, the name 
+            associated with the lowest layer interface is used for this object."
+        ::= { jnxSpSvcSetIfEntry 1 }
+
+    jnxSpSvcSetIfSvcSets OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of Service Sets configured on this Service PIC."
+        ::= { jnxSpSvcSetIfEntry 2 }
+
+    jnxSpSvcSetIfMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service PIC, expressed in
+            bytes."
+        ::= { jnxSpSvcSetIfEntry 3 }
+
+    jnxSpSvcSetIfPctMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service PIC, expressed as a
+            percentage of the total."
+        ::= { jnxSpSvcSetIfEntry 4 }
+
+    jnxSpSvcSetIfPolMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of policy memory used by this Service PIC, expressed in
+            bytes."
+        ::= { jnxSpSvcSetIfEntry 5 }
+
+    jnxSpSvcSetIfPctPolMemoryUsage OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of policy memory used by this Service PIC, expressed
+            as a percentage of the total."
+        ::= { jnxSpSvcSetIfEntry 6 }
+
+    jnxSpSvcSetIfMemoryZone OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        green  (1),
+                        yellow (2),
+                        orange (3),
+                        red    (4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The memory-usage zone currently occupied by this Service PIC.  The 
+            definitions of each zone are:
+
+              Green  - All new flows are allowed.
+              Yellow - Unused memory is reclaimed. All new flows are allowed.
+              Orange - New flows are only allowed for service sets that are 
+                       using less than their equal share of memory.
+              Red    - No new flows are allowed."
+        ::= { jnxSpSvcSetIfEntry 7 }
+
+
+    jnxSpSvcSetIfCpuUtil OBJECT-TYPE
+        SYNTAX      Gauge32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of CPU used by this Service PIC, expressed as a
+            percentage of the total."
+        ::= { jnxSpSvcSetIfEntry 8 }
+
+    jnxSpSvcSetIfMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used by this Service PIC, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetIfEntry 9 }
+
+    jnxSpSvcSetIfPolMemoryUsage64 OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of policy memory used by this Service PIC, expressed in
+            bytes, represented by 64 bit integer."
+        ::= { jnxSpSvcSetIfEntry 10 }
+
+--
+-- Service PIC Notification definitions
+--
+    jnxSpNotificationPrefix OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "All collector notifications are registered under this branch."
+        ::= { jnxSpNotifications 0 }
+
+
+    jnxSpSvcSetZoneEntered NOTIFICATION-TYPE
+        OBJECTS { jnxSpSvcSetIfMemoryZone,
+                  jnxSpSvcSetIfTableName }
+        STATUS  current
+        DESCRIPTION 
+            "This indicates a Service PIC has entered a more severe memory-usage
+            zone from a less severe memory usage zone.  The zone entered
+            is identified by jnxSpSvcSetIfMemoryZone."
+        ::= { jnxSpNotificationPrefix 1 }
+
+    jnxSpSvcSetZoneExited NOTIFICATION-TYPE
+        OBJECTS { jnxSpSvcSetIfMemoryZone,
+                  jnxSpSvcSetIfTableName }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a Service Pic has exited a more severe memory-usage
+            zone to a less severe memory usage zone.  The zone exited is
+            identified by jnxSpSvcSetIfMemoryZone."
+        ::= { jnxSpNotificationPrefix 2 }
+
+    jnxSpSvcSetCpuExceeded NOTIFICATION-TYPE
+        OBJECTS { jnxSpSvcSetIfCpuUtil,
+                  jnxSpSvcSetIfTableName }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a Service Pic has exceeded its internal threshold
+            for CPU utilization (85%)."
+        ::= { jnxSpNotificationPrefix 3 }
+
+    jnxSpSvcSetCpuOk NOTIFICATION-TYPE
+        OBJECTS { jnxSpSvcSetIfCpuUtil,
+                  jnxSpSvcSetIfTableName }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a Service Pic has crossed below its internal 
+            threshold for CPU utilization (85%)."
+        ::= { jnxSpNotificationPrefix 4 }
+      
+    jnxSpSvcSetFlowLimitUtil OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        MAX-ACCESS  accessible-for-notify
+       STATUS      current
+        DESCRIPTION
+            "The Total no of flows present in this Service Set, expressed as a
+            percentage of the total maximum flows."
+        ::= { jnxFlowLimitTrapVars 1 }
+
+   jnxSpSvcSetNameUtil OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..96))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The Service Set name."
+        ::= { jnxFlowLimitTrapVars 2 }
+
+   jnxSpSvcSetFlowLimitUtilized NOTIFICATION-TYPE
+        OBJECTS {jnxSpSvcSetFlowLimitUtil,
+                 jnxSpSvcSetNameUtil}
+        STATUS  deprecated
+        DESCRIPTION
+            "This indicates a Service Set has reached its upper limit of flows
+            threshold of a maximun flows allowed for a service set."
+        ::= { jnxSpNotifications 1 }
+
+   jnxSpSvcSetFlowLimitUtilised NOTIFICATION-TYPE
+        OBJECTS {jnxSpSvcSetFlowLimitUtil,
+                 jnxSpSvcSetNameUtil}
+        STATUS  current
+        DESCRIPTION
+            "This indicates a Service Set has reached its upper limit of flows
+            threshold of a maximun flows allowed for a service set."
+        ::= { jnxSpNotificationPrefix 5 }
+
+END

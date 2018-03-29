@@ -1,0 +1,1015 @@
+CT-FASTPATH-DHCPSERVER-MIB DEFINITIONS ::= BEGIN
+
+-- LVL7 FASTPATH DHCP Server MIB
+-- Copyright LVL7 Systems (2002-2005) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies LVL7 System's confidential and proprietary
+-- intellectual property.  LVL7 Systems retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", LVL7 Systems
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+--  This module provides authoritative definitions for Cabletron's
+--  CT-FASTPATH-DHCPSERVER-MIB.
+--
+--  This module will be extended, as needed.
+--
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys and Cabletron products.
+--
+--  Copyright January 2006 Enterasys Networks, Inc.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+    Integer32, Unsigned32, TimeTicks, Counter32
+                                        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, RowPointer, MacAddress,
+    StorageType, TruthValue, DisplayString, PhysAddress
+                                        FROM SNMPv2-TC
+-- Place this MIB on CTRON experimental branch.
+    ctDhcpServerExpMib                  FROM CTRON-MIB-NAMES;
+
+ctFastPathDHCPServerMIB MODULE-IDENTITY
+    LAST-UPDATED "200601161932Z"  -- Mon Jan 16 19:32 UTC 2006
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+      DESCRIPTION
+          "The Enterasys MIB for FASTPATH DHCP Server"
+      ::= { ctDhcpServerExpMib 1 }
+
+     --**************************************************************************************
+    -- ctAgentDhcpServerGroup -> contains MIB objects displaying various properties of a DHCP server
+    --
+    --**************************************************************************************
+
+    ctAgentDhcpServerGroup       OBJECT IDENTIFIER ::= { ctFastPathDHCPServerMIB 1 }
+
+    ctAgentDhcpServerAdminMode OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                  }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Admin-mode of the DHCP Server."
+      DEFVAL { disable }
+    ::= { ctAgentDhcpServerGroup 1 }
+
+
+    ctAgentDhcpServerPingPktNos OBJECT-TYPE
+      SYNTAX     INTEGER (0 | 2..10)
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " The no. of packets a DHCP Server sends to a pool address as part of a ping operation.Setting the value of ping-packets to zero turns off DHCP Server ping operation ."
+      DEFVAL { 2 }
+    ::= { ctAgentDhcpServerGroup 2 }
+
+    ctAgentDhcpServerAutomaticBindingsNos OBJECT-TYPE
+      SYNTAX     Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of IP addresses that have been assigned automatically."
+     
+    ::= { ctAgentDhcpServerGroup 3 }  
+    
+    ctAgentDhcpServerExpiredBindingsNos OBJECT-TYPE
+      SYNTAX     Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of expired leases."     
+    ::= { ctAgentDhcpServerGroup 4 }   
+    
+    
+    ctAgentDhcpServerMalformedMessagesReceived OBJECT-TYPE
+      SYNTAX     Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of malformed(truncated or corrupt) messages that have been received by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 5 } 
+    
+    ctAgentDhcpServerDISCOVERMessagesReceived OBJECT-TYPE
+      SYNTAX     Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPDISCOVER that have been received by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 6 } 
+    
+    ctAgentDhcpServerREQUESTMessagesReceived OBJECT-TYPE
+      SYNTAX     Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPREQUEST that have been received by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 7 } 
+    
+    ctAgentDhcpServerDECLINEMessagesReceived OBJECT-TYPE
+      SYNTAX     Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPDECLINE that have been received by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 8 }  
+    
+    ctAgentDhcpServerRELEASEMessagesReceived OBJECT-TYPE
+      SYNTAX      Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPRELEASE that have been received by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 9 }
+    
+    ctAgentDhcpServerINFORMMessagesReceived OBJECT-TYPE
+      SYNTAX      Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPINFORM that have been received by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 10 }  
+    
+    ctAgentDhcpServerOFFERMessagesSent OBJECT-TYPE
+      SYNTAX      Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPOFFER that have been sent by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 11 }  
+    
+    ctAgentDhcpServerACKMessagesSent OBJECT-TYPE
+      SYNTAX      Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPACK that have been sent by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 12 } 
+    
+    ctAgentDhcpServerNAKMessagesSent OBJECT-TYPE
+      SYNTAX      Counter32 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+       " The no. of DHCP messages of type DHCPNAK that have been sent by the DHCP server."     
+    ::= { ctAgentDhcpServerGroup 13 }
+
+    ctAgentDhcpServerClearStatistics OBJECT-TYPE
+           SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                       }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Clears the DHCP server statistics."
+      DEFVAL { disable }
+    ::= { ctAgentDhcpServerGroup 14 } 
+    
+   ctAgentDhcpServerBootpAutomatic OBJECT-TYPE
+           SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                       }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       "Used to enable or disable autmatic address allocation to bootp clients from dynamic address pools."
+      DEFVAL { disable }
+    ::= { ctAgentDhcpServerGroup 15 }
+
+--**********************************************************************************
+-- ctAgentDhcpServerPoolConfigGroup
+--  This group contains three tables :  ctAgentDhcpServerPoolConfigTable,
+--                                      ctAgentDhcpServerBindingTable,
+--
+--  ctAgentDhcpServerPoolConfigTable -> This table is used to configure a
+--                                     new DHCP address pool on a DHCP server. This table
+--                                     is also used to delete a configured DHCP address pool.
+--
+--  ctAgentDhcpServerPoolAllocationTable -> This table is used to configure a DHCP address
+--                                  pool for dynamic and manual allocations.
+--
+--  ctAgentDhcpServerExcludedAddressRangeTable -> This table lists the excluded-address ranges 
+--  for a DHCP Server
+--  
+--  ctAgentDhcpServerPoolOptionTable -> Table for DHCP Server options 
+--**********************************************************************************
+
+
+    ctAgentDhcpServerPoolConfigGroup        OBJECT IDENTIFIER ::= { ctFastPathDHCPServerMIB 2 }
+
+    ctAgentDhcpServerPoolNameCreate OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0|1..31))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "A pool is created by applying write operation
+                      on this MIB object and providing a new pool-name.
+                      Get operation on this MIB object returns a
+                      null-value, as for the purpose of viewing the
+                      pool name, the user should perform the
+                      traversal of ctAgentDhcpServerPoolConfigTable.
+                      For this reason the get operation on object
+                      ctAgentDhcpServerPoolNameCreate becomes insignificant."
+ ::= { ctAgentDhcpServerPoolConfigGroup 1 }
+
+    ctAgentDhcpServerPoolConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpServerPoolConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the DHCP Server Pool configuration entries."
+         ::= { ctAgentDhcpServerPoolConfigGroup 2 }
+
+    ctAgentDhcpServerPoolConfigEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpServerPoolConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a Dhcp server pool."
+         INDEX       { ctAgentDhcpServerPoolIndex }
+         ::= { ctAgentDhcpServerPoolConfigTable 1 }
+
+    AgentDhcpServerPoolConfigEntry ::= SEQUENCE {
+          ctAgentDhcpServerPoolIndex
+              Unsigned32,
+          ctAgentDhcpServerPoolName
+              DisplayString,
+          ctAgentDhcpServerPoolDefRouter
+              DisplayString,
+          ctAgentDhcpServerPoolDNSServer
+              DisplayString,
+          ctAgentDhcpServerPoolLeaseTime
+              Integer32,
+          ctAgentDhcpServerPoolType
+              INTEGER,
+          ctAgentDhcpServerPoolNetbiosNameServer
+              DisplayString,
+          ctAgentDhcpServerPoolNetbiosNodeType
+              INTEGER,
+          ctAgentDhcpServerPoolNextServer
+              IpAddress, 
+          ctAgentDhcpServerPoolDomainName
+              DisplayString,
+          ctAgentDhcpServerPoolBootfile
+              DisplayString,               
+          ctAgentDhcpServerPoolRowStatus
+              RowStatus
+          }
+
+    ctAgentDhcpServerPoolIndex OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..512)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The Pool Index, which 'll be used as index for the PoolConfig Table."
+         ::= { ctAgentDhcpServerPoolConfigEntry 1 }
+
+     ctAgentDhcpServerPoolName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The name of the DHCP Address pool. This value cannot be modified"
+         ::= { ctAgentDhcpServerPoolConfigEntry 2 }
+
+     ctAgentDhcpServerPoolDefRouter OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the default-router list(each default-router is
+                      separated by comma and the list is terminated by semi-colon) for a DHCP client,
+                      an example would be 10.10.1.1,192.168.36.1,157.227.44.1;(no spaces in between).User should enter  a 'null' or 'NULL' string to remove current default-router list."
+         ::= { ctAgentDhcpServerPoolConfigEntry 3 }
+
+     ctAgentDhcpServerPoolDNSServer OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "This specifies the DNS IP servers(each DNS IP server is
+                      separated by comma and the list is terminated by semi-colon) for a DHCP client,
+                      an example would be 10.10.1.1,192.168.36.1,157.227.44.1;(no spaces in between).User should enter  a 'null' or 'NULL' string to remove current default-router list."
+         ::= { ctAgentDhcpServerPoolConfigEntry 4 }
+
+     ctAgentDhcpServerPoolLeaseTime OBJECT-TYPE
+         SYNTAX      Integer32 (1..86400)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the duration of the lease(in minutes) for an IP address that is assigened from a
+                      DHCP server to a DHCP client. For infinite leases, lease-time value will be set to
+                      86400."
+         ::= { ctAgentDhcpServerPoolConfigEntry 5 }
+
+     ctAgentDhcpServerPoolType OBJECT-TYPE
+         SYNTAX      INTEGER{
+                     un-allocated(0),
+                     dynamic(1),
+                     manual(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the type of the binding that is associated with this pool."
+         ::= { ctAgentDhcpServerPoolConfigEntry 6 } 
+         
+     ctAgentDhcpServerPoolNetbiosNameServer OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "This specifies the IP address-list of Net BIOS name-servers that are 
+                       available to DHCP clients
+                       (each IP address in this list is
+                       separated by comma and the list is terminated by semi-colon),
+                       an example would be 10.10.1.1,192.168.36.1,157.227.44.1;(no spaces in between).User should enter  a 'null' or 'NULL' string to remove current Net BIOS name-server list."
+         ::= { ctAgentDhcpServerPoolConfigEntry 7 } 
+         
+      
+     ctAgentDhcpServerPoolNetbiosNodeType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         none(0),
+                         b-node(1),
+                         p-node(2),
+                         m-node(4),
+                         h-node(8)
+                         }
+                     
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "This specifies the NetBIOS node-type for DHCP clients. 'none' is shown if 
+                       node-type is not set to any of the four values."
+         ::= { ctAgentDhcpServerPoolConfigEntry 8 }
+         
+     ctAgentDhcpServerPoolNextServer OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "This configures the next server in the boot-process of a DHCP clients.User should enter zero(0.0.0.0) to remove the current Next-server address"
+         ::= { ctAgentDhcpServerPoolConfigEntry 9 }
+                                                  
+     ctAgentDhcpServerPoolDomainName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..255))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "This specifies the domain-name for a DHCP client. User should enter a 'null' or 'NULL' string to remove specified domain-name."
+         ::= { ctAgentDhcpServerPoolConfigEntry 10 }
+         
+     ctAgentDhcpServerPoolBootfile OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..128))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "This specifies the name of the default boot image for a DHCP client.User should enter a 'null' or 'NULL' string to remove specified bootfile name."
+         ::= { ctAgentDhcpServerPoolConfigEntry 11 }
+     
+     ctAgentDhcpServerPoolRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+         "The row status variable is used according to installation
+          and removal conventions for conceptual rows. When a pool is created by applying write
+          operation on 'ctAgentDhcpServerPoolCreateName',row-status becomes 'active'. If row-status for
+          a poolEntry is set to 'destroy', the corresponding pool gets deleted. "
+
+         ::= { ctAgentDhcpServerPoolConfigEntry 12 }
+
+--**********************************************************************************
+    ctAgentDhcpServerPoolAllocationTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpServerPoolAllocationEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the DHCP Server's pool entries, showing the binding(dynamic/manual)
+                      specific parameters."
+         ::= { ctAgentDhcpServerPoolConfigGroup 3 }
+
+    ctAgentDhcpServerPoolAllocationEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpServerPoolAllocationEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a Dhcp server's allocation pool."
+         AUGMENTS { ctAgentDhcpServerPoolConfigEntry }
+         ::= { ctAgentDhcpServerPoolAllocationTable 1 }
+
+    -- All objects are of type read-write
+    AgentDhcpServerPoolAllocationEntry ::= SEQUENCE {
+          ctAgentDhcpServerPoolAllocationName
+              DisplayString,
+          ctAgentDhcpServerDynamicPoolIpAddress
+              IpAddress,
+          ctAgentDhcpServerDynamicPoolIpMask
+              IpAddress,
+          ctAgentDhcpServerDynamicPoolIpPrefixLength
+              Unsigned32,
+          ctAgentDhcpServerPoolAllocationType
+              INTEGER,
+          ctAgentDhcpServerManualPoolClientIdentifier
+              DisplayString,
+          ctAgentDhcpServerManualPoolClientName
+              DisplayString,
+          ctAgentDhcpServerManualPoolClientHWAddr
+              DisplayString,
+          ctAgentDhcpServerManualPoolClientHWType
+              INTEGER,
+          ctAgentDhcpServerManualPoolIpAddress
+              IpAddress,
+          ctAgentDhcpServerManualPoolIpMask
+              IpAddress,
+          ctAgentDhcpServerManualPoolIpPrefixLength
+              Unsigned32
+          }
+
+     ctAgentDhcpServerPoolAllocationName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..30))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies name of the DHCP Address pool having dynamic binding.
+                      This value is same as ctAgentDhcpServerPoolName of the
+ctAgentDhcpServerPoolConfigTable."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 1 }
+
+     ctAgentDhcpServerDynamicPoolIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The IP address of the  DHCP Address pool.
+                      The IP address must be set before setting the IP Mask or IP Prefix Length.
+                      After setting IP address, network -mask, or IP Prefix length must be set in order to change the pool type to dynamic.
+                      This value shows 0.0.0.0, if the binding type is 'un-allocated',or,'manual'."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 2 }
+
+     ctAgentDhcpServerDynamicPoolIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The bit-combination that renders which portion of the address of the DHCP
+                      address pool refers to the network or subnet and which part refers to the host.The IP address must have been set before.
+                      This value shows 0.0.0.0, if the binding type is 'un-allocated',or,'manual'."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 3 }
+
+     ctAgentDhcpServerDynamicPoolIpPrefixLength OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the no. of bits that comprise the address-prefix.
+                      The prefix is an alternative way of specifying the network-mask of the client.The IP address must have been set before.
+                      This value shows 0, if the binding type is 'un-allocated',or,'mnaual'."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 4 }
+
+     ctAgentDhcpServerPoolAllocationType OBJECT-TYPE
+         SYNTAX      INTEGER{
+                     un-allocated(0),
+                     dynamic(1),
+                     manual(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the type of the binding that is associated with this pool."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 5 }
+
+     ctAgentDhcpServerManualPoolClientIdentifier OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "It specifies the unique identifier (in colon separated hexadecimal format)
+                      of a DHCP client. It is valid for manual bindings only.
+                      It displays 'unconfigured',if the binding type is 'un-allocated',or,'dynamic'.
+                      To set this object, input should be 7 octets long with the hardware
+                      type in the first octet."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 6 }
+
+     ctAgentDhcpServerManualPoolClientName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..30))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "It specifies the name of a DHCP client.
+                     Client name should't include domain-name.
+                     It displays 'unconfigured',if the binding type is 'un-allocated',or,'dynamic'. "
+         ::= { ctAgentDhcpServerPoolAllocationEntry 7 }
+
+     ctAgentDhcpServerManualPoolClientHWAddr OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "It specifies the hardware-address of a DHCP client. It is valid for manual bindings only.
+                      It displays 'unconfigured',if the binding type is 'un-allocated',or,'dynamic'.
+                      After hardware-address, hardware-type will be configured."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 8 }
+
+     ctAgentDhcpServerManualPoolClientHWType OBJECT-TYPE
+         SYNTAX      INTEGER{
+                     ethernet(1),
+                     ieee802(6)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "It specifies the hardware-type of a DHCP client. It is valid for manual bindings only.
+                      It displays 'unconfigured',if the binding type is 'un-allocated',or,'dynamic'.
+                      Before this, hardware-address must be configured."
+         DEFVAL { ethernet }
+         ::= { ctAgentDhcpServerPoolAllocationEntry 9 }
+
+     ctAgentDhcpServerManualPoolIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The IP address of the  DHCP Address pool for manual binding.
+                     The IP address must be set before setting the IP Mask or IP Prefix Length.After setting IP address, network -mask, or IP Prefix length must be set in order to change the pool type to dynamic.
+                     This value shows 0.0.0.0, if the binding type is 'un-allocated',or,'dynamic'."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 10 }
+
+     ctAgentDhcpServerManualPoolIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The bit-combination that renders which portion of the address of the DHCP
+                      address pool for a manual binding refers to the network or subnet and which part refers to the host.
+                      The IP address must have been set before.
+                      This value shows 0.0.0.0, if the binding type is 'un-allocated',or,'dynamic'."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 11 }
+
+     ctAgentDhcpServerManualPoolIpPrefixLength OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the no. of bits that comprise the address-prefix.
+                      The prefix is an alternative way of specifying the network-mask of the client.The IP address must have been set before.
+                      This value shows 0, if the binding type is 'un-allocated',or,'dynamic'."
+         ::= { ctAgentDhcpServerPoolAllocationEntry 12 }
+
+
+  --***********************************************************************************************
+     ctAgentDhcpServerExcludedAddressRangeCreate OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "It sets the IP address-ranges(from low to high) that a
+                      DHCP server should not assign to DHCP clients. Each time 
+                      this MIB object is set successfully, one excluded range 
+                      of IP address will be set.
+                      It is given in format - start and end IP address 
+                      separated by '-' and terminated by ';'.
+                      One example would be - 192.168.36.1-200.1.1.1;  .
+                      This sets one excluded range of IP address,which
+                      starts at 192.168.36.1 and ends at 200.1.1.1. 
+                      If only start IP address is given,
+                      end IP address is assumed to be equal to the start IP
+                      address. Get operation on this MIB object returns a 
+                      null-value, as for the purpose of viewing the 
+                      exclude-address ranges, the user should perform the 
+                      traversal of ctAgentDhcpServerExcludedAddressRangeTable.
+                      For this reason the get operation on object 
+                ctAgentDhcpServerExcludedAddressRangeCreate becomes insignificant."
+         ::= { ctAgentDhcpServerPoolConfigGroup 4 }
+
+     ctAgentDhcpServerExcludedAddressRangeTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpServerExcludedAddressRangeEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the DHCP Server Pool configuration entries."
+         ::= { ctAgentDhcpServerPoolConfigGroup 5 }
+
+     ctAgentDhcpServerExcludedAddressRangeEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpServerExcludedAddressRangeEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a Dhcp server excluded address range table."
+         INDEX       { ctAgentDhcpServerExcludedRangeIndex }
+         ::= { ctAgentDhcpServerExcludedAddressRangeTable 1 }
+
+    -- All objects are of type read-only, except ctAgentDhcpServerExcludedAddressRangeStatus,
+    -- which is of type read-write
+    AgentDhcpServerExcludedAddressRangeEntry ::= SEQUENCE {
+          ctAgentDhcpServerExcludedRangeIndex
+              Unsigned32,
+          ctAgentDhcpServerExcludedStartIpAddress
+              IpAddress,
+          ctAgentDhcpServerExcludedEndIpAddress
+              IpAddress,
+          ctAgentDhcpServerExcludedAddressRangeStatus
+              RowStatus
+          }
+
+    ctAgentDhcpServerExcludedRangeIndex OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..256)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the index of the excluded IP address-range table."
+         ::= { ctAgentDhcpServerExcludedAddressRangeEntry 1 }
+
+    ctAgentDhcpServerExcludedStartIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the starting IP address of the excluded address-range."
+         ::= { ctAgentDhcpServerExcludedAddressRangeEntry 2 }
+
+    ctAgentDhcpServerExcludedEndIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the ending IP address of the excluded address-range."
+         ::= { ctAgentDhcpServerExcludedAddressRangeEntry 3 }
+
+    ctAgentDhcpServerExcludedAddressRangeStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the row-status of the excluded address-range. Implemented values
+                      are - active(1) and destroy(6). For a valid range, the row-satus will return active(1).
+                      When it is set to destroy(6), the corresponding address-range is deleted."
+         ::= { ctAgentDhcpServerExcludedAddressRangeEntry 4 } 
+         
+         --***********************************************************************************************
+     
+     ctAgentDhcpServerPoolOptionCreate OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This sets the option for an existing DHCP Server pool. Here, it is required 
+                      to enter the pool-index, for which option is to be set and 
+                      the value of the DHCP option code in string-format : pool-index and option code 
+                      separated by '-' and terminated by ';', one example would be -> 1-19; 
+                      , 1 is the pool-index and 19 is the option code.  "
+         ::= { ctAgentDhcpServerPoolConfigGroup 6 }
+
+     ctAgentDhcpServerPoolOptionTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpServerPoolOptionEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for configuring DHCP Server options."
+         ::= { ctAgentDhcpServerPoolConfigGroup 7 }
+
+     ctAgentDhcpServerPoolOptionEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpServerPoolOptionEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a Dhcp server option table."
+         INDEX       { ctAgentDhcpServerPoolOptionIndex, 
+                       ctAgentDhcpServerPoolOptionCode }
+         ::= { ctAgentDhcpServerPoolOptionTable 1 }
+
+    -- All objects are of type read-write, except the indexes ctAgentDhcpServerPoolOptionIndex and 
+    -- ctAgentDhcpServerPoolOptionCode
+    -- For a particular poolOption entry, option data ( ASCII, HEX and IP Address) can be 
+    -- entered multiple times provided data-format is same each time.
+    AgentDhcpServerPoolOptionEntry ::= SEQUENCE {
+          ctAgentDhcpServerPoolOptionIndex
+              Unsigned32,
+          ctAgentDhcpServerPoolOptionCode
+              Unsigned32,
+          ctAgentDhcpServerOptionPoolName
+              DisplayString,
+          ctAgentDhcpServerPoolOptionAsciiData
+              DisplayString,
+          ctAgentDhcpServerPoolOptionHexData
+              DisplayString,
+          ctAgentDhcpServerPoolOptionIpAddressData
+              DisplayString,
+          ctAgentDhcpServerPoolOptionStatus
+              RowStatus
+          }
+    ctAgentDhcpServerPoolOptionIndex OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..512)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The Pool Index alongwith option-code, acts as index for the DHCP Server Option table.
+                      "
+         ::= { ctAgentDhcpServerPoolOptionEntry 1 }
+
+    ctAgentDhcpServerPoolOptionCode OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..254)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the DHCP option code. This alongwith pool-index acts as the index of the 
+                      DHCP Server Option table."
+         ::= { ctAgentDhcpServerPoolOptionEntry 2 }
+         
+     ctAgentDhcpServerOptionPoolName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The name of the DHCP Address pool. This value cannot be modified"
+         ::= { ctAgentDhcpServerPoolOptionEntry 3 }
+
+    ctAgentDhcpServerPoolOptionAsciiData OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..441))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies an NVT ASCII character string. ASCII character strings 
+                      that contain white space must be delimited by quotation marks. 
+                      If an ascii optiondata is entered again, it gets concatenated with the 
+                      previous ascii data."
+         ::= { ctAgentDhcpServerPoolOptionEntry 4 }
+
+    ctAgentDhcpServerPoolOptionHexData OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..1324)) 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies semi-colon separated hexadecimal data. Two hexadecimal digits 
+                     in hexadecimal character string represents one byte . Hexadecimal strings can 
+                     be entered in the following formats :
+                      1) continuous hexadecimal digits like -- 0123456789abcdef
+                      2) hexadecimal digits separated by space ' ' -- 01 23 45 67 de 0f
+                      3) Two hexadecimal digits separated by delimeter ':' -- 01:02:a0 de:0f 78:5e 
+                      4) Four hexadecimal digits separated by delimeter '.' -- 01ab.c0de.7865 
+                      If a Hex optiondata is entered again, it gets concatenated with the 
+                      previous Hex data." 
+         ::= { ctAgentDhcpServerPoolOptionEntry 5 }
+         
+     ctAgentDhcpServerPoolOptionIpAddressData OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the IP-address list(each IP-address is
+                      separated by comma and the list is terminated by semi-colon) for a DHCP client,
+                      an example would be 10.10.1.1,192.168.36.1,157.227.44.1;(no spaces in between).
+                      If a IP option is entered again, it gets concatenated with the 
+                      previous IP data.
+                      Maximum no. of IP addresses that can be entered at one time is 8.
+                      "
+         ::= { ctAgentDhcpServerPoolOptionEntry 6 }
+
+
+    ctAgentDhcpServerPoolOptionStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the row-status of the DHCP Server Pool option."
+         ::= { ctAgentDhcpServerPoolOptionEntry 7 }
+
+    --**************************************************************************************
+    -- ctAgentDhcpServerLeaseGroup -> contains MIB objects displaying and clearing leases of a DHCP server
+    --
+    --**************************************************************************************
+
+      ctAgentDhcpServerLeaseGroup        OBJECT IDENTIFIER ::= { ctFastPathDHCPServerMIB 3 }
+
+      ctAgentDhcpServerLeaseClearAllBindings OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                  }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       "Clears All the DHCP server bindings."
+      DEFVAL { disable }
+    ::= { ctAgentDhcpServerLeaseGroup 1}
+
+       ctAgentDhcpServerLeaseTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpServerLeaseEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the DHCP Server's Lease entries."
+         ::= { ctAgentDhcpServerLeaseGroup 2 }
+
+      ctAgentDhcpServerLeaseEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpServerLeaseEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a Dhcp server's leases."
+         INDEX       { ctAgentDhcpServerLeaseIPAddress }
+
+         ::= { ctAgentDhcpServerLeaseTable 1 }
+
+    -- All objects are of type read-only
+     AgentDhcpServerLeaseEntry ::= SEQUENCE {
+          ctAgentDhcpServerLeaseIPAddress
+              IpAddress,
+          ctAgentDhcpServerLeaseIPMask
+              IpAddress,
+          ctAgentDhcpServerLeaseHWAddress
+              MacAddress,
+          ctAgentDhcpServerLeaseRemainingTime
+              TimeTicks,
+          ctAgentDhcpServerLeaseType
+              INTEGER,
+          ctAgentDhcpServerLeaseStatus
+              RowStatus
+          }
+
+    ctAgentDhcpServerLeaseIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the IP address leased to the client."
+         ::= { ctAgentDhcpServerLeaseEntry 1 }
+
+    ctAgentDhcpServerLeaseIPMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the IP mask of the address leased to the client."
+         ::= { ctAgentDhcpServerLeaseEntry 2 }
+    ctAgentDhcpServerLeaseHWAddress OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the hardware address of the client."
+         ::= { ctAgentDhcpServerLeaseEntry 3 }
+
+    ctAgentDhcpServerLeaseRemainingTime OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the period for which the lease is valid. It is displayed in days, hours, minutes, and seconds."
+         ::= { ctAgentDhcpServerLeaseEntry 4 }
+
+    ctAgentDhcpServerLeaseType OBJECT-TYPE
+         SYNTAX      INTEGER{
+                     automatic(1),
+                     manual(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the type of address lease as Automatic or Manual."
+         ::= { ctAgentDhcpServerLeaseEntry 5 }
+
+    ctAgentDhcpServerLeaseStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the row-status of the address-lease. Implemented values
+                      are - active(1) and destroy(6). For a valid range, the row-satus will return active(1).
+                      When it is set to destroy(6), the corresponding address-lease is cleared."
+         ::= { ctAgentDhcpServerLeaseEntry 6 } 
+         
+         
+    --**************************************************************************************
+    -- ctAgentDhcpServerAddressConflictGroup -> contains MIB objects displaying and clearing 
+    --   address conflicts found by a DHCP server, when addresses are offered to the client. 
+    --
+    --**************************************************************************************
+
+      ctAgentDhcpServerAddressConflictGroup        OBJECT IDENTIFIER ::= { ctFastPathDHCPServerMIB 4 }
+
+        ctAgentDhcpServerClearAllAddressConflicts OBJECT-TYPE
+        SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                  }
+     
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+         "Clears all the address-conflicts found by DHCP server,when set to enable."
+        DEFVAL { disable }
+      ::= { ctAgentDhcpServerAddressConflictGroup 1}
+    
+      ctAgentDhcpServerAddressConflictLogging OBJECT-TYPE
+           SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                       }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " It is used to enable, or disables the logging of address-conflicts on a DHCP Server."
+      DEFVAL { enable }
+      ::= { ctAgentDhcpServerAddressConflictGroup 2}
+
+
+
+       ctAgentDhcpServerAddressConflictTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpServerAddressConflictEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the conflicting-address entries."
+         ::= { ctAgentDhcpServerAddressConflictGroup 3 }
+
+      ctAgentDhcpServerAddressConflictEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpServerAddressConflictEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents a conflicting-address entry."
+         INDEX       { ctAgentDhcpServerAddressConflictIP }
+
+         ::= { ctAgentDhcpServerAddressConflictTable 1 }
+
+     -- All objects are of type read-only, except ctAgentDhcpServerAddressConflictStatus which is 
+     -- of type read-write 
+     AgentDhcpServerAddressConflictEntry ::= SEQUENCE {
+          ctAgentDhcpServerAddressConflictIP
+              IpAddress,
+          ctAgentDhcpServerAddressConflictDetectionType
+              INTEGER,
+          ctAgentDhcpServerAddressConflictDetectionTime
+              TimeTicks,
+          ctAgentDhcpServerAddressConflictStatus
+              RowStatus
+          }
+
+    ctAgentDhcpServerAddressConflictIP OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the conflicting IP address assigned to the client by DHCP server."
+         ::= { ctAgentDhcpServerAddressConflictEntry 1 }   
+         
+    ctAgentDhcpServerAddressConflictDetectionType OBJECT-TYPE
+         SYNTAX      INTEGER{
+                     ping(1),
+                     gratuitousArp(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the address-conflict detection-method."
+         ::= { ctAgentDhcpServerAddressConflictEntry 2 } 
+         
+    ctAgentDhcpServerAddressConflictDetectionTime OBJECT-TYPE
+         SYNTAX      TimeTicks      
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the sysUpTime at which the address-conflict was detected."
+         ::= { ctAgentDhcpServerAddressConflictEntry 3 }
+         
+    ctAgentDhcpServerAddressConflictStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the row-status of the conflicting-address entry. Implemented values
+                      are - active(1) and destroy(6). For a valid range, the row-satus will return active(1).
+                      When it is set to destroy(6), the corresponding conflicting-address entry is cleared."
+         ::= { ctAgentDhcpServerAddressConflictEntry 4 }
+
+END

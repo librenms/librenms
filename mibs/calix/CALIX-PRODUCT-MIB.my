@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- CALIX-PRODUCT-MIB.my: Calix Networks Product Registrations
+--
+-- Calix confidential and proprietary.
+--
+-- Copyright (c) 2000-2009 Calix Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CALIX-PRODUCT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	MODULE-IDENTITY, OBJECT-IDENTITY
+	    FROM SNMPv2-SMI
+--	calixRegistrations, calixModules,
+--	calixProducts, calixEntities,
+--	calixGeneric, calixManagement
+	calixRegistrations, calixModules,
+	calixProducts, calixManagement
+	    FROM CALIX-SMI
+	;
+
+    calixProduct MODULE-IDENTITY
+	LAST-UPDATED "200706280000Z"
+	ORGANIZATION "Calix Networks, Inc."
+	CONTACT-INFO
+	    "       Calix Networks, Inc.
+
+	    Postal: 1035 North McDowell Boulevard
+		    Petaluma, CA  94954-1173
+		    USA
+
+	     Phone: +1 707 766 3000
+	       Fax: +1 707 766 3100
+
+	    E-mail: tech.support@calix.com"
+	DESCRIPTION
+	    "This management information module contains the
+	    administrative assignments which are used to
+	    uniquely identify physical components"
+
+	REVISION "200912100000Z"
+	DESCRIPTION
+	    "Changed E5 references to E7, with comments."
+	REVISION "200706280000Z"
+	DESCRIPTION
+	    "Updated for E5 and E5-100."
+	REVISION "200008310026Z"
+	DESCRIPTION
+	    "Initial release."
+
+	::= { calixModules 1 }
+
+
+--
+-- Calix Product Registrations
+--
+    c7 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The definitive identifier of the Calix Networks C7"
+	::= { calixProducts 1 }
+
+    e7 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The definitive identifier of the Calix Networks E7, E5-400, and E5-312
+         products."
+	::= { calixProducts 2 }
+
+    e7Modules OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree to register the values assigned to E7 modules with the
+	     MODULE-IDENTITY construct."
+	::= { e7 1 }
+
+    e7Devices OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree to register the device types which use the E7 modules.  These
+         registrations below this point are the sysObjectID values."
+	::= { e7 5 }
+
+    e5x312 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E5-312 product."
+	::= { e7Devices 1 }
+
+    e5x400 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E5-400 product."
+	::= { e7Devices 2 }
+
+    e7x2 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E7-2 product."
+	::= { e7Devices 3 }
+
+    e7x20 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E7-20 product."
+	::= { e7Devices 4 }
+
+    e5x100 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The definitive identifier of the Calix Networks E5-100"
+	::= { calixProducts 3 }
+
+-- 
+-- Calix Entity Registrations
+--
+
+    c7ShelfAssembly OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "C7 Shelf Assembly Object"
+	::= { c7 1 }
+
+    c7Backplane OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "C7 Backplane Object"
+	::= { c7 2 }
+
+    c7Slot OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "C7 Card Object"
+	::= { c7 3 }
+
+    c7Card OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "C7 Card Object"
+	::= { c7 4 }
+
+    c7Port OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "C7 Port Object"
+	::= { c7 5 }
+
+-- C7 Cards
+
+    amp OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Administration and Maintenance Processor"
+	::= { c7Card 1 }
+
+    mta OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Metallic Test Access"
+	::= { c7Card 2 }
+
+    rapOc OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Resource and Arbitration Processor with OC-3/12/48, 1310 IR"
+	::= { c7Card 3 }
+
+    rapDs3 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Resource and Arbitration Processor with DS3 UNI"
+	::= { c7Card 4 }
+
+    rpots24 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "POTS, 24-port"
+	::= { c7Card 5 }
+
+    adsl24 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "ADSL, 24-port"
+	::= { c7Card 6 }
+
+    ds1x12 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "DS1, 12-port"
+	::= { c7Card 7 }
+
+    ds3x12s OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "DS3, 12-port, SONET mapped"
+	::= { c7Card 8 }
+
+    ds3x12p OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "DS3, 12-port, Packet"
+	::= { c7Card 9 }
+
+    oc3x4ir OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "OC3, 4-port, Packet/SONET, 1310 IR"
+	::= { c7Card 10 }
+
+    oc12x4ir OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "OC12, 4-port, Packet/SONET, 1310 IR"
+	::= { c7Card 11 }
+
+    oc48x1lr OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "OC48, 1-port, Packet/SONET, 1550 LR"
+	::= { c7Card 12 }
+
+    fta OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Fan Tray Assembly"
+	::= { c7Card 13 }
+
+    dfta OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Display Fan Tray Assembly"
+	::= { c7Card 14 }
+
+    mspa OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Metallic Service Protection - Side A"
+	::= { c7Card 15 }
+
+    mspb OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Metallic Service Protection - Side B"
+	::= { c7Card 16 }
+
+-- C7 Ports
+
+    ds0 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "DS0 Port Object"
+	::= { c7Port 1 }
+
+    c7Ds1 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "DS1 Port Object"
+	::= { c7Port 2 }
+
+    c7Ds3 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "DS3 Port Object"
+	::= { c7Port 3 }
+
+    adsl OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "ADSL Port Object"
+	::= { c7Port 4 }
+
+    oc3 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "OC-3 Port Object"
+	::= { c7Port 5 }
+
+    oc12 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "OC-12 Port Object"
+	::= { c7Port 6 }
+
+    oc48 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "OC-48 Port Object"
+	::= { c7Port 7 }
+
+END

@@ -1,0 +1,2080 @@
+
+	ALCATEL-IND1-LAG-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32, Counter32, TimeTicks
+			FROM SNMPv2-SMI
+		DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus
+			FROM SNMPv2-TC
+	        NOTIFICATION-TYPE              FROM SNMPv2-SMI
+		NOTIFICATION-GROUP             FROM SNMPv2-CONF
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		InterfaceIndex
+			FROM IF-MIB
+		PortList
+			FROM Q-BRIDGE-MIB
+                LacpKey,LacpState,ChurnState
+			FROM IEEE8023-LAG-MIB
+
+                lnkaggTraps,
+		softentIND1LnkAgg
+			FROM ALCATEL-IND1-BASE 
+
+	;
+	alcatelIND1LAGMIB MODULE-IDENTITY
+		LAST-UPDATED "200704030000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+		    "Please consult with Customer Service to ensure the most appropriate
+		     version of this document is used with the products in question:
+ 	
+				Alcatel-Lucent, Enterprise Solutions Division
+			       (Formerly Alcatel Internetworking, Incorporated)
+				       26801 West Agoura Road
+			 	   Agoura Hills, CA  91301-5122
+			      		United States Of America
+	
+	    	     Telephone:              North America  +1 800 995 2696
+			 	     	     Latin America  +1 877 919 9526
+					     Europe         +31 23 556 0100
+				     	     Asia           +65 394 7933
+				     	     All Other      +1 818 878 4507
+	
+	             Electronic Mail:         support@ind.alcatel.com
+	             World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+	             File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+	DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+			   The Link Aggregation module for managing  ALCATEL FALCON product
+			   This MIB is an image of the  802.3ad standard. 
+     		 The aim of this proprietary MIB is to allow the creation of
+         aggregate objects with their size.
+         
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+         
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+         
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+         
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+		::= { softentIND1LnkAgg 1 }
+
+
+	alcatelIND1LAGMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1LAGMIB 1 }
+
+
+	-- -------------------------------------------------------------
+	-- Textual Conventions
+	-- -------------------------------------------------------------
+
+
+
+
+
+--	- Local Declares
+
+   LacpType ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The object supports or not (Omnichannel) the LACP protocol ."
+		SYNTAX INTEGER {
+			lacpOff(0),
+			lacpOn(1)
+				}
+
+		
+		
+	-- -------------------------------------------------------------
+	
+
+	-- -------------------------------------------------------------
+	-- groups in the LAG MIB
+	-- -------------------------------------------------------------
+
+
+	alclnkaggAgg OBJECT IDENTIFIER ::= { alcatelIND1LAGMIBObjects 1 }
+	alclnkaggAggPort OBJECT IDENTIFIER ::= { alcatelIND1LAGMIBObjects 2 }
+
+
+	-- -------------------------------------------------------------
+	
+	-- -------------------------------------------------------------
+	-- The Tables Last Changed Object
+	-- -------------------------------------------------------------
+
+
+
+	alclnkaggTablesLastChanged OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This object indicates the time of the
+			most recent change to the alclnkaggAggTable,
+			alclnkaggAggPortListTable, or
+			alclnkaggAggPortTable."
+	::= { alcatelIND1LAGMIBObjects 3 }
+	
+
+
+
+	
+	-- -------------------------------------------------------------
+	-- The Aggregator Configuration Table
+	-- -------------------------------------------------------------
+	
+
+	alclnkaggAggTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggAggEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table that contains information about every
+			Aggregator that is associated with this System.
+                        To create specify alclnkaggAggIndex,alclnkaggAggSize
+                        and alclnkaggAggLacpType. "
+    
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1"
+		::= { alclnkaggAgg 1 }
+
+
+	alclnkaggAggEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A list of the Aggregator parameters. This is indexed
+			by the ifIndex of the Aggregator."
+		INDEX { alclnkaggAggIndex }
+		::= { alclnkaggAggTable 1 }
+
+
+	AlclnkaggAggEntry ::=
+		SEQUENCE {
+		alclnkaggAggIndex
+			InterfaceIndex,
+		alclnkaggAggMACAddress
+			MacAddress,
+        	alclnkaggAggActorSystemPriority
+			INTEGER,
+		alclnkaggAggActorSystemID
+			MacAddress,
+		alclnkaggAggPartnerAdminKey
+			 LacpKey,
+		alclnkaggAggActorAdminKey
+			LacpKey,
+		alclnkaggAggActorOperKey
+			LacpKey,
+		alclnkaggAggPartnerSystemID
+			MacAddress,
+		alclnkaggAggPartnerSystemPriority
+			INTEGER,
+		alclnkaggAggPartnerOperKey
+			LacpKey,
+--------------------------------
+--   Specific Proprietary Part
+------------------------------ 
+		alclnkaggAggSize
+			 INTEGER,
+		alclnkaggAggNumber
+			 INTEGER,
+		alclnkaggAggDescr
+			 DisplayString,
+  	        alclnkaggAggName
+			 DisplayString,
+		alclnkaggAggLacpType
+			 LacpType,
+		alclnkaggAggAdminState
+--           Adminstate,
+			 INTEGER,
+		alclnkaggAggOperState
+			 INTEGER,	
+                alclnkaggAggNbrSelectedPorts
+                         INTEGER,
+                alclnkaggAggNbrAttachedPorts
+                         INTEGER,
+                alclnkaggAggPrimaryPortIndex
+                        InterfaceIndex,
+		alclnkaggAggPrimaryPortPosition
+                        INTEGER,
+	        alclnkaggAggRowStatus
+			 RowStatus,
+		alclnkaggAggPreemptState   
+			INTEGER,   	
+		alclnkaggAggPreemptValue   
+			Integer32 
+		}
+	
+	
+	alclnkaggAggIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The unique identifier allocated to this Aggregator by the local
+			System.
+			This attribute identifies an Aggregator instance among the subordinate
+			managed objects of the containing object. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.1"
+		::= { alclnkaggAggEntry 1 }
+	
+	
+	alclnkaggAggMACAddress OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A 6-octet read-only value carrying the individual
+			MAC address assigned to the Aggregator."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.9"
+		::= { alclnkaggAggEntry 2 }
+	
+	
+	alclnkaggAggActorSystemPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 2-octet read-create value indicating the priority value
+			associated with the Actor's System ID."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.5"
+		::= { alclnkaggAggEntry 3 }
+	
+	
+	alclnkaggAggActorSystemID OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 6-octet read-create MAC address value used as a unique
+			identifier for the System that contains this Aggregator.
+			NOTE-From the perspective of the Link Aggregation mechanisms
+			described in Clause , only a single combination of
+			Actor's System ID and System Priority are considered, and no
+			distinction is made between the values of these parameters
+			for an Aggregator and the port(s) that are associated with
+			it; i.e., the protocol is described in terms of the operation
+			of aggregation within a single System. However, the managed.
+			objects provided for the Aggregator and the port both allow
+			management of these parameters. The result of this is to
+			permit a single piece of equipment to be configured by
+			management to contain more than one System from the point of
+			view of the operation of Link Aggregation. This may be of
+			particular use in the configuration of equipment that has
+			limited aggregation capability (see )."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.4"
+		::= { alclnkaggAggEntry 4 }
+	
+	alclnkaggAggPartnerAdminKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current Administrative value of the Key accepted for the
+			Aggregator's current protocol Partner. Optional this is
+			a 16-bit read-create value. If the aggregation is manually
+			configured, this Key value will be a value assigned by the
+			local System. The administrative Key value may differ from 
+                                   the operational "
+		REFERENCE
+			" specific to ALCATEL "
+		::= { alclnkaggAggEntry 5 }
+
+		
+	alclnkaggAggActorAdminKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current administrative value of the Key for the Aggregator.
+			The administrative Key value may differ from the operational
+			Key value for the reasons discussed in . This is a 16-bit,
+			read-create value. The meaning of particular Key values
+			is of local significance."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.7"
+		::= { alclnkaggAggEntry 6 }
+	
+	
+	alclnkaggAggActorOperKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current operational value of the Key for the Aggregator.
+			The administrative Key value may differ from the operational
+			Key value for the reasons discussed in .
+			This is a 16-bit read-only value. The meaning of particular Key
+			values is of local significance."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.8"
+		::= { alclnkaggAggEntry 7 }
+	
+	
+	alclnkaggAggPartnerSystemID OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 6-octet read-create MAC address value consisting
+			of the unique identifier for the current protocol Partner of
+			this Aggregator. A value of zero indicates that there is no
+			known Partner. If the aggregation is manually configured, this
+			System ID value will be a value assigned by the local System."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.10"
+		::= { alclnkaggAggEntry 8 }
+	
+	
+	alclnkaggAggPartnerSystemPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 2-octet read-create value that indicates the priority
+			value associated with the Partner's System ID. If the
+			aggregation is manually configured, this System Priority value
+			will be a value assigned by the local System."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.11"
+		::= { alclnkaggAggEntry 9 }
+	
+	
+	alclnkaggAggPartnerOperKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current operational value of the Key for the
+			Aggregator's current protocol Partner. This is
+			a 16-bit read-create value. If the aggregation is manually
+			configured, this Key value will be a value assigned by the
+			local System."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.12"
+		::= { alclnkaggAggEntry 10 }
+
+
+------------------------------------------------------------
+-- Specific Proprietary Part
+-----------------------------------------------------------
+
+	
+	alclnkaggAggSize OBJECT-TYPE
+		SYNTAX INTEGER (1..16)
+		MAX-ACCESS read-create
+		STATUS  current
+		DESCRIPTION
+			"Maximum number of links that could be attached to this
+                         aggregator, This nominator is mandatory and is a required
+                         field in order to create a row in this table"
+		REFERENCE
+			"specific to ALCATEL"
+		::= { alclnkaggAggEntry 11 }
+         
+	alclnkaggAggNumber OBJECT-TYPE
+		SYNTAX INTEGER(0..127)
+--		MAX-ACCESS read-create
+		MAX-ACCESS read-only
+		 STATUS  current
+		DESCRIPTION
+--			"Aggreagtor number to assign a reference  number at the creation of 
+--                       an aggregator mandatory for the Omnichhannel object creation"
+			"Aggreagtor number reference the aggregate dedicated from the 
+                         ifindex at the creation"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggEntry 12 }
+
+           -- alclnkaggAggDescr is equivalent to ifDescr in ifTable 
+
+	alclnkaggAggDescr OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		 STATUS  current
+		DESCRIPTION
+			"Description is a human readable string which describes of 
+             the type of aggregator object OMNICHANNEL / LACP  etc …  "
+		REFERENCE
+			" IEEE 802.3 Subclause 30.7.1.1.2"
+		::= { alclnkaggAggEntry 13 }
+	
+            -- alclnkaggAggDescr is equivalent to ifDescr in ifXTable 
+
+	alclnkaggAggName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-create
+		 STATUS current
+		DESCRIPTION
+			"Name of the aggregator is human readable string manually given by
+                                      the operator"
+		REFERENCE
+			" IEEE 802.3 Subclause 30.7.1.1.3"
+		::= { alclnkaggAggEntry 14 }
+
+
+	alclnkaggAggLacpType OBJECT-TYPE
+		SYNTAX LacpType
+		MAX-ACCESS read-create
+		 STATUS current
+		DESCRIPTION
+			"Aggreagtor set with LACP protocol or not (case of Omnichannel)
+                         mandatory at the creation of the aggregator, cannot be modified
+                         later "
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggEntry 15 }
+
+
+           -- alclnkaggAggAdminState is equivalent to ifAdminStatus in ifTable 
+
+	alclnkaggAggAdminState OBJECT-TYPE
+--		SYNTAX AdminState
+                SYNTAX  INTEGER {
+                	    enable(1),       -- ready to pass packets
+                	    disable(2)
+                      }
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"status assigned by the admnistrator. The activation of the aggregator 
+                                     is managed by this nominator"
+		REFERENCE
+			" IEEE 802.3 Subclause 30.7.1.1.13"
+		::= { alclnkaggAggEntry 16 }
+
+           -- alclnkaggAggOperState is similar  to ifOperStatus in ifTable but the nominator  
+           -- does not take exactly the same values.
+
+	alclnkaggAggOperState OBJECT-TYPE
+		  SYNTAX  INTEGER {
+		                           up(1),
+                                           down(2),
+		                           logicPortCreatFailed(3),
+                                           qReservationFailed(4)
+                                                  }
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"Operational status of the aggregator with proprietary values
+                         operational state from iftable corresponds to UP state "
+		REFERENCE
+			" IEEE 802.3 Subclause 30.7.1.1.14"
+		::= { alclnkaggAggEntry 17 }
+
+	 alclnkaggAggNbrSelectedPorts OBJECT-TYPE
+		SYNTAX INTEGER (0..16)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of ports selected at the momemt ."
+		REFERENCE
+			"Specific to ALCATEL"
+		::= { alclnkaggAggEntry 18 }
+	
+	  alclnkaggAggNbrAttachedPorts OBJECT-TYPE
+		SYNTAX INTEGER (0..16)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of ports attached at the momemt ."
+		REFERENCE
+			"Specific to ALCATEL"
+		::= { alclnkaggAggEntry 19 }
+	
+	  alclnkaggAggPrimaryPortIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"the ifindex of the primary port in the aggregator used to send  
+                         BPDUs and flooding frames Zeo indicates no primary port is
+                         available ."
+		REFERENCE
+			"Specific to ALCATEL"
+		::= { alclnkaggAggEntry 20 }
+
+	  alclnkaggAggPrimaryPortPosition OBJECT-TYPE
+		SYNTAX INTEGER (-1..15)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"the port index number in the aggregator used to send  
+                         BPDUs and flooding frames ."
+		REFERENCE
+			"Specific to ALCATEL"
+		::= { alclnkaggAggEntry 21 }
+
+	
+	alclnkaggAggRowStatus OBJECT-TYPE
+                SYNTAX RowStatus   	
+      		MAX-ACCESS read-create
+      		STATUS current
+      		DESCRIPTION
+         		"This object is the RowStatus (locking flag) for creating or
+  			deleting aggregator objects. alclnkaggAggSize, alclnkaggAggLacpType 
+                        and  must be supplied in the request to create a row, it is a 
+                        required field."
+		REFERENCE
+			" specific to ALCATEL "
+		::= { alclnkaggAggEntry 22 }
+
+	alclnkaggAggPreemptState OBJECT-TYPE
+                SYNTAX INTEGER {
+                    enable(1),
+                    disable(2)
+                   }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                       "This sets the pre-emption state for an aggregate. The default value is disable."
+                REFERENCE
+                        "specific to ALCATEL"
+                ::={ alclnkaggAggEntry 23}
+
+          alclnkaggAggPreemptValue OBJECT-TYPE
+                SYNTAX Integer32 (30..300)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                       "This sets the pre-empt timer value in seconds for an aggregate. The default value is 30 seconds."
+                REFERENCE
+                        "specific to ALCATEL"
+                ::={ alclnkaggAggEntry 24}
+
+
+	
+	
+	-- -------------------------------------------------------------
+	-- The Aggregation Port List Table
+	-- -------------------------------------------------------------
+
+
+	alclnkaggAggPortListTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggAggPortListEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table that contains a list of all the ports
+			associated with each Aggregator."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.31"
+		::= { alclnkaggAgg 2 }
+
+	
+	alclnkaggAggPortListEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggPortListEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A list of the ports associated with a given Aggregator.
+			This is indexed by the ifIndex of the Aggregator."
+		INDEX { alclnkaggAggIndex }
+		::= { alclnkaggAggPortListTable 1 }
+	
+
+	AlclnkaggAggPortListEntry ::=
+		SEQUENCE {
+			alclnkaggAggPortListPorts
+				PortList
+		}
+
+
+	alclnkaggAggPortListPorts OBJECT-TYPE
+		SYNTAX PortList
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The complete set of ports currently associated with
+			this Aggregator. Each bit set in this list represents
+			an Actor Port member of this Link Aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.1.1.31"
+		::= { alclnkaggAggPortListEntry 1 }	
+
+
+	-- -------------------------------------------------------------
+	-- The Aggregation Port Table
+	-- -------------------------------------------------------------
+
+
+	alclnkaggAggPortTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggAggPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table that contains Link Aggregation Control
+			configuration information about every
+			Aggregation Port associated with this device.
+			A row appears in this table for each physical port."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2"
+		::= { alclnkaggAggPort 1 }
+	
+	alclnkaggAggPortEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggPortEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A list of Link Aggregation Control configuration
+			parameters for each Aggregation Port on this device."
+		INDEX { alclnkaggAggPortIndex }
+		::= { alclnkaggAggPortTable 1 }
+
+
+	AlclnkaggAggPortEntry ::=
+		SEQUENCE {
+			alclnkaggAggPortIndex
+				InterfaceIndex,
+			alclnkaggAggPortActorSystemPriority
+				INTEGER,
+			alclnkaggAggPortActorSystemID
+				MacAddress,
+			alclnkaggAggPortActorAdminKey
+				LacpKey,
+			alclnkaggAggPortActorOperKey
+				LacpKey,
+			alclnkaggAggPortPartnerAdminSystemPriority
+				INTEGER,
+			alclnkaggAggPortPartnerOperSystemPriority
+				INTEGER,
+			alclnkaggAggPortPartnerAdminSystemID
+				MacAddress,
+			alclnkaggAggPortPartnerOperSystemID
+				MacAddress,
+			alclnkaggAggPortPartnerAdminKey
+				LacpKey,
+			alclnkaggAggPortPartnerOperKey
+				LacpKey,
+			alclnkaggAggPortSelectedAggID
+				InterfaceIndex,
+			alclnkaggAggPortAttachedAggID
+				InterfaceIndex,
+			alclnkaggAggPortActorPort
+				INTEGER,
+			alclnkaggAggPortActorPortPriority
+				INTEGER,
+			alclnkaggAggPortPartnerAdminPort
+				INTEGER,
+			alclnkaggAggPortPartnerOperPort
+				INTEGER,
+			alclnkaggAggPortPartnerAdminPortPriority
+				INTEGER,
+			alclnkaggAggPortPartnerOperPortPriority
+				INTEGER,
+			alclnkaggAggPortActorAdminState
+				LacpState,
+			alclnkaggAggPortActorOperState
+				LacpState,
+			alclnkaggAggPortPartnerAdminState
+				LacpState,
+			alclnkaggAggPortPartnerOperState
+				LacpState,
+
+------------------------------------------------------------
+-- Specific Proprietary Part
+-----------------------------------------------------------
+ 	
+            		alclnkaggAggPortSelectedAggNumber
+		        	INTEGER,
+            		alclnkaggAggPortGlobalPortNumber
+		        	 INTEGER,
+            		alclnkaggAggPortAdminState
+--	   			AdminState,
+                 		INTEGER,
+		    	alclnkaggAggPortOperState
+--			     	OperState,
+                 		INTEGER,
+		    	alclnkaggAggPortState
+                 		INTEGER,
+			alclnkaggAggPortLinkState
+                 		INTEGER,
+		        alclnkaggAggPortPrimary 
+		                INTEGER,
+			alclnkaggAggPortLacpType
+				 LacpType,
+ 	        	alclnkaggAggPortRowStatus
+				 RowStatus,
+			alclnkaggAggPortStandbyState
+				 INTEGER
+		}
+
+
+	alclnkaggAggPortIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The ifIndex of the port"
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.1"
+		::= { alclnkaggAggPortEntry 1 }
+	
+
+	alclnkaggAggPortActorSystemPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 2-octet read-create value used to define the priority
+			value associated with the Actor's System ID."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.2"
+		::= { alclnkaggAggPortEntry 2 }
+	
+	alclnkaggAggPortActorSystemID OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 6-octet read-create MAC address value that defines
+			the value of the System ID for the System that contains this
+			Aggregation Port."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.3"
+		::= { alclnkaggAggPortEntry 3 }
+	
+	alclnkaggAggPortActorAdminKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current administrative value of the Key for the
+			Aggregation Port. This is a 16-bit read-create value.
+			The meaning of particular Key values is of local significance."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.4"
+		::= { alclnkaggAggPortEntry 4 }
+	
+
+	alclnkaggAggPortActorOperKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current operational value of the Key for the
+			Aggregation Port. This is a 16-bit read-only value.
+			The meaning of particular Key values is of local significance."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.5"
+		::= { alclnkaggAggPortEntry 5 }
+
+
+	alclnkaggAggPortPartnerAdminSystemPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 2-octet read-create value used to define the administrative
+			value of priority associated with the Partner's System ID. The
+			assigned value is used, along with the value of
+			aAggPortPartnerAdminSystemID, aAggPortPartnerAdminKey,
+			aAggPortPartnerAdminPort, and aAggPortPartnerAdminPortPriority,
+			in order to achieve manually configured aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.6"
+		::= { alclnkaggAggPortEntry 6 }
+	
+	alclnkaggAggPortPartnerOperSystemPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A 2-octet read-only value indicating the operational value
+			of priority associated with the Partner's System ID. The
+			value of this attribute may contain the manually configured value
+			carried in aAggPortPartnerAdminSystemPriority
+			if there is no protocol Partner."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.7"
+		::= { alclnkaggAggPortEntry 7 }
+		
+	alclnkaggAggPortPartnerAdminSystemID OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A 6-octet read-create MACAddress value representing
+			the administrative value of the Aggregation Port's protocol
+			Partner's System ID. The assigned value is used, along with
+			the value of aAggPortPartnerAdminSystemPriority,
+			aAggPortPartnerAdminKey, aAggPortPartnerAdminPort,
+			and aAggPortPartnerAdminPortPriority, in order to
+			achieve manually configured aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.8"
+		::= { alclnkaggAggPortEntry 8 }
+	
+	alclnkaggAggPortPartnerOperSystemID OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A 6-octet read-only MACAddress value representing
+			the current value of the Aggregation Port's protocol Partner's
+			System ID. A value of zero indicates that there is no known
+			protocol Partner. The value of this attribute may contain the
+			manually configured value carried in
+			aAggPortPartnerAdminSystemID if there is no protocol Partner."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.9"
+		::= { alclnkaggAggPortEntry 9 }
+	
+
+	alclnkaggAggPortPartnerAdminKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current administrative value of the Key for the
+			protocol Partner. This is a 16-bit read-create value.
+			The assigned value is used, along with the value of
+			aAggPortPartnerAdminSystemPriority, aAggPortPartnerAdminSystemID,
+			aAggPortPartnerAdminPort, and aAggPortPartnerAdminPortPriority,
+			in order to achieve manually configured aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.10"
+		::= { alclnkaggAggPortEntry 10 }
+	
+
+	alclnkaggAggPortPartnerOperKey OBJECT-TYPE
+		SYNTAX LacpKey
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current operational value of the Key for the
+			protocol Partner. The value of this attribute may contain
+			the manually configured value carried in
+			aAggPortPartnerAdminKey if there is no protocol Partner.
+			This is a 16-bit read-only value."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.11"
+		::= { alclnkaggAggPortEntry 11 }
+	
+
+	alclnkaggAggPortSelectedAggID OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The identifier value of the Aggregator that this Aggregation
+			Port has currently selected. Zero indicates that the Aggregation
+			Port has not selected an Aggregator, either because it is in the
+			process of detaching from an Aggregator or because there is no
+			suitable Aggregator available for it to select. This value is
+			read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.12"
+		::= { alclnkaggAggPortEntry 12 }
+
+
+	alclnkaggAggPortAttachedAggID OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The identifier value of the Aggregator that this Aggregation
+			Port is currently attached to. Zero indicates that the Aggregation
+			Port is not currently attached to an Aggregator. This value is
+			read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.13"
+		::= { alclnkaggAggPortEntry 13 }
+
+
+	alclnkaggAggPortActorPort OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The port number locally assigned to the Aggregation Port.
+			The port number is communicated in LACPDUs as the
+			Actor_Port. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.14"
+		::= { alclnkaggAggPortEntry 14 }
+
+
+	alclnkaggAggPortActorPortPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The priority value assigned to this Aggregation Port.
+			This 16-bit value is read-create."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.15"
+		::= { alclnkaggAggPortEntry 15 }
+
+
+	alclnkaggAggPortPartnerAdminPort OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current administrative value of the port number
+			for the protocol Partner. This is a 16-bit read-create value.
+			The assigned value is used, along with the value of
+			aAggPortPartnerAdminSystemPriority,
+			aAggPortPartnerAdminSystemID, aAggPortPartnerAdminKey,
+			and aAggPortPartnerAdminPortPriority,
+			in order to achieve manually configured aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.16"
+		::= { alclnkaggAggPortEntry 16 }
+
+
+	alclnkaggAggPortPartnerOperPort OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operational port number assigned to this Aggregation
+			Port by the Aggregation Port's protocol Partner. The value
+			of this attribute may contain the manually configured value
+			carried in aAggPortPartnerAdminPort if there is no protocol
+			Partner. This 16-bit value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.17"
+		::= { alclnkaggAggPortEntry 17 }
+
+
+	alclnkaggAggPortPartnerAdminPortPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The current administrative value of the port priority
+			for the protocol Partner. This is a 16-bit read-create value.
+			The assigned value is used, along with the value of
+			aAggPortPartnerAdminSystemPriority, aAggPortPartnerAdminSystemID,
+			aAggPortPartnerAdminKey, and aAggPortPartnerAdminPort,
+			in order to achieve manually configured aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.18"
+		::= { alclnkaggAggPortEntry 18 }
+
+
+	alclnkaggAggPortPartnerOperPortPriority OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The priority value assigned to this Aggregation Port
+			by the Partner. The value of this attribute may contain the
+			manually configured value carried in
+			aAggPortPartnerAdminPortPriority if there is no
+			protocol Partner. This 16-bit value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.19"
+		::= { alclnkaggAggPortEntry 19 }
+
+
+	alclnkaggAggPortActorAdminState OBJECT-TYPE
+		SYNTAX LacpState
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A string of 8 bits, corresponding to the administrative values
+			of Actor_State () as transmitted by the Actor in LACPDUs.
+			The first bit corresponds to bit 0 of Actor_State (LACP_Activity),
+			the second bit corresponds to bit 1 (LACP_Timeout), the third bit
+			corresponds to bit 2 (Aggregation), the fourth bit corresponds to
+			bit 3 (Synchronization), the fifth bit corresponds to bit 4
+			(Collecting), the sixth bit corresponds to bit 5 (Distributing),
+			the seventh bit corresponds to bit 6 (Defaulted), and the eighth
+			bit corresponds to bit 7 (Expired). These values allow
+			administrative control over the values of LACP_Activity,
+			LACP_Timeout and Aggregation. This attribute value is read-create."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.20"
+		::= { alclnkaggAggPortEntry 20 }
+
+
+	alclnkaggAggPortActorOperState OBJECT-TYPE
+		SYNTAX LacpState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A string of 8 bits, corresponding to the current
+			operational values of Actor_State as transmitted by the
+			Actor in LACPDUs. The bit allocations are as defined in
+			. This attribute value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.21"
+		::= { alclnkaggAggPortEntry 21 }
+
+
+	alclnkaggAggPortPartnerAdminState OBJECT-TYPE
+		SYNTAX LacpState
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"A string of 8 bits, corresponding to the current administrative
+			value of Actor_State for the protocol Partner. The bit
+			allocations are as defined in . This attribute value is
+			read-create. The assigned value is used in order to achieve
+			manually configured aggregation."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.22"
+		::= { alclnkaggAggPortEntry 22 }
+
+
+	alclnkaggAggPortPartnerOperState OBJECT-TYPE
+		SYNTAX LacpState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A string of 8 bits, corresponding to the current values of
+			Actor_State in the most recently received LACPDU transmitted
+			by the protocol Partner. The bit allocations are as defined in
+			. In the absence of an active protocol Partner, this
+			value may reflect the manually configured value
+			aAggPortPartnerAdminState. This attribute value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.2.1.23"
+		::= { alclnkaggAggPortEntry 23 }
+
+
+------------------------------------------------------------
+-- Specific Proprietary Part
+-----------------------------------------------------------
+
+
+	alclnkaggAggPortSelectedAggNumber OBJECT-TYPE
+		SYNTAX INTEGER(-1..127)
+		MAX-ACCESS read-create
+		 STATUS current
+		DESCRIPTION
+			"Aggreagtor number to attach a  port at its creation  
+                         mandatory and only used for the 
+                         Omnichhannel not allowed for LACP
+                         (-1) value displayed when it is not significant"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 24 }
+
+	alclnkaggAggPortGlobalPortNumber OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"Physical reference of the port "
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 25 }
+
+
+           -- alclnkaggAggPortAdminState is equivalent to ifAdminStatus in ifTable 
+
+	alclnkaggAggPortAdminState OBJECT-TYPE
+                SYNTAX  INTEGER {
+                	    enable(1),       -- ready to pass packets
+                	    disable(2)
+                      }
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"status assigned by the admnistrator. port activation done by iftable
+                         this nominator is equivalent to ifAdminStatus in ifTable  "
+		REFERENCE
+			" IEEE 802.3 Subclause 30.7.1.1.13"
+		::= { alclnkaggAggPortEntry 26 }
+
+
+	alclnkaggAggPortOperState OBJECT-TYPE
+		  SYNTAX  INTEGER {
+		                    up(1),
+                                    down(2),
+		                    notAttached(3),
+                                    notAggregable(4)
+                                   }
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"Operational status of the port regarding the traffic"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 27 }
+
+	alclnkaggAggPortState OBJECT-TYPE
+		  SYNTAX  INTEGER {
+		                    created(1),
+                                    configurable(2),
+		                    configured(3),
+                                    selected(4),
+                                    reserved(5),
+                                    attached(6)
+                                   }
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"aggregation status of the port"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 28 }
+
+	alclnkaggAggPortLinkState OBJECT-TYPE
+		  SYNTAX  INTEGER {
+		                    up(1),
+                                    down(2)
+                                   }
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"Operational status of the link"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 29 }
+
+	 -- alclnkaggAggPortLinkState is equivalent to ifOperStatus 
+
+	alclnkaggAggPortPrimary OBJECT-TYPE
+		  SYNTAX  INTEGER {
+		                    yes(1),
+                                    no(2),
+                                    notSignificant(3)
+                                   }
+		MAX-ACCESS read-only
+		 STATUS current
+		DESCRIPTION
+			"port primary or not"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 30 }
+
+
+	alclnkaggAggPortLacpType OBJECT-TYPE
+		SYNTAX LacpType
+		MAX-ACCESS read-create
+--		 STATUS mandatory
+		 STATUS current
+		DESCRIPTION
+			"Port set with LACP protocol or not (case of Omnichannel)
+                          mandatory at the creation of the port"
+		REFERENCE
+			" specific to ALCATEL"
+		::= { alclnkaggAggPortEntry 31 }
+
+
+	alclnkaggAggPortRowStatus OBJECT-TYPE
+	SYNTAX RowStatus   
+      		MAX-ACCESS read-create
+      		STATUS current
+      		DESCRIPTION
+         		"This object is the RowStatus (locking flag) for creating or
+  			 deleting aggregatable port objects. alclnkaggAggPortActorAdminKey
+                         and alclnkaggAggPortSlotSlice must be supplied 
+                         in the request to create a row, it is a required field."
+		REFERENCE
+			" specific to ALCATEL "
+		::= { alclnkaggAggPortEntry 32 }
+
+	alclnkaggAggPortStandbyState OBJECT-TYPE
+                 SYNTAX INTEGER {
+                                enable(1),
+                                disable(2)
+                               }
+                 MAX-ACCESS read-create
+                 STATUS current
+                 DESCRIPTION
+                         "This sets the standby state for a port. The default value is disable."
+                 ::= { alclnkaggAggPortEntry 33 }
+
+	
+	-- -------------------------------------------------------------
+	-- LACP Statistics Table
+	-- -------------------------------------------------------------
+
+
+	alclnkaggAggPortStatsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggAggPortStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table that contains Link Aggregation information
+			 about every port that is associated with this device.
+			 A row appears in this table for each physical port."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3"
+		::= { alclnkaggAggPort 2 }
+
+
+	alclnkaggAggPortStatsEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggPortStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A list of Link Aggregation Control Protocol statistics
+			for each port on this device."
+		INDEX { alclnkaggAggPortIndex }
+		::= { alclnkaggAggPortStatsTable 1 }
+
+
+	AlclnkaggAggPortStatsEntry ::=
+		SEQUENCE {
+			alclnkaggAggPortStatsLACPDUsRx
+				Counter32,
+			alclnkaggAggPortStatsMarkerPDUsRx
+				Counter32,
+			alclnkaggAggPortStatsMarkerResponsePDUsRx
+				Counter32,
+			alclnkaggAggPortStatsUnknownRx
+				Counter32,
+			alclnkaggAggPortStatsIllegalRx
+				Counter32,
+			alclnkaggAggPortStatsLACPDUsTx
+				Counter32,
+			alclnkaggAggPortStatsMarkerPDUsTx
+				Counter32,
+			alclnkaggAggPortStatsMarkerResponsePDUsTx
+				Counter32
+		}
+
+
+	alclnkaggAggPortStatsLACPDUsRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of valid LACPDUs received on this
+			Aggregation Port. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.2"
+		::= { alclnkaggAggPortStatsEntry 1 }
+
+
+	alclnkaggAggPortStatsMarkerPDUsRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of valid Marker PDUs received on this
+			Aggregation Port. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.3"
+		::= { alclnkaggAggPortStatsEntry 2 }
+
+
+	alclnkaggAggPortStatsMarkerResponsePDUsRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of valid Marker Response PDUs received on this
+			 Aggregation Port. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.4"
+		::= { alclnkaggAggPortStatsEntry 3 }
+
+
+	alclnkaggAggPortStatsUnknownRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of frames received that either:
+			- carry the Slow Protocols Ethernet Type value (),
+			but contain an unknown PDU, or:
+			- are addressed to the Slow Protocols group MAC
+			Address (), but do not carry the Slow Protocols Ethernet Type.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.5"
+		::= { alclnkaggAggPortStatsEntry 4 }
+
+
+	alclnkaggAggPortStatsIllegalRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of frames received that carry the Slow
+			Protocols Ethernet Type value (), but contain a badly formed
+			PDU or an illegal value of Protocol Subtype ().
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.6"
+		::= { alclnkaggAggPortStatsEntry 5 }
+
+
+	alclnkaggAggPortStatsLACPDUsTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of LACPDUs transmitted on this
+			Aggregation Port. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.7"
+		::= { alclnkaggAggPortStatsEntry 6 }
+
+
+	alclnkaggAggPortStatsMarkerPDUsTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of Marker PDUs transmitted on this
+			Aggregation Port. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.3.1.8"
+		::= { alclnkaggAggPortStatsEntry 7 }
+
+
+	alclnkaggAggPortStatsMarkerResponsePDUsTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of Marker Response PDUs transmitted
+			 on this Aggregation Port. This value is read-only."
+		REFERENCE
+		"IEEE 802.3 Subclause 30.7.3.1.9"
+		::= { alclnkaggAggPortStatsEntry 8 }
+
+
+	-- -------------------------------------------------------------
+	-- LACP Debug Table
+	-- -------------------------------------------------------------
+
+
+
+	alclnkaggAggPortDebugTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggAggPortDebugEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table that contains Link Aggregation debug
+			information about every port that is associated with
+			this device. A row appears in this table for each
+			physical port."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4"
+		::= { alclnkaggAggPort 3 }
+
+
+	alclnkaggAggPortDebugEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggPortDebugEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A list of the debug parameters for a port."
+		INDEX { alclnkaggAggPortIndex }
+		::= { alclnkaggAggPortDebugTable 1 }
+	
+	AlclnkaggAggPortDebugEntry ::=
+		SEQUENCE {
+			alclnkaggAggPortDebugRxState
+				INTEGER,
+			alclnkaggAggPortDebugLastRxTime
+				TimeTicks,   
+			alclnkaggAggPortDebugMuxState
+            			INTEGER,
+        		alclnkaggAggPortDebugMuxReason
+            			DisplayString,
+			alclnkaggAggPortDebugActorChurnState
+				ChurnState,
+			alclnkaggAggPortDebugPartnerChurnState
+				ChurnState,
+			alclnkaggAggPortDebugActorChurnCount
+				Counter32,
+			alclnkaggAggPortDebugPartnerChurnCount
+				Counter32,
+			alclnkaggAggPortDebugActorSyncTransitionCount
+				Counter32,
+			alclnkaggAggPortDebugPartnerSyncTransitionCount
+				Counter32,
+			alclnkaggAggPortDebugActorChangeCount
+				Counter32,
+			alclnkaggAggPortDebugPartnerChangeCount
+				Counter32
+		}
+
+
+	alclnkaggAggPortDebugRxState OBJECT-TYPE
+		SYNTAX INTEGER {
+					current(1),
+					expired(2),
+					defaulted(3),
+					initialize(4),
+					lacpDisabled(5),
+					portDisabled(6)
+			}
+	MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This attribute holds the value 'current' if the Receive
+			state machine for the Aggregation Port is in the
+			CURRENT state, 'expired' if the Receive state machine.
+			is in the EXPIRED state, 'defaulted' if the Receive state
+			machine is in the DEFAULTED state, 'initialize' if the
+			Receive state machine is in the INITIALIZE state,
+			'lacpDisabled' if the Receive state machine is in the
+			LACP_DISABLED state, or 'portDisabled' if the Receive
+			state machine is in the PORT_DISABLED state.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.2"
+		::= { alclnkaggAggPortDebugEntry 1 }
+
+
+	alclnkaggAggPortDebugLastRxTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The value of aTimeSinceSystemReset (F.2.1) when
+			the last LACPDU was received by this Aggregation Port.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.3"
+		::= { alclnkaggAggPortDebugEntry 2 }
+
+       alclnkaggAggPortDebugMuxState OBJECT-TYPE
+    		SYNTAX       INTEGER {
+                    detached(1),
+                    waiting(2),
+                    attached(3),
+                    collecting(4),
+                    distributing(5),
+                    collectingDistributing(6)
+             	}
+    		MAX-ACCESS   read-only
+    		STATUS       current
+    		DESCRIPTION
+        		"This attribute holds the value `detached' if the Mux
+       			state machine (43.4.14) for the Aggregation Port is in
+        		the DETACHED state, `waiting' if the Mux state machine
+        		is in the WAITING state, `attached' if the Mux state
+        		machine for the Aggregation Port is in the ATTACHED
+        		state, `collecting' if the Mux state machine for the
+        		Aggregation Port is in the COLLECTING state,
+        		`distributing' if the Mux state machine for the
+        		Aggregation Port is in the DISTRIBUTING state, and
+        		`collectingDistributing' if the Mux state machine for
+        		the Aggregation Port is in the COLLECTING_DISTRIBUTING
+        		state. This value is read-only."
+    		REFERENCE
+        	"IEEE 802.3 Subclause 30.7.4.1.4"
+    		::= { alclnkaggAggPortDebugEntry 3 }
+
+
+	alclnkaggAggPortDebugMuxReason OBJECT-TYPE
+    		SYNTAX       DisplayString
+    		MAX-ACCESS   read-only
+    		STATUS       current
+    		DESCRIPTION
+        		"A human-readable text string indicating the reason
+        		for the most recent change of Mux machine state.
+        		This value is read-only."
+    		REFERENCE
+        		"IEEE 802.3 Subclause 30.7.4.1.5"
+    		::= { alclnkaggAggPortDebugEntry 4 }
+
+
+	alclnkaggAggPortDebugActorChurnState OBJECT-TYPE
+		SYNTAX ChurnState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The state of the Actor Churn Detection machine
+			() for the Aggregation Port. A value of 'noChurn'
+			indicates that the state machine is in either the
+			NO_ACTOR_CHURN or the ACTOR_CHURN_MONITOR
+			state, and 'churn' indicates that the state machine is in the
+			ACTOR_CHURN state. This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.6"
+		::= { alclnkaggAggPortDebugEntry 5 }
+
+
+	alclnkaggAggPortDebugPartnerChurnState OBJECT-TYPE
+		SYNTAX ChurnState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The state of the Partner Churn Detection machine
+			() for the Aggregation Port. A value of 'noChurn'
+			indicates that the state machine is in either the
+			NO_PARTNER_CHURN or the PARTNER_CHURN_MONITOR
+			state, and 'churn' indicates that the state machine is
+			in the PARTNER_CHURN state.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.7"
+		::= { alclnkaggAggPortDebugEntry 6 }
+
+ 
+
+	alclnkaggAggPortDebugActorChurnCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Count of the number of times the Actor Churn state
+			machine has entered the ACTOR_CHURN state.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.8"
+		::= { alclnkaggAggPortDebugEntry 7 }
+
+
+	alclnkaggAggPortDebugPartnerChurnCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Count of the number of times the Partner Churn
+			state machine has entered the PARTNER_CHURN state.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.9"
+		::= { alclnkaggAggPortDebugEntry 8 }
+
+
+	alclnkaggAggPortDebugActorSyncTransitionCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Count of the number of times the Actor's Mux state
+			machine () has entered the IN_SYNC state.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.10"
+		::= { alclnkaggAggPortDebugEntry 9 }
+	
+
+	alclnkaggAggPortDebugPartnerSyncTransitionCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Count of the number of times the Partner's Mux
+			state machine () has entered the IN_SYNC state.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.11"
+		::= { alclnkaggAggPortDebugEntry 10 }
+
+
+	alclnkaggAggPortDebugActorChangeCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Count of the number of times the Actor's perception of
+			the LAG ID for this Aggregation Port has changed.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.12"
+		::= { alclnkaggAggPortDebugEntry 11 }
+
+
+	alclnkaggAggPortDebugPartnerChangeCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Count of the number of times the Partner's perception of
+			the LAG ID (see ) for this Aggregation Port has changed.
+			This value is read-only."
+		REFERENCE
+			"IEEE 802.3 Subclause 30.7.4.1.13"
+		::= { alclnkaggAggPortDebugEntry 12 }
+
+
+
+	-- -------------------------------------------------------------
+	-- Link Aggregation additional parameters
+	-- -------------------------------------------------------------
+
+        alclnkaggAggEniActivate OBJECT-TYPE
+
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+		       }
+		MAX-ACCESS read-create
+		STATUS obsolete
+		DESCRIPTION
+			"This variable activates or deactivates link aggregation for ENI"
+		::= { alclnkaggAgg 3 }
+
+	
+	alclnkaggSlotTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggSlotEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Each row in this table represents the link aggregation status
+			for the associated slot. "
+		REFERENCE
+			"specific to Alcatel"
+		::= { alclnkaggAgg 4 }
+
+
+	alclnkaggSlotEntry OBJECT-TYPE
+		SYNTAX AlclnkaggSlotEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Configuration parameters for link aggregation."
+		INDEX { alclnkaggSlotNum }
+		::= { alclnkaggSlotTable 1 }
+
+
+	AlclnkaggSlotEntry ::=
+		SEQUENCE {
+		alclnkaggSlotNum
+			INTEGER,
+		alclnkaggSlotStatus
+			INTEGER,
+		alclnkaggMultipleAggPerSlot
+			INTEGER
+		}
+	
+	
+
+	alclnkaggSlotNum OBJECT-TYPE
+		SYNTAX INTEGER (1..16)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The slot number."
+		REFERENCE
+			"specific to Alcatel"
+		::= { alclnkaggSlotEntry 1 }
+	
+
+	alclnkaggSlotStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+			}
+
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Link aggregation enable/disable"
+		::= { alclnkaggSlotEntry 2 }
+
+	alclnkaggMultipleAggPerSlot OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+			}
+
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Enable/disable multiple Link aggregation per slot"
+		::= { alclnkaggSlotEntry 3 }
+
+	----------------------------------------------------------------
+	-- Table for mapping LAG Id to the ifIndex of this aggregate
+	---------------------------------------------------------------
+
+	alclnkaggAggIdIfIndexTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlclnkaggAggIdIfIndexEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Each row in this table represents the link aggregation 
+			aggregate id's corresponding ifIndex. "
+		REFERENCE
+			"specific to Alcatel"
+		::= { alclnkaggAgg 5 }
+
+
+	alclnkaggAggIdIfIndexEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggIdIfIndexEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Parameters for link aggregation aggregate id relationship to ifIndex."
+		INDEX { alclnkaggIfIndex }
+		::= { alclnkaggAggIdIfIndexTable 1 }
+
+
+	AlclnkaggAggIdIfIndexEntry ::=
+		SEQUENCE {
+		
+		alclnkaggIfIndex
+			INTEGER,
+		alclnkaggAggId
+			INTEGER	
+		}
+	
+	alclnkaggIfIndex OBJECT-TYPE
+		SYNTAX INTEGER  (1..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"IfIndex for the given Aggregate ID"
+		::= { alclnkaggAggIdIfIndexEntry 1 }
+	
+	alclnkaggAggId OBJECT-TYPE
+		SYNTAX INTEGER (0..127)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The aggregate id number."
+		REFERENCE
+			"specific to Alcatel"
+		::= { alclnkaggAggIdIfIndexEntry 2 }
+	
+
+	
+
+	
+	-- -------------------------------------------------------------
+	-- IEEE 802.3ad MIB - Conformance Information
+	-- -------------------------------------------------------------
+
+
+   	alcatelIND1LAGMIBConformance OBJECT-IDENTITY
+        	STATUS current
+        	DESCRIPTION
+            		"Branch For Link Aggregation Subsystem Conformance Information."
+        ::= { alcatelIND1LAGMIB 2 }	
+
+    	alcatelIND1LAGMIBGroups OBJECT-IDENTITY
+        	STATUS current
+        	DESCRIPTION
+            		"Branch For Link Aggregation Subsystem Units Of Conformance."
+        	::= { alcatelIND1LAGMIBConformance 1 }
+	
+
+    	alcatelIND1LAGMIBCompliances OBJECT-IDENTITY
+        	STATUS current
+        	DESCRIPTION
+            		"Branch For Link Aggregation Subsystem Compliance Statements."
+        	::= { alcatelIND1LAGMIBConformance 2 }
+
+
+	-- -------------------------------------------------------------
+	-- units of conformance
+	-- -------------------------------------------------------------
+
+
+	alclnkaggAggGroup OBJECT-GROUP
+		OBJECTS {
+			alclnkaggAggActorSystemID,
+			alclnkaggAggActorSystemPriority,
+			alclnkaggAggActorAdminKey,
+			alclnkaggAggMACAddress,
+			alclnkaggAggActorOperKey,
+			alclnkaggAggPartnerSystemID,
+			alclnkaggAggPartnerSystemPriority,
+			alclnkaggAggPartnerOperKey,
+--------------------------------
+--   Specific Proprietary Part
+------------------------------ 
+		        alclnkaggAggSize,
+		        alclnkaggAggNumber,
+		        alclnkaggAggDescr,
+  	                alclnkaggAggName,
+		        alclnkaggAggLacpType,
+		        alclnkaggAggAdminState,
+		        alclnkaggAggOperState,	
+                        alclnkaggAggNbrSelectedPorts,
+                        alclnkaggAggNbrAttachedPorts,
+                        alclnkaggAggPrimaryPortIndex, 
+	                alclnkaggAggPrimaryPortPosition,
+			alclnkaggAggPreemptState,
+			alclnkaggAggPreemptValue
+		}
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing information about an
+			aggregation."
+		::= { alcatelIND1LAGMIBGroups 1 }
+	
+
+	alclnkaggAggPortListGroup OBJECT-GROUP
+		OBJECTS {
+			alclnkaggAggPortListPorts
+		}
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing information about every
+			port in an aggregation."
+		::= { alcatelIND1LAGMIBGroups 2 }
+
+	
+	alclnkaggAggPortGroup OBJECT-GROUP
+		OBJECTS {
+			alclnkaggAggPortActorSystemPriority,
+			alclnkaggAggPortActorSystemID,
+			alclnkaggAggPortActorAdminKey,
+			alclnkaggAggPortActorOperKey,
+			alclnkaggAggPortPartnerAdminSystemPriority,
+			alclnkaggAggPortPartnerOperSystemPriority,
+			alclnkaggAggPortPartnerAdminSystemID,
+			alclnkaggAggPortPartnerOperSystemID,
+			alclnkaggAggPortPartnerAdminKey,
+			alclnkaggAggPortPartnerOperKey,
+			alclnkaggAggPortSelectedAggID,
+			alclnkaggAggPortAttachedAggID,
+			alclnkaggAggPortActorPort,
+			alclnkaggAggPortActorPortPriority,
+			alclnkaggAggPortPartnerAdminPort,
+			alclnkaggAggPortPartnerOperPort,
+			alclnkaggAggPortPartnerAdminPortPriority,
+			alclnkaggAggPortPartnerOperPortPriority,
+			alclnkaggAggPortActorAdminState,
+			alclnkaggAggPortActorOperState,
+			alclnkaggAggPortPartnerAdminState,
+			alclnkaggAggPortPartnerOperState,
+                        alclnkaggAggPortSelectedAggNumber,
+                        alclnkaggAggPortGlobalPortNumber,
+                        alclnkaggAggPortAdminState,
+		        alclnkaggAggPortOperState,
+		        alclnkaggAggPortState,
+			alclnkaggAggPortLinkState,
+			alclnkaggAggPortPrimary,
+		        alclnkaggAggPortLacpType,
+			alclnkaggAggPortStandbyState 
+			}
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing information about every
+			port in an aggregation."
+		::= { alcatelIND1LAGMIBGroups 3 }
+	
+
+	alclnkaggAggPortStatsGroup OBJECT-GROUP
+		OBJECTS {
+			alclnkaggAggPortStatsLACPDUsRx,
+			alclnkaggAggPortStatsMarkerPDUsRx,
+			alclnkaggAggPortStatsMarkerResponsePDUsRx,
+			alclnkaggAggPortStatsUnknownRx,
+			alclnkaggAggPortStatsIllegalRx,
+			alclnkaggAggPortStatsLACPDUsTx,
+			alclnkaggAggPortStatsMarkerPDUsTx,
+			alclnkaggAggPortStatsMarkerResponsePDUsTx
+		}	
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing information about every
+			port in an aggregation."
+		::= { alcatelIND1LAGMIBGroups 4 }
+	
+
+	alclnkaggAggPortDebugGroup OBJECT-GROUP
+		OBJECTS {
+			alclnkaggAggPortDebugRxState,
+			alclnkaggAggPortDebugLastRxTime,
+			alclnkaggAggPortDebugActorChurnState,
+			alclnkaggAggPortDebugPartnerChurnState,
+			alclnkaggAggPortDebugActorChurnCount,
+			alclnkaggAggPortDebugPartnerChurnCount,
+			alclnkaggAggPortDebugActorSyncTransitionCount,
+			alclnkaggAggPortDebugPartnerSyncTransitionCount,
+			alclnkaggAggPortDebugActorChangeCount,
+			alclnkaggAggPortDebugPartnerChangeCount
+		}
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing debug information about.
+			every aggregated port."
+		::= { alcatelIND1LAGMIBGroups 5 }
+	
+
+	alclnkaggTablesLastChangedGroup OBJECT-GROUP
+		OBJECTS {
+			alclnkaggTablesLastChanged
+		}
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing information about the time
+			of changes to the configuration of aggregations and their ports."
+		::= { alclnkaggAggGroup 6 }
+
+
+	-- -------------------------------------------------------------
+	-- compliance statements
+	-- -------------------------------------------------------------
+
+
+	alclnkaggAggCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION
+			"The compliance statement for device support of
+			Link Aggregation."
+		
+
+		MODULE
+			MANDATORY-GROUPS {
+				alclnkaggAggGroup,
+				alclnkaggAggPortGroup,
+				alclnkaggTablesLastChangedGroup,
+				lnkaggNotificationVarsGroup 
+			}
+
+
+			GROUP alclnkaggAggPortListGroup
+			DESCRIPTION
+				"This group is optional."
+
+
+			GROUP alclnkaggAggPortStatsGroup
+			DESCRIPTION
+				"This group is optional."
+	
+
+			GROUP alclnkaggAggPortDebugGroup
+			DESCRIPTION
+				"This group is optional."
+
+
+		::= { alcatelIND1LAGMIBCompliances 1 }
+
+ 
+
+lnkaggNotificationVarsGroup OBJECT-GROUP
+        OBJECTS
+        {
+                       traplnkaggAggId,
+                       traplnkaggPortIfIndex
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects which appear only in notifications."
+        ::= {alcatelIND1LAGMIBGroups  7 } 
+
+lnkaggTrapsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            lnkaggAggUp,
+            lnkaggAggDown,
+            lnkaggPortJoin,
+            lnkaggPortLeave,
+            lnkaggPortRemove,
+	    lnkaggPortReserve 
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Traps for Link Aggregation ."
+        ::= { alcatelIND1LAGMIBGroups 8 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	lnkaggNotificationVars  OBJECT IDENTIFIER ::= { alcatelIND1LAGMIBObjects 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	traplnkaggAggId OBJECT-TYPE
+                SYNTAX  INTEGER  (0..32)
+                MAX-ACCESS  accessible-for-notify
+                STATUS  current
+                DESCRIPTION
+                        "Index Value of Link Aggregation group  ."
+           ::= {lnkaggNotificationVars  1 }
+
+        traplnkaggPortIfIndex OBJECT-TYPE
+                SYNTAX  INTEGER  (1..2147483647)
+                MAX-ACCESS  accessible-for-notify
+                STATUS  current
+                DESCRIPTION
+                        "Port of  Link Aggregate group ."
+           ::= {lnkaggNotificationVars   2 }
+
+ 
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  NOTIFICATIONS
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lnkaggAggUp NOTIFICATION-TYPE
+        OBJECTS {
+                traplnkaggAggId,
+                traplnkaggPortIfIndex  
+                }
+        STATUS current
+        DESCRIPTION
+                "The Link Aggregation  is  active .
+                This trap is sent when any one port of the link aggregation 
+		goes to attached state."
+        ::= { lnkaggTraps 0 1 }
+
+
+
+lnkaggAggDown NOTIFICATION-TYPE
+        OBJECTS {
+                traplnkaggAggId,
+                traplnkaggPortIfIndex  
+                }
+        STATUS current
+        DESCRIPTION
+                "The Link Aggregation  is  not active .
+                This trap is sent when all  ports of the link aggregation 
+		goes out of attached state."
+        ::= { lnkaggTraps 0 2 }
+
+
+
+
+lnkaggPortJoin NOTIFICATION-TYPE
+        OBJECTS {
+                traplnkaggAggId,
+                traplnkaggPortIfIndex  
+                }
+        STATUS current
+        DESCRIPTION
+                "The Link Aggregation port  joins  the aggregate .
+                This trap is sent when given  port of the link aggregation 
+		goes to attached state."
+        ::= { lnkaggTraps 0 3 }
+
+lnkaggPortLeave NOTIFICATION-TYPE
+        OBJECTS {
+                traplnkaggAggId,
+                traplnkaggPortIfIndex  
+                }
+        STATUS current
+        DESCRIPTION
+                "The Link Aggregation port  leaves  the aggregate .
+                This trap is sent when given  port of the link aggregation 
+		goes out of  attached state."
+        ::= { lnkaggTraps 0 4 }
+
+lnkaggPortRemove NOTIFICATION-TYPE
+        OBJECTS {
+                traplnkaggAggId,
+                traplnkaggPortIfIndex  
+                }
+        STATUS current
+        DESCRIPTION
+                "The Link Aggregation port removed from the aggregate  .
+                This trap is sent when given  port of the link aggregation 
+		removed due to invalid configuration ."
+        ::= { lnkaggTraps 0 5 }
+
+lnkaggPortReserve NOTIFICATION-TYPE
+	OBJECTS {
+		traplnkaggAggId,
+		traplnkaggPortIfIndex
+		}
+	STATUS current
+	DESCRIPTION
+		"The Link Aggregation port  is reserved for this aggregate .
+		This trap is sent when given  port of the link aggregation
+		goes to reserved state."
+	::= { lnkaggTraps 0 6 }
+	END

@@ -1,0 +1,723 @@
+CISCOSB-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB ROS
+-- Version:    7.46
+-- Date:       23-Jan-2007
+--
+-- 05-Jun-2003  Added rlHostParamTable
+-- 12-Jun-2003  Added enumeration to rndErrorSeverity
+-- 14-Jun-2003  Added field rlCopyHistoryErrorMessage to table rlCopyHistoryTable
+-- 29-Jun-2003  Tables rlOspf...LnkTable replayed tables rlOspf...LSATable)
+-- 08-Jul-2003  The low range boundary and the default value of rlDvmrpPruneLifetime
+--              were changed from 300 to 200 seconds
+-- 16-Jul-2003  The following values VesuvioT and VesuvioF were added to
+--              rlPhDModuleType
+-- 22-Jul-2003  Added rlStartupCDBChanged, rlManualReboot
+-- 23-Jul-2003  New group rldot1x was added
+-- 24-Jul-2003  Changed ipMRouteStdMIB to rlIpMRouteStdMIB
+-- 27-Jul-2003  Changed access of rlMaxNumberOfAccessRules to read-only
+-- 27-Jul-2003  Changed access of rlMaxNumberOfAccessRulesAfterReset to read-write
+-- 30-Jul-2003  Added 802.1x traps rldot1xPortStatusAuthorizedTrap and
+--              rldot1xPortStatusUnauthorizedTrap
+-- 30-Jul-2003  Added rlFile
+-- 31-Jul-2003  Added rlAAAEap
+-- 10-Aug-2003  Renamed enumeration values resetCDB to resetStartupCDB and
+--                                         eraseCDB to eraseStartupCDB and
+--              added enumeration values eraseRunningCDB and copyStartupToRunning
+-- 16-Aug-2003  Added rlSnmp
+-- 18-Aug-2002 Added rldot1xExtAuthSessionStatsTable
+-- 21-Aug-2003  Added rlOspfTuning
+-- 09-Sep-2003  Added rlPortCopyVlanTaggingTable
+-- 13-Sep-2003  Added IMPLIED to INDEX { IMPLIED rlTranslationNameToIpName }
+-- 15-Sep-2003  rlPhysicalDescription's version (a value of variable rlPhDMibVersion)
+--              was changed from 2 to 3
+-- 15-Sep-2003  Added field rldot1dStpPortRole to rldot1dStpPortTable
+-- 15-Sep-2003  Added field rldot1sMStpInstancePortRole to rldot1sMstpInstancePortTable
+-- 15-Sep-2003  Added field rldot1sMstpExtPortBoundary to rldot1sMstpExtPortEntryTable
+-- 19-Sep-2003  Added rldot1xGuestVlanSupported, rldot1xGuestVlanVID, rldot1xGuestVlanPorts,
+--                    rldot1xUnAuthenticatedVlanSupported, rldot1xUnAuthenticatedVlanTable,
+--                    rldot1xUserBasedVlanSupported, rldot1xUserBasedVlanPorts
+-- 26-Sep-2003  Added rlMridTable
+-- 26-Sep-2003  Added rlMirModel
+-- 26-Sep-2003  Deleted JackType from IMPORTS clause
+-- 26-Sep-2003  Changed naming of SMIv2-like types
+-- 26-Sep-2003  Moved rlSyslog branch to new MIB
+-- 26-Sep-2003  Moved rlCopy branch to new MIB
+-- 26-Sep-2003  Editorial changes
+-- 02-Oct-2003  Added vlanSpecialTagTable
+-- 02-Oct-2003  Added field branch rlMibTree and table rlMibTreeTable
+-- 02-Oct-2003  rlPhysicalDescription's version (a value of variable rlPhDMibVersion)
+--              was changed from 3 to 4
+-- 02-Oct-2003  Added vlanSpecialTagCurrentTable
+-- 09-Oct-2003  Added field rldot1sMstpInstanceRemainingHopes to rldot1sMstpInstanceTable
+-- 11-Oct-2003  Changed OSPF tuning
+-- 24-Oct-2003  Change range of rldot1sMstpInstancePortPathCost
+--              from (1..65535) to (1..200000000)
+-- 26-Oct-2003  Added rsMaxNumberRpAddresesInGroupRange,rsMaxNumberRpAddresesInGroupRangeAfterReset
+-- 26-Oct-2003  Removed rlPimSMBootStrapInfoEnable
+-- 27-Oct-2003  Change range of rldot1sMStpInstancePortAdminPathCost
+--              from (0..65535) to (0..200000000)
+-- 29-Oct-2003  Added rlIfExistingPortList
+-- 07-Nov-2003  rldot1sMstpMaxHopes:
+--                a. range was changed from 1..20 to 1..40
+--                b. default value was chaged from 10 to 20
+--                   rldot1sMstpDesignatedMaxHopes:
+--                a. range was changed from 1..40 to 1..20
+-- 02-Dec-2003   Unused group rsIpZeroHopRouting was deleted
+-- 03-Dec-2003  Added rlSNMPDomains branch
+-- 03-Dec-3003  Added rlTstBasicRateTable
+-- 14-Dec-2003  Added field rldot1dStpBpduType to rldot1dStpPortEntry
+-- 14-Dec-2003  Added rldot1dStpFilterBpdu
+-- 21-Dec-2003  Updated imports of  DisplayString, PhysAddress, TimeInterval,
+--              DateAndTime, ipAddrEntry
+-- 21-Dec-3003  Added rlEmWebHttpsActiveCertificateId and rlSsl
+-- 24-Dec-3003  Added rldot1sMstpRemainingHops
+-- 13-Jan-2004 Change MSTP tables indexes to read-only.
+-- 30-Jan-2004 add field rldot1sMstpExtPortInternalAdminPathCost to rldot1sMstpExtPortTable.
+-- 30-Jan-2004 change field rldot1sMstpExtPortInternalPathCost to rldot1sMstpExtPortInternalOperPathCost
+--             and make it read-only, change range to (0..200000000).
+-- 03-Feb-2004 traps 186-191 are implemeted in the Physicaldescription MIB - for stacking.
+-- 09-Feb-2004 Change the upper rage of rldot1sMstpVlan to 4094.
+-- 11-Mar-2004 Added swIfPortLockIfRangeTable
+-- 26-Mar-2004 rlLcli MIB was moved to separated file
+-- 30-Mar-2004 Added traps swIfTablePortLock and swIfTablePortUnLock
+-- 19-Apr-2004 Moved to separate MIBS IP Multicast & DVMRP
+-- 24-Apr-2004 Moved to separate MIBS VLAN
+-- 05-May-2004 Deleted default values in swIfEntry
+-- 07-May-2004 Added mac base priority MIB as switch001 101
+-- 16-May-2004 Added value invalidImage(3) to rndActiveSoftwareFileAfterReset
+--             of rndActiveSoftwareFileTable
+-- 18-May-2004 Moved to separate files: ipSpec, rlBgp, rsTunning, rlFft,
+--             rndMng, rndApplications
+-- 31-May-2004 Added rlWlanAccessPoint
+-- 31-May-2004 Moved to separate files: rsUDP, swInterfaces, rlRmonControl
+-- 09-Jun-2004 change field rldot1sMstpInstancePortEnable in rldot1sMstpInstancePortEntry
+--             to read-only
+-- 16-Jun-2004 Added rndIpHostManagementSupported and rndIpHostManagementIfIndex
+-- 10-Nov-2004 Added rndNotifications
+-- 11-Nov-2004 Added rlAAAUserLocked trap
+-- 23-Nov-2004 Added type kiloBitsPerSecond RlStormCtrlRateUnit.
+-- 29-Nov-2004 limit rldot1sMstpPendingConfigurationName to 32 characters.
+-- 17-Jan-2005 Add rldot1dStpPortRestrictedRole field to rldot1dStpPortEntry
+-- 16-Mar-2005 Add rlLocalization branch
+-- 14-Apr-2005 Add rlRs232
+-- 18-Apr-2005 Add rldot1dStpPortAutoEdgePort to rldot1dStpPortEntry
+-- 27-Apr-2005 ZachM add rlStackLinkChange trap.
+-- 16-Jun-2005 Added rlNicRedundancy
+-- 01-Jul-2005 Added rlIgmpSnoopMulticastTvTable
+-- 07-Dec-2005 Added rlUPnP branch
+-- 12-Dec-2005 Added rldot1dStpFloodBpduMethod
+-- 14-Dec-2005 Add rlLldp branch
+-- 02-Feb-2006 GalVA added rlEmWebExtraPort
+-- 02-Feb-2006 GalVA added rlEmWebExtraPortType
+-- 12-Feb-2006 Import V2 textual conventions from SNMPv2-TC-v1 instead of SNMPv2-TC and CISCOSB-SNMPv2
+-- 12-Feb-2006 Removed private trunk MIB to separate MIB module.
+-- 06-Mar-2006 Added rldot1dStpSeparatedBridges
+-- 13-Mar-2006 GalVA added rlEmWebMaxHttpsIdleTimeout
+-- 26-Mar-2006 Removed IMPORTs from IEEE8023-LAG-MIB + editorial change in rldot1dStpSeparatedBridges
+-- 24-May-2006 Added BPDU Guard support
+-- 31-May-2006 Added rldot1xAuthenticationPortTable  OBJECT-TYPE
+-- 08-Jun-2006 Added rlDhcpSpoofing
+-- 08-Jun-2006 Added rldot1xAuthMultiStatsTable, rldot1xAuthMultiDiagTable, rldot1xAuthMultiSessionStatsEntry
+-- 02-Jul-2006 Added Bonjour branch
+-- 02-Jul-2006 Added rlCiscoSmartMIB branch
+-- 05-Jul-2006 Added rldot1xAuthConfigTable
+-- 10-Jul-2006 Moved branch rlMacMulticast to rlbridgemulticast
+-- 07-Aug-2006 Moved definitios of traps rlCopyFinished and rlCopyFailed TRAP-TYPE
+--             to ADLAN-COPY-MIB
+-- 23-Aug-2006 Added rlGlobalIpAddrTable
+-- 29-Aug-2006 Added rndImageSize
+-- 21-Sep-2006 Added rldot1xBpduFilteringEnabled
+-- 07-Sep-2006 Moved all rlEmbWeb definitions to rlembweb.mib
+-- 06-Oct-2006 Added rndBackupConfigurationEnabled
+-- 09-Oct-2006 Added rndImageInfoTable
+-- 03-Nov-2006 Added dlPrivate
+-- 18-Dec-2006 Added rlDhcpClCommandTable
+-- 02-Jan-2007 rndDeviceParams  MIB was moved to separate file CISCOSB-DEVICEPARAMS-MIB.MIB
+-- 02-Jan-2007 rndBootP  MIB was moved to separate file CISCOSB-BOOTP-MIB.MIB
+-- 02-Jan-2007 rlBrgMacSwitch  MIB was moved to separate file CISCOSB-BRGMACSWITCH-MIB.MIB
+-- 02-Jan-2007 rlpBridgeMIBObjects  MIB was moved to separate file CISCOSB-BRIDGEMIBOBJECTS-MIB.MIB
+-- 02-Jan-2007 rlCli  MIB was moved to separate file CISCOSB-CLI-MIB.MIB
+-- 02-Jan-2007 rlTelnet  MIB was moved to separate file CISCOSB-TELNET-MIB.MIB
+-- 02-Jan-2007 rlArpSpoofing  MIB was moved to separate file CISCOSB-ARPSPOOFING-MIB.MIB
+-- 02-Jan-2007 rlMir  MIB was moved to separate file CISCOSB-MIR-MIB.MIB
+-- 02-Jan-2007 rlGvrp  MIB was moved to separate file CISCOSB-GVRP-MIB.MIB
+-- 02-Jan-2007 rlSwPackageVersion  MIB was moved to separate file RCISCOSB-SWPACKAGEVERSION-MIB.MIB
+-- 02-Jan-2007 rlRCli  MIB was moved to separate file CISCOSB-RCLI-MIB.MIB
+-- 02-Jan-2007 rlAggregateVlan  MIB was moved to separate file CISCOSB-AGGREGATEVLAN-MIB.MIB
+-- 02-Jan-2007 rlGmrp  MIB was moved to separate file CISCOSB-GMRP-MIB.MIB
+-- 02-Jan-2007 rlDhcpCl  MIB was moved to separate file CISCOSB-DHCPCL-MIB.MIB
+-- 02-Jan-2007 rlStormCtrl  MIB was moved to separate file CISCOSB-STORMCTRL-MIB.MIB
+-- 02-Jan-2007 rlSmon  MIB was moved to separate file CISCOSB-SMON-MIB.MIB
+-- 02-Jan-2007 rlDigitalKeyManage  MIB was moved to separate file CISCOSB-DIGITALKEYMANAGE-MIB.MIB
+-- 02-Jan-2007 rldot1x  MIB was moved to separate file CISCOSB-DOT1X-MIB.MIB
+-- 02-Jan-2007 rlSocket  MIB was moved to separate file CISCOSB-SOCKET-MIB.MIB
+-- 02-Jan-2007 rl3sw2swTables  MIB was moved to separate file CISCOSB-3SW2SWTABLES-MIB.MIB
+-- 02-Jan-2007 rlMultiSessionTerminal  MIB was moved to separate file CISCOSB-MULTISESSIONTERMINAL-MIB.MIB
+-- 02-Jan-2007 rlTraceRoute  MIB was moved to separate file CISCOSB-TRACEROUTE-MIB.MIB
+-- 02-Jan-2007 rlJumboFrames  MIB was moved to separate file CISCOSB-JUMBOFRAMES-MIB.MIB
+-- 02-Jan-2007 rlCDB  MIB was moved to separate file CISCOSB-CDB-MIB.MIB
+-- 02-Jan-2007 rndEndOfMibGroup  MIB was moved to separate file CISCOSB-ENDOFMIB-MIB.MIB
+-- 15-Jan-2007 Devided file appolo.txt to a few files
+--             Renamed file appolo.txt to ralan-mib.mib
+-- 22-Jan-2007 Added rlIntel
+-- 28-Mar-2007 added rlTunnel
+-- 08/APR/07- add rlAutoUpdate
+-- 21-Oct-2007 Add rldot1dStpPortLoopback to rldot1dStpPortEntry
+-- 08-MAY-2007 Added rlCpuCounters
+-- 11-Mar-2008 Added rlIPv6
+-- 07-Apr-2008 added rlActionAcl for DIPO's ACLs.
+-- 14-Apr-2008 added rlSafeGuard for DIPO's Safeguard.
+-- 27-Aug-2008 added rlVlanTrunking for DIPO's Vlan Trunking
+-- 31-Dec-2008 added rlTrafficSegmentation
+-- 05-Jan-2009 added rlIMPBFeatures
+-- 25-Mar-2009 added rlDeleteImg
+-- 02-Apr-2009 added rlCustom1BonjourService
+-- 18-Apr-2010 added rlPfcMib
+
+
+-- Title:                CISCOSB ROS
+--                       Private CISCOSB MIB
+-- Version:              7.46
+-- Date:                 2 JAN 2007
+
+IMPORTS
+
+    enterprises
+                FROM SNMPv2-SMI;
+
+    Percents ::= INTEGER (0..100)
+    NetNumber ::=  OCTET STRING (SIZE(4))
+    VlanPriority ::= INTEGER (0..7)
+
+switch001 MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines CISCOSB private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { enterprises 9 6 1 101 }
+
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to switch001 MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+--   Objects in this MIB are arranged into groups:
+--01 rndMng             - Management/Action
+--02 rndDeviceParams    - General parameters
+--04 rndInterface       - Obsolete
+--09 rndBackup          - Obsolete
+--12 rndIPX             - Parameters for management of IPX router
+--16 rndFACS            - Obsolete
+--20 rndCOD             - Obsolete
+--22 rndBrgHub          - Obsolete
+--23 rndAdapter         - Obsolete
+--24 rndBootP           - BootP configurgaration.
+--26 ipSpec             - IP Private MIBs
+--27 virtualLan         - Obsolete
+--28 rsConf             - Obsolete
+--29 rsTunning          - Tunning sub group
+--30 rndISDN            - Obsolete
+--31 rndPPP             - Obsolete
+--34 frameRelay         - Obsolete
+--35 rndApplications    -
+--38 rsDHCP             - DHCP server configuration
+--39 radWiz             - Obsolete
+--40 rsCfgUpgrade       - Obsolete
+--42 rsUDP              -
+--43 swInterfaces       -
+--44 securityZone       - Obsolete
+--45 rll3SwtchETMdl     - Obsolete
+--46 rlIPmulticast      -
+--47 rlFFT              -
+--48 vlan               -
+--49 rlRmonControl      -
+--50 rlBrgMacSwitch     -
+--51 rlExperience       -
+--52 rlCli              -
+--53 rlPhysicalDescription -
+--54 rlIfInterfaces     -
+--55 rlMacMulticast     -
+--56 rlGalileo          -
+--57 rlpBridgeMIBObjects-
+--58 rlTelnet           -
+--59 rlPolicy           -
+--60 rlArpSpoofing      -
+--61 rlMir              -
+--62 rlIpMRouteStdMIB     -
+--63 rl3sw2swTables     -
+--64 rlGvrp             -
+--65 rlDot3adAgg        -
+--66 rlEmbWeb           -
+--67 rlSwPackageVersion -
+--68 rlBroadcom          -
+--69 rlMultiSessionTerminal -
+--70 rlRCli             -
+--71 rlBgp              -
+--72 rlAgentsCapabilitiesGroups -
+--73 rlAggregateVlan    -
+--74 rlLCli             -
+--75 rlGmrp             -
+--76 rlDhcpCl           - Dhcp client
+--77 rlStormCtrl        -
+--78 rlSsh              -
+--79 rlAAA              -
+--80 Radius             -
+--81 rlTraceRoute       -
+--82 rlSyslog           -
+--83 rlEnv              - HardWare status indication
+--84 rlSmon             -
+--85 rlSocket           -
+--86 rlDigitalKeyManage -
+--87 rlCopy             -
+--88 rlQosCliMib        -
+--89 rlMngInf           -
+--90 rlPhy              -
+--91 rlJumboFrames      -
+--92 rlTimeSynchronization
+--93 rlDnsCl            - Dns client
+--94 rlCDB
+--95 rldot1x
+--96 rlFile
+--97 rlAAAEap           - AAA for 1x
+--98 rlSNMP
+--99 rlQosServ
+--100 rlSsl
+--101 rlMacBasePrio
+--102 Wireless Access Point Private MIB
+--103 rlLocalization
+--104 rlRs232
+--105 rlNicRedundancy
+--106 rlAmap
+--107 rlStack
+--108 rlPoe
+--109 rlUPnP
+--110 rlLldp
+--111 rlOib
+--112 rlBridgeSecurity
+--113 rlDhcpSpoofing
+--114 rlBonjour
+--115 rlCiscoSmartMIB
+--116 rlBrgMulticast
+--117 rlBrgMcMngr
+--118 rlGlobalIpAddrTable
+--119 dlPrivate
+--120 rlSecuritySuiteMib
+--121 rlIntel
+--122 rlTunnel
+--126 rlGreenEthernet
+--127 rlLbd
+--128 rlErrdisableRecovery
+--129 rlIPv6
+-- ...
+--139 rlIMPBFeatures
+--140 rlSmartPorts
+--143 rlCustom1BonjourService
+--200 rlWanMib
+
+-- At the end of the MIB there is a definition of all RND-specific traps.
+
+rndNotifications OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION " All the switch001 notifications will reside under this branch
+                         as specified in
+                         RFC2578 'Structure of Management Information Version 2 (SMIv2)' 8.5"
+           ::= { switch001 0 }
+
+
+-- rndMng group contains Management Variables for switch001 devices
+
+rndMng   OBJECT IDENTIFIER ::= { switch001 1  }
+-- see CISCOSBMng.mib
+
+rndDeviceParams       OBJECT IDENTIFIER ::= { switch001 2  }
+-- see CISCOSB-DEVICEPARAMS-MIB.MIB
+
+-- Obsolete
+-- rndInterface OBJECT IDENTIFIER ::= { switch001 4  }
+
+-- Obsolete
+-- rndBackup    OBJECT IDENTIFIER ::= { switch001 9 }
+
+-- Obsolete
+-- rndIPX   OBJECT IDENTIFIER ::= { switch001 12 }
+
+-- Obsolete
+-- rndFACS    OBJECT IDENTIFIER ::=  { switch001 16 }
+
+-- Obsolete
+-- rndCOD    OBJECT IDENTIFIER ::=  { switch001 20 }
+
+-- Obsolete
+-- rndBrgHub     OBJECT IDENTIFIER ::=  { switch001 22 }
+
+-- Obsolete
+-- rndAdapter    OBJECT IDENTIFIER ::=  { switch001 23 }
+
+rndBootP       OBJECT IDENTIFIER ::= { switch001 24  }
+-- see CISCOSB-BOOTP-MIB.MIB
+
+-- ip Specific group  Addition parameters to ip group in MIB-2
+
+ipSpec      OBJECT IDENTIFIER ::= { switch001 26 }
+-- see rlIp.mib
+
+-- Obsolete
+-- virtualLan  OBJECT IDENTIFIER ::= { switch001 27 }
+
+-- Obsolete
+-- rsConf  OBJECT IDENTIFIER ::= { switch001 28 }
+
+rsTunning  OBJECT IDENTIFIER ::= { switch001 29 }
+-- see rlTuning.mib
+
+-- Obsolete
+-- rndISDN      OBJECT IDENTIFIER ::= { switch001 30}
+
+-- Obsolete
+-- rndPPP   OBJECT IDENTIFIER ::= { switch001 31 }
+
+-- Obsolete
+-- frameRelay    OBJECT IDENTIFIER ::= { switch001 34 }
+
+rndApplications  OBJECT IDENTIFIER ::= { switch001 35 }
+-- see rlApplication.mib
+
+-- Obsolete
+-- rndOGCompression  OBJECT IDENTIFIER ::= { switch001 36 }
+
+-- Obsolete
+-- rndEthernet  OBJECT IDENTIFIER ::= { switch001 37 }
+
+--rsDHCP  OBJECT IDENTIFIER ::= { switch001 38 }
+--see rlDhcl.mib
+
+-- Obsolete
+-- radWiz  OBJECT IDENTIFIER ::= { switch001 39 }
+
+-- Obsolete
+-- rsCfgUpgrade  OBJECT IDENTIFIER ::= { switch001 40 }
+
+-- Obsolete
+--rsRMON  OBJECT IDENTIFIER ::= { switch001 41 }
+
+-- rsCopyPort was deleted
+-- { rsRMON 1 } reserved
+
+-- rsMonitPort was deleted
+-- { rsRMON 2 } reserved
+
+rsUDP    OBJECT IDENTIFIER ::=  { switch001 42}
+-- see rlUdp.mib
+
+swInterfaces  OBJECT IDENTIFIER ::= { switch001 43 }
+-- see rlInterfaces.mib
+
+-- Obsolete
+-- securityZone  OBJECT IDENTIFIER ::= { switch001 44 }
+
+-- Obsolete
+-- rll3SwtchETMdl OBJECT IDENTIFIER ::= { switch001 45 }
+
+rlIPmulticast OBJECT IDENTIFIER ::= { switch001 46 }
+
+rlFFT OBJECT IDENTIFIER ::= { switch001 47 }
+
+vlan  OBJECT IDENTIFIER ::= { switch001 48 }
+
+rlRmonControl   OBJECT IDENTIFIER ::=  { switch001 49}
+-- see rlRmon.mib
+
+rlBrgMacSwitch       OBJECT IDENTIFIER ::= { switch001 50  }
+-- see CISCOSB-BRGMACSWITCH-MIB.MIB
+
+rlExperience OBJECT IDENTIFIER ::= { switch001 51 }
+
+rlCli OBJECT IDENTIFIER ::= { switch001 52 }
+--see CISCOSB-CLI-MIB.MIB
+
+-- Used for Drafts not received yet OBJECT IDENTIFIER
+
+rlPhysicalDescription OBJECT IDENTIFIER ::= { switch001 53 }
+
+rlIfInterfaces OBJECT IDENTIFIER ::= { switch001 54 }
+-- see rlInterfaces.mib
+
+rlMacMulticast OBJECT IDENTIFIER ::= { switch001 55 }
+--see rlbrgmulticast.mib
+
+rlGalileo OBJECT IDENTIFIER ::= { switch001 56 }
+
+rlpBridgeMIBObjects OBJECT IDENTIFIER ::= { switch001 57 }
+--see CISCOSB-BRIDGEMIBOBJECTS-MIB.MIB
+
+rlTelnet OBJECT IDENTIFIER ::= { switch001 58 }
+--see CISCOSB-TELNET-MIB.MIB
+
+rlPolicy  OBJECT IDENTIFIER ::= { switch001 59 }
+
+rlArpSpoofing OBJECT IDENTIFIER ::= { switch001 60 }
+--see CISCOSB-ARPSPOOFING-MIB.MIB
+
+rlMir  OBJECT IDENTIFIER ::= { switch001 61 }
+--see CISCOSB-MIR-MIB.MIB
+
+rlIpMRouteStdMIB OBJECT IDENTIFIER ::= { switch001 62 }
+
+rl3sw2swTables OBJECT IDENTIFIER ::= { switch001 63 }
+--see CISCOSB-3SW2SWTABLES-MIB.MIB
+
+rlGvrp  OBJECT IDENTIFIER ::= { switch001 64 }
+--see CISCOSB-GVRP-MIB.MIB
+
+rlDot3adAgg  OBJECT IDENTIFIER ::= { switch001 65 }
+
+rlEmbWeb  OBJECT IDENTIFIER ::= { switch001 66 }
+
+rlSwPackageVersion OBJECT IDENTIFIER ::= { switch001 67 }
+--see CISCOSB-SWPACKAGEVERSION-MIB.MIB
+
+rlBroadcom OBJECT IDENTIFIER ::= { switch001 68 }
+
+rlMultiSessionTerminal  OBJECT IDENTIFIER ::= { switch001 69 }
+--see CISCOSB-MULTISESSIONTERMINAL-MIB.MIB
+
+rlRCli  OBJECT IDENTIFIER ::= { switch001 70 }
+--see CISCOSB-RCLI-MIB.MIB
+
+rlBgp OBJECT IDENTIFIER ::= { switch001 71 }
+
+rlAgentsCapabilitiesGroups  OBJECT IDENTIFIER ::= { switch001 72 }
+
+rlAggregateVlan OBJECT IDENTIFIER ::= {switch001 73}
+--see CISCOSB-AGGREGATEVLAN-MIB.MIB
+
+-- rlLCli  OBJECT IDENTIFIER ::= { switch001 74 }
+
+rlGmrp  OBJECT IDENTIFIER ::= { switch001 75 }
+--see CISCOSB-GMRP-MIB.MIB
+
+rlDhcpCl OBJECT IDENTIFIER ::= { switch001 76 }
+--see CISCOSB-DHCPCL-MIB.MIB
+
+------------------------------
+
+rlStormCtrl OBJECT IDENTIFIER ::= { switch001 77 }
+--see CISCOSB-STORMCTRL-MIB.MIB
+
+rlSsh OBJECT IDENTIFIER ::= { switch001 78 }
+
+rlAAA OBJECT IDENTIFIER ::= { switch001 79 }
+
+rlRadius  OBJECT IDENTIFIER ::= { switch001 80 }
+
+-- see rlAAA.mib
+
+rlTraceRoute  OBJECT IDENTIFIER ::= { switch001 81 }
+--see CISCOSB-TRACEROUTE-MIB.MIB
+
+rlSyslog  OBJECT IDENTIFIER ::= { switch001 82 }
+
+rlEnv  OBJECT IDENTIFIER ::= { switch001 83 }
+-- rlPhysicalDescription OBJECT IDENTIFIER ::= { rlEnv 1 }
+-- entitySensorMIB OBJECT IDENTIFIER ::= { rlEnv 2 }
+
+rlSmon  OBJECT IDENTIFIER ::= { switch001 84 }
+-- see CISCOSB-SMON-MIB.MIB
+
+rlSocket OBJECT IDENTIFIER ::= { switch001 85 }
+-- see CISCOSB-SOCKET-MIB.MIB
+
+rlDigitalKeyManage OBJECT IDENTIFIER ::= { switch001 86 }
+-- see CISCOSB-DIGITALKEYMANAGE-MIB.MIB
+
+rlCopy  OBJECT IDENTIFIER ::= { switch001 87 }
+
+rlQosCliMib OBJECT IDENTIFIER ::= { switch001 88 }
+
+rlMngInf OBJECT IDENTIFIER ::= { switch001 89 }
+
+rlPhy OBJECT IDENTIFIER ::= { switch001 90 }
+
+rlJumboFrames OBJECT IDENTIFIER ::= { switch001 91 }
+-- see CISCOSB-JUMBOFRAMES-MIB.MIB
+
+rlTimeSynchronization OBJECT IDENTIFIER ::= { switch001 92 }
+
+rlDnsCl OBJECT IDENTIFIER ::= { switch001 93 }
+
+rlCDB  OBJECT IDENTIFIER ::= { switch001 94 }
+-- see CISCOSB-CDB-MIB.MIB
+
+rldot1x  OBJECT IDENTIFIER ::= { switch001 95 }
+-- see CISCOSB-DOT1X-MIB.MIB
+
+rlFile  OBJECT IDENTIFIER ::= { switch001 96 }
+
+rlAAAEap OBJECT IDENTIFIER ::= { switch001 97 }
+
+rlSNMP OBJECT IDENTIFIER ::= { switch001 98 }
+
+--rlQosServ OBJECT IDENTIFIER ::= { switch001 99 }
+
+rlSsl OBJECT IDENTIFIER ::= { switch001 100 }
+
+rlMacBasePrio OBJECT IDENTIFIER ::= { switch001 101 }
+
+rlWlanAccessPoint OBJECT IDENTIFIER ::= { switch001 102 }
+
+rlLocalization  OBJECT IDENTIFIER ::= { switch001 103 }
+
+rlRs232 OBJECT IDENTIFIER ::= { switch001 104 }
+
+rlNicRedundancy OBJECT IDENTIFIER ::= { switch001 105 }
+
+rlAmap OBJECT IDENTIFIER ::= { switch001 106 }
+
+rlStack OBJECT IDENTIFIER ::= { switch001 107 }
+
+rlPoe OBJECT IDENTIFIER ::= { switch001 108 }
+
+rlUPnP  OBJECT IDENTIFIER ::= { switch001 109 }
+
+rlLldp OBJECT IDENTIFIER ::= { switch001 110 }
+
+rlOib OBJECT IDENTIFIER ::= { switch001 111 }
+
+rlBridgeSecurity OBJECT IDENTIFIER ::= { switch001 112 }
+
+rlDhcpSpoofing  OBJECT IDENTIFIER ::= { switch001 113 }
+
+rlBonjour OBJECT IDENTIFIER ::= { switch001 114 }
+
+rlCiscoSmartMIB  OBJECT IDENTIFIER ::= { switch001 115 }
+
+rlBrgMulticast  OBJECT IDENTIFIER ::= { switch001 116 }
+
+rlBrgMcMngr  OBJECT IDENTIFIER ::= { switch001 117 }
+
+rlGlobalIpAddrTable OBJECT IDENTIFIER ::= { switch001 118 }
+
+dlPrivate OBJECT IDENTIFIER ::= { switch001 119 }
+
+rlSecuritySuiteMib OBJECT IDENTIFIER ::= { switch001 120 }
+
+rlIntel OBJECT IDENTIFIER ::= { switch001 121 }
+
+rlTunnel OBJECT IDENTIFIER ::= { switch001 122 }
+
+rlAutoUpdate OBJECT IDENTIFIER ::= { switch001 123 }
+
+rlCpuCounters OBJECT IDENTIFIER ::= { switch001 124 }
+
+--xxxx  OBJECT IDENTIFIER ::= { switch001 125 }
+
+--rlGreenEthernet OBJECT IDENTIFIER ::= { switch001 126 }
+
+rlLbd  OBJECT IDENTIFIER ::= { switch001 127 }
+
+rlErrdisableRecovery  OBJECT IDENTIFIER ::= { switch001 128 }
+
+rlIPv6 OBJECT IDENTIFIER ::= { switch001 129 }
+
+rlActionAcl  OBJECT IDENTIFIER ::= { switch001 130 }
+
+rlSafeGuard OBJECT IDENTIFIER ::= { switch001 131 }
+
+rlProtectedPorts OBJECT IDENTIFIER ::= { switch001 132}
+
+rlBanner OBJECT IDENTIFIER ::= { switch001 133}
+
+rlGreenEth OBJECT IDENTIFIER ::= { switch001 134}
+
+rlDlf OBJECT IDENTIFIER ::= { switch001 135}
+
+rlVlanTrunking OBJECT IDENTIFIER ::= { switch001 136 }
+
+rlCdp OBJECT IDENTIFIER ::= { switch001 137 }
+
+rlTrafficSeg OBJECT IDENTIFIER ::= { switch001 138 }
+
+rlImpbFeatures OBJECT IDENTIFIER ::= { switch001 139 }
+
+rlSmartPorts OBJECT IDENTIFIER ::= { switch001 140 }
+
+rlStatistics OBJECT IDENTIFIER ::= { switch001 141 }
+
+rlDeleteImg  OBJECT IDENTIFIER ::= { switch001 142 }
+
+rlCustom1BonjourService OBJECT IDENTIFIER ::= { switch001 143 }
+
+rlSpecialBpdu OBJECT IDENTIFIER ::= { switch001 144 }
+
+rlTBIMib OBJECT IDENTIFIER ::= { switch001 145}
+
+rlWeightedRandomTailDrop OBJECT IDENTIFIER ::= { switch001 146}
+
+rlsFlowMib OBJECT IDENTIFIER ::= { switch001 147 }
+
+rlPfcMib OBJECT IDENTIFIER ::= { switch001 148}
+
+rlEee OBJECT IDENTIFIER ::= { switch001 149}
+
+rlEventsMib OBJECT IDENTIFIER ::= { switch001 150}
+
+rlWlanMIB OBJECT IDENTIFIER ::= { switch001 200 }
+
+rlEtsMib OBJECT IDENTIFIER ::= { switch001 201 }
+
+rlQcnMib OBJECT IDENTIFIER ::= { switch001 202 }
+
+rlSctMib OBJECT IDENTIFIER ::= { switch001 203 }
+
+rlSysmngMib OBJECT IDENTIFIER ::= { switch001 204 }
+
+rlFip OBJECT IDENTIFIER ::= { switch001 205 }
+
+rlDebugCapabilities OBJECT IDENTIFIER ::= { switch001 206 }
+
+rlIpStdAcl  OBJECT IDENTIFIER ::= { switch001 207 }
+
+rlWBA  OBJECT IDENTIFIER ::= { switch001 208 }
+
+rlSecSd  OBJECT IDENTIFIER ::= { switch001 209 }
+
+rlOspf  OBJECT IDENTIFIER ::= { switch001 210 }
+
+rlRtRedist OBJECT IDENTIFIER ::= { switch001 211 }
+
+rlIpPrefList  OBJECT IDENTIFIER ::= { switch001 212 }
+
+rlVoipSnoop  OBJECT IDENTIFIER ::= { switch001 213 }
+
+rlDhcpv6  OBJECT IDENTIFIER ::= { switch001 214}
+
+rlIpv6Fhs  OBJECT IDENTIFIER ::= { switch001 215} 
+
+rlInventoryEnt  OBJECT IDENTIFIER ::= { switch001 217}
+
+rlUdld OBJECT IDENTIFIER ::= { switch001 218 }
+
+rndEndOfMibGroup   OBJECT IDENTIFIER ::= { switch001 1000  }
+
+-- see CISCOSB-ENDOFMIB-MIB.MIB
+
+END
+

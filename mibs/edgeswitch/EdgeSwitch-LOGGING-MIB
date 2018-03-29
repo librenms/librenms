@@ -1,0 +1,804 @@
+EdgeSwitch-LOGGING-MIB DEFINITIONS ::= BEGIN
+
+-- Copyright Broadcom Inc (2004-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Broadcom Inc's confidential and proprietary
+-- intellectual property.  Broadcom Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32,
+        Unsigned32, TimeTicks, NOTIFICATION-TYPE  FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, 
+        DateAndTime, RowStatus                        FROM SNMPv2-TC
+        fastPath                                      FROM EdgeSwitch-REF-MIB
+        InetAddress, InetAddressType, InetPortNumber  FROM INET-ADDRESS-MIB
+        agentInventoryComponentIndex                  FROM EdgeSwitch-INVENTORY-MIB
+        InterfaceIndexOrZero                          FROM IF-MIB;
+
+    AgentLogFacility ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "Facility code used in determining the SysLog Priority value."
+        REFERENCE
+            "RFC3164 - 4.1.1: Table 1"
+        SYNTAX  INTEGER {
+            kernel(0),   -- kernel messages
+            user(1),     -- user-level messages
+            mail(2),     -- mail system
+            system(3),   -- system daemons
+            security(4), -- security/authorization messages
+            syslog(5),   -- messages generated internally by syslogd
+            lpr(6),      -- line printer subsystem
+            nntp(7),     -- network news subsystem
+            uucp(8),     -- UUCP subsystem
+            cron(9),     -- clock daemon
+            auth (10),   -- security/authorization messages
+            ftp(11),     -- FTP daemon
+            ntp(12),     -- NTP subsystem
+            audit(13),   -- log audit
+            alert(14),   -- log alert
+            clock(15),   -- clock daemon
+            local0(16),  -- local use 0
+            local1(17),  -- local use 1
+            local2(18),  -- local use 2
+            local3(19),  -- local use 3
+            local4(20),  -- local use 4
+            local5(21),  -- local use 5
+            local6(22),  -- local use 6
+            local7(23)   -- local use 7
+            }
+
+    AgentLogSeverity ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "Severity code used in determining the SysLog Priority value."
+        REFERENCE
+            "RFC3164 - 4.1.1: Table 2"
+        SYNTAX  INTEGER {
+            emergency(0),     -- System is unusable. System failure has occurred.
+            alert(1),         -- Action must be taken immediately. Unrecoverable
+                              --  failure of a component. System failure likely.
+            critical(2),      -- Critical conditions. Recoverable failure of a
+                              --  component that may lead to system failure.
+            error(3),         -- Error conditions. Recoverable failure of a component.
+            warning(4),       -- Warning conditions. Minor failure, e.g.
+                              --  misconfiguration of a component.
+            notice(5),        -- Normal but significant conditions.
+            informational(6), -- Informational messages.
+            debug(7)          -- Debug-level messages.
+            }
+
+    fastPathLogging MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Broadcom Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+            "This MIB provides objects to configure and display events logged
+            on this system."
+        
+        -- Revision history.	  
+        REVISION
+            "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+            "Postal address updated."
+        REVISION
+            "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+            "Ubiquiti branding related changes."
+        REVISION
+            "200410261303Z" -- Tue Oct 23 13:03:07 2004 GMT 
+        DESCRIPTION
+            "Initial version."
+ 
+        ::= { fastPath 14 }
+
+    --**************************************************************************************
+    -- agentLogConfigGroup
+    --
+    --**************************************************************************************
+
+    agentLogConfigGroup                          OBJECT IDENTIFIER ::= { fastPathLogging 1 }
+
+    --**************************************************************************************
+    -- agentLogInMemoryConfigGroup
+    --
+    --**************************************************************************************
+
+    agentLogInMemoryConfigGroup                  OBJECT IDENTIFIER ::= { agentLogConfigGroup 1 }
+
+    agentLogInMemoryAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administratively enable/disable the In Memory log."
+        ::= { agentLogInMemoryConfigGroup 1 }
+
+ 
+    agentLogInMemoryBehavior OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    wrap(1),
+                    stop-on-full(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Configures the behavior of the In Memory Log when it becomes full.  A value of
+            wrap(1) will cause the oldest log message to be removed, making room for the new
+            message.  A value of stop-on-full(2) will prevent any further logging."
+        ::= { agentLogInMemoryConfigGroup 4 }
+
+    --**************************************************************************************
+    -- agentLogConsoleConfigGroup
+    --
+    --**************************************************************************************
+
+    agentLogConsoleConfigGroup                   OBJECT IDENTIFIER ::= { agentLogConfigGroup 2 }
+
+    agentLogConsoleAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Admin mode for console logs"
+        ::= { agentLogConsoleConfigGroup 1 }
+
+    agentLogConsoleSeverityFilter OBJECT-TYPE
+        SYNTAX      AgentLogSeverity
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Severity filter for console logs"
+        ::= { agentLogConsoleConfigGroup 2 }
+
+
+    --**************************************************************************************
+    -- agentLogSysLogConfigGroup
+    --
+    --**************************************************************************************
+
+    agentLogSysLogConfigGroup                    OBJECT IDENTIFIER ::= { agentLogConfigGroup 4 }
+
+    agentLogSyslogAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "For Enabling and Disabling logging to configured syslog hosts. Setting this to disable 
+             stops logging to all syslog hosts."
+        ::= { agentLogSysLogConfigGroup 1 }
+
+    agentLogSyslogLocalPort OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the port on the local host from which syslog messages are sent."
+        ::= { agentLogSysLogConfigGroup 3 }
+
+    agentLogSyslogMaxHosts OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum number of hosts that can be configured for logging syslog messages."
+        ::= { agentLogSysLogConfigGroup 4 }
+    --**************************************************************************************
+    -- agentLogCliCommandsConfigGroup
+    --
+    --**************************************************************************************
+
+   agentLogCliCommandsConfigGroup                    OBJECT IDENTIFIER ::= { agentLogConfigGroup 5 }
+
+    agentLogCliCommandsAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administratively enable/disable the logging of the CLI Commands "
+        ::= { agentLogCliCommandsConfigGroup 1 }
+
+    --**************************************************************************************
+    -- agentLogWebConfigGroup
+    --
+    --**************************************************************************************
+
+   agentLogWebConfigGroup                    OBJECT IDENTIFIER ::= { agentLogConfigGroup 7 }
+
+    agentLogWebAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administratively enable/disable the logging of the Web "
+        ::= { agentLogWebConfigGroup 1 }
+
+   --**************************************************************************************
+    -- agentLogSnmpConfigGroup
+    --
+    --**************************************************************************************
+
+   agentLogSnmpConfigGroup                    OBJECT IDENTIFIER ::= { agentLogConfigGroup 8 }
+
+    agentLogSnmpAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administratively enable/disable the logging of the Snmp "
+        ::= { agentLogSnmpConfigGroup 1 }
+
+   --**************************************************************************************
+    -- agentLogAuditConfigGroup
+    --
+    --**************************************************************************************
+
+    agentLogAuditConfigGroup                    OBJECT IDENTIFIER ::= { agentLogConfigGroup 9 }
+
+    agentLogAuditAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administratively enable/disable Switch Auditing "
+        ::= { agentLogAuditConfigGroup 1 }
+    --**************************************************************************************
+    -- agentLogSyslogHostTable
+    --
+    --**************************************************************************************
+
+    agentLogSyslogHostTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentLogSyslogHostEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Syslog host table containing syslog host entries."
+        ::= { agentLogSysLogConfigGroup 5 }
+
+    agentLogSyslogHostEntry OBJECT-TYPE
+        SYNTAX         AgentLogSyslogHostEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Syslog Host entry attributes."
+        INDEX          { agentLogHostTableIndex }
+        ::= { agentLogSyslogHostTable 1 }
+
+    AgentLogSyslogHostEntry ::=
+        SEQUENCE {
+         agentLogHostTableIndex
+                 Unsigned32,
+         agentLogHostTableIpAddress
+                 InetAddress,
+         agentLogHostTableIpAddressType
+                 InetAddressType,
+         agentLogHostTablePort
+                 Unsigned32,
+         agentLogHostTableSeverityFilter
+                 AgentLogSeverity,
+         agentLogHostTableRowStatus
+                 RowStatus
+         }
+
+    agentLogHostTableIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index to syslog host entry in syslog host table."
+        ::= { agentLogSyslogHostEntry 1 }
+
+    agentLogHostTableIpAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Syslog Host table IP Address Type."
+        ::= { agentLogSyslogHostEntry 2 }
+
+    agentLogHostTableIpAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Syslog Host table IP Address. Set operation of this object can be successful
+             only when the valid IpAddressType (Ipv4, Ipv6 or DNS) is configured and the
+             address specified is valid for that Address type."
+        ::= { agentLogSyslogHostEntry 3 }
+
+    agentLogHostTablePort OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Syslog Host table port number."
+        ::= { agentLogSyslogHostEntry 4 }
+
+    agentLogHostTableSeverityFilter OBJECT-TYPE
+        SYNTAX      AgentLogSeverity
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Configures the minimum severity that will be stored in the In Memory log."
+        ::= { agentLogSyslogHostEntry 5 }
+
+    agentLogHostTableRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Syslog Host table row status"
+        ::= { agentLogSyslogHostEntry 7 }
+
+    --**************************************************************************************
+    -- agentLogSyslogSourceInterface
+    --
+    --**************************************************************************************
+
+    agentLogSyslogSourceInterface OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A source-interface selection on an Interface Index (like vlan based
+             routing interface, port based routing interface, loopback interface,
+             tunnel interface). A non-zero value indicates ifIndex for the
+             corresponding interface entry in the ifTable is selected.
+             A zero value indicates the source-interface un-selection."
+        ::= { agentLogSysLogConfigGroup 6 }
+
+    --**************************************************************************************
+    -- agentLogStatisticsGroup
+    --
+    --**************************************************************************************
+
+    agentLogStatisticsGroup                      OBJECT IDENTIFIER ::= { fastPathLogging 2 }
+
+    agentLogMessagesReceived OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of messages received by the log process. This includes messages that are 
+             dropped or ignored."
+        ::= { agentLogStatisticsGroup 1 }
+
+    agentLogMessagesDropped OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of messages that could not be processed due to error or lack of resources."
+        ::= { agentLogStatisticsGroup 2 }
+
+    agentLogSyslogMessagesRelayed OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of messages forwarded by the syslog function to a syslog host. Messages forwarded 
+             to multiple hosts are counted once for each host."
+        ::= { agentLogStatisticsGroup 3 }
+
+    agentLogSyslogMessagesIgnored OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The number of messages that were not processed by the syslog process because the component name 
+             or the priority level did not match any specification."
+        ::= { agentLogStatisticsGroup 4 }
+
+    agentLogMessageReceivedTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local time when a message was last received by the log subsystem specified as the number of 
+             non-leap seconds since 00:00:00 UTC on January 1 1970."
+        ::= { agentLogStatisticsGroup 5 }
+
+    agentLogSyslogMessageDeliveredTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local time when a message was last delivered to a syslog host specified as the number of non-leap 
+             seconds since 00:00:00 UTC on January 1 1970."
+        ::= { agentLogStatisticsGroup 6 }
+
+    --**************************************************************************************
+    -- agentLogemailAlertConfigGroup
+    --
+    --**************************************************************************************
+  agentLogEmailAlertConfigGroup                    OBJECT IDENTIFIER ::= { agentLogConfigGroup 6 }
+
+   agentLogEmailAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "For Enabling and Disabling email alerts to SMTP server. Setting this to disable
+             stops emailing to SMTP servers."
+        ::= { agentLogEmailAlertConfigGroup 1 }
+
+   agentLogEmailfromAddr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Email from Address"
+        ::= { agentLogEmailAlertConfigGroup 2 }
+
+   agentLogEmaillogDuration OBJECT-TYPE
+        SYNTAX      Unsigned32(30..1440)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This duration in minutes determines how frequently the non critical messages are sent to the SMTP server."
+        ::= { agentLogEmailAlertConfigGroup 3 }
+
+   agentLogEmailUrgentSeverity OBJECT-TYPE
+        SYNTAX      AgentLogSeverity
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the severity level for the critical log messages"
+        ::= { agentLogEmailAlertConfigGroup 4 }
+
+   agentLogEmailNonUrgentSeverity OBJECT-TYPE
+        SYNTAX      AgentLogSeverity
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the severity level for the non critical log messages."
+        ::= { agentLogEmailAlertConfigGroup 5 }
+
+   agentLogEmailTrapsSeverity OBJECT-TYPE
+        SYNTAX      AgentLogSeverity
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the severity level for Trap messages."
+        ::= { agentLogEmailAlertConfigGroup 6 }
+        
+
+
+	agentLogEmailToAddrTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF AgentLogEmailToAddrEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	            "The (conceptual) table listing the destination email address and the message type."
+	    ::= { agentLogEmailAlertConfigGroup 7 }
+
+	agentLogEmailToAddrEntry OBJECT-TYPE
+	SYNTAX     AgentLogEmailToAddrEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	            "An entry (conceptual row) in the agentLogEmailtoAddrTable. This entry shows what kind of messages go to the given destination email addresses."
+	    INDEX      { agentLogEmailToAddrMessageType, agentLogEmailToAddr}
+	::= { agentLogEmailToAddrTable 1 }
+
+	AgentLogEmailToAddrEntry ::= SEQUENCE {
+	agentLogEmailToAddrMessageType    INTEGER,
+	agentLogEmailToAddr               DisplayString,
+	agentLogEmailToAddrEntryStatus    RowStatus
+	}
+
+	agentLogEmailToAddrMessageType OBJECT-TYPE
+	        SYNTAX      INTEGER { critical(1), non-critical(2) }
+	        MAX-ACCESS  not-accessible 
+	        STATUS      current
+	        DESCRIPTION
+	            "Log message Type"
+	        ::= { agentLogEmailToAddrEntry 1 }
+
+        agentLogEmailToAddr OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  not-accessible 
+                STATUS      current
+                DESCRIPTION
+                    "Email Sender Address"
+                ::= { agentLogEmailToAddrEntry 2 }
+
+
+	agentLogEmailToAddrEntryStatus OBJECT-TYPE
+	        SYNTAX      RowStatus
+	        MAX-ACCESS  read-create
+	        STATUS      current
+	        DESCRIPTION
+	            "This is to create or delete the entry"
+	        ::= { agentLogEmailToAddrEntry 3 }
+
+	agentLogEmailSubjectTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF AgentLogEmailSubjectEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	            "The (conceptual) table listing the subject of the email and the message type."
+	    ::= { agentLogEmailAlertConfigGroup 8 }
+
+	agentLogEmailSubjectEntry OBJECT-TYPE
+	SYNTAX     AgentLogEmailSubjectEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	            "An entry (conceptual row) in the agentLogEmailtoAddrTable. This entry shows what kind of subject to be used for the given message type."
+	    INDEX      { agentLogEmailSubjectMessageType}
+	::= { agentLogEmailSubjectTable 1 }
+
+	AgentLogEmailSubjectEntry ::= SEQUENCE {
+	agentLogEmailSubjectMessageType          INTEGER,
+	agentLogEmailSubject                     DisplayString,
+	agentLogEmailSubjectEntryStatus          RowStatus
+	}
+
+        agentLogEmailSubjectMessageType OBJECT-TYPE
+                SYNTAX      INTEGER { critical(1), non-critical(2)}
+                MAX-ACCESS  not-accessible 
+                STATUS      current
+                DESCRIPTION
+                    "Log message Type"
+                ::= { agentLogEmailSubjectEntry 1 }
+
+	agentLogEmailSubject OBJECT-TYPE
+	        SYNTAX      DisplayString
+	        MAX-ACCESS  read-create
+	        STATUS      current
+	        DESCRIPTION
+	            "Email Subject. When this object is set to empty-string, it resets to
+               factory default string."
+	        ::= { agentLogEmailSubjectEntry 2}
+
+
+	agentLogEmailSubjectEntryStatus OBJECT-TYPE
+	        SYNTAX      RowStatus
+	        MAX-ACCESS  read-create
+	        STATUS      current
+	        DESCRIPTION
+	            "This is to create or delete the entry"
+	        ::= { agentLogEmailSubjectEntry 3 }
+
+	agentLogEmailMailServerTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF AgentLogEmailMailServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	            "The (conceptual) table listing the mail servers"
+	    ::= { agentLogEmailAlertConfigGroup 9 }
+
+	agentLogEmailMailServerEntry OBJECT-TYPE
+	SYNTAX     AgentLogEmailMailServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	            "An entry (conceptual row) in the agentLogEmailMailServerTable. This entry shows the conmfiguration for mail server."
+	    INDEX      { agentLogEmailSmtpAddrType, agentLogEmailSmtpAddr }
+	::= { agentLogEmailMailServerTable 1 }
+
+	AgentLogEmailMailServerEntry ::= SEQUENCE {
+	agentLogEmailSmtpAddrType       InetAddressType,
+	agentLogEmailSmtpAddr           InetAddress,
+	agentLogEmailSmtpPort           InetPortNumber,
+	agentLogEmailSecurity   	      INTEGER,	
+	agentLogEmailloginID            DisplayString,
+	agentLogEmailPassword   	      DisplayString,
+	agentLogEmailEntryStatus        RowStatus
+
+	}
+
+	agentLogEmailSmtpAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "Email SMTP Address type"
+        ::= { agentLogEmailMailServerEntry 1 }
+
+	agentLogEmailSmtpAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "SMTP server Address"
+        ::= { agentLogEmailMailServerEntry 2 }
+
+        agentLogEmailSmtpPort OBJECT-TYPE
+        SYNTAX     InetPortNumber
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "SMTP Port number. When this object is set to 0, it resets to 
+             factory default port number."
+        ::= { agentLogEmailMailServerEntry 3 }
+	
+        agentLogEmailSecurity OBJECT-TYPE
+        SYNTAX      INTEGER { none(1), tlsv1(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the authentication mechanism that should be used."
+        ::= { agentLogEmailMailServerEntry 4 }
+
+
+	agentLogEmailloginID OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This user id is used while the switch/router is being authenticated by the SMTP server.The user ID
+                     should be minimum of 1 charcter to maximum of 16 characters."
+        ::= { agentLogEmailMailServerEntry 5 }
+
+
+       agentLogEmailPassword OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION
+            "This password is used while the switch/router is being authenticated by the SMTP server.The password
+                should be minimum of 1 character to maximum of 16 characters."
+        ::= { agentLogEmailMailServerEntry 6 }
+
+        agentLogEmailEntryStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This is to create or delete the entry"
+        ::= { agentLogEmailMailServerEntry 7 }
+	        
+
+
+   agentLogEmailAlertStatsGroup                    OBJECT IDENTIFIER ::= { agentLogStatisticsGroup 7}
+
+
+   agentLogEmailStatsemailsSentCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION
+            "This is the count to show the no of emails sent so far."
+        ::= { agentLogEmailAlertStatsGroup 1 }
+
+   agentLogEmailStatsemailsFailureCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION
+            "This is the count to show the no of emails failures happened so far..."
+        ::= { agentLogEmailAlertStatsGroup 2 }
+
+   agentLogEmailStatsTimeSinceLastEmailSent OBJECT-TYPE
+        SYNTAX      Unsigned32 
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION
+            "This is the number of seconds since the last email was sent."
+        ::= { agentLogEmailAlertStatsGroup 3}
+
+   agentLogEmailStatsClear OBJECT-TYPE
+        SYNTAX      INTEGER { enable(1), disable(2)}
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION
+            "This is to clear the email alert stats."
+        ::= { agentLogEmailAlertStatsGroup 4}
+
+
+
+
+    --**************************************************************************************
+    -- agentLogInMemoryGroup
+    --
+    --**************************************************************************************
+
+    agentLogInMemoryGroup                        OBJECT IDENTIFIER ::= { fastPathLogging 3 }
+
+    agentLogInMemoryLogCount OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The count of valid entries in the in-memory log." 
+        ::= { agentLogInMemoryGroup 1 }
+
+    --**************************************************************************************
+    -- agentLogInMemoryTable
+    --
+    --**************************************************************************************
+
+    agentLogInMemoryTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentLogInMemoryEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "The in-memory log table containing sequence of in-memory log entries."
+        ::= { agentLogInMemoryGroup 2 }
+
+    agentLogInMemoryEntry OBJECT-TYPE
+        SYNTAX         AgentLogInMemoryEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "An individual message entry in in-memory log table."
+        INDEX          { agentLogInMemoryMsgIndex }
+        ::= { agentLogInMemoryTable 1 }
+         
+    AgentLogInMemoryEntry ::=
+        SEQUENCE {
+         agentLogInMemoryMsgIndex
+                 Unsigned32,
+         agentLogInMemoryMsgText
+                 DisplayString
+         }
+
+    agentLogInMemoryMsgIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index to message entry in the in-memory log table."
+        ::= { agentLogInMemoryEntry 1 }
+
+    agentLogInMemoryMsgText OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Message text info for inmemory logged messages."
+        ::= { agentLogInMemoryEntry 2 }
+
+    --**************************************************************************************
+    -- agentLogTrapsGroup
+    --
+    --**************************************************************************************
+
+    agentLogTrapsGroup                      OBJECT IDENTIFIER ::= { fastPathLogging 5 }
+
+    agentLogEmailAlertTrapsGroup            OBJECT IDENTIFIER ::= { agentLogTrapsGroup 1}        
+
+    agentLogEmailSendFailed NOTIFICATION-TYPE
+    OBJECTS {
+       agentLogEmailStatsemailsFailureCount -- No of emails Failed
+       
+    }
+    STATUS             current
+    DESCRIPTION
+            "When ever a mail sending to the SMTP server is failed, this trap is sent with a count of how many times the connection to the SMTP server is failed so far."
+    ::= { agentLogEmailAlertTrapsGroup 1 }
+
+END

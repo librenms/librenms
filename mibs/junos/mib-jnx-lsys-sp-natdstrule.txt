@@ -1,0 +1,199 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-NATDSTRULE-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpNATdstrule                  
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+    
+    jnxLsysSpNATdstruleMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005191644Z" -- May 19, 2010
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the NAT-destination-rule-specific MIB for 
+             Juniper Enterprise Logical-System (LSYS) security profiles.  
+             Juniper documentation is recommended as the reference. 
+
+             The LSYS security profile provides various static and dynamic 
+             resource management by observing resource quota limits. 
+             Security NAT-destination-rule resource is the focus in this MIB. 
+            "
+        ::= { jnxLsysSpNATdstrule 1 }
+
+    jnxLsysSpNATdstruleObjects  OBJECT IDENTIFIER ::= { jnxLsysSpNATdstruleMIB 1 }
+    jnxLsysSpNATdstruleSummary  OBJECT IDENTIFIER ::= { jnxLsysSpNATdstruleMIB 2 }
+    
+ 
+-- **********************************************************************
+-- Tabular NAT-destination-rule resource information objects per LSYS:
+--   Below are NAT-destination-rule resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- The NAT-destination-rule resource table per LSYS
+
+    jnxLsysSpNATdstruleTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpNATdstruleEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION 
+            "LSYSPROFILE NAT-destination-rule objects for NAT-destination-rule 
+             resource consumption per LSYS."  
+    ::= { jnxLsysSpNATdstruleObjects 1 }
+    
+    jnxLsysSpNATdstruleEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpNATdstruleEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION  
+            "An entry in NAT-destination-rule resource table."
+    INDEX { IMPLIED jnxLsysSpNATdstruleLsysName }          
+    ::= { jnxLsysSpNATdstruleTable 1 }          
+
+    JnxLsysSpNATdstruleEntry ::= 
+       SEQUENCE {
+          jnxLsysSpNATdstruleLsysName    DisplayString,
+          jnxLsysSpNATdstruleProfileName DisplayString,
+          jnxLsysSpNATdstruleUsage       Unsigned32,
+          jnxLsysSpNATdstruleReserved    Unsigned32,
+          jnxLsysSpNATdstruleMaximum     Unsigned32
+    }   
+ 
+-- Entry definitions for the NAT-destination-rule resource table
+ 
+    jnxLsysSpNATdstruleLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which NAT-destination-rule 
+             resource information is retrieved. "
+        ::= { jnxLsysSpNATdstruleEntry 1 }
+
+    jnxLsysSpNATdstruleProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpNATdstruleEntry 2 }
+
+    jnxLsysSpNATdstruleUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION  
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpNATdstruleEntry 3 }
+    
+    jnxLsysSpNATdstruleReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpNATdstruleEntry 4 } 
+
+    jnxLsysSpNATdstruleMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpNATdstruleEntry 5 }
+
+
+-- **********************************************************************
+-- The NAT-destination-rule resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpNATdstruleUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The NAT-destination-rule resource consumption over all LSYS."
+    ::= { jnxLsysSpNATdstruleSummary 1 }          
+
+    jnxLsysSpNATdstruleMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-destination-rule resource maximum quota for the whole 
+            device for all LSYS."
+    ::= { jnxLsysSpNATdstruleSummary 2 }
+    
+    jnxLsysSpNATdstruleAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The NAT-destination-rule resource available in the whole device."
+    ::= { jnxLsysSpNATdstruleSummary 3 }
+    
+    jnxLsysSpNATdstruleHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The most amount of NAT-destination-rule resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpNATdstruleSummary 4 }
+    
+    jnxLsysSpNATdstruleHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the most NAT-destination-rule resource."
+    ::= { jnxLsysSpNATdstruleSummary 5 }
+    
+    jnxLsysSpNATdstruleLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The least amount of NAT-destination-rule resource consumed of a 
+            LSYS."
+    ::= { jnxLsysSpNATdstruleSummary 6 }
+    
+    jnxLsysSpNATdstruleLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION 
+           "The LSYS name that consume the least NAT-destination-rule resource."
+    ::= { jnxLsysSpNATdstruleSummary 7 }
+    
+
+
+ -- ***************************************************************
+ -- definition of NAT-destination-rule resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File 
+--
+
+END

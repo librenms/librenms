@@ -1,0 +1,702 @@
+-- *******************************************************************
+-- Juniper enterprise Network Address Translation (NAT) MIB.
+--
+-- Copyright (c) 2001-2012, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+	JUNIPER-JS-NAT-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+
+        Gauge32, Integer32,
+        Counter32,
+        NOTIFICATION-TYPE,
+    	MODULE-IDENTITY, OBJECT-TYPE	FROM SNMPv2-SMI
+
+	InterfaceIndex                  FROM IF-MIB
+
+	DateAndTime,
+    	DisplayString		        FROM SNMPv2-TC 
+    	InetAddressType,
+        InetAddress,
+        InetAddressIPv4 	        FROM INET-ADDRESS-MIB
+
+	jnxJsNAT                        FROM JUNIPER-JS-SMI;
+
+
+	jnxJsNatMIB  	MODULE-IDENTITY
+    	LAST-UPDATED  "201301051022Z" -- January 05, 2012
+    	ORGANIZATION  "Juniper Networks, Inc."
+    	CONTACT-INFO
+					"Juniper Technical Assistance Center
+						Juniper Networks, Inc.
+						1194 N. Mathilda Avenue
+						Sunnyvale, CA 94089
+
+						E-mail: support@juniper.net
+						HTTP://www.juniper.net"
+    	DESCRIPTION
+            "This module defines the object that are used to monitor
+             network address translation attributes."
+
+        REVISION        "200704132022Z" -- April 13, 2007
+    	DESCRIPTION 	"Creation Date"
+
+        REVISION        "201203011122Z" -- March 01, 2012
+        DESCRIPTION     "Deprecated jnxJsNatRuleTransHits and
+                         jnxJsNatPoolTransHits, added
+                         jnxJsNatRuleHits and jnxJsNatPoolHits."
+
+        REVISION        "201301051022Z" -- January 05, 2012
+        DESCRIPTION     "added jnxJsNatRuleNumOfSessions in 
+                         jnxJsNatRuleEntry;
+                         added jnxJsNatPoolUtil in
+                         jnxJsNatPoolEntry;
+                         added jnxJsNatTrapRuleName, jnxJsNatTrapRuleType, 
+                         jnxJsNatTrapRuleNumOfSessions and
+                         jnxJsNatRuleThresholdStatus."
+
+    ::= { jnxJsNAT 1 }   
+
+
+    jnxJsNatNotifications OBJECT IDENTIFIER ::= { jnxJsNatMIB 0 }
+    jnxJsNatObjects       OBJECT IDENTIFIER ::= { jnxJsNatMIB 1 }
+    jnxJsNatTrapVars      OBJECT IDENTIFIER ::= { jnxJsNatMIB 2 }
+
+
+    -- ***************************************************************
+    -- Source NAT (Network Address Translation) Table  
+    -- ***************************************************************
+
+    jnxJsSrcNatNumOfEntries OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of dynamic addresses being translated.  
+
+			 jnxJsSrcNatNumOfEntries provides the total number 
+		     of entries in the jnxJsSrcNatTable. "
+            ::= { jnxJsNatObjects 1 }
+	
+
+    jnxJsSrcNatTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsSrcNatEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        deprecated
+        DESCRIPTION
+            "This table exposes the source NAT translation 
+			 attributes of the translated addresses. 
+
+			 When performing source IP address translation, the device 
+			 translates the original source IP address and/or port 
+			 number to different one.  The resource, address source pools
+			 provide the security device with a supply of addresses from 
+			 which to draw when performing source network address translation.
+
+			 The security device has the following types of source pools:
+				- source pool with PAT (Port Address Translation)
+				- source pool without PAT
+				- Static Source Pool
+
+			 This table contains information on source IP address 
+			 translation only."
+    	::= { jnxJsNatObjects 2 }   
+
+    jnxJsSrcNatEntry OBJECT-TYPE
+        SYNTAX        JnxJsSrcNatEntry
+        MAX-ACCESS    not-accessible
+        STATUS        deprecated
+        DESCRIPTION
+            "Source NAT address entries.  It is indexed by the address  
+			 pool table and the address allocated. "
+        INDEX   { jnxJsNatSrcIpPoolName,
+				  jnxJsNatSrcGlobalAddr  }
+        ::= { jnxJsSrcNatTable 1 }
+
+    JnxJsSrcNatEntry ::= SEQUENCE
+    {
+        jnxJsNatSrcIpPoolName			DisplayString,
+		jnxJsNatSrcGlobalAddr			InetAddressIPv4,
+		jnxJsNatSrcPortPoolType			INTEGER,
+		jnxJsNatSrcNumOfPortInuse 		INTEGER,
+		jnxJsNatSrcNumOfSessions 		INTEGER,
+		jnxJsNatSrcAssocatedIf 			InterfaceIndex
+    }
+
+
+    jnxJsNatSrcIpPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..32)) 
+        MAX-ACCESS    accessible-for-notify 
+        STATUS        deprecated
+        DESCRIPTION
+        	"The name of dynamic source IP address pool. 
+
+			 This is the address pool where the translated   
+			 address is allocated from. "
+		::= { jnxJsSrcNatEntry 1 }
+
+	jnxJsNatSrcGlobalAddr OBJECT-TYPE
+        SYNTAX        InetAddressIPv4
+        MAX-ACCESS    not-accessible
+        STATUS        deprecated
+        DESCRIPTION
+        	"The name of dynamic source IP address allocated from 
+		 	the address pool used in the NAT translation. "
+		::= { jnxJsSrcNatEntry 2 }
+
+	jnxJsNatSrcPortPoolType OBJECT-TYPE
+        SYNTAX        INTEGER {
+						withPAT 		(1),
+						withoutPAT		(2),
+						static 			(3)
+						} 		 	
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+        	"Source NAT can do address translation with or without port 
+		 	 address translation (PAT).  The source port pool type indicates
+			 whether the address translation is done with port or without
+         	 the port, or if it is a static translation.
+		
+			 withPAT(Source Pool with PAT): the security device translates 
+			 both source IP address and port number of the packets 
+
+			 withoutPAT (Source Pool without PAT): the device performs source 
+			 network address translation for the IP address without 
+			 performing port address translation (PAT) for the source port
+             number.
+
+			 Static translation means that one range of IP addresses is 
+		     statically mapped one to one to a shifted range of IP addresses. 
+			 "
+		::= { jnxJsSrcNatEntry 3 }
+
+	jnxJsNatSrcNumOfPortInuse OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only 
+        STATUS        deprecated
+        DESCRIPTION
+       	 	"The number of ports in use for this NAT address entry.
+
+			 This attribute is only applicable to NAT translation with 
+			 PAT."
+		::= { jnxJsSrcNatEntry 4 }
+
+	jnxJsNatSrcNumOfSessions OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only 
+        STATUS        deprecated
+        DESCRIPTION
+        	"The number of sessions are in use based on this NAT address 
+			 entry.
+
+			 This attribute is only applicable to NAT translation without PAT."
+		::= { jnxJsSrcNatEntry 5 }
+
+	jnxJsNatSrcAssocatedIf OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    read-only 
+        STATUS        deprecated
+        DESCRIPTION
+        	"The index of interface associated with this NAT address entry. 
+
+                 This is an unique value, greater than zero, for each 
+                 interface."
+		::= { jnxJsSrcNatEntry 6 }
+
+
+    -- ***************************************************************
+    --  Port Usage of Interface Source Pool 
+    -- ***************************************************************
+
+    jnxJsNatIfSrcPoolPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsNatIfSrcPoolPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+			"This table monitors the port usage of the NAT interface 
+			 source IP address pool.
+
+			 Interface source pool is pre-defined.  This source pool is
+			 referenced in a policy it is configured.  The security 
+			 device translates the source IP address to the address of
+             the egress interface for the traffic matching a policy which 
+             references interface source pool.  The security device always 
+             applies port address translation (PAT) for interface source
+             pool. "
+        ::= { jnxJsNatObjects 3 }  
+
+    jnxJsNatIfSrcPoolPortEntry OBJECT-TYPE
+        SYNTAX        JnxJsNatIfSrcPoolPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Source NAT address entries.  It is indexed by the address  
+             pool table and the address. "
+        INDEX   { jnxJsNatIfSrcPoolIndex }
+        ::= { jnxJsNatIfSrcPoolPortTable 1 }
+
+    JnxJsNatIfSrcPoolPortEntry ::= SEQUENCE
+    {
+		jnxJsNatIfSrcPoolIndex 		         INTEGER,
+		jnxJsNatIfSrcPoolTotalSinglePorts    INTEGER,
+		jnxJsNatIfSrcPoolAllocSinglePorts    INTEGER,
+        jnxJsNatIfSrcPoolTotalTwinPorts      INTEGER,
+        jnxJsNatIfSrcPoolAllocTwinPorts      INTEGER
+    }
+
+    jnxJsNatIfSrcPoolIndex OBJECT-TYPE
+        SYNTAX        INTEGER(0..2147483647)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        	"The index of the port pool of this address pool."
+    ::= { jnxJsNatIfSrcPoolPortEntry 1 }
+
+    jnxJsNatIfSrcPoolTotalSinglePorts OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"The total number of single ports in a port pool."
+    ::= { jnxJsNatIfSrcPoolPortEntry 2 }
+
+    jnxJsNatIfSrcPoolAllocSinglePorts OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"The number of single ports in a port pool allocated 
+			 or inuse."
+    ::= { jnxJsNatIfSrcPoolPortEntry 3 }
+
+    jnxJsNatIfSrcPoolTotalTwinPorts OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"The total number of twin ports in a port pool."
+    ::= { jnxJsNatIfSrcPoolPortEntry 4 }
+
+    jnxJsNatIfSrcPoolAllocTwinPorts OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"The number of twin ports in a port pool allocated 
+			 or inuse."
+    ::= { jnxJsNatIfSrcPoolPortEntry 5 }
+
+    -- ***************************************************************
+    --  New Source NAT Table
+    -- ***************************************************************
+
+    jnxJsSrcNatStatsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsSrcNatStatsEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes the source NAT translation 
+			 attributes of the translated addresses. 
+
+			 When performing source IP address translation, the device 
+			 translates the original source IP address and/or port 
+			 number to different one.  The resource, address source pools
+			 provide the security device with a supply of addresses from 
+			 which to draw when performing source network address translation.
+
+			 The security device has the following types of source pools:
+				- source pool with PAT (Port Address Translation)
+				- source pool without PAT
+				- Static Source Pool
+
+			 This table contains information on source IP address 
+			 translation only."
+    	::= { jnxJsNatObjects 4 }   
+
+    jnxJsSrcNatStatsEntry OBJECT-TYPE
+        SYNTAX        JnxJsSrcNatStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Source NAT address entries.  It is indexed by the address  
+			 pool table and the address allocated. "
+        INDEX   { jnxJsNatSrcPoolName,
+                  jnxJsNatSrcXlatedAddrType,
+                  jnxJsNatSrcXlatedAddr  }
+        ::= { jnxJsSrcNatStatsTable 1 }
+
+    JnxJsSrcNatStatsEntry ::= SEQUENCE
+    {
+        jnxJsNatSrcPoolName			DisplayString,
+        jnxJsNatSrcXlatedAddrType	InetAddressType,
+        jnxJsNatSrcXlatedAddr		InetAddress,
+        jnxJsNatSrcPoolType         INTEGER,
+        jnxJsNatSrcNumPortInuse     INTEGER,
+        jnxJsNatSrcNumSessions      INTEGER
+    }
+
+
+    jnxJsNatSrcPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..32)) 
+        MAX-ACCESS    accessible-for-notify 
+        STATUS        current
+        DESCRIPTION
+        	"The name of dynamic source IP address pool. 
+
+			 This is the address pool where the translated   
+			 address is allocated from. "
+		::= { jnxJsSrcNatStatsEntry 1 }
+
+	jnxJsNatSrcXlatedAddrType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The type of dynamic source IP address allocated from 
+            the address pool used in the NAT translation. 
+            For NAT MIB, supporting ipv4(1) and ipv6(2) only."
+		::= { jnxJsSrcNatStatsEntry 2 }
+
+	jnxJsNatSrcXlatedAddr OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        	"The name of dynamic source IP address allocated from 
+		 	the address pool used in the NAT translation. 
+		 	For NAT MIB, supporting IPv4 and IPv6 address only. "
+		::= { jnxJsSrcNatStatsEntry 3 }
+
+	jnxJsNatSrcPoolType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        withPAT         (1),
+                        withoutPAT      (2),
+                        static          (3)
+                      } 		 	
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"Source NAT can do address translation with or without port 
+		 	 address translation (PAT).  The source port pool type indicates
+			 whether the address translation is done with port or without
+         	 the port, or if it is a static translation.
+		
+			 withPAT(Source Pool with PAT): the security device translates 
+			 both source IP address and port number of the packets 
+
+			 withoutPAT (Source Pool without PAT): the device performs source 
+			 network address translation for the IP address without 
+			 performing port address translation (PAT) for the source port
+             number.
+
+			 Static translation means that one range of IP addresses is 
+		     statically mapped one to one to a shifted range of IP addresses. 
+			 "
+		::= { jnxJsSrcNatStatsEntry 4 }
+
+	jnxJsNatSrcNumPortInuse OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION
+       	 	"The number of ports in use for this NAT address entry.
+
+			 This attribute is only applicable to NAT translation with 
+			 PAT."
+		::= { jnxJsSrcNatStatsEntry 5 }
+
+	jnxJsNatSrcNumSessions OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION
+        	"The number of sessions are in use based on this NAT address 
+			 entry.
+
+			 This attribute is only applicable to NAT translation without PAT."
+		::= { jnxJsSrcNatStatsEntry 6 }
+
+    -- ***************************************************************
+    --  NAT Rule Hit Table
+    -- ***************************************************************
+
+    jnxJsNatRuleTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsNatRuleEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+			"This table monitors NAT rule hits  "
+        ::= { jnxJsNatObjects 5 }  
+
+    jnxJsNatRuleEntry OBJECT-TYPE
+        SYNTAX        JnxJsNatRuleEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "NAT rule hit entries.  It is indexed by the rule index"
+        INDEX   { jnxJsNatRuleName, jnxJsNatRuleType }
+        ::= { jnxJsNatRuleTable 1 }
+
+    JnxJsNatRuleEntry ::= SEQUENCE
+    {
+        jnxJsNatRuleName                     DisplayString,
+        jnxJsNatRuleType                     INTEGER,
+        jnxJsNatRuleTransHits                INTEGER,
+        jnxJsNatRuleHits                     Counter32,
+        jnxJsNatRuleNumOfSessions            Counter32
+    }
+
+    jnxJsNatRuleName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..32)) 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"NAT rule name"
+    ::= { jnxJsNatRuleEntry 1 }
+
+    jnxJsNatRuleType OBJECT-TYPE
+        SYNTAX        INTEGER {
+						source		(1),
+						destination	(2),
+						static		(3)
+				   	  } 		 	
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"NAT types: Source, Destination and Static"
+    ::= { jnxJsNatRuleEntry 2 }
+
+    jnxJsNatRuleTransHits OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+        	"The number of hits on this NAT rule,
+             Deprecated to avoid negative value."
+    ::= { jnxJsNatRuleEntry 3 }
+
+    jnxJsNatRuleHits OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of hits on this NAT rule to 
+             deprecate jnxJsNatRuleTransHits"
+    ::= { jnxJsNatRuleEntry 4 }
+
+    jnxJsNatRuleNumOfSessions OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of sessions on this NAT rule"
+    ::= { jnxJsNatRuleEntry 5 }
+
+    -- ***************************************************************
+    --  NAT Pool Hit Table
+    -- ***************************************************************
+
+    jnxJsNatPoolTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsNatPoolEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+			"This table monitors NAT pool hits  "
+        ::= { jnxJsNatObjects 6 }  
+
+    jnxJsNatPoolEntry OBJECT-TYPE
+        SYNTAX        JnxJsNatPoolEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "NAT pool hit entries.  It is indexed by the pool index"
+        INDEX   { jnxJsNatPoolName, jnxJsNatPoolType }
+        ::= { jnxJsNatPoolTable 1 }
+
+    JnxJsNatPoolEntry ::= SEQUENCE
+    {
+        jnxJsNatPoolName                     DisplayString,
+        jnxJsNatPoolType                     INTEGER,
+        jnxJsNatPoolTransHits                INTEGER,
+        jnxJsNatPoolHits                     Counter32,
+        jnxJsNatPoolUtil                     INTEGER
+    }
+
+    jnxJsNatPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..32)) 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"NAT Pool name"
+    ::= { jnxJsNatPoolEntry 1 }
+
+    jnxJsNatPoolType OBJECT-TYPE
+        SYNTAX        INTEGER {
+						source		(1),
+						destination	(2),
+						static		(3)
+					  } 		 	
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"NAT types: Source, Destination and Static"
+    ::= { jnxJsNatPoolEntry 2 }
+
+    jnxJsNatPoolTransHits OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+        	"The number of hits on this NAT Pool,
+             Deprecated to avoid negative value."
+    ::= { jnxJsNatPoolEntry 3 }
+
+    jnxJsNatPoolHits OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of hits on this NAT Pool
+             to deprecate jnxJsNatPoolTransHits."
+    ::= { jnxJsNatPoolEntry 4 }
+
+    jnxJsNatPoolUtil OBJECT-TYPE
+        SYNTAX        INTEGER (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        	"The dynamic pool utilization in percentage."
+    ::= { jnxJsNatPoolEntry 5 }
+
+    -- ***************************************************************
+    --  NAT Trap definition
+    -- ***************************************************************
+
+    --
+	-- Trap variables 
+	-- 
+	jnxJsNatAddrPoolUtil OBJECT-TYPE
+		SYNTAX      Integer32 (0..100)
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"The dynamic address pool utilization in percentage."
+        ::= { jnxJsNatTrapVars 1 }
+
+    jnxJsNatTrapPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..32))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Source NAT Pool name who issues trap"
+       ::= { jnxJsNatTrapVars 2 }
+
+    jnxJsNatPatPoolUtil OBJECT-TYPE
+		SYNTAX      Integer32 (0..100)
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"The dynamic pat pool utilization in percentage."
+        ::= { jnxJsNatTrapVars 3 }
+
+    jnxJsNatTrapRuleName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..32))
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"NAT rule name"
+        ::= { jnxJsNatTrapVars 4 }
+
+    jnxJsNatTrapRuleType OBJECT-TYPE
+        SYNTAX        INTEGER {
+						source		(1),
+						destination	(2),
+						static		(3)
+				   	  }
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "NAT types: Source, Destination and Static"
+       ::= { jnxJsNatTrapVars 5 }
+
+    jnxJsNatTrapRuleNumOfSessions OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"The number of sessions"
+        ::= { jnxJsNatTrapVars 6 }
+
+    --
+	-- Trap notifications 
+	--
+
+    --
+    -- NAT Address Pool Utilization Threshold Status 
+    -- 
+    jnxJsNatAddrPoolThresholdStatus NOTIFICATION-TYPE
+		OBJECTS			{ jnxJsNatSrcIpPoolName,
+						  jnxJsNatAddrPoolUtil }
+        STATUS         deprecated 
+        DESCRIPTION
+             "The NAT address pool untilization threshold status
+              trap signifies that the address pool utilization
+              is either exceeds certain percentage, or clear of 
+              that percentage.
+					
+			  jnxJsNatSrcIpPoolName is the name of the resource pool
+			  jnxJsNatAddrPoolUtil is the percentage of utilization 
+              of the address pool." 
+        ::= { jnxJsNatNotifications 1 }
+	
+    -- NAT Source Pool Utilization Threshold Status
+    -- updated since jnxJsNatSrcIpPoolName is deprecated
+    --
+    jnxJsSrcNatPoolThresholdStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxJsNatTrapPoolName,
+                          jnxJsNatAddrPoolUtil,
+                          jnxJsNatPatPoolUtil }
+        STATUS         current
+        DESCRIPTION
+             "The Source NAT pool untilization threshold status
+              trap signifies that the address pool or PAT utilization
+              is either exceeds certain percentage, or clear of that
+              percentage.
+              
+              jnxJsNatTrapPoolName is the name of source pool
+              jnxJsNatAddrPoolUtil is the percentage of utilization
+              of the address pool.
+              jnxJsNatPatPoolUtil is the percentage of utilization
+              of the pat pool."
+        ::= { jnxJsNatNotifications 2 }       
+
+	
+    -- NAT rule session count Threshold Status
+    --
+    jnxJsNatRuleThresholdStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxJsNatTrapRuleName,
+                          jnxJsNatTrapRuleType,
+                          jnxJsNatTrapRuleNumOfSessions }
+        STATUS         current
+        DESCRIPTION
+             "The NAT rule session count threshold status 
+              trap signifies that the number of sessions
+              is either exceeds certain threshold, or clear of that
+              threshold.
+              
+              jnxJsNatTrapRuleName is the name of rule
+              jnxJsNatTrapRuleType is the type of rule.
+              jnxJsNatTrapRuleConcurrentHits is the session count
+              of that rule."
+        ::= { jnxJsNatNotifications 3 }
+
+    -- ***************************************************************
+    --  END of File 
+    -- ***************************************************************
+
+END 

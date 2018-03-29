@@ -1,0 +1,1 @@
+CREATE TABLE `alert_template_map` (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,`alert_templates_id` INT NOT NULL ,`alert_rule_id` INT NOT NULL ,INDEX (  `alert_templates_id` ,  `alert_rule_id` )) ENGINE = INNODB;

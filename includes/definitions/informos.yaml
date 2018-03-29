@@ -1,0 +1,9 @@
+os: informos
+text: 'HPE 3PAR'
+type: storage
+icon: hpe
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12925.1

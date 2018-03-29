@@ -1,0 +1,330 @@
+
+-- *****************************************************************************
+-- Juniper-HTTP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   HTTP MIB
+--
+-- Copyright (c) 2000 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-HTTP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniHttpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200508221551Z"  -- 22-Aug-05 03:51 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The HTTP MIB for Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200508221551Z"  -- 22-Aug-05 03:51 PM EDT  - JUNOSe 8.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 78 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHttpObjects     OBJECT IDENTIFIER ::= { juniHttpMIB 1 }
+
+
+juniHttpDaemon         OBJECT IDENTIFIER ::= { juniHttpObjects 1 }
+juniHttpDaemonStats    OBJECT IDENTIFIER ::= { juniHttpObjects 2 }
+juniHttpInterfaces     OBJECT IDENTIFIER ::= { juniHttpObjects 3 }
+
+--
+-- The HTTP Daemon
+--
+
+juniHttpDaemonRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created or
+        destroyed as a result of creating or destroying an entry in this table."
+    ::= { juniHttpDaemon 1 }
+
+juniHttpDaemonAccessListName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is a 32 byte string that indentifies the access list."
+    ::= { juniHttpDaemon 2 }
+
+juniHttpDaemonPort  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This port number that the HTTP server will serve requests from."
+    DEFVAL      { 80 }
+    ::= { juniHttpDaemon 3 }
+
+juniHttpDaemonSameAddressLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of connections that the server will open for requests
+         from the same address."
+	DEFVAL      { 10 }
+    ::= { juniHttpDaemon 4 }
+
+--
+--
+--  The HTTP Daemon Stats
+--
+
+juniHttpDaemonStatsEnabled OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of times the server has been enabled."
+    ::= { juniHttpDaemonStats 1 }
+
+juniHttpDaemonStatsDisabled OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of times the server has been disabled."
+    ::= { juniHttpDaemonStats 2 }
+
+juniHttpDaemonStatsSameHost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of times the server has not created
+         a connection due to same host client address limit."
+    ::= { juniHttpDaemonStats 3 }
+
+juniHttpDaemonStatsAccDeny OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of times the server has not created a
+		 connection due to policy access table deny."
+    ::= { juniHttpDaemonStats 4 }
+
+juniHttpDaemonStatsNoResource OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of times the server has not created a
+		 connection due to no resources available."
+    ::= { juniHttpDaemonStats 5 }
+
+juniHttpDaemonStatsCreate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of connections created."
+    ::= { juniHttpDaemonStats 6 }
+
+juniHttpDaemonStatsRemove OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of connections removed."
+    ::= { juniHttpDaemonStats 7 }
+
+juniHttpDaemonStatsAged OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of connections removed due to connection
+         age limits."
+    ::= { juniHttpDaemonStats 8 }
+
+juniHttpDaemonStatsServed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of successful html requests served."
+    ::= { juniHttpDaemonStats 9 }
+
+juniHttpDaemonStatsHtmlError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number malformed html requests."
+    ::= { juniHttpDaemonStats 10 }
+
+juniHttpDaemonStatsUnknownUrl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of the number of requests for unknown urls."
+    ::= { juniHttpDaemonStats 11 }
+
+--
+--  The HTTP Interface Table
+--
+
+juniHttpInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniHttpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the interfaces on which HTTP is enabled."
+    ::= { juniHttpInterfaces 1 }
+
+juniHttpInterfaceEntry  OBJECT-TYPE
+    SYNTAX      JuniHttpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing an interface on which HTTP is configured."
+    INDEX     { juniHttpInterfaceIndex }
+    ::= { juniHttpInterfaceTable 1 }
+
+JuniHttpInterfaceEntry ::= SEQUENCE {
+    juniHttpInterfaceIndex           InterfaceIndex,
+	juniHttpInterfaceRowStatus       RowStatus,
+    juniHttpInterfaceRedirectUrl     DisplayString }
+
+juniHttpInterfaceIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the interface for which HTTP services are enabled."
+    ::= { juniHttpInterfaceEntry 1 }
+
+juniHttpInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created or
+        destroyed as a result of creating or destroying an entry in this table."
+    ::= { juniHttpInterfaceEntry 2 }
+
+juniHttpInterfaceRedirectUrl  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is a 64 byte string that will be used as the redirect
+         URL when requests arrive at the HTTP server over the Ip Interface
+         configured."
+    ::= { juniHttpInterfaceEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniHttpTrapControl      OBJECT IDENTIFIER ::= { juniHttpMIB 2 }
+-- juniHttpTraps            OBJECT IDENTIFIER ::= { juniHttpMIB 3 }
+-- juniHttpTrapPrefix       OBJECT IDENTIFIER ::= { juniHttpTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHttpConformance OBJECT IDENTIFIER ::= { juniHttpMIB 4 }
+juniHttpCompliances OBJECT IDENTIFIER ::= { juniHttpConformance 1 }
+juniHttpGroups      OBJECT IDENTIFIER ::= { juniHttpConformance 2 }
+
+--
+-- compliance statements
+--
+juniHttpCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper HTTP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+			juniHttpDaemonGroup,
+            juniHttpDaemonStatsGroup,
+            juniHttpInterfaceGroup }
+    ::= { juniHttpCompliances 1 }                                  -- JUNOSe 8.0
+
+juniHttpGroup  OBJECT-GROUP
+    OBJECTS {
+        juniHttpDaemonRowStatus,
+        juniHttpDaemonAccessListName,
+        juniHttpDaemonPort,
+        juniHttpDaemonSameAddressLimit }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of HTTP services in a
+        Juniper product."
+    ::= { juniHttpGroups 1 }                                       -- JUNOSe 8.0
+
+juniHttpDaemonStatsGroup OBJECT-GROUP
+    OBJECTS {
+		juniHttpDaemonStatsEnabled,
+		juniHttpDaemonStatsDisabled,
+		juniHttpDaemonStatsSameHost,
+		juniHttpDaemonStatsAccDeny,
+		juniHttpDaemonStatsNoResource,
+		juniHttpDaemonStatsCreate,
+		juniHttpDaemonStatsRemove,
+		juniHttpDaemonStatsAged,
+		juniHttpDaemonStatsServed,
+		juniHttpDaemonStatsHtmlError,
+		juniHttpDaemonStatsUnknownUrl }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of HTTP interfaces in a
+        Juniper product."
+    ::= { juniHttpGroups 2 }                                       -- JUNOSe 8.0
+
+juniHttpInterfaceGroup  OBJECT-GROUP
+    OBJECTS {
+         juniHttpInterfaceRowStatus,
+         juniHttpInterfaceRedirectUrl }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of HTTP interfaces in a
+        Juniper product."
+    ::= { juniHttpGroups 3 }                                       -- JUNOSe 8.0
+
+END

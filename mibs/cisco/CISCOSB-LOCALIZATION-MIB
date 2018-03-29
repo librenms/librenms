@@ -1,0 +1,192 @@
+CISCOSB-LOCALIZATION-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB LOCALIZATION ROS
+--                         This Private MIB supports localization of ROS products
+-- Version:                    7.39
+-- Date:                       15 Mar 2005
+
+
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    OBJECT-TYPE, IpAddress, Unsigned32,
+    MODULE-IDENTITY                         FROM SNMPv2-SMI
+    SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+    DisplayString,
+    TEXTUAL-CONVENTION,
+    TruthValue, RowStatus                   FROM SNMPv2-TC;
+
+rlLocalization MODULE-IDENTITY
+         LAST-UPDATED "200503150000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "The private MIB module definition for product localization."
+         REVISION "200503150000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { switch001 103 }
+
+
+
+--rlLocalizationMibVersion OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION
+--        "MIB's version, the current version is 1."
+--    ::= {rlLocalization 1}
+
+
+
+
+
+
+--
+-- ------------------------------------
+-- All the above should be deprecated
+-- ------------------------------------
+
+rlLocalizationActivelanguage  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..50))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Points out to field rlLocalizationLanguagesName -- RG
+          of the languages table. This value affects
+          also translations performed on server side. -- RG not true
+          If length is 0 this value is undefined; this means  -- RG
+          default language is applied."
+    ::= {rlLocalization 8}
+
+rlLocalizationLoginlanguage  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The accepted languages of the WEB GUI, comma delimited.
+         This value is taken from the Accept-Language HTTP header.
+        "
+    ::= {rlLocalization 9}
+
+rlLocalizationLanguagesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlLocalizationLanguagesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for localization information this table shows the list
+         of available languages."
+    ::= {rlLocalization 10 }
+
+rlLocalizationLanguagesEntry  OBJECT-TYPE
+    SYNTAX      RlLocalizationLanguagesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for localization information this table shows the list
+         of available languages."
+    INDEX {IMPLIED rlLocalizationLanguagesName }
+    ::= {rlLocalizationLanguagesTable  1 }
+
+RlLocalizationLanguagesEntry ::= SEQUENCE {
+    rlLocalizationLanguagesName               DisplayString   (SIZE(1..50)),
+    rlLocalizationLanguagesUnicodeName        SnmpAdminString (SIZE(1..64)),
+    rlLocalizationLanguagesUrlDir             DisplayString,
+    rlLocalizationLanguagesUrlHelpDir         DisplayString,
+    rlLocalizationLanguageCode                DisplayString,
+    rlLocalizationNumOfSections               INTEGER (0..100),
+    rlLocalizationNumOfEmbSections            INTEGER (0..100),
+    rlLocalizationVersion                     DisplayString (SIZE(0..15)),
+    rlLocalizationMd5ChksumFile               DisplayString
+}
+
+rlLocalizationLanguagesName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..50))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique name of the language in English."
+    ::=  { rlLocalizationLanguagesEntry 1 }
+
+rlLocalizationLanguagesUnicodeName OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "String in UTF-8. Unique name of language for user-friendly
+         presentation in GUI "
+    ::= { rlLocalizationLanguagesEntry 2 }
+
+rlLocalizationLanguagesUrlDir OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique URL-path of GUI dictionary file for all pages and messages."
+    ::=  { rlLocalizationLanguagesEntry 3 }
+
+rlLocalizationLanguagesUrlHelpDir OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique URL-path of help files directory."
+    ::= { rlLocalizationLanguagesEntry 4 }
+
+rlLocalizationLanguageCode  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Language code from (RFC 4646) "
+    ::= { rlLocalizationLanguagesEntry 5 }
+
+
+rlLocalizationNumOfSections OBJECT-TYPE
+
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sections of the dictionary.xml file which is technically split."
+    ::= { rlLocalizationLanguagesEntry 6 }
+
+
+rlLocalizationNumOfEmbSections OBJECT-TYPE
+
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sections of the diagnostics file which is technically split."
+    ::= { rlLocalizationLanguagesEntry 7 }
+
+rlLocalizationVersion OBJECT-TYPE
+
+    SYNTAX      DisplayString  (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the language file (x.y.z.w)"
+    ::= { rlLocalizationLanguagesEntry 8 }
+
+rlLocalizationMd5ChksumFile OBJECT-TYPE
+
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MD5 of the language file (as string)"
+    ::= { rlLocalizationLanguagesEntry 9 }
+
+
+END
+

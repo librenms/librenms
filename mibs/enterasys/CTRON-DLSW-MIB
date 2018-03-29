@@ -1,0 +1,1059 @@
+CTRON-DLSW-MIB DEFINITIONS ::= BEGIN
+ 
+        --  Ctron Data Link Switching MIB
+        --  Revision: 1.00.00
+        --  Date: October 20, 1995
+        --  Part Number:
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+-- This Cabletron DLSw MIB is derived from the DLSw MIB (proposed
+-- by the DLSw MIB RIGlet), IBM 6611 DLSw MIB, and DCL's SOF API Spec.
+-- This MIB is defined in SNMPv1 format.
+
+-- Objects in this MIB are arranged into groups.  Each group is
+-- organized as a set of related objects.  The overall structure
+-- is shown below.
+--
+--     DLSw MIB
+--     |
+--     |== Node Group
+--     |   |== Node Configuration
+--     |
+--     |== Port Group
+--     |   |== Port Table
+--     |
+--     |== Filter Group
+--     |   |== Local NETBIOS Filter Table
+--     |   |== Remote NETBIOS Filter Table
+--     |   |== Local MAC Filter Table
+--     |   |== Remote MAC Filter Table
+--     |
+--     |== Transport Connection Group
+--     |   |== Transport Connection Table
+--     |
+--     |== Trap Group
+--     |
+--     |== Event Log Group
+--     |   |== Event Log Configuration
+--     |   |== Event Log Filter Table
+--     |   |== Event Log Table
+ 
+-- Node group
+--   This mandatory group contains objects required to configure and
+--   monitor the operation of this DLSw.  In operation, the DLSw 
+--   requires a bridge number.  This value is taken from RFC 1286; (See
+--   dot1dSrPortBridgeNum contained within the associated entry in
+--   dot1dSrPortTable).  Furthermore, the DLSw also requires an IP
+--   address.  This value is taken from MIB II; (See ifIndex contained
+--   within the associated entry in ifTable).
+
+-- Port group
+--   This mandatory group contains a table which contains an entry for
+--   each DLSw port on a local ring/segment.  Each entry contains objects
+--   required to configure and monitor the operation of that port.  In
+--   operation, each port also requires a local ring/segment number.
+--   This value is taken from RFC 1286; (See dot1dSrPortLocalSegment
+--   contained within the associated entry in dot1dSrPortTable).
+
+-- Filter Group
+--   This mandatory group contains objects required to configure and
+--   monitor the operation of each type filter.  It also contains a table
+--   for each type filter, the entries of which define a set of filter
+--   parameters.  Local filters act on frames received on any port (ie.
+--   from the local ring/segment).  Remote filters act on frames
+--   received on any transport connection (ie. from another DLSw).
+
+-- Transport Connection Group
+--   A Transport Connection is a full-duplex reliable connection
+--   (presently TCP) between this DLSw and another Partner DLSw.
+--   This mandatory group contains objects required to configure and
+--   monitor the operation of Transport Connections.  It also contains
+--   a table whose entries describe defined or existing Transport
+--   Connections.
+
+-- Trap Group
+--   This group contains SNMP Traps used to notify the management
+--   application of a change in this DLSw configuration.  Presently
+--   traps are issued after a transport connection becomes enabled
+--   or disabled.
+
+-- Event Log Group
+
+
+ 
+IMPORTS
+ 
+        TimeTicks, IpAddress
+               FROM RFC1155-SMI
+
+        ctDLSW
+               FROM CTRON-MIB-NAMES
+
+        DisplayString
+               FROM RFC1213-MIB
+  
+        MacAddress
+               FROM BRIDGE-MIB
+  
+        OBJECT-TYPE
+               FROM RFC-1212;
+ 
+--  DisplayString ::= OCTET STRING
+
+--  MacAddress   ::= OCTET STRING (SIZE (6))
+
+NBName       ::= DisplayString (SIZE (0..16))
+ 
+ 
+-- Cabletron's Data Link Switching Mib groups
+
+ctdlswNode                  OBJECT IDENTIFIER ::= { ctDLSW 1 }
+ctdlswNodeConfig            OBJECT IDENTIFIER ::= { ctdlswNode 1 }
+
+ctdlswPort                  OBJECT IDENTIFIER ::= { ctDLSW 2 }
+
+ctdlswFilter                OBJECT IDENTIFIER ::= { ctDLSW 3 }
+
+ctdlswTConn                 OBJECT IDENTIFIER ::= { ctDLSW 4 }
+
+ctdlswTrap                  OBJECT IDENTIFIER ::= { ctDLSW 5 }
+
+ctdlswEvent                 OBJECT IDENTIFIER ::= { ctDLSW 6 }
+ctdlswEventLogConfig        OBJECT IDENTIFIER ::= { ctdlswEvent 1 }
+ctdlswEventLogFilterTable   OBJECT IDENTIFIER ::= { ctdlswEvent 2 }
+ctdlswEventLogTable         OBJECT IDENTIFIER ::= { ctdlswEvent 3 }
+ 
+
+-- *******************************************************************
+-- DLSw Node Group
+-- *******************************************************************
+ 
+-- ===================================================================
+-- DLSw Node Configuration
+-- ===================================================================
+
+ctdlswVersion  OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the current revision level of the DLSw firmware
+        in textual format."
+    ::= { ctdlswNodeConfig 1 }
+ 
+ctdlswAdminStatus  OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),             --  none of the following
+        disable(2),           --  shut down DLSw services
+        enable(3)             --  start up DLSw services
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Sets the system-wide administrative state of DLSw services."
+    ::= { ctdlswNodeConfig 2 }
+ 
+ctdlswOperStatus  OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),             --  none of the following
+        disabled(2),          --  inactive
+        enabled(3)            --  active
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the current system-wide status of DLSw services."
+    ::= { ctdlswNodeConfig 3 }
+ 
+ctdlswUpTime  OBJECT-TYPE
+    SYNTAX TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the time (in hundredths of a second) since the DLSw
+        services portion of the system was enabled."
+    ::= { ctdlswNodeConfig 4 }
+ 
+ctdlswOperVirtualRingNumber  OBJECT-TYPE
+    SYNTAX INTEGER (1..4095)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the operational ring/segment number that uniquely
+        identifies the virtual segment to which this DLSw is connected.
+        This object may only be modified when ctdlswOperStatus is
+        disabled."
+    DEFVAL { 1 }
+    ::= { ctdlswNodeConfig 5 }
+ 
+ctdlswNBLocalFilterType  OBJECT-TYPE
+    SYNTAX INTEGER { block(1), pass(2) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the type of filtering to be applied
+        to NetBIOS frames received on a local LAN segment.
+        If set to block(1), any frame matching any entry in
+        ctdlswNBLocalFilterTable will not be forwarded.
+        If set to pass(2), only frames matching any entry in
+        ctdlswNBLocalFilterTable will be forwarded."
+    ::= { ctdlswNodeConfig 6 }
+ 
+ctdlswNBRemoteFilterType  OBJECT-TYPE
+    SYNTAX INTEGER { block(1), pass(2) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the type of filtering to be applied to
+        NetBIOS frames received from a remote DLSw partner.
+        If set to block(1), any frame matching any entry in
+        ctdlswNBRemoteFilterTable will not be forwarded.
+        If set to pass(2), only frames matching any entry in
+        ctdlswNBRemoteFilterTable will be forwarded."
+    ::= { ctdlswNodeConfig 7 }
+ 
+ctdlswMacLocalFilterType  OBJECT-TYPE
+    SYNTAX INTEGER { block(1), pass(2) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the type of address filtering to be applied
+        to SNA MAC frames received on a local LAN segment.
+        If set to block(1), any frame matching any entry in
+        ctdlswMacLocalFilterTable will not be forwarded.
+        If set to pass(2), only frames matching any entry in
+        ctdlswMacLocalFilterTable will be forwarded."
+    ::= { ctdlswNodeConfig 8 }
+ 
+ctdlswMacRemoteFilterType  OBJECT-TYPE
+    SYNTAX INTEGER { block(1), pass(2) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the type of address filtering to be applied
+        to SNA MAC frames received from a remote DLSw partner.
+        If set to block(1), any frame matching any entry in
+        ctdlswMacRemoteFilterTable will not be forwarded.
+        If set to pass(2), only frames matching any entry in
+        ctdlswMacRemoteFilterTable will be forwarded."
+    ::= { ctdlswNodeConfig 9 }
+
+ctdlswAcceptDynamicTConn OBJECT-TYPE
+    SYNTAX  INTEGER { yes(1), no(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Specifies whether this DLSw allows unconfigured DLSw partners
+        to establish transport connections.  Yes(1) means unconfigured
+        DLSw partners may establish transport connections with this
+        DLSw.  No(2) means only user configured DLSw partners may
+        establish transport connections with this DLSw."
+    ::= { ctdlswNodeConfig 10 }
+ 
+ctdlswDefaultPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Specifies the index of the port whose associated IP address
+        will be used to identify this DLSw node to its DLSw partners.
+        The value must be consistent with 'ifIndex' of mib-II."
+    ::= { ctdlswNodeConfig 11 }
+ 
+ 
+-- *******************************************************************
+-- DLSw Port Group
+-- *******************************************************************
+
+-- ==================================================================
+-- DLSw Port Table
+-- ==================================================================
+
+ctdlswPortTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "This table contains an entry for each port, and specifies
+        configuration parameters used to establish circuits over that
+        port.  This table is indexed by ctdlswPortName, which 
+        identifies the port for which an entry exists.  These port
+        configuration entries will be provided automatically based on
+        the physical port configuration.  These entries cannot be
+        created or deleted - only modified."
+    ::= { ctdlswPort 1 }
+ 
+ctdlswPortEntry  OBJECT-TYPE
+    SYNTAX CtdlswPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "Each entry specifies configuration parameters for a port for
+        which the entry exists."
+    INDEX   { ctdlswPortName }
+    ::= { ctdlswPortTable 1 }
+ 
+CtdlswPortEntry ::= SEQUENCE {
+    ctdlswPortIndex            INTEGER,
+    ctdlswPortName             DisplayString,
+    ctdlswPortAddress          MacAddress,
+    ctdlswPortAdminStatus      INTEGER,
+    ctdlswPortOperStatus       INTEGER,
+    ctdlswPortUpTime           TimeTicks
+    }
+ 
+ctdlswPortIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Specifies a unique value for each port.  Values are derived
+        from 'ifIndex' of mib-II."
+    ::= { ctdlswPortEntry 1 }
+ 
+ctdlswPortName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Specifies the user friendly name for this port."
+    ::= { ctdlswPortEntry 2 }
+ 
+ctdlswPortAddress  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Specifies the MAC address of this port."
+    ::= { ctdlswPortEntry 3 }
+ 
+ctdlswPortAdminStatus  OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),
+        disabled(2),
+        enabled(3)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Sets the administrative state of DLSw frame forwarding
+        for this port."
+    ::= { ctdlswPortEntry 4 }
+ 
+ctdlswPortOperStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),           --  none of the following
+        disabled(2),        --  inactive
+        enabled(3)          --  active
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the current operating status of DLSw frame
+        forwarding for this port."
+    ::= { ctdlswPortEntry 5 }
+ 
+ctdlswPortUpTime  OBJECT-TYPE
+    SYNTAX TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the time (in hundredths of a second) since this port
+        was enabled.  A value of zero means this port is not presently
+        enabled."
+    ::= { ctdlswPortEntry 6 }
+
+
+-- *******************************************************************
+-- DLSw Filter Group
+-- *******************************************************************
+
+-- ==================================================================
+-- DLSw Local NETBIOS Name Filter Table
+--
+-- The local NetBIOS filter table applies to NetBIOS frames generated on
+-- locally attached LANS.
+-- ===================================================================
+
+ctdlswLocalNBFilterTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswLocalNBFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "A list of NETBIOS source-destination name pairs whose frames
+        are allowed (or not allowed) to be forwarded via this DLSw.
+        Only source-destination name pairs from locally generated 
+        NetBIOS frames are compared against entries in this table."
+    ::= { ctdlswFilter 1 }
+ 
+ctdlswLocalNBFilterEntry  OBJECT-TYPE
+    SYNTAX CtdlswLocalNBFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "Information for one NetBIOS source-destination name pair."
+    INDEX   { ctdlswLocalNBFilterSrcName, ctdlswLocalNBFilterDestName }
+    ::= { ctdlswLocalNBFilterTable 1 }
+ 
+CtdlswLocalNBFilterEntry ::= SEQUENCE {
+    ctdlswLocalNBFilterSrcName         NBName,
+    ctdlswLocalNBFilterDestName        NBName,
+    ctdlswLocalNBFilterControl         INTEGER
+    }
+ 
+ctdlswLocalNBFilterSrcName  OBJECT-TYPE
+    SYNTAX  NBName
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The source NETBIOS name to filter on."
+    ::= { ctdlswLocalNBFilterEntry 1 }
+ 
+ctdlswLocalNBFilterDestName  OBJECT-TYPE
+    SYNTAX  NBName
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The destination NETBIOS NAME to filter on."
+    ::= { ctdlswLocalNBFilterEntry 2 }
+ 
+ctdlswLocalNBFilterControl  OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        create(2),
+        delete(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Set this object to delete(3) to remove this entry.  Set to
+        create(2) to add this entry.  A get of this object will return
+        other(1)."
+    ::= { ctdlswLocalNBFilterEntry 3 }
+ 
+-- ==================================================================
+-- DLSw Remote NETBIOS Name Filter Table
+--
+-- The remote NetBIOS filter table applies to NetBIOS frames received from
+-- remote DLSw partners.
+-- ===================================================================
+
+ctdlswRemoteNBFilterTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswRemoteNBFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "A list of NETBIOS source-destination name pairs whose frames
+        are allowed (or not allowed) to be forwarded via this DLSw.
+        Only source-destination name pairs from NetBIOS frames received
+        from remote DLSw partners are compared against entries in this table."
+    ::= { ctdlswFilter 2 }
+ 
+ctdlswRemoteNBFilterEntry  OBJECT-TYPE
+    SYNTAX CtdlswRemoteNBFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "Information for one NetBIOS source-destination name pair."
+    INDEX   { ctdlswRemoteNBFilterSrcName, ctdlswRemoteNBFilterDestName }
+    ::= { ctdlswRemoteNBFilterTable 1 }
+ 
+CtdlswRemoteNBFilterEntry ::= SEQUENCE {
+    ctdlswRemoteNBFilterSrcName         NBName,
+    ctdlswRemoteNBFilterDestName        NBName,
+    ctdlswRemoteNBFilterControl         INTEGER
+    }
+ 
+ctdlswRemoteNBFilterSrcName  OBJECT-TYPE
+    SYNTAX  NBName
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The source NETBIOS name to filter on."
+    ::= { ctdlswRemoteNBFilterEntry 1 }
+ 
+ctdlswRemoteNBFilterDestName  OBJECT-TYPE
+    SYNTAX  NBName
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The destination NETBIOS name to filter on."
+    ::= { ctdlswRemoteNBFilterEntry 2 }
+ 
+ctdlswRemoteNBFilterControl  OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        create(2),
+        delete(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Set this object to delete(3) to remove this entry.  Set to
+        create(2) to add this entry.  A get of this object will return
+        other(1)."
+    ::= { ctdlswRemoteNBFilterEntry 3 }
+ 
+-- ===================================================================
+-- DLSw Local SNA MAC Address Filter Table
+--
+-- The local MAC filter table applies to SNA MAC frames generated on locally
+-- attached LANS.
+-- ==================================================================
+
+ctdlswLocalMacFilterTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswLocalMacFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "A list of source-destination MAC address pairs whose frames
+        are allowed (or not allowed) to be forwarded via this DLSw.
+        Only source-destination name pairs from locally generated 
+        SNA MAC frames are compared against entries in this table."
+    ::= { ctdlswFilter 3 }
+ 
+ctdlswLocalMacFilterEntry  OBJECT-TYPE
+    SYNTAX CtdlswLocalMacFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "Information for one source-destination MAC address pair."
+    INDEX   { ctdlswLocalMacFilterSrcAddr,  ctdlswLocalMacFilterSrcMask,
+              ctdlswLocalMacFilterDestAddr, ctdlswLocalMacFilterDestMask }
+    ::= { ctdlswLocalMacFilterTable 1 }
+ 
+CtdlswLocalMacFilterEntry ::= SEQUENCE {
+    ctdlswLocalMacFilterSrcAddr       MacAddress,
+    ctdlswLocalMacFilterSrcMask       MacAddress,
+    ctdlswLocalMacFilterDestAddr      MacAddress,
+    ctdlswLocalMacFilterDestMask      MacAddress,
+    ctdlswLocalMacFilterControl       INTEGER
+    }
+ 
+ctdlswLocalMacFilterSrcAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The source MAC Address to filter on."
+    ::= { ctdlswLocalMacFilterEntry 1 }
+ 
+ctdlswLocalMacFilterSrcMask  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The source MAC Address mask to filter on."
+    ::= { ctdlswLocalMacFilterEntry 2 }
+ 
+ctdlswLocalMacFilterDestAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The destination MAC Address to filter on."
+    ::= { ctdlswLocalMacFilterEntry 3 }
+ 
+ctdlswLocalMacFilterDestMask  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The destination MAC Address mask to filter on."
+    ::= { ctdlswLocalMacFilterEntry 4 }
+ 
+ctdlswLocalMacFilterControl  OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        create(2),
+        delete(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Set this object to delete(3) to remove this entry.  Set to
+        create(2) to add this entry.  A get of this object will return
+        other(1)."
+    ::= { ctdlswLocalMacFilterEntry 5 }
+ 
+-- ===================================================================
+-- DLSw Remote MAC Address Filter Table
+--
+-- The remote MAC filter table applies to SNA MAC frames received from
+-- remote DLSw partners.
+-- ===================================================================
+
+ctdlswRemoteMacFilterTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswRemoteMacFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "A list of source-destination MAC address pairs whose frames
+        are allowed (or not allowed) to be forwarded via this DLSw.
+        Only source-destination name pairs from SNA MAC frames received
+        from remote DLSw partners are compared against entries in this table."
+    ::= { ctdlswFilter 4 }
+ 
+ctdlswRemoteMacFilterEntry  OBJECT-TYPE
+    SYNTAX CtdlswRemoteMacFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "Information for one source-destination MAC address pair."
+    INDEX   { ctdlswRemoteMacFilterSrcAddr,  ctdlswRemoteMacFilterSrcMask,
+              ctdlswRemoteMacFilterDestAddr, ctdlswRemoteMacFilterDestMask }
+    ::= { ctdlswRemoteMacFilterTable 1 }
+
+CtdlswRemoteMacFilterEntry ::= SEQUENCE {
+    ctdlswRemoteMacFilterSrcAddr       MacAddress,
+    ctdlswRemoteMacFilterSrcMask       MacAddress,
+    ctdlswRemoteMacFilterDestAddr      MacAddress,
+    ctdlswRemoteMacFilterDestMask      MacAddress,
+    ctdlswRemoteMacFilterControl       INTEGER
+    }
+ 
+ctdlswRemoteMacFilterSrcAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The source MAC Address to filter on."
+    ::= { ctdlswRemoteMacFilterEntry 1 }
+ 
+ctdlswRemoteMacFilterSrcMask  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The source MAC Address mask to filter on."
+    ::= { ctdlswRemoteMacFilterEntry 2 }
+ 
+ctdlswRemoteMacFilterDestAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The destination MAC Address to filter on."
+    ::= { ctdlswRemoteMacFilterEntry 3 }
+ 
+ctdlswRemoteMacFilterDestMask  OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The destination MAC Address mask to filter on."
+    ::= { ctdlswRemoteMacFilterEntry 4 }
+ 
+ctdlswRemoteMacFilterControl  OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        create(2),
+        delete(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Set this object to delete(3) to remove this entry.  Set to
+        create(2) to add this entry.  A get of this object will return
+        other(1)."
+    ::= { ctdlswRemoteMacFilterEntry 5 }
+
+
+-- *******************************************************************
+-- DLSw Transport Connection (Partner) Group
+-- *******************************************************************
+
+-- ===================================================================
+-- DLSw Transport Connection (Partner) Table
+-- ===================================================================
+
+ctdlswTConnTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswTConnEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "A list of transport connections which are either user defined
+        or dynamically created for this DLSw."
+    ::= { ctdlswTConn 1 }
+ 
+ctdlswTConnEntry  OBJECT-TYPE
+    SYNTAX CtdlswTConnEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       ""
+    INDEX   { ctdlswTConnRemoteTAddr }
+    ::= { ctdlswTConnTable 1 }
+ 
+CtdlswTConnEntry ::= SEQUENCE {
+    ctdlswTConnRemoteTAddr          IpAddress,
+    ctdlswTConnControl              INTEGER,
+    ctdlswTConnUpTime               TimeTicks,
+    ctdlswTConnOperStatus           INTEGER,
+    ctdlswTConnType                 INTEGER
+    }
+ 
+ctdlswTConnRemoteTAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Specifies the remote transport address for this transport
+        connection.  It can be defined by the user, or established
+        dynamically upon receiving a connection setup request from
+        another DLSw."
+    ::= { ctdlswTConnEntry 1 }
+ 
+ctdlswTConnControl  OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        create(2),
+        delete(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Set this object to delete(3) to remove this entry.  Set to
+        create(2) to add this entry.  A get of this object will
+        return other(1)."
+    ::= { ctdlswTConnEntry 2 }
+ 
+ctdlswTConnUpTime  OBJECT-TYPE
+    SYNTAX TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the time (in hundredths of a second) since this
+        transport connection was last established.  A value of zero
+        means this transport connection is not presently established."
+    ::= { ctdlswTConnEntry 3 }
+ 
+ctdlswTConnOperStatus  OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),             --  none of the following
+        disabled(2),          --  inactive
+        enabled(3),           --  active
+        pendingDisable(4),    --  deactivate in progress
+        pendingEnable(5)      --  activate in progress
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the status of this transport connection."
+    ::= { ctdlswTConnEntry 4 }
+ 
+ctdlswTConnType  OBJECT-TYPE
+    SYNTAX INTEGER  {
+        configured(1),
+        dynamic(2)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Indicates the means by which this transport connection was
+        determined.  Configured(1) means this entry was user defined.
+        Dynamic(2) means this entry was not user defined but was 
+        created as a result of a connection initiated by another DLSw."
+    ::= { ctdlswTConnEntry 5 }
+
+ 
+-- *******************************************************************
+-- DLSW EVENT LOG GROUP
+-- *******************************************************************
+-- ...............................................................
+-- Event Log Configuration
+-- ...............................................................
+
+ctdlswEventAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+           other(1),
+           disabled(2),
+           enabled(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Set the administrative state of Data Link Switching event
+        logging. enabled(3) causes the event log to become active.
+        disabled(2) causes the event log to become inactive."
+    DEFVAL { disabled }
+    ::= { ctdlswEventLogConfig 1 }
+
+ctdlswEventMaxEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Sets the maximum number of entries allowed in the event log
+       table.  When the number of entries reaches the value of
+       ctdlswEventMaxEntries the first (oldest) entry is deleted
+       to allow a new entry to be added."
+    DEFVAL { 100 }
+    ::= { ctdlswEventLogConfig 2 }
+
+ctdlswEventTraceAll OBJECT-TYPE
+    SYNTAX INTEGER {
+           other(1),
+           disabled(2),
+           enabled(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "enabled(3) allows logging of all event types.
+        disabled(2) causes the event log filter table to specify
+        which events to log."
+    DEFVAL { enabled }
+    ::= { ctdlswEventLogConfig 3 }
+
+-- ...............................................................
+-- Event Log Filter Table
+-- ...............................................................
+
+ctdlswEventFilterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswEventFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "This table contains descriptions of how to filter log entries."
+    ::= { ctdlswEventLogFilterTable 1 }
+
+ctdlswEventFilterEntry OBJECT-TYPE
+    SYNTAX CtdlswEventFilterEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry specifies the filter for log entries.  The
+        instance ctdlswEventProtocol refers to the instance used
+        in the nwRtgProtocolTable and nwComponentTable specified
+        by the ctrouter-mib.txt. "
+    INDEX   { ctdlswEventFltrProtocol, ctdlswEventFltrIfNum }
+    ::= { ctdlswEventFilterTable 1 }
+
+CtdlswEventFilterEntry ::= SEQUENCE {
+    ctdlswEventFltrProtocol   INTEGER,
+    ctdlswEventFltrIfNum      INTEGER,
+    ctdlswEventFltrControl    INTEGER,
+    ctdlswEventFltrType       INTEGER,
+    ctdlswEventFltrSeverity   INTEGER,
+    ctdlswEventFltrAction     INTEGER
+    }
+
+ctdlswEventFltrProtocol OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Selects the protocol to log events from."
+    ::= { ctdlswEventFilterEntry 1 }
+
+ctdlswEventFltrIfNum OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the port on which to log events."
+    ::= { ctdlswEventFilterEntry 2 }
+
+ctdlswEventFltrControl OBJECT-TYPE
+    SYNTAX INTEGER {
+           other(1),
+           delete(2),
+           add(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "Setting this field to delete will allow entries to be
+        removed from the table.  This is done by adding new entries
+        with instance fields that match the entry to be removed from
+        the table.  The new entry being added must have this control
+        field set to delete in order for the matching entry already
+        in the table to be deleted.  Setting this field to add will
+        add the entry to the table."
+    ::= { ctdlswEventFilterEntry 3 }
+
+ctdlswEventFltrType OBJECT-TYPE
+    SYNTAX INTEGER {
+           misc(1),
+           timer(2),
+           rcv(4),
+           xmit(8),
+           event(16),
+           error(32)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This bit field mask filter will allow only events of
+        certain types to be logged.  By default all types will be
+        logged.  Clearing event types from this field will cause
+        those types not to be logged.  Adding event types to this
+        field will enable those types to be logged. "
+    ::= { ctdlswEventFilterEntry 4 }
+
+ctdlswEventFltrSeverity OBJECT-TYPE
+    SYNTAX INTEGER {
+           highest(1),
+           highmed(2),
+           highlow(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This filter controls the amount of logging by ignoring events
+        of lower priority than that specified by the filter value.
+        Specifying highest(1) causes all events except those of highest
+        severity to be ignored. Specifying highmed(2) causes lowest
+        severity events to be ignored.  Specifying highlow(3) causes
+        all events to be logged.  highmed(2) is the default setting."
+    ::= { ctdlswEventFilterEntry 5 }
+
+ctdlswEventFltrAction OBJECT-TYPE
+    SYNTAX INTEGER {
+           log(1),
+           trap(2),
+           logTrap(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This field specifies how the events are to be logged.
+        Specifying log(1) stores the events in the event log
+        table (defined below).  Specifying trap(2) sends events
+        out through the trap mechanism. Specifying logTrap(3)
+        does both. "
+    ::= { ctdlswEventFilterEntry 6 }
+
+-- ...............................................................
+-- Event Log Table
+-- ...............................................................
+
+ctdlswEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtdlswEventEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "This table contains all events that have been logged."
+    ::= { ctdlswEventLogTable 1 }
+
+ctdlswEventEntry OBJECT-TYPE
+    SYNTAX CtdlswEventEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry specifies events that have been logged."
+    INDEX { ctdlswEventNumber }
+    ::= { ctdlswEventTable 1 }
+
+CtdlswEventEntry ::= SEQUENCE {
+    ctdlswEventNumber         INTEGER,
+    ctdlswEventTime           TimeTicks,
+    ctdlswEventType           INTEGER,
+    ctdlswEventSeverity       INTEGER,
+    ctdlswEventProtocol       INTEGER,
+    ctdlswEventIfNum          INTEGER,
+    ctdlswEventTextString     OCTET STRING
+    }
+
+ctdlswEventNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "The number uniquely identifies events."
+    ::= { ctdlswEventEntry 1 }
+
+ctdlswEventTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "This number specifies when the event was logged."
+    ::= { ctdlswEventEntry 2 }
+
+ctdlswEventType OBJECT-TYPE
+    SYNTAX INTEGER {
+           misc(1),
+           timer(2),
+           rcv(4),
+           xmit(8),
+           event(16),
+           error(32)
+           }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies type of event logged."
+    ::= { ctdlswEventEntry 3 }
+
+ctdlswEventSeverity OBJECT-TYPE
+    SYNTAX INTEGER {
+           highest(1),
+           highmed(2),
+           highlow(3)
+           }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the severity of the event logged."
+    ::= { ctdlswEventEntry 4 }
+
+ctdlswEventProtocol OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the protocol where the event occured."
+    ::= { ctdlswEventEntry 5 }
+
+ctdlswEventIfNum          OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Specifies the port the event occurred on."
+    ::= { ctdlswEventEntry 6 }
+
+ctdlswEventTextString OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "Specifies the actual text string to be logged."
+    ::= { ctdlswEventEntry 7 }
+
+END

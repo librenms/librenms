@@ -1,0 +1,1187 @@
+--  Title:    DPS_V41v2.MIB
+--  Version:  v4.1 for SNMPv2c
+--
+--  Copyright @ 2015 DPS Inc. All Rights Reserved
+--
+--  This MIB defines objects for the DPS products.
+--
+-- Note: AnalogChannels table only available in NetGuardianG4 v4.2J or later
+--
+
+DPS-MIB-V38-V2EXT DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM SNMPv2-TC
+	MODULE-IDENTITY,
+	NOTIFICATION-TYPE,	
+	OBJECT-TYPE,
+	Integer32
+		FROM SNMPv2-SMI
+   enterprises
+		FROM RFC1155-SMI
+	;
+
+dpsInc OBJECT IDENTIFIER ::= {enterprises  2682}
+
+dpsAlarmControl OBJECT IDENTIFIER ::= {dpsInc 1}
+
+tmonXM OBJECT IDENTIFIER ::= {dpsAlarmControl 1}
+
+tmonV2XM	MODULE-IDENTITY
+   LAST-UPDATED	"201502051200Z"  --February 5th, 2015 12:00 PDT
+	ORGANIZATION	"DPS Telecom"
+	CONTACT-INFO	"DPS Support Team 
+			Web 	http://dpstele.com/support
+			E-Mail 	support@dpstele.com
+			Phone	(559)454-1600"
+	DESCRIPTION	"Second generation MIB for DPS Telecom products"
+
+	REVISION	"201502051200Z"  --February 5th, 2015 12:00 PDT
+	DESCRIPTION	"Modified for proper smi/asn.1 formatting and structure (CBH)"
+
+	::= { dpsAlarmControl 3 }
+   
+tmonV2Ident OBJECT IDENTIFIER ::= {tmonV2XM 1}
+
+tmonV2IdentManufacturer OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The TMON/XM Unit manufacturer."
+	::= {tmonV2Ident  1}
+
+tmonV2IdentModel OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The TMON/XM model designation."
+	::= {tmonV2Ident  2}
+
+tmonV2IdentSoftwareVersion OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The TMON/XM SNMP Agent software version."
+	::= {tmonV2Ident  3}
+
+tmonV2AlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TMonV2AlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "A table of TMonV2 Alarm-specific information. Returns standing alarms."
+	::= {tmonV2XM 2}
+
+tmonV2AlarmEntry OBJECT-TYPE
+	SYNTAX  TMonV2AlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular TMonV2 alarm."
+	INDEX   {tmonV2AIndex}
+	::= {tmonV2AlarmTable 1}
+
+TMonV2AlarmEntry ::= SEQUENCE  {	tmonV2AIndex		Integer32,
+					tmonV2ASite		DisplayString,
+					tmonV2ADesc		DisplayString,
+					tmonV2AState		DisplayString,
+					tmonV2ASeverity		DisplayString,
+					tmonV2AChgDate		DisplayString,
+					tmonV2AChgTime		DisplayString,
+					tmonV2AAuxDesc		DisplayString,
+					tmonV2ADispDesc		DisplayString,
+					tmonV2APntType		Integer32,
+					tmonV2APort		Integer32,
+					tmonV2AAddress		Integer32,
+					tmonV2ADisplay		Integer32,
+					tmonV2APoint		Integer32,
+               tmonV2AEvent     Integer32,
+               tmonV2AIPAddr  DisplayString, 
+               tmonV2ADevDesc  DisplayString
+				}
+
+tmonV2AIndex OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Tmon alarm table index (1..NumberOfAlarms)."
+	::={tmonV2AlarmEntry 1}
+
+tmonV2ASite OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The site of the alarm (i.e. Atlanta Hub, Sub-Station H32)."
+	::= {tmonV2AlarmEntry 2}
+
+tmonV2ADesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A user-defined text string associated with the alarm 
+					 (i.e. South Door, Generator, Power Grid 1)."
+	::= {tmonV2AlarmEntry 3}
+
+tmonV2AState OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current alarm state."
+	::= {tmonV2AlarmEntry 4}
+
+tmonV2ASeverity OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The severity of the last alarm event."
+	::= {tmonV2AlarmEntry 5}
+
+tmonV2AChgDate OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The date (mm/dd/yy) of the last alarm event."
+	::= {tmonV2AlarmEntry 6}
+
+tmonV2AChgTime OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The time (hh:mm:ss) of the last alarm event."
+	::= {tmonV2AlarmEntry 7}
+
+tmonV2AAuxDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "An auxiliary user-defined text string associated with the
+					 alarm (i.e. This remote needs servicing)."
+	::= {tmonV2AlarmEntry 8}
+
+tmonV2ADispDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of the display on which this point appears."
+	::= {tmonV2AlarmEntry 9}
+
+tmonV2APntType OBJECT-TYPE
+	SYNTAX  Integer32 (0..999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Type of this point."
+	::={tmonV2AlarmEntry 10}
+
+tmonV2APort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Port on which this point is reported."
+	::={tmonV2AlarmEntry 11}
+
+tmonV2AAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Address of unit reporting this point."
+	::={tmonV2AlarmEntry 12}
+
+tmonV2ADisplay OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Display on which this point appears."
+	::={tmonV2AlarmEntry 13}
+
+tmonV2APoint OBJECT-TYPE
+	SYNTAX  Integer32 (0..64)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Index into display of this point."
+	::={tmonV2AlarmEntry 14}
+   
+tmonV2AEvent OBJECT-TYPE
+   SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Event id for this message."
+	::={tmonV2AlarmEntry 15}
+
+tmonV2AIPAddr OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The IP Address of the device on which this point appears."
+	::= {tmonV2AlarmEntry 16}
+   
+tmonV2ADevDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of the devie on which this point appears."
+	::= {tmonV2AlarmEntry 17}
+   
+-- structure used to issue a command to tmonV2XM element
+
+tmonV2CommandGrid OBJECT IDENTIFIER ::= {tmonV2XM 3}
+
+tmonV2CPType OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Tmon point type."
+	::= {tmonV2CommandGrid 1}
+
+tmonV2CPort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Tmon port number."
+	::= {tmonV2CommandGrid 2}
+
+tmonV2CAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Tmon_port address number."
+	::= {tmonV2CommandGrid 3}
+
+tmonV2CDisplay OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Tmon_port_address display number."
+	::= {tmonV2CommandGrid 4}
+
+tmonV2CPoint OBJECT-TYPE
+	SYNTAX  Integer32 (0..64)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Tmon_port_display point number (1-64)."
+	::= {tmonV2CommandGrid 5}
+
+tmonV2CEvent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Tmon event ID."
+	::= {tmonV2CommandGrid 6}
+
+tmonV2CAction OBJECT-TYPE
+	SYNTAX  INTEGER	{	latch(1),
+				release(2),
+				momentary(3),
+				ack(17),
+				tag(18),
+				untag(19)
+			}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Requested command action (tmonV2XM will ignore if invalid)."
+	::= {tmonV2CommandGrid 7}
+
+tmonV2CAuxText OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "An auxiliary user-defined text string associated with the
+					 command (i.e. User_initials)."
+	::= {tmonV2CommandGrid 8}
+
+tmonV2CResult OBJECT-TYPE
+	SYNTAX  INTEGER	{	success(1),
+				failure(2),
+				pending(3)
+			}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Command result."
+	::= {tmonV2CommandGrid 9}
+
+-- structure used for the cos table list
+
+tmonV2CosEventTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TMonV2CosEventEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "A table of TMonV2 Alarm-specific information. Returns change of state alarms."
+	::= {tmonV2XM 4}
+
+tmonV2CosEventEntry OBJECT-TYPE
+	SYNTAX  TMonV2CosEventEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular TMonV2 change of state alarm."
+	INDEX   {tmonV2AIndex}
+	::= {tmonV2CosEventTable 1}
+
+TMonV2CosEventEntry ::= SEQUENCE  {	tmonV2CosEIndex		Integer32,
+					tmonV2CosESite		DisplayString,
+					tmonV2CosEDesc		DisplayString,
+					tmonV2CosEState		DisplayString,
+					tmonV2CosESeverity		DisplayString,
+					tmonV2CosEChgDate		DisplayString,
+					tmonV2CosEChgTime		DisplayString,
+					tmonV2CosEAuxDesc		DisplayString,
+					tmonV2CosEDispDesc		DisplayString,
+					tmonV2CosEPntType		Integer32,
+					tmonV2CosEPort		Integer32,
+					tmonV2CosEAddress		Integer32,
+					tmonV2CosEDisplay		Integer32,
+					tmonV2CosEPoint		Integer32,
+               tmonV2CosEEventID    Integer32
+				}
+
+tmonV2CosEIndex OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Tmon change of state alarm table index (1..NumberOfAlarms)."
+	::={tmonV2CosEventEntry 1}
+
+tmonV2CosESite OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The site of the change of state alarm (i.e. Atlanta Hub, Sub-Station H32)."
+	::= {tmonV2CosEventEntry 2}
+
+tmonV2CosEDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A user-defined text string associated with the alarm 
+					 (i.e. South Door, Generator, Power Grid 1)."
+	::= {tmonV2CosEventEntry 3}
+
+tmonV2CosEState OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The alarm state."
+	::= {tmonV2CosEventEntry 4}
+
+tmonV2CosESeverity OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The severity of the alarm event."
+	::= {tmonV2CosEventEntry 5}
+
+tmonV2CosEChgDate OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The date (mm/dd/yy) of the alarm event."
+	::= {tmonV2CosEventEntry 6}
+
+tmonV2CosEChgTime OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The time (hh:mm:ss) of the alarm event."
+	::= {tmonV2CosEventEntry 7}
+
+tmonV2CosEAuxDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "An auxiliary user-defined text string associated with the
+					 alarm (i.e. This remote needs servicing)."
+	::= {tmonV2CosEventEntry 8}
+
+tmonV2CosEDispDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of the display on which this point appears."
+	::= {tmonV2CosEventEntry 9}
+
+tmonV2CosEPntType OBJECT-TYPE
+	SYNTAX  Integer32 (0..999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Type of this point."
+	::={tmonV2CosEventEntry 10}
+
+tmonV2CosEPort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Port on which this point is reported."
+	::={tmonV2CosEventEntry 11}
+
+tmonV2CosEAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Address of unit reporting this point."
+	::={tmonV2CosEventEntry 12}
+
+tmonV2CosEDisplay OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Display on which this point appears."
+	::={tmonV2CosEventEntry 13}
+
+tmonV2CosEPoint OBJECT-TYPE
+	SYNTAX  Integer32 (0..64)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Index into display of this point."
+	::={tmonV2CosEventEntry 14}
+
+tmonV2CosEEventID OBJECT-TYPE
+   SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Unique event ID for the alarm event."
+	::={tmonV2CosEventEntry 15}
+   
+-- structure used for the alarm status grid
+
+tmonV2AlarmGrid OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TMonV2AlarmGridEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "A table of TMonV2 Alarm-specific information. Returns alarm status."
+	::= {tmonV2XM 5}
+
+tmonV2AlarmGridEntry OBJECT-TYPE
+	SYNTAX  TMonV2AlarmGridEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular TMonV2 alarm."
+	INDEX   {tmonV2AIndex}
+	::= {tmonV2AlarmGrid 1}
+
+TMonV2AlarmGridEntry ::= SEQUENCE  {	tmonV2AGIndex		Integer32,
+					tmonV2AGSite		DisplayString,
+					tmonV2AGDesc		DisplayString,
+					tmonV2AGState		DisplayString,
+					tmonV2AGSeverity		DisplayString,
+					tmonV2AGChgDate		DisplayString,
+					tmonV2AGChgTime		DisplayString,
+					tmonV2AGAuxDesc		DisplayString,
+					tmonV2AGDispDesc		DisplayString,
+					tmonV2AGPntType		Integer32,
+					tmonV2AGPort		Integer32,
+					tmonV2AGAddress		Integer32,
+					tmonV2AGDisplay		Integer32,
+					tmonV2AGPoint		Integer32
+				}
+
+tmonV2AGIndex OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Tmon alarm table index (1..NumberOfAlarms)."
+	::={tmonV2AlarmGridEntry 1}
+
+tmonV2AGSite OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The site of the alarm (i.e. Atlanta Hub, Sub-Station H32)."
+	::= {tmonV2AlarmGridEntry 2}
+
+tmonV2AGDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A user-defined text string associated with the alarm 
+					 (i.e. South Door, Generator, Power Grid 1)."
+	::= {tmonV2AlarmGridEntry 3}
+
+tmonV2AGState OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current alarm state."
+	::= {tmonV2AlarmGridEntry 4}
+
+tmonV2AGSeverity OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The severity of the last alarm event."
+	::= {tmonV2AlarmGridEntry 5}
+
+tmonV2AGChgDate OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The date (mm/dd/yy) of the last alarm event."
+	::= {tmonV2AlarmGridEntry 6}
+
+tmonV2AGChgTime OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The time (hh:mm:ss) of the last alarm event."
+	::= {tmonV2AlarmGridEntry 7}
+
+tmonV2AGAuxDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "An auxiliary user-defined text string associated with the
+					 alarm (i.e. This remote needs servicing)."
+	::= {tmonV2AlarmGridEntry 8}
+
+tmonV2AGDispDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of the display on which this point appears."
+	::= {tmonV2AlarmGridEntry 9}
+
+tmonV2AGPntType OBJECT-TYPE
+	SYNTAX  Integer32 (0..999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Type of this point."
+	::={tmonV2AlarmGridEntry 10}
+
+tmonV2AGPort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Port on which this point is reported."
+	::={tmonV2AlarmGridEntry 11}
+
+tmonV2AGAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Address of unit reporting this point."
+	::={tmonV2AlarmGridEntry 12}
+
+tmonV2AGDisplay OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Display on which this point appears."
+	::={tmonV2AlarmGridEntry 13}
+
+tmonV2AGPoint OBJECT-TYPE
+	SYNTAX  Integer32 (0..64)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Index into display of this point."
+	::={tmonV2AlarmGridEntry 14}
+
+
+-- Table for accessing TMon analog channel value
+
+tmonV2analogChannels OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TMonV2channelEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Holds information on analog channels"
+	::= {tmonV2XM 6}
+
+tmonV2channelEntry OBJECT-TYPE
+	SYNTAX  ChannelEntryv2
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular channel"
+	INDEX   {channelNumberv2}
+	::= {tmonV2analogChannels 1}
+
+TMonV2channelEntry ::= SEQUENCE	{	tmonV2chanPort    Integer32,
+               tmonV2chanAddress    Integer32,
+               tmonV2chanNumber	Integer32,
+					tmonV2chanEnabled	Integer32,
+					tmonV2chanDescription	DisplayString,
+               tmonV2chanValueInt	Integer32,
+               tmonV2chanValueInt100	Integer32,
+					tmonV2chanValueStr		DisplayString,
+               tmonV2chanDisplayunits      DisplayString,
+					tmonV2chanThresholds	Integer32
+				}
+
+tmonV2chanPort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Input channel port reference"
+	::= {tmonV2channelEntry 1}
+            
+tmonV2chanAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Input channel device address reference"
+	::= {tmonV2channelEntry 2}
+   
+tmonV2chanNumber OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Input channel number"
+	::= {tmonV2channelEntry 3}
+
+tmonV2chanEnabled OBJECT-TYPE
+	SYNTAX  INTEGER	{	disabled	(0),
+				enabled		(1)
+			}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Enable status of channel"
+	::= {tmonV2channelEntry 4}
+
+tmonV2chanDescription OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The user defined description of the channel"
+	::= {tmonV2channelEntry 5}		
+										
+tmonV2chanValueInt OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current value of the channel as an integer. This is the whole number only"
+	::= {tmonV2channelEntry 6}		
+   
+tmonV2chanValueInt100 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current value of the channel as an integer. This value is multiplied by 100 to preserve decimal values."
+	::= {tmonV2channelEntry 7}		
+   
+tmonV2chanValueStr OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current value of the channel as a string"
+	::= {tmonV2channelEntry 8}
+
+tmonV2chanDisplayunits OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current display units of the channel value"
+	::= {tmonV2channelEntry 9}
+   
+tmonV2chanThresholds OBJECT-TYPE
+	SYNTAX  INTEGER	{	noAlarms	(0),
+				minorUnder	(1),
+				minorOver	(2),
+				majorUnder	(3),
+				majorOver	(4)
+			}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Highest threshold level crossed, if MJ, MN is assumed"
+	::= {tmonV2channelEntry 10}
+
+dpsRTUv2 OBJECT IDENTIFIER ::= {dpsAlarmControl 4}
+
+dpsRTUv2Ident OBJECT IDENTIFIER ::= {dpsRTUv2 1}
+
+dpsRTUv2Manufacturer OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The Remote Telemetry Unit manufacturer."
+	::= {dpsRTUv2Ident  1}
+
+dpsRTUv2Model OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The RTU model designation."
+	::= {dpsRTUv2Ident  2}
+
+dpsRTUv2FirmwareVersion OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The RTU firmware version."
+	::= {dpsRTUv2Ident  3}
+
+dpsRTUv2DateTime OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "The RTU system date and time."
+	::= {dpsRTUv2Ident  4}
+
+dpsRTUv2SyncReq OBJECT-TYPE
+	SYNTAX  INTEGER	{	sync(1)
+			}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Caution: SETting this object initiates traps for all
+					 standing alarms."
+	::= {dpsRTUv2Ident  5}
+
+
+-- structure used to access displays managed by this RTU
+
+dpsRTUv2DisplayGrid OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DPSrtuV2DispEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Holds information on displays managed by the RTU."
+	::= {dpsRTUv2 2}
+
+dpsRTUv2DisplayEntry OBJECT-TYPE
+	SYNTAX  DPSrtuV2DispEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular RTU display."
+	INDEX   {dpsRTUv2Port, dpsRTUv2Address, dpsRTUv2Display}
+	::= {dpsRTUv2DisplayGrid 1}
+
+DPSrtuV2DispEntry ::= SEQUENCE	{	dpsRTUv2Port		Integer32,
+					dpsRTUv2Address		Integer32,
+					dpsRTUv2Display		Integer32,
+					dpsRTUv2DispDesc	DisplayString,
+					dpsRTUv2PntMap		DisplayString
+				}
+
+dpsRTUv2Port OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU port number."
+	::= {dpsRTUv2DisplayEntry 1}
+
+dpsRTUv2Address OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU_port address number."
+	::= {dpsRTUv2DisplayEntry 2}
+
+dpsRTUv2Display OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsRTUv2DisplayEntry 3}
+
+dpsRTUv2DispDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of the associated display."
+	::= {dpsRTUv2DisplayEntry 4}
+
+dpsRTUv2PntMap OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A map of the points appearing in this display."
+	::= {dpsRTUv2DisplayEntry 5}
+
+
+-- structure used to issue a control to a managed point
+
+dpsRTUv2ControlGrid OBJECT IDENTIFIER ::= {dpsRTUv2 3}
+
+dpsRTUv2CPort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "RTU port number."
+	::= {dpsRTUv2ControlGrid 1}
+
+dpsRTUv2CAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "RTU_port address number."
+	::= {dpsRTUv2ControlGrid 2}
+
+dpsRTUv2CDisplay OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsRTUv2ControlGrid 3}
+
+dpsRTUv2CPoint OBJECT-TYPE
+	SYNTAX  Integer32 (0..64)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "RTU_port_display point number (1-64)."
+	::= {dpsRTUv2ControlGrid 4}
+
+dpsRTUv2CAction OBJECT-TYPE
+	SYNTAX  INTEGER	{	latch(1),
+				release(2),
+				momentary(3)
+			}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Requested action on point (RTU will ignore if invalid)."
+	::= {dpsRTUv2ControlGrid 5}
+
+
+
+dpsRTUv2AlarmGrid OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DPSrtuV2AlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Holds individual alarm point information."
+	::= {dpsRTUv2 5}
+
+dpsRTUv2AlarmEntry OBJECT-TYPE
+	SYNTAX  DPSrtuV2AlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Detailed information about a particular RTU display."
+	INDEX   {dpsRTUv2APort, dpsRTUv2AAddress, dpsRTUv2ADisplay, dpsRTUv2APoint}
+	::= {dpsRTUv2AlarmGrid 1}
+
+DPSrtuV2AlarmEntry ::= SEQUENCE	{	dpsRTUv2APort		Integer32,
+					dpsRTUv2AAddress	Integer32,
+					dpsRTUv2ADisplay	Integer32,
+					dpsRTUv2APoint		Integer32,
+					dpsRTUv2APntDesc	DisplayString,
+					dpsRTUv2AState		DisplayString
+				}
+
+dpsRTUv2APort OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU port number."
+	::= {dpsRTUv2AlarmEntry 1}
+
+dpsRTUv2AAddress OBJECT-TYPE
+	SYNTAX  Integer32 (0..9999)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU_port address number."
+	::= {dpsRTUv2AlarmEntry 2}
+
+dpsRTUv2ADisplay OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsRTUv2AlarmEntry 3}
+
+dpsRTUv2APoint OBJECT-TYPE
+	SYNTAX  Integer32 (0..64)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "RTU_port_address_display point number."
+	::= {dpsRTUv2AlarmEntry 4}
+
+dpsRTUv2APntDesc OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of this point."
+	::= {dpsRTUv2AlarmEntry 5}
+
+dpsRTUv2AState OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current state of this point."
+	::= {dpsRTUv2AlarmEntry 6}
+
+
+--Table for accessing analog channel value
+
+analogChannelsv2 OBJECT-TYPE
+	SYNTAX  SEQUENCE OF ChannelEntryv2
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Holds information on analog channels"
+	::= {dpsRTUv2 6}
+
+channelEntryv2 OBJECT-TYPE
+	SYNTAX  ChannelEntryv2
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular channel"
+	INDEX   {channelNumberv2}
+	::= {analogChannelsv2 1}
+
+ChannelEntryv2 ::= SEQUENCE	{	channelNumberv2	Integer32,
+					enabledv2	Integer32,
+					descriptionv2	DisplayString,
+					valuev2		DisplayString,
+					thresholdsv2	Integer32
+				}
+
+channelNumberv2 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Input channel number"
+	::= {channelEntryv2 1}
+
+enabledv2 OBJECT-TYPE
+	SYNTAX  INTEGER	{	disabled	(0),
+				enabled		(1)
+			}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Enable status of channel"
+	::= {channelEntryv2 2}
+
+descriptionv2 OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The user defined description of the channel"
+	::= {channelEntryv2 3}		
+										
+valuev2 OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current value of the channel"
+	::= {channelEntryv2 4}		
+
+thresholdsv2 OBJECT-TYPE
+	SYNTAX  INTEGER	{	noAlarms	(0),
+				minorUnder	(1),
+				minorOver	(2),
+				majorUnder	(3),
+				majorOver	(4),
+				notDetected (5)
+			}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Highest threshold level crossed, if MJ, MN is assumed"
+	::= {channelEntryv2 5}
+	
+-- TRAP definitions
+
+tmonV2CRalarmSet NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a critical alarm is set."
+--	::= {tmonV2XM 10}
+	::= {tmonXM 10}
+
+
+tmonV2CRalarmClr NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a critical alarm clears."
+--	::= {tmonV2XM 11}
+   ::= {tmonXM 11}
+
+tmonV2MJalarmSet NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a major alarm is set."
+--	::= {tmonV2XM 12}
+   ::= {tmonXM 12}
+
+tmonV2MJalarmClr NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a major alarm clears."
+--	::= {tmonV2XM 13}
+   ::= {tmonXM 13}
+
+tmonV2MNalarmSet NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a minor alarm is set."
+--	::= {tmonV2XM 14}
+   ::= {tmonXM 14}
+
+tmonV2MNalarmClr NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a minor alarm clears."
+--	::= {tmonV2XM 15}
+   ::= {tmonXM 15}
+
+tmonV2STalarmSet NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a status alarm is set."
+--	::= {tmonV2XM 16}
+   ::= {tmonXM 16}
+
+tmonV2STalarmClr NOTIFICATION-TYPE
+	OBJECTS	 {	tmonV2ASite, tmonV2ADesc, tmonV2AState, tmonV2ASeverity, tmonV2AChgDate,
+					tmonV2AChgTime, tmonV2AAuxDesc, tmonV2ADispDesc, tmonV2APntType,
+					tmonV2APort, tmonV2AAddress, tmonV2ADisplay, tmonV2APoint, tmonV2CEvent,
+               tmonV2AIPAddr, tmonV2ADevDesc }
+	STATUS		current
+	DESCRIPTION "Generated when a status alarm clears."
+--	::= {tmonV2XM 17}
+   ::= {tmonXM 17}
+
+--dpsRTUv2PointSet NOTIFICATION-TYPE
+--	OBJECTS	 {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--					dpsRTUv2APort, dpsRTUv2AAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--					dpsRTUv2APntDesc, dpsRTUv2AState }
+--	STATUS		current
+--	DESCRIPTION "Generated when a point is set."
+--	::= {dpsRTUv2 20}
+--
+--dpsRTUv2PointClr NOTIFICATION-TYPE
+--	OBJECTS	 {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--					dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--					dpsRTUv2APntDesc, dpsRTUv2AState }
+--	STATUS		current
+--	DESCRIPTION "Generated when a point clears."
+--	::= {dpsRTUv2 21}
+--
+--dpsRTUv2sumPSet NOTIFICATION-TYPE
+--	OBJECTS	 {	sysDescr, sysLocation, dpsRTUv2DateTime }
+--	STATUS		current
+--	DESCRIPTION "Generated when any point is set."
+--	::= {dpsRTUv2 101}
+--
+--dpsRTUv2sumPClr NOTIFICATION-TYPE
+--	OBJECTS	 {	sysDescr, sysLocation, dpsRTUv2DateTime }
+--	STATUS		current
+--	DESCRIPTION "Generated when all points clear."
+--	::= {dpsRTUv2 102}
+--
+--dpsRTUv2comFailed NOTIFICATION-TYPE
+--	OBJECTS	 {	sysDescr, sysLocation, dpsRTUv2DateTime }
+--	STATUS		current
+--	DESCRIPTION "Generated when polled unit fails to respond."
+--	::= {dpsRTUv2 103}
+--
+--dpsRTUv2comRestored NOTIFICATION-TYPE
+--	OBJECTS	 {	sysDescr, sysLocation, dpsRTUv2DateTime }
+--	STATUS		current
+--	DESCRIPTION "Generated when failed unit resumes responding."
+--	::= {dpsRTUv2 104}
+--
+-- **************************************************************************
+-- Granular TRAP definitions
+--
+--    The following section supports granular trapping available on selected
+-- DPS remote telemetry units.  This software selectable facility changes the
+-- trap sent by a remote so equipped.  The standard trap identifies a SET or
+-- CLR event in the trap ID and binds variables identifying the specific
+-- remote point associated with the event.  A granular trap identifies a SET
+-- or CLR event and the specific point associated with the event all in the
+-- trap ID.  This is accomplished by mapping all SET event/points into the
+-- trap ID range 10001-19999 and all CLR event/points into the trap ID range
+-- 20001-29999.
+--    If the unit manages multiple displays, the displays are mapped
+-- sequentially with each display occupying a 64 point range.  For example, a
+-- standalone standard or timestamp KDA which manages two displays, reports
+-- SET event/points in the first display (discrete alarm points) in the range
+-- 10001-10064.  The CLR event/points for the same display would be reported
+-- in the range 20001-20064.  The second display (controls & housekeeping
+-- alarm points) would have its SET event/points reported in the range 10065-
+-- 10128 and its CLR event/points reported in the range 20065-20128.
+--    SET and CLR definitions for the first 64 points have been included and
+-- can be used as is for driving most SNMP manager mechanisms designed to key
+-- on the trap ID for distinguishing and managing events.  Additional events
+-- can be added simply by editing the following trap definitions prior to
+-- compiling this file into your SNMP manager.  We recommend managing the SET
+-- and CLR event definitions for a specific point as a single unit and using
+-- the following simple rules:
+--  + Adjust the numeric portion of the label preceeding NOTIFICATION-TYPE.
+--  + Adjust the numeric reference in the DESCRIPTION text.
+--  + Adjust the number on the last line of the definition.
+--
+--    Using these rules a definition for the 65th point would be:
+-- 
+-- dpsRTUv2p0065Set NOTIFICATION-TYPE
+-- 	ENTERPRISE  dpsRTUv2
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--						dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--						dpsRTUv2APntDesc, dpsRTUv2AState }
+--    DESCRIPTION "Generated when granular point 65 is set."
+--    ::= 10065
+--
+-- dpsRTUv2p0065Clr NOTIFICATION-TYPE
+--    ENTERPRISE  dpsRTUv2
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--						dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--						dpsRTUv2APntDesc, dpsRTUv2AState }
+--    DESCRIPTION "Generated when granular point 65 clears."
+--    ::= 20065
+--
+--    This editing can can be accomplished quite easily using a plain ASCII
+-- file editor.  The repetitive structure of the definitions also makes for
+-- rapid scripted or programmed generation if any such tools are available.
+-- A compressed file containing event/point definitions for 144 displays is
+-- available (DPS_G36.zip 150K) which uncompressed (DPS_G36.mib 6.2M) can be
+-- used for cut-and-paste editing if desired.
+--    The definitions can be further customized if desired by similar editing
+-- prior to compiling carefully observing the following conventions:
+--  + The label preceeding the NOTIFICATION-TYPE designator can be edited with some
+--    freedom but the label must be utterly unique among all trap definitions.
+--  + The ENTERPRISE and VARIABLES sections must not be changed.
+--  + The DESCRIPTION can be edited with complete freedom and is typically
+--    ignored within the context of standard SNMP manager trap handling.  The
+--    quote mark before and after the text of the description are required.
+--  + The number on the last line of the definition is the actual trap ID
+--    defined and must also be utterly unique.
+--
+--    For example:
+-- 
+-- dpsRTUv2p0001Set NOTIFICATION-TYPE
+-- 	ENTERPRISE  dpsRTUv2
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--						dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--						dpsRTUv2APntDesc, dpsRTUv2AState }
+--    DESCRIPTION "Generated when granular point 1 is set."
+--    ::= 10001
+--
+-- dpsRTUv2p0001Clr NOTIFICATION-TYPE
+--    ENTERPRISE  dpsRTUv2
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--						dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--						dpsRTUv2APntDesc, dpsRTUv2AState }
+--    DESCRIPTION "Generated when granular point 1 clears."
+--    ::= 20001
+--
+--    Could be customized as:
+--
+-- dpsRTUv2FireAlarm NOTIFICATION-TYPE
+--    ENTERPRISE  dpsRTUv2
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--						dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--						dpsRTUv2APntDesc, dpsRTUv2AState }
+--    DESCRIPTION "Generated when smoke detector activates."
+--    ::= 10001
+--
+-- dpsRTUv2FireOut NOTIFICATION-TYPE
+--    ENTERPRISE  dpsRTUv2
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUv2DateTime,
+--						dpsRTUv2APort, dpsRTUv2CAddress, dpsRTUv2ADisplay, dpsRTUv2APoint,
+--						dpsRTUv2APntDesc, dpsRTUv2AState }
+--    DESCRIPTION "Generated when smoke detector deactivates."
+--    ::= 20001
+-- **************************************************************************
+
+
+END

@@ -1,0 +1,8 @@
+# .scrutinizer.yml
+imports:
+    - javascript
+    - php
+
+# FIXME: find a way to keep excluded_paths list sorted
+filter:
+    excluded_paths: [ html/js/*, html/css/*, lib/*, vendor/* ]

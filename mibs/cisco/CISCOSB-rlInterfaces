@@ -1,0 +1,1317 @@
+CISCOSB-rlInterfaces DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Switch Interfaces Private
+-- Version:    7.45
+-- Date:       07 May 2006
+-- 30-Nov-2004 Added type AutoNegCapabilitiesBits
+-- 30-Nov-2004 Added fields swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities
+--                          swIfOperSpeedDuplexAutoNegotiationLocalCapabilities
+--                          swIfSpeedDuplexNegotiationRemoteCapabilities to swIfEntry
+-- 22-Nov-2005 Obsoleted field swIfPhysAddressType
+-- 22-Nov-2005 Added rlIfBaseMACAddressPerIfIndex
+-- 30-Oct-2005 Added swIfExtTable
+-- 30-Nov-2005 Added fields swIfAdminComboMode
+--                          swIfOperComboMode swIfExtTable to swIfEntry
+-- 05-Dec-2005 Added rlFlowControlCascadeMode and rlFlowControlCascadeType
+-- 23-Feb-2005 Added rlFlowControlRxPerSystem
+-- 07-May-2006 Added rlCascadePortProtectionAction
+-- 04-Jun-2006 Added multiple-auth enum to swIfHostMode
+-- 11-Jun-2008 Added rlManagementIfIndex
+-- 06-Jun-2009 Added rlIfClearPortMacAddresses
+-- 30-May-2011  Added MODULE-IDENTITY
+
+IMPORTS
+    switch001, rlIfInterfaces                               FROM CISCOSB-MIB
+    ifIndex, InterfaceIndex, InterfaceIndexOrZero           FROM IF-MIB
+    PortList                                                FROM Q-BRIDGE-MIB
+    Unsigned32, Integer32, Counter32,
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    RowStatus, TruthValue, TEXTUAL-CONVENTION,
+    DisplayString                                           FROM SNMPv2-TC;
+
+swInterfaces MODULE-IDENTITY
+      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+		ORGANIZATION "Cisco Systems, Inc."
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for Switch Interfaces."
+      	REVISION     "201304010000Z"  -- April 1, 2013
+      	DESCRIPTION
+              "Added MODULE-IDENTITY"
+        ::= { switch001 43 }
+
+-- These bits can be set in any combination (except unknown)
+-- for field swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities
+-- and will take affect when field swIfSpeedDuplexAutoNegotiation
+-- will be set to enabled.
+-- In addition these fields can be read for operative values of
+-- auto negotiation capabilities
+AutoNegCapabilitiesBits ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Auto negotiation capabilities bits."
+    SYNTAX BITS {
+        default(0),
+        unknown(1),
+        tenHalf(2),
+        tenFull(3),
+        fastHalf(4),
+        fastFull(5),
+        gigaHalf(6),
+        gigaFull(7),
+        tenGigaFull(8)
+    }
+
+--
+-- swTable
+--
+
+swIfTable    OBJECT-TYPE
+   SYNTAX  SEQUENCE  OF SwIfEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Switch media specific information and configuration of the device
+     interfaces."
+   ::=  { swInterfaces 1 }
+
+swIfEntry OBJECT-TYPE
+   SYNTAX  SwIfEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Defines the contents of each line in the swIfTable table."
+   INDEX   { swIfIndex }
+   ::=  { swIfTable 1 }
+
+SwIfEntry ::= SEQUENCE {
+        swIfIndex                                               INTEGER,
+        swIfPhysAddressType                                     INTEGER,
+        swIfDuplexAdminMode                                     INTEGER,
+        swIfDuplexOperMode                                      INTEGER,
+        swIfBackPressureMode                                    INTEGER,
+        swIfTaggedMode                                          INTEGER,
+        swIfTransceiverType                                     INTEGER,
+        swIfLockAdminStatus                                     INTEGER,
+        swIfLockOperStatus                                      INTEGER,
+        swIfType                                                INTEGER,
+        swIfDefaultTag                                          INTEGER,
+        swIfDefaultPriority                                     INTEGER,
+        swIfStatus                                              RowStatus,
+        swIfFlowControlMode                                     INTEGER,
+        swIfSpeedAdminMode                                      INTEGER,
+        swIfSpeedDuplexAutoNegotiation                          INTEGER,
+        swIfOperFlowControlMode                                 INTEGER,
+        swIfOperSpeedDuplexAutoNegotiation                      INTEGER,
+        swIfOperBackPressureMode                                INTEGER,
+        swIfAdminLockAction                                     INTEGER,
+        swIfOperLockAction                                      INTEGER,
+        swIfAdminLockTrapEnable                                 TruthValue,
+        swIfOperLockTrapEnable                                  TruthValue,
+        swIfOperSuspendedStatus                                 TruthValue,
+        swIfLockOperTrapCount                                   INTEGER,
+        swIfLockAdminTrapFrequency                              INTEGER,
+        swIfReActivate                                          TruthValue,
+        swIfAdminMdix                                           INTEGER,
+        swIfOperMdix                                            INTEGER,
+        swIfHostMode                                            INTEGER,
+        swIfSingleHostViolationAdminAction                      INTEGER,
+        swIfSingleHostViolationOperAction                       INTEGER,
+        swIfSingleHostViolationAdminTrapEnable                  TruthValue,
+        swIfSingleHostViolationOperTrapEnable                   TruthValue,
+        swIfSingleHostViolationOperTrapCount                    INTEGER,
+        swIfSingleHostViolationAdminTrapFrequency               INTEGER,
+        swIfLockLimitationMode                                  INTEGER,
+        swIfLockMaxMacAddresses                                 INTEGER,
+        swIfLockMacAddressesCount                               INTEGER,
+        swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities    AutoNegCapabilitiesBits,
+        swIfOperSpeedDuplexAutoNegotiationLocalCapabilities     AutoNegCapabilitiesBits,
+        swIfSpeedDuplexNegotiationRemoteCapabilities            AutoNegCapabilitiesBits,
+        swIfAdminComboMode                                      INTEGER,
+        swIfOperComboMode                                       INTEGER,
+        swIfAutoNegotiationMasterSlavePreference                INTEGER
+    }
+
+
+swIfIndex OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to the swIfTable. The interface defined by a
+         particular value of this index is the same interface as
+         identified by the same value of ifIndex (MIB II)."
+    ::= {  swIfEntry 1  }
+
+swIfPhysAddressType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        default(1),
+        reserve(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        " This variable indicates whether the physical address assigned to this
+          interface should be the default one or be chosen from the set of
+          reserved physical addresses of the device."
+    DEFVAL { default }
+    ::= {  swIfEntry 2  }
+
+swIfDuplexAdminMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1),
+        half(2),
+        full(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies whether this interface should operate in
+         half duplex or full duplex mode. This specification will take effect
+         only if swIfSpeedDuplexAutoNegotiation is disabled.
+         A value of 'none' is returned if a value of the variable
+         hasn't been set."
+    DEFVAL { none }
+    ::= {  swIfEntry 3  }
+
+swIfDuplexOperMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        half(1),
+        full(2),
+        hybrid(3),
+        unknown(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates whether this interface operates in half
+          duplex or full duplex mode.
+          This variable can have the values hybrid or unknown
+          only for a trunk.
+          unknown - only if trunk operative status is not present."
+    ::= {  swIfEntry 4  }
+
+swIfBackPressureMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether this interface activates back pressure
+         when congested."
+    ::= {  swIfEntry 5 }
+
+swIfTaggedMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enable, this interface operates in tagged mode, i.e all frames sent
+         out through this interface will have the 802.1Q header.
+         If disabled the frames will not be tagged."
+    DEFVAL { disable }
+    ::= {  swIfEntry 6 }
+
+swIfTransceiverType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        regular(1),
+        fiberOptics(2),
+        comboRegular(3),
+        comboFiberOptics(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates the transceiver type of this interface."
+    ::= {  swIfEntry 7  }
+
+swIfLockAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+       locked(1),
+       unlocked(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether this interface should operate in locked
+         or unlocked mode.
+         In unlocked mode the device learns all MAC addresses from this port and
+         forwards all frames arrived at this port. In locked mode no new MAC
+         addresses are learned and only frames with known source MAC
+         addresses are forwarded."
+    DEFVAL { unlocked }
+    ::= {  swIfEntry 8 }
+
+swIfLockOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        locked(1),
+        unlocked(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable defines whether this interface operates in locked
+         or unlocked mode. It is locked in each of the following two cases:
+             1) if swLockAdminStatus  is set to locked
+             2) no IP/IPX interface is defined over this interface and no
+                VLAN contains this interface.
+         In unlocked mode the device learns all MAC addresses from this port and
+         forwards all frames arrived at this port. In locked mode no new MAC
+         addresses are learned and only frames with known source MAC
+         addresses are forwarded."
+    ::= {  swIfEntry 9 }
+
+swIfType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        eth10M(1),
+        eth100M(2),
+        eth1000M(3),
+        eth10G(4),
+        eth20G(5),
+        eth40G(6),
+        eth100G(7),
+        unknown(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " This variable specifies the type of interface."
+    ::= {  swIfEntry 10 }
+
+swIfDefaultTag  OBJECT-TYPE
+    SYNTAX  INTEGER (0..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies the default VLAN tag which will be attached
+         to outgoing frames if swIfTaggedMode for this interface is enabled."
+    DEFVAL { 0 }
+    ::= {  swIfEntry 11 }
+
+swIfDefaultPriority  OBJECT-TYPE
+    SYNTAX  INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " This variable specifies the default port priority."
+    DEFVAL { 0 }
+    ::= { swIfEntry 12 }
+
+swIfStatus OBJECT-TYPE
+   SYNTAX  RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The status of a table entry.
+        It is used to delete an entry from this table."
+  ::= { swIfEntry 13 }
+
+swIfFlowControlMode OBJECT-TYPE
+   SYNTAX  INTEGER {
+      on(1),
+      off(2),
+      autoNegotiation(3),
+      enabledRx(4),
+      enabledTx(5)
+   }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "on - Flow control will be enabled on this interface according to the
+             IEEE 802.3x standard.
+        off - Flow control is disabled.
+        autoNegotiation - Flow control will be enabled or disabled on this
+                          interface. If enabled, it will operate as specified
+                          by the IEEE 802.3x standard.
+        enabledRx - Flow control will be enabled on this interface for
+                    recieved frames.
+        enabledTx - Flow control will be enabled on this interface for
+                    transmitted frames.
+        An attempt to set this object to 'enabledRx(4)' or 'enabledTx(5)'
+        will fail on interfaces that do not support operation
+        at greater than 100 Mb/s.
+        In any case, flow control can work only if swIfDuplexOperMode is
+        full."
+   ::= { swIfEntry  14}
+
+swIfSpeedAdminMode OBJECT-TYPE
+   SYNTAX  INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "This variable specifies the required speed of this interface in bits
+         per second. This specification will take effect only if
+         swIfSpeedDuplexAutoNegotiation is disabled.
+         A value of 10 is returned for 10G.
+         A value of 0 is returned if the value of the variable
+         hasn't been set."
+   DEFVAL { 0 }
+  ::= { swIfEntry  15 }
+
+swIfSpeedDuplexAutoNegotiation OBJECT-TYPE
+   SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+   }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "If enabled the speed and duplex mode will be set by the device through
+       the autonegotiation process. Otherwise these characteristics will be
+       set according to the values of swIfSpeedAdminMode and
+       swIfSpeedDuplexAutoNegotiation."
+  ::= { swIfEntry 16 }
+
+swIfOperFlowControlMode OBJECT-TYPE
+   SYNTAX  INTEGER {
+      on(1),
+      off(2),
+      enabledRx(3),
+      enabledTx(4)
+   }
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "on - Flow control is enabled on this interface according to the
+             IEEE 802.3x standard.
+        off - Flow control is disabled.
+        enabledRx - Flow control is enabled on this interface for
+                    recieved frames.
+        enabledTx - Flow control is enabled on this interface for
+                    transmitted frames."
+  ::= { swIfEntry  17}
+
+swIfOperSpeedDuplexAutoNegotiation OBJECT-TYPE
+   SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2),
+        hybrid(3),
+        unknown(4)
+   }
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "If enabled the speed and duplex are determined by the device through
+       the autonegotiation process.
+       If disabled these characteristics are determined according to the values
+       of swIfSpeedAdminMode and swIfDuplexAdminMode.
+       hybrid - only for a trunk.
+       unknown -  only for ports that there operative status is not present."
+  ::= { swIfEntry 18 }
+
+swIfOperBackPressureMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2),
+        hybrid(3),
+        unknown(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the operative back pressure mode of
+         this interface."
+    ::= {  swIfEntry 19 }
+
+swIfAdminLockAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        discard(1),
+        forwardNormal(2),
+        discardDisable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates which action this interface should be taken
+        in locked mode and therefore relevant only in locked mode.
+        Possible actions:
+        discard(1) - every packet is dropped.
+        forwardNormal(2) - every packet is forwarded according to the DST address.
+        discardDisable(3) - drops the first packet and suspends the port."
+    --DEFVAL { discard } changed to product specific
+    ::= {  swIfEntry 20 }
+
+
+swIfOperLockAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        discard(1),
+        forwardNormal (2),
+        discardDisable(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates which action this interface actually takes in
+        locked mode and therefore relevant only in locked mode.
+        Possible actions:
+        discard(1) - every packet is dropped.
+        forwardNormal(2) - every packet is forwarded according to the DST address.
+        discardDisable(3) - drops the first packet and suspends the port."
+    ::= {  swIfEntry 21 }
+
+
+swIfAdminLockTrapEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether to create a SNMP trap in the locked mode."
+    --DEFVAL { false } changed to product specific
+    ::= {  swIfEntry 22 }
+
+swIfOperLockTrapEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether a SNMP trap can be created in the
+        locked mode."
+    ::= {  swIfEntry 23 }
+
+swIfOperSuspendedStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether the port is suspended or not due to some
+        feature. After reboot this value is false"
+    ::= {  swIfEntry 24 }
+
+swIfLockOperTrapCount  OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 2147483647 )
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the trap counter status per ifIndex
+        (i.e. number of received packets since the last trap sent due to a
+        packet which was received on this ifIndex). It's relevant only in locked
+        mode while trap is enabled."
+    ::= {  swIfEntry 25 }
+
+swIfLockAdminTrapFrequency OBJECT-TYPE
+    SYNTAX  INTEGER (1 .. 1000000)
+--    UNITS    "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the minimal frequency (in seconds) of sending
+        a trap per ifIndex. It's relevant only in locked  mode and in trap
+        enabled."
+    --DEFVAL { 10 } changed to product specific
+    ::= {  swIfEntry 26 }
+
+swIfReActivate OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable reactivates (enables) an ifIndex (which was suspended)"
+    DEFVAL { false }
+    ::= {  swIfEntry 27 }
+
+swIfAdminMdix OBJECT-TYPE
+   SYNTAX  INTEGER {
+      cross(1),
+      normal(2),
+      auto(3)
+   }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The configuration is on a physical port, not include trunks.
+        cross  - The interface should force crossover.
+        normal - The interface should not force crossover.
+        auto    - Auto mdix is enabled on the interface."
+   ::= { swIfEntry 28 }
+
+swIfOperMdix OBJECT-TYPE
+   SYNTAX  INTEGER {
+      cross(1),
+      normal(2),
+      unknown(3)
+   }
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "cross  - The interface is in crossover mode.
+        normal - The interface is not in crossover mode.
+        unknown - Only for port that its operative status is not present
+                  or down."
+   ::= { swIfEntry 29 }
+
+swIfHostMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+       single(1),
+       multiple(2),
+       multiple-auth(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the 802.1X host mode of a port. Relevant when the port's 802.1X control is auto.
+        In addtion multiple-auth was added."
+    DEFVAL { single }
+    ::= {  swIfEntry 30 }
+
+swIfSingleHostViolationAdminAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+       discard(1),
+       forwardNormal (2),
+       discardDisable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates which action this interface should take in single authorized.
+        Possible actions:
+        discard - every packet is dropped.
+        forwardNormal - every packet is forwarded according to the DST address.
+        discardDisable - drops the first packet and suspends the port."
+    DEFVAL { discard }
+    ::= {  swIfEntry 31 }
+
+swIfSingleHostViolationOperAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+       discard(1),
+       forwardNormal (2),
+       discardDisable(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates which action this interface actually takes in single authorized.
+        Possible actions:
+        discard(1) - every packet is dropped.
+        forwardNormal(2) - every packet is forwarded according to the DST address.
+        discardDisable(3) - drops the first packet and suspends the port."
+    DEFVAL { discard }
+    ::= {  swIfEntry 32 }
+
+swIfSingleHostViolationAdminTrapEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether to create a SNMP trap in single authorized."
+    DEFVAL { false }
+    ::= {  swIfEntry 33 }
+
+swIfSingleHostViolationOperTrapEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether a SNMP trap can be created in the single authorized."
+    ::= {  swIfEntry 34 }
+
+swIfSingleHostViolationOperTrapCount OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the trap counter status per ifIndex
+        (i.e. number of received packets since the last trap sent due to a packet
+        which was received on this ifIndex). It's relevant only in single authorized
+        while trap is enabled."
+    ::= {  swIfEntry 35 }
+
+swIfSingleHostViolationAdminTrapFrequency OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 1000000)
+ -- UNITS    "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the minimal frequency (in seconds) of sending a
+        trap per ifIndex. It's relevant only in single authorized and in trap enabled.
+        A value of 0 means that trap is disabled."
+    DEFVAL { 0 }
+    ::= {  swIfEntry 36 }
+
+swIfLockLimitationMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(1),
+        dynamic(2),
+        secure-permanent(3),
+        secure-delete-on-reset(4)
+    }
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "This variable indicates what is the learning limitation on the locked interface.
+        Possible values:
+        disabled - learning is stopped. The dynamic addresses associated with the
+            port are not aged out or relearned on other port as long as the port is
+            locked.
+        dynamic - dynamic addresses can be learned up to the maximum dynamic addresses
+            allowed on the port. Relearning and aging of the dynamic addresses are
+            enabled. The learned addresses aren't kept after reset.
+        secure-permanent - secure addresses can be learned up to the maximum addresses
+            allowed on the port. Relearning and aging of addresses are disabled.
+            The learned addresses are kept after reset.
+        secure-delete-on-reset - secure addresses can be learned up to the maximum addresses
+            allowed on the port. Relearning and aging of addresses are disabled.
+            The learned addresses are not kept after reset."
+    --DEFVAL { disabled } changed to product specific
+    ::= {  swIfEntry 37 }
+
+swIfLockMaxMacAddresses OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable defines the maximum number of dynamic addresses that
+        can be asscoiated with the locked interface. It isn't relevant in
+        disabled limitation mode."
+    DEFVAL { 1 }
+    ::= {  swIfEntry 38 }
+
+swIfLockMacAddressesCount OBJECT-TYPE
+    SYNTAX  INTEGER (0 .. 2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the actual number of dynamic addresses that can
+        be asscoiated with the locked interface. It isn't relevant in disabled
+        limitation mode."
+    ::= {  swIfEntry 39 }
+
+swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities OBJECT-TYPE
+    SYNTAX AutoNegCapabilitiesBits
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Administrative auto negotiation capabilities of the interface that can be advertised when
+        swIfSpeedDuplexAutoNegotiation is enabled.
+        default bit means advertise all the port's capabilities
+        according to its type."
+    DEFVAL { {default} }
+    ::= { swIfEntry 40 }
+
+swIfOperSpeedDuplexAutoNegotiationLocalCapabilities OBJECT-TYPE
+    SYNTAX AutoNegCapabilitiesBits
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Operative auto negotiation capabilities of the remote link.
+        unknown bit means that port operative status is not up."
+    ::= { swIfEntry 41 }
+
+swIfSpeedDuplexNegotiationRemoteCapabilities OBJECT-TYPE
+    SYNTAX AutoNegCapabilitiesBits
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Operative auto negotiation capabilities of the remote link.
+        unknown bit means that port operative status is not up,
+        or auto negotiation process not complete,
+        or remote link is not auto negotiation able."
+    ::= { swIfEntry 42 }
+
+swIfAdminComboMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        force-fiber(1),
+        force-copper(2),
+        prefer-fiber(3),
+        prefer-copper(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies the administrative mode of a combo Ethernet interface."
+    DEFVAL { prefer-fiber }
+    ::= {  swIfEntry 43  }
+
+swIfOperComboMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        fiber(1),
+        copper(2),
+        unknown(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies the operative mode of a combo Ethernet interface."
+    ::= {  swIfEntry 44  }
+
+swIfAutoNegotiationMasterSlavePreference OBJECT-TYPE
+    SYNTAX  INTEGER {
+        preferMaster(1),
+        preferSlave(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies the administrative mode of the Maste-Slave preference in auto negotiation."
+--    DEFVAL - according to MTSC parameter
+    ::= {  swIfEntry 45 }
+
+
+
+--
+-- swIfMibVersion
+--
+swIfMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The swIfTable Mib's version, the current version is 3."
+    ::= { swInterfaces 2 }
+
+
+--
+-- swIfPortLockSupport
+--
+swIfPortLockSupport OBJECT-TYPE
+    SYNTAX  INTEGER {
+        supported (1),
+        notSupported (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "indicates if the locked port package is supported."
+    ::= { swInterfaces 3 }
+
+
+--
+-- swIfPortLockActionSupport
+--
+swIfPortLockActionSupport OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "indicates which port lock actions are supported:
+                (bit 0 is the most significant bit)
+            bit 0 - discard
+            bit 1 - forwardNormal
+            bit 2 - discardDisable"
+    ::= { swInterfaces 4 }
+
+
+--
+-- swIfPortLockTrapSupport
+--
+swIfPortLockTrapSupport OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "indicates with which port lock actions the trap option is supported
+        (e.g. discard indicates that trap is supported only when the portlock
+         action is discard):
+                (bit 0 is the most significant bit)
+            bit 0 - discard
+            bit 1 - forwardNormal
+            bit 2 - discardDisable"
+    ::= { swInterfaces 5 }
+
+
+
+--
+-- swIfPortLockIfRangeTable
+--
+swIfPortLockIfRangeTable    OBJECT-TYPE
+   SYNTAX  SEQUENCE  OF SwIfPortLockIfRangeEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Port lock interfaces range configuration"
+   ::=  { swInterfaces 6 }
+
+swIfPortLockIfRangeEntry OBJECT-TYPE
+   SYNTAX  SwIfPortLockIfRangeEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Defines the contents of each line in the swIfPortLockIfRangeTable table."
+   INDEX   { swIfPortLockIfRangeIndex }
+   ::=  { swIfPortLockIfRangeTable 1 }
+
+SwIfPortLockIfRangeEntry ::= SEQUENCE {
+        swIfPortLockIfRangeIndex           INTEGER,
+        swIfPortLockIfRange                PortList,
+        swIfPortLockIfRangeLockStatus      INTEGER,
+        swIfPortLockIfRangeAction          INTEGER,
+        swIfPortLockIfRangeTrapEn          TruthValue,
+        swIfPortLockIfRangeTrapFreq        INTEGER
+    }
+
+swIfPortLockIfRangeIndex OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to the swIfPortLockIfRangeTable."
+    ::= {  swIfPortLockIfRangeEntry 1  }
+
+swIfPortLockIfRange OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The set of interfaces to which the port lock parameters should be configured"
+    ::= { swIfPortLockIfRangeEntry 2 }
+
+swIfPortLockIfRangeLockStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+       locked(1),
+       unlocked(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether the interfaces range should operate in locked
+         or unlocked mode.
+         In unlocked mode the device learns all MAC addresses from these interfaces and
+         forwards all frames arrived at these interfaces. In locked mode no new MAC
+         addresses are learned and only frames with known source MAC
+         addresses are forwarded."
+    DEFVAL { unlocked }
+    ::= { swIfPortLockIfRangeEntry 3 }
+
+swIfPortLockIfRangeAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        discard(1),
+        forwardNormal(2),
+        discardDisable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates which action for these interfaces should be take
+        in locked mode and therefore relevant only in locked mode.
+        Possible actions:
+        discard(1) - every packet is dropped.
+        forwardNormal(2) - every packet is forwarded according to the DST address.
+        discardDisable(3) - drops the first packet and suspends the port."
+    --DEFVAL { discard } changed to product specific
+    ::= {  swIfPortLockIfRangeEntry 4 }
+
+swIfPortLockIfRangeTrapEn OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether to create a SNMP trap in the locked mode."
+    --DEFVAL { false } changed to product specific
+    ::= {  swIfPortLockIfRangeEntry 5 }
+
+swIfPortLockIfRangeTrapFreq OBJECT-TYPE
+    SYNTAX  INTEGER (1 .. 1000000)
+--    UNITS    "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the minimal frequency (in seconds) of sending
+        a trap for these interfaces. It's relevant only in locked  mode and in trap
+        enabled."
+    --DEFVAL { 10 } changed to product specific
+    ::= {  swIfPortLockIfRangeEntry 6 }
+
+--
+-- swIfExtTable
+--
+
+swIfExtTable    OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF SwIfExtEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Display information and configuration of the device interfaces."
+    ::=  { swInterfaces 7 }
+
+swIfExtEntry OBJECT-TYPE
+    SYNTAX  SwIfExtEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Defines the contents of each row in the swIfExtTable."
+    INDEX   { ifIndex }
+    ::=  { swIfExtTable 1 }
+
+SwIfExtEntry ::= SEQUENCE {
+        swIfExtSFPSpeed    INTEGER
+    }
+
+swIfExtSFPSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        default(1),
+        eth100M(2),
+        eth1G(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure speed of an SFP Ethernet interface."
+    DEFVAL { default }
+    ::= {  swIfExtEntry 1  }
+
+--
+-- rlIfInterfaces
+--
+
+rlIfMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlIfInterfaces 1 }
+
+rlIfNumOfPhPorts OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of physical ports on this device
+         (including all stack units)"
+    ::= { rlIfInterfaces 2 }
+
+rlIfMapOfOnPhPorts OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS          read-only
+    STATUS      current
+    DESCRIPTION
+       "Each bit in this octet string indicates that the correspondig port's
+        ifOperStatus is ON if set.
+        The mapping of port number to bits in this octet string is as follows:
+        The port with the L2 interface number 1 is mapped to the least
+        significant bit of the 1st octet, the port with L2 ifNumber 2 to the
+        next significant bit in the 1st octet, port 8 to the most-significant
+        bit of the in the 1st octet, port 9 to the least
+        significant bit of the 2nd octet, etc. and in general,
+        port n to bit corresponding to 2**((n mod 8) -1) in byte n/8 + 1"
+    ::= { rlIfInterfaces 3 }
+
+rlIfClearPortMibCounters OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Each bit that is set in this portList represent a port that
+         its mib counters should be reset."
+    ::= { rlIfInterfaces 4 }
+
+rlIfNumOfUserDefinedPorts OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user defined ports on this device."
+    ::= { rlIfInterfaces 5 }
+
+rlIfFirstOutOfBandIfIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS          read-only
+    STATUS      current
+    DESCRIPTION
+        "First ifIndex of out-of-band port.
+         This scalar exists only the device has out of band ports."
+    ::= { rlIfInterfaces 6 }
+
+rlIfNumOfLoopbackPorts OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of loopback ports on this device."
+    ::= { rlIfInterfaces 7 }
+
+rlIfFirstLoopbackIfIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "First ifIndex of loopback port.
+         This scalar will exists only if rlIfNumOfLoopbackPorts
+         is different from 0."
+    ::= { rlIfInterfaces 8 }
+
+rlIfExistingPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates which ports/trunks exist in the system.
+         It doesn't indicate which are present."
+    ::= { rlIfInterfaces 9 }
+
+rlIfBaseMACAddressPerIfIndex OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the system will assign a unique MAC per Ethernet port or not."
+    ::= { rlIfInterfaces 10 }
+
+rlFlowControlCascadeMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "enable disable flow control on cascade ports"
+    ::= { rlIfInterfaces 11 }
+
+rlFlowControlCascadeType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        internalonly(1),
+        internalexternal(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "define which type of ports will be affected by flow control on cascade ports"
+    ::= { rlIfInterfaces 12 }
+
+rlFlowControlRxPerSystem OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "define if flow control RX is supported per system."
+    ::= { rlIfInterfaces 13 }
+
+rlCascadePortProtectionAction OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "As a result of this set all of the local cascade ports
+         will stop being consider unstable and will be force up."
+    ::= { rlIfInterfaces 14 }
+
+rlManagementIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify L2 bound management interface index in a single IP address system
+        when configurable management interface is supported."
+    ::= { rlIfInterfaces 15 }
+
+rlIfClearStackPortsCounters OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "As a result of this set all counters of
+         all external cascade ports will be cleared."
+    ::= { rlIfInterfaces 16 }
+
+rlIfClearPortMacAddresses OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "if port is non secure, its all dynamic MAC addresses are cleared.
+          if port is secure, its all secure MAC addresses which have learned or configured are cleared."
+    ::= { rlIfInterfaces 17 }
+
+rlIfCutThroughPacketLength OBJECT-TYPE
+    SYNTAX      INTEGER (257 .. 16383)
+    MAX-ACCESS  read-write
+--              Obsolete
+    STATUS      current
+    DESCRIPTION
+        "The default packet length that is assigned to a packet in the
+         Cut-Through mode."
+    DEFVAL { 1522 }
+    ::= { rlIfInterfaces 18 }
+
+rlIfCutPriorityZero OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 0."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 19 }
+
+rlIfCutPriorityOne OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 1."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 20 }
+
+rlIfCutPriorityTwo OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 2."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 21 }
+
+rlIfCutPriorityThree OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 3."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 22 }
+
+rlIfCutPriorityFour OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 4."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 23 }
+
+rlIfCutPriorityFive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 5."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 24 }
+
+rlIfCutPrioritySix OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 6."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 25 }
+
+rlIfCutPrioritySeven OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-Through for priority 7."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 26 }
+
+rlIfCutThroughTable    OBJECT-TYPE
+   SYNTAX  SEQUENCE  OF RlIfCutThroughEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Information and configuration of cut-through feature."
+   ::=  { rlIfInterfaces 27 }
+
+rlIfCutThroughEntry OBJECT-TYPE
+   SYNTAX  RlIfCutThroughEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Defines the contents of each line in the swIfTable table."
+   INDEX   { swIfIndex }
+   ::=  { rlIfCutThroughTable 1 }
+
+RlIfCutThroughEntry ::= SEQUENCE {
+        rlIfCutThroughPriorityEnable                            TruthValue,
+        rlIfCutThroughUntaggedEnable                            TruthValue,
+        rlIfCutThroughOperMode                                  TruthValue
+    }
+
+rlIfCutThroughPriorityEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-through for a priority for an interface."
+    DEFVAL { false }
+    ::= {  rlIfCutThroughEntry 1  }
+
+rlIfCutThroughUntaggedEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable cut-through for untagged packets for an interface."
+    DEFVAL { false }
+    ::= {  rlIfCutThroughEntry 2  }
+
+rlIfCutThroughOperMode  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational mode of spesific cut-through interface."
+    ::= {  rlIfCutThroughEntry 3  }
+
+rlCutThroughPacketLength OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The default packet length that is assigned to a packet in the
+         Cut-Through mode."
+    ::= { rlIfInterfaces 28 }
+
+rlCutThroughPacketLengthAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER (257 .. 16383)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default packet length that is assigned to a packet in the
+         Cut-Through mode after reset."
+    DEFVAL { 1522 }
+    ::= { rlIfInterfaces 29 }
+
+rlCutThroughEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Cut-Through global enable mode."
+    ::= { rlIfInterfaces 30 }
+
+rlCutThroughEnableAfterReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Cut-Through global enable mode after reset."
+    DEFVAL { false }
+    ::= { rlIfInterfaces 31 }
+
+rlFlowControlMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        send-receive(1),
+        receive-only(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Define which mode will be enabled on flow control enabled ports.
+        The interfaces with enabled flow control will receive pause frames, but will not send flow control pause
+        frames
+        Send-receive: The interfaces with enabled flow control will receive and send pause frames.
+        Receive-only: The interfaces with enabled flow control will receive pause frames, but will not send flow
+       control pause frames."
+
+    ::= { rlIfInterfaces 32 }
+
+
+
+END
+
+

@@ -1,0 +1,229 @@
+CISCOSB-PHY-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB PHY MIB
+-- Version:    7.38
+-- Date:       10 Sep 2004
+--
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY                FROM SNMPv2-SMI
+    ifIndex                                     FROM IF-MIB
+    TimeStamp, DisplayString                    FROM SNMPv2-TC
+    switch001                                   FROM CISCOSB-MIB
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
+
+   rlPhy MODULE-IDENTITY
+      LAST-UPDATED "200209300024Z"  -- September 30, 2002
+      ORGANIZATION "Cisco Systems, Inc."
+
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
+
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+      DESCRIPTION
+              "The MIB module describes the private MIB for testing Layer1 interfaces supported
+               by CISCOSB's software and products."
+      REVISION     "200209300024Z"  -- September 30, 2002
+      DESCRIPTION
+              "Initial revision"
+      REVISION     "200309210024Z"  -- September 21, 2003
+      DESCRIPTION
+              "Added MODULE-IDENTITY and TEXTUAL-CONVENTION IMPORTS."
+      ::= { switch001 90  }
+
+
+RlPhyTestType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A value indicating the test to perform."
+   SYNTAX  INTEGER {
+        rlPhyTestTableNoTest(1),
+        rlPhyTestTableCableStatus(2),
+        rlPhyTestTableCableFault(3),
+        rlPhyTestTableCableLength(4),
+        rlPhyTestTableTransceiverTemp(5),
+        rlPhyTestTableTransceiverSupply(6),
+        rlPhyTestTableTxBias(7),
+        rlPhyTestTableTxOutput(8),
+        rlPhyTestTableRxOpticalPower(9),
+        rlPhyTestTableDataReady(10),
+        rlPhyTestTableLOS(11),
+        rlPhyTestTableTxFault(12),
+        rlPhyTestTableCableChannel1(13),
+        rlPhyTestTableCableChannel2(14),
+        rlPhyTestTableCableChannel3(15),
+        rlPhyTestTableCableChannel4(16),
+        rlPhyTestTableCablePolarity1(17),
+        rlPhyTestTableCablePolarity2(18),
+        rlPhyTestTableCablePolarity3(19),
+        rlPhyTestTableCablePolarity4(20),
+        rlPhyTestTableCablePairSkew1(21),
+        rlPhyTestTableCablePairSkew2(22),
+        rlPhyTestTableCablePairSkew3(23),
+        rlPhyTestTableCablePairSkew4(24)
+    }
+
+rlPhyTest OBJECT IDENTIFIER ::= { rlPhy 1 }
+
+rlPhyTestSetTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPhyTestSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rlPhyTest 1}
+
+rlPhyTestSetEntry OBJECT-TYPE
+    SYNTAX       RlPhyTestSetEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "An entry containing objects for invoking tests on an interface."
+    INDEX {ifIndex }
+    ::= { rlPhyTestSetTable 1 }
+
+RlPhyTestSetEntry ::=
+    SEQUENCE {
+        rlPhyTestSetType        RlPhyTestType
+    }
+
+rlPhyTestSetType       OBJECT-TYPE
+    SYNTAX  RlPhyTestType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "A control variable used to start operator initiated interface
+             tests.1 indicates that no test has been initiated. Only
+             operator initiated interface tests can be set to this variable."
+              ::= { rlPhyTestSetEntry 1 }
+
+rlPhyTestGetTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhyTestGetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { rlPhyTest 2 }
+
+rlPhyTestGetEntry OBJECT-TYPE
+    SYNTAX       RlPhyTestGetEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "An entry containing results of tests on an interface."
+    INDEX {ifIndex, rlPhyTestGetType}
+    ::= { rlPhyTestGetTable 1 }
+
+RlPhyTestGetEntry ::=
+    SEQUENCE {
+        rlPhyTestGetType        RlPhyTestType,
+        rlPhyTestGetStatus      INTEGER,
+        rlPhyTestGetResult      INTEGER,
+        rlPhyTestGetUnits       INTEGER,
+        rlPhyTestGetAlarm       INTEGER,
+        rlPhyTestGetTimeStamp   DisplayString
+    }
+
+rlPhyTestGetType       OBJECT-TYPE
+    SYNTAX     RlPhyTestType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A control variable used to, 1 to indicate that this test can be
+            done on the specified port, 2 to initiate the test whenever the
+            user wishes"
+              ::= { rlPhyTestGetEntry 1 }
+
+rlPhyTestGetStatus  OBJECT-TYPE
+    SYNTAX       INTEGER {
+        none(1),          -- no test yet requested
+        success(2),
+        inProgress(3),
+        notSupported(4),
+        unAbleToRun(5),   -- due to state of system
+        aborted(6),
+        failed(7)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object contains the status of the most recently
+        requested test for operator initiated tests or the value
+        none(1) if no tests have been requested since the last
+        reset. For non operator initiated tests the value is always
+        none(1).
+        Note that this facility provides no provision for saving
+        the results of one test when starting another, as could
+        be required if used by multiple managers concurrently."
+    ::= { rlPhyTestGetEntry 2 }
+
+rlPhyTestGetResult  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "This object holds the test result"
+    ::= { rlPhyTestGetEntry 3 }
+
+rlPhyTestGetUnits   OBJECT-TYPE
+   SYNTAX  INTEGER {
+        integer(1),
+        boolean(2),
+        downUP(3),
+        reverseNormal(4),
+        mdiMdix(5),
+        meter(6),
+        degree(7),  -- Celsius
+        microVolt(8),
+        microOham(9),
+        microAmper(10),
+        microWatt(11),
+        millisecond(12),
+        alaskaPhyLength(13),
+        alaskaPhyStatus(14),
+        dbm(15),
+        decidbm(16),
+        milidbm(17),
+        abcd(18),
+        nanosecond(19)
+            }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The test result unit of measure. The units can be standard unit or special units
+         that are designed for special test.
+
+         The alaskaPhyLength unit is design for the VCT diagnostic and its values are:
+         less_than_50M(1), 50-80M(2), 80-110M(3), 110-140M(4), more_than_140M(5).
+
+         The alaskaPhyStatus unit is design for the VCT diagnostic and its values are:
+         4_pair_cable(1), 2_pair_cable(2), no_cable(3), open_cable(4), short_cable(5), bad_cable(6), impedance_mismatch(7)."
+   ::= { rlPhyTestGetEntry 4 }
+
+rlPhyTestGetAlarm   OBJECT-TYPE
+   SYNTAX  INTEGER {
+        notRelevant(1),
+        noAlarmSet(2),
+        lowWarning(3),
+        highWarning(4),
+        lowAlarm(5),
+        highAlarm(6)
+   }
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+        "This object hold the Alarm for this Entry. only Test that have can have alarms
+          use this field, other holds the Value notRelevant(1) "
+   ::= { rlPhyTestGetEntry 5 }
+
+rlPhyTestGetTimeStamp   OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE(1..32))
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+        "The time in string (formated DD-MMM-YYYY HH:MM:SS e.g
+         14-Apr-2002 10:33:31)"
+    ::= { rlPhyTestGetEntry 6 }
+
+END

@@ -1,0 +1,45 @@
+sudo: required
+language: php
+services:
+  - mysql
+matrix:
+  fast_finish: true
+  include:
+  - php: 7.2
+  - php: 7.1
+    env: SKIP_STYLE_CHECK=1
+  - php: 7.0
+    env: SKIP_STYLE_CHECK=1
+  - php: 5.6
+    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
+#  - php: hhvm
+#    env: SKIP_STYLE_CHECK=1
+
+  allow_failures:
+  - php: hhvm
+
+cache:
+  directories:
+    - vendor
+    - $HOME/.cache/pip
+    - $HOME/.composer/cache
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y snmp fping
+  - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
+
+install:
+  - composer install --prefer-dist --no-interaction
+  - pip install --user snmpsim pylint mysql-python
+
+after_failure:
+  - tail /tmp/snmpsimd.log
+
+script:
+  - php scripts/pre-commit.php -l
+  - php scripts/pre-commit.php -s
+  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
+  - bash -n daily.sh
+  - pylint -E poller-wrapper.py discovery-wrapper.py
+  - bash scripts/deploy-docs.sh

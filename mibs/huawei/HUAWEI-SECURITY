@@ -1,0 +1,713 @@
+-- ==================================================================
+-- Copyright (C) 2008 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI SECURITY MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2008-3-12 publish
+-- ==================================================================
+          
+    HUAWEI-SECURITY-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+          hwDatacomm            
+              FROM HUAWEI-MIB            
+          OBJECT-GROUP, MODULE-COMPLIANCE            
+              FROM SNMPv2-CONF            
+          Integer32, OBJECT-TYPE, MODULE-IDENTITY
+              FROM SNMPv2-SMI
+          EnabledStatus
+              FROM P-BRIDGE-MIB;
+                      
+          hwSecurityMIB MODULE-IDENTITY 
+          LAST-UPDATED "200803121015Z"
+          ORGANIZATION 
+              "Huawei Technologies Co.,Ltd."
+          CONTACT-INFO 
+              "8090 Team Huawei Technologies Co.,Ltd.
+              Huawei Bld.,NO.3 Xinxi Rd., 
+              Shang-Di Information Industry Base,
+              Hai-Dian District Beijing P.R. China
+              http://www.huawei.com
+              Zip:100085
+              "  
+          DESCRIPTION 
+              "The private mib file includes the general extent 
+              information of the device.hwDatacomm(165).hwSecurityMIB." 
+          ::= { hwDatacomm 165 }  
+          
+                            
+      hwBaseSecurityMIBObjects OBJECT IDENTIFIER ::= { hwSecurityMIB 1 }
+      
+      hwLocalUrpf OBJECT IDENTIFIER ::= { hwBaseSecurityMIBObjects 2 }
+             
+      hwLocalUrpfTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwLocalUrpfEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " The table lists the information about local URPF Packets. "
+          ::= { hwLocalUrpf 1 }
+            
+      hwLocalUrpfEntry OBJECT-TYPE
+          SYNTAX HwLocalUrpfEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " The table lists the information about local URPF protection." 
+          INDEX  { hwLocalUrpfChassisId , hwLocalUrpfSlotId }    
+          ::= { hwLocalUrpfTable 1 }           
+    
+      HwLocalUrpfEntry  ::= 
+          SEQUENCE{
+              hwLocalUrpfChassisId
+                  INTEGER,   
+              hwLocalUrpfSlotId
+                  Integer32,   
+              hwLocalUrpfCurrentRateLow             
+                  Integer32,
+              hwLocalUrpfCurrentRateHigh             
+                  Integer32,
+              hwLocalUrpfNotifyEnabledStatus
+                  EnabledStatus,
+              hwLocalUrpfRateThreshold
+                  Integer32, 
+              hwLocalUrpfRateInterval
+                  Integer32              
+                  }                      
+
+      hwLocalUrpfChassisId OBJECT-TYPE
+          SYNTAX      INTEGER{
+                       clc1(1),
+                       clc2(2),
+                       clc3(3),
+                       clc4(4),
+                       clc5(5),
+                       clc6(6),
+                       clc7(7),
+                       clc8(8)
+                      }
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION              
+              "The Data index of local URPF,the chassis ID indicates the slot on which chassis is configured with URPF."
+          ::= { hwLocalUrpfEntry 1 }
+          
+      hwLocalUrpfSlotId OBJECT-TYPE
+          SYNTAX Integer32(1..16)
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "The Data index of local URPF,the slot configured with URPF."
+          ::= { hwLocalUrpfEntry 2 }
+          
+      hwLocalUrpfCurrentRateLow OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION              
+              "The lower 32 bits discard number during the interval of local URPF.unit(packet)."
+          ::= { hwLocalUrpfEntry 11 }
+          
+      hwLocalUrpfCurrentRateHigh OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "The upper 32 bits discard number during the interval of local URPF.unit(packet)."
+          ::= { hwLocalUrpfEntry 12 } 
+          
+      hwLocalUrpfNotifyEnabledStatus OBJECT-TYPE
+        SYNTAX        EnabledStatus
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION              
+              "The alarm state of local URPF."
+        ::= { hwLocalUrpfEntry 13 }
+        
+      hwLocalUrpfRateThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+              "Local URPF's discard threshold during the configured interval.unit(packet)."
+        ::= { hwLocalUrpfEntry 14 } 
+      
+      hwLocalUrpfRateInterval OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION             
+              "The detection interval of the local URPF.unit(s). "
+        ::= { hwLocalUrpfEntry 15 }
+           
+      hwTcpIpDefend OBJECT IDENTIFIER ::= { hwBaseSecurityMIBObjects 3 }
+                                  
+      hwTcpIpDefendTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwTcpIpDefendEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION              
+              "This table list the information about TCPIP protection."
+          ::= { hwTcpIpDefend 1 }
+            
+      hwTcpIpDefendEntry OBJECT-TYPE
+          SYNTAX      HwTcpIpDefendEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table list the information about TCPIP protection." 
+          INDEX  { hwTcpIpDefendChassisId, 
+                   hwTcpIpDefendSlotId,
+                   hwTcpIpDefendType
+                 }    
+          ::= { hwTcpIpDefendTable 1 }  
+                       
+      HwTcpIpDefendEntry  ::= 
+          SEQUENCE{
+              hwTcpIpDefendChassisId
+                  INTEGER,   
+              hwTcpIpDefendSlotId
+                  Integer32,   
+              hwTcpIpDefendType
+                  INTEGER,   
+              hwTcpIpDefendCurrentRateLow             
+                  Integer32,
+              hwTcpIpDefendCurrentRateHigh             
+                  Integer32,
+              hwTcpIpDefendNotifyEnabledStatus
+                  EnabledStatus,
+              hwTcpIpDefendRateThreshold
+                  Integer32,
+              hwTcpIpDefendRateInterval
+                  Integer32                  
+                  }                  
+
+      hwTcpIpDefendChassisId OBJECT-TYPE
+          SYNTAX      INTEGER{
+                       clc1(1),
+                       clc2(2),
+                       clc3(3),
+                       clc4(4),
+                       clc5(5),
+                       clc6(6),
+                       clc7(7),
+                       clc8(8)
+                      }
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "The Data index of TCPIP protection,the chassis ID indicates the slot on which chassis is configured with TCPIP protection."
+          ::= { hwTcpIpDefendEntry 1 }
+          
+      hwTcpIpDefendSlotId OBJECT-TYPE
+          SYNTAX      Integer32(1..16)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "The Data index of TCPIP protection,the slot configured with TCPIP protection."
+          ::= { hwTcpIpDefendEntry 2 }
+          
+      hwTcpIpDefendType OBJECT-TYPE
+          SYNTAX      INTEGER{
+                       abnormalPacket(1),
+                       udpPacket(2),
+                       tcpSyn(3),
+                       ipFragmentation(4)
+                      }
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "The Data index of TCPIP protection,the type of TCPIP protection."
+          ::= { hwTcpIpDefendEntry 3 }
+          
+      hwTcpIpDefendCurrentRateLow OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "The lower 32 bits discard number during the interval of TCPIP protection.unit(packet)."
+          ::= { hwTcpIpDefendEntry 11 }
+          
+      hwTcpIpDefendCurrentRateHigh OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "The upper 32 bits discard number during the interval of TCPIP protection.unit(packet)."
+          ::= { hwTcpIpDefendEntry 12 }
+      
+      hwTcpIpDefendNotifyEnabledStatus OBJECT-TYPE
+          SYNTAX      EnabledStatus
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "The alarm state of TCPIP protection."
+          ::= { hwTcpIpDefendEntry 13 }
+          
+      hwTcpIpDefendRateThreshold OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "TCPIP protection's discard threshold during the configured interval.unit(packet)."
+          ::= { hwTcpIpDefendEntry 14 } 
+          
+      hwTcpIpDefendRateInterval OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "The detection interval of TCPIP protection.unit(s)."
+          ::= { hwTcpIpDefendEntry 15 }
+
+          
+      hwMaDefend OBJECT IDENTIFIER ::= { hwBaseSecurityMIBObjects 4 }
+
+      hwMaDefendTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwMaDefendEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table list the information about management and application protection."
+          ::= { hwMaDefend 1 }
+            
+      hwMaDefendEntry OBJECT-TYPE
+          SYNTAX      HwMaDefendEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table list the information about management and application protection."
+          INDEX  { hwMaDefendChassisId,
+                   hwMaDefendSlotId, 
+                   hwMaDefendProtocol}    
+          ::= { hwMaDefendTable 1 }  
+                       
+      HwMaDefendEntry  ::= 
+          SEQUENCE{
+              hwMaDefendChassisId
+                  INTEGER,   
+              hwMaDefendSlotId
+                  Integer32,
+              hwMaDefendProtocol
+                  INTEGER,  
+              hwMaDefendCurrentRateLow             
+                  Integer32,
+              hwMaDefendCurrentRateHigh             
+                  Integer32,
+              hwMaDefendNotifyEnabledStatus
+                  EnabledStatus,
+              hwMaDefendRateThreshold
+                  Integer32,
+              hwMaDefendRateInterval
+                  Integer32           
+                  }                  
+
+      hwMaDefendChassisId OBJECT-TYPE
+          SYNTAX     INTEGER{
+                     clc1(1),
+                     clc2(2),
+                     clc3(3),
+                     clc4(4),
+                     clc5(5),
+                     clc6(6),
+                     clc7(7),
+                     clc8(8)
+                     }
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION
+              "The Data index of management and application protection,the chassis ID indicates the slot on which chassis is configured with management and application protection."
+          ::= { hwMaDefendEntry 1 }
+          
+      hwMaDefendSlotId OBJECT-TYPE
+          SYNTAX     Integer32(1..16)
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION
+              "The Data index of management and application protection,the slots configured with management and application protection."
+          ::= { hwMaDefendEntry 2 }
+      
+      hwMaDefendProtocol OBJECT-TYPE
+          SYNTAX     INTEGER{
+                      ftp(1),
+                      ssh(2), 
+                      snmp(3),
+                      telnet(4),
+                      tftp(5),
+                      bgp(6),
+                      ldp(7),
+                      rsvp(8),
+                      ospf(9),
+                      rip(10)
+                        }
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION
+              "The Data index of management and application protection,the protocols configured in management and application protection."
+          ::= { hwMaDefendEntry 3 }
+          
+      hwMaDefendCurrentRateLow OBJECT-TYPE
+          SYNTAX     Integer32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+              "The lower 32 bits discard number during the interval of management and application protection.unit(packet)."
+          ::= { hwMaDefendEntry 11 }
+          
+      hwMaDefendCurrentRateHigh OBJECT-TYPE
+          SYNTAX     Integer32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+              "The upper 32 bits discard number during the interval of management and application protection.unit(packet)."
+          ::= { hwMaDefendEntry 12 }
+      
+      hwMaDefendNotifyEnabledStatus OBJECT-TYPE
+        SYNTAX       EnabledStatus
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+              "The alarm state of management and application protection."
+            ::= { hwMaDefendEntry 13 }
+            
+      hwMaDefendRateThreshold OBJECT-TYPE
+          SYNTAX     Integer32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+              "The discard threshold of management and application protection during the configured interval.unit(packet)."
+          ::= { hwMaDefendEntry 14 }
+          
+      hwMaDefendRateInterval OBJECT-TYPE
+          SYNTAX     Integer32
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+              "The detection interval of management and application protection. unit(s)."
+          ::= { hwMaDefendEntry 15 }  
+                     
+          
+      hwApplicationApperceive OBJECT IDENTIFIER ::= { hwBaseSecurityMIBObjects 5 }
+      
+      hwApplicationApperceiveTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwApplicationApperceiveEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table list the information about Application-Apperceive protection."
+          ::= { hwApplicationApperceive 1 }
+            
+      hwApplicationApperceiveEntry OBJECT-TYPE
+          SYNTAX      HwApplicationApperceiveEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "This table list the information about Application-Apperceive protection."
+          INDEX  { hwAppliApperChassisId,
+                   hwAppliApperSlotId, 
+                   hwAppliApperProtocol}    
+          ::= { hwApplicationApperceiveTable 1 }  
+                       
+      HwApplicationApperceiveEntry  ::= 
+          SEQUENCE{
+              hwAppliApperChassisId
+                  INTEGER,   
+              hwAppliApperSlotId
+                  Integer32,
+              hwAppliApperProtocol
+                  INTEGER,  
+              hwAppliApperCurrentRateLow             
+                  Integer32,
+              hwAppliApperCurrentRateHigh             
+                  Integer32,
+              hwAppliApperNotifyEnabledStatus
+                  EnabledStatus,
+              hwAppliApperRateThreshold
+                  Integer32,
+              hwAppliApperRateInterval
+                  Integer32
+                  }                  
+
+      hwAppliApperChassisId OBJECT-TYPE
+          SYNTAX     INTEGER{
+                     clc1(1),
+                     clc2(2),
+                     clc3(3),
+                     clc4(4),
+                     clc5(5),
+                     clc6(6),
+                     clc7(7),
+                     clc8(8)
+                     }
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION
+              "The Data index of Application-Apperceive protection,the chassis ID indicates the slot on which chassis is configured with Application-Apperceive protection."
+          ::= { hwApplicationApperceiveEntry 1 }
+          
+      hwAppliApperSlotId OBJECT-TYPE
+          SYNTAX Integer32(1..16)
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "The Data index of Application-Apperceive protection,the slots configured with Application-Apperceive protection."
+          ::= { hwApplicationApperceiveEntry 2 }
+          
+      hwAppliApperProtocol OBJECT-TYPE
+          SYNTAX INTEGER{
+                      ftpServer(1),
+                      sshServer(2), 
+                      snmp(3),
+                      telnetServer(4),
+                      tftp(5),
+                      bgp(6),
+                      ldp(7),
+                      rsvp(8),
+                      ospf(9),
+                      rip(10),
+                      isis(11),
+                      sftpSever(12),
+                      icmp(13),
+                      msdp(14),
+                      pim(15),
+                      ipv4Arp(16),
+                      bpdu(17),
+                      dhcp(18),
+                      lacp(19),
+                      ntp(20),
+                      radius(21),
+                      hwTacacs(22),
+                      lspPing(23),
+                      igmp(24),
+                      vgmp(25),
+                      rrpp(26),
+                      vrrp(27),
+                      bfd(28),
+                      mplsOam(29),
+                      eth8021ag(30),
+                      ftpClient(31),
+                      telnetClient(32),
+                      sshClient(33),
+                      sftpClient(34),
+                      dnsClient(35)
+                        }
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "The Data index of Application-Apperceive protection,the protocol configured in Application-Apperceive protection."
+          ::= { hwApplicationApperceiveEntry 3 }
+          
+      hwAppliApperCurrentRateLow OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The lower 32 bits discard number during the interval of Application-Apperceive protection.unit(packet)."
+          ::= { hwApplicationApperceiveEntry 11 }
+          
+      hwAppliApperCurrentRateHigh OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The upper 32 bits discard number during the interval of Application-Apperceive protection.unit(packet)."
+          ::= { hwApplicationApperceiveEntry 12 }
+      
+      hwAppliApperNotifyEnabledStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The alarm state of Application-Apperceive protection."
+        ::= { hwApplicationApperceiveEntry 13 }
+            
+      hwAppliApperRateThreshold OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The discard threshold of Application-Apperceive protection during the configured interval.unit(packet)."
+          ::= { hwApplicationApperceiveEntry 14 }     
+      
+      hwAppliApperRateInterval OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The detect interval of Application-Apperceive protection. unit(s)."
+          ::= { hwApplicationApperceiveEntry 15 }
+      
+      hwBaseSecurityNotifications OBJECT IDENTIFIER ::= { hwBaseSecurityMIBObjects 11 }
+      
+      hwBaseSecurityUrpfDiscardedRateRising NOTIFICATION-TYPE
+          OBJECTS { hwLocalUrpfCurrentRateLow, hwLocalUrpfCurrentRateHigh, hwLocalUrpfRateThreshold}
+          STATUS current
+          DESCRIPTION 
+              " The discard packets exceed the threshold of local URPF protection."
+          ::= { hwBaseSecurityNotifications 1 }
+            
+      hwBaseSecurityUrpfDiscardedRateResume NOTIFICATION-TYPE
+          OBJECTS { hwLocalUrpfCurrentRateLow, hwLocalUrpfCurrentRateHigh, hwLocalUrpfRateThreshold}
+          STATUS current
+          DESCRIPTION 
+              " The alarm of local URPF is resumed."
+          ::= { hwBaseSecurityNotifications  2 } 
+          
+      hwBaseSecurityTcpIpAttackDiscardedRateRising NOTIFICATION-TYPE
+          OBJECTS { hwTcpIpDefendCurrentRateLow, hwTcpIpDefendCurrentRateHigh, hwTcpIpDefendRateThreshold, hwTcpIpDefendRateInterval}
+          STATUS current
+          DESCRIPTION 
+              " The discard packets exceed the threshold of TCPIP protection. "
+          ::= { hwBaseSecurityNotifications 3 }
+            
+      hwBaseSecurityTcpIpAttackDiscardedRateResume NOTIFICATION-TYPE
+          OBJECTS { hwTcpIpDefendCurrentRateLow, hwTcpIpDefendCurrentRateHigh, hwTcpIpDefendRateThreshold, hwTcpIpDefendRateInterval}
+          STATUS current
+          DESCRIPTION 
+              " The alarm of TCPIP protection is resumed. "
+          ::= { hwBaseSecurityNotifications  4 }
+          
+      hwBaseSecurityMaDiscardedRateRising NOTIFICATION-TYPE
+          OBJECTS { hwMaDefendCurrentRateLow, hwMaDefendCurrentRateHigh, hwMaDefendRateThreshold, hwMaDefendRateInterval}
+          STATUS current
+          DESCRIPTION 
+              " The discard packets exceed the threshold of management and application protection."
+          ::= { hwBaseSecurityNotifications 5 }
+            
+      hwBaseSecurityMaDiscardedRateResume NOTIFICATION-TYPE
+          OBJECTS { hwMaDefendCurrentRateLow, hwMaDefendCurrentRateHigh, hwMaDefendRateThreshold, hwMaDefendRateInterval}
+          STATUS current
+          DESCRIPTION 
+              " The alarm of management and application protection is resumed. "
+          ::= { hwBaseSecurityNotifications  6 }
+          
+      hwBaseSecApplicationApperceiveDropRateRising NOTIFICATION-TYPE
+          OBJECTS { hwAppliApperCurrentRateLow, hwAppliApperCurrentRateHigh, hwAppliApperRateThreshold, hwAppliApperRateInterval}
+          STATUS current
+          DESCRIPTION 
+              " The discard packets exceed the threshold of Application-Apperceive protection. "
+          ::= { hwBaseSecurityNotifications 7 }
+            
+      hwBaseSecApplicationApperceiveDropRateResume NOTIFICATION-TYPE
+          OBJECTS { hwAppliApperCurrentRateLow, hwAppliApperCurrentRateHigh, hwAppliApperRateThreshold, hwAppliApperRateInterval}
+          STATUS current
+          DESCRIPTION 
+              "The alarm of Application-Apperceive protection is resumed."
+          ::= { hwBaseSecurityNotifications  8 }                     
+          
+    
+      hwSecurityConformance OBJECT IDENTIFIER ::= { hwSecurityMIB 11 }
+    
+      hwSecurityCompliances OBJECT IDENTIFIER ::= { hwSecurityConformance 1 }
+        
+      hwSecurityCompliance MODULE-COMPLIANCE
+          STATUS current
+          DESCRIPTION 
+              "The compliance statement for systems supporting 
+              the HUAWEI-SECURITY-MIB."
+          MODULE 
+              MANDATORY-GROUPS {  hwLocalUrpfObjectGroup, hwTcpIpDefendObjectGroup, hwMaDefendObjectGroup,
+                                 hwApplicationApperceiveObjectGroup, hwBaseSecurityNotificationsObjectGroup}
+          ::= { hwSecurityCompliances 1 }
+
+      hwBaseSecurityGroups OBJECT IDENTIFIER ::= { hwSecurityConformance 2 }
+
+      hwLocalUrpfObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwLocalUrpfCurrentRateLow
+                  ,
+              hwLocalUrpfCurrentRateHigh
+                  ,
+              hwLocalUrpfNotifyEnabledStatus
+                  ,
+              hwLocalUrpfRateThreshold
+                  ,
+              hwLocalUrpfRateInterval
+                 }
+          STATUS current       
+          DESCRIPTION 
+              "The alarm parameter of URPF."
+          ::= { hwBaseSecurityGroups 2 } 
+          
+      hwTcpIpDefendObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwTcpIpDefendCurrentRateLow
+                  ,
+              hwTcpIpDefendCurrentRateHigh
+                  ,
+              hwTcpIpDefendNotifyEnabledStatus
+                  ,
+              hwTcpIpDefendRateThreshold
+                  ,
+              hwTcpIpDefendRateInterval
+                 }
+          STATUS current       
+          DESCRIPTION 
+              "The alarm parameter of TCPIP protection."
+          ::= { hwBaseSecurityGroups 3 }
+          
+      hwMaDefendObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwMaDefendCurrentRateLow
+                  ,
+              hwMaDefendCurrentRateHigh
+                  ,
+              hwMaDefendNotifyEnabledStatus
+                  ,
+              hwMaDefendRateThreshold 
+                  ,
+              hwMaDefendRateInterval
+                  }
+          STATUS current       
+          DESCRIPTION 
+              "The alarm parameter of management and application protection."
+          ::= { hwBaseSecurityGroups 4 }
+          
+      hwApplicationApperceiveObjectGroup OBJECT-GROUP
+          OBJECTS{
+              hwAppliApperCurrentRateLow
+                  ,
+              hwAppliApperCurrentRateHigh
+                  ,
+              hwAppliApperNotifyEnabledStatus
+                  ,
+              hwAppliApperRateThreshold
+                  ,
+              hwAppliApperRateInterval
+                 }
+          STATUS current       
+          DESCRIPTION 
+              "The alarm parameter of Application-Apperceive protection."
+          ::= { hwBaseSecurityGroups 5 }
+          
+      hwBaseSecurityNotificationsObjectGroup NOTIFICATION-GROUP
+          NOTIFICATIONS{
+              hwBaseSecurityUrpfDiscardedRateRising
+                  ,
+              hwBaseSecurityUrpfDiscardedRateResume
+                  ,
+              hwBaseSecurityTcpIpAttackDiscardedRateRising
+                  , 
+              hwBaseSecurityTcpIpAttackDiscardedRateResume
+                  ,
+              hwBaseSecurityMaDiscardedRateRising
+                  , 
+              hwBaseSecurityMaDiscardedRateResume
+                  ,
+              hwBaseSecApplicationApperceiveDropRateRising
+                  , 
+              hwBaseSecApplicationApperceiveDropRateResume
+                                
+                 }
+          STATUS current       
+          DESCRIPTION 
+              "Total alarm of protection are resumed."
+          ::= { hwBaseSecurityGroups 6 }
+          
+                              
+END
+
+--
+-- HUAWEI-SECURITY-MIB.mib

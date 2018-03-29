@@ -1,0 +1,194 @@
+-- *****************************************************************
+-- NMS-HAL-GLOBAL-MIB.my:  
+-- FEB 2012
+-- author jeff liu
+-- *****************************************************************
+
+               NMS-HAL-GLOBAL-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+		    switchSystem
+		        FROM NMS-SWITCH-MIB;
+
+               switchHALGlobal         OBJECT IDENTIFIER ::= { switchSystem 1 }
+               
+          eapsLinkScanInterval OBJECT-TYPE
+              SYNTAX  INTEGER(10..1000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Scan interval of port link status for EAPS. The range is from 10ms to 1000ms. 
+                       Unit is 1ms. For IESwitch, default value is 10ms. For others, default value is 1000ms."
+              ::= { switchHALGlobal 1 }
+              
+          systemMTU OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "System MTU. Unit is 1byte. Default value is 1510bytes."
+              ::= { switchHALGlobal 2 }
+              
+          shareLoad OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               single(1),
+                               multishare(2)
+                               }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Share way of fabric bandwidth. Only valid for 85. 1 for single MCU data chanel and 2 for multishare MCU data chanel. Default is single. "
+              ::= { switchHALGlobal 3 }
+              
+          shareLoadBalance OBJECT-TYPE
+              SYNTAX  INTEGER{
+                               default(1),
+                               both-mac(2),
+                               both-ip(3),
+                               dest-mac(4),
+                               dest-ip(5),
+                               src-mac(6),
+                               src-ip(7),
+                               src-port(8)
+                               }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The balance way for HiG channel. Only valid for 85. 1 for default, 2 for both-mac, 
+                      3 for both-ip, 4 for dest-mac, 5 for dest-ip, 6 for src-mac, 7 for src-ip, 8 for src-port. "
+              ::= { switchHALGlobal 4 }
+               
+          errorFrameThreshold OBJECT-TYPE
+              SYNTAX  INTEGER(1..1000000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The threshold of error frame alarm. The range is for 1 - 1000000. Unit is packet. Default is 10 packets."
+              ::= { switchHALGlobal 5 }
+              
+          errorFramePeriod OBJECT-TYPE
+              SYNTAX  INTEGER(1..3600)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The period of error frame sampling. The range is for 1 - 3600. Unit is second. Default is 10S."
+              ::= { switchHALGlobal 6 }
+              
+          arpPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The ARP packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 7 }
+              
+          bgpPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The BGP packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 8 }
+              
+          bpduPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The BPDU packet priority to host CPU. The range is 0-7. Default is 3."
+              ::= { switchHALGlobal 9 }
+                        
+          dhcpPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The DHCP packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 10 }
+                        
+          igmpPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The IGMP packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 11 }
+                        
+          reservedIPMCPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The ReservedIPMC packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 12 }
+                        
+          lookupFailPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The look up failed packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 13 }
+                        
+          protoExecPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The TTL=1 packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 14 }
+                        
+          defaultPriority OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The default packet priority to host CPU. The range is 0-7. Default is 0."
+              ::= { switchHALGlobal 15 }
+                        
+          cpuPortThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The rate limitation of cpu port. Unit is 64kbps. The range is 1-1562. 0 means disable. Default is 0."
+              ::= { switchHALGlobal 16 }
+                        
+          l2TblHashAlgo OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			crc32upper(1),
+              			crc32lower(2),
+              			lsb(3),
+              			crc14lower(4),
+              			crc16upper(5)
+              		      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The hash algorithm of MAC address table. The range is 1-5. 1 means CRC32 upper,2 means CRC32 lower,
+                      3 means LSB,4 means CRC16 lower,5 means CRC16 upper. Default is 2."
+              ::= { switchHALGlobal 17 }
+                        
+          cutThrough OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			disable(0),
+              			enable(1)
+              		      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The cut-through of switching function. The range is disable/enable. 0 means disable£¬1 means enable. 
+                      Default is 0."
+              ::= { switchHALGlobal 18 }
+                        
+               
+END               
+
+
+

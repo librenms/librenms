@@ -1,0 +1,128 @@
+-- *****************************************************************
+-- NMS-ACCOUNTING-MIB.my: NMS ACCOUNTING MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-ACCOUNTING-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    nmsMgmt                             FROM NMS-SMI;
+
+--definition of NMS device card related operations and trap related values
+
+               nmsAccounting         OBJECT IDENTIFIER ::= { nmsMgmt 351 }
+               
+               nmsTelecomAccount     OBJECT IDENTIFIER ::= { nmsAccounting 1 }
+               
+               nmsTelecomAccountIsEanble OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    disable(0),
+                                    enable(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Telecommunication account status. 0-disable, 1-enable."
+                   ::= { nmsTelecomAccount 1 }
+              
+               nmsTelecomAccountPassword OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Telecommunication account password."
+                   ::= { nmsTelecomAccount 2 }
+              
+              
+               nmsUserAccountNumber OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of user account."
+                   ::= { nmsAccounting 2 }
+                    
+               nmsUserAccountTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSUserAccountEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS user account table."
+                   ::= { nmsAccounting 3 }
+        
+               nmsUserAccountEntry OBJECT-TYPE
+                   SYNTAX  NMSUserAccountEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Device user account related table entry."
+                   INDEX   { nmsUserAccountIndex }
+                   ::= { nmsUserAccountTable 1 }
+        
+               NMSUserAccountEntry ::=
+                   SEQUENCE {
+                       nmsUserAccountIndex
+                           INTEGER,
+                       nmsUserAccountIsEnable
+                           INTEGER,
+                       nmsUserAccountUserName
+                           OCTET STRING,
+                       nmsUserAccountUserPassword
+                           OCTET STRING,
+                       nmsUserAccountLevel
+                           INTEGER
+                   }
+     
+                nmsUserAccountIndex OBJECT-TYPE
+                    SYNTAX  INTEGER
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "A unique value for each user account."
+                    ::= { nmsUserAccountEntry 1 }
+           
+                nmsUserAccountIsEnable OBJECT-TYPE
+                    SYNTAX  INTEGER{
+                                     disable(0),
+                                     enable(1)
+                                   }
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "User account status. 0-disable, 1-enable."
+                    ::= { nmsUserAccountEntry 2 }
+       
+                nmsUserAccountUserName OBJECT-TYPE
+                    SYNTAX  OCTET STRING
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "User account user name."
+                    ::= { nmsUserAccountEntry 3 }
+                    
+                nmsUserAccountUserPassword OBJECT-TYPE
+                    SYNTAX  OCTET STRING
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "User account user password."
+                    ::= { nmsUserAccountEntry 4 }
+     
+                nmsUserAccountLevel OBJECT-TYPE
+                    SYNTAX  INTEGER
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "User account level, default value is 0, which is lowest level."
+                    ::= { nmsUserAccountEntry 5 }
+               
+END

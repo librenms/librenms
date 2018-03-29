@@ -1,0 +1,296 @@
+ALCATEL-IND1-LICENSE-MANAGER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  OBJECT-TYPE, OBJECT-IDENTITY, MODULE-IDENTITY, NOTIFICATION-TYPE,
+  Counter32, Counter64, Unsigned32, Integer32, IpAddress
+    FROM SNMPv2-SMI
+  OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+  snmpTraps
+	FROM SNMPv2-MIB
+  DisplayString, MacAddress, RowStatus
+    FROM SNMPv2-TC
+  softentIND1LicenseManager
+    FROM ALCATEL-IND1-BASE;
+
+aluLicenseManagerMIB MODULE-IDENTITY
+   LAST-UPDATED  "200903230000Z"
+   ORGANIZATION  "Alcatel-Lucent"
+   CONTACT-INFO
+		"Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 License Manager for decrypting and validating license file
+                 associated with licensed applications running on products of 
+				 Alcatel-Lucent's Enterprise Solutions Division.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+	REVISION	"200903230000Z"
+	DESCRIPTION
+		"The latest version of this MIB Module."
+    ::= { softentIND1LicenseManager 1}
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerMIBNotifications	OBJECT IDENTIFIER ::= { aluLicenseManagerMIB 0 }
+
+aluLicenseManagerMIBObjects OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	
+				"Branch for License Manager 
+				subsystem managed objects."
+	::= { aluLicenseManagerMIB 1 }
+
+aluLicenseManagerMIBConformance OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	
+				"Branch for License Manager subsystem
+				conformance information."
+	::= {aluLicenseManagerMIB 2 }
+
+aluLicenseManagerMIBGroups OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	
+				"Branch for License Manager subsystem
+				units of conformance."
+	::= { aluLicenseManagerMIBConformance 1 }
+
+aluLicenseManagerMIBCompliances OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	
+				"Branch for License Manager subsystem
+				compliance statements."
+	::= { aluLicenseManagerMIBConformance 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerLicenseExpired	NOTIFICATION-TYPE
+	OBJECTS { aluLicensedApplication, aluLicenseTimeRemaining }
+	STATUS	current
+	DESCRIPTION
+			"A aluLicenseManagerLicenseExpired notification is sent when the value
+			 of aluLicenseTimeRemaining becomes 0 (zero) for a demo licensed application. 
+			 The licensed application is part of aluLicensedApplication object. 
+			 This notification is applicable only for temporary licenses.
+			 This trap can be utilized by an NMS to inform user about an application license expiry."
+	::= { aluLicenseManagerMIBNotifications 0 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerConfig		OBJECT	IDENTIFIER ::= { aluLicenseManagerMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerApplyLicense OBJECT-TYPE
+	SYNTAX		INTEGER {
+				default (0),
+				apply(1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Object to apply license file to the device."
+	::= { aluLicenseManagerConfig 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerInfoTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LicenseManagerInfoEntry	
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Table of valid application license information"
+	::= { aluLicenseManagerMIBObjects 2}
+
+aluLicenseManagerInfoEntry OBJECT-TYPE
+	SYNTAX		LicenseManagerInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information of valid license applications"
+	INDEX {	aluLicenseId }
+	::= { aluLicenseManagerInfoTable 1 }
+
+LicenseManagerInfoEntry ::=
+	SEQUENCE
+	{
+	  aluLicenseId				Unsigned32,
+	  aluLicensedApplication	DisplayString,
+	  aluLicenseType			INTEGER,
+	  aluLicenseTimeRemaining	Integer32
+	}
+
+aluLicenseId OBJECT-TYPE
+  SYNTAX      Unsigned32(0..4294967295)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Number identifying a licence. This number is automatically generated in the 
+				license generation process."
+  ::= { aluLicenseManagerInfoEntry 1 }
+
+aluLicensedApplication OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (1..32))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "String displaying the application for which this license is valid."
+  ::= { aluLicenseManagerInfoEntry 2 }
+
+aluLicenseType OBJECT-TYPE
+  SYNTAX      INTEGER {
+				demo (1),
+				permanent (2)
+			  }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "License of an application can be either Permamnent or Demo. The value of this
+				indicated the type of this license."
+  ::= { aluLicenseManagerInfoEntry 3 }
+
+aluLicenseTimeRemaining OBJECT-TYPE
+  SYNTAX      Integer32(0..60)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Number of days remaining to evaluate this demo license. For
+				permanent license this is not applicable."
+  ::= { aluLicenseManagerInfoEntry 4 }
+
+
+aluLicenseManagerFileInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LicenseManagerFileInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of license file information"
+    ::= { aluLicenseManagerMIBObjects 3}
+
+aluLicenseManagerFileInfoEntry OBJECT-TYPE
+    SYNTAX      LicenseManagerFileInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information of licenses in the /flash/lmlicense.dat file."
+    INDEX { aluLicenseFileIndex }
+    ::= { aluLicenseManagerFileInfoTable 1 }
+
+LicenseManagerFileInfoEntry ::=
+    SEQUENCE
+    {
+	  aluLicenseFileIndex			Counter32,
+      aluSwitchMacAddress       	MacAddress,
+      aluLicensedFileApplication    DisplayString
+    }
+
+aluLicenseFileIndex OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Counter starting from 1 to keep track of entries in the /flash/lmlicense.dat file."
+  ::= { aluLicenseManagerFileInfoEntry 1 }
+
+aluSwitchMacAddress OBJECT-TYPE
+  SYNTAX      MacAddress
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Mac address of the switch for which this license is valid."
+  ::= { aluLicenseManagerFileInfoEntry 2 }
+
+aluLicensedFileApplication OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (1..32))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "String displaying the application for which this license is valid."
+  ::= { aluLicenseManagerFileInfoEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Compliance
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerMIBCompliance MODULE-COMPLIANCE
+	STATUS		current
+	DESCRIPTION
+				"Compliance statement for License Manager."
+	MODULE
+		MANDATORY-GROUPS
+		{
+			aluLicenseManagerConfigGroup,
+			aluLicenseManagerInfoGroup,
+			aluLicenseManagerFileInfoGroup
+		}
+	::= { aluLicenseManagerMIBCompliances 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Units of Conformance
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+aluLicenseManagerConfigGroup OBJECT-GROUP
+	OBJECTS
+	{
+		aluLicenseManagerApplyLicense
+	}
+	STATUS		current
+	DESCRIPTION	
+				"Collection of objects for configuration of License Manager."
+	::= { aluLicenseManagerMIBGroups 1 }
+
+aluLicenseManagerInfoGroup	OBJECT-GROUP
+	OBJECTS
+	{
+		aluLicensedApplication,
+		aluLicenseType,	
+		aluLicenseTimeRemaining
+	}
+	STATUS current
+	DESCRIPTION
+				"Collection of objects for information on licensed applications."
+	::= { aluLicenseManagerMIBGroups 2 }
+
+aluLicenseManagerNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS	{ aluLicenseManagerLicenseExpired }
+	STATUS	current
+	DESCRIPTION
+			"A collection of notifications to signal License Manager events."
+	::= { aluLicenseManagerMIBGroups 3}
+
+aluLicenseManagerFileInfoGroup  OBJECT-GROUP
+    OBJECTS
+    {
+		aluSwitchMacAddress,
+		aluLicensedFileApplication
+    }
+    STATUS current
+    DESCRIPTION
+                "Collection of objects for information on license file."
+    ::= { aluLicenseManagerMIBGroups 4 }
+
+END

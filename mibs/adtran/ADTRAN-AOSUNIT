@@ -1,0 +1,403 @@
+       ADTRAN-AOSUNIT DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, RowStatus, TDomain, TAddress, TEXTUAL-CONVENTION
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           adIdentity
+               FROM ADTRAN-MIB
+           adGenAOSCommon, adGenAOSConformance
+               FROM ADTRAN-AOS;
+
+       adGenAOSUnitMib MODULE-IDENTITY
+        LAST-UPDATED "200409240000Z"  -- September 24, 2004
+	ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                    	"This MIB contains device information, contact information, and
+			overall system health information."
+
+            REVISION    "200409280000Z"  -- September 28, 2004
+            DESCRIPTION
+                    "Initial version of this MIB module."
+	        REVISION    "200505120000Z"  -- May 12, 2005
+            DESCRIPTION
+                    "Added OIDs for primary and backup image name and part number"
+
+            REVISION    "200807300000Z"  -- July 30, 2008
+            DESCRIPTION
+                    "Changed syntax range for adAOSBootRevision because the
+                    revision string length has increased. This change will
+                    maintain compatibility with older revisions."
+                    
+            REVISION    "201004090000Z"  -- April 9, 2010
+            DESCRIPTION
+                    "Changed the syntax size for adAOSCurrentImage. The syntax 
+                     size now includes a range."
+
+          ::= { adIdentity 10000 53 1 1 }
+
+      adGenAOSUnit             OBJECT IDENTIFIER ::= {  adGenAOSCommon 1 }
+
+-- ========================================================================
+-- Textual Conventions for this MIB
+
+     Utf8String ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "255a"
+         STATUS  current
+         DESCRIPTION
+              "To facilitate internationalization, this TC
+               represents information taken from the ISO/IEC IS
+               10646-1 character set, encoded as an octet string
+               using the UTF-8 character encoding scheme described
+               in RFC 2044 [10].  For strings in 7-bit US-ASCII,
+               there is no impact since the UTF-8 representation is
+               identical to the US-ASCII encoding."
+         SYNTAX  OCTET STRING (SIZE (0..255))
+
+-- ========================================================================
+
+	adAOSBootRevision  OBJECT-TYPE
+           SYNTAX      DisplayString (SIZE(3..255))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	       "Unit boot PROM revision."
+	   ::= { adGenAOSUnit  1 }
+
+	adAOSCurrentImage  OBJECT-TYPE
+	   SYNTAX      DisplayString (SIZE(0..64))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	       "Filename for current firmware image."
+	   ::= { adGenAOSUnit  2 }
+
+	adAOSRunConfigChecksum  OBJECT-TYPE
+	   SYNTAX      DisplayString (SIZE(32))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	       "MD5 Digest of the running configuration"
+	   ::= { adGenAOSUnit  3 }
+
+	adAOSStartConfigChecksum  OBJECT-TYPE
+	   SYNTAX      DisplayString (SIZE(32))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	       "MD5 Digest of the startup configuration"
+	   ::= { adGenAOSUnit  4 }
+
+	adAOSDeviceIndex OBJECT-TYPE
+	    SYNTAX INTEGER (0..1000)
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "The unique device identification within the
+	         instance of this Mib."
+	    ::= { adGenAOSUnit  5 }
+
+	adAOSDeviceGlobalUniqueID OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "This represents a globally unique ID for the device.
+	         This MUST be the ordered combination of the Manufacturer,
+	         product name, AND any other text that is necessary to guarantee
+	         global uniqueness. This value may not be null.  Could use serial number.
+	         e.g. AD123456789"
+	    ::= { adGenAOSUnit  6 }
+
+	adAOSDeviceHealth OBJECT-TYPE
+	    SYNTAX INTEGER {
+	           unknown        (1),
+	           unused         (2),
+	           ok             (3), -- available for meaningful work
+	           warning        (4), -- something needs attention
+	           critical       (5), -- something has failed
+	           nonrecoverable (6)
+	    }
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "Overall health of the device. The goal of this object
+	         is to be the single poll point to check the status of the
+	         device."
+	    ::= { adGenAOSUnit  7 }
+
+	adAOSDeviceSysObjID OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "System Object ID for this Device entity. This should be an
+	         ASCII integer format. (i.e. 1.3.6.1.4.1.11.2.36.1.1)
+	         The value may not be null."
+	        --
+	        -- NOTE: For single device agents this field contains a value
+	        --       similar to the MIB II/System/sysObjID
+	        --
+	    ::= { adGenAOSUnit  8 }
+
+	adAOSDeviceManagementURL OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "This object contains the URL for the device's management
+	         software.  If it does not exist the value is empty string.
+		   If write is not supported, then return invalid. This value is
+	         retained across boots."
+	    ::= { adGenAOSUnit  9 }
+
+	adAOSDeviceManagementURLLabel OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "The label that a management application should use for the
+	         hyperlink to the entity's URL."
+	    ::= { adGenAOSUnit  10 }
+
+	adAOSDeviceManufacturer OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "The device's manufacturer name. Will return 'ADTRAN' "
+	    ::= { adGenAOSUnit  11 }
+
+	adAOSDeviceProductName OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "The device's product name. Null is NOT a valid value.
+	         (i.e. D1234A)"
+	    ::= { adGenAOSUnit  12 }
+
+	adAOSDeviceSerialNumber OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "The serial number for the device. This can return
+	         a NULL string."
+	    ::= { adGenAOSUnit  13 }
+
+	adAOSDeviceVersion OBJECT-TYPE
+	    SYNTAX Utf8String (SIZE(0..32))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "Version number for this device."
+	    ::= { adGenAOSUnit  14 }
+
+	adAOSDeviceHWVersion OBJECT-TYPE
+	    SYNTAX Utf8String (SIZE(0..32))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "Version number for this device's hardware."
+	    ::= { adGenAOSUnit  15 }
+
+	adAOSDeviceContactPerson OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "Identifies the name of the person responsible for the
+	         operation of this device. If write is not
+	         supported then return invalid."
+	        --
+	        -- NOTE: For single device agents this field contains a value
+	        --       similar to the MIB II/System/sysContact
+	        --
+	    ::= { adGenAOSUnit  16 }
+
+	adAOSDeviceContactPhone OBJECT-TYPE
+	    SYNTAX Utf8String (SIZE(0..32))
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "Phone number of the contact person for this device."
+	    ::= { adGenAOSUnit  17 }
+
+	adAOSDeviceContactEmail OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "e-mail address of the contact person for this device."
+	    ::= { adGenAOSUnit  18 }
+
+	adAOSDeviceContactPagerNumber OBJECT-TYPE
+	    SYNTAX Utf8String (SIZE(0..32))
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "Pager number of the contact person for this device."
+	    ::= { adGenAOSUnit  19 }
+
+	adAOSDeviceLocation OBJECT-TYPE
+	    SYNTAX Utf8String
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "Identifies the location for the this device. If
+	         write is not supported then return invalid."
+	        --
+	        -- NOTE: For single device agents this field contains a value
+	        --       similar to the MIB II/System/sysLocation
+	        --
+	    ::= { adGenAOSUnit  20 }
+
+	adGenAOSSaveConfig OBJECT-TYPE
+    		SYNTAX      INTEGER {
+                   saveconfig (1)
+                }
+    		MAX-ACCESS  read-write
+    		STATUS      current
+    		DESCRIPTION
+        		"Set value to 1 to copy running config to startup config."
+    		::= { adGenAOSUnit  21 }
+
+
+	adGenAOSReloadSystem  OBJECT-TYPE
+    		SYNTAX      Integer32 (0..2147483647)
+    		MAX-ACCESS  read-write
+    		STATUS      current
+    		DESCRIPTION
+        		"Set to 0 to initiate immediate system reload.
+        		Any non-zero value is the number of seconds
+        		until reload"
+    		DEFVAL      { 0 }
+    		::= { adGenAOSUnit  22 }
+
+
+	adGenAOSCancelReload  OBJECT-TYPE
+    		SYNTAX      INTEGER {
+		    cancelreload (1)
+		}
+    		MAX-ACCESS  read-write
+    		STATUS      current
+    		DESCRIPTION
+        	"Writing any value to this element will cancel a scheduled reload"
+		::= { adGenAOSUnit  23 }
+
+	 adAOSPrimaryImage  OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..64))
+	   	MAX-ACCESS  read-write
+	   	STATUS      current
+	   	DESCRIPTION
+	       	"Filename for primary firmware image."
+	   	::= { adGenAOSUnit  24 }
+
+
+	 adAOSBackupImage  OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..64))
+	   	MAX-ACCESS  read-write
+	   	STATUS      current
+	   	DESCRIPTION
+	       	"Filename for backup firmware image."
+	   	::= { adGenAOSUnit  25 }
+
+	adAOSDevicePartNumber OBJECT-TYPE
+		SYNTAX Utf8String
+	    	MAX-ACCESS read-only
+	    	STATUS current
+	    	DESCRIPTION
+	        	"The device's part number. Null is NOT a valid value.
+	         	(i.e. 1202860L1)"
+	    	::= { adGenAOSUnit  26 }
+
+
+
+
+
+
+
+         -- conformance information
+
+	adGenAOSUnitConformance
+           OBJECT IDENTIFIER ::= { adGenAOSConformance 1 }
+
+        adAOSUnitCompliances
+           OBJECT IDENTIFIER ::= { adGenAOSUnitConformance 1 }
+	adAOSUnitGroups
+           OBJECT IDENTIFIER ::= { adGenAOSUnitConformance 2 }
+
+
+
+
+	  adAOSCompliance MODULE-COMPLIANCE
+	    STATUS  current
+	    DESCRIPTION
+	        "The compliance statement for SNMPv2 entities which
+	        implement the AOS Unit MIB."
+
+	    MODULE
+	    MANDATORY-GROUPS {
+	        adGenAOSUnitGroup
+	       	    }
+
+
+	    ::= { adAOSUnitCompliances 1 }
+
+       -- compliance statements
+
+
+       -- units of conformance
+	adGenAOSUnitGroup OBJECT-GROUP
+	    OBJECTS {
+	    adAOSBootRevision,
+	    adAOSCurrentImage,
+	    adAOSRunConfigChecksum,
+	    adAOSStartConfigChecksum,
+	    adAOSDeviceIndex,
+	    adAOSDeviceGlobalUniqueID,
+	    adAOSDeviceHealth,
+	    adAOSDeviceSysObjID,
+	    adAOSDeviceManagementURL,
+	    adAOSDeviceManufacturer,
+	    adAOSDeviceProductName,
+	    adAOSDeviceSerialNumber,
+	    adAOSDeviceVersion,
+	    adAOSDeviceHWVersion,
+	    adAOSDeviceContactPerson,
+	    adAOSDeviceContactPhone,
+	    adAOSDeviceContactEmail,
+	    adAOSDeviceContactPagerNumber,
+	    adAOSDeviceLocation,
+	    adGenAOSSaveConfig,
+	    adGenAOSReloadSystem,
+	    adGenAOSCancelReload,
+	    adAOSPrimaryImage,
+	    adAOSBackupImage,
+	    adAOSDevicePartNumber
+
+	    }
+	STATUS  current
+    	DESCRIPTION
+        "The Unit SNMP Config Group."
+    	::= { adAOSUnitGroups 1 }
+
+
+
+
+       END
+

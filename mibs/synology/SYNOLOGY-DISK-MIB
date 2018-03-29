@@ -1,0 +1,141 @@
+SYNOLOGY-DISK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-GROUP, MODULE-COMPLIANCE
+				FROM SNMPv2-CONF
+	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+				FROM SNMPv2-SMI;
+
+synoDisk MODULE-IDENTITY
+    LAST-UPDATED "201309110000Z"
+    ORGANIZATION "www.synology.com"
+    CONTACT-INFO
+         "postal:   Jay Pan
+          email:    jaypan@synology.com"
+    DESCRIPTION
+        "Characteristics of the disk information"
+    REVISION     "201309110000Z"
+    DESCRIPTION
+        "Second draft."
+    ::= { synology 2 }
+
+synology	 OBJECT IDENTIFIER 
+	::= { enterprises 6574 }
+
+diskTable OBJECT-TYPE
+    SYNTAX	   SEQUENCE OF DiskEntry
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "Synology disk table"
+    ::= { synoDisk 1 }
+
+diskEntry	  OBJECT-TYPE
+    SYNTAX	   DiskEntry
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "For all disk entry"
+    INDEX   { diskIndex }
+    ::= { diskTable 1 }
+
+DiskEntry ::= SEQUENCE {
+    diskIndex		Integer32,
+    diskID			OCTET STRING,
+	diskModel		OCTET STRING,
+	diskType		OCTET STRING,
+	diskStatus		Integer32,
+	diskTemperature	Integer32
+}
+
+diskIndex OBJECT-TYPE
+    SYNTAX	   Integer32(0..2147483647)
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "The index of disk table"
+    ::= { diskEntry 1 }
+
+diskID OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk ID
+	 The ID of disk is assigned by disk Station.
+	"
+    ::= { diskEntry 2 }
+
+diskModel OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk model name
+	 The disk model name will be showed here.
+	"
+    ::= { diskEntry 3 }
+
+diskType OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk type
+	 The type of disk will be showed here, including SATA, SSD and so on.
+	"
+    ::= { diskEntry 4 }
+
+diskStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..5)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk status 
+	 Each meanings of status represented describe below.
+
+	 Normal(1): The hard disk functions normally.
+	 Initialized(2): The hard disk has system partition but no data.
+	 NotInitialized(3):	The hard disk does not have system in system partition.	
+	 SystemPartitionFailed(4): The system partitions on the hard disks are damaged.
+	 Crashed(5): The hard disk has damaged.
+	"
+    ::= { diskEntry 5 }
+
+diskTemperature OBJECT-TYPE
+    SYNTAX	   Integer32
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "Synology disk temperature
+	 The temperature of each disk uses Celsius degree.
+	"
+    ::= { diskEntry 6 }
+
+diskConformance OBJECT IDENTIFIER ::= { synoDisk 2 }
+diskCompliances OBJECT IDENTIFIER ::= { diskConformance 1 }
+diskGroups 		OBJECT IDENTIFIER ::= { diskConformance 2 }
+
+diskCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for synoDisk entities which
+            implement the SYNOLOGY DISK MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { diskGroup }
+
+    ::= { diskCompliances 1 }
+
+diskGroup OBJECT-GROUP
+    OBJECTS { diskID,
+              diskModel,
+              diskType,
+              diskStatus,
+              diskTemperature}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic information
+             of an synology disk entity."
+    ::= { diskGroups 1 }
+
+END

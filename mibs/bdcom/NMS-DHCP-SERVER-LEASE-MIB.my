@@ -1,0 +1,147 @@
+-- file: NMS-DHCP-SERVER-LEASE-MIB.my
+-- Changes:
+--      No changes needed.
+-- fanghao@nms.com.cn
+
+
+               NMS-DHCP-SERVER-LEASE-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                  mgmt, NetworkAddress, IpAddress, Counter, Gauge,
+                          TimeTicks
+                          FROM RFC1155-SMI
+                  OBJECT-TYPE
+                          FROM RFC-1212
+                  nmslocal
+                          FROM NMS-SMI;
+
+               nmslDhcpServer         OBJECT IDENTIFIER ::= { nmslocal 4 }
+
+
+          --  This MIB module uses the extended OBJECT-TYPE macro as
+          --  defined in [14];
+
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+          PhysAddress ::=
+              OCTET STRING
+          -- This data type is used to model media addresses.  For many
+          -- types of media, this will be in a binary representation.
+          -- For example, an ethernet address would be represented as
+          -- a string of 6 octets.
+
+
+          -- the nmslDhcpServer group
+
+          nmslDhcpServerLeaseNumber OBJECT-TYPE
+              SYNTAX  INTEGER (1..512)
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of lease allocted by DHCP-Server"
+              ::= { nmslDhcpServer 1 }
+
+          nmslDhcpServerLeaseTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF nmslDhcpServerLeaseEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The entry of lease allocted by DHCP-Server"
+              ::= { nmslDhcpServer 2 }
+
+          nmslDhcpServerLeaseEntry OBJECT-TYPE
+              SYNTAX  nmslDhcpServerLeaseEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The attributes set of lease"
+              INDEX { Address }
+              ::= { nmslDhcpServerLeaseTable 1 }
+
+          nmslDhcpServerLeaseEntry ::=
+              SEQUENCE {
+                  Address
+                      IpAddress,
+                  Phys
+                      PhysAddress,
+                  Expires
+                      TimeTicks,
+                  HwType
+                      INTEGER,
+                  Id
+                      DisplayString,
+                  SrcAddr
+                      IpAddress,
+                  Server
+                      IpAddress,
+              }
+
+          Address OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "IP address assigned to DHCP Client"
+              ::= { nmslDhcpServerLeaseEntry 1 }
+
+          Phys OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The MAC address of DHCP Client's ethernet"
+              ::= { nmslDhcpServerLeaseEntry 2 }
+
+          Expires OBJECT-TYPE
+              SYNTAX  TimeTicks
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The expire-date of this lease"
+              ::= { nmslDhcpServerLeaseEntry 3 }
+
+          HwType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          ethernet(1)
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The type of DHCP Client's ethernet"
+              ::= { nmslDhcpServerLeaseEntry 4 }
+
+          Id OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The identification of DHCP Client"
+              ::= { nmslDhcpServerLeaseEntry 5 }
+
+          SrcAddr OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The IP address from where the DHCP Request came"
+              ::= { nmslDhcpServerLeaseEntry 6 }
+
+          Server OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The IP address of interface where the DHCP Request
+                      came from"
+              ::= { nmslDhcpServerLeaseEntry 7 }
+
+          END

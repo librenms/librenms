@@ -1,0 +1,1654 @@
+ALCATEL-IND1-IPV6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32, Counter32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, PhysAddress, RowStatus, DisplayString, TimeStamp, TruthValue, DateAndTime
+		FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+        Ipv6Address, Ipv6IfIndexOrZero
+	        FROM IPV6-TC
+	softentIND1Ipv6
+		FROM ALCATEL-IND1-BASE
+	ipv6IfIndex, ipv6RouteEntry
+	        FROM IPV6-MIB;
+
+
+alcatelIND1IPv6MIB MODULE-IDENTITY
+    LAST-UPDATED "200807240000Z" 
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+         
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+        
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+        
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+             Propietary IPv6 MIB definitions
+         
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+         
+         No liability shall be assumed for any incidental, indirect, special,
+	 or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+         
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+         
+                     Copyright (C) 1995-2008 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200807240000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { softentIND1Ipv6 1 }
+
+
+alcatelIND1IPv6MIBObjects OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIB 1 }
+
+
+AlaIPv6AddressPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS       current
+    DESCRIPTION
+	"A data type for the 8 byte IPv6 prefixes for EUI-64 addresses"
+    SYNTAX      OCTET STRING (SIZE (8))
+
+
+--
+-- Alcatel IPv6 Configuration
+--
+
+alaIPv6Config OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIBObjects 1 }
+
+alaIPv6ClearNeighbors OBJECT-TYPE
+    SYNTAX     	INTEGER { clear(1) }
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+	"Clear all non-static entries from the Neighbor table."
+    ::= { alaIPv6Config 1 }
+
+alaIPv6ClearTraffic OBJECT-TYPE
+    SYNTAX	INTEGER { clear(1) }
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Reset all IPv6 traffic counters."
+    ::= { alaIPv6Config 2 }
+
+alaIPv6ClearPMTUTable OBJECT-TYPE
+    SYNTAX	INTEGER { clear(1) }
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Clear the path MTU table."
+    ::= { alaIPv6Config 3 }
+
+alaIPv6PMTUMinLifetime  OBJECT-TYPE
+    SYNTAX	Unsigned32 (10..1440)
+    UNITS       "minutes"
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Set the minimum lifetime for entries in the 
+	path MTU table."
+    DEFVAL      { 60 }
+    ::= { alaIPv6Config 4 }
+
+alaIPv6NeighborStaleLifetime  OBJECT-TYPE
+    SYNTAX	Unsigned32 (5..2880)
+    UNITS       "minutes"
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Set the minimum lifetime for neighbor entries in the 
+	stale state."
+    DEFVAL      { 1440 }
+    ::= { alaIPv6Config 5 }
+
+alaIPv6GlobalID  OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(5))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+      "The global ID used in the creation of local IPv6 unicast
+      addresses (RFC 4193).  An explicit value may be specified for
+      the global ID or this object may be set to all zero to have a
+      global ID be created based on the algorithm from the RFC."
+    ::= { alaIPv6Config 6 }
+
+--
+-- Alcatel IPv6 Interface Table
+--
+
+alaIPv6InterfaceTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6InterfaceEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the creation and removal of IPv6
+	interfaces.
+
+	The table is indexed by ipv6IfIndex.  The value of
+	ipv6IfIndex shall be a four byte value in one of 
+	the following formats:
+
+          0x0000vvvv - The interface for VLAN vvvv
+	  0x0100tttt - The interface for tunnel tttt
+	  0x02000001 - The IPv6 loopback interface
+
+	The loopback interface configuration cannot be 
+	modified."
+    ::= { alcatelIND1IPv6MIBObjects 2 }
+
+alaIPv6InterfaceEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6InterfaceEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"An IPv6 interface entry."
+    INDEX   	{ ipv6IfIndex }
+    ::= { alaIPv6InterfaceTable 1 }
+
+AlaIPv6InterfaceEntry ::= SEQUENCE {
+    alaIPv6InterfaceRowStatus			RowStatus,
+    alaIPv6InterfaceDescription 		DisplayString,
+    alaIPv6InterfaceMtu   			Unsigned32,
+    alaIPv6InterfaceType			INTEGER,
+    alaIPv6InterfaceAdminStatus			INTEGER,
+    alaIPv6InterfaceSendRouterAdvertisements	INTEGER,
+    alaIPv6InterfaceMaxRtrAdvInterval		Unsigned32,
+    alaIPv6InterfaceAdvManagedFlag		TruthValue,
+    alaIPv6InterfaceAdvOtherConfigFlag		TruthValue,
+    alaIPv6InterfaceAdvReachableTime		Unsigned32,
+    alaIPv6InterfaceAdvRetransTimer		Unsigned32,
+    alaIPv6InterfaceAdvDefaultLifetime		Unsigned32,
+    alaIPv6InterfaceName                        DisplayString,
+    alaIPv6InterfaceAdvSendMtu			TruthValue,
+    alaIPv6InterfaceReachableTime               Unsigned32,
+    alaIPv6InterfaceBaseReachableTime           Unsigned32,
+    alaIPv6InterfaceMinRtrAdvInterval	        Unsigned32,
+    alaIPv6InterfaceClockSkew	                Unsigned32,
+    alaIPv6InterfaceRetransTimer                Unsigned32,
+    alaIPv6InterfaceDADTransmits                Unsigned32,
+    alaIPv6InterfaceAdvHopLimit                 Unsigned32
+}
+
+alaIPv6InterfaceRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of IPv6 
+	interfaces."
+    ::= { alaIPv6InterfaceEntry 1 }
+
+alaIPv6InterfaceDescription OBJECT-TYPE
+    SYNTAX    	DisplayString (SIZE (0..80))
+    MAX-ACCESS 	read-only
+    STATUS     	current
+    DESCRIPTION
+	"The IPv6 interface's description."
+    ::= { alaIPv6InterfaceEntry 2 }
+
+alaIPv6InterfaceMtu OBJECT-TYPE
+    SYNTAX    	Unsigned32
+    MAX-ACCESS 	read-create
+    STATUS     	current
+    DESCRIPTION
+	"The IPv6 interface's maximum transmission unit."
+    ::= { alaIPv6InterfaceEntry 3 }
+
+alaIPv6InterfaceType OBJECT-TYPE
+    SYNTAX     	INTEGER { 
+                    other(1),
+                    vlan(2),
+                    tunnel(3),
+                    loopback(4)
+                }
+    MAX-ACCESS 	read-only
+    STATUS     	current
+    DESCRIPTION
+	"The interface type."
+    ::= { alaIPv6InterfaceEntry 4 }
+
+alaIPv6InterfaceAdminStatus OBJECT-TYPE
+    SYNTAX     	INTEGER { 
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS 	read-create
+    STATUS     	current
+    DESCRIPTION
+	"Interface administrative status."
+    ::= { alaIPv6InterfaceEntry 5 }
+
+alaIPv6InterfaceSendRouterAdvertisements OBJECT-TYPE
+    SYNTAX	INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Specify whether the router sends periodic router
+	 advertisements and responds to router solicitations
+	 on the interface.
+
+         The default value for most interfaces is enable(1).
+	 Some interface types (e.g. 6to4 tunnel) cannot send
+	 router advertisements so the default (and only) 
+	 value for those interfaces is disable(2)."
+    DEFVAL	{enable}
+    ::= { alaIPv6InterfaceEntry 6 }
+
+alaIPv6InterfaceMaxRtrAdvInterval OBJECT-TYPE
+    SYNTAX	Unsigned32 (4..1800)
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The maximum time allowed between sending unsolicited
+	multicast router advertisements from the interface."
+    DEFVAL	{600}
+    ::= { alaIPv6InterfaceEntry 7 }
+
+alaIPv6InterfaceAdvManagedFlag OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+	"The TRUE/FALSE value to be placed in the 'Managed
+	address configuration' flag field in router advertisements."
+    DEFVAL  { false }	
+    ::= { alaIPv6InterfaceEntry 8 }
+
+alaIPv6InterfaceAdvOtherConfigFlag OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+	"The TRUE/FALSE value to be placed in the 'Other stateful
+	configuration' flag field in router advertisements."
+    DEFVAL  { false }	
+    ::= { alaIPv6InterfaceEntry 9 }
+
+alaIPv6InterfaceAdvReachableTime OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..3600000)
+    UNITS	"milliseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The value to be placed in the Reachable Time field in
+	the router advertisements sent over this interface.  The
+	value zero means unspecified by this router."
+    DEFVAL	{0}
+    ::= { alaIPv6InterfaceEntry 10 }
+
+alaIPv6InterfaceAdvRetransTimer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"milliseconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The value to be placed in the Retrans Timer field in
+	the router advertisements sent over this interface.  The
+	value zero means unspecified by this router."
+    DEFVAL	{0}
+    ::= { alaIPv6InterfaceEntry 11 }
+
+alaIPv6InterfaceAdvDefaultLifetime OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..9000)
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The value to be placed in the Router Lifetime field in
+	the router advertisements sent over this interface.  
+
+	The value MUST be either zero, 1, or between
+	alaIPv6InterfaceMaxRtrAdvInterval and 9000 seconds.
+
+	The special value zero indicates that the router is not
+	to be used as a default router.
+
+	The special value 1 indicates that this object's true 
+	value should be computed using the formula
+	3 * alaIPv6InterfaceMaxRtrAdvInterval."
+    DEFVAL	{1}
+    ::= { alaIPv6InterfaceEntry 12 }
+
+alaIPv6InterfaceName OBJECT-TYPE
+    SYNTAX    	DisplayString (SIZE (1..20))
+    MAX-ACCESS 	read-create
+    STATUS     	current
+    DESCRIPTION
+	"The mandatory user-assigned name for the interface.
+
+        Since the loopback interface is created without user 
+        interaction, the name 'loopback' will be automatically
+        assigned."
+    ::= { alaIPv6InterfaceEntry 13 }
+
+alaIPv6InterfaceAdvSendMtu OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+	"The TRUE/FALSE value that determines whether the MTU 
+	option is sent in Router Advertisements."
+    DEFVAL  { false }	
+    ::= { alaIPv6InterfaceEntry 14 }
+
+alaIPv6InterfaceReachableTime OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS	"seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"In the absence of any reachability notification, the 
+	amount of time a neighbor reached via this interface
+	will remain in the reachable state before transitioning
+	to the stale state.  Computed to be between .5 and 1.5
+	times the alaIPv6InterfaceBaseReachableTime."
+    ::= { alaIPv6InterfaceEntry 15 }
+
+alaIPv6InterfaceBaseReachableTime OBJECT-TYPE
+    SYNTAX	Unsigned32 (10..3600)
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The base value used to compute the reachable time
+	for neighbors reached via this interface.  See
+	alaIPv6InterfaceReachableTime above."
+    ::= { alaIPv6InterfaceEntry 16 }
+
+alaIPv6InterfaceMinRtrAdvInterval OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..1350)
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The minimum time allowed between sending unsolicited
+	multicast router advertisements from the interface.
+
+	The time must be a minimum of 3 seconds and no more than
+	.75 times the value of alaIPv6InterfaceMaxRtrAdvInterval.
+
+	Setting this object to the special value of 0 indicates 
+	that the minimum interval should be automatically 
+	recalculated using the formula .33 times the value of
+	alaIPv6InterfaceMaxRtrAdvInterval."
+    DEFVAL	{0}
+    ::= { alaIPv6InterfaceEntry 17 }
+
+alaIPv6InterfaceClockSkew OBJECT-TYPE
+    SYNTAX	     Unsigned32 (0..3600)
+    UNITS        "seconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+    "Router Advertisement decrementing timers must be consistent 
+     in all Advertisements on the link. The clock skew accounts 
+     for link propogation delays and poorly synchronized clocks."
+    DEFVAL { 600 }
+    ::= { alaIPv6InterfaceEntry 18 }
+
+alaIPv6InterfaceRetransTimer OBJECT-TYPE
+    SYNTAX	 Unsigned32 (1000..30000)
+    UNITS        "milliseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+    "The amount of time to wait before retransmitting a Neighbor
+     Solicitation during neighbor discovery."
+    DEFVAL { 1000 }
+    ::= { alaIPv6InterfaceEntry 19 }
+
+alaIPv6InterfaceDADTransmits OBJECT-TYPE
+    SYNTAX	 Unsigned32 (1..10)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+    "The number of Neighbor Solicitations to send during Duplicate
+     Address Detection."
+    DEFVAL { 1 }
+    ::= { alaIPv6InterfaceEntry 20 }
+
+alaIPv6InterfaceAdvHopLimit OBJECT-TYPE
+    SYNTAX	 Unsigned32 (0..255)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+    "The value placed in the current hop limit field of router
+    advertisements."
+    DEFVAL { 64 }
+    ::= { alaIPv6InterfaceEntry 21 }
+
+
+--
+-- Alcatel IPv6 Tunnel Configuration
+--
+
+alaIPv6TunnelConfig OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIBObjects 3 }
+
+alaIPv6ConfigTunnelTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF AlaIPv6ConfigTunnelEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table for IPv6 configured tunnels.  This table contains the
+         tunnel-specific information extending the corresponding
+         tunnel interface entry in alaIPv6InterfaceTable."
+    ::= { alaIPv6TunnelConfig 2 }
+
+alaIPv6ConfigTunnelEntry OBJECT-TYPE
+    SYNTAX	AlaIPv6ConfigTunnelEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A entry contains the objects for an IPv6 configured tunnel."
+    INDEX  	{ ipv6IfIndex }
+    ::= { alaIPv6ConfigTunnelTable 1 }
+
+AlaIPv6ConfigTunnelEntry ::= SEQUENCE {
+    alaIPv6ConfigTunnelV4Source 	IpAddress,
+    alaIPv6ConfigTunnelV4Dest		IpAddress
+}
+
+alaIPv6ConfigTunnelV4Source OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The source IPv4 address for the tunnel."
+    ::= { alaIPv6ConfigTunnelEntry 1 }
+
+alaIPv6ConfigTunnelV4Dest OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The destination IPv4 address for the tunnel."
+    ::= { alaIPv6ConfigTunnelEntry 2 }
+
+
+--
+-- Alcatel IPv6 Interface Address Table
+--
+
+alaIPv6InterfaceAddressTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6InterfaceAddressEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the creation and removal of IPv6
+	addresses assigned to interfaces."
+    ::= { alcatelIND1IPv6MIBObjects 4 }
+
+alaIPv6InterfaceAddressEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6InterfaceAddressEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"An IPv6 interface address entry.
+
+	The same link-local address may be assigned to 
+        multiple interfaces.  A global address may only
+	be assigned to a single interface."
+    INDEX   	{ ipv6IfIndex, alaIPv6InterfaceAddress }
+    ::= { alaIPv6InterfaceAddressTable 1 }
+
+AlaIPv6InterfaceAddressEntry ::= SEQUENCE {
+    alaIPv6InterfaceAddressRowStatus	RowStatus,
+    alaIPv6InterfaceAddress 		Ipv6Address,
+    alaIPv6InterfaceAddressPrefixLength	Unsigned32,
+    alaIPv6InterfaceAddressAnycastFlag  TruthValue,
+    alaIPv6InterfaceAddressDADStatus    INTEGER
+}
+
+alaIPv6InterfaceAddressRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of IPv6 
+	interface addresses."
+    ::= { alaIPv6InterfaceAddressEntry 1 }
+
+alaIPv6InterfaceAddress OBJECT-TYPE
+    SYNTAX	Ipv6Address
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"An IPv6 address (or prefix for EUI-64 addresses)
+	assigned to the interface."
+    ::= { alaIPv6InterfaceAddressEntry 2 }
+
+alaIPv6InterfaceAddressPrefixLength OBJECT-TYPE
+    SYNTAX	Unsigned32 (3..128)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The number of bits that are significant in the IPv6 
+	address' prefix."
+    ::= { alaIPv6InterfaceAddressEntry 3 }
+
+alaIPv6InterfaceAddressAnycastFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object has the value 'true(1)', if this
+         address is an anycast address and the value
+         'false(2)' otherwise."
+    DEFVAL { false }
+    ::= { alaIPv6InterfaceAddressEntry 4 }
+    
+alaIPv6InterfaceAddressDADStatus OBJECT-TYPE
+    SYNTAX     	INTEGER { 
+                    unknown(0),
+		    pending(1),
+		    duplicate(2),
+		    passed(3),
+		    check(4)
+                }
+    MAX-ACCESS 	read-create
+    STATUS     	current
+    DESCRIPTION
+	"The status of duplicate address detection for this address.
+	The only value that may be set via SNMP is 'check' when the
+	current status is 'duplicate'.  In such cases, duplicate
+	address detection will be performed again for the address."
+    ::= { alaIPv6InterfaceAddressEntry 5 }
+
+
+--
+-- Alcatel IPv6 EUI64 Interface Address Table
+--
+
+alaIPv6InterfaceEUI64AddressTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6InterfaceEUI64AddressEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the creation and removal of IPv6
+	addresses formed by appending an EUI-64 interface 
+	identifier to the specified prefix.
+
+	This table is mainly used for the creation of such
+	addresses.  After creation they can be managed
+	via the alaIPv6InterfaceAddressTable."
+    ::= { alcatelIND1IPv6MIBObjects 5 }
+
+alaIPv6InterfaceEUI64AddressEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6InterfaceEUI64AddressEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"An IPv6 interface EUI-64 address entry."
+    INDEX   	{ ipv6IfIndex, 
+                  alaIPv6InterfaceEUI64AddressPrefix }
+    ::= { alaIPv6InterfaceEUI64AddressTable 1 }
+
+AlaIPv6InterfaceEUI64AddressEntry ::= SEQUENCE {
+    alaIPv6InterfaceEUI64AddressRowStatus	RowStatus,
+    alaIPv6InterfaceEUI64AddressPrefix		AlaIPv6AddressPrefix,
+    alaIPv6InterfaceEUI64AddressPrefixLength	Unsigned32,
+    alaIPv6InterfaceEUI64AddressIdentifier      OCTET STRING
+}
+
+alaIPv6InterfaceEUI64AddressRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of IPv6 
+	interface EUI-64 addresses."
+    ::= { alaIPv6InterfaceEUI64AddressEntry 1 }
+
+alaIPv6InterfaceEUI64AddressPrefix OBJECT-TYPE
+    SYNTAX	AlaIPv6AddressPrefix
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The prefix for the EUI-64 address."
+    ::= { alaIPv6InterfaceEUI64AddressEntry 2 }
+
+alaIPv6InterfaceEUI64AddressPrefixLength OBJECT-TYPE
+    SYNTAX	Unsigned32 (3..64)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The number of bits that are significant in the IPv6 
+	address' prefix."
+    ::= { alaIPv6InterfaceEUI64AddressEntry 3 }
+
+alaIPv6InterfaceEUI64AddressIdentifier OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(8))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The interface's EUI-64 identifier which is combined
+         with the prefix to form the IPv6 address."
+    ::= { alaIPv6InterfaceEUI64AddressEntry 4 }
+
+
+-- 
+-- Alcatel IPv6 Neighbor Table.
+--
+
+alaIPv6NeighborTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6NeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"The IPv6 neighbor table.  Much of this information is 
+	available in the RFC-2465 ipv6NetToMediaTable.  However,
+        that table does not allow the static configuration of
+	neighbor entries (all objects except for 
+	ipv6NetToMediaValid are read-only)."
+    ::= { alcatelIND1IPv6MIBObjects 6 }
+
+alaIPv6NeighborEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6NeighborEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Each entry contains one IPv6 address to `physical'
+	address equivalence (a neighbor)."
+    INDEX   	{ ipv6IfIndex, alaIPv6NeighborNetAddress }
+    ::= { alaIPv6NeighborTable 1 }
+
+AlaIPv6NeighborEntry ::= SEQUENCE {
+    alaIPv6NeighborNetAddress  	Ipv6Address,
+    alaIPv6NeighborPhysAddress	PhysAddress,
+    alaIPv6NeighborSlot		Unsigned32,
+    alaIPv6NeighborPort		Unsigned32,
+    alaIPv6NeighborType		INTEGER,
+    alaIPv6NeighborState	INTEGER,
+    alaIPv6NeighborLastUpdated	TimeStamp,
+    alaIPv6NeighborRowStatus	RowStatus,
+    alaIPv6NeighborLifetime     Unsigned32,
+    alaIPv6NeighborReachability INTEGER
+}
+
+alaIPv6NeighborNetAddress OBJECT-TYPE
+    SYNTAX     	Ipv6Address
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"The neighbor's IPv6 Address."
+    ::= { alaIPv6NeighborEntry 1 }
+
+alaIPv6NeighborPhysAddress OBJECT-TYPE
+    SYNTAX   	PhysAddress
+    MAX-ACCESS 	read-create
+    STATUS     	current
+    DESCRIPTION
+	"The neighbor's media-dependent `physical' address."
+    ::= { alaIPv6NeighborEntry 2 }
+
+alaIPv6NeighborSlot OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The slot used to reach the neighbor.  When creating a static neighbor
+	 the slot must be specified.  On read, a value of zero indicates
+	 the slot is not known/not applicable."
+    ::= { alaIPv6NeighborEntry 3 }
+
+alaIPv6NeighborPort OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The port used to reach the neighbor.  When creating a static neighbor
+	 the port must be specified.  On read, a value of zero indicates the
+	 port is not known/not applicable."
+    ::= { alaIPv6NeighborEntry 4 }
+
+alaIPv6NeighborType OBJECT-TYPE
+    SYNTAX     	INTEGER {
+                    other(1),    -- none of the following
+		    dynamic(2),  -- dynamically resolved
+		    static(3),   -- statically configured
+		    local(4)     -- local interface
+	        }
+    MAX-ACCESS 	read-only
+    STATUS     	current
+    DESCRIPTION
+	"The type of the mapping. The 'dynamic(2)' type
+	indicates that the IPv6 address to physical
+	addresses mapping has been dynamically
+	resolved using the IPv6 Neighbor Discovery
+	protocol. The static(3)' types indicates that
+	the mapping has been statically configured.
+	The local(4) indicates that the mapping is
+	provided for an entity's own interface address.
+
+	All entries added via this table will have the
+	type static(3) and only static entries may be
+	removed via this table."
+    ::= { alaIPv6NeighborEntry 5 }
+
+alaIPv6NeighborState OBJECT-TYPE
+    SYNTAX    	INTEGER {
+                    reachable(1), -- confirmed reachability
+		    stale(2),     -- unconfirmed reachability
+		    delay(3),     -- waiting for reachability
+		                  -- confirmation before entering
+		                  -- the probe state
+		    probe(4),     -- actively probing
+		    invalid(5),   -- an invalidated mapping
+		    unknown(6)    -- state can not be determined
+		                  -- for some reason.
+                }
+    MAX-ACCESS	read-only
+    STATUS      deprecated
+    DESCRIPTION
+	"The Neighbor Unreachability Detection state
+	for the interface when the address mapping in
+	this entry is used."
+    ::= { alaIPv6NeighborEntry 6 }
+
+alaIPv6NeighborLastUpdated OBJECT-TYPE
+    SYNTAX    	TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The value of sysUpTime at the time this entry
+	was last updated.  If this entry was updated prior
+	to the last re-initialization of the local network
+	management subsystem, then this object contains
+	a zero value."
+    ::= { alaIPv6NeighborEntry 7 }
+
+alaIPv6NeighborRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Used to control the addition and removal of static 
+	entries in the neighbor table."
+    ::= { alaIPv6NeighborEntry 8 }
+
+alaIPv6NeighborLifetime OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The remaining time the neighbor will stay in its current
+	state.  External events may cause a state change before
+	the expiry of this lifetime.  A value of zero indicates
+	the neighbor will remain in its current state indefinitely."
+    ::= { alaIPv6NeighborEntry 9 }
+
+alaIPv6NeighborReachability OBJECT-TYPE
+    SYNTAX    	INTEGER {
+                    confirmed(1),    -- confirmed reachability
+		    unconfirmed(2),  -- unconfirmed reachability
+		    incomplete(3)    -- detection incomplete
+                }
+    MAX-ACCESS	read-only
+    STATUS      current
+    DESCRIPTION
+	"The reachability status of the neighbor."
+    ::= { alaIPv6NeighborEntry 10 }
+
+
+--
+-- Alcatel IPv6 Static Routes Table
+--
+
+alaIPv6StaticRouteTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6StaticRouteEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	obsolete
+    DESCRIPTION
+	"This table has been superseded by alaIprmV6StaticRouteTable in
+	ALCATEL-IND1-IPRMV6-MIB.
+
+        Table allowing the creation and removal of static
+	IPv6 routes."
+    ::= { alcatelIND1IPv6MIBObjects 7 }
+
+alaIPv6StaticRouteEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6StaticRouteEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	obsolete
+    DESCRIPTION
+	"A static route entry."
+    INDEX   	{ alaIPv6StaticRouteDest,
+                  alaIPv6StaticRoutePfxLength }
+    ::= { alaIPv6StaticRouteTable 1 }
+
+AlaIPv6StaticRouteEntry ::= SEQUENCE {
+    alaIPv6StaticRouteDest	Ipv6Address,
+    alaIPv6StaticRoutePfxLength	INTEGER,
+    alaIPv6StaticRouteIfIndex   Ipv6IfIndexOrZero,
+    alaIPv6StaticRouteNextHop	Ipv6Address,
+    alaIPv6StaticRouteMetric  	Unsigned32,
+    alaIPv6StaticRouteRowStatus	RowStatus
+}
+
+alaIPv6StaticRouteDest OBJECT-TYPE
+    SYNTAX    	Ipv6Address
+    MAX-ACCESS 	not-accessible
+    STATUS     	obsolete
+    DESCRIPTION
+	"The destination IPv6 address of this static 
+	route.  This object may not take a Multicast
+	address value."
+    ::= { alaIPv6StaticRouteEntry 1 }
+
+alaIPv6StaticRoutePfxLength OBJECT-TYPE
+    SYNTAX     	INTEGER(0..128)
+    MAX-ACCESS 	not-accessible
+    STATUS     	obsolete
+    DESCRIPTION
+	"Indicates the prefix length of the destination
+	address."
+    ::= { alaIPv6StaticRouteEntry 2 }
+
+alaIPv6StaticRouteIfIndex OBJECT-TYPE
+    SYNTAX     	Ipv6IfIndexOrZero
+    MAX-ACCESS 	read-create
+    STATUS     	obsolete
+    DESCRIPTION
+	"If the next hop address is a link-local
+	address, this is the ipv6IfIndex value of the 
+	interface over which the destination is reached.
+        For all other next hop address types the value
+	is zero."
+    DEFVAL	{ 0 }
+    ::= { alaIPv6StaticRouteEntry 3 }
+
+alaIPv6StaticRouteNextHop OBJECT-TYPE
+    SYNTAX   	Ipv6Address
+    MAX-ACCESS 	read-create
+    STATUS     	obsolete
+    DESCRIPTION
+	"The IPv6 address of the next hop towards the
+	destination."
+    ::= { alaIPv6StaticRouteEntry 4 }
+
+alaIPv6StaticRouteMetric OBJECT-TYPE
+    SYNTAX     	Unsigned32
+    MAX-ACCESS 	read-create
+    STATUS     	obsolete
+    DESCRIPTION
+	"The routing metric for this route. The lower the
+	value, the higher the priority for the static 
+	route."
+    DEFVAL 	{ 1 }
+    ::= { alaIPv6StaticRouteEntry 5 }
+
+alaIPv6StaticRouteRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	obsolete
+    DESCRIPTION
+	"Used to control the addition and removal of static 
+	routes."
+    ::= { alaIPv6StaticRouteEntry 6 }
+
+
+--
+-- Local host name to IPv6 address table
+--
+
+alaIPv6HostTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF AlaIPv6HostEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Local table mapping host names to IPv6 addresses. This provides
+	the equivalent of /etc/hosts for IPv6."
+    ::= { alcatelIND1IPv6MIBObjects 8 }
+
+alaIPv6HostEntry OBJECT-TYPE
+    SYNTAX	AlaIPv6HostEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A entry maps a host name to an IPv6 address."
+    INDEX  	{ alaIPv6HostName, alaIPv6HostAddress }
+    ::= { alaIPv6HostTable 1 }
+
+AlaIPv6HostEntry ::= SEQUENCE {
+    alaIPv6HostName		DisplayString,
+    alaIPv6HostAddress		Ipv6Address,
+    alaIPv6HostRowStatus	RowStatus
+}
+
+alaIPv6HostName OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(1..64))
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A host name to be mapped to an IPv6 address."
+    ::= { alaIPv6HostEntry 1 }
+
+alaIPv6HostAddress OBJECT-TYPE
+    SYNTAX    	Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The IPv6 address mapped to the host name."
+    ::= { alaIPv6HostEntry 2 }
+
+alaIPv6HostRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Allows host name/IPv6 address mappings to be created and
+	deleted in this table."
+    ::= { alaIPv6HostEntry 3 }
+
+
+--
+-- Alcatel IPv6 Interface Prefix Table for Router Advertisements
+--
+
+alaIPv6InterfacePrefixTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPv6InterfacePrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table allowing the creation and removal of IPv6
+	prefixes to be placed in Prefix Information
+	options in Router Advertisement messages sent
+	from the interface.
+
+	Default: all prefixes that the router advertises
+	via routing protocols as being on-link for the
+	interface from which the advertisement is sent.
+	The link-local prefix is not included in the
+	list of advertised prefixes."
+    ::= { alcatelIND1IPv6MIBObjects 9 }
+
+
+alaIPv6InterfacePrefixEntry OBJECT-TYPE
+    SYNTAX      AlaIPv6InterfacePrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"An IPv6 interface prefix entry."
+    INDEX { ipv6IfIndex, alaIPv6InterfacePrefix,
+        alaIPv6InterfacePrefixLength }
+    ::= { alaIPv6InterfacePrefixTable 1 }
+
+
+AlaIPv6InterfacePrefixEntry ::= SEQUENCE {
+    alaIPv6InterfacePrefixRowStatus                    RowStatus,
+    alaIPv6InterfacePrefix                             Ipv6Address,
+    alaIPv6InterfacePrefixLength                       Unsigned32,
+    alaIPv6InterfacePrefixValidLifetime                Unsigned32,
+    alaIPv6InterfacePrefixOnLinkFlag                   TruthValue,
+    alaIPv6InterfacePrefixPreferredLifetime            Unsigned32,
+    alaIPv6InterfacePrefixAutonomousFlag               TruthValue,
+    alaIPv6InterfacePrefixSource                       INTEGER,
+    alaIPv6InterfacePrefixValidLifetimeDecrement       TruthValue,
+    alaIPv6InterfacePrefixValidLifetimeExpire          DateAndTime, 
+    alaIPv6InterfacePrefixPreferredLifetimeDecrement   TruthValue,
+    alaIPv6InterfacePrefixPreferredLifetimeExpire      DateAndTime
+}
+
+
+alaIPv6InterfacePrefixRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Used to control the addition and removal of IPv6
+	interface prefixes for Router ADvertisement messages."
+    ::= { alaIPv6InterfacePrefixEntry 1 }
+
+
+alaIPv6InterfacePrefix OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"The prefix associated with this interface."
+    ::= { alaIPv6InterfacePrefixEntry 2 }
+
+
+alaIPv6InterfacePrefixLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..127)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"The length of the prefix in bits."
+    ::= { alaIPv6InterfacePrefixEntry 3 }
+
+
+alaIPv6InterfacePrefixValidLifetime OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+	"The value to be placed in the Valid
+	Lifetime in the Prefix Information
+	option, in seconds. The designated value
+	of 4,294,967,295 represents infinity."
+    DEFVAL { 2592000 }
+    ::= { alaIPv6InterfacePrefixEntry 4 }
+
+
+alaIPv6InterfacePrefixOnLinkFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+	"The value to be placed in the on-link
+	flag (L-bit) field in the Prefix
+	Information option."
+    DEFVAL { true }
+    ::= { alaIPv6InterfacePrefixEntry 5 }
+
+
+alaIPv6InterfacePrefixPreferredLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+	"The value to be placed in the Preferred
+	Lifetime in the Prefix Information
+	option, in seconds. The designated value
+	of 4,294,967,295 represents infinity."
+    DEFVAL { 604800 }
+    ::= { alaIPv6InterfacePrefixEntry 6 }
+
+
+alaIPv6InterfacePrefixAutonomousFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+	"The value to be placed in the Autonomous
+	Flag field in the Prefix Information
+	option."
+    DEFVAL { true }
+    ::= { alaIPv6InterfacePrefixEntry 7 }
+
+
+alaIPv6InterfacePrefixSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   other(1),
+                   dynamic(2),
+                   configured(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The source of this prefix. If configured by
+	management the value will be configured(3). If
+	determined automatically from IPv6 interface
+	address configuration the value will be
+	dynamic(2)."
+    ::= { alaIPv6InterfacePrefixEntry 8 }
+
+
+alaIPv6InterfacePrefixValidLifetimeDecrement OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+	"If true, use the remaining seconds derived from
+	alaIPv6InterfacePrefixValidLifetime in the
+	Router Advertisement. If false, use the static value
+	alaIPv6InterfacePrefixValidLifetime."
+    DEFVAL { false }
+    ::= { alaIPv6InterfacePrefixEntry 9 }
+
+
+alaIPv6InterfacePrefixValidLifetimeExpire OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+	"The date and time when the advertised prefix Valid Lifetime 
+     expires. To use this value, 
+     alaIPv6InterfaceValidLifetimeDecrement must be set to true."
+    ::= { alaIPv6InterfacePrefixEntry 10 }
+
+
+alaIPv6InterfacePrefixPreferredLifetimeDecrement OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+	"If true, use the remaining seconds derived from
+	alaIPv6InterfacePrefixPreferredLifetime in the
+	Router Advertisement. If false, use the static value
+	alaIPv6InterfacePrefixPreferredLifetime."
+    DEFVAL { false }
+    ::= { alaIPv6InterfacePrefixEntry 11 }
+
+
+alaIPv6InterfacePrefixPreferredLifetimeExpire OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+	"The date and time when the advertised prefix Preferred Lifetime 
+     expires. To use this value, 
+     alaIPv6InterfacePreferredLifetimeDecrement must be set to true."
+    ::= { alaIPv6InterfacePrefixEntry 12 }
+
+
+--
+-- Alcatel IPv6 path MTU table
+--
+
+alaIPv6PMTUTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6PMTUEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the retrieval of the known IPv6
+         path MTU value."
+    ::= { alcatelIND1IPv6MIBObjects 10 }
+
+alaIPv6PMTUEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6PMTUEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"An IPv6 path MTU entry."
+    INDEX   	{ alaIPv6PMTUDest }
+    ::= { alaIPv6PMTUTable 1 }
+
+AlaIPv6PMTUEntry ::= SEQUENCE {
+    alaIPv6PMTUDest 		Ipv6Address,
+    alaIPv6PMTU           	Unsigned32,
+    alaIPv6PMTUExpire          	Unsigned32,
+    alaIPv6PMTUHits           	Counter32,
+    alaIPv6PMTUUpdates         	Counter32
+}
+
+alaIPv6PMTUDest OBJECT-TYPE
+    SYNTAX	Ipv6Address
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The destination address of the IPv6 path."
+    ::= { alaIPv6PMTUEntry 1 }
+
+alaIPv6PMTU OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The path's MTU."
+    ::= { alaIPv6PMTUEntry 2 }
+
+alaIPv6PMTUExpire OBJECT-TYPE
+    SYNTAX	Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The minimum time remaining before the PMTU entry is
+	removed from the table."
+    ::= { alaIPv6PMTUEntry 3 }
+
+alaIPv6PMTUHits OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of times the path MTU entry has been used."
+    ::= { alaIPv6PMTUEntry 4 }
+
+alaIPv6PMTUUpdates OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of times the path MTU entry has been updated."
+    ::= { alaIPv6PMTUEntry 5 }
+
+
+--
+-- Alcatel IPv6 route flags table
+--
+
+alaIPv6RouteFlagsTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6RouteFlagsEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"Table allowing the retrieval of the flags for
+	IPv6 route entries."
+    ::= { alcatelIND1IPv6MIBObjects 11 }
+
+alaIPv6RouteFlagsEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6RouteFlagsEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+	"An IPV6 route flags entry."
+    AUGMENTS   { ipv6RouteEntry }
+    ::= { alaIPv6RouteFlagsTable 1 }
+
+AlaIPv6RouteFlagsEntry ::= SEQUENCE {
+    alaIPv6RouteFlagsUp		TruthValue,
+    alaIPv6RouteFlagsGateway	TruthValue,
+    alaIPv6RouteFlagsHost	TruthValue,
+    alaIPv6RouteFlagsStatic	TruthValue,
+    alaIPv6RouteFlagsCloneable	TruthValue,
+    alaIPv6RouteFlagsDiscard	TruthValue,
+    alaIPv6RouteFlagsECMP	TruthValue
+}
+
+alaIPv6RouteFlagsUp OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the Up (U) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 1 }
+
+alaIPv6RouteFlagsGateway OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the Gateway (G) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 2 }
+
+alaIPv6RouteFlagsHost OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the Host (H) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 3 }
+
+alaIPv6RouteFlagsStatic OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the Static (S) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 4 }
+
+alaIPv6RouteFlagsCloneable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the Cloneable (C) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 5 }
+
+alaIPv6RouteFlagsDiscard OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the Discard/Blackhole (B) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 6 }
+
+alaIPv6RouteFlagsECMP OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"True if the ECMP (E) flag is set on the route."
+    ::= { alaIPv6RouteFlagsEntry 7 }
+
+
+--
+-- Alcatel IPv6 Local Unicast Address Table
+--
+
+alaIPv6LocalUnicastTable OBJECT-TYPE
+    SYNTAX    	SEQUENCE OF AlaIPv6LocalUnicastEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+      "Table allowing the creation and removal of local IPv6
+      unicast addresses (RFC 4193) on an interface."
+    ::= { alcatelIND1IPv6MIBObjects 13 }
+
+alaIPv6LocalUnicastEntry OBJECT-TYPE
+    SYNTAX     	AlaIPv6LocalUnicastEntry
+    MAX-ACCESS 	not-accessible
+    STATUS     	current
+    DESCRIPTION
+      "An local unicast IPv6 address entry."
+    INDEX   	{ ipv6IfIndex, 
+		  alaIPv6LocalUnicastGlobalID,
+                  alaIPv6LocalUnicastSubnetID, 
+                  alaIPv6LocalUnicastInterfaceID }
+    ::= { alaIPv6LocalUnicastTable 1 }
+
+AlaIPv6LocalUnicastEntry ::= SEQUENCE {
+    alaIPv6LocalUnicastGlobalID     OCTET STRING,
+    alaIPv6LocalUnicastSubnetID     OCTET STRING,
+    alaIPv6LocalUnicastInterfaceID  OCTET STRING,
+    alaIPv6LocalUnicastPrefixLength Unsigned32,
+    alaIPv6LocalUnicastEUI64        TruthValue,
+    alaIPv6LocalUnicastRowStatus    RowStatus
+}
+
+alaIPv6LocalUnicastGlobalID OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(5))
+    MAX-ACCESS	not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The global ID portion of the local IPv6 unicast address.  Leave
+      the value as all zero when adding a new addres to use the
+      alaIPv6GlobalID value."
+    ::= { alaIPv6LocalUnicastEntry 1 }
+
+alaIPv6LocalUnicastSubnetID OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(2))
+    MAX-ACCESS	not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The subnet ID portion of the local IPv6 unicast address."
+    ::= { alaIPv6LocalUnicastEntry 2 }
+
+alaIPv6LocalUnicastInterfaceID OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(8))
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+      "The interface identifier portion of the local IPv6 unicast 
+      address.  When alaIPv6LocalUnicastEUI64 is true(1) the value
+      of this object should be all zero."
+    ::= { alaIPv6LocalUnicastEntry 3 }
+
+alaIPv6LocalUnicastPrefixLength OBJECT-TYPE
+    SYNTAX	Unsigned32 (64..128)
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+      "The number of bits that are significant in the IPv6 
+      address prefix."
+    DEFVAL { 64 }
+    ::= { alaIPv6LocalUnicastEntry 4 }
+
+alaIPv6LocalUnicastEUI64 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "If true(1) the interface identifier is formed from an
+      automatically generated EUI-64 value."
+    DEFVAL { false }
+    ::= { alaIPv6LocalUnicastEntry 5 }
+
+alaIPv6LocalUnicastRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+      "Used to control the addition and removal of local IPv6 
+      unicast addresses."
+    ::= { alaIPv6LocalUnicastEntry 6 }
+
+
+--
+-- conformance information
+--
+
+alcatelIND1IPv6MIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIB 2 }
+alcatelIND1IPv6MIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIBConformance 1 }
+alcatelIND1IPv6MIBGroups OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIBConformance 2 }
+
+alaIPv6Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+	"The compliance statement for switches with Alcatel IPv6 stack and
+	implementing ALCATEL-IND1-IPV6-MIB."
+    MODULE
+    MANDATORY-GROUPS { alaIPv6TunnelConfigGroup,
+                       alaIPv6ConfigGroup,
+		       alaIPv6NeighborGroup,
+		       alaIPv6StaticRouteGroup,
+		       alaIPv6InterfaceGroup,
+		       alaIPv6InterfaceAddressGroup,
+		       alaIPv6InterfaceEUI64AddressGroup,
+		       alaIPv6InterfacePrefixGroup,
+		       alaIPv6PMTUGroup,
+		       alaIPv6RouteFlagsGroup,
+		       alaIPv6LocalUnicastGroup
+		    }
+    ::= { alcatelIND1IPv6MIBCompliances 1 }
+
+
+--
+-- units of conformance
+--
+
+alaIPv6TunnelConfigGroup OBJECT-GROUP
+    OBJECTS  	{ 
+		  alaIPv6ConfigTunnelV4Source,
+		  alaIPv6ConfigTunnelV4Dest
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of Alcatel IPv6
+	tunneling."
+    ::= { alcatelIND1IPv6MIBGroups 1 }
+
+alaIPv6ConfigGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  alaIPv6ClearNeighbors,
+		  alaIPv6ClearTraffic,
+		  alaIPv6ClearPMTUTable,
+		  alaIPv6PMTUMinLifetime,
+		  alaIPv6NeighborStaleLifetime,
+		  alaIPv6GlobalID
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of configuration
+	parameters of Alcatel IPv6 stack."
+    ::= { alcatelIND1IPv6MIBGroups 2 }
+
+alaIPv6NeighborGroup OBJECT-GROUP
+    OBJECTS  	{ 
+		  -- alaIPv6NeighborNetAddress,
+		  alaIPv6NeighborPhysAddress,
+		  alaIPv6NeighborSlot,
+		  alaIPv6NeighborPort,
+		  alaIPv6NeighborType,
+		  -- alaIPv6NeighborState,
+		  alaIPv6NeighborLastUpdated,
+		  alaIPv6NeighborRowStatus,
+		  alaIPv6NeighborLifetime,
+		  alaIPv6NeighborReachability
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	neighbors."
+    ::= { alcatelIND1IPv6MIBGroups 3 }
+
+alaIPv6StaticRouteGroup OBJECT-GROUP
+    OBJECTS  	{ 
+		  -- alaIPv6StaticRouteDest,
+		  -- alaIPv6StaticRoutePfxLength,
+                  alaIPv6StaticRouteIfIndex,
+		  alaIPv6StaticRouteNextHop,
+		  alaIPv6StaticRouteMetric,
+		  alaIPv6StaticRouteRowStatus
+		}
+    STATUS     obsolete
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	static routes."
+    ::= { alcatelIND1IPv6MIBGroups 4 }
+
+alaIPv6InterfaceGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  alaIPv6InterfaceRowStatus,
+		  alaIPv6InterfaceDescription,
+		  alaIPv6InterfaceMtu,
+		  alaIPv6InterfaceType,
+		  alaIPv6InterfaceAdminStatus,
+		  alaIPv6InterfaceSendRouterAdvertisements,
+		  alaIPv6InterfaceMaxRtrAdvInterval,
+		  alaIPv6InterfaceAdvManagedFlag,
+		  alaIPv6InterfaceAdvOtherConfigFlag,
+		  alaIPv6InterfaceAdvReachableTime,
+		  alaIPv6InterfaceAdvRetransTimer,
+		  alaIPv6InterfaceAdvDefaultLifetime,
+		  alaIPv6InterfaceName,
+		  alaIPv6InterfaceReachableTime,
+		  alaIPv6InterfaceBaseReachableTime,	
+		  alaIPv6InterfaceMinRtrAdvInterval,
+		  alaIPv6InterfaceClockSkew,
+		  alaIPv6InterfaceRetransTimer,
+		  alaIPv6InterfaceDADTransmits,
+		  alaIPv6InterfaceAdvHopLimit
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	interfaces."
+    ::= { alcatelIND1IPv6MIBGroups 5 }
+
+alaIPv6InterfaceAddressGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  alaIPv6InterfaceAddressRowStatus,
+		  -- alaIPv6InterfaceAddress,
+		  alaIPv6InterfaceAddressPrefixLength,
+		  alaIPv6InterfaceAddressAnycastFlag
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	addresses assigned to interfaces."
+    ::= { alcatelIND1IPv6MIBGroups 6 }
+
+alaIPv6InterfaceEUI64AddressGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  alaIPv6InterfaceEUI64AddressRowStatus,
+		  -- alaIPv6InterfaceEUI64AddressPrefix,
+		  alaIPv6InterfaceEUI64AddressPrefixLength,
+		  alaIPv6InterfaceEUI64AddressIdentifier
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	EUI-64 addresses assigned to interfaces."
+    ::= { alcatelIND1IPv6MIBGroups 7 }
+
+alaIPv6InterfacePrefixGroup OBJECT-GROUP
+    OBJECTS  	{ 
+		  alaIPv6InterfacePrefixRowStatus,
+		  -- alaIPv6InterfacePrefix,
+		  -- alaIPv6InterfacePrefixLength,
+		  alaIPv6InterfacePrefixValidLifetime,
+		  alaIPv6InterfacePrefixOnLinkFlag,
+		  alaIPv6InterfacePrefixPreferredLifetime,
+		  alaIPv6InterfacePrefixAutonomousFlag,
+		  alaIPv6InterfacePrefixSource,
+		  alaIPv6InterfacePrefixValidLifetimeDecrement,
+		  alaIPv6InterfacePrefixValidLifetimeExpire,
+		  alaIPv6InterfacePrefixPreferredLifetimeDecrement,
+		  alaIPv6InterfacePrefixPreferredLifetimeExpire
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	prefixes assigned to interfaces."
+    ::= { alcatelIND1IPv6MIBGroups 8 }
+
+alaIPv6PMTUGroup OBJECT-GROUP
+    OBJECTS  	{ 
+                  -- alaIPv6PMTUDest,
+		  alaIPv6PMTU,
+		  alaIPv6PMTUExpire,
+		  alaIPv6PMTUHits,
+		  alaIPv6PMTUUpdates
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	path MTUs."
+    ::= { alcatelIND1IPv6MIBGroups 9 }
+
+alaIPv6RouteFlagsGroup OBJECT-GROUP
+    OBJECTS  	{ 
+		  alaIPv6RouteFlagsUp,
+    		  alaIPv6RouteFlagsGateway,
+		  alaIPv6RouteFlagsHost,
+    		  alaIPv6RouteFlagsStatic,
+    		  alaIPv6RouteFlagsCloneable,
+    		  alaIPv6RouteFlagsDiscard,
+    		  alaIPv6RouteFlagsECMP
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of IPv6
+	route flags."
+    ::= { alcatelIND1IPv6MIBGroups 10 }
+
+alaIPv6LocalUnicastGroup OBJECT-GROUP
+    OBJECTS  	{ 
+		  -- alaIPv6LocalUnicastGlobalID,
+		  -- alaIPv6LocalUnicastSubnetID,
+    		  -- alaIPv6LocalUnicastInterfaceID,
+    		  alaIPv6LocalUnicastPrefixLength,
+    		  alaIPv6LocalUnicastEUI64,
+    		  alaIPv6LocalUnicastRowStatus
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of 
+	local IPv6 unicast addresses (RFC 4193)."
+    ::= { alcatelIND1IPv6MIBGroups 11 }
+
+
+--
+-- Traps in case if Maximum hardware table entries is reached
+--
+
+alcatelIND1IPv6Traps          OBJECT IDENTIFIER ::= { alcatelIND1IPv6MIBObjects 12}
+alcatelIND1IPv6TrapsRoot          OBJECT IDENTIFIER ::= { alcatelIND1IPv6Traps 0}
+
+ndpMaxLimitReached NOTIFICATION-TYPE
+     STATUS             current
+     DESCRIPTION
+           " This notification is generated when hardware table has reached supported
+             Maximum entries. OS6400 will not generate new ARP request for new nexthops"
+::= {alcatelIND1IPv6TrapsRoot 1}
+
+
+END

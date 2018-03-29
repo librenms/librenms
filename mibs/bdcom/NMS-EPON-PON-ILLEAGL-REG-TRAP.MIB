@@ -1,0 +1,47 @@
+-- *****************************************************************
+-- NMS-EPON-PON-ILLEAGL-REG-TRAP.my: NMS EPON PON TRAP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2009 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-PON-ILLEAGL-REG-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                              	FROM NMS-SMI
+    ponIfIndex                                  FROM NMS-EPON-OLT-PON
+    ifDescr                                     FROM RFC1213-MIB                                                 
+    onuID                                       FROM NMS-EPON-ONU;
+
+
+               nmsEponPonIlleagalRegTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 16 }
+               
+             
+
+-- Notifications
+	nmsEponPonOnuIllegalRegNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponPonIlleagalRegTrap 1 }
+
+
+	nmsEponPonOnuIllegalRegNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ponIfIndex,
+                       ifDescr,
+                       onuID
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when pon gets an illegal registration ."
+    		::= { nmsEponPonOnuIllegalRegNotifications 1 }
+
+              
+
+END

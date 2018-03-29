@@ -1,0 +1,181 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLAGENT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        IpAddress, Integer32, Counter64, OBJECT-TYPE,MODULE-IDENTITY, enterprises
+                FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+	 ifEntry 
+				FROM RFC1213-MIB
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId
+            FROM EQLGROUP-MIB
+    eqlMemberIndex
+            FROM EQLMEMBER-MIB;   
+    
+ 
+    eqlAgentModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762             
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Equallogic Inc. Storage Array extended error mib
+
+         Copyright (c) 2003-2009 by Dell, Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell, Inc.  This software embodies proprietary information
+         and trade secrets of Dell, Inc.
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION     "200211110000Z"  -- 02-Nov-11
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 12 }
+
+
+	eqlAgentObjects		OBJECT IDENTIFIER ::= { eqlAgentModule 1 }
+	eqlAgentNotifications 	OBJECT IDENTIFIER ::= { eqlAgentModule 2 }
+	eqlAgentConformance		OBJECT IDENTIFIER ::= { eqlAgentModule 3 }
+	eqlAgentInetObjects			OBJECT IDENTIFIER ::= { eqlAgentModule 4 }
+
+
+-- IPv4 Equallogic Extended Error Table
+
+	eqlExtErrorTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EqlExtErrorEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION "A conceptual table which associates extended error information with each 
+						SNMP operation that produced an error where such information is available"
+		::= {eqlAgentObjects 1 }
+
+	eqlExtErrorEntry	OBJECT-TYPE
+		SYNTAX 	EqlExtErrorEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION " A sequence of extended error information for each SNMP operation producing 
+						an extended error"
+		INDEX { eqlEntIpAddr, eqlSNMPrid }
+		::= {  eqlExtErrorTable 1 }
+
+		EqlExtErrorEntry ::= 
+			SEQUENCE {
+				eqlEntIpAddr IpAddress,
+				eqlSNMPrid Integer32,
+				eqlSNMPExtErrCode Integer32,
+            eqlSNMPExtErrMsg DisplayString
+			}
+
+		eqlEntIpAddr	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"The IP address of the entity making the SNMP request"
+		::= { eqlExtErrorEntry 1 }
+
+		eqlSNMPrid	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of the request id of the SNMP PDU which resulted in the 
+                      associated error."
+		::= { eqlExtErrorEntry 2 }
+
+		eqlSNMPExtErrCode	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of the extended error code resulting from the SNMP PDU with the
+                     associated request id and source address"
+		::= { eqlExtErrorEntry 3 }
+
+      eqlSNMPExtErrMsg OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The human-readable, meaningful error message that is associated with the
+                  extended error code. In most cases, this will be identical to the string 
+                  that appeared on the management console after the error occurred"
+      ::={ eqlExtErrorEntry 4 }
+
+-- Equallogic Extended Error Table
+
+	eqlExtInetErrorTable OBJECT-TYPE
+		SYNTAX			SEQUENCE OF EqlExtInetErrorEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"A conceptual table which associates extended error information with each 
+						SNMP operation that produced an error where such information is available"
+		::= {eqlAgentInetObjects 4 }
+
+	eqlExtInetErrorEntry OBJECT-TYPE
+		SYNTAX 			EqlExtInetErrorEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"A sequence of extended error information for each SNMP operation producing 
+						an extended error"
+		INDEX { eqlEntInetAddrType, eqlEntInetAddr, eqlSNMPInetrid }
+		::= {  eqlExtInetErrorTable 1 }
+
+		EqlExtInetErrorEntry ::= 
+			SEQUENCE {
+				eqlEntInetAddrType	InetAddressType,
+				eqlEntInetAddr		InetAddress,
+				eqlSNMPInetrid			Integer32,
+				eqlSNMPInetExtErrCode	Integer32,
+				eqlSNMPInetExtErrMsg	DisplayString
+			}
+
+		eqlEntInetAddrType OBJECT-TYPE
+		SYNTAX			InetAddressType
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"The IP address of the entity making the SNMP request"
+		::= { eqlExtInetErrorEntry 1 }
+
+		eqlEntInetAddr OBJECT-TYPE
+		SYNTAX			InetAddress
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"The IP address of the entity making the SNMP request"
+		::= { eqlExtInetErrorEntry 2 }
+
+		eqlSNMPInetrid OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of the request id of the SNMP PDU which resulted in the 
+						associated error."
+		::= { eqlExtInetErrorEntry 3 }
+
+		eqlSNMPInetExtErrCode OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The value of the extended error code resulting from the SNMP PDU with the
+						associated request id and source address."
+		::= { eqlExtInetErrorEntry 4 }
+
+		eqlSNMPInetExtErrMsg OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The human-readable, meaningful error message that is associated with the
+						extended error code. In most cases, this will be identical to the string 
+						that appeared on the management console after the error occurred."
+		::= { eqlExtInetErrorEntry 5 }
+END

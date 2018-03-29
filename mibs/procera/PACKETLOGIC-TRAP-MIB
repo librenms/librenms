@@ -1,0 +1,171 @@
+PACKETLOGIC-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+pl2Trap MODULE-IDENTITY
+	LAST-UPDATED "201212131322Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for PacketLogic2 traps"
+	REVISION "201212131322Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={packetlogic2 8}
+pl2Traps	OBJECT IDENTIFIER ::={pl2Trap 0}
+
+pl2TrapVals	OBJECT IDENTIFIER ::={pl2Trap 1}
+
+
+
+
+
+
+
+
+
+
+
+
+pl2ChannelTraps	OBJECT IDENTIFIER ::={pl2Trap 2}
+
+
+pl2ChannelTrapVals	OBJECT IDENTIFIER ::={pl2Trap 3}
+
+
+
+
+
+
+
+pl2TrapMessage	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Message describing trap."
+
+	::={pl2TrapVals 1}
+
+pl2TrapOid	OBJECT-TYPE
+	SYNTAX	 OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "OID Causing trap."
+
+	::={pl2TrapVals 2}
+
+pl2TrapValue	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current value of item causing trap."
+
+	::={pl2TrapVals 3}
+
+pl2TrapThreshold	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Threshold of item causing trap."
+
+	::={pl2TrapVals 4}
+
+pl2TrapValue64	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current value of item causing trap."
+
+	::={pl2TrapVals 5}
+
+pl2TrapThreshold64	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Threshold of item causing trap."
+
+	::={pl2TrapVals 6}
+
+channelIndex	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Index of the channel."
+
+	::={pl2ChannelTrapVals 1}
+
+channelDescr	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "A description of the channel."
+
+	::={pl2ChannelTrapVals 2}
+
+channelPort	OBJECT-TYPE
+	SYNTAX INTEGER { external(0), internal(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The port of the channel."
+
+	::={pl2ChannelTrapVals 3}
+
+prevState	OBJECT-TYPE
+	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This is the state the channel was in before it changed."
+
+	::={pl2ChannelTrapVals 4}
+
+newState	OBJECT-TYPE
+	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This is the new state of the channel."
+
+	::={pl2ChannelTrapVals 5}
+
+
+pl2TrapGenericMsg NOTIFICATION-TYPE
+	OBJECTS {pl2TrapMessage}
+	STATUS current
+	DESCRIPTION "Used for generic or undefined alerts. A message briefly explains the alert."
+	::= {  pl2Traps 1 }
+
+pl2TrapGeneric NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION "Used for generic or undefined alerts without message. Should be avoided."
+	::= {  pl2Traps 2 }
+
+pl2TrapSystemStatsAlert NOTIFICATION-TYPE
+	OBJECTS {pl2TrapThreshold, pl2TrapMessage, pl2TrapValue, pl2TrapOid}
+	STATUS current
+	DESCRIPTION "An Alert Threshold defined in SystemStats (System Diagnostics) was reached. This trap is used for items with 32 bit values."
+	::= {  pl2Traps 3 }
+
+pl2TrapSystemStatsAlert64 NOTIFICATION-TYPE
+	OBJECTS {pl2TrapThreshold64, pl2TrapMessage, pl2TrapValue64, pl2TrapOid}
+	STATUS current
+	DESCRIPTION "An Alert Threshold defined in SystemStats (System Diagnostics) was reached. This trap is used for items with 64 bit values."
+	::= {  pl2Traps 4 }
+
+pl2TrapSystemStatsAlertClear NOTIFICATION-TYPE
+	OBJECTS {pl2TrapOid}
+	STATUS current
+	DESCRIPTION "An Alert Threshold defined in SystemStats (System Diagnostics) is now clear."
+	::= {  pl2Traps 5 }
+
+pl2ChannelStateChanged NOTIFICATION-TYPE
+	OBJECTS {channelIndex, channelDescr, channelPort, newState, prevState}
+	STATUS current
+	DESCRIPTION "Channel state changed"
+	::= {  pl2ChannelTraps 1 }
+
+
+END

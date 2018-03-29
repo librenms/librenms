@@ -1,0 +1,319 @@
+--MibName=raisecom
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2003.5.24 by GONGGUIDONG
+-- This version of MIB is created just for management of base and user. 
+-- 
+-- Copyright(c) 2000-2002 by Raisecom  Ltd. 
+
+-- add iscom2110A-MA-PWR4 by ljk 20100714
+-- add iscom2824G by zlw 20090917
+-- add iscom2009ama by ljk 20090901
+-- add iscom3026  iscom2826  			by gongguidong 20030819
+-- add iscom4124  iscom2126  metrocom3000     	by gongguidong 20040205
+-- update rcft to rc002  , fiber to rc003 , transmiter to rc004 by gongguidong 20040205
+-- merge iscom3526,iscom3026,iscom2826,iscom2126,iscom2016,iscom2008,iscom2026 to IscomSwitch by liqiong 20041218
+-- modify ros-lite OID from 12 to 16             
+-- add iscomMediaConvertor, modify RC581FE from 1 to 2, modify RC581GE from 2 to 3,by liqiong 20060411
+-- add rc702c by sunzhanfeng 20060413
+-- add iscom2852 by zhaohongce 20060517
+-- add  opcom100-2c by liujunfu  20060914      
+-- add  rc953-gestm1 by liujunfu  20060928    {9} 
+-- add  opcom3500e liujunfu  20061025    {8}     
+-- add iscom2926, iscom2926F, iscom2017A, iscom3012 liqiong 20061228      
+-- add iscom2016C, iscom3026E, iscom3028F ,iscom3052  liqiong 20070208
+-- modify iscom3012 to iscom3012GF  zhaohc 20070216   
+-- add iscom5124, rc3000-15,liqiong, 20070718 
+-- add rc953e-gestm1 ,liqiong, 20071015    
+-- add rc959-4fe16e1, liqiong, 20071204   
+-- add opcom3500e-6, liqiong, 20071217
+-- add rc702-gestm4, liqiong, 20080125         
+-- add opcom3105 , liqiong, 20080303   
+-- add iscom2250,lizhimin, 20080331    
+-- modify iscom2250 to iscom2150-MA,lizhimin, 20080416
+-- add rc702gestm4, liqiong, 20080508   
+-- add iscom2109-MA, iscom2109A-MA,iscom2118-MA,iscom2126S-MA,chenjunyong, 20080515    
+-- add rc702d, liqiong, 20080613    
+-- add opcom3107, liqiong, 20080701   
+-- add rc006-6, liqiong, 20080807         
+-- add rc959-gestm1, liqiong, 20080811       
+-- add optUdSysMgmt, optUdSysModules, liqiong, 20080818
+-- add iscom2126E-MA, zhanxuecha0, 20080827    
+-- add iscom2126F-MA, zhanxuechao, 20080916
+-- add iscom2126FL-MA, zhanxuechao, 20081007
+-- add rc551B-GE4FE, zhanxuechao, 20090204
+-- add rc3000-6, liqiong, 20080922        
+-- add rc1201-4fe4e1t1, liqiong, 20081118     
+-- add iscom2126EA-MA, zhanxuechao, 20081128
+-- add iscom2110a-ma, ljk, 20081217
+-- add opcom3109, liqiong, 20081125    
+-- add rc006-3m-s, liqiong, 20081226     
+-- add tdmopSeries, liqiong, 20081229             
+-- delete  rc1201-4fe4e1t1, lq, 20081229      
+-- add opcom-100-oau, lq, 20090220      
+-- add dlcomSeries, liqiong, 20090421           
+-- add rc552-ge, lq, 20090601    
+-- modify RC551B-GE4FE 16 to 10, zq, 20090724  
+-- add rc3000e , lq, 20090818           
+-- add rc953-4fexe1t1, lq, 20090901    
+-- add rc905g-4fe16e1, rc905g-gestm1, lq, 20090904    
+--- add rc953eb-gestm1, lq, 20100104        
+-- add  rc953-4fe8e1t1bl,rc953-4fe4e1t1bl,rc953-4fe8e1 ,rc953-4fe4e1 ,rc951e-4fee1,lq, 20100308
+-- add  rc1106e-fe-2wx4 ,rc1106e-fe-2wx8, hxz,20100604
+-- add  opcom3500e-c , hxz,20100824
+-- ===============================================================
+
+
+RAISECOM-BASE-MIB    DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises		FROM RFC1155-SMI;
+
+
+-- =======================================================================
+--
+--  Organization  branches
+-- =======================================================================
+
+	raisecom			OBJECT IDENTIFIER ::= { enterprises 8886 }
+
+
+
+-- =======================================================================
+--
+--  raisecom  networks products  branches
+-- =======================================================================
+
+--  RaiseCom  Manager 
+	raisecomAgent			OBJECT IDENTIFIER ::= { raisecom 1 }
+
+--  TransmitConvertorSeries Series
+	rc002				OBJECT IDENTIFIER ::= { raisecom 2 }
+
+--  TransmitPDH Series  1U
+	rc003				OBJECT IDENTIFIER ::= { raisecom 3 }
+
+--  TransmitPDH Series  10U
+	rc004			OBJECT IDENTIFIER ::= { raisecom 4 }
+
+--  EOSAccess Series 
+	rc701FE			OBJECT IDENTIFIER ::= { raisecom 5 }
+
+--  ISCOM Series 
+	iscomSeries			OBJECT IDENTIFIER ::= { raisecom 6 }
+
+--  OPCOM Series 
+	opcomSeries			OBJECT IDENTIFIER ::= { raisecom 7 }
+
+--  RAISECOM Manager 
+	raisecomManager			OBJECT IDENTIFIER ::= { raisecom 8 }
+
+--  TransmitPDH Series  PC 
+	pcAgent			        OBJECT IDENTIFIER ::= { raisecom 9 }
+
+--  TransmitPCM Series 
+	pccomSeries		        OBJECT IDENTIFIER ::= { raisecom 10 }
+
+--  OEM Series 
+	oemSeries		        OBJECT IDENTIFIER ::= { raisecom 11 }   
+	
+--  rc Series 
+	rcSeries		        OBJECT IDENTIFIER ::= { raisecom 12 }
+
+--	Common MIB for Optical System Group
+	raisecomOptSysCommon	OBJECT IDENTIFIER ::= { raisecom 15 }
+
+--  ros-light Series 
+	rosliteSeries		        OBJECT IDENTIFIER ::= { raisecom 16 }     
+	
+--	draft	  
+	draft                    OBJECT IDENTIFIER ::= { raisecom 17 }
+	
+--  PON Series 
+	ponSeries		        OBJECT IDENTIFIER ::= { raisecom 18 }
+
+-- 	TDMoP Series                                                                  
+	tdmopSeries	            OBJECT IDENTIFIER ::= { raisecom 19 }    
+	
+-- 	dlcom Series                                                                  
+	dlcomSeries	            OBJECT IDENTIFIER ::= { raisecom 20 }                                                      
+-- =======================================================================
+--
+--  raisecom Agent 
+-- 
+
+	raisecomCluster			OBJECT IDENTIFIER ::= { raisecomAgent 6 }	
+-- =======================================================================
+
+-- =======================================================================
+--
+--  ISCOM Series 
+-- 
+
+	iscomSwitch			OBJECT IDENTIFIER ::= { iscomSeries 1 }	  
+	iscom3026			OBJECT IDENTIFIER ::= { iscomSeries 2 }
+	iscom2826			OBJECT IDENTIFIER ::= { iscomSeries 3 }
+	iscom4124			OBJECT IDENTIFIER ::= { iscomSeries 4 }
+	iscom2126			OBJECT IDENTIFIER ::= { iscomSeries 5 }
+    iscom2016			OBJECT IDENTIFIER ::= { iscomSeries 6 }
+    iscom2008			OBJECT IDENTIFIER ::= { iscomSeries 7 }	
+    iscom4300			OBJECT IDENTIFIER ::= { iscomSeries 8 }	   
+	iscom2026B          OBJECT IDENTIFIER ::= { iscomSeries 9 } 
+	iscom2826E          OBJECT IDENTIFIER ::= { iscomSeries 10 }    
+	iscom2828F          OBJECT IDENTIFIER ::= { iscomSeries 11 } 
+	iscom2812GF         OBJECT IDENTIFIER ::= { iscomSeries 12 } 
+	iscom2109F          OBJECT IDENTIFIER ::= { iscomSeries 13 } 
+	iscom2026           OBJECT IDENTIFIER ::= { iscomSeries 14 } 
+	iscom2025           OBJECT IDENTIFIER ::= { iscomSeries 15 } 
+	iscom2017           OBJECT IDENTIFIER ::= { iscomSeries 16 } 
+	iscom2009           OBJECT IDENTIFIER ::= { iscomSeries 17 }  
+	iscom2125           OBJECT IDENTIFIER ::= { iscomSeries 18 } 
+	iscom2117           OBJECT IDENTIFIER ::= { iscomSeries 19 } 
+	iscom2109           OBJECT IDENTIFIER ::= { iscomSeries 20 }   
+	iscom2126e          OBJECT IDENTIFIER ::= { iscomSeries 21 }	
+	iscom2852           OBJECT IDENTIFIER ::= { iscomSeries 22 }	 
+	iscom2126F          OBJECT IDENTIFIER ::= { iscomSeries 23 }      	 
+	iscomEpon          	OBJECT IDENTIFIER ::= { iscomSeries 24 }             	 
+	iscom2924GF        	OBJECT IDENTIFIER ::= { iscomSeries 25 }     	 
+	iscom2126S         	OBJECT IDENTIFIER ::= { iscomSeries 26 }        	 
+	iscom5504         	OBJECT IDENTIFIER ::= { iscomSeries 27 }
+	iscom2009A         	OBJECT IDENTIFIER ::= { iscomSeries 28 }     	 
+	iscom2109A         	OBJECT IDENTIFIER ::= { iscomSeries 29 }       	 
+	iscom2926         	OBJECT IDENTIFIER ::= { iscomSeries 30 }   	 
+	iscom2926F         	OBJECT IDENTIFIER ::= { iscomSeries 31 }   	 
+	iscom2017A         	OBJECT IDENTIFIER ::= { iscomSeries 32 }    	 
+	iscom3012GF         OBJECT IDENTIFIER ::= { iscomSeries 33 }      	 
+	iscom2016C         	OBJECT IDENTIFIER ::= { iscomSeries 34 }  	 
+	iscom3026E         	OBJECT IDENTIFIER ::= { iscomSeries 35 }  	 
+	iscom3028F         	OBJECT IDENTIFIER ::= { iscomSeries 36 }    	 
+	iscom3052         	OBJECT IDENTIFIER ::= { iscomSeries 37 }
+	iscom5124         	OBJECT IDENTIFIER ::= { iscomSeries 38 }
+	iscom2150-MA       	OBJECT IDENTIFIER ::= { iscomSeries 39 }
+	iscom2118         	OBJECT IDENTIFIER ::= { iscomSeries 40 }
+	iscom2828         	OBJECT IDENTIFIER ::= { iscomSeries 44 }
+	iscom2109-MA       	OBJECT IDENTIFIER ::= { iscomSeries 45 }
+	iscom2109A-MA       OBJECT IDENTIFIER ::= { iscomSeries 46 }
+	iscom2118-MA       	OBJECT IDENTIFIER ::= { iscomSeries 47 }
+	iscom2126S-MA      	OBJECT IDENTIFIER ::= { iscomSeries 48 }
+	iscom2126E-MA       OBJECT IDENTIFIER ::= { iscomSeries 50 }
+    iscom2126F-MA       OBJECT IDENTIFIER ::= { iscomSeries 51 }
+    iscom2126FL-MA      OBJECT IDENTIFIER ::= { iscomSeries 52 }
+	iscom2017S          OBJECT IDENTIFIER ::= { iscomSeries 53 }
+	iscom2126EA-MA      OBJECT IDENTIFIER ::= { iscomSeries 54 }
+	iscom2110A-MA		OBJECT IDENTIFIER ::= { iscomSeries 55 }
+	iscom2009A-MA		OBJECT IDENTIFIER ::= { iscomSeries 56 }
+	iscom2824G		OBJECT IDENTIFIER ::= { iscomSeries 57 }
+	iscom2110A-MA-PWR4	OBJECT IDENTIFIER ::= { iscomSeries 58 }
+	iscom2828F-C		OBJECT IDENTIFIER ::= { iscomSeries 62 }
+	iscom2828-MA		OBJECT IDENTIFIER ::= { iscomSeries 63 }
+
+-- =======================================================================
+--
+--  OPCOM Series 
+--
+
+	opcom3100			OBJECT IDENTIFIER ::= { opcomSeries 1 }
+	opcom100-4			OBJECT IDENTIFIER ::= { opcomSeries 2 }
+	opcom3500			OBJECT IDENTIFIER ::= { opcomSeries 3 }
+	opcom3101			OBJECT IDENTIFIER ::= { opcomSeries 4 }
+	opcom3102			OBJECT IDENTIFIER ::= { opcomSeries 5 }
+	opcom3103			OBJECT IDENTIFIER ::= { opcomSeries 6 }
+	opcom100-2c			OBJECT IDENTIFIER ::= { opcomSeries 7 }
+    opcom3500e          OBJECT IDENTIFIER ::= { opcomSeries 8 } 
+	opcom3500e-6          OBJECT IDENTIFIER ::= { opcomSeries 9 }     
+	opcom3105          OBJECT IDENTIFIER ::= { opcomSeries 10 }    
+	opcom3107          OBJECT IDENTIFIER ::= { opcomSeries 11 }     
+	opcom3109          OBJECT IDENTIFIER ::= { opcomSeries 12 }
+	opcom-100-oau          OBJECT IDENTIFIER ::= { opcomSeries 15 }
+	opcom3500e-c          OBJECT IDENTIFIER ::= { opcomSeries 16 }
+-- =======================================================================
+--
+--  RAISECOM Manager 
+--
+
+	iscomPM			  OBJECT IDENTIFIER ::= { raisecomManager 1 }
+
+
+-- =======================================================================
+--
+--  OEM Series 
+-- 
+
+	iscom3408			OBJECT IDENTIFIER ::= { oemSeries 1 }
+-- =======================================================================
+--
+--  rc Series 
+-- 
+
+	rc951			OBJECT IDENTIFIER ::= { rcSeries 1 }
+    rc957			OBJECT IDENTIFIER ::= { rcSeries 2 }
+	rc952			OBJECT IDENTIFIER ::= { rcSeries 3 }
+	opticaltransceiver	OBJECT IDENTIFIER ::= { rcSeries 4 }
+	rc006			OBJECT IDENTIFIER ::= { rcSeries 5 }
+	rc702           OBJECT IDENTIFIER ::= { rcSeries 6 }
+	rc702c          OBJECT IDENTIFIER ::= { rcSeries 7 }  
+	rc006-1         OBJECT IDENTIFIER ::= { rcSeries 8 }   
+	rc953-gestm1    OBJECT IDENTIFIER ::= { rcSeries 9 }   
+	rc953e-3fe16e1  OBJECT IDENTIFIER ::= { rcSeries 10 }
+	rc3000-15       OBJECT IDENTIFIER ::= { rcSeries 11 }
+	rc953e-gestm1	OBJECT IDENTIFIER ::= { rcSeries 12 }
+	rc959-4fe16e1	OBJECT IDENTIFIER ::= { rcSeries 13 } 
+	rc702-gestm4	OBJECT IDENTIFIER ::= { rcSeries 14 }	   
+	rc702gestm4     OBJECT IDENTIFIER ::= { rcSeries 15 }    
+	rc702d    		OBJECT IDENTIFIER ::= { rcSeries 16 }  
+	rc006-6         OBJECT IDENTIFIER ::= { rcSeries 17 }    	
+	rc959-gestm1	OBJECT IDENTIFIER ::= { rcSeries 18 } 	
+	rc3000-6        OBJECT IDENTIFIER ::= { rcSeries 19 }
+	rc552-ge        OBJECT IDENTIFIER ::= { rcSeries 20 } 
+	rc006-3m-s      OBJECT IDENTIFIER ::= { rcSeries 21 }
+	rc3000e			OBJECT IDENTIFIER ::= { rcSeries 22 }
+	rc953-4fexe1t1 	OBJECT IDENTIFIER ::= { rcSeries 23 } 
+	rc905g-4fe16e1	OBJECT IDENTIFIER ::= { rcSeries 24 }   
+	rc905g-gestm1	OBJECT IDENTIFIER ::= { rcSeries 25 } 
+ 	rc953eb-gestm1	OBJECT IDENTIFIER ::= { rcSeries 26 } 
+ 	rc953-4fe8e1t1bl	OBJECT IDENTIFIER ::= { rcSeries 27 } 
+ 	rc953-4fe4e1t1bl	OBJECT IDENTIFIER ::= { rcSeries 28 } 
+ 	rc953-4fe8e1	OBJECT IDENTIFIER ::= { rcSeries 29 } 
+ 	rc953-4fe4e1	OBJECT IDENTIFIER ::= { rcSeries 30 }  
+ 	rc951e-4fee1	OBJECT IDENTIFIER ::= { rcSeries 31 } 
+	rc1106e-fe-2wx4	OBJECT IDENTIFIER ::=  { rcSeries 32 }
+	rc1106e-fe-2wx8	OBJECT IDENTIFIER ::=  { rcSeries 33 }
+
+-- =======================================================================
+--
+--  Common MIB for Optical System Group
+-- 
+	optSysMgmt		OBJECT IDENTIFIER ::= { raisecomOptSysCommon 1 }
+	optSysModules	OBJECT IDENTIFIER ::= { raisecomOptSysCommon 2 }
+	optAgentCapability	OBJECT IDENTIFIER ::= { raisecomOptSysCommon 3 }
+	optUdSysMgmt		OBJECT IDENTIFIER ::= { raisecomOptSysCommon 4 }
+	optUdSysModules		OBJECT IDENTIFIER ::= { raisecomOptSysCommon 5 }
+-- =======================================================================
+--
+--  roslite Series 
+-- 
+                                                         
+	iscomMediaConvertor			OBJECT IDENTIFIER ::= { rosliteSeries 1 }
+	rc581FE			OBJECT IDENTIFIER ::= { rosliteSeries 2 }	 
+	rc581GE			OBJECT IDENTIFIER ::= { rosliteSeries 3 }             
+	rc551-FE			OBJECT IDENTIFIER ::= { rosliteSeries 4 }	 
+	rc551-GE			OBJECT IDENTIFIER ::= { rosliteSeries 5 }            
+	rc551-4FE			OBJECT IDENTIFIER ::= { rosliteSeries 6 }
+	rc551B-FE			OBJECT IDENTIFIER ::= { rosliteSeries 7 }	 
+	rc551B-GE			OBJECT IDENTIFIER ::= { rosliteSeries 8 }            
+	rc551B-4FE			OBJECT IDENTIFIER ::= { rosliteSeries 9 }
+	rc551B-GE4FE		OBJECT IDENTIFIER ::= { rosliteSeries 10 }
+	rc551E-4GE		  OBJECT IDENTIFIER ::= { rosliteSeries 11 }
+	rc551E-GE		  OBJECT IDENTIFIER ::= { rosliteSeries 12 }
+	rc551E-4GEF		  OBJECT IDENTIFIER ::= { rosliteSeries 13 }
+	
+-- =======================================================================
+--
+--  draft 
+-- 
+  
+	oam                    OBJECT IDENTIFIER ::= { draft 1 }   
+	epon                   OBJECT IDENTIFIER ::= { draft 2 }
+
+END

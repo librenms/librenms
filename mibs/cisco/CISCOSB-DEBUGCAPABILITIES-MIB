@@ -1,0 +1,50 @@
+CISCOSB-DEBUGCAPABILITIES-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private Debug Capabilities MIB
+-- Version:              7.50
+-- Date:                 5-Jan-2011
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
+    DisplayString                                           FROM SNMPv2-TC;
+
+
+rlDebugCapabilities MODULE-IDENTITY
+                LAST-UPDATED "201101050000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module is used for achieving extended
+                      debugging capablities for the device.
+                      For example: greater management capabilies for technical
+                      support users."
+                REVISION "201101050000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 206 }
+
+rlDebugCapabilitiesPassword OBJECT-TYPE
+  SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+           "A user intereseted to obtain extended debug capabilities should
+            SET this MIB to a well known secret value (it is intended to be
+            used only by authorized users).
+            Most often, this value will be based on the device MAC address.
+            Upon setting the correct value, the SET operation will return
+            noError. Otherwise, wrongValue will return to the caller.
+            GET operation on this MIB will reurn a value of length 0."
+    ::=  { rlDebugCapabilities 1 }
+
+END

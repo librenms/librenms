@@ -1,0 +1,757 @@
+-- *******************************************************************
+-- Juniper enterprise specific DHCPv6 MIB.
+--
+-- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-JDHCPV6-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, 
+    Counter32, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    ifIndex,InterfaceIndex
+        FROM IF-MIB
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime
+        FROM SNMPv2-TC 
+     Ipv6Address, Ipv6AddressPrefix
+        FROM IPV6-TC
+    jnxJdhcpv6MibRoot
+        FROM JUNIPER-SMI;
+
+jnxJdhcpv6MIB  MODULE-IDENTITY
+    LAST-UPDATED "201103150000Z" --  March 15, 2011
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+        "The JUNOS DHCP MIB for the Juniper Networks enterprise."
+
+    -- revision history
+    REVISION      "201103150000Z"
+    DESCRIPTION   "Add OIDs to the Interface Statistics Table"
+    REVISION      "201101250000Z"
+    DESCRIPTION   "Add Interface Statistics Table"
+    REVISION      "201002150000Z"
+    DESCRIPTION   "Creation Date"
+    ::= { jnxJdhcpv6MibRoot 62 }
+
+-- Managed object groups
+jnxJdhcpv6Objects                         OBJECT IDENTIFIER ::= { jnxJdhcpv6MIB 1 }
+jnxJdhcpv6LocalServerObjects              OBJECT IDENTIFIER ::= { jnxJdhcpv6MIB 2 }
+
+
+-- Managed objects for DHCPv6 local server
+jnxJdhcpv6LocalServerStatistics OBJECT IDENTIFIER
+    ::= { jnxJdhcpv6LocalServerObjects 1 }
+jnxJdhcpv6LocalServerBindings   OBJECT IDENTIFIER
+    ::= { jnxJdhcpv6LocalServerObjects 2 }
+jnxJdhcpv6LocalServerTraps    OBJECT IDENTIFIER
+    ::= { jnxJdhcpv6LocalServerObjects 3 }
+jnxJdhcpv6LocalServerTrapVars   OBJECT IDENTIFIER 
+    ::= { jnxJdhcpv6LocalServerObjects 4 }
+jnxJdhcpv6LocalServerIfcStats   OBJECT IDENTIFIER
+    ::= { jnxJdhcpv6LocalServerObjects 5 }
+
+-- DHCP V6 Server Statistics
+jnxJdhcpv6LocalServerTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DHCP v6 packets dropped." 
+    ::= { jnxJdhcpv6LocalServerStatistics 1 }
+
+jnxJdhcpv6LocalServerNoSafdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to no safd match."
+    ::= { jnxJdhcpv6LocalServerStatistics 2 }
+
+jnxJdhcpv6LocalServerBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to send error."
+    ::= { jnxJdhcpv6LocalServerStatistics 3 }
+
+jnxJdhcpv6LocalServerShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to packet being too short."
+    ::= { jnxJdhcpv6LocalServerStatistics 4 }
+
+jnxJdhcpv6LocalServerBadMsgtypeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad opcode in the packet."
+    ::= { jnxJdhcpv6LocalServerStatistics 5 }
+
+jnxJdhcpv6LocalServerBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpv6LocalServerStatistics 6 }
+
+jnxJdhcpv6LocalServerBadSrcAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to invalid addr family."
+    ::= { jnxJdhcpv6LocalServerStatistics 7 }
+
+jnxJdhcpv6LocalServerRelayHopCountDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to max relays supported."
+    ::= { jnxJdhcpv6LocalServerStatistics 8 }
+
+jnxJdhcpv6LocalServerNoClientIdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to missing client id."
+    ::= { jnxJdhcpv6LocalServerStatistics 9 }
+
+jnxJdhcpv6LocalServerDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Decline packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 10}
+
+jnxJdhcpv6LocalServerSolicitReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Solicit packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 11}
+
+jnxJdhcpv6LocalServerInformationRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Information Request packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 12 }
+
+jnxJdhcpv6LocalServerReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Release packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 13 }
+
+jnxJdhcpv6LocalServerRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Request packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 14 }
+
+jnxJdhcpv6LocalServerConfirmReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Confirm packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 15 }
+
+jnxJdhcpv6LocalServerRenewReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Renew packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 16 }
+
+jnxJdhcpv6LocalServerRebindReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Rebind packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 17 }
+
+jnxJdhcpv6LocalServerRelayForwReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Fowr packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 18 }
+
+jnxJdhcpv6LocalServerRelayReplReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Repl packets received."
+    ::= { jnxJdhcpv6LocalServerStatistics 19 }
+
+jnxJdhcpv6LocalServerAdvertiseSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Advertise packets sent."
+    ::= { jnxJdhcpv6LocalServerStatistics 20 }
+
+jnxJdhcpv6LocalServerReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reply packets sent."
+    ::= { jnxJdhcpv6LocalServerStatistics 21 }
+
+jnxJdhcpv6LocalServerReconfigureSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reconfigure packets sent."
+    ::= { jnxJdhcpv6LocalServerStatistics 22 }
+
+jnxJdhcpv6LocalServerTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpv6LocalServerStatistics 23}
+
+-- DHCPv6 Local Server Bindings Table
+
+jnxJdhcpv6LocalServerBindingsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpv6LocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address bindings maintained by this JUNOS DHCP Local Server."
+    ::= { jnxJdhcpv6LocalServerBindings 1 }
+
+jnxJdhcpv6LocalServerBindingsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpv6LocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding (client) maintained by
+        this JUNOS DHCP Local Server."
+    INDEX     { jnxJdhcpv6LocalServerBindingsPrefix, jnxJdhcpv6LocalServerBindingsLength }
+    ::= { jnxJdhcpv6LocalServerBindingsTable 1 }
+
+JnxJdhcpv6LocalServerBindingsEntry ::= SEQUENCE {
+    jnxJdhcpv6LocalServerBindingsPrefix                       Ipv6AddressPrefix,
+    jnxJdhcpv6LocalServerBindingsLength                       Unsigned32,
+    jnxJdhcpv6LocalServerBindingsState                        DisplayString,
+    jnxJdhcpv6LocalServerBindingsLeaseEndTime                 DateAndTime,
+    jnxJdhcpv6LocalServerBindingsLeaseExpireTime              Unsigned32,
+    jnxJdhcpv6LocalServerBindingsLeaseStartTime               DateAndTime,
+    jnxJdhcpv6LocalServerBindingsIncomingClientInterface      DisplayString,
+    jnxJdhcpv6LocalServerBindingsClientInterfaceVlanId        Unsigned32,
+    jnxJdhcpv6LocalServerBindingsDemuxInterfaceName           DisplayString,
+    jnxJdhcpv6LocalServerBindingsServerIpAddress              IpAddress,
+    jnxJdhcpv6LocalServerBindingsBootpRelayAddress            IpAddress,
+    jnxJdhcpv6LocalServerBindingsPreviousBootpRelayAddress    IpAddress,
+    jnxJdhcpv6LocalServerBindingsClientPoolName               DisplayString,
+    jnxJdhcpv6LocalServerBindingsClientProfileName            DisplayString
+    }
+
+jnxJdhcpv6LocalServerBindingsPrefix OBJECT-TYPE
+    SYNTAX      Ipv6AddressPrefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The prefix associated with this entry in the bindings table."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 1 }
+
+jnxJdhcpv6LocalServerBindingsLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The length of the prefix in bits."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 2 }
+
+jnxJdhcpv6LocalServerBindingsState OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state associated with this entry in the bindings table."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 3 }
+
+jnxJdhcpv6LocalServerBindingsLeaseEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the lease expires on this binding."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 4 }
+
+jnxJdhcpv6LocalServerBindingsLeaseExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining until the lease expires for this binding."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 5 }
+
+jnxJdhcpv6LocalServerBindingsLeaseStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the lease was started for this binding."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 6 }
+
+jnxJdhcpv6LocalServerBindingsIncomingClientInterface OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The incoming interface or this binding."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 7 }
+
+jnxJdhcpv6LocalServerBindingsClientInterfaceVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID for this binding."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 8 }
+
+jnxJdhcpv6LocalServerBindingsDemuxInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The demux interface for this binding."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 9 }
+
+jnxJdhcpv6LocalServerBindingsServerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 10 }
+
+jnxJdhcpv6LocalServerBindingsBootpRelayAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The BOOTP relay Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 11 }
+
+jnxJdhcpv6LocalServerBindingsPreviousBootpRelayAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Previous BOOTP relay Address associated with the server for this entry in the bindings table."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 12 }
+
+jnxJdhcpv6LocalServerBindingsClientPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The display client pool name."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 13 }
+
+jnxJdhcpv6LocalServerBindingsClientProfileName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The display client profile name."
+    ::= { jnxJdhcpv6LocalServerBindingsEntry 14 }
+
+-- DHCP V6 Local Server Interface Statistics Table
+
+jnxJdhcpv6LocalServerIfcStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpv6LocalServerIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of interface statistics maintained by this JUNOS DHCPv6 Local Server."
+    ::= { jnxJdhcpv6LocalServerIfcStats 1 }
+
+jnxJdhcpv6LocalServerIfcStatsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpv6LocalServerIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding (client) maintained by
+        this JUNOS DHCPv6 Local Server."
+    INDEX     { jnxJdhcpv6LocalServerIfcStatsIfIndex }
+    ::= { jnxJdhcpv6LocalServerIfcStatsTable 1 }
+
+JnxJdhcpv6LocalServerIfcStatsEntry ::= SEQUENCE {
+    jnxJdhcpv6LocalServerIfcStatsIfIndex                    InterfaceIndex,
+    jnxJdhcpv6LocalServerIfcStatsTotalDropped               Counter32,
+    jnxJdhcpv6LocalServerIfcStatsNoSafdDropped              Counter32,
+    jnxJdhcpv6LocalServerIfcStatsBadSendDropped             Counter32,
+    jnxJdhcpv6LocalServerIfcStatsShortPacketDropped         Counter32,
+    jnxJdhcpv6LocalServerIfcStatsBadMsgtypeDropped          Counter32,
+    jnxJdhcpv6LocalServerIfcStatsBadOptionsDropped          Counter32,
+    jnxJdhcpv6LocalServerIfcStatsBadSrcAddressDropped       Counter32,
+    jnxJdhcpv6LocalServerIfcStatsRelayCountDropped          Counter32,
+    jnxJdhcpv6LocalServerIfcStatsNoClientIdDropped          Counter32,
+    jnxJdhcpv6LocalServerIfcStatsDeclineReceived            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsSolicitReceived            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsInformationRequestReceived Counter32,
+    jnxJdhcpv6LocalServerIfcStatsReleaseReceived            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsRequestReceived            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsConfirmReceived            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsRenewReceived              Counter32,
+    jnxJdhcpv6LocalServerIfcStatsRebindReceived             Counter32,
+    jnxJdhcpv6LocalServerIfcStatsRelayForwReceived          Counter32,
+    jnxJdhcpv6LocalServerIfcStatsRelayReplReceived          Counter32,
+    jnxJdhcpv6LocalServerIfcStatsAdvertiseSent              Counter32,
+    jnxJdhcpv6LocalServerIfcStatsReplySent                  Counter32,
+    jnxJdhcpv6LocalServerIfcStatsReconfigureSent            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsTotalLeaseCount            Counter32,
+    jnxJdhcpv6LocalServerIfcStatsStrictReconfigDropped      Counter32,
+    jnxJdhcpv6LocalServerIfcStatsAuthenticationDropped      Counter32,
+    jnxJdhcpv6LocalServerIfcStatsDynamicProfileDropped      Counter32,
+    jnxJdhcpv6LocalServerIfcStatsLicenseDropped             Counter32
+    }
+
+-- According to IF-MIB.txt and interface index is an Integer 32 (1 - 2147483647) 
+-- This will correlate with an IFL in DHCP
+
+jnxJdhcpv6LocalServerIfcStatsIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which this entry
+            contains information."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 1}
+
+jnxJdhcpv6LocalServerIfcStatsTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DHCP v6 packets dropped." 
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 2}
+
+jnxJdhcpv6LocalServerIfcStatsNoSafdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to no safd match."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 3}
+
+jnxJdhcpv6LocalServerIfcStatsBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to send error."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 4}
+
+jnxJdhcpv6LocalServerIfcStatsShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to packet being too short."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 5}
+
+jnxJdhcpv6LocalServerIfcStatsBadMsgtypeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad opcode in the packet."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 6}
+
+jnxJdhcpv6LocalServerIfcStatsBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 7}
+
+jnxJdhcpv6LocalServerIfcStatsBadSrcAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to invalid addr family."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 8}
+
+jnxJdhcpv6LocalServerIfcStatsRelayCountDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to max relays supported."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 9}
+
+jnxJdhcpv6LocalServerIfcStatsNoClientIdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to missing client id."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 10}
+
+jnxJdhcpv6LocalServerIfcStatsDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Decline packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 11}
+
+jnxJdhcpv6LocalServerIfcStatsSolicitReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Solicit packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 12}
+
+jnxJdhcpv6LocalServerIfcStatsInformationRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Information Request packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 13}
+
+jnxJdhcpv6LocalServerIfcStatsReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Release packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 14}
+
+jnxJdhcpv6LocalServerIfcStatsRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Request packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 15}
+
+jnxJdhcpv6LocalServerIfcStatsConfirmReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Confirm packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 16}
+
+jnxJdhcpv6LocalServerIfcStatsRenewReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Renew packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 17}
+
+jnxJdhcpv6LocalServerIfcStatsRebindReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Rebind packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 18}
+
+jnxJdhcpv6LocalServerIfcStatsRelayForwReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Fowr packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 19}
+
+jnxJdhcpv6LocalServerIfcStatsRelayReplReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Repl packets received."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 20}
+
+jnxJdhcpv6LocalServerIfcStatsAdvertiseSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Advertise packets sent."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 21}
+
+jnxJdhcpv6LocalServerIfcStatsReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reply packets sent."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 22}
+
+jnxJdhcpv6LocalServerIfcStatsReconfigureSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reconfigure packets sent."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 23}
+
+jnxJdhcpv6LocalServerIfcStatsTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 24}
+
+jnxJdhcpv6LocalServerIfcStatsStrictReconfigDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to strict reconfigure."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 25}
+
+jnxJdhcpv6LocalServerIfcStatsAuthenticationDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to authentication failure."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 26}
+
+jnxJdhcpv6LocalServerIfcStatsDynamicProfileDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to dynamic profile error."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 27}
+
+jnxJdhcpv6LocalServerIfcStatsLicenseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to license error."
+    ::= { jnxJdhcpv6LocalServerIfcStatsEntry 28}
+
+-- Objects used for traps
+
+jnxJdhcpv6RouterName OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The VRF ID in JUNOS. Represented as the Logical Router (LR)
+         Name followed by the Router Instance (RI) Name."
+    ::= { jnxJdhcpv6LocalServerTrapVars 1 }
+
+jnxJdhcpv6LocalServerInterfaceName  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The interface where the DHCP client was detected"
+    ::= { jnxJdhcpv6LocalServerTrapVars 2 }
+
+jnxJdhcpv6LocalServerInterfaceLimit  OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The number of clients supported on this interface."
+    ::= { jnxJdhcpv6LocalServerTrapVars 3 }
+
+jnxJdhcpv6LocalServerEventSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    debug(0),
+                    warning(1),
+                    critical(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The level of error. "
+    ::= { jnxJdhcpv6LocalServerTrapVars 4 }
+
+jnxJdhcpv6LocalServerEventString  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The text of the event string associated with the health event."
+    ::= { jnxJdhcpv6LocalServerTrapVars 5 }
+
+-- Notifications
+
+jnxJdhcpv6LocalServerInterfaceLimitExceeded  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpv6RouterName,
+        jnxJdhcpv6LocalServerInterfaceName,
+        jnxJdhcpv6LocalServerInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the limit of clients has been exceeded on an interface."
+    ::= { jnxJdhcpv6LocalServerTraps 1 }
+
+jnxJdhcpv6LocalServerInterfaceLimitAbated  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpv6RouterName,
+        jnxJdhcpv6LocalServerInterfaceName,
+        jnxJdhcpv6LocalServerInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the number of clients on an interface has fallen
+        below the limit allowed on that interface."
+    ::= { jnxJdhcpv6LocalServerTraps 2 }
+
+jnxJdhcpv6LocalServerHealth NOTIFICATION-TYPE
+    OBJECTS {
+        jnxJdhcpv6RouterName,
+        jnxJdhcpv6LocalServerEventSeverity,
+        jnxJdhcpv6LocalServerEventString }
+    STATUS      current
+    DESCRIPTION
+        "Reports when a health event occurs in the V6 Local Server 
+         application."
+    ::= { jnxJdhcpv6LocalServerTraps 4 }
+
+END

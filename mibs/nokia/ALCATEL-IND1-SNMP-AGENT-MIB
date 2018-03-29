@@ -1,0 +1,221 @@
+
+ALCATEL-IND1-SNMP-AGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	OBJECT-IDENTITY,
+	MODULE-IDENTITY,
+	IpAddress		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION 	FROM SNMPv2-TC
+        OBJECT-GROUP,
+	MODULE-COMPLIANCE       FROM SNMPv2-CONF
+	softentIND1SnmpAgt	FROM ALCATEL-IND1-BASE;
+
+
+alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
+	LAST-UPDATED  "200704030000Z"
+	ORGANIZATION "Alcatel-Lucent"
+	CONTACT-INFO
+	    "Please consult with Customer Service to ensure the most appropriate
+	     version of this document is used with the products in question:
+ 
+			Alcatel-Lucent, Enterprise Solutions Division
+		       (Formerly Alcatel Internetworking, Incorporated)
+			       26801 West Agoura Road
+			    Agoura Hills, CA  91301-5122
+			      United States Of America
+	
+	    Telephone:               North America  +1 800 995 2696
+				     Latin America  +1 877 919 9526
+				     Europe         +31 23 556 0100
+				     Asia           +65 394 7933
+				     All Other      +1 818 878 4507
+	
+	    Electronic Mail:         support@ind.alcatel.com
+	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+	DESCRIPTION
+	    "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+                 For the Birds Of Prey Product Line
+                 SNMP Agent Subsystem.
+         
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+         
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+         
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+         
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+	REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+	::= { softentIND1SnmpAgt 1 }
+
+    alcatelIND1SNMPAgentMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Managed Objects."
+        ::= { alcatelIND1SNMPAgentMIB 1 }
+
+
+    alcatelIND1SNMPAgentMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Conformance Information."
+        ::= { alcatelIND1SNMPAgentMIB 2 }
+
+
+    alcatelIND1SNMPAgentMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Units Of Conformance."
+        ::= { alcatelIND1SNMPAgentMIBConformance 1 }
+
+
+    alcatelIND1SNMPAgentMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Compliance Statements."
+        ::= { alcatelIND1SNMPAgentMIBConformance 2 }
+
+
+--
+-- SNMP Agent configuration
+--
+
+snmpAgtConfig  OBJECT IDENTIFIER ::= { alcatelIND1SNMPAgentMIBObjects 1 }
+
+SnmpAgtSecurityLevel ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+	"The switch security level"
+	SYNTAX INTEGER {
+		noSec(1),
+		authSet(2),
+		authAll(3),
+		privSet(4),
+		privAll(5),
+		trapOnly(6)
+	}  
+	
+snmpAgtSecurityLevel OBJECT-TYPE
+	SYNTAX     SnmpAgtSecurityLevel
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Level of security required for SNMP get or SET.
+	 noSec: no security; all the PDU with a known user id
+		are accepted
+	 authSet: authentication required for set; all GET
+		are accepted, but not authenticated SET are
+		rejected.
+	 authAll: authentication required for SET and GET; not
+		authenticated SET and GET are rejected.
+	 privSet: authentication required for GET and encryption
+ 		required for SET.
+	 privAll: encryption required for SET and GET.
+	 trapOnly: no SNMP GET or SET are accepted."
+  	DEFVAL     { noSec }
+	::= { snmpAgtConfig 1}
+
+snmpAgtCommunityMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled(1),
+		disabled(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"If the community mode is enabled,
+		 the SNMPv1/v2 packets must use 
+		 the community names."
+	DEFVAL { enabled }
+	::= { snmpAgtConfig 2 }
+
+
+-- 
+-- SNMP Agent Epilogue Control Files anchoring
+--
+
+      snmpAgtCtlFiles OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION 
+	"MIB entity on which to attach the MODULE-IDENTITY for the
+	Epilogue(R) control files."
+	::= { alcatelIND1SNMPAgentMIBObjects 3}
+
+--
+-- SNMP Source Ip Preferred Configuration
+--
+ 
+      snmpAgtSourceIpConfig  OBJECT-TYPE
+        SYNTAX INTEGER {
+             default (1),
+             noLoopback0 (2),
+             ipInterface (3)
+       }
+       MAX-ACCESS read-write
+       STATUS        obsolete 
+       DESCRIPTION
+              "The SNMP Agent Configuration
+              1 -- Default(Loopback0 or closest IP)
+              2 -- No Loopback0
+              3 -- Interface IP Specified by User
+	      This object has been obsoleted. Use the alaIpManagedIntfEntry objects
+	      in AlcatelIND1Ip.mib"
+       DEFVAL        { default }
+       ::= {  alcatelIND1SNMPAgentMIBObjects 4 }
+ 
+      snmpAgtSourceIp  OBJECT-TYPE
+	SYNTAX     IpAddress
+        MAX-ACCESS read-write
+        STATUS       obsolete 
+        DESCRIPTION
+               "The Source IP of SNMP Packets.
+	        This object has been obsoleted. Use the alaIpManagedIntfEntry objects
+		in AlcatelIND1Ip.mib"
+        ::= {  alcatelIND1SNMPAgentMIBObjects 5 }
+
+--
+-- Compliance Statements
+--
+
+    alcatelIND1SNMPAgentMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for SNMP Agent Subsystem."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS
+            {
+                snmpAgtConfigGroup
+            }
+
+        ::= { alcatelIND1SNMPAgentMIBCompliances 1 }
+
+
+--
+-- Units Of Conformance
+--
+
+     snmpAgtConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    snmpAgtSecurityLevel,
+	    snmpAgtCommunityMode
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for SNMP Agent configuration."
+        ::= { alcatelIND1SNMPAgentMIBGroups 1 }
+
+
+END

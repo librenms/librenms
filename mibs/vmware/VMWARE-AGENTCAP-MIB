@@ -1,0 +1,548 @@
+-- **********************************************************
+-- Copyright 2008 VMware, Inc.  All rights reserved. 
+-- **********************************************************
+
+VMWARE-AGENTCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+       FROM SNMPv2-SMI
+    vmwareAgentCapabilities
+       FROM VMWARE-ROOT-MIB
+    AGENT-CAPABILITIES
+       FROM  SNMPv2-CONF;
+vmwAgentCapabilityMIB MODULE-IDENTITY
+   LAST-UPDATED "200810270000Z"
+   ORGANIZATION "VMware, Inc"
+   CONTACT-INFO
+      "VMware, Inc
+      3401 Hillview Ave
+      Palo Alto, CA 94304
+      Tel: 1-877-486-9273 or 650-427-5000
+      Fax: 650-427-5001
+      Web: http://communities.vmware.com/community/developer/forums/managementapi
+      "
+   DESCRIPTION
+     "This module defines agent capabilities for VMware agents."
+   REVISION     "200810270000Z"  
+   DESCRIPTION
+         "Capabilities for VMware ESX 4.0 added."
+        ::= { vmwareAgentCapabilities 1 }
+
+vmwEsxCapability OBJECT IDENTIFIER ::= {  vmwAgentCapabilityMIB 1 }
+
+
+vmwESX41x AGENT-CAPABILITIES 
+  PRODUCT-RELEASE 
+     "4.1.x"
+  STATUS  current
+  DESCRIPTION
+     "Release 4.1.x for VMware ESX"
+  REFERENCE 
+     "http://www.vmware.com/products"
+
+     -- RFC 3418
+     SUPPORTS SNMPv2-MIB
+     INCLUDES { 
+         snmpGroup, 
+         systemGroup,
+         snmpCommunityGroup,
+         snmpBasicNotificationsGroup,
+         snmpWarmStartNotificationGroup
+         -- groups not supported; snmpSetGroup, snmpNotificationGroup
+     }
+
+     VARIATION snmpSetSerialNo
+     ACCESS  not-implemented
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION snmpTrapOID
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION  snmpTrapEnterprise
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION snmpEnableAuthenTraps
+     SYNTAX INTEGER { disabled(2) }
+     ACCESS read-only
+     DESCRIPTION "Agent does not allow authentication traps. Poll snmpInBadCommunityNames for same info."
+     -- the above implies this:
+     -- VARIATION authenticationFailure
+     -- ACCESS not-implemented
+     -- DESCRIPTION "Agent does not provide this notification. snmpEnableAuthenTraps will return disabled."
+
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 2863
+     SUPPORTS IF-MIB
+     INCLUDES { 
+         ifGeneralInformationGroup,
+         linkUpDownNotificationsGroup
+     }
+
+     VARIATION ifAdminStatus
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of administrative state for each interface.
+                  ESX virtual layer 2 switches may support changing administrative state 
+                  of physical network interfaces (nics)."
+
+     VARIATION ifLinkUpDownTrapEnable
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION ifAlias
+     ACCESS read-only
+     DESCRIPTION "ifIndexes may only change across reboot."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "This counter always returns 0."
+
+     -- ifRcvAddressGroup is interface/media specific 
+     VARIATION ifRcvAddressStatus
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     VARIATION ifRcvAddressType 
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     -- ********************* ************ ************ *************** ***
+
+     -- REVISION 200712270000Z
+     SUPPORTS VMWARE-SYSTEM-MIB
+     INCLUDES {
+         vmwSystemGroup
+     }
+     -- REVISION 200810150000Z
+     SUPPORTS VMWARE-RESOURCES-MIB
+     INCLUDES {
+         vmwResourceGroup
+     }
+     -- REVISION 200810230000Z
+     SUPPORTS VMWARE-VMINFO-MIB
+     INCLUDES {
+         vmwVmInfoGroup,
+         vmwVmInfoNotificationGroup
+     }
+     -- VARIATION vmwVmNetConnType
+     -- DESCRIPTION "This object was valid for ESX 2.5 systems only. Only value returned was 'monitor_dev'"
+     -- STATUS deprecated
+
+     -- REVISION 200712270000Z
+     SUPPORTS VMWARE-ENV-MIB
+     INCLUDES {
+         vmwEnvNotificationGroup
+     }
+
+   ::= { vmwEsxCapability 2 }
+
+
+vmwESX40x AGENT-CAPABILITIES 
+  PRODUCT-RELEASE 
+     "4.0.x"
+  STATUS  current
+  DESCRIPTION
+     "Release 4.0.x for VMware ESX"
+  REFERENCE 
+     "http://www.vmware.com/products"
+
+     -- RFC 3418
+     SUPPORTS SNMPv2-MIB
+     INCLUDES { 
+         snmpGroup, 
+         systemGroup,
+         snmpCommunityGroup,
+         snmpBasicNotificationsGroup,
+         snmpWarmStartNotificationGroup
+         -- groups not supported; snmpSetGroup, snmpNotificationGroup
+     }
+
+     VARIATION snmpSetSerialNo
+     ACCESS  not-implemented
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION snmpTrapOID
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION  snmpTrapEnterprise
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION snmpEnableAuthenTraps
+     SYNTAX INTEGER { disabled(2) }
+     ACCESS read-only
+     DESCRIPTION "Agent does not allow authentication traps. Poll snmpInBadCommunityNames for same info."
+     -- the above implies this:
+     -- VARIATION authenticationFailure
+     -- ACCESS not-implemented
+     -- DESCRIPTION "Agent does not provide this notification. snmpEnableAuthenTraps will return disabled."
+
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 2863
+     SUPPORTS IF-MIB
+     INCLUDES { 
+         ifGeneralInformationGroup,
+         linkUpDownNotificationsGroup
+     }
+
+     VARIATION ifAdminStatus
+     SYNTAX INTEGER { up(1) }
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of system information and
+                  does not support changing operational state."
+
+     VARIATION ifLinkUpDownTrapEnable
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     -- ifXTable not implemented
+     VARIATION ifTableLastChange
+     ACCESS not-implemented
+     DESCRIPTION "post RFC 1213 managed objects not implemented."
+
+     VARIATION ifConnectorPresent
+     ACCESS not-implemented
+     DESCRIPTION "ifXTable not implemented."
+
+     VARIATION ifHighSpeed
+     ACCESS not-implemented
+     DESCRIPTION "ifXTable not implemented."
+
+     VARIATION ifName
+     ACCESS not-implemented
+     DESCRIPTION "ifXTable not implemented."
+
+     VARIATION ifAlias
+     ACCESS not-implemented
+     DESCRIPTION "ifXTable not implemented."
+
+     -- ifFixedLengthGroup
+     VARIATION ifAlias
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     -- ifHCFixedLengthGroup
+     VARIATION ifHCInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     -- ifPacketGroup
+     VARIATION ifInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifMtu
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInDiscards
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutDiscards
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifPromiscuousMode 
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+
+     -- ifHCPacketGroup
+     VARIATION ifInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifMtu
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInDiscards
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutDiscards
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifPromiscuousMode
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     -- ifVHCPacketGroup
+     VARIATION ifHCInUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCInMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCInBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCOutUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCOutMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCOutBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifHCOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutOctets
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutErrors
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifMtu
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifInDiscards
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutUcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutMulticastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutBroadcastPkts
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifOutDiscards
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     VARIATION ifPromiscuousMode
+     ACCESS not-implemented
+     DESCRIPTION "Performance counters not implemented."
+
+     -- ifCounterDiscontinuityGroup
+     VARIATION ifCounterDiscontinuityTime
+     ACCESS not-implemented
+     DESCRIPTION "Required if Performance counters are implemented."
+
+     -- ifRcvAddressGroup is interface/media specific 
+     VARIATION ifRcvAddressStatus
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     VARIATION ifRcvAddressType 
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+
+     -- ********************* ************ ************ *************** ***
+
+     -- REVISION 200712270000Z
+     SUPPORTS VMWARE-SYSTEM-MIB
+     INCLUDES {
+         vmwSystemGroup
+     }
+     -- REVISION 200810150000Z
+     SUPPORTS VMWARE-RESOURCES-MIB
+     INCLUDES {
+         vmwResourceGroup
+     }
+     -- REVISION 200810230000Z
+     SUPPORTS VMWARE-VMINFO-MIB
+     INCLUDES {
+         vmwVmInfoGroup,
+         vmwVmInfoNotificationGroup
+     }
+     -- VARIATION vmwVmNetConnType
+     -- DESCRIPTION "This object was valid for ESX 2.5 systems only. Only value returned was 'monitor_dev'"
+     -- STATUS deprecated
+
+     -- REVISION 200712270000Z
+     SUPPORTS VMWARE-ENV-MIB
+     INCLUDES {
+         vmwEnvNotificationGroup
+     }
+
+   ::= { vmwEsxCapability 1 }
+
+END
+

@@ -1,0 +1,2139 @@
+ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, IpAddress,
+		Unsigned32
+			FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		DisplayString, TEXTUAL-CONVENTION, TruthValue, RowStatus
+			FROM SNMPv2-TC
+		Ipv6Address
+			FROM IPV6-TC
+		hardentIND1System
+			FROM ALCATEL-IND1-BASE;
+
+	alcatelIND1SystemMIB MODULE-IDENTITY
+		LAST-UPDATED "200709040000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+		     "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+
+		DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Proprietary System Subsystem.
+
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "200706180000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+
+            ::= {hardentIND1System 1 }
+
+    alcatelIND1SystemMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For BOP Proprietary System
+            Subsystem Managed Objects."
+        ::= { alcatelIND1SystemMIB 1 }
+
+    alcatelIND1SystemMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Alcatel IND BOP Proprietary System
+            Subsystem Conformance Information."
+        ::= { alcatelIND1SystemMIB 2 }
+
+
+    alcatelIND1SystemMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Alcatel IND BOP Proprietary System
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1SystemMIBConformance 1 }
+
+    alcatelIND1SystemMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Alcatel IND BOP Proprietary System
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1SystemMIBConformance 2 }
+
+	-- textual conventions
+
+	SystemFileType ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"a small positive integer used to identify file types"
+		SYNTAX	INTEGER	{
+							file(1),
+							directory(2),
+							undefined(3),
+							tarArchive(4)
+						}
+
+	SwitchLoggingIndex ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+		"a small positive integer used to identify switch logging outputs"
+		SYNTAX INTEGER	{	console(1),
+							flash(2),
+							socket(3),
+							ipaddr(4)
+						}
+
+	MicrocodeDirectoryIndex ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"a small positive integer used to index into the Microcode table"
+		SYNTAX	INTEGER	{
+							loaded(1),		-- the loaded directory
+							certified(2),	-- the certified directory
+							working(3),		-- the working directory
+							issu(4)		    -- the in-service software update directory
+						}
+
+	AppIdIndex ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"a small positive integer used to index into tables arranged
+			by Application ID's."
+		SYNTAX	INTEGER (0..254)	-- 255 possible application id's
+
+
+	Enable ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"an enumerated value used to indicate whether an entity is
+			enabled(1), or disabled(2)"
+		SYNTAX	INTEGER	{
+							enabled(1),
+							disabled(2)
+						}
+
+
+	FileSystemIndex ::= TEXTUAL-CONVENTION
+   		STATUS       current
+		DESCRIPTION
+			"an enumerated value which provides an indication of the
+			file system.  The value is a small positive integer indicating
+			the type of the file system"
+		SYNTAX	INTEGER {
+					flash(1),	-- /flash
+					uflash(2)	-- /uflash (USB Flash drive)
+						}
+
+	SeverityLevel ::= TEXTUAL-CONVENTION
+   		STATUS       current
+		DESCRIPTION
+			"an enumerated value which provides an indication of the
+			severity level used for logging and debug purposes.  The value is
+			a small integer."
+		SYNTAX	INTEGER
+				{
+					severityLevelOff (1), -- logging turned off
+					severityLevelAlarm(2), -- about to crash and reboot
+					severityLevelError(3), -- functionality is reduced
+					severityLevelAlert(4), -- a violation has occurred
+					severityLevelWarn (5), -- unexpected, non critical event
+					severityLevelInfo (6), -- any other msg that is not a dbg msg
+					severityLevelDbg1 (7), -- normal event debug message
+					severityLevelDbg2 (8), -- debug specific message
+					severityLevelDbg3 (9)  -- maximum verbosity dbg specific msg
+				}
+
+	SysLogFacilityId ::= TEXTUAL-CONVENTION
+   		STATUS       current
+		DESCRIPTION
+	           ""
+
+		SYNTAX		INTEGER
+				{ 
+					uucp(0),
+					user(1),
+					system(2),
+					syslog(3),
+					secAuth2(4),
+					secAuth1(5),
+					ntp(6),
+					netNews(7),
+					mail(8),
+					lptr(9),
+					logAudit(10),
+					logAlert(11),
+					local7(12),
+					local6(13),
+					local5(14),
+					local4(15),
+					local3(16),
+					local2(17),
+					local1(18),
+					local0(19),
+					kernel(20),
+					ftp(21),
+					clock2(22),
+					clock1(23)
+				} 
+
+	CommandPercentComplete ::= TEXTUAL-CONVENTION
+		STATUS	current
+		DESCRIPTION 
+			"An indication of percent complete for a command."
+		SYNTAX	INTEGER (0..100)
+
+
+    --  groups within the system mib
+	systemMicrocode		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 1 }
+	systemBootParams	OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 2 }
+	systemHardware		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 3 }
+	systemFileSystem	OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 4 }
+	systemServices		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 5 }
+	systemSwitchLogging	OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 6 }
+	systemDNS		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 7 }
+
+	-- systemMicrocode group.  This group contains the CMM specific
+	-- microcode information.
+
+	systemMicrocodeTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SystemMicrocodeEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"This table contains one row per set of microcode objects.
+			There is always at least one set of microcode objects for each
+			CMM System Module"
+		::= {systemMicrocode 1}
+
+    systemMicrocodeEntry	OBJECT-TYPE
+        SYNTAX		SystemMicrocodeEntry
+        MAX-ACCESS	not-accessible
+        STATUS	    current
+        DESCRIPTION
+        	"The Microcode information for this CMM"
+        INDEX	{systemMicrocodeIndex}
+        ::= {systemMicrocodeTable 1}
+
+	SystemMicrocodeEntry ::= SEQUENCE 	{
+			systemMicrocodeIndex	MicrocodeDirectoryIndex -- top level
+		}
+
+
+    systemMicrocodeIndex	OBJECT-TYPE
+        SYNTAX		MicrocodeDirectoryIndex
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+		"The index to the highest level of the microcode table.  This
+		level is organized by the directory being referenced."
+		::={ systemMicrocodeEntry 1 }
+
+	systemMicrocodePackageTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF	SystemMicrocodePackageEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"the microcode package table"
+		::= {systemMicrocode 2}
+
+	systemMicrocodePackageEntry	OBJECT-TYPE
+		SYNTAX	SystemMicrocodePackageEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"a row in the microcode package table"
+		INDEX	{systemMicrocodeIndex, systemMicrocodePackageIndex}
+		::= {systemMicrocodePackageTable 1}
+
+	SystemMicrocodePackageEntry	::= SEQUENCE {
+			systemMicrocodePackageIndex			Unsigned32,
+			systemMicrocodePackageVersion		DisplayString,
+			systemMicrocodePackageName			DisplayString,
+			systemMicrocodePackageDescription	DisplayString,
+			systemMicrocodePackageStatus		INTEGER,
+			systemMicrocodePackageSize			Unsigned32
+		}
+
+	systemMicrocodePackageIndex	OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The index to the package sub table in the microcode table"
+		::= {systemMicrocodePackageEntry 1}
+
+	systemMicrocodePackageVersion OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The version of the microcode package (Fos.img, Fbase.img, etc.)"
+		::=	{systemMicrocodePackageEntry 2}
+
+	systemMicrocodePackageName OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The name of the microcode package"
+		DEFVAL	{ "" }
+		::=	{systemMicrocodePackageEntry 3}
+
+	systemMicrocodePackageDescription OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The description of the microcode package"
+		DEFVAL	{ "" }
+		::=	{systemMicrocodePackageEntry 4}
+
+	systemMicrocodePackageStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+							undefined(1),
+							ok(2),
+							inuse(3)
+						}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The status of the microcode package"
+		DEFVAL	{ undefined }
+		::=	{systemMicrocodePackageEntry 5}
+
+	systemMicrocodePackageSize OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The size of the microcode package"
+		DEFVAL	{ 0 }
+		::=	{systemMicrocodePackageEntry 6}
+
+	systemMicrocodeComponentTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF	SystemMicrocodeComponentEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"the microcode Component table"
+		::= {systemMicrocode 3}
+
+	systemMicrocodeComponentEntry	OBJECT-TYPE
+		SYNTAX	SystemMicrocodeComponentEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"a row in the microcode Component table"
+		INDEX {	systemMicrocodeIndex,
+				systemMicrocodePackageIndex,
+				systemMicrocodeComponentIndex}
+		::= {systemMicrocodeComponentTable 1}
+
+	SystemMicrocodeComponentEntry	::= SEQUENCE {
+			systemMicrocodeComponentIndex		Unsigned32,
+			systemMicrocodeComponentVersion		DisplayString,
+			systemMicrocodeComponentName		DisplayString,
+			systemMicrocodeComponentDescription	DisplayString,
+			systemMicrocodeComponentStatus		INTEGER,
+			systemMicrocodeComponentSize		Unsigned32
+		}
+
+	systemMicrocodeComponentIndex	OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The index to the Component sub table in the microcode table"
+		::= {systemMicrocodeComponentEntry 1}
+
+	systemMicrocodeComponentVersion OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The version of the microcode Component"
+		::=	{systemMicrocodeComponentEntry 2}
+
+	systemMicrocodeComponentName OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The name of the microcode Component"
+		DEFVAL	{ "" }
+		::=	{systemMicrocodeComponentEntry 3}
+
+	systemMicrocodeComponentDescription OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The description of the microcode Component"
+		DEFVAL	{ "" }
+		::=	{systemMicrocodeComponentEntry 4}
+
+	systemMicrocodeComponentStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+							undefined(1),
+							ok(2),
+							inuse(3)
+						}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The status of the microcode Component"
+		DEFVAL	{ undefined }
+		::=	{systemMicrocodeComponentEntry 5}
+
+	systemMicrocodeComponentSize OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The size of the microcode Component"
+		DEFVAL	{ 0 }
+		::=	{systemMicrocodeComponentEntry 6}
+
+	systemMicrocodeDependencyTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF	SystemMicrocodeDependencyEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"the microcode Dependency table"
+		::= {systemMicrocode 4}
+
+
+	systemMicrocodeDependencyEntry	OBJECT-TYPE
+		SYNTAX	SystemMicrocodeDependencyEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"a row in the microcode Dependency table"
+		INDEX {	systemMicrocodeIndex,
+				systemMicrocodePackageIndex,
+				systemMicrocodeComponentIndex,
+				systemMicrocodeDependencyIndex}
+		::= {systemMicrocodeDependencyTable 1}
+
+	SystemMicrocodeDependencyEntry	::= SEQUENCE {
+			systemMicrocodeDependencyIndex			Unsigned32,
+			systemMicrocodeDependencyPackageName	DisplayString,
+			systemMicrocodeDependencyVersion		DisplayString
+		}
+
+	systemMicrocodeDependencyIndex	OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The index to the Dependency sub table in the microcode table"
+		::= {systemMicrocodeDependencyEntry 1}
+
+	systemMicrocodeDependencyPackageName OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The name of the microcode Package Dependency"
+		DEFVAL	{ "" }
+		::=	{systemMicrocodeDependencyEntry 2}
+
+	systemMicrocodeDependencyVersion OBJECT-TYPE
+		SYNTAX	DisplayString	(SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The version of the microcode Dependency"
+		::=	{systemMicrocodeDependencyEntry 3}
+
+
+	-- systemBootParams group.  This group contains the CMM specific
+	-- boot parameter information.
+
+	systemBootNetwork	OBJECT-TYPE
+		SYNTAX		IpAddress
+	    MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"this object is the base IP address of the EMP for this CMM"
+		::= { systemBootParams 1 }
+
+	systemBootNetworkGateway	OBJECT-TYPE
+		SYNTAX		IpAddress
+	    MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"this object is the gateway of the EMP for this CMM"
+		::= { systemBootParams 2 }
+
+    systemBootNetworkNetmask	OBJECT-TYPE
+        SYNTAX		IpAddress
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+            "This is the Netmask of the EMP that is used when this
+			CMM boots."
+        ::={ systemBootParams 3 }
+
+
+	-- systemHardware group.  This group contains hardware information
+	-- regarding this CMM.
+
+    systemHardwareFlashMfg	OBJECT-TYPE
+		SYNTAX		INTEGER {other(1), amd(2), intel(3), atmel(4), toshiba(7), sandisk(8), sst(9), spansion(10) }
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object identifies the manufacturer of the Flash memory
+			used on this product.  toshiba(7) is for hawk only. The reason 7 is used
+			is because 5 is already used for micron and 6 is for kingston.
+			toshiba, sandisk, and sst are compact flashes for the hawk only."
+		::= { systemHardware 1}
+
+	systemHardwareFlashSize	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object identifies the size of the flash memory available
+			on this CMM.  It is the total flash hardware memory and does
+			not indicate how much of the memory is free, used, etc."
+		::= { systemHardware 2}
+
+   systemHardwareMemoryMfg	OBJECT-TYPE
+		SYNTAX		INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), dataram(10), interward(11), notreadable(12)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object identifies the manufacturer of the RAM memory
+			used on this CMM."
+		::= { systemHardware 3}
+
+	systemHardwareMemorySize	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object identifies the size of the RAM memory available on
+			this CMM.  It is the total RAM hardware memory and does not
+			indicate how much of the memory is free, used, etc."
+		::= { systemHardware 4}
+
+	systemHardwareNVRAMBatteryLow	OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object identifies the whether the NVRAM battery is low.
+			 true(1), false(2)"
+		::= { systemHardware 5}
+
+	systemHardwareBootCpuType	OBJECT-TYPE
+		SYNTAX		INTEGER	{other(1), sparc380(2), sparcV9(3), ppc(4), ppc8540(5)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Indicates the manufacturer and model number of the CPU.  Currently,
+		only two types of processors are enumerated."
+		::={ systemHardware 6 }
+
+	systemHardwareJumperInterruptBoot	OBJECT-TYPE
+		SYNTAX	TruthValue
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object identifies whether the Interrupt Boot Jumper on this
+			CMM is set: True(1), False(2)"
+		DEFVAL {false}
+		::= {systemHardware 7}
+
+	systemHardwareJumperForceUartDefaults	OBJECT-TYPE
+		SYNTAX	TruthValue
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object identifies whether the Force Uart Defaults Jumper on this
+			CMM is set: True(1), False(2)"
+		DEFVAL {false}
+		::= {systemHardware 8}
+
+	systemHardwareJumperRunExtendedMemoryDiagnostics	OBJECT-TYPE
+		SYNTAX	TruthValue
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object identifies whether the Run Extended Memory
+			Diagnostics Jumper on this CMM is set: True(1), False(2)"
+		DEFVAL {false}
+		::= {systemHardware 9}
+
+	systemHardwareJumperSpare	OBJECT-TYPE
+		SYNTAX	TruthValue
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"This object identifies whether the Spare Jumper on this
+			CMM is set: True(1), False(2)"
+		DEFVAL {false}
+		::= {systemHardware 10}
+
+	systemHardwareFpgaVersionTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF	SystemHardwareFpgaVersionEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"This table contains the FPGA version for each FPGA on this CMM"
+		::= {systemHardware 11}
+
+	systemHardwareFpgaVersionEntry	OBJECT-TYPE
+		SYNTAX	SystemHardwareFpgaVersionEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"a row in the systemHardwareFpgaVersionTable"
+		INDEX	{systemHardwareFpgaVersionIndex}
+		::= {systemHardwareFpgaVersionTable 1}
+
+	SystemHardwareFpgaVersionEntry ::= SEQUENCE	{
+			systemHardwareFpgaVersionIndex	INTEGER,
+			systemHardwareFpgaVersion		Unsigned32
+		}
+
+	systemHardwareFpgaVersionIndex	OBJECT-TYPE
+		SYNTAX INTEGER (1..3)	
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This is the index to one of the FPGA versions on this CMM"
+		::={systemHardwareFpgaVersionEntry 1}
+
+	systemHardwareFpgaVersion		OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This is the major version of one of the FPGA devices on this CMM. 
+		 	 refer to the systemHardwareMinorFpgaVersion for the minor number."
+		::={systemHardwareFpgaVersionEntry 2}
+
+	systemHardwareBootRomVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the boot rom version"
+		DEFVAL		{ "" }
+		::={ systemHardware 12 }
+
+	systemHardwareBackupMiniBootVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the backup miniboot version."
+		DEFVAL		{ "" }
+		::={ systemHardware 13 }
+
+	systemHardwareDefaultMiniBootVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the default miniboot version."
+		DEFVAL		{ "" }
+		::={ systemHardware 14 }
+
+
+
+	systemHardwareMinorFpgaVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the minor FPGA version. Refer to the 
+		 systemHardwareFpgaVersion for the major FPGA version number."
+		DEFVAL		{ "" }
+		::={ systemHardware 15 }
+
+	systemHardwareCpldVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the CPLD version."
+		DEFVAL		{ "" }
+		::={ systemHardware 16 }
+
+	systemHardwareUbootVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the Uboot version."
+		DEFVAL		{ "" }
+		::={ systemHardware 17 }
+
+	systemHardwareProdRegId	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the product ID register"
+		DEFVAL		{ "" }
+		::={ systemHardware 18 }
+
+	systemHardwareRevisionRegister	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the hardware revision register"
+		DEFVAL		{ "" }
+		::={ systemHardware 19 }
+
+	systemHardwareXfpId	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the XFP ID"
+		DEFVAL		{ "" }
+		::={ systemHardware 20 }
+
+	systemHardwareUbootMinibootVersion	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A string that identifies the Uboot-miniboot version."
+		DEFVAL		{ "" }
+		::={ systemHardware 21 }
+
+	-- systemServices group.  This group contains the objects used by the
+	-- System Services applications.
+
+	systemServicesDate OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"This object contains the current System Date in the
+			following format: MM/DD/YYYY"
+		::= { systemServices 1 }
+
+	systemServicesTime OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"This object contains the current System Time in the
+			following format: HH:MM:SS"
+		::= { systemServices 2 }
+
+	systemServicesTimezone OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"This object contains the current Hour Offset from UTC
+			in the following format:  -13:00 to +12:00
+				OR
+			a well known timezone (PST,CST,etc.)"
+		::= { systemServices 3 }
+
+	systemServicesTimezoneStartWeek OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"first, second, third, fourth, fifth, last = 1,2,3,4,5,6"
+		DEFVAL		{ 0 }
+		::= { systemServices 4 }
+
+	systemServicesTimezoneStartDay OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Sunday, Monday, Tues... = 1,2,3,4,5,6,7"
+		DEFVAL		{ 0 }
+		::= { systemServices 5 }
+
+	systemServicesTimezoneStartMonth OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"January, February, march... = 1,2,3,4,5,67,8,9,10,11,12"
+		DEFVAL		{ 0 }
+		::= { systemServices 6 }
+
+	systemServicesTimezoneStartTime OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"2:00, 3:00, 4:00... = 200, 300, 400, etc."
+		DEFVAL		{ 0 }
+		::= { systemServices 7 }
+
+	systemServicesTimezoneOffset OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"60 minutes = 60"
+		DEFVAL		{ 0 }
+		::= { systemServices 8 }
+
+	systemServicesTimezoneEndWeek OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"first, second, third, fourth, fifth, last = 1,2,3,4,5,6"
+		DEFVAL		{ 0 }
+		::= { systemServices 9 }
+
+	systemServicesTimezoneEndDay OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Sunday, Monday, Tues... = 1,2,3,4,5,6,7"
+		DEFVAL		{ 0 }
+		::= { systemServices 10 }
+
+	systemServicesTimezoneEndMonth OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"January, February, march... = 1,2,3,4,5,6,7,8,9,10,11,12"
+		DEFVAL		{ 0 }
+		::= { systemServices 11 }
+
+	systemServicesTimezoneEndTime OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    	MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"2:00, 3:00, 4:00... = 200, 300, 400, etc."
+		DEFVAL		{ 0 }
+		::= { systemServices 12 }
+
+	systemServicesEnableDST OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object enables and disables the DST."
+		DEFVAL		{ disabled }
+		::= { systemServices 13 }
+
+	systemServicesWorkingDirectory OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object contains the current file system working directory
+			for this CMM.  For example, /flash/certified"
+		DEFVAL	{"/flash"}
+		::= { systemServices 14 }
+
+	systemServicesArg1 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 1st argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 15 }
+
+	systemServicesArg2 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 2nd argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 16 }
+
+	systemServicesArg3 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 3rd argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 17 }
+
+	systemServicesArg4 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 4th argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 18 }
+
+	systemServicesArg5 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 5th argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 19 }
+
+	systemServicesArg6 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 6th argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 20 }
+
+	systemServicesArg7 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 7th argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 21 }
+
+	systemServicesArg8 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 8th argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 22 }
+
+	systemServicesArg9 OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"the 9th argument for system services action routines"
+		DEFVAL	{""}
+		::= { systemServices 23 }
+	systemServicesAction OBJECT-TYPE
+		SYNTAX	INTEGER{
+					noaction(0),
+					mkdir(1),
+					rmdir(2),
+					mv(3),
+					rm(4),
+					rmr(5),
+					cp(6),
+					cpr(7),
+					chmodpw(8),
+					chmodmw(9),
+					fsck(10),
+					ftp(11),
+					rz(12),
+					vi(13),
+					telnet(14),
+					install(15),
+					ed(16),
+					more(17),
+					newfs(18),
+					dshell(19),
+					view(20),
+					modbootparams(21),
+					filedir(22),
+					ssh(23),
+					sftp(24),
+					debugPmdNi(25),
+					bootrom(26),
+					defaultminiboot(27),
+					backupminiboot(28),
+					fpgacmm(29),
+					ubootcmm(30),
+					ubootni(31),
+					scp(32),
+                    aclman(33),
+					ubootMinibootAllSlots(34),
+					miniboot(35),
+					upgradeLicence(36),
+					restoreLicence(37),
+	                updateDSineXtroller(38),
+					ftp6(39),
+					telnet6(40),
+					ssh6(41),
+					sftp6(42),
+					mount(43),
+					umount(44),
+					backup(45),
+					restore(46),
+					tftp(47),
+					fscollect(48),
+					fpgani(49),
+					fscollectForce(50)
+
+				}
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object identifies which of the above Actions is to be
+			performed by the System Services Application.  Most Actions
+			require one or more parameters be set before the Action is
+			executed. systemServicesAction - 26 for bootrom, 27 for default miniboot,
+			and 28 for backup miniboot use systemServicesArg1 for name of the file
+
+			scp- the first 2 arguments are going to be used. Set arg 1 with the source
+			and the arg 2 with the destination file(s).
+			E.g. scp LocalDir/testfileX.txt admin@10.255.11.1:RemoteDir/testfileX.txt
+                        For mount and umount, systemServicesArg1 specifies the
+                        mount point (such as /uflash).
+                        For newfs, systemServicesArg1 contains the name of the
+                        file-system (/uflash or /flash) which will be created. On
+                        /uflash, a FAT16 file system is created with long name naming conventions.
+                        For fsck, systemServicesArg1 contains the name of the
+                        file-system (/uflash or /flash) which will be checked and
+                        systemServicesArg2 will contain the string repair or
+                        no-repair depending on if autocorrection is requested.
+                        To see all file systems currently mounted, refer to the
+                        systemFileSystemTable.
+
+                        For backup and restore, systemServicesArg1 contains the
+                        archive name and systemServicesArg2 through Arg9 contains the 
+                        directories and/or files to be archived/extracted.
+
+                        For newfs, fsck, backup and restore, the
+                        systemServicesActionPercentComplete variable can be
+                        inspected to see a progress indication."
+
+		::= { systemServices 24 }
+
+	systemServicesResultCode OBJECT-TYPE
+		SYNTAX		Unsigned32
+	    MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"the result of a system services application"
+		::= { systemServices 25 }
+
+	systemServicesResultString OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+	    MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"the string result of a system services application"
+		::= { systemServices 26 }
+
+	systemServicesKtraceEnable OBJECT-TYPE
+		SYNTAX		Enable
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"enables/disables the Ktrace facility"
+		DEFVAL { enabled }
+		::= { systemServices 27 }
+
+	systemServicesSystraceEnable OBJECT-TYPE
+		SYNTAX		Enable
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"enables/disables the Systrace facility"
+		DEFVAL { enabled }
+		::= { systemServices 28 }
+
+ 	systemServicesTtyLines OBJECT-TYPE
+		SYNTAX		Unsigned32 (0..255)
+	    MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"the number of tty lines for a console screen"
+		DEFVAL { 24 }
+		::= { systemServices 29 }
+
+	systemServicesTtyColumns OBJECT-TYPE
+		SYNTAX		Unsigned32 (0..255)
+	    MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"the number of tty columns for a console screen"
+		DEFVAL { 80 }
+		::= { systemServices 30 }
+
+	systemServicesMemMonitorEnable OBJECT-TYPE
+		SYNTAX		Enable
+	    MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"disables/enables the kernel Memory Monitor feature"
+		DEFVAL { enabled }
+		::= { systemServices 31 }
+
+	systemServicesKtraceLevelTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SystemServicesKtraceLevelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"the table of Ktrace severity level settings"
+		::= { systemServices 32}
+
+    systemServicesKtraceLevelEntry	OBJECT-TYPE
+        SYNTAX		SystemServicesKtraceLevelEntry
+        MAX-ACCESS	not-accessible
+        STATUS	    current
+        DESCRIPTION
+        	"A row in the system services ktrace level table.  There
+			is one entry for each possible Application ID"
+        INDEX	{systemServicesKtraceLevelAppId}
+        ::= {systemServicesKtraceLevelTable 1}
+
+    SystemServicesKtraceLevelEntry ::= SEQUENCE	{
+        	systemServicesKtraceLevelAppId	AppIdIndex,
+        	systemServicesKtraceLevel		SeverityLevel
+        }
+
+    systemServicesKtraceLevelAppId OBJECT-TYPE
+        SYNTAX		AppIdIndex
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+            "the index into the ktrace level table"
+        ::= {systemServicesKtraceLevelEntry  1 }
+
+    systemServicesKtraceLevel OBJECT-TYPE
+        SYNTAX		SeverityLevel
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION
+            "the ktrace level for a specific Application ID"
+		DEFVAL { severityLevelDbg3 }
+        ::= {systemServicesKtraceLevelEntry  2 }
+
+	systemServicesSystraceLevelTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SystemServicesSystraceLevelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"the table of Systrace severity level settings"
+		::= { systemServices 33}
+
+    systemServicesSystraceLevelEntry	OBJECT-TYPE
+        SYNTAX		SystemServicesSystraceLevelEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+        	"A row in the system services systrace level table.  There
+			is one entry for each possible Application ID"
+        INDEX	{systemServicesSystraceLevelAppId}
+       ::= {systemServicesSystraceLevelTable 1}
+
+    SystemServicesSystraceLevelEntry ::= SEQUENCE 	{
+        	systemServicesSystraceLevelAppId	AppIdIndex,
+        	systemServicesSystraceLevel	   		SeverityLevel
+        }
+
+    systemServicesSystraceLevelAppId OBJECT-TYPE
+        SYNTAX		AppIdIndex
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+        "the Systrace level for a specific Application ID."
+        ::= {systemServicesSystraceLevelEntry  1 }
+
+    systemServicesSystraceLevel OBJECT-TYPE
+        SYNTAX		SeverityLevel
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION
+        "the Systrace level for a specific Application ID."
+		DEFVAL { severityLevelDbg3 }
+        ::= {systemServicesSystraceLevelEntry  2 }
+
+
+	systemUpdateStatusTable OBJECT-TYPE
+                SYNTAX  SEQUENCE OF     SystemUpdateStatusEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "Provides update status for firmware updates"
+                ::= {systemServices 34}
+
+        systemUpdateStatusEntry OBJECT-TYPE
+                SYNTAX  SystemUpdateStatusEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "A row in the update status table."
+                INDEX { systemUpdateIndex}
+                ::= {systemUpdateStatusTable 1}
+
+        SystemUpdateStatusEntry ::= SEQUENCE {
+                        systemUpdateIndex               INTEGER,
+                        systemUpdateStatus              INTEGER,
+                        systemUpdateErrorCode           INTEGER
+                }
+
+        systemUpdateIndex       OBJECT-TYPE
+                SYNTAX  INTEGER(1..72)
+		MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                        "The index to the CMM for which status is required."
+                ::= {systemUpdateStatusEntry 1}
+
+        systemUpdateStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        inProgress(1),
+                        doneOk(2),
+                        doneNok(3),
+                        noOp(4)
+                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Status of a firmware update.  In the case of doneNok,
+                        further information can be obtained from    systemUpdateErrorCode."
+                ::=     {systemUpdateStatusEntry 2}
+
+        systemUpdateErrorCode OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        msgSendIpcErr(1),
+                        fXferOPenErr(2),
+                        fXferFtpErr(3),
+                        fXferReadErr(4),
+                        fXferWriteErr(5),
+                        fXferReplyErr(6),
+                        fXferQuitErr(7),
+                        fXferFcloseErr(8),
+			fileNameErr(9),
+			rmFileErr(10),
+                        noInstallComp(11),
+                        notSysResource(12),
+                        notSupported(13),
+                        invalidValue(14),
+			waitMsgMaxTry(15),
+			installDrvErr(16),
+			fileNotFound(17),
+			notPrimary(18),
+			commandBlocked(19),
+			noError(20),
+                        invalidNi(21),
+                        niNotPresent(22),
+                        dupSerialNum(23),
+                        upToDate(24),
+                        invalidModType(25),
+                        maxFaiCount(26),
+                        invalidKey(27),
+			niLocked(28)
+                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Error codes for done_nok."
+                ::=     {systemUpdateStatusEntry 3}
+
+	systemServicesActionPercentComplete OBJECT-TYPE
+		SYNTAX      CommandPercentComplete
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		"This object identifies the percent completion of the currently 
+                 executing systemServicesAction."
+		::= { systemServices 35 }
+
+	
+	systemServicesCurrentArchivePathName OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		"This object identifies the archive currently being read
+                 via the systemServicesArchiveTable. This object is the complete
+                 pathname to the archive and must be set prior to reading the
+                 systemServicesArchiveTable."
+		::= { systemServices 36 }
+
+	
+	systemServicesArchiveTable  OBJECT-TYPE
+		SYNTAX  SEQUENCE OF SystemServicesArchiveEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This table contains the contents of a backup archive.
+			This table is used by the restore action command to
+			display (rather than backup) an archive. The restore
+			command will populate this table with archive 
+			information read from the archive specified by the 
+			systemServicesAction restore command. This is done as
+			follows. Set the systemServicesArg1 object to the 
+			archive name to be read. Set the systemServicesArg2 
+			object to the string: display-only. Set the
+			systemServicesAction object to restore. Then 
+			read this table."
+		::= { systemServices 37}
+	
+	systemServicesArchiveEntry  OBJECT-TYPE
+		SYNTAX  SystemServicesArchiveEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A row in the system services archive table."
+		INDEX { systemServicesArchiveIndex }
+		::= { systemServicesArchiveTable    1 }
+	
+	SystemServicesArchiveEntry ::= SEQUENCE     {
+		systemServicesArchiveIndex  Unsigned32,
+		systemServicesArchiveName   DisplayString (SIZE (0..255)),
+		systemServicesArchiveType   SystemFileType,
+		systemServicesArchiveSize   Unsigned32,
+		systemServicesArchiveAttr   INTEGER
+		}
+	
+	
+	
+	systemServicesArchiveIndex OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Index to a specific entry in the backup archive file."
+		::= {systemServicesArchiveEntry 1}
+	
+	systemServicesArchiveName OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..255))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The name of a file in the backup archive file."
+		DEFVAL { "" }
+		::= { systemServicesArchiveEntry 2 }
+	
+	systemServicesArchiveType OBJECT-TYPE
+		SYNTAX  SystemFileType
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The type of a file in the backup archive file."
+		DEFVAL { undefined }
+		::= { systemServicesArchiveEntry 3 }
+	
+	systemServicesArchiveSize OBJECT-TYPE
+		SYNTAX          Unsigned32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION
+			"The size of a file in the backup archive file."
+		DEFVAL { 0 }
+		::= { systemServicesArchiveEntry 4 }
+	
+	systemServicesArchiveAttr OBJECT-TYPE
+		SYNTAX          INTEGER {
+			undefined(1),
+			readOnly(2),
+			readWrite(3),
+			writeOnly(4)
+		}
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION
+			"The attributes of a file in the backup archive file."
+		DEFVAL { undefined }
+		::= { systemServicesArchiveEntry 5 }
+	
+	systemServicesUsbEnable  OBJECT-TYPE
+		SYNTAX      Enable
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"disable/enable the USB interface"
+		::= { systemServices 38}
+	
+	systemServicesUsbAutoCopyEnable  OBJECT-TYPE
+		SYNTAX      Enable
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"disable/enable the USB auto-copy facility"
+		::= { systemServices 39}
+	
+	systemServicesUsbDisasterRecoveryEnable  OBJECT-TYPE
+		SYNTAX      Enable
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"disable/enable the USB disaster-recovery factility"
+		::= { systemServices 40}
+	
+
+--systemFileSystem group.  This group contains the parameters for
+--the multiple File Systems on the platform. 
+
+    systemFileSystemTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF SystemFileSystemEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"system file system table for this CMM."
+		::= { systemFileSystem 1}
+
+	systemFileSystemEntry	OBJECT-TYPE
+		SYNTAX	SystemFileSystemEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A row in the system file system table"
+		INDEX	{systemFileSystemIndex}
+		::= {systemFileSystemTable 1}
+
+	SystemFileSystemEntry ::= SEQUENCE 	{
+			systemFileSystemIndex		FileSystemIndex,
+			systemFileSystemName		DisplayString (SIZE (0..255)),
+			systemFileSystemFreeSpace	Unsigned32
+		}
+
+	systemFileSystemIndex OBJECT-TYPE
+		SYNTAX	FileSystemIndex
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Index to a specific file system."
+		::= {systemFileSystemEntry 1}
+
+	systemFileSystemName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The name of the file system."
+		DEFVAL { "" }
+		::= { systemFileSystemEntry 2 }
+
+	systemFileSystemFreeSpace	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"the free space in octets of this file system"
+		DEFVAL { 0 }
+		::= { systemFileSystemEntry 3 }
+
+	systemFileSystemDirectoryName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"The name of a file system directory.  This object is used in conjunction
+			with an Action command.  The Action command will set this directory
+			name to the name of a specific directory.  Information for all of the
+			files in that directory will then be read from the file system and
+			the appropriate values written in the entries in the systemFileSystemFile
+			table.  All this is being done to give snmp access to the file system
+			files."
+		DEFVAL { "" }
+		::= { systemFileSystem 2 }
+
+	systemFileSystemDirectoryDateTime OBJECT-TYPE
+		SYNTAX			DisplayString (SIZE (0..255))
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"the date and time (in system format) of the last access to this directory"
+		DEFVAL { "" }
+		::= { systemFileSystem 3 }
+
+    systemFileSystemFileTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF SystemFileSystemFileEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"system file system File table for this CMM.  This table is used by
+			an Action command which will populate it with file information read
+			from the files in the specified directory."
+		::= { systemFileSystem 4}
+
+	systemFileSystemFileEntry	OBJECT-TYPE
+		SYNTAX	SystemFileSystemFileEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A row in the system file system File table"
+		INDEX {	systemFileSystemFileIndex}		-- base table index
+		::= {systemFileSystemFileTable 1}
+
+	SystemFileSystemFileEntry ::= SEQUENCE 	{
+			systemFileSystemFileIndex		Unsigned32,
+			systemFileSystemFileName		DisplayString (SIZE (0..255)),
+			systemFileSystemFileType		SystemFileType,
+			systemFileSystemFileSize		Unsigned32,
+			systemFileSystemFileAttr		INTEGER,
+			systemFileSystemFileDateTime	DisplayString (SIZE (0..255))
+		}
+
+	systemFileSystemFileIndex OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Index to a specific file system File."
+		::= {systemFileSystemFileEntry 1}
+
+	systemFileSystemFileName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The name of a file system File"
+		DEFVAL { "" }
+		::= { systemFileSystemFileEntry 2 }
+
+	systemFileSystemFileType OBJECT-TYPE
+		SYNTAX	SystemFileType
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The Type of a file system File"
+		DEFVAL { undefined }
+		::= { systemFileSystemFileEntry 3 }
+
+	systemFileSystemFileSize OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"size of this file"
+		DEFVAL { 0 }
+		::= { systemFileSystemFileEntry 4 }
+
+	systemFileSystemFileAttr OBJECT-TYPE
+		SYNTAX			INTEGER {
+									undefined(1),
+									readOnly(2),
+									readWrite(3),
+									writeOnly(4)
+						}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"attributes of this file"
+		DEFVAL { undefined }
+		::= { systemFileSystemFileEntry 5 }
+
+	systemFileSystemFileDateTime OBJECT-TYPE
+		SYNTAX			DisplayString (SIZE (0..255))
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"the modification date and time of a file"
+		DEFVAL { "" }
+		::= { systemFileSystemFileEntry 6 }
+
+	--systemSwitchLogging group.  This group contains the Switch Logging
+	--configuration data.
+
+	systemSwitchLoggingIndex	OBJECT-TYPE
+		SYNTAX		SwitchLoggingIndex
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A small positive integer used to identify a switch logging
+			output"
+		DEFVAL { flash }
+		::={ systemSwitchLogging 1 }
+
+	systemSwitchLoggingEnable	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Global switch logging enable/disable"
+		DEFVAL { enabled }
+		::={ systemSwitchLogging 2 }
+
+	systemSwitchLoggingFlash	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Enable/disable switch logging to flash"
+		DEFVAL { enabled }
+		::={ systemSwitchLogging 3 }
+
+	systemSwitchLoggingSocket	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Enable/disable switch logging to a socket"
+		DEFVAL { disabled }
+		::={ systemSwitchLogging 4 }
+
+	systemSwitchLoggingSocketIpAddr	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION
+			"The IP Address of a remote host that can
+			be used to send switch logging records to as an option"
+		::={ systemSwitchLogging 5 }
+
+	systemSwitchLoggingConsole	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Enable/disable switch logging to the console"
+		DEFVAL { disabled }
+		::={ systemSwitchLogging 6 }
+
+	systemSwitchLoggingLevelTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SystemSwitchLoggingLevelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of switch logging level settings, one for each
+		Application ID"
+		::={ systemSwitchLogging 7}
+
+	systemSwitchLoggingClear	OBJECT-TYPE
+		SYNTAX	Unsigned32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Enable clearing of switch logging entries"
+		::={ systemSwitchLogging 8 }
+
+	systemSwitchLoggingFileSize	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Set size of swlog logging file"
+		::={ systemSwitchLogging 9 }
+
+	systemSwitchLoggingLevelEntry	OBJECT-TYPE
+		SYNTAX		SystemSwitchLoggingLevelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"A row in the system switch logging level table"
+		INDEX {systemSwitchLoggingLevelAppId}
+		::={ systemSwitchLoggingLevelTable 1 }
+
+	SystemSwitchLoggingLevelEntry  ::= SEQUENCE {
+			systemSwitchLoggingLevelAppId	AppIdIndex,
+			systemSwitchLoggingLevel		SeverityLevel
+		}
+
+	systemSwitchLoggingLevelAppId	OBJECT-TYPE
+		SYNTAX		AppIdIndex
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A specific application ID which has a severity level associated
+		with it.  This application ID is used as an index into the level
+		table."
+		::={ systemSwitchLoggingLevelEntry 1 }
+
+	systemSwitchLoggingLevel	OBJECT-TYPE
+		SYNTAX		SeverityLevel
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"The logging level for a specific application id."
+		::={ systemSwitchLoggingLevelEntry 2 }
+
+
+	systemSwitchLoggingHostTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SystemSwitchLoggingHostEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of switch logging remote hosts."
+		::={ systemSwitchLogging 10}
+
+	systemSwitchLoggingHostEntry  OBJECT-TYPE
+	    SYNTAX  SystemSwitchLoggingHostEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+            DESCRIPTION
+		 "A remote switch logging server entry."
+            INDEX { systemSwitchLoggingHostIpAddr }
+		::={ systemSwitchLoggingHostTable 1 }
+
+	SystemSwitchLoggingHostEntry  ::= SEQUENCE {
+            systemSwitchLoggingHostIpAddr     IpAddress,
+            systemSwitchLoggingHostPort       INTEGER,
+	    systemSwitchLoggingHostUserCommandHost	Enable,
+            systemSwitchLoggingHostStatus     RowStatus
+	    }
+
+	systemSwitchLoggingHostIpAddr	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The IP Address of a remote host that can
+			be used to send switch logging records to."
+		::={ systemSwitchLoggingHostEntry 1 }
+
+	systemSwitchLoggingHostPort	OBJECT-TYPE
+		SYNTAX		INTEGER (1..65535)
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"The port number of a remote host that can
+			be used to send switch logging records to."
+		DEFVAL	{ 514 }
+		::={ systemSwitchLoggingHostEntry 2 }
+
+	systemSwitchLoggingHostUserCommandHost	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Indicates whether this host may receive user
+			  command data."
+		DEFVAL	{ disabled }
+		::={ systemSwitchLoggingHostEntry 4 }
+
+	systemSwitchLoggingHostStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Provides the ability to add or remove a remote host entry."
+		::={ systemSwitchLoggingHostEntry 3 }
+
+	systemSwitchLoggingHostv6Table	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SystemSwitchLoggingHostv6Entry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of switch logging remote hosts."
+		::={ systemSwitchLogging 11 }
+
+	systemSwitchLoggingHostv6Entry  OBJECT-TYPE
+	    SYNTAX  SystemSwitchLoggingHostv6Entry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+            DESCRIPTION
+		 "A remote switch logging server entry."
+            INDEX { systemSwitchLoggingHostv6IpAddr }
+		::={ systemSwitchLoggingHostv6Table 1 }
+
+	SystemSwitchLoggingHostv6Entry  ::= SEQUENCE {
+            systemSwitchLoggingHostv6IpAddr    Ipv6Address,
+            systemSwitchLoggingHostv6Port      INTEGER,
+	    systemSwitchLoggingHostv6UserCommandHost	Enable,
+            systemSwitchLoggingHostv6Status    RowStatus
+	    }
+
+	systemSwitchLoggingHostv6IpAddr	OBJECT-TYPE
+		SYNTAX		Ipv6Address
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The IP Address of a remote host that can
+			be used to send switch logging records to."
+		::={ systemSwitchLoggingHostv6Entry 1 }
+
+	systemSwitchLoggingHostv6Port	OBJECT-TYPE
+		SYNTAX		INTEGER (1..65535)
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"The port number of a remote host that can
+			be used to send switch logging records to."
+		DEFVAL	{ 514 }
+		::={ systemSwitchLoggingHostv6Entry 2 }
+
+	systemSwitchLoggingHostv6UserCommandHost	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Indicates whether this host may receive user
+			  command data."
+		DEFVAL	{ disabled }
+		::={ systemSwitchLoggingHostv6Entry 4 }
+
+	systemSwitchLoggingHostv6Status	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Provides the ability to add or remove a remote host entry."
+		::={ systemSwitchLoggingHostv6Entry 3 }
+
+
+
+	systemSwitchLoggingHostCount	OBJECT-TYPE
+		SYNTAX		INTEGER (0..4)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of remote hosts currently defined."
+		::={ systemSwitchLogging 12}
+
+
+	systemSwitchLoggingConsoleLevel	OBJECT-TYPE
+		SYNTAX		SeverityLevel
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Messages whose severity level is equal to or more
+			 severe than this value will be displayed to the console."
+		DEFVAL	{ severityLevelWarn }
+		::={ systemSwitchLogging 13}
+
+	systemSwitchLoggingUserCommandStatus	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"User commands will be logged to remote hosts when enabled."
+		DEFVAL	{ disabled }
+		::={ systemSwitchLogging 14}
+
+	systemSwitchLoggingSysLogFacilityId  OBJECT-TYPE
+		SYNTAX	      SysLogFacilityId
+		MAX-ACCESS    read-write
+		STATUS        current
+		DESCRIPTION   "This textual convention enumerates the facilities
+        	    that originate syslog messages.
+	
+        	    The Facilities of syslog messages are numerically
+	            coded with decimal values.
+	            Some of the operating system daemons and processes
+	            are traditionally designated by the Facility values
+	            given below. Daemons and processes that do not have
+	            an explicitly assigned Facility may use any of the
+	            'local use' Facilities or they may use the 'user-level'
+	            Facility.
+
+	            For interoperability and backwards compatibility
+	            reasons, mapping specified in this document between
+	            a label which represents a Facility and
+	            the value which represents the corresponding code, is
+	            normative. So the mapping from a label configured by
+	            operators in syslog.conf or equivalent will consistently
+	            map to the same Facility code regardless of
+	            implementation, but the label itself is often
+	            semantically meaningless, because it is impractical to
+	            attempt to enumerate all possible facilities, and the
+	            enumeration (label and corresponding value) that is used
+	            by an actual Facility is, and has historically been,
+	            implementation-dependent.
+
+	            For example, the foobar application might log messages
+	            as having come from local7, even though there is no
+	            'local' process on the device, and the operator can
+	            configure syslog.conf to have local7.critical messages
+	            be relayed, even though there might be multiple facilities
+	            using Facility local7. This is typical current practice,
+	            and originators, relays and collectors know how to handle
+	            this situation. For improved accuracy, the foobar
+	            application can also include an APPNAME Structured Data
+	            Element."
+		DEFVAL  { uucp }
+		::={ systemSwitchLogging 15}
+
+	--systemDNS group.  This group contains the Domain Name Service
+	--configuration information.
+
+	systemDNSEnableDnsResolver	OBJECT-TYPE
+		SYNTAX		Enable
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Global Domain Name Service enable/disable"
+		DEFVAL { disabled }
+		::={ systemDNS 1 }
+
+	systemDNSDomainName	OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (0..255))
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"current domain name used by the Domain Name Service"
+		DEFVAL { "" }
+		::={ systemDNS 2 }
+
+	systemDNSNsAddr1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"1st part of address used by the Domain Name Service"
+		DEFVAL { 0 }
+		::={ systemDNS 3 }
+
+	systemDNSNsAddr2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"2nd part of address used by the Domain Name Service"
+		DEFVAL { 0 }
+		::={ systemDNS 4 }
+
+	systemDNSNsAddr3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"3rd part of address used by the Domain Name Service"
+		DEFVAL { 0 }
+		::={ systemDNS 5 }
+
+	systemDNSNsIPv6Addr1	OBJECT-TYPE
+		SYNTAX		Ipv6Address
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"IPv6 address of the Primary DNS server"
+		DEFVAL { "" }
+		::={ systemDNS 6 }
+
+	systemDNSNsIPv6Addr2	OBJECT-TYPE
+		SYNTAX		Ipv6Address
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"IPv6 address of the Secondary DNS server"
+		DEFVAL { "" }
+		::={ systemDNS 7 }
+
+	systemDNSNsIPv6Addr3	OBJECT-TYPE
+		SYNTAX		Ipv6Address
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"IPv6 address of the third DNS server"
+		DEFVAL { "" }
+		::={ systemDNS 8 }
+--
+-- Compliance Statements
+--
+
+    alcatelIND1SystemMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             Alcatel BOP Proprietary System Subsystem."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS
+            {
+                systemMicrocodeGroup,
+				systemBootParamsGroup,
+				systemHardwareGroup,
+				systemServicesGroup,
+				systemFileSystemGroup,
+				systemSwitchLoggingGroup,
+				systemDNSGroup
+            }
+
+        ::= { alcatelIND1SystemMIBCompliances 1 }
+
+--
+-- Units Of Conformance
+--
+    systemMicrocodeGroup OBJECT-GROUP
+        OBJECTS     {
+				systemMicrocodeIndex,
+				systemMicrocodePackageIndex,
+				systemMicrocodePackageVersion,
+				systemMicrocodePackageName,
+				systemMicrocodePackageDescription,
+				systemMicrocodePackageStatus,
+				systemMicrocodePackageSize,
+				systemMicrocodeComponentIndex,
+				systemMicrocodeComponentVersion,
+				systemMicrocodeComponentName,
+				systemMicrocodeComponentDescription,
+				systemMicrocodeComponentStatus,
+				systemMicrocodeComponentSize,
+				systemMicrocodeDependencyIndex,
+				systemMicrocodeDependencyPackageName,
+				systemMicrocodeDependencyVersion
+			}
+        STATUS      current
+        DESCRIPTION
+            "Group all the system microcode objects together"
+        ::= { alcatelIND1SystemMIBGroups 1 }
+
+    systemBootParamsGroup OBJECT-GROUP
+        OBJECTS	{
+			systemBootNetwork,
+			systemBootNetworkGateway,
+			systemBootNetworkNetmask
+		}
+        STATUS      current
+        DESCRIPTION
+            "Group all the system boot parameters together"
+        ::= { alcatelIND1SystemMIBGroups 2 }
+
+    systemHardwareGroup OBJECT-GROUP
+        OBJECTS     {
+			systemHardwareFlashMfg,
+			systemHardwareFlashSize,
+			systemHardwareMemoryMfg,
+	      	systemHardwareMemorySize,
+			systemHardwareNVRAMBatteryLow,
+			systemHardwareBootCpuType,
+			systemHardwareJumperInterruptBoot,
+			systemHardwareJumperForceUartDefaults,
+			systemHardwareJumperRunExtendedMemoryDiagnostics,
+			systemHardwareJumperSpare,
+			systemHardwareFpgaVersionIndex,
+			systemHardwareFpgaVersion,
+			systemHardwareBootRomVersion,
+			systemHardwareDefaultMiniBootVersion,
+			systemHardwareBackupMiniBootVersion
+        }
+        STATUS      current
+        DESCRIPTION
+            "Group all the system Hardware Data together"
+        ::= { alcatelIND1SystemMIBGroups 3 }
+
+	systemServicesGroup OBJECT-GROUP
+        OBJECTS {
+				systemServicesDate,
+				systemServicesTime,
+				systemServicesTimezone,
+				systemServicesTimezoneStartWeek,
+				systemServicesTimezoneStartDay,
+				systemServicesTimezoneStartMonth,
+				systemServicesTimezoneStartTime,
+				systemServicesTimezoneOffset,
+				systemServicesTimezoneEndWeek,
+				systemServicesTimezoneEndDay,
+				systemServicesTimezoneEndMonth,
+				systemServicesTimezoneEndTime,
+				systemServicesEnableDST,
+				systemServicesWorkingDirectory,
+				systemServicesArg1,
+				systemServicesArg2,
+				systemServicesArg3,
+				systemServicesArg4,
+				systemServicesArg5,
+				systemServicesArg6,
+				systemServicesArg7,
+				systemServicesArg8,
+				systemServicesArg9,
+				systemServicesAction,
+				systemServicesResultCode,
+				systemServicesResultString,
+				systemServicesKtraceEnable,
+				systemServicesSystraceEnable,
+				systemServicesTtyLines,
+				systemServicesTtyColumns,
+				systemServicesMemMonitorEnable,
+				systemServicesKtraceLevelAppId,
+				systemServicesKtraceLevel,
+				systemServicesSystraceLevelAppId,
+                                systemServicesSystraceLevel,
+                                systemUpdateStatus,
+                                systemUpdateErrorCode,
+                                systemServicesActionPercentComplete,
+                                systemServicesArchiveName,
+                                systemServicesArchiveType,
+                                systemServicesArchiveSize,
+                                systemServicesArchiveAttr,
+				systemServicesUsbEnable,
+				systemServicesUsbAutoCopyEnable,
+				systemServicesUsbDisasterRecoveryEnable
+			}
+        STATUS  current
+        DESCRIPTION
+            "Group all the system services parameters together"
+        ::= { alcatelIND1SystemMIBGroups 4 }
+
+	systemFileSystemGroup OBJECT-GROUP
+		OBJECTS	{
+			systemFileSystemIndex,
+			systemFileSystemFreeSpace,
+			systemFileSystemName,
+			systemFileSystemDirectoryName,
+			systemFileSystemDirectoryDateTime,
+			systemFileSystemFileIndex,
+			systemFileSystemFileName,
+			systemFileSystemFileType,
+			systemFileSystemFileSize,
+			systemFileSystemFileAttr,
+			systemFileSystemFileDateTime
+		}
+        STATUS      current
+        DESCRIPTION
+         "Group all the system flash file parameters together"
+        ::= { alcatelIND1SystemMIBGroups 5 }
+
+	systemSwitchLoggingGroup OBJECT-GROUP
+		OBJECTS{
+				systemSwitchLoggingIndex,
+				systemSwitchLoggingEnable,
+				systemSwitchLoggingFlash,
+				systemSwitchLoggingSocket,
+				systemSwitchLoggingSocketIpAddr,
+				systemSwitchLoggingConsole,
+				systemSwitchLoggingClear,
+				systemSwitchLoggingFileSize,
+				systemSwitchLoggingLevel,
+				systemSwitchLoggingLevelAppId
+			}
+        	STATUS      current
+        	DESCRIPTION
+         	"Group all the switch logging parameters together"
+        	::= { alcatelIND1SystemMIBGroups 6 }
+
+	systemDNSGroup OBJECT-GROUP
+		OBJECTS{
+				systemDNSEnableDnsResolver,
+				systemDNSDomainName,
+				systemDNSNsAddr1,
+				systemDNSNsAddr2,
+				systemDNSNsAddr3,
+				systemDNSNsIPv6Addr1,
+				systemDNSNsIPv6Addr2,
+				systemDNSNsIPv6Addr3
+			}
+        	STATUS      current
+        	DESCRIPTION
+         	"Group all the systemDNS parameters together"
+        	::= { alcatelIND1SystemMIBGroups 7 }
+
+END
+
+

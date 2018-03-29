@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gridster Grid Swapping Demo</title>
+
+    <link rel="stylesheet" type="text/css" href="assets/css/demo.css">
+    <link rel="stylesheet" type="text/css" href="../dist/jquery.gridster.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="../dist/jquery.gridster.min.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+        var gridster = "";
+        $(document).ready(function () {
+            $(".gridster ul").gridster({
+                widget_margins: [10, 10],
+                widget_base_dimensions: [140, 140],
+                shift_larger_widgets_down: false
+            });
+        });
+    </script>
+</head>
+<body>
+<style>
+    .gridster, .content {
+        width: 940px;
+        margin: 0 auto;
+
+    }
+</style>
+<div class="content">
+    <h1>Grid with larger widgets swapping spots with smaller ones</h1>
+    <p>This demo represents using the branch in swap mode. This works best with shift_larger_widgets_down set to "false". However, smaller widgets do
+        not displace larger ones.</p>
+</div>
+<div class="gridster">
+    <ul style="height: 480px; position: relative; ">
+        <li data-row="1" data-col="1" data-sizex="2" data-sizey="1" class="gs_w"></li>
+        <li data-row="3" data-col="1" data-sizex="1" data-sizey="1" class="gs_w"></li>
+
+        <li data-row="3" data-col="2" data-sizex="2" data-sizey="1" class="gs_w"></li>
+        <li data-row="1" data-col="3" data-sizex="2" data-sizey="2" class="gs_w"></li>
+
+        <li class="try gs_w" data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
+        <li data-row="2" data-col="1" data-sizex="2" data-sizey="1" class="gs_w"></li>
+        <li data-row="3" data-col="4" data-sizex="1" data-sizey="1" class="gs_w"></li>
+
+        <li data-row="1" data-col="6" data-sizex="1" data-sizey="1" class="gs_w"></li>
+        <li data-row="3" data-col="5" data-sizex="1" data-sizey="1" class="gs_w"></li>
+
+        <li data-row="2" data-col="5" data-sizex="1" data-sizey="1" class="gs_w"></li>
+        <li data-row="2" data-col="6" data-sizex="1" data-sizey="2" class="gs_w"></li>
+    </ul>
+</div>
+</body>
+</html>

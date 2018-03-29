@@ -1,0 +1,85 @@
+
+-- *****************************************************************************
+-- Juniper-CLI-CONF
+--
+-- SNMP Agent Capabilities definitions for the CLI MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+-- Copyright (c) 2007 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-CLI-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniCliAgent  MODULE-IDENTITY
+    LAST-UPDATED "200710100922Z"  -- 10-Oct-07 02:52 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the CLI component of
+        the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200710100922Z"  -- 10-Oct-07 02:52 PM EST  - JUNOSe 9.1 
+    DESCRIPTION
+        "Added the rsCliConfigurationTable. A script file transferred using
+        JUNIPER-FILE-XFER-MIB can be applied using this table."        
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103272230Z"  -- 27-Mar-01 05:30 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 6 }
+
+
+-- *****************************************************************************
+-- CLI JUNOSe SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniCliAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the CLI Security Management component of JUNOSe SNMP
+        agent.  This version of the CLI Security Management component is
+        supported in JUNOSe 1.3 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the CLI Security Management
+        application in JUNOSe."
+    SUPPORTS    Juniper-CLI-MIB
+        INCLUDES {
+            juniCliGroup,
+            juniCliSecurityAlertGroup,
+            juniCliSecurityTrapGroup }
+    ::= { juniCliAgent 1 }
+
+juniCliAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the CLI component of JUNOSe SNMP agent.
+        This version of the CLI component is supported in JUNOSe 9.1
+        and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the JUNOSe SNMP agent for the CLI 
+        application."
+    SUPPORTS    Juniper-CLI-MIB
+        INCLUDES {
+            juniCliGroup,
+            juniCliSecurityAlertGroup,
+            juniCliConfigurationGroup,
+            juniCliSecurityTrapGroup }
+    ::= { juniCliAgent 2 }
+END

@@ -1,0 +1,203 @@
+-- ****************************************************************************
+--  COLUBRIS-QOS-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks QoS MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32
+        FROM    SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF 
+    ifIndex
+        FROM    IF-MIB
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisPriorityQueue
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisQOS   MODULE-IDENTITY
+    LAST-UPDATED    "200407200000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "The MIB module for enterprise specific QoS options."
+
+    ::= { colubrisMgmtV2 13 }
+
+-- colubrisQOS definition
+colubrisQOSMIBObjects OBJECT IDENTIFIER ::= { colubrisQOS 1 }
+
+-- QOS MIB defines the following groupings
+coQOSStatistics OBJECT IDENTIFIER ::= { colubrisQOSMIBObjects 1 }
+
+
+-- *** QoS Counters Table *****************************************************
+
+coQOSCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoQOSCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Group containing attributes that are MAC counters. In tabular
+                 form to allow multiple instance on an agent."
+    ::= { coQOSStatistics 1 }
+
+coQOSCountersEntry OBJECT-TYPE
+    SYNTAX      CoQOSCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coQOSCountersEntry Table.
+                 ifIndex - Each 802.11 interface is represented by an ifEntry.
+                           Interface tables in this MIB module are indexed by
+                           ifIndex."
+    INDEX       { ifIndex, coQOSQueueId }
+    ::= { coQOSCountersTable 1 }
+
+CoQOSCountersEntry ::= SEQUENCE
+{
+    coQOSQueueId                        ColubrisPriorityQueue,
+    coQOSTransmittedFrameCount          Counter32,
+    coQOSMulticastTransmittedFrameCount Counter32,
+    coQOSFailedCount                    Counter32,
+    coQOSRetryCount                     Counter32,
+    coQOSMultipleRetryCount             Counter32,
+    coQOSFrameDuplicateCount            Counter32,
+    coQOSReceivedFrameCount             Counter32,
+    coQOSMulticastReceivedFrameCount    Counter32
+}
+
+coQOSQueueId   OBJECT-TYPE
+    SYNTAX      ColubrisPriorityQueue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Queue identifier used to access the statistics."
+    ::= { coQOSCountersEntry 1 }
+
+coQOSTransmittedFrameCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter increments only when an acknowledged MPDU
+                 with an individual address in the address 1 field or MPDU
+                 with a multicast address in the address 1 field of type Data
+                 or Management."
+    ::= { coQOSCountersEntry 2 }
+
+coQOSMulticastTransmittedFrameCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter increments only when the multicast
+		     bit is set in the destination MAC address of a successfully 
+                 transmitted MSDU. When operating as a STA in an ESS, where 
+                 these frames are directed to the AP, this implies having 
+                 received an acknowledgment to all associated MPDUs."
+    ::= { coQOSCountersEntry 3 }
+
+coQOSFailedCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter increments when an MSDU is not transmitted
+                 successfully due to the number of transmit attempts exceeding
+                 either the  coQOSShortRetryLimit or coQOSLongRetryLimit."
+    ::= { coQOSCountersEntry 4 }
+
+coQOSRetryCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter increments when an MSDU is successfully
+                 transmitted after one or more retransmissions. This
+		     is basically a total of single and multiple retry counts."
+    ::= { coQOSCountersEntry 5 }
+
+coQOSMultipleRetryCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter increments when an MSDU is successfully
+                 transmitted after more than one retransmission."
+    ::= { coQOSCountersEntry 6 }
+
+coQOSFrameDuplicateCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter increments when a frame is received
+                 that the Sequence Control field indicates is a
+                 duplicate."
+    ::= {  coQOSCountersEntry 7 }
+
+coQOSReceivedFrameCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter shall be incremented for each successfully
+                 received MPDU of type Data or Management.  This is
+		     basically a total of unicast and multicast received
+		     frames."
+    ::= { coQOSCountersEntry 8 }
+
+coQOSMulticastReceivedFrameCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This counter shall increment when a MPDU is received with the
+                 multicast bit set in the destination MAC address."
+    ::= { coQOSCountersEntry 9 }
+
+-- *** End of QOS Counters Table **********************************************
+
+
+-- *** Conformance Information ************************************************
+coQOSConformance  OBJECT IDENTIFIER ::= { colubrisQOSMIBObjects 2 }
+coQOSGroups       OBJECT IDENTIFIER ::= { coQOSConformance 1 }
+coQOSCompliances  OBJECT IDENTIFIER ::= { coQOSConformance 2 }
+
+-- *** compliance statements **************************************************
+coQOSCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for SNMPv2 entities that implement
+                 the IEEE 802.11 MIB."
+    MODULE      MANDATORY-GROUPS
+                   {
+                        coQOSCountersGroup
+                   }
+
+    ::= { coQOSCompliances 1 }
+
+-- *** Groups - units of conformance ******************************************
+
+coQOSCountersGroup OBJECT-GROUP
+    OBJECTS     {
+                    coQOSTransmittedFrameCount,
+                    coQOSMulticastTransmittedFrameCount,
+                    coQOSFailedCount,
+                    coQOSRetryCount,
+                    coQOSMultipleRetryCount,
+                    coQOSFrameDuplicateCount,
+                    coQOSReceivedFrameCount,
+                    coQOSMulticastReceivedFrameCount
+                }
+    STATUS      current
+    DESCRIPTION "Provides the necessary support for QOS counters."
+    ::= { coQOSGroups 1 }
+
+END

@@ -1,0 +1,194 @@
+--  ============================================================================
+-- AT-XEM.MIB, Allied Telesis enterprise MIB: XEMs
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-XEM-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+
+        xem MODULE-IDENTITY
+            LAST-UPDATED "201009070000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT-XEM MIB contains objects for monitoring
+                XEMs installed in the device."
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200907150000Z"
+            DESCRIPTION
+                "Corret a complier warning."
+            REVISION "200802290000Z"
+            DESCRIPTION
+                "Initial version."
+            ::= { sysinfo 11 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        xemTraps OBJECT IDENTIFIER ::= { xem 0 }
+
+
+        xemInserted NOTIFICATION-TYPE
+            OBJECTS { xemInfoMemberId, xemInfoBayId }
+            STATUS current
+            DESCRIPTION
+                "A trap generated when a XEM is inserted into the device."
+            ::= { xemTraps 1 }
+
+
+        xemRemoved NOTIFICATION-TYPE
+            OBJECTS { xemInfoMemberId, xemInfoBayId }
+            STATUS current
+            DESCRIPTION
+                "A trap generated when a XEM is removed from the device."
+            ::= { xemTraps 2 }
+
+
+        xemInsertedFail NOTIFICATION-TYPE
+            OBJECTS { xemInfoMemberId, xemInfoBayId }
+            STATUS current
+            DESCRIPTION
+                "A trap generated when the insertion of a XEM into the device fails."
+            ::= { xemTraps 3 }
+
+
+        xemNumOfXem OBJECT-TYPE
+            SYNTAX Unsigned32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of XEMs installed in the device. If devices are stacked,
+                it is the total number of XEMs installed in the stacked devices."
+            ::= { xem 1 }
+
+
+        xemInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF XemInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about XEMs. Each entry in the table
+                represents a XEM installed in the system."
+            ::= { xem 2 }
+
+
+        xemInfoEntry OBJECT-TYPE
+            SYNTAX XemInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about a single XEM."
+            INDEX { xemInfoMemberId, xemInfoBayId }
+            ::= { xemInfoTable 1 }
+
+
+        XemInfoEntry ::=
+            SEQUENCE {
+                xemInfoMemberId
+                    Unsigned32,
+                xemInfoBayId
+                    Unsigned32,
+                xemInfoXemId
+                    Unsigned32,
+                xemInfoBoardType
+                    DisplayString,
+                xemInfoBoardName
+                    DisplayString,
+                xemInfoRevision
+                    DisplayString,
+                xemInfoSerialNumber
+                    DisplayString
+             }
+
+        xemInfoMemberId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ID of the stack member where the XEM is installed."
+            ::= { xemInfoEntry 1 }
+
+
+        xemInfoBayId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bay number where the XEM is installed."
+            ::= { xemInfoEntry 2 }
+
+
+        xemInfoXemId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The board identity of the XEM."
+            ::= { xemInfoEntry 3 }
+
+
+        xemInfoBoardType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The board type of the XEM."
+            ::= { xemInfoEntry 4 }
+
+
+        xemInfoBoardName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The board name of the XEM."
+            ::= { xemInfoEntry 5 }
+
+
+        xemInfoRevision OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..5))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The board revision number of the XEM."
+            ::= { xemInfoEntry 6 }
+
+
+        xemInfoSerialNumber OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The board serial number of the XEM."
+            ::= { xemInfoEntry 7 }
+
+
+
+    END
+
+--
+-- at-xem.mib
+--
+

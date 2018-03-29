@@ -1,0 +1,328 @@
+
+-- *****************************************************************************
+-- Juniper-AUTOCONFIGURE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Auto-Configuration MIB
+--
+-- Copyright (c) 2000 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-AUTOCONFIGURE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable
+        FROM Juniper-TC;
+
+juniAutoConfMIB  MODULE-IDENTITY
+    LAST-UPDATED "200407261954Z"  -- 26-Jul-04 03:54 PM EDT
+    ORGANIZATION "Juniper Networks"
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Auto-Configuration MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200407261954Z"  -- 26-Jul-04 03:54 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added Encapsulation Type Lockout objects."
+    REVISION    "200211221608Z"  -- 22-Nov-02 11:08 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200211221524Z"  -- 22-Nov-02 10:24 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added bridgedEthernet(19) to JuniAutoConfEncaps."
+    REVISION    "200011160000Z"  -- 16-Nov-00               - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 48 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniAutoConfEncaps ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Encapsulated protocol type."
+    SYNTAX      INTEGER {
+                    ip(0),
+                    ppp(1),
+                    pppoe(17),
+                    bridgedEthernet(19) }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAutoConfObjects        OBJECT IDENTIFIER ::= {juniAutoConfMIB 1}
+
+--
+-- Functional groups
+--
+juniAutoConf               OBJECT IDENTIFIER ::= {juniAutoConfObjects 1}
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Enable/disable autoconfiguration for incoming data encapsulations.
+--
+juniAutoConfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAutoConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configures recognition of incoming data encapsulation types that
+        trigger autoconfiguration on an interface.  Also, configures the
+        time range that the encapsulation type will be locked-out from 
+        recognition in the event of an error in creating an interface of
+        the encapsulation type."
+    ::= { juniAutoConf 1 }
+
+juniAutoConfEntry OBJECT-TYPE
+    SYNTAX      JuniAutoConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configures recognition of an incoming data encapsulation type that
+        triggers autoconfiguration on an interface.  Also, configures the
+        time range that the encapsulation type will be locked-out from 
+        recognition in the event of an error in creating an interface of
+        the encapsulation type."
+    INDEX     { juniAutoConfIfIndex,
+                juniAutoConfEncaps }
+    ::= { juniAutoConfTable 1 }
+
+JuniAutoConfEntry ::= SEQUENCE {
+    juniAutoConfIfIndex             InterfaceIndex,
+    juniAutoConfEncaps              JuniAutoConfEncaps,
+    juniAutoConfEnable              JuniEnable,
+    juniAutoConfLockoutSupported    TruthValue,
+    juniAutoConfLockoutMin          Integer32,
+    juniAutoConfLockoutMax          Integer32,
+    juniAutoConfLockoutTime         Integer32,
+    juniAutoConfLockoutElapsedTime  Integer32,
+    juniAutoConfNextLockoutTime     Integer32 }
+
+juniAutoConfIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface to which the autoconfiguration information
+        in this entry applies."
+    ::= { juniAutoConfEntry 1 }
+
+juniAutoConfEncaps OBJECT-TYPE
+    SYNTAX      JuniAutoConfEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The encapsulated protocol type to which the autoconfiguration
+        information in this entry applies."
+    ::= { juniAutoConfEntry 2 }
+
+juniAutoConfEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, permits autoconfiguration of the specified interface when
+        the specified encapsulation is recognized in an incoming data frame."
+    ::= { juniAutoConfEntry 3 }
+
+juniAutoConfLockoutSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether lockout is supported for the specified
+        encapsulation type for the specified interface.  If lockout is
+        supported, then juniAutoConfLockoutMin, juniAutoConfLockoutMax, 
+        juniAutoConfLockoutTime, juniAutoConfLockoutElapsedTime, and 
+        juniAutoConfNextLockoutTime are valid and supported in this entry."
+    ::= { juniAutoConfEntry 4 }
+
+juniAutoConfLockoutMin OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lower bound, in seconds, of the time range used to specify 
+        the duration of the lockout of the encapsulation type from 
+        recognition for the specified interface.  This only takes effect
+        if juniAutoConfEnable is set to enable for the encapsulation type
+        for this interface.
+        The ability to lockout the specified encapsulation type from
+        recognition in the event of an error in creating an interface of
+        the encapsulation type is enabled by default.  The initial lockout
+        duration is this object's value and increases exponentially for
+        each failure that occurs for the specified encapsulation type
+	for the specified interface within the greater of 15 minutes
+	and juniAutoConfLockoutMax.  The lockout duration for the specified
+	encapsulation type will not exceed juniAutoConfLockoutMax.  If the 
+	time between creation errors for the specified encapsulation type
+        for the specified interface is greater than the greater of 15
+        minutes and juniAutoConfigLockoutMax, then the lockout duration
+        reverts to this object's value.
+        To disable the ability to lockout the specified encapsulation type 
+        from recognition in the event of an error in creating an interface
+        of the encapsulation type for the specified interface, the value of
+        this object and juniAutoConfLockoutMax must be set to 0.  It is not
+        recommended that this lockout feature be disabled except for 
+        debugging purposes."
+    DEFVAL    { 1 }
+    ::= { juniAutoConfEntry 5 }
+
+juniAutoConfLockoutMax OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The upper bound, in seconds, of the time range used to specify 
+        the duration of the lockout of the encapsulation type from 
+        recognition for the specified interface.  This value must equal
+        or exceed the value for juniAutoConfLockoutMin.  This only takes
+        effect if juniAutoConfEnable is set to enable for the encapsulation
+        type for this interface.
+        The ability to lockout the specified encapsulation type from
+        recognition in the event of an error in creating an interface of
+        the encapsulation type is enabled by default.  The initial lockout
+        duration is juniAutoConfLockoutMin and increases exponentially for
+        each failure that occurs for the specified encapsulation type
+        for the specified interface within the greater of 15 minutes
+        and this object's value.  The lockout duration for the specified
+        encapsulation type will not exceed this object's value.  If the 
+        time between creation errors for the specified encapsulation type
+        for the specified interface is greater than the greater of 15
+        minutes and this object's value, then the lockout duration
+        reverts to juniAutoConfigLockoutMin.
+        To disable the ability to lockout the specified encapsulation type 
+        from recognition in the event of an error in creating an interface
+        of the encapsulation type for the specified interface, the value of
+        this object and juniAutoConfLockoutMin must be set to 0.  It is not
+        recommended that this lockout feature be disabled except for 
+        debugging purposes."
+    DEFVAL    { 300 }
+    ::= { juniAutoConfEntry 6 }
+
+juniAutoConfLockoutTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time duration, in seconds, currently used to lockout the
+        specified encapsulation type from recognition for the specified
+        interface.  The reported value is within the range specified by
+        juniAutoConfLockoutMin and juniAutoConfLockoutMax.  A value of 0 
+        indicates that no lockout is occurring for the encapsulation type
+        for the specified interface."
+    ::= { juniAutoConfEntry 7 }
+
+juniAutoConfLockoutElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The elapsed time, in seconds, that the specified encapsulation type
+        has been locked-out from recognition for the specified interface. 
+        Its value will not exceed that of juniAutoConfLockoutTime.  A value of 
+        0 indicates that no lockout is occurring for the encapsulation type
+        for the specified interface."
+    ::= { juniAutoConfEntry 8 }
+
+juniAutoConfNextLockoutTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time duration, in seconds, that will be used to lockout the 
+        specified encapsulation type from recognition for the specified
+        interface for the next event that results in a lockout condition.
+        The reported value is within the range specified by
+        juniAutoConfLockoutMin and juniAutoConfLockoutMax.  When
+        juniAutoConfEnable is set to enable, a value of 0 indicates that
+        lockout is prevented from occurring for the encapsulation type
+        for the specified interface (i.e., juniAutoConfLockoutMin and
+        juniAutoConfLockoutMax are both set to 0)."
+    ::= { juniAutoConfEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAutoConfMIBConformance
+             OBJECT IDENTIFIER ::= { juniAutoConfMIB 4 }
+juniAutoConfMIBCompliances
+             OBJECT IDENTIFIER ::= { juniAutoConfMIBConformance 1 }
+juniAutoConfMIBGroups
+             OBJECT IDENTIFIER ::= { juniAutoConfMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniAutoConfCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting enabling of
+        autoconfiguration operation. This statement was obsoleted when 
+        encapsulation type lockout objects were added."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniAutoConfGroup }
+    ::= { juniAutoConfMIBCompliances 1 }
+
+juniAutoConfCompliance2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting enabling of
+        autoconfiguration operation."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniAutoConfGroup2 }
+    ::= { juniAutoConfMIBCompliances 2 }
+
+--
+-- units of conformance
+--
+juniAutoConfGroup OBJECT-GROUP
+    OBJECTS {
+        juniAutoConfEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsoleted collection of objects providing management of
+        autoconfiguration enabling in a Juniper product.  This group 
+        became obsolete when Encapsulation Type Lockout support was added."
+    ::= { juniAutoConfMIBGroups 1 }                                -- JUNOSe 3.0
+
+juniAutoConfGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniAutoConfLockoutSupported,
+        juniAutoConfLockoutMin,
+        juniAutoConfLockoutMax,
+        juniAutoConfLockoutTime,
+        juniAutoConfLockoutElapsedTime,
+        juniAutoConfNextLockoutTime }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of
+        autoconfiguration enabling in a Juniper product."
+    ::= { juniAutoConfMIBGroups 2 }                                -- JUNOSe 7.0
+
+END

@@ -1,0 +1,135 @@
+RAPID-SYSTEM-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,  Counter64, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks       FROM SNMPv2-SMI
+        rapidstream                FROM RAPID-MIB;
+        
+    rsInfoModule MODULE-IDENTITY
+        LAST-UPDATED  "0105161200Z"
+        ORGANIZATION  "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road 
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+
+        DESCRIPTION
+            "The MIB module describes various system statistics information
+            of RapidStream system."
+
+
+        REVISION      "200105161200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        ::= { rapidstream 6 }
+
+
+    rsSystemStatisticsMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base system information for all system related
+             statistical counters."
+    ::= { rsInfoModule 3 }
+
+    rsSystemCpuUtil OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 5 seconds. The value
+             is measured in 0.01%.  For example, if the value is 234, 
+             then CPU utilization is 2.34%."
+        ::= { rsSystemStatisticsMIB 4 }
+            
+    rsSystemTotalSendBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes sent since system is up. This
+            number includes both cut through traffic and host traffic."
+        ::= { rsSystemStatisticsMIB 8 }
+    
+    rsSystemTotalRecvBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes received since system is up. This
+            number includes both cut through traffic and host traffic."
+        ::= { rsSystemStatisticsMIB 9 }
+    
+    rsSystemTotalSendPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the packets sent since system is up. This
+            number includes both cut through traffic and host traffic."
+        ::= { rsSystemStatisticsMIB 10 }
+  
+    rsSystemTotalRecvPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the packets received since system is up.
+            The number includes both cut through traffic and host traffic."
+        ::= { rsSystemStatisticsMIB 11 }
+  
+    rsSystemStreamReqTotal OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the connection requests since system is up."
+        ::= { rsSystemStatisticsMIB 30 }
+ 
+    rsSystemStreamReqDrop OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the connection requests being dropped since system is up."
+        ::= { rsSystemStatisticsMIB 34 }
+     
+    rsSystemCpuUtil1 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 1 minute. The value
+            is measured in 0.01%.  For example, if the value is 234, 
+            then CPU utilization is 2.34%."
+        ::= { rsSystemStatisticsMIB 77 }
+
+    rsSystemCpuUtil5 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 5 minutes. The value
+            is measured in 0.01%.  For example, if the value is 234, 
+            then CPU utilization is 2.34%."
+        ::= { rsSystemStatisticsMIB 78 }
+
+    rsSystemCpuUtil15 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 15 minutes. The value
+            is measured in 0.01%.  For example, if the value is 234, 
+            then CPU utilization is 2.34%."
+        ::= { rsSystemStatisticsMIB 79 }
+END

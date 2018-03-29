@@ -1,0 +1,1077 @@
+HP-ICF-USER-PROFILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TimeTicks, IpAddress, Integer32, Unsigned32,
+    OBJECT-TYPE, MODULE-IDENTITY, Counter64
+        FROM SNMPv2-SMI
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    PhysAddress, DisplayString, TEXTUAL-CONVENTION,
+    RowStatus, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    hpSwitch, hpicfCommonSecurity, hpicfCommon
+        FROM HP-ICF-OID
+    VlanIndex
+        FROM Q-BRIDGE-MIB
+    ;
+
+hpicfUsrProfileMIB MODULE-IDENTITY
+    LAST-UPDATED "200704170230Z"  -- April 16, 2007
+    ORGANIZATION "Hewlett Packard Company,
+                  ProCurve Networking Business"
+    CONTACT-INFO "Hewlett Packard Company,
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747."
+    DESCRIPTION  "This MIB module contains the definitions 
+                  of Managed Objects for user access profiles."
+
+    --
+    -- Revision History
+    --
+    REVISION "200707162110Z"   -- July 16, 2007
+    DESCRIPTION
+             "Version 1.5
+              Created hpicfUsrProfileConfigFilterListTable and
+              hpicfUsrProfileConfigFilterRuleTable. Removed
+              hpicfUsrProfileConfigFilterTable. These changes
+              allow for the requirement that a filter list
+              not be in an active state in order for filter
+              rules to be added/removed/modified."
+
+    REVISION "200706192140Z"   -- June 19, 2007
+    DESCRIPTION
+             "Version 1.4
+              Added comment to hpicfUsrProfileConfigBindEntryRowStatus.
+              Changed hpicfUserProfileConfigListEnable to 
+              hpicfUserProfileConfigEntryRowStatus. Moved VlanIndex
+              from section Groups in HP-ICF-USER-PROFILE-MIb up
+              to the Import section. Added variable 
+              hpicfUsrProfileConfigEntryRowStatus to the 
+              HpicfUsrProfileConfigEntry table. Added comment
+              to the Description clause of hpicfUsrProfileConfigPvid. 
+              Added comment to the Description clause of
+              hpicfUsrProfileConfigTaggedEgressVlanMap1k
+              Changed range of hpicfUsrProfileSelector from 
+              0..16384 to 1..16384 and added comment to the
+              variable's Description clause." 
+
+    REVISION "200703142335Z"  -- March, 14 2007
+    DESCRIPTION
+             "Version 1.3
+              Added to hpicfUsrProfileStatsAccessMode to
+              hpicfUsrProfileStatsEntry."
+
+    REVISION "200702062028Z"  -- February, 6 2007
+    DESCRIPTION
+             "Version 1.2
+              Added hpicfUsrProfileConfigBindEntryRowStatus to
+              hpicfUsrProfileConfigBindTable."
+
+    REVISION     "200510120000Z"  -- October, 12 2006
+    DESCRIPTION  "Version 1.1"
+
+    REVISION "200510050000Z"  -- October, 5 2006
+    DESCRIPTION  "Initial version."
+
+    ::= { hpicfCommonSecurity 1}  
+
+-- ---------------------------------------------------------- --
+-- Groups in HP-ICF-USER-PROFILE-MIB
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileCapability  OBJECT IDENTIFIER ::= {hpicfUsrProfileMIB 0}
+hpicfUsrProfileConfig      OBJECT IDENTIFIER ::= {hpicfUsrProfileMIB 1}
+hpicfUsrProfileStats       OBJECT IDENTIFIER ::= {hpicfUsrProfileMIB 2}
+hpicfUsrProfileConformance OBJECT IDENTIFIER ::= {hpicfUsrProfileMIB 3}
+
+-- ########################################################## --
+-- The User Access Profile Capability Group 
+-- ########################################################## --
+
+hpicfUsrProfileCapabilityByPortMap OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE(8))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A string of octets containing on bit per access profile
+                primitive as follows:
+                bit 0 - PVID/native/untagged ingress VLAN
+                bit 1 - Tagged Egress VLAN
+                bit 2 - Ingress VLAN Filter 
+                bit 3 - Priority Regeneration 
+                bit 4 - Max. Ingress Bandwidth
+                bit 5 - Max. Egress Bandwidth
+                bit 6 - Filter List
+                bit 7 - Hitcount Support
+                bit 8 -  through 64 - reserved
+                
+                When a bit is set to one, it indicates that device supports
+                the selected access profile primitive only on a per port
+                ('hpicfUsrProfileUserPortNumber') basis.  The concequence is 
+                that the device can only enforce the same access primitive
+                setting for all users ('hpicfUsrProfileUserMacAddr') on a given 
+                port." 
+   ::= { hpicfUsrProfileCapability 1 }
+
+hpicfUsrProfileCapabilityByUserMap OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE(8))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "A string of octets containing one bit per access profile
+                primitive as follows:
+                bit 0 - PVID/native/untagged ingress VLAN
+                bit 1 - Tagged Egress VLAN
+                bit 2 - Ingress VLAN Filter 
+                bit 3 - Priority Regeneration 
+                bit 4 - Max. Ingress Bandwidth
+                bit 5 - Max. Egress Bandwidth
+                bit 6 - Filter List
+                bit 7 - Hitcount Support
+                bit 8 -  through 64 - reserved
+                
+                When a bit is set to one, it indicates that device supports
+                the selected access profile primitive on a per 
+                'hpicfUsrProfileUserMacAddr' basis.  The consequence is
+                that the device can enforce unique per user access profile
+                primitives for each user on a given port
+                ('hpicfUsrProfileUserPortNumber')." 
+   ::= { hpicfUsrProfileCapability 2 }
+   
+
+-- ########################################################## --
+-- The User Access Profile Configuration Group 
+-- ########################################################## --
+
+-- ---------------------------------------------------------- --
+-- Configuration of filters
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileConfigFilterListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUsrProfileConfigFilterListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains configuration objects
+                 for filter lists."
+    ::= { hpicfUsrProfileConfig 1 }
+
+hpicfUsrProfileConfigFilterListEntry OBJECT-TYPE
+    SYNTAX      HpicfUsrProfileConfigFilterListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The configuration information for a user's
+                 filtering profile."
+    INDEX       { hpicfUsrProfileFilterListIndex }
+     ::= { hpicfUsrProfileConfigFilterListTable 1 }
+
+HpicfUsrProfileConfigFilterListEntry ::= SEQUENCE {
+        hpicfUsrProfileFilterListIndex
+            Integer32,
+        hpicfUsrProfileConfigFilterListRowStatus
+            RowStatus
+}
+
+hpicfUsrProfileFilterListIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..16384)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The identifier used to select a list of
+                 filter rules. A filter list entry must be
+                 created before a filter rule entry can be
+                 added."
+    ::= { hpicfUsrProfileConfigFilterListEntry 1}
+
+hpicfUsrProfileConfigFilterListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This object indicates the status of this
+                 entry. Must NOT be active in order to modify
+                 an hpicfUsrProfileConfigFilterRuleEntry that
+                 is indexed on this entry's hpicfUsrProfileListIndex.
+                 This object must be in the notReady or notInService
+                 states in order for an 
+                 hpicfUsrProfileConfigFilterRuleEntry to be added,
+                 removed, or modified. In order to be changed to
+                 an active rowStatus, at least one rule sharing the
+                 list index must have an active  
+                 hpicfUsrProfileConfigFilterRuleRowStatus."
+    ::= { hpicfUsrProfileConfigFilterListEntry 2 }
+
+hpicfUsrProfileConfigFilterRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUsrProfileConfigFilterRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains configuration objects
+                 for filter lists."
+    ::= { hpicfUsrProfileConfig 2 }
+
+hpicfUsrProfileConfigFilterRuleEntry OBJECT-TYPE
+    SYNTAX      HpicfUsrProfileConfigFilterRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The configuration information for a user's
+                 filtering profile."
+    INDEX       { hpicfUsrProfileFilterRuleListIndex, 
+                  hpicfUsrProfileFilterRuleIndex }
+     ::= { hpicfUsrProfileConfigFilterRuleTable 1 }
+
+HpicfUsrProfileConfigFilterRuleEntry ::= SEQUENCE {
+        hpicfUsrProfileFilterRuleListIndex
+            Integer32,
+        hpicfUsrProfileFilterRuleIndex
+            Integer32,
+        hpicfUsrProfileConfigFilterRule
+            OCTET STRING,
+        hpicfUsrProfileConfigFilterRuleRowStatus
+            RowStatus
+    }
+
+hpicfUsrProfileFilterRuleListIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..16384)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The identifier used to select a list of
+                 filter rules. This filter rule list index
+                 must correspond to a created but not active
+                 filter list index in order for a rule entry
+                 to be created."
+    ::= { hpicfUsrProfileConfigFilterRuleEntry 1}
+
+hpicfUsrProfileFilterRuleIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..16384)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A numeric value assigned to each rule 
+                 within a list belong to the same 
+                 hpicfUsrProfileFilterListIndex. Rules 
+                 within a given list will be evaluated 
+                 in ascending order."
+    ::= { hpicfUsrProfileConfigFilterRuleEntry 2 }
+
+hpicfUsrProfileConfigFilterRule OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies a single filter rule using the 
+                 same syntax used for the 
+                 hp-nas-filter-rule RADIUS attribute."
+    ::= { hpicfUsrProfileConfigFilterRuleEntry 3 }
+ 
+hpicfUsrProfileConfigFilterRuleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This object indicates the status of this
+                 entry. Must NOT be active in order to modify
+                 an hpicfUsrProfileConfigFilterRuleEntry. However,
+                 if an hpicfUsrProfileConfigFilterListRowStatus
+                 is set to destroy, all HpicfUsrProfileConfigFilterRuleEntry 
+                 entries sharing the common 
+                 hpicfUsrProfileFilterListIndex will also be
+                 destroyed regardless of the value of 
+                 hpicfUsrProfileConfigFilterRuleRowStatus."
+    ::= { hpicfUsrProfileConfigFilterRuleEntry 4 }
+
+-- ---------------------------------------------------------- --
+-- Configuration of access profiles
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUsrProfileConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains configuration objects
+                 for access profiles."
+    ::= { hpicfUsrProfileConfig 3 }
+
+hpicfUsrProfileConfigEntry OBJECT-TYPE
+    SYNTAX      HpicfUsrProfileConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The configuration information for an
+                 access profile."
+    INDEX       { hpicfUsrProfileConfigIndex }
+    ::= { hpicfUsrProfileConfigTable 1 }
+
+HpicfUsrProfileConfigEntry ::=
+    SEQUENCE {
+        hpicfUsrProfileConfigIndex
+            Integer32,
+        hpicfUsrProfileConfigPvid
+            VlanIndex,
+        hpicfUsrProfileConfigPvidEnable
+            TruthValue,
+        hpicfUsrProfileConfigTaggedEgressVlanMap1k
+            OCTET STRING,
+        hpicfUsrProfileConfigTaggedEgressVlanMap2k
+            OCTET STRING,
+        hpicfUsrProfileConfigTaggedEgressVlanMap3k
+            OCTET STRING,
+        hpicfUsrProfileConfigTaggedEgressVlanMap4k
+            OCTET STRING,
+        hpicfUsrProfileConfigTaggedEgressVlanEnable
+            TruthValue,
+        hpicfUsrProfileConfigIngressVlanFilterEnable
+            TruthValue,
+        hpicfUsrProfileConfigPriorityRegenTable
+            OCTET STRING,
+        hpicfUsrProfileConfigPriorityRegenTableEnable
+            TruthValue,
+        hpicfUsrProfileConfigMaxIngressBandwidth
+            Unsigned32,
+        hpicfUsrProfileConfigMaxIngressBandwidthEnable
+            TruthValue,
+        hpicfUsrProfileConfigMaxEgressBandwidth
+            Unsigned32,
+        hpicfUsrProfileConfigMaxEgressBandwidthEnable
+            TruthValue,
+        hpicfUsrProfileConfigFilterListIndex
+            Integer32,
+        hpicfUsrProfileConfigFilterListEnable
+            TruthValue,
+        hpicfUsrProfileConfigEntryRowStatus
+            TruthValue
+    }    
+
+hpicfUsrProfileConfigIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..16384)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION "A unique numeric value assigned to each
+                 access profile in this table."
+    ::= { hpicfUsrProfileConfigEntry 1}
+
+
+hpicfUsrProfileConfigPvid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies the port VID (PVID), also known,
+                 as native VLAN to be used with this access 
+                 profile. To specify no pvid, set value to
+                 4095, not 0."
+    ::= { hpicfUsrProfileConfigEntry 2}
+
+hpicfUsrProfileConfigPvidEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE enables the 
+                usage of 'hpicfUsrProfilePvid' when this 
+                access profile is active."
+    ::= { hpicfUsrProfileConfigEntry 3}
+
+hpicfUsrProfileConfigTaggedEgressVlanMap1k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 0 through 1023.  
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 0 through 7, the second octet to VLANs 8 
+                 through 15, etc. The most significant bit of each octet 
+                 corresponds to the lowest 'VlanIndex' value in that  
+                 octet. Bit 0 in the 1K map is ignored/discarded.
+
+                 If variable hpicfUsrProfileConfigPvidEnable is TRUE, 
+                 some bit other than bit 0 in the 1K map must be set.
+                 To specify an empty tagged vlan map, vlanIndex value
+                 4095 in the 4K map must be set.
+
+                 Setting a bit to '1' specifies the usage the 
+                 corresponding VLAN with this access profile."
+    DEFVAL      { ''H }  -- the empty string: no VLANs set
+    ::= { hpicfUsrProfileConfigEntry 4}
+
+hpicfUsrProfileConfigTaggedEgressVlanMap2k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 1024 through 2047.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 1024 through 1031, the second octet to VLANs 
+                 1032 through 1039, etc. The most significant bit of 
+                 each octet corresponds to the lowest 'VlanIndex' value 
+                 in that octet.
+
+                 Setting a bit to '1' specifies the usage the 
+                 corresponding VLAN with this access profile."
+    DEFVAL      { ''H }  -- the empty string: no VLANs set
+    ::= { hpicfUsrProfileConfigEntry 5}
+
+hpicfUsrProfileConfigTaggedEgressVlanMap3k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 2048 through 3071.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 2048 through 3071, the second octet to VLANs 
+                 2056 through 2063, etc. The most significant bit of 
+                 each octet corresponds to the lowest 'VlanIndex' value 
+                 in that octet.
+
+                 Setting a bit to '1' specifies the usage the 
+                 corresponding VLAN with this access profile."
+    DEFVAL      { ''H }  -- the empty string: no VLANs set
+    ::= { hpicfUsrProfileConfigEntry 6}
+
+hpicfUsrProfileConfigTaggedEgressVlanMap4k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 3072 through 4095.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 3072 through 3079, the second octet to VLANs 
+                 3080 through 3087, etc. The most significant bit of 
+                 each octet corresponds to the lowest 'VlanIndex' value 
+                 in that octet.
+
+                 Setting a bit to '1' specifies the usage the 
+                 corresponding VLAN with this access profile."
+    DEFVAL      { ''H }  -- the empty string: no VLANs set
+    ::= { hpicfUsrProfileConfigEntry 7}
+
+hpicfUsrProfileConfigTaggedEgressVlanEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE enables the 
+                usage of 'hpicfUsrProfileTaggedVlanMapXXX' when this 
+                access profile is being enforced."
+    DEFVAL      { false }
+    ::= { hpicfUsrProfileConfigEntry 8}
+
+hpicfUsrProfileConfigIngressVlanFilterEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE causes the system to only
+                 allow ingress traffic from those VLANs on which egress
+                 traffic is permitted."
+    DEFVAL      { false }
+    ::= { hpicfUsrProfileConfigEntry 9}
+
+hpicfUsrProfileConfigPriorityRegenTable OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies the IEEE 802 priority regeneration table
+                 for this access profile.  Syntax of octet string 
+                 is same as for 'User-Priority-Table' RADIUS attribute
+                 as defined in RFC4675."
+    DEFVAL      { ''H }  -- the empty string
+    ::= { hpicfUsrProfileConfigEntry 10}
+
+hpicfUsrProfileConfigPriorityRegenTableEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE enables the usage of
+                 the 'hpicfUsrProfilePriorityRegenTable' when this
+                 access profile is active."
+    ::= { hpicfUsrProfileConfigEntry 11}
+
+hpicfUsrProfileConfigMaxIngressBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies the maximum ingress bandwidth for this 
+                 access profile. Bandwidth value is specified in Kbps."
+    ::= { hpicfUsrProfileConfigEntry 12}
+
+hpicfUsrProfileConfigMaxIngressBandwidthEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE enables the usage of
+                 the 'hpicfUsrProfileMaxIngressBandwidth' when this
+                 access profile is active."
+    ::= { hpicfUsrProfileConfigEntry 13}
+
+hpicfUsrProfileConfigMaxEgressBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies the maximum egress bandwidth for this 
+                 access profile. Bandwidth value is specified in Kbps."
+    ::= { hpicfUsrProfileConfigEntry 14}
+
+hpicfUsrProfileConfigMaxEgressBandwidthEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE enables the usage of
+                 'hpicfUsrProfileMaxEgressBandwidth' when this
+                 access profile is active."
+    ::= { hpicfUsrProfileConfigEntry 15}
+
+hpicfUsrProfileConfigFilterListIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..16384)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Selects the filter from  
+                 'hpicfUsrProfileConfigFilterTable' to associate with
+                 this access profile. The rowStatus of the filter must
+                 be in an active state."
+    ::= { hpicfUsrProfileConfigEntry 16}
+
+hpicfUsrProfileConfigFilterListEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute TRUE enables the usage of
+                 'hpicfUsrProfileConfigFilterListIndex' when this access
+                 profile is active."
+    ::= { hpicfUsrProfileConfigEntry 17}
+
+hpicfUsrProfileConfigEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This object indicates the status of this
+                 entry. Must NOT be active in order to change
+                 some other column of this config entry."
+    ::= { hpicfUsrProfileConfigEntry 18}
+
+-- ---------------------------------------------------------- --
+-- Configuration of bindings between access profiles to users 
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileConfigBindTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUsrProfileConfigBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains configuration objects
+                 for the access profile-to-user bindings."
+    ::= { hpicfUsrProfileConfig 4 }
+
+hpicfUsrProfileConfigBindEntry OBJECT-TYPE
+    SYNTAX      HpicfUsrProfileConfigBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The configuration information for a 
+                 access profile-to-user binding."
+    INDEX       { hpicfUsrProfileUserPortNumber,
+                  hpicfUsrProfileUserMacAddr }
+::= { hpicfUsrProfileConfigBindTable 1 }
+
+HpicfUsrProfileConfigBindEntry::=
+    SEQUENCE {
+        hpicfUsrProfileUserPortNumber
+            InterfaceIndex,
+        hpicfUsrProfileUserMacAddr
+            MacAddress,
+        hpicfUsrProfileSelector
+            Integer32,
+        hpicfUsrProfileConfigBindEntryRowStatus
+            RowStatus
+     }
+
+hpicfUsrProfileUserPortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The interface index associated with this user.
+                 On wired ProCurve products, the interface index
+                 is the physical port. On wireless products it is 
+                 the instance (whether real or virtual) of an AP."
+    ::= { hpicfUsrProfileConfigBindEntry 1}
+
+hpicfUsrProfileUserMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The 48-bit IEEE media access control address of
+                 the user."
+    ::= { hpicfUsrProfileConfigBindEntry 2}
+
+hpicfUsrProfileSelector OBJECT-TYPE
+    SYNTAX      Integer32(1..16384)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Setting this attribute to a value between 1 and
+                 16384 selects an access profile from  
+                 'hpicfUsrProfileConfigTable' to apply to the user."
+    ::= { hpicfUsrProfileConfigBindEntry 3}
+
+hpicfUsrProfileConfigBindEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This object indicates the status of this
+                 entry. Must NOT be active in order to change
+                 some other column of this bind entry."
+    ::= { hpicfUsrProfileConfigBindEntry 4}
+
+-- ---------------------------------------------------------- --
+-- Configuration of capability conflict resolution 
+-- ---------------------------------------------------------- --
+hpicfUsrProfileConfigConflictResolveQoS OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   non-strict(0),
+                   strict(1)
+                 }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object controls how a device behaves when
+                 QoS conflicts arise.  A conflict can arise if
+                 a device only supports the QoS access primitive
+                 on a per-port basis, but device is being configured
+                 with profiles that have per-user unique setting.
+                 Applying these profiles to the same port will cause
+                 the conflict to arise because the device cannot
+                 enforce a per-user unique QoS setting.  This object
+                 specifies two alternatives, as follows:
+                 
+                 'non-strict' - Device does not signal errors when
+                                multiple access profiles are applied
+                                to a port.  The device will apply
+                                the QoS settings specified in the 
+                                last profile applied to the port.
+                                
+                 'strict'    -  Device does signal an error when an 
+                                attempt to apply an access profile to
+                                a port that already has an active access
+                                profile with a different QoS setting.
+                                Device will not activate the access
+                                profile in question after error is 
+                                signaled. "
+    DEFVAL      { 0 }
+    ::= { hpicfUsrProfileConfig 5 }
+
+hpicfUsrProfileConfigConflictResolveMaxIngressBandwidth OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   non-strict(0),
+                   strict(1)
+                 }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object controls how a device behaves when
+                 ingress BW conflicts arise.  A conflict can arise if
+                 a device only supports the ingress BW access primitive
+                 on a per-port basis, but device is being configured
+                 with profiles that have per-user unique setting.
+                 Applying these profiles to the same port will cause
+                 the conflict to arise because the device cannot
+                 enforce a per-user unique ingress BW setting.  This object
+                 specifies two alternatives, as follows:
+                 
+                 'non-strict' - Device does not signal errors when
+                                multiple access profiles are applied
+                                to a port.  The device will apply
+                                the ingress BW settings specified in the 
+                                last profile applied to the port.
+                                
+                 'strict'    -  Device does signal an error when an 
+                                attempt to apply an access profile to
+                                a port that already has an active access
+                                profile with a different ingress BW setting.
+                                Device will not activate the access
+                                profile in question after error is 
+                                signaled. "
+    DEFVAL      { 0 }
+    ::= { hpicfUsrProfileConfig 6 }
+
+hpicfUsrProfileConfigConflictResolveMaxEgressBandwidth OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   non-strict(0),
+                   strict(1)
+                 }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object controls how a device behaves when
+                 egress BW conflicts arise.  A conflict can arise if
+                 a device only supports the egress BW access primitive
+                 on a per-port basis, but device is being configured
+                 with profiles that have per-user unique setting.
+                 Applying these profiles to the same port will cause
+                 the conflict to arise because the device cannot
+                 enforce a per-user egress BW setting.  This object
+                 specifies two alternatives, as follows:
+                 
+                 'non-strict' - Device does not signal errors when
+                                multiple access profiles are applied
+                                to a port.  The device will apply
+                                the egress BW settings specified in the 
+                                last profile applied to the port.
+                                
+                 'strict'    -  Device does signal an error when an 
+                                attempt to apply an access profile to
+                                a port that already has an active access
+                                profile with a different egress BW setting.
+                                Device will not activate the access
+                                profile in question after error is 
+                                signaled. "
+    DEFVAL      { 0 }
+    ::= { hpicfUsrProfileConfig 7 }
+
+
+-- ########################################################## --
+-- The User Access Profile Statistics Group 
+-- ########################################################## --
+
+hpicfUsrProfileLastUpdate OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A snapshot of the module sysUpTime at the time 
+                 of the last update to the access profiles                     
+                 in effect. A value of 0 indicates that the  
+                 hpicfUsrProfileLastUpdate object is not 
+                 supported by the device and a fresh copy of the
+                 hpicfUsrProfileTable will always need to be 
+                 obtained by the management application."
+    ::= { hpicfUsrProfileStats 1 }
+
+-- ---------------------------------------------------------- --
+-- Filter statistics 
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileStatsFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUsrProfileStatsFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains statistic objects
+                 for filter lists."
+    ::= { hpicfUsrProfileStats 2 }
+
+hpicfUsrProfileStatsFilterEntry OBJECT-TYPE
+    SYNTAX      HpicfUsrProfileStatsFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Statistic information for a user's
+                 filtering profile."
+    INDEX       { hpicfUsrProfileFilterListIndex,
+                  hpicfUsrProfileFilterRuleIndex }
+    ::= { hpicfUsrProfileStatsFilterTable 1 }
+
+HpicfUsrProfileStatsFilterEntry ::=
+    SEQUENCE {
+        hpicfUsrProfileStatsFilterRule
+            OCTET STRING,
+        hpicfUsrProfileStatsFilterRuleHitCount
+            Counter64,
+        hpicfUsrProfileStatsFilterRuleHitCountEnabled
+            TruthValue
+    }
+
+hpicfUsrProfileStatsFilterRule OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies a single filter rule using the 
+                 same syntax used for the 
+                 hp-nas-filter-rule RADIUS attribute."
+    ::= { hpicfUsrProfileStatsFilterEntry 1}
+
+hpicfUsrProfileStatsFilterRuleHitCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the number of times (hit count)
+                 the user's traffic has matched this rule."
+    ::= { hpicfUsrProfileStatsFilterEntry 2}
+
+hpicfUsrProfileStatsFilterRuleHitCountEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When this attribute is TRUE it signifies
+                 the 'hpicfUsrProfileStatsFilterRuleHitCount'
+                 contains a valid value. A FALSE value 
+                 signifies it does not contain a valid value."
+    ::= { hpicfUsrProfileStatsFilterEntry 3}
+
+-- ---------------------------------------------------------- --
+-- Access profile statistics 
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfUsrProfileStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table describes the access profiles
+                 currently in effect."
+    ::= { hpicfUsrProfileStats 3 }
+
+hpicfUsrProfileStatsEntry OBJECT-TYPE
+    SYNTAX       HpicfUsrProfileStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "An entry in the user access profile table."
+    INDEX        { hpicfUsrProfileUserPortNumber,
+                   hpicfUsrProfileUserMacAddr }
+    ::= { hpicfUsrProfileStatsTable 1 }
+
+HpicfUsrProfileStatsEntry ::=
+    SEQUENCE { 
+        hpicfUsrProfileStatsPvid
+            VlanIndex,
+        hpicfUsrProfileStatsTaggedEgressVlanMap1k
+            OCTET STRING,
+        hpicfUsrProfileStatsTaggedEgressVlanMap2k
+            OCTET STRING,
+        hpicfUsrProfileStatsTaggedEgressVlanMap3k
+            OCTET STRING,
+        hpicfUsrProfileStatsTaggedEgressVlanMap4k
+            OCTET STRING,
+        hpicfUsrProfileStatsIngressVlanFilterEnable
+            TruthValue,
+        hpicfUsrProfileStatsPriorityRegenTable
+            OCTET STRING,
+        hpicfUsrProfileStatsMaxIngressBandwidth
+            Unsigned32,
+        hpicfUsrProfileStatsMaxEgressBandwidth
+            Unsigned32,
+        hpicfUsrProfileStatsFilterListIndex
+            Integer32,
+        hpicfUsrProfileStatsAccessMode
+            Integer32
+    }
+
+hpicfUsrProfileStatsPvid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Active port VID (PVID) for this user."
+    ::= { hpicfUsrProfileStatsEntry 1}
+
+hpicfUsrProfileStatsTaggedEgressVlanMap1k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 0 through 1023.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 0 through 7, the second octet to VLANs 8 
+                 through 15, etc. The most significant bit of each octet 
+                 corresponds to the lowest 'VlanIndex' value in that  
+                 octet.
+
+                 When a bit is set to '1', it means the 
+                 corresponding tagged VLAN as active for this user."
+    ::= { hpicfUsrProfileStatsEntry 2}
+
+hpicfUsrProfileStatsTaggedEgressVlanMap2k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 1024 through 2047.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 1024 through 1031, the second octet to VLANs 
+                 1032 through 1039, etc. The most significant bit of 
+                 each octet corresponds to the lowest 'VlanIndex' value 
+                 in that octet.
+
+                 When a bit is set to '1', it indicates the 
+                 corresponding tagged VLAN as active for this user."
+    ::= { hpicfUsrProfileStatsEntry 3}
+
+hpicfUsrProfileStatsTaggedEgressVlanMap3k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 2048 through 3071.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 2048 through 2055, the second octet to VLANs 
+                 2056 through 2063, etc. The most significant bit of 
+                 each octet corresponds to the lowest 'VlanIndex' value 
+                 in that octet.
+
+                 When a bit is set to '1', it indicates the 
+                 corresponding tagged VLAN as active for this user."
+    ::= { hpicfUsrProfileStatsEntry 4}
+
+hpicfUsrProfileStatsTaggedEgressVlanMap4k OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A string of octets containing one bit per VLAN 
+                 for VLANS with 'VlanIndex' values of 3072 through 4095.  
+
+                 The first octet corresponds to VLANs with 'VlanIndex' 
+                 values of 3072 through 3079, the second octet to VLANs 
+                 3080 through 3087, etc. The most significant bit of 
+                 each octet corresponds to the lowest 'VlanIndex' value 
+                 in that octet.
+
+                 When a bit is set to '1', it indicates the 
+                 corresponding tagged VLAN as active for this user."
+    ::= { hpicfUsrProfileStatsEntry 5}
+
+hpicfUsrProfileStatsIngressVlanFilterEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When this attribute is TRUE causes the system is only
+                 allowing ingress traffic from those VLANs on which 
+                 egress traffic is permitted."
+    ::= { hpicfUsrProfileStatsEntry 6}
+
+hpicfUsrProfileStatsPriorityRegenTable OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the IEEE 802 priority regeneration table
+                 active for this access profile.  Syntax of octet string 
+                 is same as for 'User-Priority-Table' RADIUS attribute
+                 as defined in RFC4675."
+    ::= { hpicfUsrProfileStatsEntry 7}
+
+hpicfUsrProfileStatsMaxIngressBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the maximum ingress bandwidth for this 
+                 access profile. Bandwidth value is specified in Kbps."
+    ::= { hpicfUsrProfileStatsEntry 8}
+
+hpicfUsrProfileStatsMaxEgressBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the maximum egress bandwidth for this 
+                 access profile. Bandwidth value is specified in Kbps."
+    ::= { hpicfUsrProfileStatsEntry 9}
+
+hpicfUsrProfileStatsFilterListIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..16384)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A value of 0 indicates that no filter rule set is
+                 active for the user.
+                 A value between 1 and 16384 selects the active filter
+                 rule set from 'hpicfUsrProfileStatsFilterTable'."
+    ::= { hpicfUsrProfileStatsEntry 10}
+
+hpicfUsrProfileStatsAccessMode OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    snmp(1),
+                    dot8021x(2),
+                    webauth(3),
+                    macauth(4),
+                    webmacauth(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates whether profile was applied via SNMP
+                or via RADIUS. Application by SNMP has precedence 
+                over RADIUS. Where there are no attribute conflicts,
+                profile attributes may be a combination of those
+                applied by both SNMP and RADIUS. In such case, 
+                the variable value will still be SNMP."
+    ::= { hpicfUsrProfileStatsEntry 11}
+
+-- ########################################################## --
+-- Conformance Information
+-- ########################################################## --
+
+hpicfUsrProfileGroup OBJECT IDENTIFIER ::= { hpicfUsrProfileConformance 1 }
+hpicfUsrProfileCompliances OBJECT IDENTIFIER 
+    ::= { hpicfUsrProfileConformance 2 }
+        
+-- ---------------------------------------------------------- --
+-- units of conformance
+-- ---------------------------------------------------------- --
+
+hpicfUsrProfileCapabilityGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfUsrProfileCapabilityByPortMap,
+        hpicfUsrProfileCapabilityByUserMap        
+    }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing device capability 
+                 information for user access profiles."
+    ::= { hpicfUsrProfileGroup 1 }
+
+hpicfUsrProfileConfigGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfUsrProfileFilterListIndex,
+        hpicfUsrProfileConfigFilterListRowStatus,
+        hpicfUsrProfileFilterRuleListIndex,
+        hpicfUsrProfileFilterRuleIndex,
+        hpicfUsrProfileConfigFilterRule,
+        hpicfUsrProfileConfigFilterRuleRowStatus,
+        hpicfUsrProfileConfigIndex,
+        hpicfUsrProfileConfigPvid,
+        hpicfUsrProfileConfigPvidEnable,
+        hpicfUsrProfileConfigTaggedEgressVlanMap1k,
+        hpicfUsrProfileConfigTaggedEgressVlanMap2k,
+        hpicfUsrProfileConfigTaggedEgressVlanMap3k,
+        hpicfUsrProfileConfigTaggedEgressVlanMap4k,
+        hpicfUsrProfileConfigTaggedEgressVlanEnable,
+        hpicfUsrProfileConfigIngressVlanFilterEnable,
+        hpicfUsrProfileConfigPriorityRegenTable,
+        hpicfUsrProfileConfigPriorityRegenTableEnable,
+        hpicfUsrProfileConfigMaxIngressBandwidth,
+        hpicfUsrProfileConfigMaxIngressBandwidthEnable,
+        hpicfUsrProfileConfigMaxEgressBandwidth,
+        hpicfUsrProfileConfigMaxEgressBandwidthEnable,
+        hpicfUsrProfileConfigFilterListIndex,
+        hpicfUsrProfileConfigFilterListEnable,
+        hpicfUsrProfileConfigEntryRowStatus,
+        hpicfUsrProfileConfigConflictResolveQoS,
+        hpicfUsrProfileConfigConflictResolveMaxIngressBandwidth,
+        hpicfUsrProfileConfigConflictResolveMaxEgressBandwidth                        
+    }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing configuration
+                 of user access profiles."
+    ::= { hpicfUsrProfileGroup 2 }
+    
+    
+hpicfUsrProfileStatsGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfUsrProfileLastUpdate,
+        hpicfUsrProfileStatsFilterRule,
+        hpicfUsrProfileStatsFilterRuleHitCount,
+        hpicfUsrProfileStatsFilterRuleHitCountEnabled,
+        hpicfUsrProfileStatsPvid,
+        hpicfUsrProfileStatsTaggedEgressVlanMap1k,
+        hpicfUsrProfileStatsTaggedEgressVlanMap2k,
+        hpicfUsrProfileStatsTaggedEgressVlanMap3k,
+        hpicfUsrProfileStatsTaggedEgressVlanMap4k,
+        hpicfUsrProfileStatsIngressVlanFilterEnable,
+        hpicfUsrProfileStatsPriorityRegenTable,
+        hpicfUsrProfileStatsMaxIngressBandwidth,
+        hpicfUsrProfileStatsMaxEgressBandwidth,
+        hpicfUsrProfileStatsFilterListIndex,
+        hpicfUsrProfileStatsAccessMode
+    }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing statistics
+                 of user access profiles."
+    ::= { hpicfUsrProfileGroup 3 }
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+hpicfUsrProfileCompliance MODULE-COMPLIANCE
+     STATUS  current
+     DESCRIPTION
+         "The compliance statement for devices support of
+          HP-USER-PROFILE-MIB."
+     MODULE -- This Module
+        MANDATORY-GROUPS {
+            hpicfUsrProfileCapabilityGroup,
+            hpicfUsrProfileConfigGroup,
+            hpicfUsrProfileStatsGroup
+        }
+     ::= { hpicfUsrProfileCompliances 1 }
+
+
+END

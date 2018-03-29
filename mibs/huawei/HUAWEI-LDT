@@ -1,0 +1,394 @@
+--  =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI LDT MIB, this mib will maintain infomation of LDT 
+--              for datacomm product.  
+-- Reference:
+-- Version:     V1.00
+-- History:
+--  
+--  V1.00 2008-07-15 initial version
+-- =================================================================
+
+HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    TruthValue,TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32,
+    OBJECT-IDENTITY, Unsigned32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+                        
+    hwDatacomm
+        FROM HUAWEI-MIB
+
+                       
+    InterfaceIndex
+        FROM IF-MIB
+        
+            
+    VlanId
+        FROM Q-BRIDGE-MIB;
+         
+    hwLdtMIB MODULE-IDENTITY
+        LAST-UPDATED "200807171700Z"        -- July 15, 2008 at 14:30 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "R&D NanJing, Huawei Technologies co.,Ltd.
+            High hope mansion, 
+            Baixia road,
+            Nanjing city
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com        
+            Zip:100000
+            "
+        DESCRIPTION
+            "This file is an LDT-MIB. It provides such functions of 
+           globally enabling or disabling the LDT function, enabling the global
+           alarm, clearing statistics on ports and configuring work mode and so on."
+            ::= { hwDatacomm 174 }  
+                                              
+    -- ============================================================================
+    -- Node definitions
+    -- ============================================================================ 
+
+    hwLdtObjects  OBJECT IDENTIFIER ::= { hwLdtMIB 1 } 
+    
+    hwLdtPortTrapObjects OBJECT IDENTIFIER ::= { hwLdtMIB 2 }
+
+    hwLdtTraps OBJECT IDENTIFIER ::= { hwLdtMIB 3 }  
+    
+    hwLdtConformance  OBJECT IDENTIFIER ::= { hwLdtMIB 4 }
+ 
+
+  -- ============================================================================
+  --
+  -- ======================= Objects definitions=================================
+  --
+  -- ============================================================================  
+
+    hwLdtConfiguration  OBJECT IDENTIFIER ::= { hwLdtObjects 1}
+  
+    hwLdtEnable OBJECT-TYPE 
+        SYNTAX   INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Globally enable or disable the LDT configuration. If the hwLdtEnable 
+                is 1, LDT is enabled. If the hwLdtEnable is 2, LDT is disabled. 
+            By default, LDT is 2(disabled)."   
+        DEFVAL { 2 }
+        ::= { hwLdtConfiguration 1 }   
+
+    hwLdtIntervalTime OBJECT-TYPE 
+        SYNTAX   Integer32(5..300) 
+           MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Packet send interval time. By default, the time is 5s."
+        DEFVAL { 5 }        
+        ::= { hwLdtConfiguration 2 }     
+    
+    hwLdtVlanListLow OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE (256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lowest possible value of the vlan list."     
+        ::= { hwLdtConfiguration 3 }
+        
+    hwLdtVlanListHigh OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE (256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The highest possible value of the vlan list."
+        ::= { hwLdtConfiguration 4 } 
+ 
+     hwLdtPortConfigTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF HwLdtPortConfigEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION 
+            "LDT port congfiguration table."
+          ::= { hwLdtConfiguration  5 }
+      
+    hwLdtPortConfigEntry OBJECT-TYPE
+        SYNTAX HwLdtPortConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+               "Entries of the LDT port congfiguration table."
+        INDEX{ hwLdtInterfaceIndex }
+        ::= { hwLdtPortConfigTable 1}
+        
+    HwLdtPortConfigEntry ::=
+        SEQUENCE{    
+                    hwLdtInterfaceIndex        InterfaceIndex,
+                    hwLdtInterfaceName         OCTET STRING,
+                    hwLdtPortLdtEnable         INTEGER,
+                    hwLdtPortMode              INTEGER,
+                    hwLdtPortStatus            INTEGER,
+                    hwLdtPortRecoveryTime      Integer32                                    
+                }
+                    
+    hwLdtInterfaceIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A unique value, greater than zero, for each interface or interface
+             sub-layer in the managed system. The value is consistent with the
+             ifIndex in ifTable of IF-MIB."    
+           ::= { hwLdtPortConfigEntry 1 }
+           
+       hwLdtInterfaceName   OBJECT-TYPE 
+           SYNTAX OCTET STRING(SIZE(0..48))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The interface name."
+        ::= { hwLdtPortConfigEntry 2 }
+      
+    hwLdtPortLdtEnable OBJECT-TYPE 
+        SYNTAX   INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interface enable or disable. If the hwLdtPortLdtEnable 
+                is 1, it is enabled. If the hwLdtPortLdtEnable is 2, it is disabled. 
+            By default, it is disabled."   
+        DEFVAL { 1 }
+        ::= { hwLdtPortConfigEntry 3 }   
+                
+    hwLdtPortMode OBJECT-TYPE 
+        SYNTAX   INTEGER 
+           { 
+            trap(1),
+            blocking(2),
+            noLearning(3),
+            shutdown(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Action of Loop detection, including trap, blocking,noLearning,and shutdown. By default the mode
+             is blocking."     
+        DEFVAL { 2 }
+        ::= { hwLdtPortConfigEntry 4 }   
+        
+    hwLdtPortStatus OBJECT-TYPE 
+        SYNTAX   INTEGER 
+           { 
+            normal(1),
+            blocking(2),
+            noLearning(3),
+            shutdown(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port status, including normal, blocking,noLearning,and shutdown. By default the status
+             is normal."     
+        DEFVAL { 1 }
+        ::= { hwLdtPortConfigEntry 5 }        
+        
+    hwLdtPortRecoveryTime OBJECT-TYPE
+        SYNTAX Integer32(0..255) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Port recovery time.By default the time is 1s."
+        ::= { hwLdtPortConfigEntry 6 }
+            
+         hwLdtPortStatusTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF HwLdtPortStatusEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION 
+            "LDT port status table."
+          ::= { hwLdtConfiguration  6 }
+      
+    hwLdtPortStatusEntry OBJECT-TYPE
+        SYNTAX HwLdtPortStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+               "Entries of the LDT port status table."   
+        INDEX{ hwLdtInterfaceIndex,hwLdtPortVlanIDIndex }
+        ::= { hwLdtPortStatusTable 1}
+         
+    HwLdtPortStatusEntry ::=
+        SEQUENCE{    
+                    hwLdtPortVlanIDIndex        VlanId,  
+                    hwLdtPortVlanStatus            INTEGER
+                }       
+                
+    hwLdtPortVlanIDIndex OBJECT-TYPE
+        SYNTAX VlanId 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port enabled vlanId."
+        ::= { hwLdtPortStatusEntry 1 }
+           
+       hwLdtPortVlanStatus OBJECT-TYPE 
+        SYNTAX   INTEGER 
+           { 
+            normal(1),
+            blocking(2),
+            noLearning(3),          
+            shutdown(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port status, including normal, blocking,noLearning,and shutdown. By default the status
+             is normal."     
+        DEFVAL { 1 }
+        ::= { hwLdtPortStatusEntry 2 }        
+    hwLdtPortLoopVlanListLow OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE (256))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The lowest possible value of the vlan list for discovering loop."     
+        ::= { hwLdtPortTrapObjects 1 }
+        
+    hwLdtPortLoopVlanListHigh OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE (256))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The highest possible value of the vlan list for discovering loop."
+        ::= { hwLdtPortTrapObjects 2 }
+    
+    hwLdtPortRecoverVlanListLow OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE (256))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The lowest possible value of the vlan list for discovering loop."     
+        ::= { hwLdtPortTrapObjects 3 }
+        
+    hwLdtPortRecoverVlanListHigh OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE (256))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The highest possible value of the vlan list for discovering loop."
+        ::= { hwLdtPortTrapObjects 4 }
+     
+        
+---Notifycation    
+    
+      hwLdtPortLoop  NOTIFICATION-TYPE
+      OBJECTS {hwLdtInterfaceName,hwLdtPortLoopVlanListLow,hwLdtPortLoopVlanListHigh}
+      STATUS current    
+    DESCRIPTION 
+          "Notify the NMS that the LDT detected Loop.hwLdtInterfaceName node is interface name,
+          hwLdtPortLoopVlanlistLow node is The lowest possible value of the vlan list,
+          hwLdtPortLoopVlanlistHigh node is The highest possible value of the vlan list."
+    ::= { hwLdtTraps 1}
+
+      hwLdtPortRecovry  NOTIFICATION-TYPE
+      OBJECTS {hwLdtInterfaceName,hwLdtPortRecoverVlanListLow,hwLdtPortRecoverVlanListHigh}
+     STATUS current    
+    DESCRIPTION 
+          "Notify the NMS that the LDT detected resuming port.hwLdtInterfaceName node is interface index,
+          hwLdtPortRecoverVlanlistLow node is The lowest possible value of the vlan list,
+          hwLdtPortRecoverVlanlistHigh node is The highest possible value of the vlan list."
+    ::= { hwLdtTraps 2}  
+        
+    --
+    -- ***********************************************************
+    --
+    -- HAUWEILDTMIBCONFORMANCE
+    --
+    -- ***********************************************************
+    --
+     
+    hwLdtConformances OBJECT IDENTIFIER ::= { hwLdtConformance 1 }
+    hwLdtGroups OBJECT IDENTIFIER ::= { hwLdtConformance 2 }
+    -- compliance statements
+    hwLdtCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        the HUAWEI-LDT-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { 
+    hwLdtConfigGroup,
+    hwLdtPortConfigGroup,
+    hwLdtTrapPortGroup,
+    hwLdtTrapGroup
+    }
+    ::= { hwLdtConformances 1 }    
+       
+    -- MIB groupings
+    hwLdtConfigGroup OBJECT-GROUP
+    OBJECTS {  
+    hwLdtEnable,
+    hwLdtIntervalTime,
+    hwLdtVlanListLow,
+    hwLdtVlanListHigh
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        LDT implementation behavior.
+        This group is mandatory for agents which implement the LDT."
+    ::= { hwLdtGroups 1 }     
+    
+    hwLdtPortConfigGroup OBJECT-GROUP
+    OBJECTS {      
+    hwLdtPortLdtEnable,
+    hwLdtInterfaceName,
+    hwLdtPortMode,
+    hwLdtPortStatus,
+    hwLdtPortRecoveryTime        
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects indicate information of port."
+    ::= { hwLdtGroups 2 } 
+
+    hwLdtTrapPortGroup OBJECT-GROUP
+    OBJECTS {
+    hwLdtPortLoopVlanListLow, 
+    hwLdtPortLoopVlanListHigh,
+    hwLdtPortRecoverVlanListLow, 
+    hwLdtPortRecoverVlanListHigh            
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of notifications used to indicate HUAWEI-LDT-MIB
+        data consistency and general status information."
+    ::= { hwLdtGroups 3 }
+    
+       hwLdtTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+    hwLdtPortLoop,
+    hwLdtPortRecovry            
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of notifications used to indicate HUAWEI-LDT-MIB
+        data consistency and general status information."
+    ::= { hwLdtGroups 4 }  
+    
+END     
+    
+--
+-- HUAWEI-LDT-MIB.mib
+--     

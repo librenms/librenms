@@ -1,0 +1,994 @@
+LLDP-EXT-DCBX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    lldpExtensions, LldpPortNumber
+        FROM LLDP-MIB;
+
+lldpXdcbxMIB MODULE-IDENTITY
+    LAST-UPDATED "200811200000Z" -- November 20, 2008
+    ORGANIZATION "IEEE ??? Working Group"
+    CONTACT-INFO
+            "WG-URL: ???
+             WG-EMail: ???
+
+             Contact: Robert Cowart
+              Postal: IBM
+                      6303 Barfield Road NE
+                      Atlanta, GA 30328-4233
+                      USA
+                 Tel: +1-404-935-6841
+              E-mail: rcowart@us.ibm.com
+
+             Contact: Nagaraj Govindaiah
+              Postal: EMULEX
+                      2560 N First St. Ste.300
+                      San Jose, CA 95131
+                      USA
+                 Tel: +1-408-904-4150
+              E-mail: nagaraj.govindaiah@emulex.com"
+    DESCRIPTION
+            "The LLDP Management Information Base extension module for
+            DCB Capability Exchage Protocol (DCBX).
+
+            In order to assure the uniqueness of the LLDP-MIB,
+            lldpXdcbxMIB is branched from lldpExtensions using OUI value
+            as the node.  An OUI/'company_id' is a 24 bit globally unique
+            assigned number referenced by various standards."
+-- OUI for IEEE DCBX is 6945 (00-1B-21)
+   ::= { lldpExtensions 6945 }
+--**************************************************
+-- Once the OUI is determined we will use it create
+-- the MIB branch for this extension similiar to how
+-- other LLDP extensions have done.
+--**************************************************
+
+--------
+-- Textual Conventions
+--------
+
+LldpXdcbxPriority ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "IEEE 802.1p Priorities."
+    SYNTAX    Integer32 (0..7)
+
+LldpXdcbxPriorityGroup ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "DCB Priority Groups."
+    SYNTAX    INTEGER {priorityGroupId0(0),
+                         priorityGroupId1(1),
+                         priorityGroupId2(2),
+                         priorityGroupId3(3),
+                         priorityGroupId4(4),
+                         priorityGroupId5(5),
+                         priorityGroupId6(6),
+                         priorityGroupId7(7),
+                         reserved8(8),
+                         reserved9(9),
+                         reserved10(10),
+                         reserved11(11),
+                         reserved12(12),
+                         reserved13(13),
+                         reserved14(14),
+                         noBandwidthLimit(15)}
+
+LldpXdcbxFeatureType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Type code of the DCB Feature. Following is a list of defined types:
+
+         2 – Priority Groups
+         3 – Priority Flow Control
+         4 - Application Protocol"
+    SYNTAX    INTEGER {
+                    priorityGroup(2),
+                    priorityFlowControl(3),
+                    applicationProtocol(4)
+                }
+
+LldpXdcbxFeatureSubType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "LLDP DCBX Feature Sub Type."
+    SYNTAX    INTEGER (0..255)
+
+LldpXdcbxVersion ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "LLDP DCBX Version."
+    SYNTAX    INTEGER (0..255)
+
+LldpXdcbxTC ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Traffic Classes Supported."
+    SYNTAX    INTEGER (0..7)
+
+LldpXdcbxPgBw ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Priority Group Bandwidth Range."
+    SYNTAX    INTEGER (0..100)
+
+LldpXdcbxTCPFC ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Number of TCs that can simultaneously support PFC."
+    SYNTAX    INTEGER (1..8)
+
+LldpXdcbxTCPeer ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Private Extension: Number of TCs that supported on the peer."
+    SYNTAX    INTEGER (0..8)
+
+LldpXdcbxAppProtos ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Number of Application Protocols (TLVs) supported."
+    SYNTAX    INTEGER (0..15)
+
+LldpXdcbxSF ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Selector Field to specify Application Protocol ID Type."
+    SYNTAX    INTEGER {
+                    l2EtherType(0),
+                    socketNumber(1),
+                    reserved2(2),
+                    reserved3(3)
+                }
+
+--------
+-- DCBX MIB Objects
+--------
+
+lldpXdcbxNotifications    OBJECT IDENTIFIER ::= { lldpXdcbxMIB 0 }
+lldpXdcbxObjects    OBJECT IDENTIFIER ::= { lldpXdcbxMIB 1 }
+lldpXdcbxFeatures    OBJECT IDENTIFIER ::= { lldpXdcbxMIB 2 }
+
+--------
+-- DCBX Port Configuration MIB Objects
+--------
+
+lldpXdcbxPortTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of all ports capable of supporting DCBX."
+    ::= { lldpXdcbxObjects 1 }
+
+lldpXdcbxPortEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing DCBX control parameters for a particular port."
+    INDEX  { lldpXdcbxPortNumber }
+    ::= { lldpXdcbxPortTable 1 }
+
+LldpXdcbxPortEntry ::= SEQUENCE {
+    lldpXdcbxPortNumber      LldpPortNumber,
+    lldpXdcbxPortEnable      TruthValue,
+    lldpXdcbxPortVersionOper LldpXdcbxVersion,
+    lldpXdcbxPortVersionMax  LldpXdcbxVersion,
+    lldpXdcbxPortSeqNo       Integer32,
+    lldpXdcbxPortAckNo       Integer32 }
+
+lldpXdcbxPortNumber    OBJECT-TYPE
+    SYNTAX      LldpPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Each port contained in the chassis (that is known to the LLDP agent)
+         is uniquely identified by a port number.
+
+         A port number has no mandatory relationship to an InterfaceIndex
+         object (of the interfaces MIB, IETF RFC 2863). If the LLDP agent is a
+         IEEE 802.1D, IEEE 802.1Q bridge, the LldpPortNumber will have the same
+         value as the dot1dBasePort object (defined in IETF RFC 1493)
+         associated corresponding bridge port. If the system hosting LLDP agent
+         is not an IEEE 802.1D or an IEEE 802.1Q bridge, the LldpPortNumber
+         will have the same value as the corresponding interface's
+         InterfaceIndex object.
+
+         Port numbers should be in the range of 1 and 4096 since a particular
+         port is also represented by the corresponding port number bit in
+         LldpPortList."
+    ::= { lldpXdcbxPortEntry 1 }
+
+lldpXdcbxPortEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A device capable of any DCB feature must have DCBX enabled by default
+         with an option for DCBX to be administratively disabled."
+    DEFVAL { true }
+    ::= { lldpXdcbxPortEntry 2 }
+
+lldpXdcbxPortVersionOper    OBJECT-TYPE
+    SYNTAX      LldpXdcbxVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operating version of the DCBX protocol. The system adjusts as needed
+         to operate at the highest version supported by both link partners."
+    ::= { lldpXdcbxPortEntry 3 }
+
+lldpXdcbxPortVersionMax    OBJECT-TYPE
+    SYNTAX      LldpXdcbxVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest DCBX protocol version supported by the system. Version numbers
+         start at zero. The DCBX protocol must be backward compatible with all
+         previous versions."
+    ::= { lldpXdcbxPortEntry 4 }
+
+lldpXdcbxPortSeqNo    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A value that changes each time an exchanged parameter in one or more
+         of the DCB feature TLV’s changes."
+    ::= { lldpXdcbxPortEntry 5 }
+
+lldpXdcbxPortAckNo    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SeqNo value from the most recent peer DCBX TLV that has been
+         handled. This acknowledges to the peer that a specific SeqNo has
+         been received."
+    ::= { lldpXdcbxPortEntry 6 }
+
+--------
+-- DCBX General Feature Configuration MIB Objects
+--------
+
+lldpXdcbxFeatTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxFeatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of DCBX features configured on this system."
+    ::= { lldpXdcbxFeatures 1 }
+
+lldpXdcbxFeatEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry containing DCBX feature parameters which are common to all
+         features."
+    INDEX  { lldpXdcbxPortNumber, lldpXdcbxFeatType, lldpXdcbxFeatSubType }
+    ::= { lldpXdcbxFeatTable 1 }
+
+LldpXdcbxFeatEntry ::= SEQUENCE {
+    lldpXdcbxFeatType                                LldpXdcbxFeatureType,
+    lldpXdcbxFeatSubType                             LldpXdcbxFeatureSubType,
+    lldpXdcbxFeatVersionOper                         LldpXdcbxVersion,
+    lldpXdcbxFeatVersionMax                          LldpXdcbxVersion,
+    lldpXdcbxFeatEnable                              TruthValue,
+    lldpXdcbxFeatWilling                             TruthValue,
+    lldpXdcbxFeatError                               TruthValue,
+    lldpXdcbxFeatAdvertise                           TruthValue,
+    lldpXdcbxFeatOperMode                            TruthValue,
+    lldpXdcbxFeatSyncd                               TruthValue,
+    lldpXdcbxFeatSeqNo                               Integer32,
+    lldpXdcbxFeatPeerWilling                         TruthValue,
+    lldpXdcbxFeatLocalParameterChange                TruthValue,
+    lldpXdcbxFeatPeerEnable                          TruthValue,
+    lldpXdcbxFeatPeerError                           TruthValue,
+    lldpXdcbxFeatPeerAdvertise                       TruthValue,
+    lldpXdcbxFeatPeerTC                              LldpXdcbxTCPeer }
+
+lldpXdcbxFeatType    OBJECT-TYPE
+    SYNTAX             LldpXdcbxFeatureType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type code of the DCB Feature. Following is a list of defined types:
+
+         2 – Priority Groups
+         3 – Priority Flow Control
+         4 – Application Protocol"
+    ::= { lldpXdcbxFeatEntry 1 }
+
+lldpXdcbxFeatSubType    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatureSubType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Some Feature TLVs may define subtypes that are specific to that
+         feature. When subtypes are not defined by a specific  feature, subtype
+         field should be set to zero.
+
+         In general, the Type and SubType, taken together, identify a unique
+         feature that is managed by an instance of the DCB Feature State
+         Machine."
+    DEFVAL { 0 }
+    ::= { lldpXdcbxFeatEntry 2 }
+
+lldpXdcbxFeatVersionOper    OBJECT-TYPE
+    SYNTAX      LldpXdcbxVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operating version of the feature. The system adjusts to operate at the
+         highest version supported by both link partners."
+    ::= { lldpXdcbxFeatEntry 3 }
+
+lldpXdcbxFeatVersionMax    OBJECT-TYPE
+    SYNTAX      LldpXdcbxVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest feature version supported by the system. Version numbers start
+         at zero. The feature must be backward compatible for all previous
+         versions."
+    ::= { lldpXdcbxFeatEntry 4 }
+
+lldpXdcbxFeatEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Locally administered parameter that indicates whether the DCB feature
+         is enabled or not."
+    DEFVAL { true }
+    ::= { lldpXdcbxFeatEntry 5 }
+
+lldpXdcbxFeatWilling    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Locally administered parameter that indicates whether this feature
+         accepts its configuration from the peer or not. When set to TRUE, the
+         system uses the DesiredCfg supplied by a not Willing peer as the
+         OperCfg. A system set to Willing must be capable of accepting any
+         valid DesiredCfg for the feature from the peer.
+
+         If both local and remote systems have the same value for the Willing
+         flag, then the local DesiredCfg is used and the operational outcome of
+         the exchange is determined by the Compatible method of the feature."
+    DEFVAL { true }
+    ::= { lldpXdcbxFeatEntry 6 }
+
+lldpXdcbxFeatError    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an error has occurred during the configuration exchange
+         with the peer. Error is set TRUE when the OperCfg and OperMode of a
+         feature cannot be set as the protocol requires. Error is also set to
+         TRUE when the Compatible method for the feature fails. The Feature
+         turns OperMode to FALSE if either the local or remote Error flag is
+         set to TRUE.
+
+         Duplicate TLV’s for the same Type/SubType or the DCBX Control TLV also
+         causes Error to be set to TRUE."
+    DEFVAL { false }
+    ::= { lldpXdcbxFeatEntry 7 }
+
+lldpXdcbxFeatAdvertise    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Locally administered parameter that indicates whether this feature is
+         exchanged in the DCBX TLV. When Advertise is False, received TLVs for
+         this feature are ignored."
+    ::= { lldpXdcbxFeatEntry 8 }
+
+lldpXdcbxFeatOperMode    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the feature."
+    ::= { lldpXdcbxFeatEntry 9 }
+
+lldpXdcbxFeatSyncd    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the current DesiredCfg has been received by the
+         peer."
+    ::= { lldpXdcbxFeatEntry 10 }
+
+lldpXdcbxFeatSeqNo    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When Syncd is False, this indicates the value that SeqNo must
+         become equal to before Syncd can become True."
+    ::= { lldpXdcbxFeatEntry 11 }
+
+lldpXdcbxFeatPeerWilling    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Willing state of the peer as received in a DCBX TLV from the
+         peer."
+    ::= { lldpXdcbxFeatEntry 12 }
+
+lldpXdcbxFeatLocalParameterChange    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that a configurable DCB Feature TLV field or state variable
+         has been modified on the local system."
+    ::= { lldpXdcbxFeatEntry 13 }
+
+lldpXdcbxFeatPeerEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Private Extension: The Feature Enable state of the peer as received in a DCBX TLV from the
+         peer."
+    ::= { lldpXdcbxFeatEntry 14 }
+
+lldpXdcbxFeatPeerError    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Private Extension: The Feature Error state of the peer as received in a DCBX TLV from the
+         peer."
+    ::= { lldpXdcbxFeatEntry 15 }
+
+lldpXdcbxFeatPeerAdvertise    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Private Extension: The Feature Advertisment state of the peer as received in a DCBX TLV from the
+         peer."
+    ::= { lldpXdcbxFeatEntry 16 }
+
+lldpXdcbxFeatPeerTC    OBJECT-TYPE
+    SYNTAX      LldpXdcbxTCPeer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Private Extension: Number of TCs that supported on the peer.
+         Relevan for PG and PFC features. If not relevant (as for App feat), will be set to 0."
+    ::= { lldpXdcbxFeatEntry 17 }
+
+--------
+-- DCBX Priority Group Feature Configuration MIB Objects
+--------
+
+lldpXdcbxFeatPg    OBJECT IDENTIFIER ::= { lldpXdcbxFeatures 2 }
+
+lldpXdcbxFeatPgNumTCsSupported    OBJECT-TYPE
+    SYNTAX      LldpXdcbxTC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of TCs supported by device.
+         Number of Priority Groups supported by a device can not be more than
+         number of TCs supported."
+    ::= { lldpXdcbxFeatPg 1 }
+
+lldpXdcbxFeatPgPrioAllocTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxFeatPgPrioAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of priorities and the their priority group assignment or
+         declaration of no bandwidth limit."
+    ::= { lldpXdcbxFeatPg 2 }
+
+lldpXdcbxFeatPgPrioAllocEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatPgPrioAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for a priority which allows the priority to be assigned to a
+         priority group, or declared with no bandwidth limit."
+    INDEX  { lldpXdcbxPortNumber, lldpXdcbxFeatPgPrioAllocPrioId }
+    ::= { lldpXdcbxFeatPgPrioAllocTable 1 }
+
+LldpXdcbxFeatPgPrioAllocEntry ::= SEQUENCE {
+    lldpXdcbxFeatPgPrioAllocPrioId      LldpXdcbxPriority,
+    lldpXdcbxFeatPgPrioAllocPgIdDesired LldpXdcbxPriorityGroup,
+    lldpXdcbxFeatPgPrioAllocPgIdOper    LldpXdcbxPriorityGroup,
+    lldpXdcbxFeatPgPrioAllocPgIdPeer    LldpXdcbxPriorityGroup}
+
+lldpXdcbxFeatPgPrioAllocPrioId    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority which is to be assigned to a priority group, or defined
+         with no bandwidth limit."
+    ::= { lldpXdcbxFeatPgPrioAllocEntry 1 }
+
+lldpXdcbxFeatPgPrioAllocPgIdDesired    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriorityGroup
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The locally configured priority group value assigned to this
+         priority."
+    ::= { lldpXdcbxFeatPgPrioAllocEntry 2 }
+
+lldpXdcbxFeatPgPrioAllocPgIdOper    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriorityGroup
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operating priority group value assigned to this priority.
+
+         NOTE: This value may be different than the locally desired value
+         depending on whether or not this feature is 'willing' to accept the
+         peer's desired configuration. The operating configuration MUST match
+         either the locally desired configuration or the peer's desired
+         configuration if the feature is operational."
+    ::= { lldpXdcbxFeatPgPrioAllocEntry 3 }
+
+lldpXdcbxFeatPgPrioAllocPgIdPeer    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriorityGroup
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The priority group value that the peer desires to assign to this
+         priority."
+    ::= { lldpXdcbxFeatPgPrioAllocEntry 4 }
+
+
+lldpXdcbxFeatPgBwAllocTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxFeatPgBwAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of priority group bandwidth allocations."
+    ::= { lldpXdcbxFeatPg 3 }
+
+lldpXdcbxFeatPgBwAllocEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatPgBwAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for a priority group bandwidth allocation."
+    INDEX  { lldpXdcbxPortNumber, lldpXdcbxFeatPgBwAllocPgId }
+    ::= { lldpXdcbxFeatPgBwAllocTable 1 }
+
+LldpXdcbxFeatPgBwAllocEntry ::= SEQUENCE {
+    lldpXdcbxFeatPgBwAllocPgId      LldpXdcbxPriorityGroup,
+    lldpXdcbxFeatPgBwAllocBwDesired LldpXdcbxPgBw,
+    lldpXdcbxFeatPgBwAllocBwOper    LldpXdcbxPgBw,
+    lldpXdcbxFeatPgBwAllocBwPeer    LldpXdcbxPgBw}
+
+lldpXdcbxFeatPgBwAllocPgId    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriorityGroup
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority group for which bandwidth is allocated in this table."
+    ::= { lldpXdcbxFeatPgBwAllocEntry 1 }
+
+lldpXdcbxFeatPgBwAllocBwDesired    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPgBw
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The locally configured bandwidth allocated to this priority group."
+    ::= { lldpXdcbxFeatPgBwAllocEntry 2 }
+
+lldpXdcbxFeatPgBwAllocBwOper    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPgBw
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operating bandwidth allocated to this priority group.
+
+         NOTE: This value may be different than the locally desired value
+         depending on whether or not this feature is 'willing' to accept the
+         peer's desired configuration. The operating configuration MUST match
+         either the locally desired configuration or the peer's desired
+         configuration if the feature is operational."
+    ::= { lldpXdcbxFeatPgBwAllocEntry 3 }
+
+lldpXdcbxFeatPgBwAllocBwPeer    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPgBw
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bandwidth allocation that the peer desires to assign to this
+         priority group."
+    ::= { lldpXdcbxFeatPgBwAllocEntry 4 }
+
+
+--------
+-- DCBX Priority Flow Control Feature Configuration MIB Objects
+--------
+
+lldpXdcbxFeatPfc    OBJECT IDENTIFIER ::= { lldpXdcbxFeatures 3 }
+
+lldpXdcbxFeatPfcNumTCPFCSupported    OBJECT-TYPE
+    SYNTAX      LldpXdcbxTCPFC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of TCs that can simultaneously support PFC."
+    ::= { lldpXdcbxFeatPfc 1 }
+
+lldpXdcbxFeatPfcTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxFeatPfcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of priority flow control configurations for each priority."
+    ::= { lldpXdcbxFeatPfc 2 }
+
+lldpXdcbxFeatPfcEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatPfcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring priority flow control for each priority."
+    INDEX  { lldpXdcbxPortNumber, lldpXdcbxFeatPfcPriority }
+    ::= { lldpXdcbxFeatPfcTable 1 }
+
+LldpXdcbxFeatPfcEntry ::= SEQUENCE {
+    lldpXdcbxFeatPfcPriority      LldpXdcbxPriority,
+    lldpXdcbxFeatPfcEnableDesired TruthValue,
+    lldpXdcbxFeatPfcEnableOper    TruthValue,
+    lldpXdcbxFeatPfcEnablePeer    TruthValue }
+
+lldpXdcbxFeatPfcPriority    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority for which priority flow control is being configured."
+    ::= { lldpXdcbxFeatPfcEntry 1 }
+
+lldpXdcbxFeatPfcEnableDesired    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The locally configured status of priority flow control for this
+         priority.
+
+         0: Disabled
+         1: Enabled
+
+         PFC Enabled means that flow control in both directions (Rx and Tx) is
+         enabled."
+    ::= { lldpXdcbxFeatPfcEntry 2 }
+
+lldpXdcbxFeatPfcEnableOper    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operating status of priority flow control for this priority.
+
+         NOTE: This value may be different than the locally desired value
+         depending on whether or not this feature is 'willing' to accept the
+         peer's desired configuration. The operating configuration MUST match
+         either the locally desired configuration or the peer's desired
+         configuration if the feature is operational."
+    ::= { lldpXdcbxFeatPfcEntry 3 }
+
+lldpXdcbxFeatPfcEnablePeer    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The priority flow control status that the peer desires to assign to
+         this priority."
+    ::= { lldpXdcbxFeatPfcEntry 4 }
+
+--------
+-- DCBX Application Protocol Feature Configuration MIB Objects
+--------
+
+lldpXdcbxFeatAppProto    OBJECT IDENTIFIER ::= { lldpXdcbxFeatures 4 }
+
+lldpXdcbxFeatAppProtoTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxFeatAppProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Application Protocol configurations."
+    ::= { lldpXdcbxFeatAppProto 1 }
+
+lldpXdcbxFeatAppProtoEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatAppProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring Application Protocol ID."
+    INDEX  { lldpXdcbxPortNumber, lldpXdcbxFeatAppProtoIndex }
+    ::= { lldpXdcbxFeatAppProtoTable 1 }
+
+LldpXdcbxFeatAppProtoEntry ::= SEQUENCE {
+    lldpXdcbxFeatAppProtoIndex       LldpXdcbxAppProtos,
+    lldpXdcbxFeatAppProtoSF          LldpXdcbxSF,
+    lldpXdcbxFeatAppProtoOUI         Integer32,
+    lldpXdcbxFeatAppProtoId          INTEGER }
+
+lldpXdcbxFeatAppProtoIndex    OBJECT-TYPE
+    SYNTAX      LldpXdcbxAppProtos
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The index of the Application Protocol being configured in a list of
+         Application Protocols."
+    ::= { lldpXdcbxFeatAppProtoEntry 1 }
+
+lldpXdcbxFeatAppProtoSF    OBJECT-TYPE
+    SYNTAX      LldpXdcbxSF
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the Selector Field for this application protocol."
+    ::= { lldpXdcbxFeatAppProtoEntry 2 }
+
+lldpXdcbxFeatAppProtoOUI    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the Application Protocol OUI for this application
+         protocol."
+    ::= { lldpXdcbxFeatAppProtoEntry 3 }
+
+lldpXdcbxFeatAppProtoId    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the Application Protocol ID for this application
+         protocol."
+    ::= { lldpXdcbxFeatAppProtoEntry 4 }
+
+lldpXdcbxFeatAppProtoPrioTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdcbxFeatAppProtoPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of priority configurations for each application protocol."
+    ::= { lldpXdcbxFeatAppProto 2 }
+
+lldpXdcbxFeatAppProtoPrioEntry    OBJECT-TYPE
+    SYNTAX      LldpXdcbxFeatAppProtoPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for selecting priorities for the Application Protocol."
+    INDEX  { lldpXdcbxPortNumber, lldpXdcbxFeatAppProtoIndex, lldpXdcbxFeatAppProtoPriority }
+    ::= { lldpXdcbxFeatAppProtoPrioTable 1 }
+
+LldpXdcbxFeatAppProtoPrioEntry ::= SEQUENCE {
+    lldpXdcbxFeatAppProtoPriority    LldpXdcbxPriority,
+    lldpXdcbxFeatAppProtoEnableDesired TruthValue,
+    lldpXdcbxFeatAppProtoEnableOper    TruthValue,
+    lldpXdcbxFeatAppProtoEnablePeer    TruthValue }
+
+lldpXdcbxFeatAppProtoPriority    OBJECT-TYPE
+    SYNTAX      LldpXdcbxPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority for which Application Protocol is being configured."
+    ::= { lldpXdcbxFeatAppProtoPrioEntry 1 }
+
+lldpXdcbxFeatAppProtoEnableDesired    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The locally configured status of Application Protocol for this
+         priority.
+
+         0: Disabled
+         1: Enabled"
+    ::= { lldpXdcbxFeatAppProtoPrioEntry 2 }
+
+lldpXdcbxFeatAppProtoEnableOper    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operating status of Application Protocol for this priority.
+
+         NOTE: This value may be different than the locally desired value
+         depending on whether or not this feature is 'willing' to accept the
+         peer's desired configuration. The operating configuration MUST match
+         either the locally desired configuration or the peer's desired
+         configuration if the feature is operational."
+    ::= { lldpXdcbxFeatAppProtoPrioEntry 3 }
+
+lldpXdcbxFeatAppProtoEnablePeer    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Application Protocol status that the peer desires to assign to
+         this priority."
+    ::= { lldpXdcbxFeatAppProtoPrioEntry 4 }
+
+
+--------
+-- DCBX Notifications
+--------
+
+lldpXdcbxMiscControlError    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent whenever an error occurs with DCBX control and there
+         is no other trap defined for the specific error condition."
+    ::= { lldpXdcbxNotifications 1 }
+
+lldpXdcbxMiscFeatureError    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxFeatError }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent whenever lldpXdcbxFeatError is true and there is no
+         other trap defined for the specific error condition."
+    ::= { lldpXdcbxNotifications 2 }
+
+lldpXdcbxMultiplePeers    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when multiple LLDP neighbors are detected on the
+         same port.
+
+         DCBX is expected to operate over a point to point link. If multiple
+         LLDP neighbors are detected, then DCBX behaves as if the peer's DCBX
+         TLVs are not present until the multiple LLDP neighbor condition is no
+         longer present. An LLDP neighbor is identified by its logical MAC
+         Service Access Identifier (MSAP). The logical MSAP is a concatenation
+         of the chassis ID and port ID values transmitted in the LLDPDU."
+    ::= { lldpXdcbxNotifications 3 }
+
+lldpXdcbxLldpTxDisabled    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when the LLDP transmit has been disabled.
+
+         LLDP gives administrator control to enable/disable the protocol
+         independently on the Rx side and Tx side. Since DCBX is an
+         acknowledged protocol which uses LLDP, for the protocol to operate
+         correctly both LLDP Rx and Tx must be enabled on the interface on
+         which DCBX runs. The behavior of DCBX is as follows with respect to
+         LLDP Rx/Tx admin state controls:
+
+         - If either of Rx or Tx is in disable state, DCBX is disabled on the
+           interface. Neither the control nor feature state machines should
+           run. The LLDP PDU's that are generated from this interface do not
+           have any DCBX TLVs. If the peer sends DCBX TLVs they should be
+           ignored as far as the DCBX state machines are concerned.
+
+         - When DCBX is currently running and LLDP TX is disabled, then
+           according to the LLDP specification, a shutdown LLDPDU is sent. When
+           the peer receives this PDU, DCBX is determined to be disabled on the
+           peer. This is equivalent to DCBX TLV TTL expired in the Control
+           State machine and Rx.Feature.present() = FALSE in the Feature state
+           machine. If for some reason this frame is lost, then DCBX depends on
+           standard rxInfoTTL expiry of the peer's LLDP TLV's.
+
+         - When DCBX is currently running and LLDP Rx is disabled, then all
+           DCBX TLV's including the control TLV should be withdrawn from the
+           LLDP PDUs that the interface generates. The peer's behavior should
+           be the same as discussed in the previous case."
+    ::= { lldpXdcbxNotifications 4 }
+
+lldpXdcbxLldpRxDisabled    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when the LLDP receive has been disabled.
+
+         LLDP gives administrator control to enable/disable the protocol
+         independently on the Rx side and Tx side. Since DCBX is an
+         acknowledged protocol which uses LLDP, for the protocol to operate
+         correctly both LLDP Rx and Tx must be enabled on the interface on
+         which DCBX runs. The behavior of DCBX is as follows with respect to
+         LLDP Rx/Tx admin state controls:
+
+         - If either of Rx or Tx is in disable state, DCBX is disabled on the
+           interface. Neither the control nor feature state machines should
+           run. The LLDP PDU's that are generated from this interface do not
+           have any DCBX TLVs. If the peer sends DCBX TLVs they should be
+           ignored as far as the DCBX state machines are concerned.
+
+         - When DCBX is currently running and LLDP TX is disabled, then
+           according to the LLDP specification, a shutdown LLDPDU is sent. When
+           the peer receives this PDU, DCBX is determined to be disabled on the
+           peer. This is equivalent to DCBX TLV TTL expired in the Control
+           State machine and Rx.Feature.present() = FALSE in the Feature state
+           machine. If for some reason this frame is lost, then DCBX depends on
+           standard rxInfoTTL expiry of the peer's LLDP TLV's.
+
+         - When DCBX is currently running and LLDP Rx is disabled, then all
+           DCBX TLV's including the control TLV should be withdrawn from the
+           LLDP PDUs that the interface generates. The peer's behavior should
+           be the same as discussed in the previous case."
+    ::= { lldpXdcbxNotifications 5 }
+
+lldpXdcbxDupControlTlv    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when a duplicate control Sub-TLV is detected.
+
+         The DCBX Control Sub-TLV and the set of Feature Sub-TLVs can be
+         arranged in any order within the DCBX TLV.  Duplicate Sub-TLV’s (such
+         as more than one Sub-TLV for the same feature) are not allowed.
+         A duplicate DCBX Control TLV causes an error for all features."
+    ::= { lldpXdcbxNotifications 6 }
+
+lldpXdcbxDupFeatureTlv    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxFeatType }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when a duplicate feature Sub-TLV is detected.
+
+         The DCBX Control Sub-TLV and the set of Feature Sub-TLVs can be
+         arranged in any order within the DCBX TLV.  Duplicate Sub-TLV's (such
+         as more than one Sub-TLV for the same feature) are not allowed.
+         Duplicates are handled as a configuration error for the feature."
+    ::= { lldpXdcbxNotifications 7 }
+
+lldpXdcbxPeerNoFeat    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxFeatType }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when a feature is not supported on by a peer.
+
+         This condition can occur when a device does not support a feature (not
+         really an error) or if the feature's Advertise flag is off (possible
+         configuration error)."
+    ::= { lldpXdcbxNotifications 8 }
+
+lldpXdcbxPeerNoResp    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when the peer has stopped responding as evidenced by
+         an LLDP timeout event."
+    ::= { lldpXdcbxNotifications 9 }
+
+lldpXdcbxPeerConfigMismatch    NOTIFICATION-TYPE
+    OBJECTS { lldpXdcbxPortNumber }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when the configuration received from peer results
+         into partial or complete mismatch."
+    ::= { lldpXdcbxNotifications 10 }
+
+END

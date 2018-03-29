@@ -1,0 +1,806 @@
+DASAN-EPON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, Integer32, TimeTicks, mib-2, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, PhysAddress, TruthValue, RowStatus, TimeStamp, AutonomousType, TestAndIncr FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP        FROM SNMPv2-CONF 
+	--NetworkAddress, IpAddress  FROM RFC1155-SMI 
+	dasanMgmt       FROM DASAN-SMI
+	dsSwitchModules, dsPortModuleIndex, dsPortPortIndex  FROM DASAN-SWITCH-MIB;
+
+
+-- Definition Grammer
+
+dasanPonMIB MODULE-IDENTITY
+    	LAST-UPDATED	"200504130000Z"
+    	ORGANIZATION	"DASAN Co., Ltd."
+    	CONTACT-INFO	"DASAN Co., Ltd."
+    	DESCRIPTION     "."
+    ::= { dasanMgmt 11 }
+
+ 
+dasanEPonMIBObjects OBJECT IDENTIFIER ::= { dasanPonMIB 2 }
+
+dsEPon    OBJECT IDENTIFIER ::= { dasanEPonMIBObjects 1 } 
+
+
+--
+-- Textual Conventions.
+-- 
+DsEPonSystemChannelStatusType ::= INTEGER
+{
+  unknown(0),
+  inactive(1),
+  deny(2),
+  block(3),
+  active(4),
+  reset(5)            
+}          
+
+DsEPonSystemRegModeType ::= INTEGER
+{
+  unknown(0),
+  auto(1),
+  manual(2),
+  fixedOnu(3)
+}                         
+
+DsEPonSystemPortStatusType ::= INTEGER
+{
+  unknown(0),
+  enable(1),
+  disable(2),
+  reset(3)
+}
+
+DsEPonSystemChannelOpticModuleType ::= INTEGER
+{
+  unknown(0),
+  normal(1),
+  abnormal(2)
+}
+      
+DsEPonSystemPortRequestType ::= INTEGER
+{
+  unknown(0),
+  clearStatistics(1)
+}
+
+DsEPonSystemChannelRowStatusType ::= INTEGER
+{         
+  unknown(0),
+  create(1),
+  destroy(2),
+  valid(3)
+}
+
+--
+--  Status
+--    
+
+dsEPonSystem OBJECT IDENTIFIER ::= { dsEPon 1 }   
+
+--
+--  OLT-channel status table
+--       
+              
+--
+-- OLT
+--    
+dsEPonSystemInfo OBJECT IDENTIFIER ::= { dsEPonSystem 1 } 
+
+dsEPonStatusReset OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsEPonSystemInfo 1 }
+
+dsEPonSystemPort OBJECT IDENTIFIER ::= { dsEPonSystem 2 }    
+
+
+--
+-- OLT-PORT
+--         
+
+dsEPonSystemPortTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsEPonSystemPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON System Port Information."
+		::= { dsEPonSystemPort 1 }
+
+dsEPonSystemPortEntry	OBJECT-TYPE
+		SYNTAX		DsEPonSystemPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON System Port Information."
+		INDEX		{dsPortModuleIndex, dsPortPortIndex}
+		::= { dsEPonSystemPortTable 1 }                                                   
+		
+
+DsEPonSystemPortEntry	::= SEQUENCE {
+		dsEPonSystemPortRegMode			DsEPonSystemRegModeType,
+		dsEPonSystemPortStatus			DsEPonSystemPortStatusType,
+		dsEPonSystemPortRequest         DsEPonSystemPortRequestType
+}                                                                 
+
+dsEPonSystemPortRegMode OBJECT-TYPE
+       SYNTAX      DsEPonSystemRegModeType
+       MAX-ACCESS  read-write
+       STATUS      current
+
+       DESCRIPTION
+               "The registeration mode of port."
+       ::= { dsEPonSystemPortEntry 1 }  
+       
+dsEPonSystemPortStatus OBJECT-TYPE
+       SYNTAX      DsEPonSystemPortStatusType
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The current status of port."
+       ::= { dsEPonSystemPortEntry 2 }  
+       
+dsEPonSystemPortRequest OBJECT-TYPE
+       SYNTAX      DsEPonSystemPortRequestType
+       MAX-ACCESS  write-only
+       STATUS      current
+       DESCRIPTION
+               "The user request about port."
+       ::= { dsEPonSystemPortEntry 100 }  
+       
+
+
+
+--
+-- OLT-ONU/ONT
+--              
+
+dsEPonSystemChannel OBJECT IDENTIFIER ::= { dsEPonSystem 3 }
+
+dsEPonSystemChannelTable  OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsEPonSystemChannelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON System Channel Information."
+		::= { dsEPonSystemChannel 1 }
+
+dsEPonSystemChannelEntry	OBJECT-TYPE
+		SYNTAX		DsEPonSystemChannelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON System Channel Information."
+		INDEX		{dsPortModuleIndex, dsPortPortIndex, dsEPonSystemChannelId}
+		::= { dsEPonSystemChannelTable 1 }
+
+DsEPonSystemChannelEntry	::= SEQUENCE {            
+		dsEPonSystemChannelNodeIndex		    INTEGER,
+		dsEPonSystemChannelPortIndex			INTEGER,
+		dsEPonSystemChannelId					INTEGER,  -- ONU/ONT ID
+		dsEPonSystemChannelLlid					INTEGER,  -- LLID of ONU/ONT              
+		dsEPonSystemChannelIpAddress  			IpAddress,
+		dsEPonSystemChannelMacAddress  			PhysAddress,                  
+		dsEponSystemChannelRegMode				DsEPonSystemRegModeType,			
+		dsEPonSystemChannelStatus  	    		DsEPonSystemChannelStatusType,
+		dsEPonSystemChannelOpticModule			DsEPonSystemChannelOpticModuleType,
+		dsEPonSystemChannelRtt					Integer32,
+		dsEPonSystemChannelDescription			DisplayString
+--		dsEPonSystemChannelRowStatus			DsEPonSystemChannelRowStatusType		
+	}
+
+dsEPonSystemChannelNodeIndex OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+               "System Node Index."
+       ::= { dsEPonSystemChannelEntry 1 }  
+       
+dsEPonSystemChannelPortIndex OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+               "System port Index."
+       ::= { dsEPonSystemChannelEntry 2 }  
+
+dsEPonSystemChannelId OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "System channel ID (ONU/ONT ID)."
+       ::= { dsEPonSystemChannelEntry 3 }  
+       
+dsEPonSystemChannelLlid OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "System channel LLID (LLID of ONU/ONT)."
+       ::= { dsEPonSystemChannelEntry 4 }    
+       
+dsEPonSystemChannelIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Unique IP address identify channel-unit."
+       ::= { dsEPonSystemChannelEntry 5 }
+
+dsEPonSystemChannelMacAddress OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The Unique HW address identify channel-unit."
+       ::= { dsEPonSystemChannelEntry 6 } 
+
+dsEponSystemChannelRegMode OBJECT-TYPE
+		SYNTAX		DsEPonSystemRegModeType
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"The registration-mode of channel-unit."
+		::= { dsEPonSystemChannelEntry 7 }
+
+dsEPonSystemChannelStatus OBJECT-TYPE
+       SYNTAX      DsEPonSystemChannelStatusType
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The link status of channel."
+       ::= { dsEPonSystemChannelEntry 8 } 
+       
+dsEPonSystemChannelOpticModule OBJECT-TYPE
+       SYNTAX      DsEPonSystemChannelOpticModuleType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The module status of the optic module of channel."
+       ::= { dsEPonSystemChannelEntry 9 }
+
+dsEPonSystemChannelRtt OBJECT-TYPE
+       SYNTAX      Integer32    
+       UNITS	   "meter"
+       MAX-ACCESS  read-only
+       STATUS      current   
+       
+       DESCRIPTION
+               "The Round Trip Time of Channel."
+       ::= { dsEPonSystemChannelEntry 10 }
+ 
+dsEPonSystemChannelDescription OBJECT-TYPE
+	   SYNTAX		DisplayString
+	   MAX-ACCESS	read-write
+	   STATUS		current
+	   DESCRIPTION
+	   			"The Description of Channel."
+	   ::= { dsEPonSystemChannelEntry 11 }
+
+
+-- dsEPonSystemChannelRowStatus OBJECT-TYPE
+--	   SYNTAX		DsEPonSystemChannelRowStatusType
+--	   MAX-ACCESS	read-write
+--	   STATUS		current
+--	   DESCRIPTION
+--	   			"The row-status of Channel."
+--	   ::= { dsEPonSystemChannelEntry 100 } 
+ 
+ 
+--
+--  Statistics
+--   
+
+dsEPonDeviceStatistics OBJECT IDENTIFIER ::= { dsEPon 2 }
+                            
+--
+-- OLT-SWITCH Table
+--  
+
+--
+-- Switch side
+--                           
+dsEPonDeviceStatTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsEPonDeviceStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON OLT switch-side traffic statistics."
+		::= { dsEPonDeviceStatistics 1 }
+
+dsEPonDeviceStatEntry	OBJECT-TYPE
+		SYNTAX		DsEPonDeviceStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON OLT switch-side traffic statistics."
+		INDEX		{dsPortModuleIndex, dsPortPortIndex}
+		::= { dsEPonDeviceStatTable 1 }
+
+DsEPonDeviceStatEntry	::= SEQUENCE {
+		   -- Rx
+           dsEPonDeviceInOctets            Counter64,
+           dsEPonDeviceInPkts			   Counter32, 
+           dsEPonDeviceInPause			   Counter32,
+           dsEPonDeviceInErroredFrame	   Counter32, 
+           dsEPonDeviceInUnicastPkts	   Counter32,
+           dsEPonDeviceInBroadcastPkts	   Counter32,
+           dsEPonDeviceInMulticastPkts	   Counter32, 
+           -- Tx
+           dsEPonDeviceOutOctets           Counter64,
+           dsEPonDeviceOutPkts			   Counter32,
+           dsEPonDeviceOutPause			   Counter32,
+           dsEPonDeviceOutDropped		   Counter32,
+           dsEPonDeviceOutUnicastPkts	   Counter32,
+           dsEPonDeviceOutBroadcastPkts	   Counter32,
+           dsEPonDeviceOutMulticastPkts	   Counter32
+    }
+ 
+dsEPonDeviceInOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 1 }
+
+dsEPonDeviceInPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 2 }
+		   
+dsEPonDeviceInPause	 OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 3 }
+
+dsEPonDeviceInErroredFrame OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 4 }     
+       
+dsEPonDeviceInUnicastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 5 }   
+       
+dsEPonDeviceInBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 6 }   
+       
+dsEPonDeviceInMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 7 }   
+       
+dsEPonDeviceOutOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 8 }
+       
+dsEPonDeviceOutPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 9 }
+      
+dsEPonDeviceOutPause OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 10 }
+           
+dsEPonDeviceOutDropped OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 11 }
+       
+       
+dsEPonDeviceOutUnicastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 12 }   
+       
+dsEPonDeviceOutBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 13 }   
+       
+dsEPonDeviceOutMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatEntry 14 } 
+       
+
+--
+--  Pon side 
+-- 
+
+dsEPonDeviceStatPonTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsEPonDeviceStatPonEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON OLT pon-side traffic statistics."
+		::= { dsEPonDeviceStatistics 2 }
+
+dsEPonDeviceStatPonEntry	OBJECT-TYPE
+		SYNTAX		DsEPonDeviceStatPonEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"EPON OLT pon-side traffic statistics."
+		INDEX		{dsPortModuleIndex, dsPortPortIndex}
+		::= { dsEPonDeviceStatPonTable 1 }
+
+DsEPonDeviceStatPonEntry	::= SEQUENCE {
+		   -- Rx
+           dsEPonDeviceStatPonInOctets             Counter64,
+           dsEPonDeviceStatPonInPkts			   Counter32, 
+           dsEPonDeviceStatPonInPause			   Counter32,
+           dsEPonDeviceStatPonInErroredFrame	   Counter32, 
+           dsEPonDeviceStatPonInUnicastPkts	       Counter32,
+           dsEPonDeviceStatPonInBroadcastPkts	   Counter32,
+           dsEPonDeviceStatPonInMulticastPkts	   Counter32, 
+           -- Tx
+           dsEPonDeviceStatPonOutOctets            Counter64,
+           dsEPonDeviceStatPonOutPkts			   Counter32,
+           dsEPonDeviceStatPonOutPause			   Counter32,
+           dsEPonDeviceStatPonOutDropped		   Counter32,
+           dsEPonDeviceStatPonOutUnicastPkts	   Counter32,
+           dsEPonDeviceStatPonOutBroadcastPkts	   Counter32,
+           dsEPonDeviceStatPonOutMulticastPkts	   Counter32
+    }
+ 
+dsEPonDeviceStatPonInOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 1 }
+
+dsEPonDeviceStatPonInPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 2 }
+		   
+dsEPonDeviceStatPonInPause	 OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 3 }
+
+dsEPonDeviceStatPonInErroredFrame OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 4 }     
+       
+dsEPonDeviceStatPonInUnicastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 5 }   
+       
+dsEPonDeviceStatPonInBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 6 }   
+       
+dsEPonDeviceStatPonInMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 7 }   
+       
+dsEPonDeviceStatPonOutOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 8 }
+       
+dsEPonDeviceStatPonOutPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 9 }
+      
+dsEPonDeviceStatPonOutPause OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 10 }
+           
+dsEPonDeviceStatPonOutDropped OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 11 }
+       
+       
+dsEPonDeviceStatPonOutUnicastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 12 }   
+       
+dsEPonDeviceStatPonOutBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 13 }   
+       
+dsEPonDeviceStatPonOutMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+
+       DESCRIPTION
+               "."
+       ::= { dsEPonDeviceStatPonEntry 14 } 
+       
+
+       
+--
+-- Configuration & Control                         
+--    
+
+dsEPonNotification OBJECT IDENTIFIER ::= { dsEPon 3 }
+
+dsEPonOnuRegistrationError NOTIFICATION-TYPE
+	OBJECTS {                    
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index 
+       dsEPonSystemChannelId       -- ONU/ONT Index
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 1 }  
+
+dsEPonBadEncryptionKey NOTIFICATION-TYPE
+	OBJECTS { 
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index 
+       dsEPonSystemChannelId       
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 2 }
+
+dsEPonLlidMismatch NOTIFICATION-TYPE
+	OBJECTS { 
+	   dsEPonSystemChannelNodeIndex, 
+       dsEPonSystemChannelPortIndex,    -- OLT Index 
+       dsEPonSystemChannelId
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 3 }  
+	
+dsEPonTooManyOnuRegistering NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+ 	   dsEPonSystemChannelId
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 4 }   
+
+dsEPonDyingGASP NOTIFICATION-TYPE
+	OBJECTS {  
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+ 	   dsEPonSystemChannelId
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 5 }  
+
+dsEPonOnuRegister NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+ 	   dsEPonSystemChannelId,
+	   dsEPonSystemChannelMacAddress
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 6 }  
+			                    
+			                
+dsEPonOnuDeregister NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+ 	   dsEPonSystemChannelId,
+	   dsEPonSystemChannelMacAddress
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 7 }
+	
+dsEPonLastOnuDeregister NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+ 	   dsEPonSystemChannelId
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 8 } 
+	
+dsEPonOltCableDown NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 9 }
+
+dsEPonOltRecoverCableDown NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 10 }	
+	
+dsEponOnuFristRegisteredOnAutoToManual NOTIFICATION-TYPE
+	OBJECTS {   
+	   dsEPonSystemChannelNodeIndex,
+       dsEPonSystemChannelPortIndex,    -- OLT Index       
+	dsEPonSystemChannelId,
+	   dsEPonSystemChannelMacAddress
+    }
+	STATUS             current   
+	DESCRIPTION
+			"."
+	::= { dsEPonNotification 11 }
+
+-- dsEPonBERUP NOTIFICATION-TYPE 
+--	OBJECTS {
+--       dsPortPortIndex,     OLT Index 
+--       dsEPonSystemChannelId       
+--    }
+--	STATUS             current   
+--	DESCRIPTION
+--			"."
+--	::= { dsEPonNotification 1 }     
+	
+-- dsEPonBERDown NOTIFICATION-TYPE
+--	OBJECTS {
+--       dsPortPortIndex,     OLT Index 
+--       dsEPonSystemChannelId       
+--    }
+--	STATUS             current   
+--	DESCRIPTION
+--			"."
+--	::= { dsEPonNotification 2 }     
+	
+-- dsEPonFERUP NOTIFICATION-TYPE
+--	OBJECTS {
+--       dsPortPortIndex,     OLT Index 
+--       dsEPonSystemChannelId       
+--    }
+--	STATUS             current   
+--	DESCRIPTION
+--			"."
+--	::= { dsEPonNotification 3 }     
+	
+-- dsEPonFERDown NOTIFICATION-TYPE
+--	OBJECTS {
+--       dsPortPortIndex,     OLT Index 
+--       dsEPonSystemChannelId       
+--    }
+--	STATUS             current   
+--	DESCRIPTION
+--			"."
+--	::= { dsEPonNotification 4 }     
+
+
+
+END

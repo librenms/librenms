@@ -1,0 +1,65 @@
+WATCHGUARD-INFO-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        OBJECT-IDENTITY, enterprises       FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        watchguard                         FROM WATCHGUARD-SMI;
+        
+    wgInfoModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "  WatchGuard Technologies, Inc.
+                  
+                     505 Fifth Avenue South
+                     Suite 500
+                     Seattle, WA 98104
+                     United States
+                     
+                     +1.206.613.6600 "
+
+        DESCRIPTION
+            "The MIB module describes general information
+            of WatchGuard system.  Mainly, the information 
+            obtained from this MIB is used by wgInfoSystemMIB,
+            wgClientMIB, wgSystemStatisticsMIB, wgIpsecTunnelMIB."
+
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 6 }
+
+
+    wgInfoSystem OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base system information for all wg Client
+             branches."
+        ::= { wgInfoModule 1 }
+
+    wgInfoSystemCurrentTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The host's notion of the local date and time of day." 
+        ::= {wgInfoSystem 1}
+
+    wgInfoGavService OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Version and update time of Gateway Antivirus Service"
+        ::= {wgInfoSystem 3}
+
+    wgInfoIpsService OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Version and update time of Intrusion Prevention Service"
+        ::= {wgInfoSystem 4}
+END

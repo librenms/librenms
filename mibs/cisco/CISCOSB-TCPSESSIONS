@@ -1,0 +1,166 @@
+CISCOSB-TCPSESSIONS DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB UDP Private Extension
+-- Version:    7.37.00.00
+-- Date:       17 May 2004
+-- 30-May-2011  Added MODULE-IDENTITY
+
+IMPORTS
+    Unsigned32, Integer32,
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2                     FROM SNMPv2-SMI
+    DisplayString,
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC
+    InetAddress,InetAddressType                             FROM INET-ADDRESS-MIB;
+
+tcp MODULE-IDENTITY
+        LAST-UPDATED "201105300000Z"
+		ORGANIZATION "Cisco Small Business"
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
+		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for TCP Private Extension."
+        REVISION "201105300000Z"
+        DESCRIPTION
+             "Initial revision."
+        ::= { mib-2 6 }
+
+--	tcp      OBJECT IDENTIFIER ::= { mib-2 6 }
+
+rlTcpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlTcpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing TCP sessions information."
+    ::= { tcp 16 }
+
+
+rlTcpSessionEntry OBJECT-TYPE
+    SYNTAX      RlTcpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX   { rlTcpSessionLocalAddrType,
+              rlTcpSessionLocalAddress,
+              rlTcpSessionLocalPort,
+              rlTcpSessionRemAddrType,
+              rlTcpSessionRemAddress,
+              rlTcpSessionRemPort }
+    ::= { rlTcpSessionTable 1 }
+
+RlTcpSessionEntry ::= SEQUENCE {
+        rlTcpSessionLocalAddrType  InetAddressType,
+        rlTcpSessionLocalAddress   InetAddress,
+        rlTcpSessionLocalPort      INTEGER,
+        rlTcpSessionRemAddrType    InetAddressType,
+        rlTcpSessionRemAddress     InetAddress,
+        rlTcpSessionRemPort        INTEGER,
+        rlTcpSessionState          INTEGER,
+        rlTcpSessionAppName        DisplayString
+    }
+
+rlTcpSessionLocalAddrType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The type of the rlTcpSessionLocalAddress address"
+    ::= { rlTcpSessionEntry 1 }
+
+rlTcpSessionLocalAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The local IP address for this TCP connection.  In the case
+         of a connection in the listen state which is willing to
+         accept connections for any IP interface associated with the
+         node, the value 0.0.0.0 is used."
+    ::= { rlTcpSessionEntry 2 }
+
+rlTcpSessionLocalPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The local port number for this TCP connection."
+    ::= { rlTcpSessionEntry 3 }
+
+rlTcpSessionRemAddrType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The type of the rlTcpSessionRemAddress address"
+::= { rlTcpSessionEntry 4 }
+
+rlTcpSessionRemAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The remote IP address for this TCP connection."
+    ::= { rlTcpSessionEntry 5 }
+
+
+rlTcpSessionRemPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The remote port number for this TCP connection."
+    ::= { rlTcpSessionEntry 6 }
+
+rlTcpSessionState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    closed(1),
+                    listen(2),
+                    synSent(3),
+                    synReceived(4),
+                    established(5),
+                    finWait1(6),
+                    finWait2(7),
+                    closeWait(8),
+                    lastAck(9),
+                    closing(10),
+                    timeWait(11),
+                    deleteTCB(12)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The state of this TCP connection.
+
+            The only value which may be set by a management station is
+            deleteTCB(12).  Accordingly, it is appropriate for an agent
+            to return a `badValue' response if a management station
+            attempts to set this object to any other value.
+
+            If a management station sets this object to the value
+            deleteTCB(12), then this has the effect of deleting the TCB
+            (as defined in RFC 793) of the corresponding connection on
+            the managed node, resulting in immediate termination of the
+            connection.
+
+            As an implementation-specific option, a RST segment may be
+            sent from the managed node to the other TCP endpoint (note
+            however that RST segments are not sent reliably)."
+    ::= { rlTcpSessionEntry 7 }
+
+rlTcpSessionAppName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..12))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The name of the application for this TCP connection."
+    ::= {rlTcpSessionEntry 8}
+
+END

@@ -1,0 +1,89 @@
+-- *******************************************************************
+-- Juniper enterprise specific Access Authentication objects MIB.
+--
+-- Copyright (c) 2001-2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    JUNIPER-MAG-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        Counter32, IpAddress, Integer32,
+        NOTIFICATION-TYPE, MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC
+
+        jnxMagMibRoot
+            FROM JUNIPER-SMI;
+
+
+    jnxMagMib  MODULE-IDENTITY
+        LAST-UPDATED  "201002201210Z"
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+
+        DESCRIPTION
+            "These MIB objects pertain to Secure access,
+             infranet controller and WAN acceleration service
+             modules?"
+
+        REVISION      "201002201200Z"
+        DESCRIPTION   "Creation Date"
+        ::= { jnxMagMibRoot 1 }
+
+
+    jnxMagNotifications OBJECT IDENTIFIER ::= { jnxMagMib 0 }
+    jnxMagObjects       OBJECT IDENTIFIER ::= { jnxMagMib 1 }
+
+    -- ***************************************************************
+    --  Next Branch node.
+    -- ***************************************************************
+
+    jnxMagSSOObjects OBJECT IDENTIFIER ::= { jnxMagObjects 1 }
+
+
+    -- ***************************************************************
+    -- Single Sign-on Statistics
+    -- ***************************************************************
+
+
+    jnxMagSSOAuthTokenAttempt OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of Auth Token attempts made"
+        ::= { jnxMagSSOObjects 1 }
+
+
+    jnxMagSSOFailedAuthToken OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of Failed Auth Token "
+        ::= { jnxMagSSOObjects 2 }
+
+
+    -- ***************************************************************
+    -- MAG Notfications
+    -- ***************************************************************
+
+    jnxMagSSOValidationError NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+       " Auth Token Validation error"
+       ::= { jnxMagNotifications 1 }
+
+END

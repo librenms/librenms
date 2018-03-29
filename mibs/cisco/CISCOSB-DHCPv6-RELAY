@@ -1,0 +1,203 @@
+CISCOSB-DHCPv6-RELAY DEFINITIONS ::= BEGIN
+
+-- Version:    7.60
+
+-- Date:       10-May-2012
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32                                      FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    DisplayString, TruthValue                       FROM SNMPv2-TC
+    InetAddressType,InetAddress,InetAddressIPv6     FROM INET-ADDRESS-MIB -- RFC2851
+    rlDhcpv6Relay                                   FROM CISCOSB-DHCPv6;
+
+-- =======================================================
+-- DHCPv6 relay interface list Table
+-- =======================================================
+
+rlDhcpv6RelayInterfaceListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RLDhcpv6RelayInterfaceListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains interfaces that have configured DHCPv6 relay"
+    ::= { rlDhcpv6Relay 1}
+
+rlDhcpv6RelayInterfaceListEntry OBJECT-TYPE
+    SYNTAX RLDhcpv6RelayInterfaceListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains ifindex field."
+    INDEX { rlDhcpv6RelayInterfaceListIfIndex }
+    ::= { rlDhcpv6RelayInterfaceListTable 1 }
+
+RLDhcpv6RelayInterfaceListEntry::= SEQUENCE {
+        rlDhcpv6RelayInterfaceListIfIndex       Unsigned32,
+        rlDhcpv6RelayInterfaceListRowStatus     RowStatus
+    }
+
+rlDhcpv6RelayInterfaceListIfIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface that have configured DHCPv6 relay"
+    ::= { rlDhcpv6RelayInterfaceListEntry 1 }
+
+rlDhcpv6RelayInterfaceListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This variable displays the validity or invalidity of the entry.
+         Setting it to 'destroy' has the effect of  rendering it inoperative.
+         The internal effect (row removal) is implementation dependent."
+    ::= { rlDhcpv6RelayInterfaceListEntry 2 }
+
+
+-- =======================================================
+-- DHCPv6 relay destinations global
+-- =======================================================
+
+rlDhcpv6RelayDestinationsGlobalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpv6RelayDestinationsGlobalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The table is used to store the global destinations defined by the
+          user to which the relay agent forwards RELAY-FW messages "
+    ::= { rlDhcpv6Relay 2 }
+
+rlDhcpv6RelayDestinationsGlobalEntry OBJECT-TYPE
+    SYNTAX RlDhcpv6RelayDestinationsGlobalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The row definition for this table. "
+    INDEX { rlDhcpv6RelayDestinationsGlobalIpv6AddrType,
+            rlDhcpv6RelayDestinationsGlobalIpv6Addr,
+            rlDhcpv6RelayDestinationsGlobalOutputInterface
+          }
+    ::=  { rlDhcpv6RelayDestinationsGlobalTable 1 }
+
+RlDhcpv6RelayDestinationsGlobalEntry::= SEQUENCE {
+        rlDhcpv6RelayDestinationsGlobalIpv6AddrType          InetAddressType,
+        rlDhcpv6RelayDestinationsGlobalIpv6Addr              InetAddress,
+        rlDhcpv6RelayDestinationsGlobalOutputInterface       Unsigned32,
+        rlDhcpv6RelayDestinationsGlobalRowStatus             RowStatus
+     }
+
+rlDhcpv6RelayDestinationsGlobalIpv6AddrType  OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The only inet type that is supported is ipv6"
+    ::= { rlDhcpv6RelayDestinationsGlobalEntry 1  }
+
+rlDhcpv6RelayDestinationsGlobalIpv6Addr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The address relay uses to forward the message"
+    ::= { rlDhcpv6RelayDestinationsGlobalEntry 2  }
+
+rlDhcpv6RelayDestinationsGlobalOutputInterface OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The output interface (ifindex) is required only in case the destination address is not global unicast."
+    ::= { rlDhcpv6RelayDestinationsGlobalEntry 3 }
+
+rlDhcpv6RelayDestinationsGlobalRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This variable displays the validity or invalidity of the entry.
+        Setting it to 'destroy' has the effect of  rendering it inoperative.
+        The internal effect (row removal) is implementation dependent."
+    ::= { rlDhcpv6RelayDestinationsGlobalEntry 4 }
+
+
+-- =======================================================
+-- DHCPv6 relay destinations per interface
+-- =======================================================
+
+rlDhcpv6RelayInterfaceDestinationsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlDhcpv6RelayInterfaceDestinationsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The table is used to store  destinations defined by the user per
+          interface to which the relay agent forwards RELAY-FW messages "
+    ::= { rlDhcpv6Relay 3 }
+
+rlDhcpv6RelayInterfaceDestinationsEntry OBJECT-TYPE
+    SYNTAX RlDhcpv6RelayInterfaceDestinationsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The row definition for this table. "
+    INDEX { rlDhcpv6RelayInterfaceDestinationsIfindex,
+            rlDhcpv6RelayInterfaceDestinationsIpv6AddrType,
+            rlDhcpv6RelayInterfaceDestinationsIpv6Addr,
+            rlDhcpv6RelayInterfaceDestinationsOutputInterface
+          }
+    ::=  { rlDhcpv6RelayInterfaceDestinationsTable 1 }
+
+RlDhcpv6RelayInterfaceDestinationsEntry::= SEQUENCE {
+        rlDhcpv6RelayInterfaceDestinationsIfindex           Unsigned32,
+        rlDhcpv6RelayInterfaceDestinationsIpv6AddrType      InetAddressType,
+        rlDhcpv6RelayInterfaceDestinationsIpv6Addr          InetAddress,
+        rlDhcpv6RelayInterfaceDestinationsOutputInterface   Unsigned32,
+        rlDhcpv6RelayInterfaceDestinationsRowStatus         RowStatus
+     }
+
+rlDhcpv6RelayInterfaceDestinationsIfindex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The relay interface"
+    ::= { rlDhcpv6RelayInterfaceDestinationsEntry 1 }
+
+rlDhcpv6RelayInterfaceDestinationsIpv6AddrType  OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The only inet type that is supported is ipv6"
+    ::= { rlDhcpv6RelayInterfaceDestinationsEntry 2  }
+
+rlDhcpv6RelayInterfaceDestinationsIpv6Addr  OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The address relay uses to forward the message"
+    ::= { rlDhcpv6RelayInterfaceDestinationsEntry 3  }
+
+rlDhcpv6RelayInterfaceDestinationsOutputInterface OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The output interface (ifindex) is required only in case the destination address is not global unicast."
+    ::= { rlDhcpv6RelayInterfaceDestinationsEntry 4 }
+
+rlDhcpv6RelayInterfaceDestinationsRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This variable displays the validity or invalidity of the entry.
+        Setting it to 'destroy' has the effect of  rendering it inoperative.
+        The internal effect (row removal) is implementation dependent."
+    ::= { rlDhcpv6RelayInterfaceDestinationsEntry 5 }
+
+END

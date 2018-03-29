@@ -1,0 +1,1316 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Alteon WebSystems, Inc. 2002
+-- All rights reserved
+-- 
+-- HISTORY
+-- $Log: aoslayer7.mib,v $
+-- Revision 1.1  2007/10/17 01:09:54  jeneric
+-- 10/07 mib updates
+--
+-- Revision submit_cheetah_16636/1 2006/01/10 04:52:39 rvakkala
+-- Ported connection pooling support from 23.0 branch
+-- 
+-- Revision submit_cheetah_13635/1 2005/08/10 05:46:24 rrekha
+-- Converted excludes in Makefile to #if defines in the *.raw and *.ctl files.
+-- 
+-- Revision submit_cheetah_13563/1 2005/08/05 17:39:21 rrekha
+-- Moved all the BWM related flags into the raw files.
+-- 
+-- Revision submit_cheetah_12113/1 2005/05/25 10:16:27 rvakkala
+-- Added MIB support for /c/slb/layer7/sdp.
+-- 
+-- Revision submit_cheetah_10393/1 2005/01/05 21:01:29 mmacnt
+-- code reorg - moved from lib/agent
+-- 
+-- Revision submit_cheetah_9196/1 2004/09/01 21:40:34 rrekha
+-- Fixed Q00973926: Added MIB objects for the layer7 SP mem statistics.
+-- 
+-- Revision submit_cheetah_8280/1 2004/07/13 05:59:35 dillibab
+-- Added mib objects for Layer7 SLB Http Methods.
+-- 
+-- Revision submit_cheetah_8173/1 2004/07/09 07:32:51 dillibab
+-- Added objects for layer7 general configuration.
+-- Added dbind timeout under layer7 general configuration.
+-- 
+-- Revision submit_cheetah_8006/1 2004/06/28 09:00:25 dillibab
+-- Mib variable slbParsingString size is added .
+-- 
+-- Revision submit_cheetah_7745/1 2004/06/10 06:33:43 dillibab
+-- Added SNMP object to case sensitive URL String match configuration under slbUrlBalance.
+-- 
+-- Revision submit_cheetah_7693/1 2004/06/08 07:19:44 dillibab
+-- Added Info object for SLB Cookie parsing.
+-- 
+-- Revision submit_cheetah_5693/1 2003/11/16 19:34:30 rrekha
+-- Converted MIBs to SMIv2.
+-- 
+-- Revision submit_cheetah_4966/1 2003/09/05 00:49:13 ocheung
+-- Corrected the description for slbNewCfgUrlLbPathOffset,
+-- slbNewCfgUrlLbPathDepth, slbNewCfgUrlLbPathOper,
+-- slbCurCfgUrlLbPathOffset, slbCurCfgUrlLbPathDepth, and
+-- slbCurCfgUrlLbPathOper.
+-- 
+-- Revision submit_cheetah_4435/1 2003/08/12 22:59:51 rrekha
+-- Changed name of mib file for cheetah*.mib to aos*.mib.
+-- 
+-- Revision submit_cheetah_4337/1 2003/08/05 21:20:38 ocheung
+-- Checkin comments for "lib/agent/cheetahLayer7.mib":
+-- Renamed UrlLbStringType to UrlLbPatternStringType on Wendell's
+-- request.
+-- Also changed slbNewCfgUrlLbPathHTTPHeader and
+-- slbNewCfgUrlLbPathHTTPHeaderValue to read-write.
+-- 
+-- Revision submit_cheetah_3687/1 2003/06/27 01:57:11 ocheung
+-- Changed max value of UrlLbPathOffset and UrlLbPathDepth to 1500.
+-- 
+-- Revision submit_cheetah_3476/1 2003/06/19 01:03:54 rmundhra
+-- Adding SNMP/WebUI support for UDP pattern matching
+-- and DOS attack detection.
+-- 
+-- Revision submit_cheetah_2810/1 2003/05/07 23:05:49 rtsai
+-- Changed slbCurCfgUrlLbPathHTTPHeader size from 48 to 32.
+-- 
+-- Revision submit_cheetah_2881/1 2003/05/07 02:15:02 ocheung
+-- Added support for UDP_PMATCH_FILT feature.
+-- 
+-- Revision submit_cheetah_2437/1 2003/04/25 18:16:42 rtsai
+-- Added MIB objects for Layer7 Header string.
+-- 
+-- Revision submit_cheetah_1919/1 2003/02/05 20:04:01 rrekha
+-- Changed the include paths for integrating support
+-- for SNMP V3 Windmanage Stack.
+-- 
+-- Revision submit_cheetah_1112/1 2002/10/03 17:53:14 rrekha
+-- Fixed Q00533800: The index for urlStatSlbPathTable shoulbd be 
+-- urlStatSlbPathIndex.
+-- 
+-- Revision submit_cheetah_914/1 2002/09/10 23:27:34 rrekha
+-- Added MIB objects for WCR RTSP redir statictics and some
+-- missing L7 maint statistics.
+-- 
+-- Revision ch_1_0_0_dev/4 2002/06/04 18:36:24 rrekha
+-- Fixed some typos in the mib descriptions.
+-- 
+-- Revision ch_1_0_0_dev/3 2002/05/28 19:42:24 rrekha
+-- Added layer7 maintenance statistics.
+-- 
+-- Revision ch_1_0_0_dev/2 2002/05/01 22:50:52 rrekha
+-- Removed slbUrlExpTable since it is no longer used.
+-- 
+-- Revision ch_1_0_0_dev/1 2002/04/23 21:47:04 smiao
+-- Renamed node cheetah to aws-switches.
+-- 
+-- Revision ch10latest_smiao/4 2002/02/22 01:20:27 smiao
+-- 	Removed WCR_RTSP for CHEETAH  in SNMP and webUI.
+-- 
+-- Revision ch10latest_smiao/2 2002/02/13 01:41:24 smiao
+-- 	Initial checked in for cheetah MIB files.
+-- 
+-- $EndLog$
+
+ALTEON-CHEETAH-LAYER7-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, IpAddress 
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    aws-switch 
+        FROM ALTEON-ROOT-MIB;
+
+layer7 MODULE-IDENTITY
+    LAST-UPDATED "200409010000Z" --  1 September, 2004
+    ORGANIZATION "Nortel Networks"
+    CONTACT-INFO "Rekha Singamsetty
+                  Suresh Batchu
+
+                  Nortel Networks
+                  4655 Great America Parkway
+                  Santa Clara CA 95054
+
+                  +1 408 495 2400
+                  rrekha@nortelnetworks.com
+                  sbatchu@nortelnetworks.com"
+    DESCRIPTION
+        "The MIB module for the Alteon OS layer 7 features."
+    REVISION "200409010000Z"     -- 1 September, 2004
+    DESCRIPTION
+        "Added revision clause for SMIv2 compliance."
+    ::= { aws-switch 5 }
+
+layer7Configs     OBJECT IDENTIFIER ::= { layer7 1 }
+layer7Stats       OBJECT IDENTIFIER ::= { layer7 2 }
+layer7Info        OBJECT IDENTIFIER ::= { layer7 3 }
+layer7Oper        OBJECT IDENTIFIER ::= { layer7 4 }
+
+urlCfg	          OBJECT IDENTIFIER ::= { layer7Configs 1 }
+layer7GeneralCfg  OBJECT IDENTIFIER ::= { layer7Configs 2 }
+sdpCfg            OBJECT IDENTIFIER ::= { layer7Configs 3 }
+slbUrlRedir       OBJECT IDENTIFIER ::= { urlCfg 1 }
+slbUrlBalance     OBJECT IDENTIFIER ::= { urlCfg 2 }
+slbUrlHttpMethods OBJECT IDENTIFIER ::= { urlCfg 3 }
+
+urlStats          OBJECT IDENTIFIER ::= { layer7Stats  1 }
+connPoolingStats  OBJECT IDENTIFIER ::= { layer7Stats 2 }
+
+slbParsing        OBJECT IDENTIFIER ::= { layer7Info 1 }
+
+-- Layer 7 Configuration 
+
+-- SLB URL Redirection Group
+slbCurCfgUrlRedirNonGetOrigSrv OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"This is for controlling if the switch should redirect packet 
+         to the origin server when HTTP non-GETs are detected.  
+
+         enabled(1) - Allow redirect traffic to the origin server
+         disabled(2)- redirect to a group of servers"
+    ::= { slbUrlRedir 3 }
+
+slbNewCfgUrlRedirNonGetOrigSrv OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is for controlling if the switch should redirect packet to 
+         the origin server when HTTP non-GETs are detected.  
+
+         enabled(1) - Allow redirect traffic to the origin server
+         disabled(2)- redirect to a group of servers"
+    ::= { slbUrlRedir 4 }
+
+slbCurCfgUrlRedirCookieOrigSrv OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is for controlling if the switch should redirect packet to the 
+         origin server when user cookies are detected.  
+
+         enabled(1) - Allow redirect traffic to the origin server
+         disabled(2)- redirect to a group of servers"
+    ::= { slbUrlRedir 5 }
+
+slbNewCfgUrlRedirCookieOrigSrv OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is for controlling if the switch should redirect packet to the 
+         origin server when user cookies are detected.  
+
+         enabled(1) - Allow redirect traffic to the origin server
+         disabled(2)- redirect to a group of servers"
+    ::= { slbUrlRedir 6 }
+
+slbCurCfgUrlRedirNoCacheOrigSrv OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is for controlling if the switch should redirect packet to the 
+         origin server when no-cache header are detected.  
+
+         enabled(1) - Allow redirect traffic to the origin server
+         disabled(2)- redirect to a group of servers"
+    ::= { slbUrlRedir 7 }
+
+slbNewCfgUrlRedirNoCacheOrigSrv OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is for controlling if the switch should redirect packet to the 
+         origin server when no-cache header are detected.  
+
+         enabled(1) - Allow redirect traffic to the origin server
+         disabled(2)- redirect to a group of servers"
+    ::= { slbUrlRedir 8 }
+
+slbCurCfgUrlRedirUriHashLength OBJECT-TYPE
+    SYNTAX  INTEGER (0..255) 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specify the number of bytes in the URI will be used to hash 
+         onto server"
+    ::= { slbUrlRedir 9 }
+
+slbNewCfgUrlRedirUriHashLength OBJECT-TYPE
+    SYNTAX  INTEGER (0..255) 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify the number of bytes in the URI will be used to hash 
+         onto server"
+    ::= { slbUrlRedir 10 }
+
+slbCurCfgUrlRedirHeader OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"This is for controlling if the switch should redirect packet to the 
+         cache server based on HTTP header.
+
+         enabled(1) - Redirect web traffic based on HTTP header
+         disabled(2)- Redirect web traffic based on URI"
+    ::= { slbUrlRedir 11 }
+
+slbNewCfgUrlRedirHeader OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+	"This is for controlling if the switch should redirect packet to the 
+         cache server based on HTTP header.
+
+         enabled(1) - Redirect web traffic based on HTTP header
+         disabled(2)- Redirect web traffic based on URI"
+    ::= { slbUrlRedir 12 }
+
+slbCurCfgUrlRedirHeaderName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The HTTP header name"
+    ::= { slbUrlRedir 13 }
+
+slbNewCfgUrlRedirHeaderName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-write 
+    STATUS current
+    DESCRIPTION
+        "The HTTP header name"
+    ::= { slbUrlRedir 14 }
+
+-- SLB URL Load Balancing
+
+slbUrlLbPathTableMaxSize OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS read-only 
+    STATUS current 
+    DESCRIPTION 
+        "The maximum number of entries in SLB URL load balance table." 
+    ::= { slbUrlBalance 1 }
+
+slbCurCfgUrlLbPathTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlbCurCfgUrlLbPathTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of URL path for URL load balancing in the current_config."
+    ::= { slbUrlBalance 2 }
+
+slbCurCfgUrlLbPathTableEntry OBJECT-TYPE
+    SYNTAX  SlbCurCfgUrlLbPathTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about an URL path for URL load balancing."
+    INDEX   { slbCurCfgUrlLbPathIndex }
+    ::= { slbCurCfgUrlLbPathTable 1 }
+
+SlbCurCfgUrlLbPathTableEntry ::= SEQUENCE {
+    slbCurCfgUrlLbPathIndex             Integer32,
+    slbCurCfgUrlLbBwmContract           Integer32,
+    slbCurCfgUrlLbPathHTTPHeader        DisplayString,
+    slbCurCfgUrlLbPathHTTPHeaderValue   DisplayString,
+    slbCurCfgUrlLbPathPatternStringType INTEGER,
+    slbCurCfgUrlLbPathOffset            INTEGER,
+    slbCurCfgUrlLbPathDepth             INTEGER,
+    slbCurCfgUrlLbPathOper              INTEGER,
+    slbCurCfgUrlLbPathString            DisplayString
+   }
+
+slbCurCfgUrlLbPathIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The URL path table index."
+    ::= { slbCurCfgUrlLbPathTableEntry 1 }
+
+slbCurCfgUrlLbPathString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..96))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The SLB string or ASCII/BINARY string for pattern matching ."
+    ::= { slbCurCfgUrlLbPathTableEntry 2 }
+
+slbCurCfgUrlLbBwmContract OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The BW contract for the path."
+    ::= { slbCurCfgUrlLbPathTableEntry 3 }
+
+slbCurCfgUrlLbPathHTTPHeader OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The HTTP header for URL load balancing."
+    ::= { slbCurCfgUrlLbPathTableEntry 4 }
+
+slbCurCfgUrlLbPathHTTPHeaderValue OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..48))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The HTTP header value for URL load balancing."
+    ::= { slbCurCfgUrlLbPathTableEntry 5 }
+ 
+slbCurCfgUrlLbPathPatternStringType OBJECT-TYPE
+    SYNTAX INTEGER {
+        ascii(1),
+        binary(2),
+	none  (3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Type of pattern string (ASCII or binary or none)."
+    ::= { slbCurCfgUrlLbPathTableEntry 6 }
+
+slbCurCfgUrlLbPathOffset OBJECT-TYPE
+    SYNTAX  INTEGER (0..1500)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Offset from beginning of IP packet to start matching the
+	 pattern string."
+    ::= { slbCurCfgUrlLbPathTableEntry 7 }
+
+slbCurCfgUrlLbPathDepth OBJECT-TYPE
+    SYNTAX  INTEGER (0..1500)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Depth of IP packet to search and match the pattern string."
+    ::= { slbCurCfgUrlLbPathTableEntry 8 }
+
+slbCurCfgUrlLbPathOper OBJECT-TYPE
+    SYNTAX  INTEGER {
+	eq(1),
+	gt(2),
+	lt(3),
+	none(4)
+	} 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"Operation to be performed on the pattern match string.
+	 For ASCII pattern strings, only the equal (eq) operation
+	 is valid."
+    ::= { slbCurCfgUrlLbPathTableEntry 9 }
+
+slbNewCfgUrlLbPathTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlbNewCfgUrlLbPathTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of URL path for URL load balancing in the new_config."
+    ::= { slbUrlBalance 3 }
+
+slbNewCfgUrlLbPathTableEntry OBJECT-TYPE
+    SYNTAX  SlbNewCfgUrlLbPathTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about an URL path for URL load balancing."
+    INDEX   { slbNewCfgUrlLbPathIndex }
+    ::= { slbNewCfgUrlLbPathTable 1 }
+
+SlbNewCfgUrlLbPathTableEntry ::= SEQUENCE {
+    slbNewCfgUrlLbPathIndex             Integer32,
+    slbNewCfgUrlLbPathString            DisplayString,
+    slbNewCfgUrlLbBwmContract           Integer32,
+    slbNewCfgUrlLbPathHTTPHeader        DisplayString,
+    slbNewCfgUrlLbPathHTTPHeaderValue   DisplayString,
+    slbNewCfgUrlLbPathPatternStringType INTEGER,
+    slbNewCfgUrlLbPathOffset            INTEGER,
+    slbNewCfgUrlLbPathDepth             INTEGER,
+    slbNewCfgUrlLbPathOper              INTEGER,
+    slbNewCfgUrlLbPathDelete            INTEGER
+    }
+
+slbNewCfgUrlLbPathIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The URL path table index."
+    ::= { slbNewCfgUrlLbPathTableEntry 1 }
+
+slbNewCfgUrlLbPathString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..96))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The SLB string or ASCII/BINARY string for pattern matching ."
+    ::= { slbNewCfgUrlLbPathTableEntry 2 }
+
+slbNewCfgUrlLbBwmContract OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The BW contract for the load path."
+    ::= { slbNewCfgUrlLbPathTableEntry 4 }
+    
+slbNewCfgUrlLbPathHTTPHeader OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..48))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The HTTP header for URL load balancing."
+    ::= { slbNewCfgUrlLbPathTableEntry 5 }
+
+slbNewCfgUrlLbPathHTTPHeaderValue OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..48))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The HTTP header value for URL load balancing."
+    ::= { slbNewCfgUrlLbPathTableEntry 6 }
+
+slbNewCfgUrlLbPathPatternStringType OBJECT-TYPE
+    SYNTAX INTEGER {
+        ascii(1),
+        binary(2),
+	none  (3)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Type of pattern string (ASCII or binary)."
+    ::= { slbNewCfgUrlLbPathTableEntry 7 }
+
+slbNewCfgUrlLbPathOffset OBJECT-TYPE
+    SYNTAX  INTEGER (0..1500)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Offset from beginning of IP packet to start matching the
+	 pattern string."
+    ::= { slbNewCfgUrlLbPathTableEntry 8 }
+
+slbNewCfgUrlLbPathDepth OBJECT-TYPE
+    SYNTAX  INTEGER (0..1500)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Depth of IP packet to search and match the pattern string."
+    ::= { slbNewCfgUrlLbPathTableEntry 9 }
+
+slbNewCfgUrlLbPathOper OBJECT-TYPE
+    SYNTAX  INTEGER {
+	eq(1),
+	gt(2),
+	lt(3),
+	none(4)
+	} 
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+	"Operation to be performed on the pattern match string.
+	 For ASCII pattern strings, only the equal (eq) operation
+	 is valid."
+    ::= { slbNewCfgUrlLbPathTableEntry 10 }
+
+slbNewCfgUrlLbPathDelete OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Action object to delete an URL Path.  When set to the value 
+         of 2 (delete), the entire row is deleted. When read, other(1) is 
+         returned. Setting the value to anything other than delete(2) 
+         has no effect on the state of the row."
+    ::= { slbNewCfgUrlLbPathTableEntry 3 }
+
+slbCurCfgUrlLbErrorMsg OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Customize error message to send back to client when switch cannot 
+         bind client's request to servers."
+    ::= { slbUrlBalance 4 }
+
+slbNewCfgUrlLbErrorMsg OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Customize error message to send back to client when switch cannot 
+         bind client's request to servers."
+    ::= { slbUrlBalance 5 }
+
+slbCurCfgUrlLbCaseSensitiveStrMatch OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"This is for controlling if the URL String matching is case sensitive or not.  
+
+         enabled(1) - URL String matching is case sensitive
+         disabled(2)- URL String matching is not case sensitive"
+    ::= { slbUrlBalance 6 }
+
+slbNewCfgUrlLbCaseSensitiveStrMatch OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+	"This is for controlling if the URL String matching is case sensitive or not.  
+
+         enabled(1) - URL String matching is case sensitive
+         disabled(2)- URL String matching is not case sensitive"
+    ::= { slbUrlBalance 7 }
+
+slbUrlHttpMethodsTableMaxSize OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only 
+    STATUS  current 
+    DESCRIPTION 
+        "The maximum number of http method entries in layer7 processing engine." 
+    ::= { slbUrlHttpMethods 1 }
+
+slbCurCfgUrlHttpMethodsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlbCurCfgUrlHttpMethodsTableEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The http methods table in layer7 processing engine."
+    ::= { slbUrlHttpMethods 2 }
+
+slbCurCfgUrlHttpMethodsTableEntry OBJECT-TYPE
+    SYNTAX  SlbCurCfgUrlHttpMethodsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the http methods table."
+    INDEX   { slbCurCfgUrlHttpMethodIndex }
+    ::= { slbCurCfgUrlHttpMethodsTable 1 }
+
+SlbCurCfgUrlHttpMethodsTableEntry ::= SEQUENCE {
+    slbCurCfgUrlHttpMethodIndex          Integer32,
+    slbCurCfgUrlHttpMethodString         DisplayString
+    }
+
+slbCurCfgUrlHttpMethodIndex OBJECT-TYPE 
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only 
+    STATUS  current 
+    DESCRIPTION 
+        "The http method table index." 
+    ::= { slbCurCfgUrlHttpMethodsTableEntry 1 }
+
+slbCurCfgUrlHttpMethodString OBJECT-TYPE  
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The http method string to process in layer7 engine."
+    ::= { slbCurCfgUrlHttpMethodsTableEntry 2 } 
+
+slbNewCfgUrlHttpMethodsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlbNewCfgUrlHttpMethodsTableEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The http methods table in layer7 processing engine."
+    ::= { slbUrlHttpMethods 3 }
+
+slbNewCfgUrlHttpMethodsTableEntry OBJECT-TYPE
+    SYNTAX  SlbNewCfgUrlHttpMethodsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the http methods table."
+    INDEX   { slbNewCfgUrlHttpMethodIndex }
+    ::= { slbNewCfgUrlHttpMethodsTable 1 }
+
+SlbNewCfgUrlHttpMethodsTableEntry ::= SEQUENCE {
+    slbNewCfgUrlHttpMethodIndex    Integer32,
+    slbNewCfgUrlHttpMethodString   DisplayString,
+    slbNewCfgUrlHttpMethodDelete   INTEGER
+    }
+
+slbNewCfgUrlHttpMethodIndex OBJECT-TYPE 
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only 
+    STATUS  current 
+    DESCRIPTION 
+        "The http method table index." 
+    ::= { slbNewCfgUrlHttpMethodsTableEntry 1 }
+
+slbNewCfgUrlHttpMethodString OBJECT-TYPE  
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The http method string to process in layer7 engine."
+    ::= { slbNewCfgUrlHttpMethodsTableEntry 2 } 
+
+slbNewCfgUrlHttpMethodDelete OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other(1) is returned. Setting the value to anything 
+         other than 2(delete) has no effect on the state of the row."
+    ::= { slbNewCfgUrlHttpMethodsTableEntry 3 }
+
+-- Layer7 General Configuration
+
+layer7CurCfgDbindTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (10..60) 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION
+        "The timeout for incomplete delayed binding connections."
+    ::= { layer7GeneralCfg 1 }
+
+layer7NewCfgDbindTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (10..60) 
+    MAX-ACCESS  read-write
+    STATUS  current 
+    DESCRIPTION
+        "The timeout for incomplete delayed binding connections."
+    ::= { layer7GeneralCfg 2 }
+
+slbSdpTableMaxSize OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only 
+    STATUS  current 
+    DESCRIPTION 
+        "The maximum number of SDP entries in layer7 processing engine." 
+    ::= { sdpCfg 1 }
+
+slbCurCfgSdpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlbCurCfgSdpTableEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The SDP table in layer7 processing engine."
+    ::= { sdpCfg 2 }
+
+slbCurCfgSdpTableEntry OBJECT-TYPE
+    SYNTAX  SlbCurCfgSdpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the table."
+    INDEX   { slbCurCfgSdpIndex }
+    ::= { slbCurCfgSdpTable 1 }
+
+SlbCurCfgSdpTableEntry ::= SEQUENCE {
+    slbCurCfgSdpIndex                Integer32,
+    slbCurCfgSdpPrivAddr             IpAddress,
+    slbCurCfgSdpPublicAddr           IpAddress
+    }   
+
+slbCurCfgSdpIndex   OBJECT-TYPE 
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only 
+    STATUS  current 
+    DESCRIPTION 
+        "The SDP table index." 
+    ::= { slbCurCfgSdpTableEntry 1 }
+
+slbCurCfgSdpPrivAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The private IP address of SDP entry."
+    ::= { slbCurCfgSdpTableEntry 2 }
+
+slbCurCfgSdpPublicAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The public IP address of SDP entry."
+    ::= { slbCurCfgSdpTableEntry 3 }
+
+slbNewCfgSdpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlbNewCfgSdpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The SDP table in layer7 processing engine."
+    ::= { sdpCfg 3 }
+
+slbNewCfgSdpTableEntry OBJECT-TYPE
+    SYNTAX  SlbNewCfgSdpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the SDP table."
+    INDEX   { slbCurCfgSdpIndex }
+    ::= { slbNewCfgSdpTable 1 }
+
+SlbNewCfgSdpTableEntry ::= SEQUENCE {
+    slbNewCfgSdpIndex                Integer32,
+    slbNewCfgSdpPrivAddr             IpAddress,
+    slbNewCfgSdpPublicAddr           IpAddress,
+    slbNewCfgSdpDelete               INTEGER
+    }
+
+slbNewCfgSdpIndex   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The SDP table index."
+    ::= { slbNewCfgSdpTableEntry 1 }
+
+slbNewCfgSdpPrivAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The private IP address of SDP entry."
+    ::= { slbNewCfgSdpTableEntry 2 }
+
+slbNewCfgSdpPublicAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The public IP address of SDP entry."
+    ::= { slbNewCfgSdpTableEntry 3 }
+
+slbNewCfgSdpDelete  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is
+         deleted. When read, other(1) is returned. Setting the value
+         to anything other than 2(delete) has no effect on the state of the row." 
+    ::= { slbNewCfgSdpTableEntry 4 }
+
+-- The URL Redirection/Load Balancing Statistics
+
+urlRedirStats    OBJECT IDENTIFIER ::= { urlStats  1 }
+
+urlStatRedRedirs OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of instances that the received packet matches the 
+         specified URL expressions and redirected to specified group of 
+         real servers."
+    ::= { urlRedirStats 1 }
+
+urlStatRedOrigSrvs OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of instances that the received packet is sent to the 
+         origin server due to mis-match with the specified URL expressions 
+         or detecting of HTTP non-GETs,user cookies, and no-cache as users 
+         configuration."
+    ::= { urlRedirStats 2 }
+
+urlStatRedNonGets OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of instances that the received packet contains 
+         none GETs(POST ,HEAD ,PUT..) methods."
+    ::= { urlRedirStats 3 }
+
+urlStatRedCookie OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of instances that the received packet contains
+         a 'Cookie: ' header."
+    ::= { urlRedirStats 4 }
+
+urlStatRedNoCache OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of instances that the received packet contains
+         a no-cache header value."
+    ::= { urlRedirStats 5 }
+
+urlStatRedStraightOrigSrvs OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of HTTP requests forwarded straight to the origin server."
+    ::= { urlRedirStats 6 }
+
+urlStatRedRtspCacheSrvs OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of RTSP requests redirected to the cache server."
+    ::= { urlRedirStats 7 }
+
+urlStatRedRtspOrigSrvs OBJECT-TYPE 
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION 
+        "The number of RTSP requests forwarded to the origin server."
+    ::= { urlRedirStats 8 }
+
+urlSlbStats    OBJECT IDENTIFIER ::= { urlStats  2 }
+
+urlStatSlbPathTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UrlStatSlbPathTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The statistics table of instances that the URL path matched."
+    ::= { urlSlbStats 1 }
+
+urlStatSlbPathTableEntry OBJECT-TYPE
+    SYNTAX  UrlStatSlbPathTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about the number of instances that are 
+	 load-balanced due to match of a particular URL path."
+    INDEX   { urlStatSlbPathIndex }
+    ::= { urlStatSlbPathTable 1 }
+
+UrlStatSlbPathTableEntry ::= SEQUENCE {
+    urlStatSlbPathIndex       Integer32,
+    urlStatSlbPathHits        Counter32
+    }
+
+urlStatSlbPathIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The URL path table index."
+    ::= { urlStatSlbPathTableEntry 1 }
+
+urlStatSlbPathHits OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of instances that are load-balanced due to match of 
+         the particular URL path."
+    ::= { urlStatSlbPathTableEntry 2 }
+
+-- Layer 7 Maintenance Statistics
+
+urlMaintStats    OBJECT IDENTIFIER ::= { urlStats  3 }
+
+urlMaintStatClientReset OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of reset frames sent to the client by the switch during
+         client connection termination."
+    ::= { urlMaintStats 1 }
+
+urlMaintStatServerReset OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of reset frames sent to the server by the switch during
+         server connection termination."
+    ::= { urlMaintStats 2 }
+
+urlMaintStatConnSplicing OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of connection swapping between different real
+         servers in supporting multiple HTTP/1.1 client requests."
+    ::= { urlMaintStats 3 }
+
+urlMaintStatHalfOpens OBJECT-TYPE
+    SYNTAX  Gauge32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of outstanding TCP connections have been half opened.
+	 This statistics is valid only when URL parsing has been turned on.
+	 It is incremented when the switch respond to TCP SYN packet and 
+	 decremented upon receiving TCP SYN ACK packet from the requester."
+    ::= { urlMaintStats 4 }
+
+urlMaintStatSwitchRetries OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of switch retries to connect to the real server."
+    ::= { urlMaintStats 5 }
+
+urlMaintStatRandomEarlyDrops OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of SYN frames dropped when the buffer is low."
+    ::= { urlMaintStats 6 }
+
+urlMaintStatReqTooLong OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of GET requests that exceeded 4500 bytes."
+    ::= { urlMaintStats 7 }
+
+urlMaintStatInvalidHandshakes OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of dropped frames because of invalid 3-way 
+         handshakes."
+    ::= { urlMaintStats 8 }
+
+urlMaintStatCurSPMemUnits OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The current available SP memory units."
+    ::= { urlMaintStats 9 }
+
+urlMaintStatCurSEQBufEntries OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of outstanding sequence buffers used."
+    ::= { urlMaintStats 10 }
+
+urlMaintStatHighestSEQBufEntries OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The highest number of sequence buffers ever used."
+    ::= { urlMaintStats 11 }
+
+urlMaintStatCurDataBufUse OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of outstanding data buffers used."
+    ::= { urlMaintStats 12 }
+
+urlMaintStatHighestDataBufUse OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The highest number of data buffers ever used."
+    ::= { urlMaintStats 13 }
+
+urlMaintStatCurSPBufEntries OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of outstanding SP buffers used."
+    ::= { urlMaintStats 14 }
+
+urlMaintStatHighestSPBufEntries OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of SP buffers ever used."
+    ::= { urlMaintStats 15 }
+
+urlMaintStatTotalNonZeroSEQAlloc OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of sequence buffer allocations with non zero length."
+    ::= { urlMaintStats 16 }
+
+urlMaintStatTotalSEQBufAllocs OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of sequence buffer allocations."
+    ::= { urlMaintStats 17 }
+
+urlMaintStatTotalSEQBufFrees OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of sequence buffer freed."
+    ::= { urlMaintStats 18 }
+
+urlMaintStatTotalDataBufAllocs OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of data buffers allocated to store client request."
+    ::= { urlMaintStats 19 }
+
+urlMaintStatTotalDataBufFrees OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of data buffers freed."
+    ::= { urlMaintStats 20 }
+
+urlMaintStatSeqBufAllocFails OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of times sequence buffer allocation failed."
+    ::= { urlMaintStats 21 }
+
+urlMaintStatUBufAllocFails OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of times URL data buffer allocation failed."
+    ::= { urlMaintStats 22 }
+
+urlMaintStatMaxSessPerBucket OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The maximum number of items(sessions) allowed in the session table
+         hash bucket chain."
+    ::= { urlMaintStats 23 }
+
+urlMaintStatMaxFramesPerSess OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The maximum number of frames to be buffered per session."
+    ::= { urlMaintStats 24 }
+
+urlMaintStatMaxBytesBuffered OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The maximum number of bytes buffered per session."
+    ::= { urlMaintStats 25 }
+
+urlMaintStatInvalidMethods OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of invalid method hits."
+    ::= { urlMaintStats 26 }
+
+urlMaintStatAgedSessions OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The total number of aged delayed binding sessions."
+    ::= { urlMaintStats 27 }
+
+urlMaintStatLowestSPMemUnits OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The lowest available SP memory units."
+    ::= { urlMaintStats 28 }
+
+urlSpMaintStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UrlSpMaintStatsTableEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of URL SP maintenance statistics."
+    ::= { urlStats 4 }
+
+urlSpMaintStatsTableEntry OBJECT-TYPE
+    SYNTAX  UrlSpMaintStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the URL SP maintenance statistics table."
+    INDEX   { urlSpMaintStatsSpIndex }
+    ::= { urlSpMaintStatsTable 1 }
+
+UrlSpMaintStatsTableEntry ::= SEQUENCE {
+    urlSpMaintStatsSpIndex          Integer32,
+    urlSpMaintStatsCurMemUnits      Gauge32,
+    urlSpMaintStatsLowestMemUnits   Gauge32
+    }
+
+urlSpMaintStatsSpIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The SP index."
+    ::= { urlSpMaintStatsTableEntry 1 }
+
+urlSpMaintStatsCurMemUnits OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The number of memory units available."
+    ::= { urlSpMaintStatsTableEntry 2 }
+
+urlSpMaintStatsLowestMemUnits OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The lowest number of memory units available."
+    ::= { urlSpMaintStatsTableEntry 3 }
+
+currOpenedServerConns OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies number of current opened server connections."
+    ::= { connPoolingStats 1 }
+
+activeServerConns OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies number of active server connections."
+    ::= { connPoolingStats 2 }
+
+availServerConns OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies number of available server connections."
+    ::= { connPoolingStats 3 }
+
+agedOutClientConns OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies number of aged out client connection."
+    ::= { connPoolingStats 4 }
+
+agedOutServerConns OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies number of aged out server connection."
+    ::= { connPoolingStats 5 }
+
+slbParsingString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..22))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The SLB Cookie to parse of length 16 or 20 bytes and Cookie value should be in 0xXXXXXXXXXXXXXXXX format."
+    ::= { slbParsing 1 }
+
+slbParsingVip OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Virtual IP address from parsed SLB Cookie."
+    ::= { slbParsing 2 }
+
+slbParsingRip OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Real IP address from parsed SLB Cookie."
+    ::= { slbParsing 3 }
+
+slbParsingRport OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Real Port Number from parsed SLB Cookie."
+    ::= { slbParsing 4 }
+END

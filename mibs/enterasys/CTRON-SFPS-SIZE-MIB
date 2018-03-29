@@ -1,0 +1,274 @@
+CTRON-SFPS-SIZE-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-size-mib.txt
+--  Revision: 0.0.03
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+       DisplayString
+                FROM RFC1213-MIB
+--  tcl    enterprises
+--         IpAddress,
+--       Counter, Gauge
+--         TimeTicks
+--                FROM RFC1155-SMI
+ 
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.10
+        sfpsSizeService, sfpsSizeServiceAPI
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+--SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+--SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+--HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+
+--  SFPS Diagnostic Statistics Group
+
+sfpsSizeServiceTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsSizeServiceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the current status of the SizeService. This table
+                 displays how much was granted to each user, how much was
+                 requested, the number of times they've requested, the status,
+                 etc. Note :: The <user> refers to the object/code/whatever
+                 which makes a request to the SizeService."
+        ::= { sfpsSizeService 1 }
+
+sfpsSizeServiceEntry    OBJECT-TYPE
+        SYNTAX  SfpsSizeServiceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the SfpsSizeServiceTable instanced by ServiceName"
+        INDEX   { sfpsSizeServiceName }
+                ::= { sfpsSizeServiceTable 1 }
+
+SfpsSizeServiceEntry ::=
+        SEQUENCE {
+                sfpsSizeServiceName          DisplayString,  
+                sfpsSizeServiceId            INTEGER,  
+                sfpsSizeServiceElemSize      INTEGER,  
+                sfpsSizeServiceDesired       INTEGER,  
+                sfpsSizeServiceGranted       INTEGER,  
+                sfpsSizeServiceIncrement     INTEGER,  
+                sfpsSizeServiceTotalBytes    INTEGER,
+                                sfpsSizeServiceNbrCalls      INTEGER,
+                                sfpsSizeServiceRtnStatus     INTEGER,
+                                sfpsSizeServiceHowGranted    INTEGER
+        }  
+
+sfpsSizeServiceName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Name of the SizeService 'user'"
+        ::= { sfpsSizeServiceEntry 1 }
+
+sfpsSizeServiceId   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the ID corresponding to the Name above"
+        ::= { sfpsSizeServiceEntry 2 }
+
+
+sfpsSizeServiceElemSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Element Size for the current user (in bytes)."
+        ::= { sfpsSizeServiceEntry 3 }
+
+
+sfpsSizeServiceDesired   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays how many Elements/Bytes the current user asked 
+                 for in SizeRequest"
+        ::= { sfpsSizeServiceEntry 4 }
+
+
+sfpsSizeServiceGranted   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays how many Elements/Bytes the current user was 
+                 granted via SizeRequest."
+        ::= { sfpsSizeServiceEntry 5 }
+
+
+sfpsSizeServiceIncrement   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays total Element/Bytes the user was granted via 
+                 all IncrementRequest calls."
+        ::= { sfpsSizeServiceEntry 6 }
+
+
+sfpsSizeServiceTotalBytes   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the total number of Bytes the current user was 
+                 granted (SizeRequest & IncrementRequest)."
+        ::= { sfpsSizeServiceEntry 7 }
+
+
+sfpsSizeServiceNbrCalls   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the number of requests the current user has made 
+                 to the SizeService."
+        ::= { sfpsSizeServiceEntry 8 }
+
+
+sfpsSizeServiceRtnStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ok(1),
+                        nvramOk(2),
+                        unknown(3),
+                        notAllowed(4),
+                        nonApiOk(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Status of the current user."
+        ::= { sfpsSizeServiceEntry 9 }
+
+
+sfpsSizeServiceHowGranted   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        elements(1),
+                        memory(2),
+                        other(3),
+                        notAllowed(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays how the current user was granted it's memory."
+        ::= { sfpsSizeServiceEntry 10 }
+
+
+--  API
+
+sfpsSizeServiceAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        next(2),
+                        prev(3),
+                        set(4),
+                        clear(5),
+                        clearAll(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The action desired to perform on the SizeService Table"
+        ::= { sfpsSizeServiceAPI 1 }
+
+sfpsSizeServiceAPIName   OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Name of the SizeService <user>"
+        ::= { sfpsSizeServiceAPI 2 }
+
+sfpsSizeServiceAPIId   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "ID corresponding to the sfpsSizeServiceAPIName"
+        ::= { sfpsSizeServiceAPI 3 }
+
+sfpsSizeServiceAPIGrant   OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of Elements/Bytes being requested via SizeRequest."
+        ::= { sfpsSizeServiceAPI 4 }
+
+sfpsSizeServiceAPIIncrement   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Total Element/Bytes being requested via IncrementRequest"
+        ::= { sfpsSizeServiceAPI 5 }
+
+sfpsSizeServiceAPINumberSet   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Number to set."
+        ::= { sfpsSizeServiceAPI 6 }
+
+sfpsSizeServiceAPIVersion   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The version."
+        ::= { sfpsSizeServiceAPI 7 }
+
+END 

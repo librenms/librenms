@@ -1,0 +1,456 @@
+CISCOSB-GVRP-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private GVRP MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
+    TruthValue, TimeInterval                                FROM SNMPv2-TC
+    EnabledStatus                                           FROM P-BRIDGE-MIB
+    Counter                                                 FROM RFC1155-SMI
+    dot1dBasePort                                           FROM BRIDGE-MIB;
+
+rlGvrp MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines GVRP private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 64 }
+
+rlPortGvrpTimersTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPortGvrpTimersEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of GVRP timer values for every bridge
+         port.  This is indexed by dot1dBasePort."
+    ::= { rlGvrp 1 }
+
+rlPortGvrpTimersEntry OBJECT-TYPE
+    SYNTAX  RlPortGvrpTimersEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "GVRP timer values for a bridge port."
+    INDEX   { dot1dBasePort }
+    ::= { rlPortGvrpTimersTable 1 }
+
+RlPortGvrpTimersEntry ::=
+    SEQUENCE {
+        rlPortGvrpJoinTime          TimeInterval,
+        rlPortGvrpLeaveTime         TimeInterval,
+        rlPortGvrpLeaveAllTime      TimeInterval,
+        rlPortGvrpOverrideGarp      EnabledStatus
+    }
+
+rlPortGvrpJoinTime OBJECT-TYPE
+    SYNTAX  TimeInterval
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The GVRP Join time, in centiseconds."
+    DEFVAL { 20 }
+    ::= { rlPortGvrpTimersEntry 1 }
+
+rlPortGvrpLeaveTime OBJECT-TYPE
+    SYNTAX  TimeInterval
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The GVRP Leave time, in centiseconds."
+    DEFVAL { 60 }
+    ::= { rlPortGvrpTimersEntry 2 }
+
+rlPortGvrpLeaveAllTime OBJECT-TYPE
+    SYNTAX  TimeInterval
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The GVRP LeaveAll time, in centiseconds."
+    DEFVAL { 1000 }
+    ::= { rlPortGvrpTimersEntry 3 }
+
+rlPortGvrpOverrideGarp OBJECT-TYPE
+    SYNTAX  EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If enabled{1}, GVRP timer values for this port are
+         determined by the values in this entry. Otherwise, they
+         are determined by the values in dot1dPortGarpTable."
+    DEFVAL { disabled }
+    ::= { rlPortGvrpTimersEntry 4 }
+
+rlGvrpSupported OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Is GVRP supported in this device or not"
+    ::= { rlGvrp 2 }
+
+rlGvrpMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 3."
+    ::= { rlGvrp 3 }
+
+-- rlPortGvrpStatisticsTable
+
+rlPortGvrpStatisticsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPortGvrpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of GVRP statistics values for every bridge
+         port.  This is indexed by dot1dBasePort."
+    ::= { rlGvrp 4 }
+
+rlPortGvrpStatisticsEntry OBJECT-TYPE
+    SYNTAX  RlPortGvrpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "GVRP statistics values for a bridge port."
+    INDEX   { dot1dBasePort }
+    ::= { rlPortGvrpStatisticsTable 1 }
+
+RlPortGvrpStatisticsEntry ::=
+    SEQUENCE {
+        rlPortGvrpStatisticsRJE       Counter,
+        rlPortGvrpStatisticsRJIn      Counter,
+        rlPortGvrpStatisticsREmp      Counter,
+        rlPortGvrpStatisticsRLIn      Counter,
+        rlPortGvrpStatisticsRLE       Counter,
+        rlPortGvrpStatisticsRLA       Counter,
+        rlPortGvrpStatisticsSJE       Counter,
+        rlPortGvrpStatisticsSJIn      Counter,
+        rlPortGvrpStatisticsSEmp      Counter,
+        rlPortGvrpStatisticsSLIn      Counter,
+        rlPortGvrpStatisticsSLE       Counter,
+        rlPortGvrpStatisticsSLA       Counter,
+        rlPortGvrpStatisticsClear     INTEGER
+    }
+
+rlPortGvrpStatisticsRJE OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Join Empty  Received  on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 1 }
+
+rlPortGvrpStatisticsRJIn OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Join In  Received  on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 2 }
+
+rlPortGvrpStatisticsREmp OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Empty  Received  on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 3 }
+
+rlPortGvrpStatisticsRLIn OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Leave In Received on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 4 }
+
+rlPortGvrpStatisticsRLE OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Leave Empty Received on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 5 }
+
+rlPortGvrpStatisticsRLA OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Leave All Received on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 6 }
+
+rlPortGvrpStatisticsSJE OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Join Empty Sent on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 7 }
+
+rlPortGvrpStatisticsSJIn OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Join In Sent on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 8 }
+
+rlPortGvrpStatisticsSEmp OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Empty Sent on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 9 }
+
+rlPortGvrpStatisticsSLIn OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Leave In Sent on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 10 }
+
+rlPortGvrpStatisticsSLE OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Leave Empty Sent on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 11 }
+
+rlPortGvrpStatisticsSLA OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Leave All Sent on the port,
+         since the last clearance."
+    ::= { rlPortGvrpStatisticsEntry 12 }
+
+rlPortGvrpStatisticsClear OBJECT-TYPE
+    SYNTAX  INTEGER {
+        activate(1),
+        passive(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "activate - the signal/trigger to clear ALL
+                    the rlPortGvrpStatisticsEntry's fields.
+         passive  - specify that the rlPortGvrpStatisticsClear field is not
+                    activate, or finshed the clearnce process.
+                    the rlPortGvrpStatisticsClear return automatically to
+                    passive after it was activate."
+    DEFVAL { passive }
+    ::= { rlPortGvrpStatisticsEntry 13 }
+
+-- rlPortGvrpErrorStatisticsTable
+
+rlPortGvrpErrorStatisticsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPortGvrpErrorStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of GVRP ErrorStatistics values for every bridge
+         port.  This is indexed by dot1dBasePort."
+    ::= { rlGvrp 5 }
+
+rlPortGvrpErrorStatisticsEntry OBJECT-TYPE
+    SYNTAX  RlPortGvrpErrorStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "GVRP ErrorStatistics values for a bridge port."
+    INDEX   { dot1dBasePort }
+    ::= { rlPortGvrpErrorStatisticsTable 1 }
+
+RlPortGvrpErrorStatisticsEntry ::=
+    SEQUENCE {
+        rlPortGvrpErrorStatisticsInvProt    Counter,
+        rlPortGvrpErrorStatisticsInvAtyp    Counter,
+        rlPortGvrpErrorStatisticsInvAval    Counter,
+        rlPortGvrpErrorStatisticsInvPlen    Counter,
+        rlPortGvrpErrorStatisticsInvAlen    Counter,
+        rlPortGvrpErrorStatisticsInvEvent   Counter,
+        rlPortGvrpErrorStatisticsClear      INTEGER
+    }
+
+rlPortGvrpErrorStatisticsInvProt OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Invalid Protocol Id encountered by
+         the GVRP port. (since the last clearance)"
+    ::= { rlPortGvrpErrorStatisticsEntry 1 }
+
+rlPortGvrpErrorStatisticsInvAtyp OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Invalid Attribute Type encountered by
+         the GVRP port. (since the last clearance)"
+    ::= { rlPortGvrpErrorStatisticsEntry 2 }
+
+rlPortGvrpErrorStatisticsInvAval OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Invalid Attribute Value encountered by
+         the GVRP port. (since the last clearance)"
+    ::= { rlPortGvrpErrorStatisticsEntry 3 }
+
+rlPortGvrpErrorStatisticsInvPlen OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Invalid PDU Length encountered by
+         the GVRP port. (since the last clearance)"
+    ::= { rlPortGvrpErrorStatisticsEntry 4 }
+
+rlPortGvrpErrorStatisticsInvAlen OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The number of Invalid Attribute Length encountered by
+         the GVRP port. (since the last clearance)"
+    ::= { rlPortGvrpErrorStatisticsEntry 5 }
+
+rlPortGvrpErrorStatisticsInvEvent OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of Invalid Event encountered by
+         the GVRP port. (since the last clearance)"
+    ::= { rlPortGvrpErrorStatisticsEntry 6 }
+
+rlPortGvrpErrorStatisticsClear OBJECT-TYPE
+    SYNTAX  INTEGER {
+        activate(1),
+        passive(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "activate - the signal/trigger to clear ALL
+                    the rlPortGvrpErrorStatisticsEntry's fields.
+         passive  - specify that the rlPortGvrpErrorStatisticsClear field is not
+                    activate, or finshed the clearnce process.
+                    the rlPortGvrpErrorStatisticsClear return automatically to
+                    passive after it was activate."
+    DEFVAL { passive }
+    ::= { rlPortGvrpErrorStatisticsEntry 7 }
+
+-- rlPortGvrpApplicantStatusTable
+
+rlPortGvrpApplicantStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPortGvrpApplicantStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of GVRP Applicant Status values for every bridge
+         port.  This is indexed by dot1dBasePort."
+    ::= { rlGvrp 6 }
+
+rlPortGvrpApplicantStatusEntry OBJECT-TYPE
+    SYNTAX  RlPortGvrpApplicantStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "GVRP Applicant Status value for a bridge port."
+    INDEX   { dot1dBasePort }
+    ::= { rlPortGvrpApplicantStatusTable 1 }
+
+RlPortGvrpApplicantStatusEntry ::=
+    SEQUENCE {
+        rlPortGvrpApplicantStatusValue        INTEGER
+    }
+
+rlPortGvrpApplicantStatusValue OBJECT-TYPE
+    SYNTAX  INTEGER {
+        participant(1),
+        nonParticipant(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "participant -  the Gvrp enabled port sending GARP PDUs.
+         nonParticipant - preventing the Gvrp enabled port from sending GARP PDUs."
+    DEFVAL { participant }
+    ::= { rlPortGvrpApplicantStatusEntry 1 }
+
+-- rlGvrpDynamicVlanCreation was deleted
+-- { rlGvrp 7 } reserved
+
+-- rlPortGvrpRegistrationModeTable
+
+rlPortGvrpRegistrationModeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPortGvrpRegistrationModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of GVRP Registration Mode values for every bridge
+         port.  This is indexed by dot1dBasePort."
+    ::= { rlGvrp 8 }
+
+rlPortGvrpRegistrationModeEntry OBJECT-TYPE
+    SYNTAX  RlPortGvrpRegistrationModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "GVRP  Registration Mode value for a bridge port."
+    INDEX   { dot1dBasePort }
+    ::= { rlPortGvrpRegistrationModeTable 1 }
+
+RlPortGvrpRegistrationModeEntry ::=
+    SEQUENCE {
+        rlPortGvrpRegistrationModeForbidden        TruthValue
+    }
+
+rlPortGvrpRegistrationModeForbidden OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "true -  deregisters all VLANS on the specified port and prevents any
+                 VLAN creation or registration on that port.
+         false - the registration operation on this port behaves normally."
+    DEFVAL { false }
+    ::= { rlPortGvrpRegistrationModeEntry 1 }
+
+END

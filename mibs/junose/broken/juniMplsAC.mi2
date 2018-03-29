@@ -1,0 +1,537 @@
+
+-- *****************************************************************************
+-- Juniper-MPLS-CONF
+--
+-- SNMP Agent Capabilities definitions for the MPLS MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-MPLS-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniMplsAgent  MODULE-IDENTITY
+    LAST-UPDATED "200406231509Z"  -- 23-Jun-04 11:09 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the MultiProtocol Label
+        Switching (MPLS) component of the SNMP agent in the Juniper E-series
+        family of products."
+    -- Revision History
+    REVISION    "200406112136Z"  -- 11-Jun-04 05:36 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+    	"Added agent capabilities definitions for MPLS-LSR-STD-MIB."
+    REVISION    "200301241834Z"  -- 24-Jan-03 01:34 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added IP TTL Propagate object to the MPLS scalar group."
+    REVISION    "200211041547Z"  -- 04-Nov-02 10:47 AM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Added RowStatus support to the minor layer and the tunnel profile
+        groups."
+    REVISION    "200112052141Z"  -- 05-Dec-01 04:41 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 51 }
+
+
+-- *****************************************************************************
+-- MPLS SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniMplsAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the MultiProtocol Label Switching (MPLS) component of the
+        JUNOSe SNMP agent.  This version of the MPLS component was supported in
+        JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the MPLS application in JUNOSe.
+        These capabilities became obsolete when new RowStatus objects were added
+        to the tables in juniMplsMinorLayerConfGroup and
+        juniMplsTunnelProfileConfGroup."
+    SUPPORTS    Juniper-MPLS-MIB
+        INCLUDES {
+            juniMplsLsrGlobalConfGroup,
+            juniMplsMajorLayerConfGroup,
+            juniMplsMinorLayerConfGroup,
+            juniMplsTunnelProfileConfGroup,
+            juniMplsExplicitPathConfGroup }
+    ::= { juniMplsAgent 1 }
+
+juniMplsAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the MultiProtocol Label Switching (MPLS) component of the
+        JUNOSe SNMP agent.  This version of the MPLS component was supported in
+        JUNOSe 4.1 and subsequent 4.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the MPLS application in JUNOSe.
+        These capabilities became obsolete when the IP TTL Propagate object was
+        added to the MPLS scalar group."
+    SUPPORTS    Juniper-MPLS-MIB
+        INCLUDES  {
+            juniMplsLsrGlobalConfGroup,
+            juniMplsMajorLayerConfGroup,
+            juniMplsMinorLayerConfGroup2,
+            juniMplsTunnelProfileConfGroup2,
+            juniMplsExplicitPathConfGroup }
+    ::= { juniMplsAgent 2 }
+
+juniMplsAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the MultiProtocol Label Switching (MPLS) component of the
+        JUNOSe SNMP agent.  This version of the MPLS component is supported in
+        JUNOSe 5.0 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the MPLS application in
+        JUNOSe. These capabilities became obsolete when some of the objects in 
+	that MIB became obsolete."
+    SUPPORTS    Juniper-MPLS-MIB
+        INCLUDES  {
+            juniMplsLsrGlobalConfGroup2,
+            juniMplsMajorLayerConfGroup,
+            juniMplsMinorLayerConfGroup2,
+            juniMplsTunnelProfileConfGroup2,
+            juniMplsExplicitPathConfGroup }
+    ::= { juniMplsAgent 3 }
+
+juniMplsAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the MultiProtocol Label Switching (MPLS) component of the
+        JUNOSe SNMP agent.  This version of the MPLS component is supported in
+        JUNOSe 6.0 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the MPLS application in
+        JUNOSe. These capabilities became obsolete when the MPLS-LSR-STD-MIB
+	support is added."
+    SUPPORTS    Juniper-MPLS-MIB
+        INCLUDES  {
+            juniMplsLsrGlobalConfGroup3,
+            juniMplsMajorLayerConfGroup2,
+            juniMplsMinorLayerConfGroup3,
+            juniMplsTunnelProfileConfGroup3,
+            juniMplsExplicitPathConfGroup }
+    ::= { juniMplsAgent 4 }
+
+juniMplsAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the MultiProtocol Label Switching (MPLS) component of the
+        JUNOSe SNMP agent.  This version of the MPLS component is supported in
+        JUNOSe 6.1 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the MPLS application in
+        JUNOSe."
+    SUPPORTS    Juniper-MPLS-MIB
+        INCLUDES  {
+            juniMplsLsrGlobalConfGroup3,
+            juniMplsMajorLayerConfGroup2,
+            juniMplsMinorLayerConfGroup3,
+            juniMplsTunnelProfileConfGroup3,
+            juniMplsExplicitPathConfGroup }
+    SUPPORTS    MPLS-LSR-MIB-JUNI
+        INCLUDES  {
+            mplsInterfaceGroup,
+            mplsInSegmentGroup,
+            mplsOutSegmentGroup,
+            mplsXCGroup,
+            mplsPerfGroup,
+            mplsHCInSegmentPerfGroup,
+            mplsHCOutSegmentPerfGroup,
+            mplsLabelStackGroup,
+            mplsLsrNotificationGroup }
+    VARIATION   mplsInSegmentInterface
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentNPop
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentAddrFamily
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentTrafficParamPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentInterface
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentPushTopLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTopLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTopLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentNextHopAddrType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTopLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentNextHopAddrType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentNextHopAddr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTrafficParamPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCLspId
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCLabelStackIndex
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCOwner
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCNotificationsEnable
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfInLabelsInUse
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfInLabelLookupFailures
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfOutLabelsInUse
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfOutFragmentedPkts
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentMapIndex
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentMapTable cannot be accessed via SNMP
+	    in this agent."
+    
+    ::= { juniMplsAgent 5 }
+
+juniMplsAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the MultiProtocol Label Switching (MPLS) component of the
+        JUNOSe SNMP agent.  This version of the MPLS component is supported in
+        JUNOSe 7.1 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the MPLS application in
+        JUNOSe."
+    SUPPORTS    MPLS-LSR-MIB-JUNI
+        INCLUDES  {
+            mplsInterfaceGroup,
+            mplsInSegmentGroup,
+            mplsOutSegmentGroup,
+            mplsXCGroup,
+            mplsPerfGroup,
+            mplsHCInSegmentPerfGroup,
+            mplsHCOutSegmentPerfGroup,
+            mplsLabelStackGroup,
+            mplsLsrNotificationGroup }
+    VARIATION   mplsInSegmentInterface
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentNPop
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentAddrFamily
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentTrafficParamPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentInterface
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentPushTopLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTopLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTopLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentNextHopAddrType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTopLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentNextHopAddrType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentNextHopAddr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentTrafficParamPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsOutSegmentStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsOutSegmentTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCLspId
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCLabelStackIndex
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCOwner
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsXCTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackLabel
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackLabelPtr
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackRowStatus
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsLabelStackStorageType
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsXCNotificationsEnable
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsLabelStackTable cannot be created via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfInLabelsInUse
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfInLabelLookupFailures
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfOutLabelsInUse
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInterfacePerfOutFragmentedPkts
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInterfacePerfTable cannot be accessed via SNMP
+	    in this agent."
+    VARIATION   mplsInSegmentMapIndex
+    	ACCESS      read-only
+	DESCRIPTION
+	    "Entries in the mplsInSegmentMapTable cannot be accessed via SNMP
+	    in this agent."
+    
+    ::= { juniMplsAgent 6 }
+
+END

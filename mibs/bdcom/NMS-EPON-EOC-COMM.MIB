@@ -1,0 +1,296 @@
+-- *****************************************************************
+-- NMS-EPON-EOC-COMM.MIB:  NMS EOC COMM MIB file
+-- SEP 2011
+-- *****************************************************************
+--
+
+               NMS-EPON-EOC-COMM DEFINITIONS ::= BEGIN
+
+               IMPORTS
+               	    llidIfIndex
+			FROM NMS-EPON-LLID
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC
+		    IpAddress
+		        FROM SNMPv2-SMI;
+          
+               nmsEponEocComm         OBJECT IDENTIFIER ::= { nmsEPONGroup 30 }
+               
+          numberOfTerminal OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Maximal number of every EoC slave that EoC master connects to ."
+              ::= { nmsEponEocComm 1 }
+
+          authenMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                          auto(1),
+                          white_list(2),
+                          black_list(3)
+                   }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "EoC slave authentication mode. auto(1),white_list(2),black_list(3),and default is auto(0). It effects to all EoC master."
+              ::= { nmsEponEocComm 2 }
+
+          eocRegRetryTimes OBJECT-TYPE
+              SYNTAX  INTEGER(0..15)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Eoc slave registered retry times while EoC slave registered failed ."
+              ::= { nmsEponEocComm 3 }
+
+          eocMasterReset OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			reset(1),
+              			no_action(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Eoc master reset operation, it effects to all EoC master ."
+              ::= { nmsEponEocComm 4 }
+
+          eocSaveConfig OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			save(1),
+              			no_action(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Eoc master save configuration, it effects to all EoC master ."
+              ::= { nmsEponEocComm 5 }
+
+          isSendEocSlaveTrap OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			send(1),
+              			no_send(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "EoC slave sending trap indication. send_trap(1), no_send_trap(2)."
+              ::= { nmsEponEocComm 6 }
+
+
+               nmsEponEocMasterTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocMasterEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC master property table."
+                   ::= { nmsEponEocComm 7 }
+
+               nmsEponEocMasterEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocMasterEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc master property."
+                   INDEX { uniSeqNo }
+               ::= { nmsEponEocMasterTable 1 }
+
+               NMSEponEocMasterEntry ::=
+                   SEQUENCE {
+                       uniSeqNo
+                           INTEGER,
+                       eocMasterMacAddr
+                           MacAddress,
+                       isEocMasterPresent
+                       	   INTEGER,
+                       eocMasterRegStatus
+                       	   INTEGER,
+                       eocMasterChipType
+                           OCTET STRING,
+                       eocMasterFWVersion
+                           OCTET STRING,
+                       eocMasterNid
+                           OCTET STRING,
+                       eocMasterSnid
+                           OCTET STRING,
+                       ccoMacAddr
+                           MacAddress,
+                       ccoTei
+                           OCTET STRING,
+                       tei
+                           OCTET STRING                           
+		}
+
+               uniSeqNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON ONU UNI port sequence the same value in EoC msater index."
+                   ::= { nmsEponEocMasterEntry 1 } 
+
+               eocMasterMacAddr OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON EoC master MAC address."
+                   ::= { nmsEponEocMasterEntry 2 } 
+
+               isEocMasterPresent OBJECT-TYPE
+                   SYNTAX  INTEGER{
+              			present(1),
+              			absent(2)
+                             }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC is present or not. present(1), absent(2)."
+                   ::= { nmsEponEocMasterEntry 3 } 
+
+               eocMasterRegStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+              			de_register(1),
+              			register(2),
+              			bad_eoc_master(3)
+                             }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC registered status. de_register(1), register(2), bad_eoc_master(3)."
+                   ::= { nmsEponEocMasterEntry 4 } 
+
+               eocMasterChipType OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master chip type. String length is limited to 16."
+                   ::= { nmsEponEocMasterEntry 5 } 
+
+               eocMasterFWVersion OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master chip firmware verion information. String length is limited to 64."
+                   ::= { nmsEponEocMasterEntry 6 } 
+
+               ecoMasterNid OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master network identifier. String length is limited to 7."
+                   ::= { nmsEponEocMasterEntry 7 } 
+
+               eocMasterSnid OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master short network identifier. String length is limited to 1."
+                   ::= { nmsEponEocMasterEntry 8 } 
+
+               ccoMacAddr OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master belongs to AVLN CCO MAC address."
+                   ::= { nmsEponEocMasterEntry 9 } 
+
+               ccoTei OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master belongs to AVLN CCO TEI."
+                   ::= { nmsEponEocMasterEntry 10 } 
+
+               tei OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master TEI."
+                   ::= { nmsEponEocMasterEntry 11 } 
+
+	
+               nmsEponEocMasterMgmtTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocMasterMgmtEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC master management property table."
+                   ::= { nmsEponEocComm 8 }
+
+               nmsEponEocMasterMgmtEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocMasterMgmtEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc master management property."
+                   INDEX { uniSeqNo }
+               ::= { nmsEponEocMasterMgmtTable 1 }
+
+               NMSEponEocMasterMgmtEntry ::=
+                   SEQUENCE {
+                       eocMasterReset
+                           INTEGER,
+                       eocMasterUploadWidthLimit
+                           INTEGER,
+                       eocMasterDownloadWidthLimit
+                       	   INTEGER,
+                       updatePib
+                       	   OCTET STRING
+		}
+		
+               eocMasterReset OBJECT-TYPE
+                   SYNTAX  INTEGER{
+              			   reset(1)         
+              			  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master reset operation. reset(1)."
+                   ::= { nmsEponEocMasterMgmtEntry 1 } 
+
+               eocMasterUploadWidthLimit OBJECT-TYPE
+                   SYNTAX  INTEGER(64..16384)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master upload bandwidth limitaion is between 64 and 16384, and the unit is kbps."
+                   ::= { nmsEponEocMasterMgmtEntry 2 } 
+
+               eocMasterDownloadWidthLimit OBJECT-TYPE
+                   SYNTAX  INTEGER(64..16384)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master download bandwidth limitaion is between 64 and 16384, and the unit is kbps."
+                   ::= { nmsEponEocMasterMgmtEntry 3 } 
+
+               updatePib OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EoC master update PIB operation. The value is PIB file name. And the updating operation effects after manually reset the EoC master."
+                   ::= { nmsEponEocMasterMgmtEntry 4 } 
+
+		
+
+               
+               
+END               
+               

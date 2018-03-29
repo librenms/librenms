@@ -1,0 +1,101 @@
+--
+-- Juniper Mobile Gateways objects MIB.
+--
+-- Copyright (c) 2011-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MOBILE-GATEWAYS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter64, IpAddress, Integer32, Counter32, Unsigned32,
+    NOTIFICATION-TYPE, MODULE-IDENTITY,OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+
+    Ipv6AddressPrefix, Ipv6AddressIfIdentifier, Ipv6Address
+        FROM IPV6-TC
+
+    InetAddressType, InetAddress, InetPortNumber, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+
+    EnabledStatus
+        FROM JUNIPER-MIMSTP-MIB
+
+        jnxMobileGatewayMibRoot
+            FROM JUNIPER-SMI;
+
+--
+-- This will be used as a root for MIBs common for both PGW and SGW.
+--
+
+jnxMobileGateways MODULE-IDENTITY
+    LAST-UPDATED "201101031200Z" -- Jan 03, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Mobile-Edge Gateways"
+    REVISION "201101031200Z" -- Jan 03, 2011, 12:00:00
+    DESCRIPTION "Initial version"
+
+    ::= { jnxMobileGatewayMibRoot 4 }
+
+jnxMbgGwIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF JnxMbgGwIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry corresponds to a mobile gateway "
+  ::= { jnxMobileGateways 1 }
+
+jnxMbgGwIndexEntry OBJECT-TYPE
+    SYNTAX      JnxMbgGwIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A specification of the mobile gateway"
+    INDEX     { jnxMbgGwIndex }
+
+    ::= { jnxMbgGwIndexTable 1}
+
+JnxMbgGwIndexEntry ::= SEQUENCE {
+    jnxMbgGwIndex          Unsigned32,
+    jnxMbgGwName           DisplayString,
+    jnxMbgGwType           DisplayString
+}
+
+jnxMbgGwIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Gateway Index."
+    ::= { jnxMbgGwIndexEntry 1 }
+
+jnxMbgGwName   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Gateway Name."
+    ::= { jnxMbgGwIndexEntry 2 }
+
+jnxMbgGwType   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Gateway type: PGW/SGW."
+    ::= { jnxMbgGwIndexEntry 3 }
+
+
+END

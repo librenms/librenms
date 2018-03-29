@@ -1,0 +1,239 @@
+
+-- *****************************************************************************
+-- Juniper-V35-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   X.21/V.35 Server MIB
+--
+-- Copyright (c) 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-V35-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniV35MIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The X.21/V.35 Server MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200202081625Z"  -- 08-Feb-02 11:25 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 59 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniV35Objects     OBJECT IDENTIFIER ::= { juniV35MIB 1 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- X.21/V.35 Interfaces
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The X.21/V.35 Interface Table
+--
+juniV35IfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniV35IfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for X.21/V.35 interfaces present in the
+        system.  This table provides an extension to the
+        Juniper-HDLC-MIB.juniHdlcIfTable for HDLC interfaces that support
+        X.21/V.35 signalling."
+    ::= { juniV35Objects 2 }
+
+juniV35IfEntry  OBJECT-TYPE
+    SYNTAX      JuniV35IfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an X.21/V.35 interface."
+    INDEX     { juniV35IfIndex }
+    ::= { juniV35IfTable 1 }
+
+JuniV35IfEntry ::= SEQUENCE {
+    juniV35IfIndex           InterfaceIndex,
+    juniV35IfType            INTEGER,
+    juniV35IfMode            INTEGER,
+    juniV35IfClockRate       Unsigned32,
+    juniV35IfNrzEncoding     INTEGER,
+    juniV35IfTxClock         INTEGER,
+    juniV35IfIgnoreDcd       INTEGER,
+    juniV35IfLoopback        INTEGER }
+
+juniV35IfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the X.21/V.35 interface.  It has the same value as the
+        juniHdlcIfIndex for the common interface."
+    ::= { juniV35IfEntry 1 }
+
+juniV35IfType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    x21(0),
+                    v35(1),
+                    interfaceTypeNoCable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Read only parameter of interface type X.21/V.35."
+    ::= {juniV35IfEntry 2}
+
+juniV35IfMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dte(0),
+                    dce(1),
+                    interfaceModeNoCable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Read only parameter of interface mode of interface X.21/V.35 Data
+        Terminating Equipment(DTE)/Data Communication Equipment(DCE)."
+    ::= { juniV35IfEntry 3 }
+
+juniV35IfClockRate  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The clock rate setting in hertz for this X.21/V.35 interface.  Only the
+        following values are valid: 1200, 2400, 4800, 9600, 19200, 38400, 56000,
+        64000, 128000, 1024000, 1536000, 2048000, 3072000, 4096000, 4915200,
+        6144000, and 8192000.  If a value other than one of the predefined
+        values is set, then the closest matching value is used.
+
+        The clock rate parameter is only meaningful when the interface is in DCE
+        mode.  When the interface is in DTE mode, the value is simply ignored."
+    DEFVAL    { 2048000 }
+    ::= { juniV35IfEntry 4 }
+
+juniV35IfNrzEncoding  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    inverted(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The non-return-to-zero (NRZ) encoding for X.21/V.35 interface.
+        Inverted encoding is provided with NRZI-encoding command, which is
+        non-return-to-zero inverted (NRZI) encoding."
+    DEFVAL    { normal }
+    ::= { juniV35IfEntry 5 }
+
+juniV35IfTxClock  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    inverted(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "There is an option of inverting the transmit clock signal for X.21/V.35
+        interface.  Inverting the tranmit clock is used to compensate for skews
+        between the clock and data when transmitting across long cables at fast
+        data rates."
+    DEFVAL    { normal }
+    ::= { juniV35IfEntry 6 }
+
+juniV35IfIgnoreDcd  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ignoredNone(0),
+                    dcdIgnored(1),
+                    linkStateIgnored(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When in X.21/V.35 DTE mode we have the capability of ignoring the DCD
+        signal in determining whether or not an interface is up."
+    DEFVAL    { ignoredNone }
+    ::= { juniV35IfEntry 7 }
+
+juniV35IfLoopback  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    loopback(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback interface is configured (or not) for X.21/V.35 interface"
+    DEFVAL    { none }
+    ::= { juniV35IfEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniV35TrapControl OBJECT IDENTIFIER ::= { juniV35MIB 2 }
+-- juniV35Traps            OBJECT IDENTIFIER ::= { juniV35MIB 3 }
+-- juniV35TrapPrefix       OBJECT IDENTIFIER ::= { juniV35Traps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniV35Conformance OBJECT IDENTIFIER ::= { juniV35MIB 4 }
+juniV35Compliances OBJECT IDENTIFIER ::= { juniV35Conformance 1 }
+juniV35Groups      OBJECT IDENTIFIER ::= { juniV35Conformance 2 }
+
+--
+-- compliance statements
+--
+juniV35Compliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper
+        X.21/V.35 MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniV35Group }
+    ::= { juniV35Compliances 1 }                                   -- JUNOSe 4.0
+
+
+--
+-- units of conformance
+--
+juniV35Group  OBJECT-GROUP
+    OBJECTS {
+        juniV35IfType,
+        juniV35IfMode,
+        juniV35IfClockRate,
+        juniV35IfNrzEncoding,
+        juniV35IfTxClock,
+        juniV35IfIgnoreDcd,
+        juniV35IfLoopback }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of X.21/V.35 interfaces in
+        a Juniper product."
+    ::= { juniV35Groups 1 }
+
+END
