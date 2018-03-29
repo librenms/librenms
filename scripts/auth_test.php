@@ -3,18 +3,17 @@
 
 use LibreNMS\Authentication\Auth;
 
-$options = getopt('u:rdvh');
-if (isset($options['h']) || !isset($options['u'])) {
+$options = getopt('u:rldvh');
+if (isset($options['h']) || (!isset($options['l']) && !isset($options['u']))) {
     echo ' -u <username>  (Required) username to test
  -r             Reauthenticate user, (requires previous web login with "Remember me" enabled)
+ -l             List all users (checks that auth can enumerate all allowed users)
  -d             Enable debug output
  -v             Enable verbose debug output
  -h             Display this help message
 ';
     exit;
 }
-
-$test_username = $options['u'];
 
 if (isset($options['d'])) {
     $debug = true;
@@ -82,6 +81,14 @@ try {
         }
     }
 
+    if (isset($options['l'])) {
+        $users = $authorizer->getUserlist();
+        echo "Users: " . implode(', ', array_column($users, 'username')) . PHP_EOL;
+        echo "Total users: " . count($users) . PHP_EOL;
+        exit;
+    }
+
+    $test_username = $options['u'];
     $auth = false;
     if (isset($options['r'])) {
         echo "Reauthenticate Test\n";
