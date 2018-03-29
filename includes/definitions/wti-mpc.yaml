@@ -1,0 +1,14 @@
+os: wti-mpc
+text: 'WTI'
+type: power
+icon: wti
+mib_dir:
+    - wti
+discovery:
+    - 
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: WTI-MPC-MIB::environmentUnitName.1
+          op: '!='
+          value: false
+
