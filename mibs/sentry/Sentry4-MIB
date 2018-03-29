@@ -1,5 +1,5 @@
 --
---  Copyright(C) 2003-2016 Server Technology, Inc.
+--  Copyright(C) 2003-2017 Server Technology, Inc.
 --
 
     Sentry4-MIB DEFINITIONS ::= BEGIN
@@ -12,7 +12,7 @@
 
 
     sentry4 MODULE-IDENTITY
-        LAST-UPDATED "201611182340Z" -- 18 November 2016
+        LAST-UPDATED "201706151830Z" -- 15 June 2017
         ORGANIZATION "Server Technology, Inc."
         CONTACT-INFO
             "Server Technology, Inc.
@@ -26,6 +26,12 @@
              Sentry product family.  This includes the PRO1 and PRO2
              series of Smart and Switched Cabinet Distribution Unit (CDU)
              and Power Distribution Unit (PDU) products."
+        REVISION "201706151830Z" -- 15 June 2017
+        DESCRIPTION
+            "Added support for fan sensors, including objects for installed
+             count, identification, speed and status monitoring, threshold
+             and hysteresis configuration, and a notification for events.
+             Added the st4UnitOutletDisplayOrder object."
         REVISION "201611182340Z" -- 18 November 2016
         DESCRIPTION
             "Added the st4UnitProductMfrDate object.  Adjusted the upper
@@ -253,12 +259,14 @@
         st4UnitProductMfrDate        DisplayString,
         st4UnitDisplayOrientation    INTEGER,
         st4UnitOutletSequenceOrder   INTEGER,
+        st4UnitOutletDisplayOrder    INTEGER,
         st4UnitInputCordCount        Integer32,
         st4UnitTempSensorCount       Integer32,
         st4UnitHumidSensorCount      Integer32,
         st4UnitWaterSensorCount      Integer32,
         st4UnitCcSensorCount         Integer32,
-        st4UnitAdcSensorCount        Integer32
+        st4UnitAdcSensorCount        Integer32,
+        st4UnitFanSensorCount        Integer32
     }
 
     st4UnitIndex OBJECT-TYPE
@@ -340,7 +348,8 @@
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The product manufacture date in YYYY-MM-DD (ISO 8601 format)."
+            "The product manufacture date in YYYY-MM-DD (ISO 8601 format) of
+             the unit."
         ::= { st4UnitConfigEntry 9 }
 
     st4UnitDisplayOrientation OBJECT-TYPE
@@ -365,6 +374,18 @@
         DESCRIPTION
             "The sequencing order of all outlets in the unit."
         ::= { st4UnitConfigEntry 21 }
+
+    st4UnitOutletDisplayOrder OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(0),
+                        reversed(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The display order in the user interfaces of all outlets in the
+             unit."
+        ::= { st4UnitConfigEntry 22 }
 
     st4UnitInputCordCount OBJECT-TYPE
         SYNTAX      Integer32(0..4)
@@ -415,6 +436,14 @@
             "The number of analog-to-digital converter sensors supported by the
              unit."
         ::= { st4UnitConfigEntry 35 }
+
+    st4UnitFanSensorCount OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of fan sensors supported by the unit."
+        ::= { st4UnitConfigEntry 36 }
 
     -- Unit Monitor Table
 
@@ -2647,8 +2676,8 @@
         st4TempSensorIndex                 Integer32,
         st4TempSensorID                    DisplayString,
         st4TempSensorName                  DisplayString,
-        st4TempSensorValueMin              Integer32, 
-        st4TempSensorValueMax              Integer32 
+        st4TempSensorValueMin              Integer32,
+        st4TempSensorValueMax              Integer32
     }
 
     st4TempSensorIndex OBJECT-TYPE
@@ -3021,7 +3050,7 @@
         ::= { st4WaterSensorConfigTable 1 }
 
     St4WaterSensorConfigEntry ::= SEQUENCE {
-        st4WaterSensorIndex                 Integer32,       
+        st4WaterSensorIndex                 Integer32,
         st4WaterSensorID                    DisplayString,
         st4WaterSensorName                  DisplayString
     }
@@ -3140,7 +3169,7 @@
         ::= { st4CcSensorConfigTable 1 }
 
     St4CcSensorConfigEntry ::= SEQUENCE {
-        st4CcSensorIndex                 Integer32,       
+        st4CcSensorIndex                 Integer32,
         st4CcSensorID                    DisplayString,
         st4CcSensorName                  DisplayString
     }
@@ -3357,7 +3386,7 @@
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
-            "Event configuration objects for a particular 
+            "Event configuration objects for a particular
              analog-to-digital converter sensor."
         INDEX       { st4UnitIndex, st4AdcSensorIndex }
         ::= { st4AdcSensorEventConfigTable 1 }
@@ -3414,6 +3443,188 @@
             "The 8-bit value for the high alarm threshold of the
              analog-to-digital converter sensor."
         ::= { st4AdcSensorEventConfigEntry 5 }
+
+    -- Fan Sensors
+
+    st4FanSensors OBJECT IDENTIFIER ::= { st4Objects 14 }
+
+    -- Fan Sensor Common Configuration
+
+    st4FanSensorCommonConfig OBJECT IDENTIFIER ::= { st4FanSensors 1 }
+
+    st4FanSensorHysteresis OBJECT-TYPE
+        SYNTAX      Integer32(0..1200)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The fan speed hysteresis of the sensor in rotations per minute."
+        ::= { st4FanSensorCommonConfig 1 }
+
+    -- Fan Sensor Configuration Table
+
+    st4FanSensorConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4FanSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor configuration table."
+        ::= { st4FanSensors 2 }
+
+    st4FanSensorConfigEntry OBJECT-TYPE
+        SYNTAX      St4FanSensorConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration objects for a particular fan sensor."
+        INDEX       { st4UnitIndex, st4FanSensorIndex }
+        ::= { st4FanSensorConfigTable 1 }
+
+    St4FanSensorConfigEntry ::= SEQUENCE {
+        st4FanSensorIndex                Integer32,
+        st4FanSensorID                   DisplayString,
+        st4FanSensorName                 DisplayString
+    }
+
+    st4FanSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32(0..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor index."
+        ::= { st4FanSensorConfigEntry 1 }
+
+    st4FanSensorID OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The internal ID of the fan sensor.  Format=AN."
+        ::= { st4FanSensorConfigEntry 2 }
+
+    st4FanSensorName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The name of the fan sensor."
+        ::= { st4FanSensorConfigEntry 3 }
+
+    -- Fan Sensor Monitor Table
+
+    st4FanSensorMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4FanSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor monitor table."
+        ::= { st4FanSensors 3 }
+
+    st4FanSensorMonitorEntry OBJECT-TYPE
+        SYNTAX      St4FanSensorMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Objects to monitor for a particular fan sensor."
+        INDEX       { st4UnitIndex, st4FanSensorIndex }
+        ::= { st4FanSensorMonitorTable 1 }
+
+    St4FanSensorMonitorEntry ::= SEQUENCE {
+        st4FanSensorValue                 Integer32,
+        st4FanSensorStatus                DeviceStatus
+    }
+
+    st4FanSensorValue OBJECT-TYPE
+        SYNTAX      Integer32(-1..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured fan speed of the sensor in rotations per minute."
+        ::= { st4FanSensorMonitorEntry 1 }
+
+    st4FanSensorStatus OBJECT-TYPE
+        SYNTAX      DeviceStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the fan sensor."
+        ::= { st4FanSensorMonitorEntry 2 }
+
+    -- Fan Sensor Event Configuration Table
+
+    st4FanSensorEventConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF St4FanSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor event configuration table."
+        ::= { st4FanSensors 4 }
+
+    st4FanSensorEventConfigEntry OBJECT-TYPE
+        SYNTAX      St4FanSensorEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Event configuration objects for a particular fan sensor."
+        INDEX       { st4UnitIndex, st4FanSensorIndex }
+        ::= { st4FanSensorEventConfigTable 1 }
+
+    St4FanSensorEventConfigEntry ::= SEQUENCE {
+        st4FanSensorNotifications             EventNotificationMethods,
+        st4FanSensorLowAlarm                  Integer32,
+        st4FanSensorLowWarning                Integer32,
+        st4FanSensorHighWarning               Integer32,
+        st4FanSensorHighAlarm                 Integer32
+    }
+
+    st4FanSensorNotifications OBJECT-TYPE
+        SYNTAX      EventNotificationMethods
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The notification methods enabled for fan sensor events."
+        ::= { st4FanSensorEventConfigEntry 1 }
+
+    st4FanSensorLowAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low alarm threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 2 }
+
+    st4FanSensorLowWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low warning threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 3 }
+
+    st4FanSensorHighWarning OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high warning threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 4 }
+
+    st4FanSensorHighAlarm OBJECT-TYPE
+        SYNTAX      Integer32(0..15300)
+        UNITS       "rotations per minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high alarm threshold of the fan sensor in rotations per
+             minute."
+        ::= { st4FanSensorEventConfigEntry 5 }
 
     -- Event Information
 
@@ -4076,6 +4287,32 @@
         --#STATE UNKNOWN
         ::= { st4Events 24 }
 
+    st4FanSensorEvent NOTIFICATION-TYPE
+        OBJECTS {
+            st4SystemLocation,
+            st4FanSensorID,
+            st4FanSensorName,
+            st4FanSensorValue,
+            st4FanSensorStatus,
+            st4EventStatusText,
+            st4EventStatusCondition
+        }
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor event."
+        --#TYPE "Sentry: Fan Sensor Event."
+        --#SUMMARY "Status of Fan Sensor '%s' (%s) is '%s'."
+        --#ARGUMENTS { 2, 1, 4 }
+        --#SEVERITY CRITICAL
+        --#GENERIC 6
+        --#CATEGORY "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 255
+        --#HELP ""
+        --#HELPTAG 0
+        --#STATE UNKNOWN
+        ::= { st4Events 25 }
+
 --  Conformance Definitions
 
     st4Conformance OBJECT IDENTIFIER ::= { sentry4 200 }
@@ -4115,12 +4352,14 @@
             st4UnitProductMfrDate,
             st4UnitDisplayOrientation,
             st4UnitOutletSequenceOrder,
+            st4UnitOutletDisplayOrder,
             st4UnitInputCordCount,
             st4UnitTempSensorCount,
             st4UnitHumidSensorCount,
             st4UnitWaterSensorCount,
             st4UnitCcSensorCount,
             st4UnitAdcSensorCount,
+            st4UnitFanSensorCount,
             st4UnitStatus,
             st4UnitNotifications
         }
@@ -4415,6 +4654,24 @@
             "Analog-to-digital converter sensor objects group."
         ::= { st4Groups 13 }
 
+    st4FanSensorObjectsGroup OBJECT-GROUP
+        OBJECTS {
+            st4FanSensorHysteresis,
+            st4FanSensorID,
+            st4FanSensorName,
+            st4FanSensorValue,
+            st4FanSensorStatus,
+            st4FanSensorNotifications,
+            st4FanSensorLowAlarm,
+            st4FanSensorLowWarning,
+            st4FanSensorHighWarning,
+            st4FanSensorHighAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+            "Fan sensor objects group."
+        ::= { st4Groups 14 }
+
     st4EventInfoObjectsGroup OBJECT-GROUP
         OBJECTS {
             st4EventStatusText,
@@ -4450,7 +4707,8 @@
             st4HumidSensorEvent,
             st4WaterSensorStatusEvent,
             st4CcSensorStatusEvent,
-            st4AdcSensorEvent
+            st4AdcSensorEvent,
+            st4FanSensorEvent
         }
         STATUS      current
         DESCRIPTION
@@ -4505,6 +4763,9 @@
         GROUP st4AdcSensorObjectsGroup
         DESCRIPTION
             "Analog-to-digital converter sensor objects group."
+        GROUP st4FanSensorObjectsGroup
+        DESCRIPTION
+            "Fan sensor objects group."
         GROUP st4EventInfoObjectsGroup
         DESCRIPTION
             "Event information objects group."
