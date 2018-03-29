@@ -1,5 +1,5 @@
 os: wti-mpc
-text: 'WTI'
+text: 'WTI MPC'
 type: power
 icon: wti
 mib_dir:
