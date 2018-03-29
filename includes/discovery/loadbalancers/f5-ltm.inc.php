@@ -54,6 +54,7 @@ $ltmVirtualServOID = array(
     errorcode => '1.3.6.1.4.1.3375.2.2.10.13.2.1.5',
 );
 
+$ltmVirtualServEntry = [];
 foreach ($ltmVirtualServOID as $key => $value) {
     $ltmVirtualServEntry[$key] = snmpwalk_array_num($device, $value, 0);
 };
@@ -69,9 +70,11 @@ $ltmPoolEntryOID = array(
     monitor => '1.3.6.1.4.1.3375.2.2.5.1.2.1.17',
 );
 
+$ltmPoolEntry = [];
 foreach ($ltmPoolEntryOID as $key => $value) {
     $ltmPoolEntry[$key] = snmpwalk_array_num($device, $value, 0);
 };
+
 // Pool Member Data
 $ltmPoolMemberEntryOID = array(
     name => '1.3.6.1.4.1.3375.2.2.5.3.2.1.1',
@@ -85,6 +88,7 @@ $ltmPoolMemberEntryOID = array(
     errorcode => '1.3.6.1.4.1.3375.2.2.5.6.2.1.8',
 );
 
+$ltmPoolMemberEntry = [];
 foreach ($ltmPoolMemberEntryOID as $key => $value) {
     $ltmPoolMemberEntry[$key] = snmpwalk_array_num($device, $value, 0);
 };
@@ -93,7 +97,7 @@ foreach ($ltmPoolMemberEntryOID as $key => $value) {
  * False == no object found - this is not an error, OID doesn't exist.
  * null  == timeout or something else that caused an error, OID may exist but we couldn't get it.
  */
-if (!is_null($ltmVirtualServEntry) || !is_null($ltmPoolEntry) || !is_null($ltmPoolMemberEntry)) {
+if (!empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemberEntry)) {
     // No Nulls, lets go....
     d_echo("Objects Found:\n");
 
