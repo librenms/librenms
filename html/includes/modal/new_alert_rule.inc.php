@@ -37,35 +37,33 @@ if (is_admin()) {
                         <input type="hidden" name="template_id" id="template_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div class='form-group' title="The description of this alert rule.">
-                            <label for='name' class='col-sm-3 control-label'>Rule name: </label>
-                            <div class='col-sm-9'>
+                            <label for='name' class='col-sm-3 col-md-2 control-label'>Rule name: </label>
+                            <div class='col-sm-9 col-md-10'>
                                 <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-sm-3">
-                                <div class="pull-right">
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button"
-                                                id="import-from" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="true">
-                                            Import from
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
-                                            <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
-                                            <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
-                                            <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
-                                        </ul>
-                                    </div>
+                            <div class="col-sm-3 col-md-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button"
+                                            id="import-from" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="true">
+                                        Import from
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
+                                        <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
+                                        <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
+                                        <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
+                                    </ul>
                                 </div>
                             </div>
-                            <div class="col-sm-9">
+                            <div class="col-sm-9 col-md-10">
                                 <div id="builder"></div>
                             </div>
                         </div>
                         <div class="form-group" title="How to display the alert.  OK: green, Warning: yellow, Critical: red">
-                            <label for='severity' class='col-sm-3 control-label'>Severity: </label>
+                            <label for='severity' class='col-sm-3 col-md-2 control-label'>Severity: </label>
                             <div class="col-sm-2">
                                 <select name='severity' id='severity' class='form-control'>
                                     <option value='ok'>OK</option>
@@ -75,7 +73,7 @@ if (is_admin()) {
                             </div>
                         </div>
                         <div class="form-group form-inline">
-                            <label for='count' class='col-sm-3 control-label' title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">Max alerts: </label>
+                            <label for='count' class='col-sm-3 col-md-2 control-label' title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">Max alerts: </label>
                             <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
                                 <input type='text' id='count' name='count' class='form-control' size="4" value="123">
                             </div>
@@ -83,41 +81,41 @@ if (is_admin()) {
                                 <label for='delay' class='control-label' style="vertical-align: top;">Delay: </label>
                                 <input type='text' id='delay' name='delay' class='form-control' size="4">
                             </div>
-                            <div class="col-sm-4" title="How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)">
-                                <label for='interval' class='control-label align-top' style="vertical-align: top;">Interval: </label>
+                            <div class="col-sm-4 col-md-3" title="How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)">
+                                <label for='interval' class='control-label' style="vertical-align: top;">Interval: </label>
                                 <input type='text' id='interval' name='interval' class='form-control' size="4">
                             </div>
                         </div>
-                        <div class='form-group'>
-                            <label for='mute' class='col-sm-3 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts: </label>
-                            <div class='col-sm-2'title="Show alert status in the webui, but do not issue notifications.">
+                        <div class='form-group form-inline'>
+                            <label for='mute' class='col-sm-3 col-md-2 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts: </label>
+                            <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
                                 <input type="checkbox" name="mute" id="mute">
                             </div>
-                            <label for='invert' class='col-sm-2 control-label' title="Alert when this rule doesn't match.">Invert match: </label>
+                            <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert match: </label>
                             <div class='col-sm-2' title="Alert when this rule doesn't match.">
                                 <input type='checkbox' name='invert' id='invert'>
                             </div>
                         </div>
                         <div class="form-group" title="Issue recovery notifications.">
-                            <label for='recovery' class='col-sm-3 control-label'>Recovery alerts: </label>
+                            <label for='recovery' class='col-sm-3 col-md-2 control-label'>Recovery alerts: </label>
                             <div class='col-sm-2'>
                                 <input type='checkbox' name='recovery' id='recovery'>
                             </div>
                         </div>
                         <div class="form-group" title="Restricts this alert rule to the selected devices or groups.">
-                            <label for='maps' class='col-sm-3 control-label'>Map To: </label>
-                            <div class="col-sm-9">
+                            <label for='maps' class='col-sm-3 col-md-2 control-label'>Map To: </label>
+                            <div class="col-sm-9 col-md-10">
                                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                             </div>
                         </div>
                         <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
-                            <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
-                            <div class='col-sm-9'>
+                            <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL: </label>
+                            <div class='col-sm-9 col-md-10'>
                                 <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-sm-offset-3 col-sm-3">
+                            <div class="col-sm-12 text-center">
                                 <button type="button" class="btn btn-success" id="btn-save" name="save-alert">
                                     Save Rule
                                 </button>
