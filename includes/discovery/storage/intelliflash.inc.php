@@ -55,12 +55,7 @@ if (is_array($tegile_storage2)) {
         $pfsh = ($storae['projectFreeSizeHigh'] << 32 );
         $pfsl = ($storage['projectFreeSizeLow']);
         $pfst = (($pfsh + $pfsl) * $units);
-        // $storage['size'] = ($pcdst + $pfst);
-        // e['used'] = ($entry['size'] - $pcdst);
-        // $storage['free'] = ($pfst);
-        // $size = (((($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units) + (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units);
-        // $used = ((($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units);
-        // $free = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
+        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
         $size = ($pdst + $pfst);
         $used = ($pdst);
         $free = ($pfst);
