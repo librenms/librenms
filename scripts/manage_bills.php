@@ -27,6 +27,30 @@ function list_bills($bill_name)
     return $bill[0]['bill_id'];
 }
 
+// Create a new bill. 
+function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
+{
+/** create_bill
+    Note:
+      - bill_name: can be a duplicate since it's unique is is bill_id. We are going to be cowards and refuse to create duplicate bill_name
+      - bill_type: can be cdr (Committed data rate, 95th) or quota (total bytes moved)
+      - bill_cdr:  if bill_type is cdr, then this is in bits, if bill_type is quota, then it's in bytes (!!)
+      - bill_day:  day of month billing starts.
+**/
+
+    echo("Creating bill with name : ".$bill_name." (Type: ".$bill_type.", Quota: ".$bill_cdr.")\n");
+    $insert = array (
+        'bill_name' => $bill_name,
+        'bill_type' => $bill_type,
+        'bill_cdr' =>  $bill_cdr,
+        'bill_day' => '1',
+    );
+    $create_bill = dbInsert($insert, 'bills');
+    echo("Created bill ID ".$create_bill."\n");
+    return $create_bill;
+}
+
+
 // This will get an array of devices we are interested in from the CLI glob
 function get_devices($host_glob, $nameType)
 {
@@ -69,15 +93,40 @@ function add_ports_to_bill($devs, $intf_glob, $id)
     return true;
 }
 
+function print_help()
+{
+    echo "Usage:\n";
+    echo "Updating bills\n";
+    echo "-b <bill name glob>   Bill name to match\n";
+    echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
+    echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
+    echo "-i <Interface description glob>   Interface description to match\n";
+    echo "-f Flush all ports from a bill before adding adding ports\n";
+    echo "Creating bills\n";
+    echo "-n Create new bill\n";
+    echo "-t bill type (cdr or quota)\n";
+    echo "-q Quota (In bits for cdr, bytes for quota)\n\n";
+    echo "Update an existing bill called 'Telia - Transit', add interfaces matching \"Telia\" from all devices\n";
+    echo "php manage_bills.php -b 'Telia - Transit' -s all -i Telia\n\n";
+    echo "Create a new bill called 'Transit' with a CDR of 1Gbit\n";
+    echo "php manage_bills.php -n -b 'Transit' -t cdr -q 1000000000";
+    echo "\n";
+    exit;
+}
+
+
 /** Setup options:
-    l - bill_name - bill glob
-    c - circuit_id - interface glob
+    b - bill_name - bill glob
+    i - circuit_id - interface glob
     s - sysName - device glob
     h - hostname - device glob
     f - flush - boolean
+    n - new - create new bill
+    t - type - bill type
+    q - quota - bill quota
 **/
 
-$options = getopt('b:s:h:i:f');
+$options = getopt('b:s:h:i:f:np:t:q:');
 
 if (!empty($options['s'])) {
     $host_glob = str_replace('*', '%', mres($options['s']));
@@ -87,30 +136,40 @@ if (!empty($options['h'])) {
     $host_glob = str_replace('*', '%', mres($options['h']));
     $nameType = "hostname";
 }
-if (empty($options['s']) && empty($options['h'])) {
-    echo "Please set -s or -h\n";
-} elseif (!empty($options['s']) && !empty($options['h'])) {
-    echo "Please set either -s or -h, not both\n";
+if (array_key_exists('n', $options)) {
+    $create_bill = true;
 }
-if (!empty($options['i']) && !empty($options['h'])) {
-    echo "Please set -i\n";
+if (!empty($options['t'])) {
+    $bill_type = mres($options['t']);
+}
+if (!empty($options['q'])) {
+    $bill_cdr = mres($options['q']);
 }
 
 $bill_name = str_replace('*', '%', mres($options['b']));
 $intf_glob = str_replace('*', '%', mres($options['i']));
 
-if (empty($bill_name) or !(empty($options['h']) and empty($options['s']))) {
-    echo "Usage:\n";
-    echo "-b <bill name glob>   Bill name to match\n";
-    echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
-    echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
-    echo "-i <Interface description glob>   Interface description to match\n";
-    echo "-f Flush all ports from a bill before adding adding ports\n";
-    echo "Example:\n";
-    echo "If I wanted to add all interfaces containing the description Telia to a bill called 'My Lovely Transit Provider'\n";
-    echo "php manage_bills.php -l 'My Lovely Transit Provider' -d all -c Telia";
-    echo "\n";
-    exit;
+# Exit if no bill
+if (empty($bill_name)) {
+    echo "Please set -b (bill name)\n";
+    print_help();
+}
+if ($create_bill) {
+    create_bill($bill_name, $bill_type, $bill_cdr, '1');
+    exit(1);
+}
+# Exit if missing hostname or sysName (or both set
+if (empty($options['s']) && empty($options['h'])) {
+    echo "Please set -s (sysName) or -h (hosthame)\n";
+    print_help();
+} else if (!empty($options['s']) && !empty($options['h'])) {
+    echo "Please set either -s or -h, not both\n";
+    print_help();
+}
+# Exit if missing hostname or sysName
+if (empty($options['i'])) {
+    echo "Please set -i (interface glob)\n";
+    print_help();
 }
 
 if ($bill_name == 'all') {

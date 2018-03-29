@@ -19,7 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 theherodied
+ * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
 use LibreNMS\Config;
@@ -31,8 +31,9 @@ if (is_array($nimble_storage)) {
         $units  = 1024*1024;
         $fstype = $storage['volOnline'];
         $descr  = $storage['volName'];
-        $size = $storage['volSizeLow'] * $units;
-        $used = $storage['volUsageLow'] * $units;
+        //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
+        $size = (($storage['volSizeHigh'] << 32 ) + $storage['volSizeLow']) * $units;
+        $used = (($storage['volUsageHigh'] << 32 ) + $storage['volUsageLow']) * $units;
         if (is_numeric($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'nimbleos', $descr, $size, $units, $used);
         }

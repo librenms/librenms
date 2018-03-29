@@ -9,25 +9,25 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 $where = '1';
 
-if (is_numeric($_POST['device'])) {
+if (is_numeric($vars['device'])) {
     $where .= ' AND E.host = ?';
-    $param[] = $_POST['device'];
+    $param[] = $vars['device'];
 }
 
-if (!empty($_POST['eventtype'])) {
+if (!empty($vars['eventtype'])) {
     $where .= ' AND `E`.`type` = ?';
-    $param[] = $_POST['eventtype'];
+    $param[] = $vars['eventtype'];
 }
 
-if ($_POST['string']) {
+if ($vars['string']) {
     $where .= ' AND E.message LIKE ?';
-    $param[] = '%' . $_POST['string'] . '%';
+    $param[] = '%' . $vars['string'] . '%';
 }
 
 if ($_SESSION['userlevel'] >= '5') {
@@ -38,7 +38,7 @@ if ($_SESSION['userlevel'] >= '5') {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' `D`.`sysName` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(event_id) $sql";
