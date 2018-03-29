@@ -67,7 +67,7 @@ $sql .= " `ifAdminStatus`, `ifDescr`, `ifOperStatus`, `ifInErrors`, `ifOutErrors
 
 // Get most likely endpoint port_id, used to add a visual marker for this element
 // in the list 
-if (isset($vars['searchby']) && !empty($vars['searchPhrase']) && $vars['searchby'] != 'vlan' ) {
+if (isset($vars['searchby']) && !empty($vars['searchPhrase']) && $vars['searchby'] != 'vlan') {
     $countsql .= " ORDER BY `C`.`portCount` ASC LIMIT 1";
     foreach (dbFetchRows($select . $sql . $countsql, $param) as $entry) {
         $endpoint_portid = $entry['port_id'];
