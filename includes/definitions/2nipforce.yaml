@@ -1,0 +1,11 @@
+os: 2N IP Force
+text: '2N IP Force'
+type: appliance
+icon: 2n
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+mib_dir:
+    - 2n
+discovery:
+    - sysDescr:
+        - 2N IP Force
