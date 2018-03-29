@@ -124,7 +124,7 @@ if ($config['map']['engine'] == 'leaflet') {
         if (!empty($widget_settings['group_radius'])) {
             $group_radius = $widget_settings['group_radius'];
         } else {
-            $group_radius = Config::get('leaflet.group_radius', 80;
+            $group_radius = Config::get('leaflet.group_radius', 80);
         }
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
             $widget_settings['status'] = '0,1';
