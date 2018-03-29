@@ -31,6 +31,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
 class Pmp extends OS implements
@@ -38,7 +39,8 @@ class Pmp extends OS implements
     WirelessSnrDiscovery,
     WirelessFrequencyDiscovery,
     WirelessUtilizationDiscovery,
-    WirelessSsrDiscovery
+    WirelessSsrDiscovery,
+    WirelessClientsDiscovery
 {
 
     /**
@@ -225,5 +227,26 @@ class Pmp extends OS implements
         }
 
         return 1;
+    }
+    /**
+     * Discover wireless client counts. Type is clients.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessClients()
+    {
+        $registeredSM = '.1.3.6.1.4.1.161.19.3.1.7.1.0'; //WHISP-APS-MIB::regCount.0
+        return array(
+            new WirelessSensor(
+                'clients',
+                $this->getDeviceId(),
+                $registeredSM,
+                'pmp',
+                0,
+                'Client Count',
+                null
+            )
+        );
     }
 }
