@@ -26,9 +26,9 @@ if (!is_array($storage_cache['intelliflash-pl'])) {
     $storage_cache['intelliflash-pl'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
+//Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $entry = $storage_cache['intelliflash-pl'][$storage[storage_index]];
 $storage['units'] = 1;
-//Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];
 $storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);

@@ -30,10 +30,9 @@ if (is_array($tegile_storage)) {
         $units  = 1;
         $fstype = $storage['poolState'];
         $descr  = $storage['poolName'];
-        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
+        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
         $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
         $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
-        //$tmp_index = "poolEntry.$index";
         if (is_numeric($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pl', $descr, $size, $units, $used);
         }
@@ -53,11 +52,10 @@ if (is_array($tegile_storage2)) {
         $pfsh = ($storae['projectFreeSizeHigh'] << 32 );
         $pfsl = ($storage['projectFreeSizeLow']);
         $pfst = (($pfsh + $pfsl) * $units);
-        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
+        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
         $size = ($pdst + $pfst);
         $used = ($pdst);
         $free = ($pfst);
-        //$tmp_index = "projectEntry.$index";
         if (is_numeric($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pr', $descr, $size, $units, $used);
         }

@@ -26,6 +26,7 @@ if (!is_array($storage_cache['intelliflash-pr'])) {
     $storage_cache['intelliflash-pr'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
+//Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $entry = $storage_cache['intelliflash-pr'][$storage[storage_index]];
 $units = 1;
 $pdsh = ($entry['projectDataSizeHigh'] << 32 );
