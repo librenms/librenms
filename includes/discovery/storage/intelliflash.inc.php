@@ -34,9 +34,40 @@ if (is_array($tegile_storage)) {
         //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
         $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
         $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
+        //$tmp_index = "poolEntry.$index";
         if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash', $descr, $size, $units, $used);
+            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pl', $descr, $size, $units, $used);
         }
         unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
+    }
+}
+
+$tegile_storage2 = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
+if (is_array($tegile_storage2)) {
+    echo 'projectEntry ';
+    foreach ($tegile_storage2 as $index => $storage) {
+        $units = 1;
+        $descr = $storage['projectName'];
+        $fstype = 1;
+        $pdsh = ($storage['projectDataSizeHigh'] << 32 );
+        $pdsl = ($storage['projectDataSizeLow']);
+        $pdst = (($pdsh + $pdsl) * $units);
+        $pfsh = ($storae['projectFreeSizeHigh'] << 32 );
+        $pfsl = ($storage['projectFreeSizeLow']);
+        $pfst = (($pfsh + $pfsl) * $units);
+        // $storage['size'] = ($pcdst + $pfst);
+        // e['used'] = ($entry['size'] - $pcdst);
+        // $storage['free'] = ($pfst);
+        // $size = (((($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units) + (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units);
+        // $used = ((($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units);
+        // $free = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
+        $size = ($pdst + $pfst);
+        $used = ($pdst);
+        $free = ($pfst);
+        //$tmp_index = "projectEntry.$index";
+        if (is_numeric($index)) {
+            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pr', $descr, $size, $units, $used);
+        }
+	unset($deny, $fstype, $descr, $size, $used2, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }
