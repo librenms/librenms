@@ -403,7 +403,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option(
             $this->ldap_connection,
             LDAP_OPT_NETWORK_TIMEOUT,
-            Config::has('auth_ad_timeout') ? Config::has('auth_ad_timeout') : 5
+            Config::get('auth_ad_timeout', 5)
         );
 
         // With specified bind user
