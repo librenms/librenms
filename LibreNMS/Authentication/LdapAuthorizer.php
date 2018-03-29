@@ -267,7 +267,7 @@ class LdapAuthorizer extends AuthorizerBase
             throw new AuthenticationException('Unable to connect to ldap server');
         }
 
-        ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 2));
+        ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 3));
 
         $use_tls = Config::get('auth_ldap_starttls');
         if ($use_tls == 'optional'||$use_tls == 'require') {
@@ -280,6 +280,10 @@ class LdapAuthorizer extends AuthorizerBase
 
         if ($skip_bind) {
             return $this->ldap_connection;
+        }
+
+        if (Config::get('auth_ldap_debug')) {
+            ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
 
         // set timeout
@@ -295,11 +299,14 @@ class LdapAuthorizer extends AuthorizerBase
                 $bind_dn = $this->getFullDn(Config::get('auth_ldap_binduser'));
             }
 
-            if (ldap_bind(
-                $this->ldap_connection,
-                $bind_dn,
-                Config::get('auth_ldap_bindpassword')
-            )) {
+
+            $bind_result = ldap_bind($this->ldap_connection, $bind_dn, Config::get('auth_ldap_bindpassword'));
+
+            if (Config::get('auth_ldap_debug')) {
+                echo "Bind result: " . ldap_error($this->ldap_connection) . PHP_EOL;
+            }
+
+            if ($bind_result) {
                 ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
                 return $this->ldap_connection;
             }
@@ -307,6 +314,10 @@ class LdapAuthorizer extends AuthorizerBase
 
         // Anonymous
         ldap_bind($this->ldap_connection);
+
+        if (Config::get('auth_ldap_debug')) {
+            echo "Anonymous bind result: " . ldap_error($this->ldap_connection) . PHP_EOL;
+        }
 
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
         return $this->ldap_connection;
