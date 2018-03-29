@@ -3,7 +3,6 @@ text: 'Tegile IntelliFlash'
 type: storage
 icon: tegile
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_storage, text: 'Storage Usage' }
 mib_dir:
     - tegile

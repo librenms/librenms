@@ -23,42 +23,44 @@
  * @author     https://github.com/theherodied/
  */
 use LibreNMS\Config;
-$tegile_storage = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
-if (is_array($tegile_storage)) {
-    echo 'poolEntry ';
-    foreach ($tegile_storage as $index => $storage) {
-        $units  = 1;
-        $fstype = $storage['poolState'];
-        $descr  = $storage['poolName'];
-        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-        $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
-        $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
-        if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pl', $descr, $size, $units, $used);
+if($device['os'] = 'intelliflash') {
+    $tegile_storage = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
+    if (is_array($tegile_storage)) {
+        echo 'poolEntry ';
+        foreach ($tegile_storage as $index => $storage) {
+            $units  = 1;
+            $fstype = $storage['poolState'];
+            $descr  = $storage['poolName'];
+            //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
+            $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
+            $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
+            if (is_numeric($index)) {
+                discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pl', $descr, $size, $units, $used);
+            }
+            unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
         }
-        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
-}
-$tegile_storage2 = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
-if (is_array($tegile_storage2)) {
-    echo 'projectEntry ';
-    foreach ($tegile_storage2 as $index => $storage) {
-        $units = 1;
-        $descr = $storage['projectName'];
-        $fstype = 1;
-        $pdsh = ($storage['projectDataSizeHigh'] << 32 );
-        $pdsl = ($storage['projectDataSizeLow']);
-        $pdst = (($pdsh + $pdsl) * $units);
-        $pfsh = ($storae['projectFreeSizeHigh'] << 32 );
-        $pfsl = ($storage['projectFreeSizeLow']);
-        $pfst = (($pfsh + $pfsl) * $units);
-        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-        $size = ($pdst + $pfst);
-        $used = ($pdst);
-        $free = ($pfst);
-        if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pr', $descr, $size, $units, $used);
+    $tegile_storage2 = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
+    if (is_array($tegile_storage2)) {
+        echo 'projectEntry ';
+        foreach ($tegile_storage2 as $index => $storage) {
+            $units = 1;
+            $descr = $storage['projectName'];
+            $fstype = 1;
+            $pdsh = ($storage['projectDataSizeHigh'] << 32 );
+            $pdsl = ($storage['projectDataSizeLow']);
+            $pdst = (($pdsh + $pdsl) * $units);
+            $pfsh = ($storae['projectFreeSizeHigh'] << 32 );
+            $pfsl = ($storage['projectFreeSizeLow']);
+            $pfst = (($pfsh + $pfsl) * $units);
+            //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
+            $size = ($pdst + $pfst);
+            $used = ($pdst);
+            $free = ($pfst);
+            if (is_numeric($index)) {
+                discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash-pr', $descr, $size, $units, $used);
+            }
+            unset($deny, $fstype, $descr, $size, $used2, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
         }
-	unset($deny, $fstype, $descr, $size, $used2, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }
