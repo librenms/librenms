@@ -585,17 +585,15 @@
         "discovery": {
             "toner": [
                 {
-                    "toner_id": "1",
                     "toner_index": "1",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Cyan",
+                    "toner_descr": "Toner (Cyan)",
                     "toner_capacity": "100",
                     "toner_current": "29",
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_id": "10",
                     "toner_index": "10",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
@@ -605,7 +603,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
                 },
                 {
-                    "toner_id": "11",
                     "toner_index": "11",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
@@ -615,7 +612,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
                 },
                 {
-                    "toner_id": "12",
                     "toner_index": "12",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
@@ -625,7 +621,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
                 },
                 {
-                    "toner_id": "13",
                     "toner_index": "13",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.13",
@@ -635,7 +630,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.13"
                 },
                 {
-                    "toner_id": "14",
                     "toner_index": "14",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.14",
@@ -645,7 +639,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.14"
                 },
                 {
-                    "toner_id": "15",
                     "toner_index": "15",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.15",
@@ -655,7 +648,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.15"
                 },
                 {
-                    "toner_id": "16",
                     "toner_index": "16",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.16",
@@ -665,7 +657,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.16"
                 },
                 {
-                    "toner_id": "17",
                     "toner_index": "17",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.17",
@@ -675,37 +666,33 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.17"
                 },
                 {
-                    "toner_id": "2",
                     "toner_index": "2",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Magenta",
+                    "toner_descr": "Toner (Magenta)",
                     "toner_capacity": "100",
                     "toner_current": "31",
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_id": "3",
                     "toner_index": "3",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Yellow",
+                    "toner_descr": "Toner (Yellow)",
                     "toner_capacity": "100",
                     "toner_current": "58",
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_id": "4",
                     "toner_index": "4",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Black",
+                    "toner_descr": "Toner (Black)",
                     "toner_capacity": "100",
                     "toner_current": "83",
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "toner_id": "5",
                     "toner_index": "5",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
@@ -715,7 +702,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
                 },
                 {
-                    "toner_id": "6",
                     "toner_index": "6",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
@@ -725,7 +711,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
                 },
                 {
-                    "toner_id": "7",
                     "toner_index": "7",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
@@ -735,7 +720,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
                 },
                 {
-                    "toner_id": "8",
                     "toner_index": "8",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
@@ -745,7 +729,6 @@
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
                 },
                 {
-                    "toner_id": "9",
                     "toner_index": "9",
                     "toner_type": "jetdirect",
                     "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
