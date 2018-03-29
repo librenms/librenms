@@ -47,6 +47,14 @@ If you can't access OpenStreet map directly you can run a local [tile server](ht
 ```php
 $config['leaflet']['tile_url'] = 'localhost.com';
 ```
+### Additional Leaflet config
+```php
+$config['map']['engine']                                = "leaflet";
+$config['leaflet']['default_lat']                       = "51.981074";
+$config['leaflet']['default_lng']                       = "5.350342";
+$config['leaflet']['default_zoom']                      = 8;    
+$config['leaflet']['group_radius']                      = 1;    // Device grouping radius in KM default 80KM
+```
 
 ### Jquery-Mapael config
 Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of
