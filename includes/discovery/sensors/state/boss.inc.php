@@ -2,7 +2,7 @@
 /**
  * boss.inc.php
  *
- * LibreNMS Fan and Power Supply state Discovery module for Avaya ERS
+ * LibreNMS Fan and Power Supply state Discovery module for Extreme/Avaya ERS
  */
 
 if ($device['os'] === 'boss') {
