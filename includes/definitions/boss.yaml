@@ -1,5 +1,5 @@
-os: extreme-boss
-text: 'BOSS'
+os: boss
+text: 'Extreme BOSS'
 type: network
 icon: extremeboss
 ifname: 1
