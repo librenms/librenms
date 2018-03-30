@@ -1,6 +1,6 @@
 <?php
 /**
- * extreme-voss.inc.php
+ * voss.inc.php
  *
  * LibreNMS Fan and Power Supply state Discovery module for Extreme
  * VOSS(VSP Operating System Software)
