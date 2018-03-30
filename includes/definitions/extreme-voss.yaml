@@ -1,5 +1,5 @@
-os: extreme-voss
-text: 'VOSS'
+os: voss
+text: 'Extreme VOSS'
 type: network
 icon: extremevoss
 mib_dir:
