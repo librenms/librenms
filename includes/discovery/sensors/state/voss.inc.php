@@ -2,7 +2,7 @@
 /**
  * voss.inc.php
  *
- * LibreNMS Fan and Power Supply state Discovery module for Extreme
+ * LibreNMS Fan and Power Supply state Discovery module for Extreme/Avaya
  * VOSS(VSP Operating System Software)
  *
  * Copyright (c) 2017 Daniel Cox <danielcoxman@gmail.com>
