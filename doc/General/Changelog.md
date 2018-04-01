@@ -1,3 +1,90 @@
+## 1.38
+*(2018-03-29)*
+
+#### Bugfixes
+* Restored config items in sql queries ([#8443](https://github.com/librenms/librenms/issues/8443))
+* Fixed sysname -> sysName for device dependancy display ([#8343](https://github.com/librenms/librenms/issues/8343))
+* MySQL query in alert_rules.json ([#8300](https://github.com/librenms/librenms/issues/8300))
+* Change the column type from varchar(255) to TEXT for nagios-plugins perfdata ([#8322](https://github.com/librenms/librenms/issues/8322))
+* Fixed etherlike graphs ([#8358](https://github.com/librenms/librenms/issues/8358))
+* Fixed HP Proliant state sensors ([#8315](https://github.com/librenms/librenms/issues/8315))
+* Change rootPort DB data type ([#8404](https://github.com/librenms/librenms/issues/8404))
+* Fixed and improved toner discovery ([#8428](https://github.com/librenms/librenms/issues/8428))
+
+#### Documentation
+* RRDCached-Security clearify security ([#8302](https://github.com/librenms/librenms/issues/8302))
+* Improved pushover documentation ([#8330](https://github.com/librenms/librenms/issues/8330))
+* Updated Graylog and Syslog documentation ([#8396](https://github.com/librenms/librenms/issues/8396))
+
+#### Devices
+* Added detection for Cisco SPA devices ([#8446](https://github.com/librenms/librenms/issues/8446))
+* Updated moxa-etherdevice hardware/software/version detection
+* Added hardware and firmware detection for Hanwha Techwin devices ([#8468](https://github.com/librenms/librenms/issues/8468))
+* Added additional detection for Calix B6 ([#8445](https://github.com/librenms/librenms/issues/8445))
+* Added DEVELOP Support ([#8153](https://github.com/librenms/librenms/issues/8153))
+* Added more Dell iDrac state sensors ([#8254](https://github.com/librenms/librenms/issues/8254))
+* Improve Allied Telesis Chassis product support ([#8139](https://github.com/librenms/librenms/issues/8139))
+* Added OID for Cisco FTD model 9300 Ref. #8212 ([#8285](https://github.com/librenms/librenms/issues/8285))
+* Added more WirelessSensors and processor/mempools support for EWC ([#8294](https://github.com/librenms/librenms/issues/8294))
+* Improved Lenovo CNOS Discovery/Logo ([#8332](https://github.com/librenms/librenms/issues/8332))
+* Added detection of Axis Network Speaker ([#8336](https://github.com/librenms/librenms/issues/8336))
+* Added Nimble storage volume utilization ([#8405](https://github.com/librenms/librenms/issues/8405))
+* Added Radwin OS Wireless Sensors ([#8372](https://github.com/librenms/librenms/issues/8372))
+* Added contact,relay,outlet discovery for AOS-EMU2 ([#8317](https://github.com/librenms/librenms/issues/8317)) 
+* Added support for Moxa EDS-P510A-8PoE ([#8384](https://github.com/librenms/librenms/issues/8384))
+* Added detection for Ciena 8700 (SAOS 8) ([#8442](https://github.com/librenms/librenms/issues/8442))
+* Added better detection for HiveOS devices ([#8277](https://github.com/librenms/librenms/issues/8277))
+* Added detection for Raritan KVM and EMX devices ([#8279](https://github.com/librenms/librenms/issues/8279))
+* Improved detection for dlink and dlinkap devices ([#8447](https://github.com/librenms/librenms/issues/8447))
+* Added serial number detection to xerox ([#8439](https://github.com/librenms/librenms/issues/8439))
+* Added Phybridge OS support ([#8456](https://github.com/librenms/librenms/issues/8456))
+* Improved Sentry4 sensor discovery ([#8407](https://github.com/librenms/librenms/issues/8407))
+* Added Cambium pmp ap client count discovery ([#8487](https://github.com/librenms/librenms/issues/8487))
+
+#### WebUI
+* Added override default device grouping radius ([#8485](https://github.com/librenms/librenms/issues/8485))
+* Added auto width and height dimensions parameters for generic image widget ([#8314](https://github.com/librenms/librenms/issues/8314))
+* Removed unused JS causing issues with typeahead ([#8307](https://github.com/librenms/librenms/issues/8307))
+* S.M.A.R.T visualization improvements ([#8310](https://github.com/librenms/librenms/issues/8310))
+* Added Oxidized reload node list button ([#8375](https://github.com/librenms/librenms/issues/8375))
+* Added docs link to about page ([#8397](https://github.com/librenms/librenms/issues/8397))
+* Active Directory: filter disabled users, allow nested group membership for AD auth ([#8222](https://github.com/librenms/librenms/issues/8222))
+* Added borderless fullscreen geographical map, with just the nodes. ([#8337](https://github.com/librenms/librenms/issues/8337))
+* Improved LDAP filters for getUserlist and getUserlevel ([#8398](https://github.com/librenms/librenms/issues/8398))
+* Added LDAP debug output ([#8434](https://github.com/librenms/librenms/issues/8434))
+* LDAP fall back to slow search if memberof is missing ([#8491](https://github.com/librenms/librenms/issues/8491))
+* Allow full search on devices page ([#8364](https://github.com/librenms/librenms/issues/8364))
+
+#### Alerting
+* Added a irc_alert_short option to only send the alert title ([#8312](https://github.com/librenms/librenms/issues/8312)) 
+* Added Philips Hue as transport ([#8320](https://github.com/librenms/librenms/issues/8320)) 
+* Added two html alert template examples ([#8360](https://github.com/librenms/librenms/issues/8360))
+* Added alert_id to alerts for templates ([#8368](https://github.com/librenms/librenms/issues/8368))
+* Added new alert rule builder UI ([#8293](https://github.com/librenms/librenms/issues/8293))
+* Added support for disabling recovery notifications ([#8430](https://github.com/librenms/librenms/issues/8430))
+* Change the default alert delay to 1m ([#8462](https://github.com/librenms/librenms/issues/8462))
+
+#### Documentation
+* Use single quotes in example SNMP community per issue 8342 ([#8348](https://github.com/librenms/librenms/issues/8348))
+* Update SNMP-Configuration-Examples.md to add VMWare example ([#8381](https://github.com/librenms/librenms/issues/8381))
+
+#### Misc
+* Improve LDAP filter in the getUserlist() function ([#8253](https://github.com/librenms/librenms/issues/8253))
+* Created check_graylog.inc.php service file ([#8334](https://github.com/librenms/librenms/issues/8334))
+* Created check_haproxy.inc.php service file ([#8412](https://github.com/librenms/librenms/issues/8412))
+* Module tests update: per module output, only store modules data that are run ([#8355](https://github.com/librenms/librenms/issues/8355))
+* Updated APC PowerNet-MIB ([#8377](https://github.com/librenms/librenms/issues/8377))
+* Print mysql errors in debug output ([#8414](https://github.com/librenms/librenms/issues/8414))
+* Use custom phpcs ruleset for LibreNMS ([#8418](https://github.com/librenms/librenms/issues/8418))
+* Updating the mibs file from vmware ([#8388](https://github.com/librenms/librenms/issues/8388))
+* Small improvement to per port polling (speed boost) ([#8431](https://github.com/librenms/librenms/issues/8431))
+* Fixed validation sql for primary keys and first columns ([#8453](https://github.com/librenms/librenms/issues/8453))
+* Added ifAlias to tag influxdb port data ([#8461](https://github.com/librenms/librenms/issues/8461))
+* Bumping CISCO-PRODUCTS-MIB to newest release ([#8483](https://github.com/librenms/librenms/issues/8483))
+* Updated and improved manage_bills.php script ([#8467](https://github.com/librenms/librenms/issues/8467))
+
+---
+
 ## 1.37
 *(2018-02-25)*
 
