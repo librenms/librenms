@@ -73,7 +73,7 @@ $height=125;            //SVG internal height : do not modify
 $width=300;             //SVG internal width : do not modify
 
 /********* Graph DATA **************/
-print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
+?>
 <svg width="100%" height="100%" viewBox="0 0 <?php echo("$width $height") ?>" preserveAspectRatio="none" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
      onload="init(evt)">
   <g id="graph">
