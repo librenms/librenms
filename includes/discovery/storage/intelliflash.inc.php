@@ -23,7 +23,7 @@
  * @author     https://github.com/theherodied/
  */
 use LibreNMS\Config;
-if($device['os'] = 'intelliflash') {
+if($device['os'] == 'intelliflash') {
     $tegile_storage = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     if (is_array($tegile_storage)) {
         echo 'poolEntry ';
