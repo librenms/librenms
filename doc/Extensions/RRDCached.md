@@ -164,8 +164,9 @@ Make sure you have network option in /var/default/rrdcached
 NETWORK_OPTIONS="-L" 
 ```
 ```php
-$config['rrdcached'] = "0:42217";
+$config['rrdcached'] = "IPADDRESS:42217";
 ```
+NOTE: change IPADDRESS to the ip the rrdcached server is listening on. 
 
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
