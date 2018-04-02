@@ -1,8 +1,8 @@
 <?php
 /**
- * sentry4.inc.php
+ * ipolis.inc.php
  *
- * LibreNMS power discovery module for Sentry4
+ * LibreNMS os poller module for Hanwha Techwin devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,19 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
- */
+ * @copyright  2018 Priit Mustasaar
+ * @author     Priit Mustasaar <priit.mustasaar@gmail.com>
+*/
 
-foreach ($pre_cache['sentry4_input'] as $index => $data) {
-    $descr   = $data['st4InputCordName'];
-    $oid     = ".1.3.6.1.4.1.1718.4.1.3.3.1.3.$index";
-    $current = $data['st4InputCordActivePower'];
-    if ($current >= 0) {
-        discover_sensor($valid['sensor'], 'power', $device, $oid, "st4InputCord.$index", 'sentry4', $descr, 1, 1, null, null, null, null, $current);
-    }
+$oids = array(
+    'hardware' => $device['sysObjectID'].'.1.0',
+    'version' => $device['sysObjectID'].'.2.1.1.0'
+);
+
+$os_data = snmp_get_multi_oid($device, $oids);
+
+foreach ($oids as $var => $oid) {
+    $$var = trim($os_data[$oid], '"');
 }
+
+unset($oids, $os_data);

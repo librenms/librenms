@@ -11,7 +11,7 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
 

@@ -601,15 +601,12 @@ if ($alerts['active_count'] > 0) {
               <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg" aria-hidden="true"></i> Notifications</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Alert History</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i> Statistics</a></li>
-                <?php
-                if ($_SESSION['userlevel'] >= '10') {
-                    ?>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
-                    <?php
-                }
-                ?>
+                <?php if (is_admin()) { ?>
+                    <li role="presentation" class="divider"></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                <?php } ?>
           </ul>
       </li>
 

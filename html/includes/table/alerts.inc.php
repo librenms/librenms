@@ -9,7 +9,7 @@
  * @package    LibreNMS
  * @subpackage graphs
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
 
@@ -38,36 +38,36 @@ $alert_severities = array(
 
 $show_recovered = false;
 
-if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
-    $where .= ' AND `alerts`.`device_id`=' . $_POST['device_id'];
+if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
+    $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
 
-if (is_numeric($_POST['acknowledged'])) {
+if (is_numeric($vars['acknowledged'])) {
     // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
-    $where .= " AND `alerts`.`state`" . ($_POST['acknowledged'] ? "=" : "!=") . $alert_states['acknowledged'];
+    $where .= " AND `alerts`.`state`" . ($vars['acknowledged'] ? "=" : "!=") . $alert_states['acknowledged'];
 }
 
-if (is_numeric($_POST['state'])) {
-    $where .= " AND `alerts`.`state`=" . $_POST['state'];
-    if ($_POST['state'] == $alert_states['recovered']) {
+if (is_numeric($vars['state'])) {
+    $where .= " AND `alerts`.`state`=" . $vars['state'];
+    if ($vars['state'] == $alert_states['recovered']) {
         $show_recovered = true;
     }
 }
 
-if (isset($_POST['min_severity'])) {
-    if (is_numeric($_POST['min_severity'])) {
-        $min_severity_id = $_POST['min_severity'];
-    } elseif (!empty($_POST['min_severity'])) {
-        $min_severity_id = $alert_severities[$_POST['min_severity']];
+if (isset($vars['min_severity'])) {
+    if (is_numeric($vars['min_severity'])) {
+        $min_severity_id = $vars['min_severity'];
+    } elseif (!empty($vars['min_severity'])) {
+        $min_severity_id = $alert_severities[$vars['min_severity']];
     }
     if (isset($min_severity_id)) {
         $where .= " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
 }
 
-if (is_numeric($_POST['group'])) {
+if (is_numeric($vars['group'])) {
     $where .= " AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)";
-    $param[] = $_POST['group'];
+    $param[] = $vars['group'];
 }
 
 if (!$show_recovered) {
@@ -75,7 +75,7 @@ if (!$show_recovered) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
+    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%' OR `sysName` LIKE '%$searchPhrase%')";
 }
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
@@ -112,7 +112,7 @@ if ($rowCount != -1) {
 $sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `devices`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
 
 $rulei = 0;
-$format = $_POST['format'];
+$format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
