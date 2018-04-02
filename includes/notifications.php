@@ -47,7 +47,7 @@ function get_notifications()
         $obj = array_merge($obj, $feed);
         echo '('.sizeof($obj).')'.PHP_EOL;
     }
-    $obj = array_sort($obj, 'datetime');
+    $obj = array_sort_by_column($obj, 'datetime');
     return $obj;
 }
 
