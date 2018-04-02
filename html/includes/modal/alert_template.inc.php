@@ -225,11 +225,8 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {
-                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                toastr.success(msg);
                 $("#alert-template").modal('hide');
-                setTimeout(function() {
-                    location.reload(1);
-                }, 1000);
             } else {
                 $("#error").html('<div class="alert alert-danger">'+msg+'</div>');
             }
