@@ -123,7 +123,11 @@ if (is_numeric($rule_id) && $rule_id > 0) {
         if ($rule_id) {
             $message = "Added Rule: <i>$name</i>";
         } else {
-            $message = 'Failed to add Rule: <i>' . $name . '</i>';
+            if (dbFetchCell('SELECT 1 FROM alert_rules WHERE name=?', [$name])) {
+                $message = "Rule named <i>$name</i> already exists";
+            } else {
+                $message = "Failed to add Rule: <i>$name</i>";
+            }
             $status = 'error';
         }
     }
