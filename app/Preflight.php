@@ -25,7 +25,6 @@
 
 namespace App;
 
-use Illuminate\Support\Facades\App;
 use LibreNMS\Config;
 
 class Preflight
@@ -37,13 +36,24 @@ class Preflight
         self::checkWriteAccess();
     }
 
+    public static function checkDependencies()
+    {
+        if (!class_exists(Illuminate\Foundation\Application::class)) {
+            self::printMessage(
+                'Error: Missing dependencies! Run the following command to fix:',
+                './scripts/composer_wrapper.php install --no-dev',
+                true
+            );
+        }
+    }
+
     public static function checkWriteAccess()
     {
         // check file/folder permissions
         $check = [
-            base_path('bootstrap/cache'),
-            base_path('storage'),
-            base_path('logs/librenms.log')
+            self::basePath('bootstrap/cache'),
+            self::basePath('storage'),
+            self::basePath('logs/librenms.log')
         ];
         foreach ($check as $path) {
             if (!is_writable($path)) {
@@ -53,21 +63,20 @@ class Preflight
                 self::printMessage(
                     "Error: $path is not writable! Run these commands to fix:",
                     [
-                        "cd " . base_path(),
+                        "cd " . self::basePath(),
                         "chown -R $user:$group $dirs",
                         "setfacl -R -m g::rwx $dirs",
                         "setfacl -d -m g::rwx $dirs"
-                    ]
+                    ],
+                    true
                 );
-                exit;
             }
         }
     }
 
-
-    private static function printMessage($title, $content)
+    private static function printMessage($title, $content, $exit = false)
     {
-        $content = array_wrap($content);
+        $content = (array)$content;
 
         if (PHP_SAPI == 'cli') {
             $format = "%s\n\n%s\n\n";
@@ -78,5 +87,19 @@ class Preflight
         }
 
         printf($format, $title, $message);
+
+        if ($exit) {
+            exit(1);
+        }
+    }
+
+    private static function basePath($path = '')
+    {
+        if (function_exists('base_path')) {
+            return base_path($path);
+        }
+
+        $base_dir = realpath(__DIR__ . '..');
+        return "$base_dir/$path";
     }
 }
