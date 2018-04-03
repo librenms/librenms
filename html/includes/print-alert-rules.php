@@ -50,7 +50,9 @@ if (isset($_POST['create-default'])) {
 require_once 'includes/modal/new_alert_rule.inc.php';
 require_once 'includes/modal/delete_alert_rule.inc.php';
 require_once 'includes/modal/alert_rule_collection.inc.php';
+require_once 'includes/modal/edit_alert_contacts.inc.php';
 ?>
+
 <form method="post" action="" id="result_form">
 <?php
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
@@ -77,6 +79,9 @@ if (is_admin()) {
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
     echo '<i> - OR - </i>';
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
+
+    echo '<i> - OR - </i>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#edit-alert-contacts"><i class="fa fa-plus"></i> Add alert contact</button>';
 }
 echo '</td>
     <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
