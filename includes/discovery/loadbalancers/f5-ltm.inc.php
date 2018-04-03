@@ -46,7 +46,6 @@ $tblBigIP = array();
 
 // Virtual Server Data
 $ltmVirtualServOID = array(
-    name => '1.3.6.1.4.1.3375.2.2.10.1.2.1.1',
     ip => '1.3.6.1.4.1.3375.2.2.10.1.2.1.3',
     port => '1.3.6.1.4.1.3375.2.2.10.1.2.1.6',
     defaultpool => '1.3.6.1.4.1.3375.2.2.10.1.2.1.19',
@@ -55,13 +54,19 @@ $ltmVirtualServOID = array(
 );
 
 $ltmVirtualServEntry = [];
-foreach ($ltmVirtualServOID as $key => $value) {
-    $ltmVirtualServEntry[$key] = snmpwalk_array_num($device, $value, 0);
-};
+//Check for Virtual Server Enries
+$ltmVirtualServEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.1.2.1.1', 0);
+//If no Virtual Servers are found don't look for statistics
+if (!empty($ltmVirtualServEntry[name])) {
+    foreach ($ltmVirtualServOID as $key => $value) {
+        $ltmVirtualServEntry[$key] = snmpwalk_array_num($device, $value, 0);
+    }
+} else {
+    d_echo("No Virtual Servers Found\n");
+}
 
-// Pools Server Data
+// Pool Data
 $ltmPoolEntryOID = array(
-    name => '1.3.6.1.4.1.3375.2.2.5.1.2.1.1',
     mode => '1.3.6.1.4.1.3375.2.2.5.1.2.1.2',
     minup => '1.3.6.1.4.1.3375.2.2.5.1.2.1.4',
     minupstatus => '1.3.6.1.4.1.3375.2.2.5.1.2.1.5',
@@ -70,14 +75,8 @@ $ltmPoolEntryOID = array(
     monitor => '1.3.6.1.4.1.3375.2.2.5.1.2.1.17',
 );
 
-$ltmPoolEntry = [];
-foreach ($ltmPoolEntryOID as $key => $value) {
-    $ltmPoolEntry[$key] = snmpwalk_array_num($device, $value, 0);
-};
-
 // Pool Member Data
 $ltmPoolMemberEntryOID = array(
-    name => '1.3.6.1.4.1.3375.2.2.5.3.2.1.1',
     ip => '1.3.6.1.4.1.3375.2.2.5.3.2.1.3',
     port => '1.3.6.1.4.1.3375.2.2.5.3.2.1.4',
     ratio => '1.3.6.1.4.1.3375.2.2.5.3.2.1.6',
@@ -88,10 +87,27 @@ $ltmPoolMemberEntryOID = array(
     errorcode => '1.3.6.1.4.1.3375.2.2.5.6.2.1.8',
 );
 
+//Check for Pool Enries
+$ltmPoolEntry = [];
 $ltmPoolMemberEntry = [];
-foreach ($ltmPoolMemberEntryOID as $key => $value) {
-    $ltmPoolMemberEntry[$key] = snmpwalk_array_num($device, $value, 0);
-};
+$ltmPoolEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.1', 0);
+
+//If no Pools are found don't look for statistics or pool members
+if (!empty($ltmPoolEntry[name])) {
+    // If there are pools gather Pool Member Data
+    foreach ($ltmPoolEntryOID as $key => $value) {
+        $ltmPoolEntry[$key] = snmpwalk_array_num($device, $value, 0);
+    }
+    // Gather Pool Member Data if pool members found
+    $ltmPoolMemberEntry[name] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1', 0);
+    if (!empty($ltmPoolMemberEntry[name])) {
+        foreach ($ltmPoolMemberEntryOID as $key => $value) {
+            $ltmPoolMemberEntry[$key] = snmpwalk_array_num($device, $value, 0);
+        }
+    }
+} else {
+    d_echo("No Pools Found\n");
+}
 
 /*
  * False == no object found - this is not an error, OID doesn't exist.
