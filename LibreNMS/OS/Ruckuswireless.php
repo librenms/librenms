@@ -7,8 +7,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\OS;
 
 class Ruckuswireless extends OS implements
-                WirelessClientsDiscovery,
-                WirelessApCountDiscovery
+    WirelessClientsDiscovery,
+    WirelessApCountDiscovery
 {
     public function discoverWirelessClients()
     {
