@@ -368,6 +368,11 @@ class Config
             ini_set('session.cookie_secure', 1);
         }
 
+        // If we're on SSL, let's properly detect it
+        if (isset($_SERVER['HTTPS'])) {
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+        }
+
         // Define some variables if they aren't set by user definition in config.php
         self::setDefault('html_dir', '%s/html', ['install_dir']);
         self::setDefault('rrd_dir', '%s/rrd', ['install_dir']);
