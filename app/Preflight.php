@@ -38,7 +38,7 @@ class Preflight
 
     public static function checkDependencies()
     {
-        if (!class_exists(Illuminate\Foundation\Application::class)) {
+        if (!class_exists(\Illuminate\Foundation\Application::class)) {
             self::printMessage(
                 'Error: Missing dependencies! Run the following command to fix:',
                 './scripts/composer_wrapper.php install --no-dev',
