@@ -55,7 +55,7 @@ class HiveosWireless extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-     	$oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1'; // AH-INTERFACE-MIB::ahRadioChannel
+        $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1'; // AH-INTERFACE-MIB::ahRadioChannel
         return array(
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Radio Frequency')
         );
