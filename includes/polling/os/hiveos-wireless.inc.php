@@ -44,7 +44,10 @@ if ($ap250 == "AP250") {
     $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.6.0', '-OQv', '', ''), '" ');
 
     // SNMPv2-SMI::enterprises.6530.11.4.0 = STRING: "2.22.0.31.8"
-    $version = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.12.0', '-OQv', '', ''), '" ');
+    // Version has 'HiveOS ' included. We want to remove it so OS doesn't show HiveOS twice.
+    $version2 = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.12.0', '-OQv', '', ''), '" ');
+    $prefix = 'HiveOS ';
+    $version = preg_replace('/^' . preg_quote($prefix, '/') . '/', '', $version2);
 
     // SNMPv2-SMI::enterprises.6530.11.3.0 = STRING: "54-0880-2424"
     $serial = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.5.0', '-OQv', '', ''), '" ');
