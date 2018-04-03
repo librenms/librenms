@@ -285,6 +285,10 @@ if (is_admin()) {
                 $maps.empty();
                 $maps.val(null).trigger('change');
                 setRuleDevice() // pre-populate device in the maps if this is a per-device rule
+                
+                var $contacts = $('#contacts');
+                $contacts.empty();
+                $contacts.val(null).trigger('change');
             }
         });
 
