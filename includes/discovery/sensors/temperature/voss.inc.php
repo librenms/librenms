@@ -20,7 +20,7 @@ if (is_array($rcChasFan)) {
         $value = $rcChasFan[$index]['rcChasFanAmbientTemperature'];
         $var1 = 'rcChasFanAmbientTemperature';
         $oid = '.1.3.6.1.4.1.2272.1.4.7.1.1.3.'.$index;
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", 'voss', $descr, '1', '1', null, null, null, null, $value);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
     }
 }
 
