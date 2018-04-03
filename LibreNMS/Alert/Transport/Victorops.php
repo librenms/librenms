@@ -35,7 +35,7 @@ class Victorops implements Transport
         $protocol = array(
             'entity_id' => ($obj['id'] ? $obj['id'] : $obj['uid']),
             'state_start_time' => strtotime($obj['timestamp']),
-	    'entity_display_name' => $obj['title'],
+            'entity_display_name' => $obj['title'],
             'state_message' => $obj['msg'],
             'monitoring_tool' => 'librenms',
         );
