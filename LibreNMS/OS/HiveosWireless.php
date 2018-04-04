@@ -77,7 +77,7 @@ class HiveosWireless extends OS implements
             Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
-               '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization
+                '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization
                 0
             )
         );
