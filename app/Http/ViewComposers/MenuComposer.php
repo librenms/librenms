@@ -31,6 +31,7 @@ use App\Models\BgpPeer;
 use App\Models\CefSwitching;
 use App\Models\Component;
 use App\Models\DeviceGroup;
+use App\Models\Notification;
 use App\Models\OspfInstance;
 use App\Models\Package;
 use App\Models\Sensor;
@@ -218,6 +219,12 @@ class MenuComposer
         } else {
             $vars['alert_menu_class'] = 'success';
         }
+
+        // User menu
+        $vars['notification_count'] = Notification::isSticky()
+            ->orWhere(function ($query) use ($user) {
+            $query->isUnread($user);
+        })->count();
 
         $view->with($vars);
     }

@@ -314,10 +314,34 @@
                         @endadmin
                     </ul>
                 </li>
-
-
             </ul>
 
+{{-- User --}}
+            <form role="search" class="navbar-form navbar-right global-search">
+                <div class="form-group">
+                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
+                </div>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                        <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count }}</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
+                        <li><a href="notifications/"><span class="badge count-notif">{{ $notification_count }}</span> Notifications</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+                {{--<li class="dropdown">--}}
+                    {{--<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">Settings</span></a>--}}
+                    {{--<ul class="dropdown-menu">--}}
+                        {{--@admin--}}
+                        {{--<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>--}}
+                        {{--<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>--}}
+                        {{--@endadmin--}}
+                        {{--<li role="presentation" class="divider"></li>--}}
         </div>
     </div>
 </nav>
