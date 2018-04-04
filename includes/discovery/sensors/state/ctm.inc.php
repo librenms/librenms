@@ -1,6 +1,6 @@
 <?php
 /**
- * lastmile.inc.php
+ * ctm.inc.php
  *
  * Last Mile Gear CTM State
  *
