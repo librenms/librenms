@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\App;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\DatabaseConnectException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
             Config::loadFromDatabase();
         } catch (\ErrorException $ee) {
             Log::error("Error in config.php!\n" . $ee->getMessage() . PHP_EOL);
-        } catch (DatabaseConnectException $dbce) {
+        } catch (QueryException $dbce) {
             Log::error("Error connecting to database.\n" . $dbce->getMessage() . PHP_EOL);
         }
 

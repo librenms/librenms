@@ -34,6 +34,8 @@ use LibreNMS\Config;
 global $config;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -98,10 +100,12 @@ ini_set('display_errors', 1);
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
+        dbConnect();
+
         // boot Eloquent outside of Laravel
         if (!defined('LARAVEL_START')) {
             $capsule = new Capsule;
-            $db_config = @include($install_dir . '/config/database.php');
+            $db_config = include($install_dir . '/config/database.php');
             $capsule->addConnection($db_config['connections'][$db_config['default']]);
             $capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher());
             $capsule->setAsGlobal();
