@@ -146,12 +146,11 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     
     //update contacts
     $contacts = [];
-    foreach((array) $_POST['contacts'] as $contact) {
+    foreach ((array) $_POST['contacts'] as $contact) {
         // Only option currently is email transport mapping - do not need to check starting letter
         $contacts[] = (int)substr($contact, 1);
     }
     dbSyncRelationship('alert_transport_map', 'rule_id', $rule_id, 'transport_id', $contacts);
-
 }
 
 

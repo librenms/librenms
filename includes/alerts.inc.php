@@ -661,7 +661,6 @@ function IssueAlert($alert)
     $obj = DescribeAlert($alert);
     
     if (is_array($obj)) {
-
         echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
         
         // If there is a transport mapping for the alert, then send alerts
@@ -941,7 +940,8 @@ function IsParentDown($device)
  * @param int $alert_id Alert-ID
  * @return array
  */
-function GetTransports($alert_id) {
+function GetTransports($alert_id)
+{
     $query = "SELECT `email` FROM `alert_transport_map` LEFT JOIN `transport_email` ON `alert_transport_map`.`transport_id`=`transport_email`.`transport_id` WHERE `rule_id`=?";
     $rule_id = GetRuleId($alert_id);
     $params = [$rule_id];
@@ -952,11 +952,12 @@ function GetTransports($alert_id) {
 
 
 /**
- * Return Rule ID from Alert ID 
+ * Return Rule ID from Alert ID
  * @param int $alert_id Alert-ID
  * @return int $rule_id Rule-ID
  */
-function GetRuleId($alert_id) {
+function GetRuleId($alert_id)
+{
     $query = "SELECT `rule_id` FROM `alerts` WHERE `id`=?";
     $param = [$alert_id];
 
@@ -972,8 +973,8 @@ function GetRuleId($alert_id) {
  * @param array $obj alert object
  * @return void
  */
-function SendTransports($transports, $obj) {
-    
+function SendTransports($transports, $obj)
+{
     foreach ($transports as $transport) {
         $tmp = false;
         $tmpObj = $obj;
@@ -983,7 +984,7 @@ function SendTransports($transports, $obj) {
         $msg = FormatALertTpl($tmpObj);
         $tmpObj['msg'] = $msg;
         $instance = new LibreNMS\Alert\Transport\Mail;
-        $tmp = $instance->deliverAlert($tmpObj, NULL);
+        $tmp = $instance->deliverAlert($tmpObj, null);
 
         if ($tmp === true) {
             echo 'OK';

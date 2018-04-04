@@ -33,12 +33,11 @@ if ($transport_type = 'email' && $status == 'ok') {
             'email' => $member,
             'contact_name' => $name
         ), 'transport_email');
-        
+ 
         $message = 'Added contact name'. $name;
-    
     } else {
         $status = 'error';
-        $message = 'Invalid email provided'; 
+        $message = 'Invalid email provided';
     }
 }
 
