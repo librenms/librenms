@@ -98,7 +98,7 @@ class Programs extends BaseValidation
             return Config::get($bin);
         }
 
-        $located = locate_binary($bin);
+        $located = Config::locateBinary($bin);
         if (is_executable($located)) {
             return $located;
         }

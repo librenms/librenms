@@ -27,6 +27,7 @@
  * @param array $modules Which modules to initialize
  */
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
@@ -97,6 +98,16 @@ ini_set('display_errors', 1);
 if (!module_selected('nodb', $init_modules)) {
     // Connect to database
     try {
+        // boot Eloquent outside of Laravel
+        if (!defined('LARAVEL_START')) {
+            $capsule = new Capsule;
+            $db_config = @include($install_dir . '/config/database.php');
+            $capsule->addConnection($db_config['connections'][$db_config['default']]);
+            $capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher());
+            $capsule->setAsGlobal();
+            $capsule->bootEloquent();
+        }
+
         dbConnect();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {

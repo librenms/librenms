@@ -56,10 +56,7 @@
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Tests\\": "tests"
-        },
-        "files": [
-            "includes/dbFacile.php"
-        ]
+        }
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",

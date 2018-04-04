@@ -312,9 +312,9 @@ class Config
     {
         // type cast value. Is this needed here?
         if (filter_var($value, FILTER_VALIDATE_INT)) {
-            $value = (int) $value;
+            $value = (int)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            $value = (float) $value;
+            $value = (float)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
@@ -388,7 +388,7 @@ class Config
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
             if (!is_executable(self::get($bin))) {
-                self::set($bin, locate_binary($bin), true, $bin, "Path to $bin", 'external', 'paths');
+                self::set($bin, self::locateBinary($bin), true, $bin, "Path to $bin", 'external', 'paths');
             }
         }
     }
@@ -462,5 +462,26 @@ class Config
         }
 
         return array_intersect_key($config, $keys); // return only the db settings
+    }
+
+    /**
+     * Locate the actual path of a binary
+     *
+     * @param $binary
+     * @return mixed
+     */
+    public static function locateBinary($binary)
+    {
+        if (!str_contains($binary, '/')) {
+            $output = `whereis -b $binary`;
+            $list = trim(substr($output, strpos($output, ':') + 1));
+            $targets = explode(' ', $list);
+            foreach ($targets as $target) {
+                if (is_executable($target)) {
+                    return $target;
+                }
+            }
+        }
+        return $binary;
     }
 }

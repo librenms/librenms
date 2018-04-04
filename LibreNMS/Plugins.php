@@ -25,6 +25,8 @@
 
 namespace LibreNMS;
 
+use App\Models\Plugin;
+
 class Plugins
 {
 
@@ -39,7 +41,7 @@ class Plugins
 
             if (file_exists($plugin_dir)) {
                 // $plugin_files = scandir($config['plugin_dir']);
-                $plugin_files = dbFetchRows("SELECT * FROM `plugins` WHERE `plugin_active` = '1'");
+                $plugin_files = Plugin::isActive()->get()->toArray();
                 foreach ($plugin_files as $plugins) {
                     $plugin_info = pathinfo($plugin_dir.'/'.$plugins['plugin_name'].'/'.$plugins['plugin_name'].'.php');
                     if ($plugin_info['extension'] == 'php') {

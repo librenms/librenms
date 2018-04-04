@@ -2418,29 +2418,6 @@ function return_num($entry)
 }
 
 /**
- * Locate the actual path of a binary
- *
- * @param $binary
- * @return mixed
- */
-function locate_binary($binary)
-{
-    if (!str_contains($binary, '/')) {
-        $output = `whereis -b $binary`;
-        $list = trim(substr($output, strpos($output, ':') + 1));
-        $targets = explode(' ', $list);
-
-        foreach ($targets as $target) {
-            if (is_executable($target)) {
-                return $target;
-            }
-        }
-    }
-
-    return $binary;
-}
-
-/**
  * If Distributed, create a lock, then purge the mysql table
  *
  * @param string $table
