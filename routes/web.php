@@ -21,7 +21,7 @@ Route::get('/laravel', function () {
     Auth::onceUsingId($_SESSION['user_id']);
 
     $user = Auth::getUser();
-    \App\Preflight::checkNotifications();
+    \App\Checks::postAuth();
     Toastr::info('Welcome ' . ($user->realname ?: $user->username));
 
     \LibreNMS\Config::loadFromDatabase();

@@ -2,7 +2,7 @@
 
 namespace App\Http;
 
-use App\Preflight;
+use App\Checks;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -62,7 +62,7 @@ class Kernel extends HttpKernel
 
     public function bootstrap()
     {
-        Preflight::checkAll();
+        Checks::preBoot();
         parent::bootstrap();
     }
 }

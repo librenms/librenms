@@ -1,8 +1,8 @@
 <?php
 /**
- * Preflight.php
+ * Checks.php
  *
- * -Description-
+ * Pre-flight checks at various stages of booting
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ use Carbon\Carbon;
 use LibreNMS\Config;
 use Toastr;
 
-class Preflight
+class Checks
 {
-    public static function checkAll()
+    public static function preBoot()
     {
         Config::load(); // load without database
 
@@ -44,7 +44,7 @@ class Preflight
     /**
      * Pre-boot dependency check
      */
-    public static function checkDependencies()
+    public static function postAutoload()
     {
         if (!class_exists(\Illuminate\Foundation\Application::class)) {
             self::printMessage(
@@ -88,7 +88,7 @@ class Preflight
     /**
      * Post boot Toast messages
      */
-    public static function checkNotifications()
+    public static function postAuth()
     {
         $notifications = Notification::isUnread(Auth::user())->where('severity', '>', 1)->get();
         foreach ($notifications as $notification) {

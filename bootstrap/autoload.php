@@ -16,8 +16,8 @@ define('LARAVEL_START', microtime(true));
 
 @include __DIR__ . '/../vendor/autoload.php';
 
-if (!class_exists(\App\Preflight::class)) {
+if (!class_exists(\App\Checks::class)) {
     require __DIR__ . '/../app/Preflight.php';
 }
 
-\App\Preflight::checkDependencies();
+\App\Checks::postAutoload();
