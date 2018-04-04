@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -17,13 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        try {
-            Config::loadFromDatabase();
-        } catch (\ErrorException $ee) {
-            Log::error("Error in config.php!\n" . $ee->getMessage() . PHP_EOL);
-        } catch (QueryException $dbce) {
-            Log::error("Error connecting to database.\n" . $dbce->getMessage() . PHP_EOL);
-        }
+        Config::loadFromDatabase();
 
         // direct log output to librenms.log
         Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')));

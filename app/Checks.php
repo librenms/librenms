@@ -29,8 +29,8 @@ use App\Models\Device;
 use App\Models\Notification;
 use Auth;
 use Carbon\Carbon;
+use Kamaln7\Toastr\Facades\Toastr;
 use LibreNMS\Config;
-use Toastr;
 
 class Checks
 {
@@ -98,6 +98,20 @@ class Checks
         if (Device::isUp()->whereTime('last_polled', '<=', Carbon::now()->subMinutes(15))->count() > 0) {
             Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last 15 minutes, you may want to check that out :)</a>', 'Devices unpolled');
         }
+
+        // Directory access checks
+        $rrd_dir = Config::get('rrd_dir');
+        if (!is_dir($rrd_dir)) {
+            Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail.");
+        }
+
+        $temp_dir = Config::get('temp_dir');
+        if (!is_dir($temp_dir)) {
+            Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail.");
+        } elseif (!is_writable($temp_dir)) {
+            Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail.");
+        }
+
     }
 
     private static function printMessage($title, $content, $exit = false)

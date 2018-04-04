@@ -48,7 +48,7 @@ class Config
         }
 
         // Process $config to tidy up
-        self::processConfig();
+        self::processConfig(dbIsConnected());
 
         return $config;
     }
@@ -353,9 +353,9 @@ class Config
      * Proces the config after it has been loaded.
      * Make sure certain variables have been set properly and
      *
-     *
+     * @param bool $persist Save binary locations and other settings to the database.
      */
-    private static function processConfig()
+    private static function processConfig($persist = true)
     {
         if (!self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
@@ -388,7 +388,7 @@ class Config
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
             if (!is_executable(self::get($bin))) {
-                self::set($bin, self::locateBinary($bin), true, $bin, "Path to $bin", 'external', 'paths');
+                self::set($bin, self::locateBinary($bin), $persist, $bin, "Path to $bin", 'external', 'paths');
             }
         }
     }

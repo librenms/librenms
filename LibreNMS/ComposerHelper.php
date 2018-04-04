@@ -117,11 +117,15 @@ class ComposerHelper
         }
 
         foreach ($settings as $key => $value) {
+            // only add non-empty settings
+            if (empty($value)) {
+                continue;
+            }
+
             if (strpos($content, "$key=") !== false) {
-                // only replace ones that aren't already set for safety
-                $content = preg_replace("/$key=\n/", "$key=$value\n", $content);
-            } elseif (!empty($value)) {
-                // only add non-empty settings
+                // only replace ones that aren't already set for safety and uncomment
+                $content = preg_replace("/#?$key=\n/", "$key=$value\n", $content);
+            } else {
                 $content .= "$key=$value\n";
             }
         }

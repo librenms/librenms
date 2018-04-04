@@ -294,7 +294,7 @@ class DeviceGroup extends BaseModel
         }
 
         if (!$this->isJoined($query, 'device_group_device')) {
-            $query->join('device_group_device', 'device_group_device.device_group_id', 'device_group.id');
+            $query->join('device_group_device', 'device_group_device.device_group_id', 'device_groups.id');
         }
 
         return $this->hasDeviceAccess($query, $user, 'device_group_device');

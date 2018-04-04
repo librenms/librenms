@@ -12,6 +12,7 @@
  */
 
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Config;
 
 if (empty($_SERVER['PATH_INFO'])) {
     if (strstr($_SERVER['SERVER_SOFTWARE'], "nginx") && isset($_SERVER['PATH_TRANSLATED']) && isset($_SERVER['ORIG_SCRIPT_FILENAME'])) {
@@ -301,16 +302,29 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" r
 <?php
 }
 
+// Pre-flight checks
+$rrd_dir = Config::get('rrd_dir');
+if (!is_dir($rrd_dir)) {
+    $msg_box[] = ['type' => 'error', 'message' => "RRD Log Directory is missing ($rrd_dir).  Graphing may fail."];
+}
+
+$temp_dir = Config::get('temp_dir');
+if (!is_dir($temp_dir)) {
+    $msg_box[] = ['type' => 'error', 'message' => "Temp Directory is missing ($temp_dir).  Graphing may fail."];
+} elseif (!is_writable($temp_dir)) {
+    $msg_box[] = ['type' => 'error', 'message' => "Temp Directory is not writable ($temp_dir).  Graphing may fail."];
+}
+
 if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
-    $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
+    $msg_box[] = ['type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled'];
 }
 
 foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array(Auth::id())) as $notification) {
-    $msg_box[] = array(
+    $msg_box[] = [
         'type' => 'error',
         'message' => "<a href='notifications/'>${notification['body']}</a>",
         'title' => $notification['title']
-    );
+    ];
 }
 
 if (is_array($msg_box)) {
