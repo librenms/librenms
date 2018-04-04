@@ -205,19 +205,18 @@ class MenuComposer
         $vars['routing_menu'] = $routing_menu;
 
         // Alert menu
-        $vars['alert_menu_class'] = 'success';
+        $alert_status = AlertRule::select('severity')
+            ->isActive()
+            ->hasAccess($user)
+            ->groupBy('severity')
+            ->pluck('severity');
 
-        if ($user->hasGlobalRead()) {
-            $alert_status = AlertRule::select('severity')
-                ->active()
-                ->groupBy('severity')
-                ->pluck('severity');
-
-            if ($alert_status->contains('critical')) {
-                $vars['alert_menu_class'] = 'danger';
-            } elseif ($alert_status->contains('warning')) {
-                $vars['alert_menu_class'] = 'warning';
-            }
+        if ($alert_status->contains('critical')) {
+            $vars['alert_menu_class'] = 'danger';
+        } elseif ($alert_status->contains('warning')) {
+            $vars['alert_menu_class'] = 'warning';
+        } else {
+            $vars['alert_menu_class'] = 'success';
         }
 
         $view->with($vars);

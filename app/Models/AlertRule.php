@@ -26,9 +26,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
-class AlertRule extends Model
+class AlertRule extends BaseModel
 {
     public $timestamps = false;
 
@@ -44,15 +43,40 @@ class AlertRule extends Model
     }
 
     /**
+     * Scope for only alert rules that are currently in alarm
+     *
      * @param Builder $query
      * @return Builder
      */
-    public function scopeActive($query)
+    public function scopeIsActive($query)
     {
-        return $query->enabled()->whereHas('alerts', function ($query) {
-            return $query->active();
-        });
+        return $query->enabled()
+            ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
+            ->where('alerts.state', 1);
     }
+
+    /**
+     * Scope to filter rules for devices permitted to user
+     * (do not use for admin and global read-only users)
+     *
+     * @param $query
+     * @param User $user
+     * @return mixed
+     */
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        if (!$this->isJoined($query, 'alerts')) {
+            $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
+        }
+
+        return $query->join('devices_perms', 'devices_perms.device_id', 'alerts.device_id')
+            ->where('devices_perms.user_id', $user->user_id);
+    }
+
     // ---- Define Relationships ----
 
     public function alerts()
@@ -60,8 +84,8 @@ class AlertRule extends Model
         return $this->hasMany('App\Models\Alert', 'rule_id');
     }
 
-    public function device()
+    public function devices()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
+        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'device_id', 'devices');
     }
 }

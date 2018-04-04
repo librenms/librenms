@@ -66,7 +66,7 @@ class Alert extends Model
         return $this->belongsTo('App\Models\Rule', 'rule_id', 'id');
     }
 
-    public function user()
+    public function users()
     {
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
     }

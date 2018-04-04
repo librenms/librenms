@@ -289,6 +289,11 @@ class DeviceGroup extends Model
 
     // ---- Define Relationships ----
 
+    public function rules()
+    {
+        return $this->belongsToMany('App\Models\AlertRule', 'alert_group_map', 'group_id', 'rule_id');
+    }
+
     public function devices()
     {
         return $this->belongsToMany('App\Models\Device', 'device_group_device', 'device_group_id', 'device_id');

@@ -101,6 +101,14 @@ class Device extends Model
         ]);
     }
 
+    public function scopeIsActive($query)
+    {
+        return $query->where([
+            ['ignore', '=', 0],
+            ['disabled', '=', 0]
+        ]);
+    }
+
     public function scopeIsDown($query)
     {
         return $query->where([
@@ -189,9 +197,9 @@ class Device extends Model
         return $this->hasMany('App\Models\Processor', 'device_id');
     }
 
-    public function alertRules()
+    public function rules()
     {
-        return $this->hasMany('App\Models\AlertRule', 'device_id');
+        return $this->belongsToMany('App\Models\AlertRule', 'alert_device_map', 'device_id', 'rule_id');
     }
 
     public function sensors()

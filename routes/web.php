@@ -27,6 +27,26 @@ Route::get('/laravel', function () {
 
 Route::post('/ajax/set_resolution', 'AjaxController@setResolution');
 
+
+// Debugbar routes need to be here because of catch-all
+if ($this->app->environment() !== 'production' && config('app.debug')) {
+    Route::get('/_debugbar/assets/stylesheets', [
+        'as' => 'debugbar-css',
+        'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'
+    ]);
+
+    Route::get('/_debugbar/assets/javascript', [
+        'as' => 'debugbar-js',
+        'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@js'
+    ]);
+
+    Route::get('/_debugbar/open', [
+        'as' => 'debugbar-open',
+        'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
+    ]);
+}
+
+// Legacy routes
 Route::any('/api/v0/{path?}', 'LegacyController@api')->where('path', '.*');
 Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
 

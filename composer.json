@@ -43,7 +43,8 @@
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
         "fojuth/readmegen": "1.*",
-        "barryvdh/laravel-ide-helper": "^2.4"
+        "barryvdh/laravel-ide-helper": "^2.4",
+        "barryvdh/laravel-debugbar": "~2.4"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
