@@ -28,13 +28,13 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+//use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
 class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
-    WirelessFrequencyDiscovery,
+    //WirelessFrequencyDiscovery,
     ProcessorDiscovery
 {
     /**
@@ -56,14 +56,13 @@ class HiveosWireless extends OS implements
      *
      * @return array Sensors
      */
-     //FIXME Needs array two get all radios and return channels.
+    /**
     public function discoverWirelessFrequency()
     {
-        $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1'; // AH-INTERFACE-MIB::ahRadioChannel
-        return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Radio Frequency')
-        );
+        // instant
+        return $this->discoverInstantRadio('frequency', 'ahRadioChannel');
     }
+    */
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
