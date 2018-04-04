@@ -347,7 +347,7 @@ function list_devices()
         $param[] = $_SESSION['user_id'];
     }
     $devices = array();
-    $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
+    $dev_query = "SELECT dev.*, lat, lng FROM (SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order) dev LEFT JOIN locations ON locations.location=dev.location";
     foreach (dbFetchRows($dev_query, $param) as $device) {
         $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
