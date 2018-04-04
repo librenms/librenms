@@ -333,15 +333,168 @@
                         <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>
                     </ul>
                 </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">Settings</span></a>
+                    <ul class="dropdown-menu">
+                        @admin
+                        <li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>
+                        <li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>
+                        <li role="presentation" class="divider"></li>
+                        @if(\LibreNMS\Authentication\Auth::get()->canManageUsers())
+                            <li><a href="edituser/"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+                            <li><a href="authlog/"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
+                            <li role="presentation" class="divider"></li>
+                        @endif
+                        <li class="dropdown-submenu">
+                            <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
+                            <ul class="dropdown-menu scrollable-menu">
+                                <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
+                                <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
+                                @config('distributed_poller')
+                                <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>
+                                @endconfig
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li class="dropdown-submenu">
+                            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
+                            <ul class="dropdown-menu scrollable-menu">
+                                <li><a href="api-access/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
+                                <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        @endadmin
+                        <li><a href="about/"><i class="fa fa-info-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;{{ \LibreNMS\Config::get('project_name') }}</a></li>
+                    </ul>
+                </li>
             </ul>
-                {{--<li class="dropdown">--}}
-                    {{--<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">Settings</span></a>--}}
-                    {{--<ul class="dropdown-menu">--}}
-                        {{--@admin--}}
-                        {{--<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>--}}
-                        {{--<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>--}}
-                        {{--@endadmin--}}
-                        {{--<li role="presentation" class="divider"></li>--}}
         </div>
     </div>
 </nav>
+
+<script>
+    var devices = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: "ajax_search.php?search=%QUERY&type=device",
+            filter: function (devices) {
+                return $.map(devices, function (device) {
+                    return {
+                        device_id: device.device_id,
+                        device_image: device.device_image,
+                        url: device.url,
+                        name: device.name,
+                        device_os: device.device_os,
+                        version: device.version,
+                        device_hardware: device.device_hardware,
+                        device_ports: device.device_ports,
+                        location: device.location
+                    };
+                });
+            },
+            wildcard: "%QUERY"
+        }
+    });
+    var ports = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: "ajax_search.php?search=%QUERY&type=ports",
+            filter: function (ports) {
+                return $.map(ports, function (port) {
+                    return {
+                        count: port.count,
+                        url: port.url,
+                        name: port.name,
+                        description: port.description,
+                        colours: port.colours,
+                        hostname: port.hostname
+                    };
+                });
+            },
+            wildcard: "%QUERY"
+        }
+    });
+    var bgp = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: "ajax_search.php?search=%QUERY&type=bgp",
+            filter: function (bgp_sessions) {
+                return $.map(bgp_sessions, function (bgp) {
+                    return {
+                        count: bgp.count,
+                        url: bgp.url,
+                        name: bgp.name,
+                        description: bgp.description,
+                        localas: bgp.localas,
+                        bgp_image: bgp.bgp_image,
+                        remoteas: bgp.remoteas,
+                        colours: bgp.colours,
+                        hostname: bgp.hostname
+                    };
+                });
+            },
+            wildcard: "%QUERY"
+        }
+    });
+
+    if ($(window).width() < 768) {
+        var cssMenu = 'typeahead-left';
+    } else {
+        var cssMenu = '';
+    }
+
+    devices.initialize();
+    ports.initialize();
+    bgp.initialize();
+    $('#gsearch').bind('typeahead:select', function(ev, suggestion) {
+        window.location.href = suggestion.url;
+    });
+    $('#gsearch').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1,
+            classNames: {
+                menu: cssMenu
+            }
+        },
+        {
+            source: devices.ttAdapter(),
+            limit: '{{ $typeahead_limit }}',
+            async: true,
+            display: 'name',
+            valueKey: 'name',
+            templates: {
+                header: '<h5><strong>&nbsp;Devices</strong></h5>',
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" border="0"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} | @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
+            }
+        },
+        {
+            source: ports.ttAdapter(),
+            limit: '{{ $typeahead_limit }}',
+            async: true,
+            display: 'name',
+            valueKey: 'name',
+            templates: {
+                header: '<h5><strong>&nbsp;Ports</strong></h5>',
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> – @{{hostname}}<br /><i>@{{description}}</i></small></a></p>')
+            }
+        },
+        {
+            source: bgp.ttAdapter(),
+            limit: '{{ $typeahead_limit }}',
+            async: true,
+            display: 'name',
+            valueKey: 'name',
+            templates: {
+                header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{{bgp_image}}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+            }
+        });
+    $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
+        $('#gsearch').addClass('search-box');
+    });
+</script>

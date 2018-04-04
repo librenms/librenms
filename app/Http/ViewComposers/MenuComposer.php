@@ -226,6 +226,9 @@ class MenuComposer
             $query->isUnread($user);
         })->count();
 
+        // Search bar
+        $vars['typeahead_limit'] = \LibreNMS\Config::get('webui.global_search_result_limit') ;
+
         $view->with($vars);
     }
 }
