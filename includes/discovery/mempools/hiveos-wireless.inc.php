@@ -27,6 +27,6 @@ if ($device['os'] == 'hiveos-wireless') {
     $memory_oid = '1.3.6.1.4.1.26928.1.2.4.0';
     $usage = snmp_get($device, $memory_oid, '-Ovq');
     if (is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, '0', 'hiveos-wireless', 'Memory', '1', null, null);
+        discover_mempool($valid_mempool, $device, '0', 'hiveos-wireless', 'Memory');
     }
 }

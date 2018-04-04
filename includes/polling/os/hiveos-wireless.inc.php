@@ -1,14 +1,4 @@
 <?php
-/*
- * LibreNMS
- *
- * Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
- */
 /**
  * hiveos-wireless.inc.php
  *
@@ -27,6 +17,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
+ * @copyright  2015 Søren Friis Rosiak
+ * @author     sorenrosiak@gmail.com
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
@@ -38,17 +30,17 @@ $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.1.3.0', '-Ovq'), '
 $version = trim(snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.1.13.0', '-Ovq'), '"');
 $serial = trim(snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.1.4.0', '-Ovq'), '"');
 
-$apmodel = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.6.0', '-OQv', '', ''), '" ');
+$apmodel = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.6.0', '-OQv'), '"');
 if ($apmodel == "AP250" OR "AP550") {
-    // SNMPv2-SMI::enterprises.6530.11.1.0 = STRING: "2N IP Force"
-    $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.6.0', '-OQv', '', ''), '" ');
+    // AH-SYSTEM-MIB::.1.3.6.1.4.1.26928.1.2.6.0 = STRING: "AP250"
+    $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.6.0', '-OQv'), '"');
 
-    // SNMPv2-SMI::enterprises.6530.11.4.0 = STRING: "2.22.0.31.8"
+    // AH-SYSTEM-MIB::.1.3.6.1.4.1.26928.1.2.12.0 = STRING: "2.22.0.31.8"
     // Version has 'HiveOS ' included. We want to remove it so OS doesn't show HiveOS twice.
-    $version2 = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.12.0', '-OQv', '', ''), '" ');
+    $version2 = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.12.0', '-OQv'), '"');
     $prefix = 'HiveOS ';
     $version = preg_replace('/^' . preg_quote($prefix, '/') . '/', '', $version2);
 
-    // SNMPv2-SMI::enterprises.6530.11.3.0 = STRING: "54-0880-2424"
-    $serial = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.5.0', '-OQv', '', ''), '" ');
+    // AH-SYSTEM-MIB::1.3.6.1.4.1.26928.1.2.5.0 = STRING: "025015198798176"
+    $serial = trim(snmp_get($device, '.1.3.6.1.4.1.26928.1.2.5.0', '-OQv'), '"');
 }
