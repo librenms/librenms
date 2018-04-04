@@ -29,7 +29,7 @@ Route::post('/ajax/set_resolution', 'AjaxController@setResolution');
 
 
 // Debugbar routes need to be here because of catch-all
-if ($this->app->environment() !== 'production' && config('app.debug')) {
+if (config('app.env') !== 'production' && config('app.debug')) {
     Route::get('/_debugbar/assets/stylesheets', [
         'as' => 'debugbar-css',
         'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'
