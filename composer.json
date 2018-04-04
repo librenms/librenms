@@ -35,7 +35,8 @@
         "rmccue/requests": "^1.7",
         "palanik/corsslim": "^1.1",
         "influxdb/influxdb-php": "^1.14",
-        "laravel/laravel": "5.4.*"
+        "laravel/laravel": "5.4.*",
+        "oriceon/toastr-5-laravel": "dev-master"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",

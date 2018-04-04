@@ -20,6 +20,10 @@ Route::get('/laravel', function () {
     // FIXME real auth
     Auth::onceUsingId($_SESSION['user_id']);
 
+    $user = Auth::getUser();
+    \App\Preflight::checkNotifications();
+    Toastr::info('Welcome ' . ($user->realname ?: $user->username));
+
     \LibreNMS\Config::loadFromDatabase();
 
     return view('laravel');

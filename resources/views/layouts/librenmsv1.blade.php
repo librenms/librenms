@@ -103,5 +103,7 @@
     </div>
 </div>
 
+{!! Toastr::render() !!}
+
 </body>
 </html>

@@ -25,7 +25,12 @@
 
 namespace App;
 
+use App\Models\Device;
+use App\Models\Notification;
+use Auth;
+use Carbon\Carbon;
 use LibreNMS\Config;
+use Toastr;
 
 class Preflight
 {
@@ -36,6 +41,9 @@ class Preflight
         self::checkWriteAccess();
     }
 
+    /**
+     * Pre-boot dependency check
+     */
     public static function checkDependencies()
     {
         if (!class_exists(\Illuminate\Foundation\Application::class)) {
@@ -47,6 +55,9 @@ class Preflight
         }
     }
 
+    /**
+     * Mid-boot check for folder access
+     */
     public static function checkWriteAccess()
     {
         // check file/folder permissions
@@ -71,6 +82,21 @@ class Preflight
                     true
                 );
             }
+        }
+    }
+
+    /**
+     * Post boot Toast messages
+     */
+    public static function checkNotifications()
+    {
+        $notifications = Notification::isUnread(Auth::user())->where('severity', '>', 1)->get();
+        foreach ($notifications as $notification) {
+            Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
+        }
+
+        if (Device::isUp()->whereTime('last_polled', '<=', Carbon::now()->subMinutes(15))->count() > 0) {
+            Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last 15 minutes, you may want to check that out :)</a>', 'Devices unpolled');
         }
     }
 
