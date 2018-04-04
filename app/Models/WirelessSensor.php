@@ -25,9 +25,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class WirelessSensor extends Model
+class WirelessSensor extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'sensors_id';
@@ -46,6 +44,13 @@ class WirelessSensor extends Model
         return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
             ->get($this->sensor_class, []))
             ->get('icon', 'signal');
+    }
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
     }
 
     // ---- Define Relationships ----

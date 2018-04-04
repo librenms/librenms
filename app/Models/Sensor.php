@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Sensor extends Model
+class Sensor extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'sensors_id';
@@ -51,6 +49,13 @@ class Sensor extends Model
     public function icon()
     {
         return collect(self::$icons)->get($this->sensor_class, 'heartbeat');
+    }
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
     }
 
     // ---- Define Relationships ----

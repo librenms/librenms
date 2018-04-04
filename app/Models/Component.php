@@ -25,12 +25,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Component extends Model
+class Component extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'component';
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
     // ---- Define Relationships ----
 

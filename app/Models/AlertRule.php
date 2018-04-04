@@ -73,8 +73,7 @@ class AlertRule extends BaseModel
             $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
         }
 
-        return $query->join('devices_perms', 'devices_perms.device_id', 'alerts.device_id')
-            ->where('devices_perms.user_id', $user->user_id);
+        return $this->hasDeviceAccess($query, $user, 'alerts');
     }
 
     // ---- Define Relationships ----

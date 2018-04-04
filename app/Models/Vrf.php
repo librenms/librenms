@@ -25,13 +25,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Vrf extends Model
+class Vrf extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'vrfs';
     protected $primaryKey = 'vrf_id';
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
     // ---- Define Relationships ----
 

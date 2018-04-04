@@ -26,14 +26,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
-class BaseModel extends Model
+abstract class BaseModel extends Model
 {
     /**
      * Check if query is already joined with a table
      *
-     * @param $query
-     * @param $table
+     * @param Builder $query
+     * @param string $table
      * @return bool
      */
     public static function isJoined($query, $table)
@@ -48,5 +49,53 @@ class BaseModel extends Model
             }
         }
         return false;
+    }
+
+    /**
+     * Helper function to determine if user has access based on device permissions
+     *
+     * @param Builder $query
+     * @param User $user
+     * @param string $table
+     * @return Builder
+     */
+    protected function hasDeviceAccess($query, User $user, $table = null)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        if (is_null($table)) {
+            $table = $this->getTable();
+        }
+
+        return $query->join('devices_perms', 'devices_perms.device_id', "$table.device_id")
+            ->where('devices_perms.user_id', $user->user_id);
+    }
+
+    /**
+     * Helper function to determine if user has access based on port permissions
+     *
+     * @param Builder $query
+     * @param User $user
+     * @param string $table
+     * @return Builder
+     */
+    protected function hasPortAccess($query, User $user, $table = null)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        if (is_null($table)) {
+            $table = $this->getTable();
+        }
+
+        return $query->join('ports_perms', 'ports_perms.port_id', "$table.port_id")
+            ->join('devices_perms', 'devices_perms.device_id', "$table.device_id")
+            ->where(function ($query) use ($user) {
+                $query->where('ports_perms.user_id', $user->user_id)
+                    ->orWhere('devices_perms.user_id', $user->user_id);
+            });
     }
 }

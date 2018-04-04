@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Service extends Model
+class Service extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'service_id';
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
     // ---- Define Relationships ----
 

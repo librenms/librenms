@@ -25,12 +25,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Package extends Model
+class Package extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'pkg_id';
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
     // ---- Define Relationships ----
 

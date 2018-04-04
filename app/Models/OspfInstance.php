@@ -25,12 +25,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class OspfInstance extends Model
+class OspfInstance extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'ospf_instance_id';
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
     // ---- Define Relationships ----
 

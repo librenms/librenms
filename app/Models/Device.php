@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Device extends Model
+class Device extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -138,6 +136,11 @@ class Device extends Model
         return $query->where([
             ['disabled', '=', 1]
         ]);
+    }
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
     }
 
     // ---- Define Relationships ----

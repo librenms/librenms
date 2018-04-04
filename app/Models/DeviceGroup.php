@@ -27,10 +27,9 @@ namespace App\Models;
 
 use App\Util;
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Settings;
 
-class DeviceGroup extends Model
+class DeviceGroup extends BaseModel
 {
     public $timestamps = false;
     protected $appends = ['patternSql'];
@@ -286,6 +285,20 @@ class DeviceGroup extends Model
         return $pattern;
     }
 
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        if (!$this->isJoined($query, 'device_group_device')) {
+            $query->join('device_group_device', 'device_group_device.device_group_id', 'device_group.id');
+        }
+
+        return $this->hasDeviceAccess($query, $user, 'device_group_device');
+    }
 
     // ---- Define Relationships ----
 

@@ -30,15 +30,18 @@ use App\Models\Application;
 use App\Models\BgpPeer;
 use App\Models\CefSwitching;
 use App\Models\Component;
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Notification;
 use App\Models\OspfInstance;
 use App\Models\Package;
+use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
+use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Config;
@@ -55,7 +58,7 @@ class MenuComposer
     {
         $vars = [];
         /** @var User $user */
-        $user = auth()->user();
+        $user = Auth::user();
 
         $vars['navbar'] = in_array(Config::get('site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
 
@@ -66,20 +69,20 @@ class MenuComposer
         }
 
         // Device menu
-        $vars['device_groups'] = DeviceGroup::select('id', 'name', 'desc')->get();
-        $vars['package_count'] = Package::count();
+        $vars['device_groups'] = DeviceGroup::hasAccess($user)->select('id', 'name', 'desc')->get();
+        $vars['package_count'] = Package::hasAccess($user)->count();
 
-        $vars['device_types'] = $user->devices()->select('type')->distinct()->get()->pluck('type');
+        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->get()->pluck('type')->filter();
 
         if (Config::get('show_locations') && Config::get('show_locations_dropdown')) {
-            $vars['locations'] = $user->devices()->select('location')->distinct()->get()->pluck('location')->filter();
+            $vars['locations'] = Device::hasAccess($user)->select('location')->distinct()->get()->pluck('location')->filter();
         } else {
             $vars['locations'] = [];
         }
 
         // Service menu
         if (Config::get('show_services')) {
-            $vars['service_status'] = Service::groupBy('service_status')
+            $vars['service_status'] = Service::hasAccess($user)->groupBy('service_status')
                 ->select('service_status', DB::raw('count(*) as count'))
                 ->whereIn('service_status', [1, 2])
                 ->get()
@@ -92,21 +95,20 @@ class MenuComposer
         }
 
         // Port menu
-        // FIXME actual queries
         $vars['port_counts'] = [
-            'count' => 5,
-            'up' => 1,
-            'down' => 1,
-            'shutdown' => 1,
-            'errored' => 1,
-            'ignored' => 1,
-            'deleted' => 1,
-            'alerted' => 1, // not actually supported on old...
+            'count' => Port::hasAccess($user)->count(),
+            'up' => Port::hasAccess($user)->isUp()->count(),
+            'down' => Port::hasAccess($user)->isDown()->count(),
+            'shutdown' => Port::hasAccess($user)->isDisabled()->count(),
+            'errored' => Port::hasAccess($user)->hasErrors()->count(),
+            'ignored' => Port::hasAccess($user)->isIgnored()->count(),
+            'deleted' => Port::hasAccess($user)->isDeleted()->count(),
+            'alerted' => 0, // not actually supported on old...
         ];
 
         // Sensor menu
         $sensor_menu = [];
-        $sensor_classes = Sensor::select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
+        $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
 
         foreach ($sensor_classes as $sensor_model) {
             /** @var Sensor $sensor_model */
@@ -128,7 +130,7 @@ class MenuComposer
 
         // Wireless menu
         $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
-        $vars['wireless_menu'] = WirelessSensor::select('sensor_class')
+        $vars['wireless_menu'] = WirelessSensor::hasAccess($user)->select('sensor_class')
             ->groupBy('sensor_class')
             ->get()
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
@@ -137,27 +139,24 @@ class MenuComposer
             });
 
         // Application menu
-        if ($user->hasGlobalRead()) {
-            $vars['app_menu'] = Application::select('app_type', 'app_instance')
-                ->groupBy('app_type', 'app_instance')
-                ->orderBy('app_type')
-                ->get()
-                ->groupBy('app_type');
-        } else {
-            $vars['app_menu'] = false;
-        }
+        $vars['app_menu'] = Application::hasAccess($user)
+            ->select('app_type', 'app_instance')
+            ->groupBy('app_type', 'app_instance')
+            ->orderBy('app_type')
+            ->get()
+            ->groupBy('app_type');
 
         // Routing menu
         // FIXME queries use relationships to user
         $routing_menu = [];
         if ($user->hasGlobalRead()) {
-            if (Vrf::count()) {
+            if (Vrf::hasAccess($user)->count()) {
                 $routing_menu[] = [['url' => 'vrf',
                     'icon' => 'arrows',
                     'text' => 'VRFs',]];
             }
 
-            if (OspfInstance::count()) {
+            if (OspfInstance::hasAccess($user)->count()) {
                 $routing_menu[] = [[
                     'url' => 'ospf',
                     'icon' => 'circle-o-notch fa-rotate-180',
@@ -165,7 +164,7 @@ class MenuComposer
                 ]];
             }
 
-            if (Component::where('type', 'Cisco-OTV')->count()) {
+            if (Component::hasAccess($user)->where('type', 'Cisco-OTV')->count()) {
                 $routing_menu[] = [[
                     'url' => 'cisco-otv',
                     'icon' => 'exchange',
@@ -173,7 +172,7 @@ class MenuComposer
                 ]];
             }
 
-            if (BgpPeer::count()) {
+            if (BgpPeer::hasAccess($user)->count()) {
                 $vars['show_peeringdb'] = Config::get('peeringdb.enabled', false);
                 $vars['bgp_alerts'] = BgpPeer::inAlarm()->count();
                 $routing_menu[] = [
@@ -195,7 +194,7 @@ class MenuComposer
                 ];
             }
 
-            if (CefSwitching::count()) {
+            if (CefSwitching::hasAccess($user)->count()) {
                 $routing_menu[] = [[
                     'url' => 'cef',
                     'icon' => 'exchange',

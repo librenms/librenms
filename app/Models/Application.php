@@ -25,9 +25,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Application extends Model
+class Application extends BaseModel
 {
     /**
      * Indicates if the model should be timestamped.
@@ -78,6 +76,13 @@ class Application extends Model
     {
         return collect(self::$display_name)
             ->get($this->app_type, ucwords(str_replace(['_', '-'], ' ', $this->app_type)));
+    }
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
     }
 
     // ---- Define Relationships ----

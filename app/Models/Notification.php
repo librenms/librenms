@@ -71,7 +71,7 @@ class Notification extends Model
         }
     }
 
-    // ---- Define Scopes ----
+    // ---- Query Scopes ----
 
     /**
      * @param Builder $query

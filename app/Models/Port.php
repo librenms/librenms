@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Port extends Model
+class Port extends BaseModel
 {
     public $timestamps = false;
     protected $primaryKey = 'port_id';
@@ -41,10 +39,17 @@ class Port extends Model
 
     // ---- Query scopes ----
 
-    public function scopeNotDeleted($query)
+    public function scopeIsDeleted($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
+            ['deleted', 1],
+        ]);
+    }
+
+    public function scopeIsNotDeleted($query)
+    {
+        return $query->where([
+            ['deleted', 0],
         ]);
     }
 
@@ -82,6 +87,19 @@ class Port extends Model
             ['ignore', '=', 0],
             ['ifAdminStatus', '=', 'down'],
         ]);
+    }
+
+    public function scopeHasErrors($query)
+    {
+        return $query->where(function ($query) {
+            $query->where('ifInErrors_delta', '>', 0)
+                ->orWhere('ifOutErrors_delta', '>', 0);
+        });
+    }
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasPortAccess($query, $user);
     }
 
     // ---- Define Relationships ----

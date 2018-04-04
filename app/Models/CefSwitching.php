@@ -25,13 +25,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class CefSwitching extends Model
+class CefSwitching extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'cef_switching';
     protected $primaryKey = 'cef_switching_id';
+
+
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
 
     // ---- Define Relationships ----
 
