@@ -151,25 +151,33 @@ class MenuComposer
         $routing_menu = [];
         if ($user->hasGlobalRead()) {
             if (Vrf::hasAccess($user)->count()) {
-                $routing_menu[] = [['url' => 'vrf',
-                    'icon' => 'arrows',
-                    'text' => 'VRFs',]];
+                $routing_menu[] = [
+                    [
+                        'url' => 'vrf',
+                        'icon' => 'arrows',
+                        'text' => 'VRFs',
+                    ]
+                ];
             }
 
             if (OspfInstance::hasAccess($user)->count()) {
-                $routing_menu[] = [[
-                    'url' => 'ospf',
-                    'icon' => 'circle-o-notch fa-rotate-180',
-                    'text' => 'OSPF Devices',
-                ]];
+                $routing_menu[] = [
+                    [
+                        'url' => 'ospf',
+                        'icon' => 'circle-o-notch fa-rotate-180',
+                        'text' => 'OSPF Devices',
+                    ]
+                ];
             }
 
             if (Component::hasAccess($user)->where('type', 'Cisco-OTV')->count()) {
-                $routing_menu[] = [[
-                    'url' => 'cisco-otv',
-                    'icon' => 'exchange',
-                    'text' => 'Cisco OTV',
-                ]];
+                $routing_menu[] = [
+                    [
+                        'url' => 'cisco-otv',
+                        'icon' => 'exchange',
+                        'text' => 'Cisco OTV',
+                    ]
+                ];
             }
 
             if (BgpPeer::hasAccess($user)->count()) {
@@ -195,11 +203,13 @@ class MenuComposer
             }
 
             if (CefSwitching::hasAccess($user)->count()) {
-                $routing_menu[] = [[
-                    'url' => 'cef',
-                    'icon' => 'exchange',
-                    'text' => 'Cisco CEF',
-                ]];
+                $routing_menu[] = [
+                    [
+                        'url' => 'cef',
+                        'icon' => 'exchange',
+                        'text' => 'Cisco CEF',
+                    ]
+                ];
             }
         }
         $vars['routing_menu'] = $routing_menu;
@@ -222,11 +232,11 @@ class MenuComposer
         // User menu
         $vars['notification_count'] = Notification::isSticky()
             ->orWhere(function ($query) use ($user) {
-            $query->isUnread($user);
-        })->count();
+                $query->isUnread($user);
+            })->count();
 
         // Search bar
-        $vars['typeahead_limit'] = \LibreNMS\Config::get('webui.global_search_result_limit') ;
+        $vars['typeahead_limit'] = \LibreNMS\Config::get('webui.global_search_result_limit');
 
         $view->with($vars);
     }
