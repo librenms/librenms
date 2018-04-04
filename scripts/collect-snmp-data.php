@@ -2,7 +2,6 @@
 <?php
 
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Exceptions\SnmpsimException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -28,12 +27,8 @@ $options = getopt(
 );
 
 if (isset($options['snmpsim'])) {
-    try {
-        $snmpsim = new Snmpsim();
-        $snmpsim->run();
-    } catch (SnmpsimException $e) {
-        echo $e->getMessage() . PHP_EOL;
-    }
+    $snmpsim = new Snmpsim();
+    $snmpsim->run();
     exit;
 }
 

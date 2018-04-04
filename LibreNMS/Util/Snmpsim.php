@@ -26,7 +26,6 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Config;
-use LibreNMS\Exceptions\SnmpsimException;
 use LibreNMS\Proc;
 
 class Snmpsim
