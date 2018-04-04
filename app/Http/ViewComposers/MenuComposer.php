@@ -36,6 +36,7 @@ use App\Models\Notification;
 use App\Models\OspfInstance;
 use App\Models\Package;
 use App\Models\Port;
+use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\User;
@@ -103,6 +104,7 @@ class MenuComposer
             'errored' => Port::hasAccess($user)->hasErrors()->count(),
             'ignored' => Port::hasAccess($user)->isIgnored()->count(),
             'deleted' => Port::hasAccess($user)->isDeleted()->count(),
+            'pseudowire' => Config::get('enable_pseudowires') ? Pseudowire::hasAccess($user)->count() : 0,
             'alerted' => 0, // not actually supported on old...
         ];
 

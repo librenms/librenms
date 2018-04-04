@@ -34,6 +34,7 @@
                                 <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg" aria-hidden="true"></i> Geographical</a></li>
                             </ul>
                         </li>
+                        @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count())
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -46,6 +47,7 @@
                                 @endadmin
                             </ul>
                         </li>
+                        @endif
                         <li class="dropdown-submenu">
                             <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -176,9 +178,9 @@
                             <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg" aria-hidden="true"></i> Traffic Bills</a></li>
                         @endconfig
 
-                        @config('enable_pseudowires')
+                        @if($port_counts['pseudowire'] > 0))
                             <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg" aria-hidden="true"></i> Pseudowires</a></li>
-                        @endconfig
+                        @endif
 
                         @if(auth()->user()->hasGlobalRead())
                             <li role="presentation" class="divider"></li>
@@ -239,9 +241,9 @@
                     </ul>
                 </li>
 {{-- Wireless --}}
-                @if($wireless_menu)
+                @if($wireless_menu->count())
                     <li class="dropdown">
-                        <a href="wireless/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Wireless</span></a>
+                        <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Wireless</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
                                 <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
@@ -250,11 +252,11 @@
                     </li>
                 @endif
 {{-- App --}}
-                @if($app_menu)
+                @if($app_menu->count())
                     <li class="dropdown">
-                        <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
+                        <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="apps/"><i class="fa fa-object-group fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
+                            <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
                             @foreach($app_menu as $app_type => $app_instances)
                                 @if($app_instances->filter->app_instance->count() > 0)
                                     <li class="dropdown-submenu">
@@ -275,7 +277,7 @@
 {{-- Routing --}}
                 @if($routing_menu)
                     <li class="dropdown">
-                        <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Routing</span></a>
+                        <a href="{{ url('routing') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Routing</span></a>
                         <ul class="dropdown-menu">
                         @foreach($routing_menu as $routing_menu_group)
                             @if(!$loop->first)
@@ -288,12 +290,12 @@
 
                         @if($bgp_alerts)
                             <li role="presentation" class="divider"></li>
-                            <li><a href="routing/protocol=bgp/adminstatus=start/state=down/"><i class="fa fa-exclamation-circle fa-fw fa-lg" aria-hidden="true"></i> Alerted BGP ({{ $bgp_alerts }})</a></li>
+                            <li><a href="{{ url('routing/protocol=bgp/adminstatus=start/state=down') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg" aria-hidden="true"></i> Alerted BGP ({{ $bgp_alerts }})</a></li>
                         @endif
                         @admin
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
-                                <li><a href="peering/"><i class="fa fa-hand-o-right fa-fw fa-lg" aria-hidden="true"></i> PeeringDB</a></li>
+                                <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg" aria-hidden="true"></i> PeeringDB</a></li>
                             @endif
                         @endadmin
                         </ul>
@@ -327,31 +329,31 @@
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count }}</span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
-                        <li><a href="notifications/"><span class="badge count-notif">{{ $notification_count }}</span> Notifications</a></li>
+                        <li><a href="{{ url('preferences') }}"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
+                        <li><a href="{{ url('notifications') }}"><span class="badge count-notif">{{ $notification_count }}</span> Notifications</a></li>
                         <li role="presentation" class="divider"></li>
-                        <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>
+                        <li><a href="{{ url('logout') }}"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">Settings</span></a>
                     <ul class="dropdown-menu">
                         @admin
-                        <li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>
-                        <li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>
+                        <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>
+                        <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>
                         <li role="presentation" class="divider"></li>
                         @if(\LibreNMS\Authentication\Auth::get()->canManageUsers())
-                            <li><a href="edituser/"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
-                            <li><a href="authlog/"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
+                            <li><a href="{{ url('edituser') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+                            <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
                             <li role="presentation" class="divider"></li>
                         @endif
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                             <ul class="dropdown-menu scrollable-menu">
-                                <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
-                                <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
+                                <li><a href="{{ url('poll-log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
+                                <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
                                 @config('distributed_poller')
-                                <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>
+                                <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>
                                 @endconfig
                             </ul>
                         </li>
@@ -359,13 +361,13 @@
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
                             <ul class="dropdown-menu scrollable-menu">
-                                <li><a href="api-access/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
+                                <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endadmin
-                        <li><a href="about/"><i class="fa fa-info-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;{{ \LibreNMS\Config::get('project_name') }}</a></li>
+                        <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;{{ \LibreNMS\Config::get('project_name') }}</a></li>
                     </ul>
                 </li>
             </ul>
