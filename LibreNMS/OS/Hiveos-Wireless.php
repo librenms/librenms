@@ -44,7 +44,7 @@ class HiveosWireless extends OS implements
     {
         $oid = '.1.3.6.1.4.1.26928.1.2.9.0'; // AH-SYSTEM-MIB::ahClientCount
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Clients')
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'Hiveos-Wireless', 1, 'Clients')
         );
     }
     /**
@@ -53,11 +53,30 @@ class HiveosWireless extends OS implements
      *
      * @return array Sensors
      */
+     //FIXME Needs array two get all radios and return channels.
     public function discoverWirelessFrequency()
     {
         $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1'; // AH-INTERFACE-MIB::ahRadioChannel
         return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Radio Frequency')
+            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'Hiveos-Wireless', 1, 'Radio Frequency')
         );
+    }
+    /**
+     * Discover processors.
+     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     *
+     * @return array Processors
+     */
+    public function discoverProcessors()
+    {
+        $processor = Processor::discover(
+            'hiveos-wireless',
+            $this->getDeviceId(),
+            '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization
+            0,
+            'Device CPU'
+        );
+        }
+        return array($processor);
     }
 }
