@@ -657,11 +657,20 @@ function IssueAlert($alert)
         $qry = dbFetchRows($sql, array($alert['device_id']));
         $alert['details']['contacts'] = GetContacts($qry);
     }
-
+    
     $obj = DescribeAlert($alert);
+    
     if (is_array($obj)) {
+
         echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
-        if (!empty($config['alert']['transports'])) {
+        
+        // If there is a transport mapping for the alert, then send alerts
+        // only to those transports
+        $transports = GetTransports($obj['alert_id']);
+
+        if ($transports) {
+            SendTransports($transports, $obj);
+        } elseif (!empty($config['alert']['transports'])) {
             ExtTransports($obj);
         }
 
@@ -926,3 +935,65 @@ function IsParentDown($device)
 
     return false;
 } //end IsParentDown()
+
+/**
+ * Get list of email transports
+ * @param int $alert_id Alert-ID
+ * @return array
+ */
+function GetTransports($alert_id) {
+    $query = "SELECT `email` FROM `alert_transport_map` LEFT JOIN `transport_email` ON `alert_transport_map`.`transport_id`=`transport_email`.`transport_id` WHERE `rule_id`=?";
+    $rule_id = GetRuleId($alert_id);
+    $params = [$rule_id];
+    
+    $transports = dbFetchColumn($query, $params);
+    return $transports;
+} //end GetTransports
+
+
+/**
+ * Return Rule ID from Alert ID 
+ * @param int $alert_id Alert-ID
+ * @return int $rule_id Rule-ID
+ */
+function GetRuleId($alert_id) {
+    $query = "SELECT `rule_id` FROM `alerts` WHERE `id`=?";
+    $param = [$alert_id];
+
+    $rule_id = dbFetchCell($query, $param);
+    return $rule_id;
+} // end GetRuleId
+
+
+/**
+ * Send out external transports mapped to specific rule
+ * This function is specific to emails currently
+ * @param array $transport transport-emails
+ * @param array $obj alert object
+ * @return void
+ */
+function SendTransports($transports, $obj) {
+    
+    foreach ($transports as $transport) {
+        $tmp = false;
+        $tmpObj = $obj;
+        $tmpObj['contacts'] = $transport;
+        $tmpObj['transport'] = 'mail';
+
+        $msg = FormatALertTpl($tmpObj);
+        $tmpObj['msg'] = $msg;
+        $instance = new LibreNMS\Alert\Transport\Mail;
+        $tmp = $instance->deliverAlert($tmpObj, NULL);
+
+        if ($tmp === true) {
+            echo 'OK';
+            log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+        } elseif ($tmp === false) {
+            echo 'ERROR';
+            log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+        } else {
+            echo "ERROR: $tmp\r\n";
+            log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
+        }
+    }
+} //end SendTransports
