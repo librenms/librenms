@@ -21,10 +21,9 @@
  * @author     https://github.com/theherodied/
  */
 // SNMPv2-SMI::enterprises.6530.11.1.0 = STRING: "2N IP Force"
-$hardware = trim(snmp_get($device, '.1.3.6.1.4.1.6530.11.1.0', '-OQv', '', ''), '" ');
-
 // SNMPv2-SMI::enterprises.6530.11.4.0 = STRING: "2.22.0.31.8"
-$version = trim(snmp_get($device, '.1.3.6.1.4.1.6530.11.4.0', '-OQv', '', ''), '" ');
-
 // SNMPv2-SMI::enterprises.6530.11.3.0 = STRING: "54-0880-2424"
-$serial = trim(snmp_get($device, '.1.3.6.1.4.1.6530.11.3.0', '-OQv', '', ''), '" ');
+$data = snmp_get_multi_oid($device, '.1.3.6.1.4.1.6530.11.1.0 .1.3.6.1.4.1.6530.11.3.0 .1.3.6.1.4.1.6530.11.4.0', '-OUQn');
+$hardware = isset($data['.1.3.6.1.4.1.6530.11.1.0']) ? $data['.1.3.6.1.4.1.6530.11.1.0'] : '';
+$version = isset($data['.1.3.6.1.4.1.6530.11.4.0']) ? $data['.1.3.6.1.4.1.6530.11.4.0'] : '';
+$serial = isset($data['.1.3.6.1.4.1.6530.11.3.0']) ? $data['.1.3.6.1.4.1.6530.11.3.0'] : '';
