@@ -67,7 +67,7 @@ You can associate a rule to a procedure by giving the URL of the procedure when 
 
 Alert when:
 
-- Device goes down: `devices.status = 1`
+- Device goes down: `devices.status != 1`
 - Any port changes: `ports.ifOperStatus != 'up'`
 - Root-directory gets too full: `storage.storage_descr = '/' AND storage.storage_perc >= '75'`
 - Any storage gets fuller than the 'warning': `storage.storage_perc >= storage_perc_warn`
