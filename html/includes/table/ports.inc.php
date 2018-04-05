@@ -23,17 +23,19 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Authentication\Auth;
+
 $where = "`D`.`hostname` != '' ";
 $param = array();
 $sql = 'FROM `ports`';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `ports`.`device_id` = `DP`.`device_id`';
     $sql .= ' LEFT JOIN `ports_perms` AS `PP` ON `ports`.`port_id` = `PP`.`port_id`';
 
     $where .= ' AND (`DP`.`user_id`=? OR `PP`.`user_id`=?)';
-    $param[] = $_SESSION['user_id'];
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';
@@ -165,7 +167,7 @@ foreach (dbFetchRows($query, $param) as $port) {
         $actions .= generate_device_url($device, array('tab' => 'alerts'));
         $actions .= '" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>';
 
-        if ($_SESSION['userlevel'] >= '7') {
+        if (Auth::user()->hasGlobalAdmin()) {
             $actions .= '<div class="col-xs-1"><a href="';
             $actions .= generate_device_url($device, array('tab' => 'edit', 'section' => 'ports'));
             $actions .= '" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>';

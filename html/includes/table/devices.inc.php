@@ -13,15 +13,17 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $where = 1;
 $param = array();
 
 $sql = ' FROM `devices`';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 if (!empty($vars['location'])) {
@@ -170,21 +172,21 @@ foreach (dbFetchRows($sql, $param) as $device) {
                 <div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'alerts')) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>
     ';
 
-    if ($_SESSION['userlevel'] >= '7') {
+    if (Auth::user()->hasGlobalAdmin()) {
         $actions .= '<div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'edit')) . '"> <i class="fa fa-pencil fa-lg icon-theme" title="Edit device"></i></a></div>';
     }
 
     if ($subformat == 'detail') {
         $actions .= '</div><div class="row">';
     }
-    
-    
+
+
         $actions .= '
                     <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
                     ';
     if (isset($config['gateone']['server'])) {
         if ($config['gateone']['use_librenms_user'] == true) {
-                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $_SESSION['username'] . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
         } else {
                     $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
         }
@@ -196,7 +198,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
                 </div>
             </div>
         ';
-    
+
     $hostname = generate_device_link($device);
 
     if (extension_loaded('mbstring')) {

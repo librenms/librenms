@@ -1,7 +1,9 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 if ($_POST['editing']) {
-    if ($_SESSION['userlevel'] > '7') {
+    if (Auth::user()->hasGlobalAdmin()) {
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
         if ($snmp_enabled) {

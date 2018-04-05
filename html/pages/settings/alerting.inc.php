@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 ?>
@@ -240,7 +242,7 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
-if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin() === true) {
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && Auth::user()->hasGlobalAdmin()) {
     set_config_name('alert.transports.pagerduty', '');
     set_config_name('alert.pagerduty.account', '');
     set_config_name('alert.pagerduty.service', '');

@@ -1,13 +1,14 @@
 <?php
 
 use LibreNMS\Util\IP;
+use LibreNMS\Authentication\Auth;
 
 $param = array();
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $perms_sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where     .= ' AND `DP`.`user_id`=?';
-    $param[]    = array($_SESSION['user_id']);
+    $param[]    = array(Auth::id());
 }
 
 list($address,$prefix) = explode('/', $vars['address']);

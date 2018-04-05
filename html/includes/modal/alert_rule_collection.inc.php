@@ -23,7 +23,9 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 

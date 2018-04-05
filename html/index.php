@@ -11,6 +11,8 @@
  *
  */
 
+use LibreNMS\Authentication\Auth;
+
 if (empty($_SERVER['PATH_INFO'])) {
     if (strstr($_SERVER['SERVER_SOFTWARE'], "nginx") && isset($_SERVER['PATH_TRANSLATED']) && isset($_SERVER['ORIG_SCRIPT_FILENAME'])) {
             $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'] . $_SERVER['PHP_SELF'], "", $_SERVER['ORIG_SCRIPT_FILENAME']);
@@ -187,7 +189,7 @@ if (empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
 }
 
 if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
-    if ($_SESSION['authenticated']) {
+    if (Auth::check()) {
         require 'includes/print-menubar.php';
     }
 } else {
@@ -210,7 +212,7 @@ if (isset($devel) || isset($vars['devel'])) {
     echo("</pre>");
 }
 
-if ($_SESSION['authenticated']) {
+if (Auth::check()) {
     // Authenticated. Print a page.
     if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
         require "pages/" . $vars['page'] . ".inc.php";
@@ -303,7 +305,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(
     $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 
-foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array($_SESSION['user_id'])) as $notification) {
+foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array(Auth::id())) as $notification) {
     $msg_box[] = array(
         'type' => 'error',
         'message' => "<a href='notifications/'>${notification['body']}</a>",
@@ -325,7 +327,7 @@ if (is_array($msg_box)) {
     echo("</script>");
 }
 
-if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === true) {
+if (is_array($sql_debug) && is_array($php_debug) && Auth::check()) {
     require_once "includes/print-debug.php";
 }
 

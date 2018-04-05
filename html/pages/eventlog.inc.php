@@ -13,10 +13,12 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 $param = array();
 
-if ($vars['action'] == 'expunge' && $_SESSION['userlevel'] >= '10') {
+if ($vars['action'] == 'expunge' && Auth::user()->hasGlobalAdmin()) {
     dbQuery('TRUNCATE TABLE `eventlog`');
     print_message('Event log truncated');
 }

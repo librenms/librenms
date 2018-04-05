@@ -15,6 +15,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $pagetitle[] = 'Services';
 
 require_once 'includes/modal/new_service.inc.php';
@@ -120,12 +122,12 @@ require_once 'includes/modal/delete_service.inc.php';
                     $sql_param[] = $state;
                 }
 
-                if ($_SESSION['userlevel'] >= '5') {
+                if (Auth::user()->hasGlobalRead()) {
                     $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
                     $host_par = array();
                 } else {
                     $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
-                    $host_par = array($_SESSION['user_id']);
+                    $host_par = array(Auth::id());
                 }
 
                 $shift = 1;
@@ -188,7 +190,7 @@ require_once 'includes/modal/delete_service.inc.php';
                         echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
                         echo '<td>' . nl2br(display($service['service_message'])) . '</td>';
 
-                        if (is_admin() === true) {
+                        if (Auth::user()->hasGlobalAdmin()) {
                             echo "<td>
                                     <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
                                     <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>

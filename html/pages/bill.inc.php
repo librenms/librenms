@@ -1,8 +1,10 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $bill_id = mres($vars['bill_id']);
 
-if ($_SESSION['userlevel'] >= '10') {
+if (Auth::user()->hasGlobalAdmin()) {
     include 'pages/bill/actions.inc.php';
 }
 
@@ -59,7 +61,7 @@ if (bill_permitted($bill_id)) {
         AND D.device_id = P.device_id',
         array($bill_id)
     );
-    
+
     if (!$vars['view']) {
         $vars['view'] = 'quick';
     }
@@ -85,11 +87,11 @@ if (bill_permitted($bill_id)) {
 
         echo '</div></div>';
     }//end print_port_list
-    
+
 ?>
 
     <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
-    
+
 <?php
     print_optionbar_start();
     echo "<strong>Bill</strong> &raquo; ";
@@ -99,7 +101,7 @@ if (bill_permitted($bill_id)) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs'
     );
-if ($_SESSION['userlevel'] >= '10') {
+if (Auth::user()->hasGlobalAdmin()) {
     $menu_options['edit'] = 'Edit';
     $menu_options['delete'] = 'Delete';
     $menu_options['reset'] = 'Reset';
@@ -118,16 +120,16 @@ foreach ($menu_options as $option => $text) {
 
     $sep = ' | ';
 }
-    
+
     echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
-if ($vars['view'] == 'edit' && $_SESSION['userlevel'] >= '10') {
+if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
     include 'pages/bill/edit.inc.php';
-} elseif ($vars['view'] == 'delete' && $_SESSION['userlevel'] >= '10') {
+} elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
     include 'pages/bill/delete.inc.php';
-} elseif ($vars['view'] == 'reset' && $_SESSION['userlevel'] >= '10') {
+} elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
     include 'pages/bill/reset.inc.php';
 } elseif ($vars['view'] == 'history') {
     include 'pages/bill/history.inc.php';
@@ -261,7 +263,7 @@ if ($vars['view'] == 'accurate') {
 </div>
 <?php echo $bi ?>
 </div>
-    
+
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">24 Hour View</h3>
@@ -274,7 +276,7 @@ if ($vars['view'] == 'accurate') {
     <h3 class="panel-title">Monthly View</h3>
 </div>
 <?php echo $mi ?>
-</div>    
+</div>
 <?php
 } //end if
 } else {

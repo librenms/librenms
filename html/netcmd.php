@@ -10,6 +10,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Authentication\Auth;
+
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
@@ -23,7 +25,7 @@ if ($_GET[debug]) {
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!$_SESSION['authenticated']) {
+if (!Auth::check()) {
     echo 'unauthenticated';
     exit;
 }
@@ -46,7 +48,7 @@ if ($_GET['query'] && $_GET['cmd']) {
                 break;
 
             case 'nmap':
-                if ($_SESSION['userlevel'] != '10') {
+                if (!Auth::user()->isAdmin()) {
                     echo 'insufficient privileges';
                 } else {
                     $cmd = $config['nmap']." $host";

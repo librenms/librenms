@@ -48,4 +48,19 @@ class Auth
         static::$_instance = null;
         return static::get();
     }
+
+    public static function check()
+    {
+        return static::get()->sessionAuthenticated();
+    }
+
+    public static function user()
+    {
+        return new UserProxy;
+    }
+    
+    public static function id()
+    {
+        return $_SESSION['user_id'];
+    }
 }
