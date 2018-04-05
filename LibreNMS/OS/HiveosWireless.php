@@ -76,6 +76,8 @@ class HiveosWireless extends OS implements
      *
      * @return array Sensors
      */
+
+    /**
     public function discoverWirelessFrequency()
     {
     $data = snmp_get_multi_oid($device, '.1.3.6.1.4.1.26928.1.1.1.2.1.1.1.5 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10', '-OUQn');
@@ -107,6 +109,28 @@ class HiveosWireless extends OS implements
             ),
         );
     }
-    
-}
+    */    
 
+
+ public function discoverWirelessFrequency()
+    {
+        $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
+        $data = snmpwalk_group($this->getDevice(), $oid);
+        $sensors = array();
+        foreach ($data as $index => $entry) {
+            $radio = $data[$index];
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                //'.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
+                $index,
+                'hiveoswireless',
+                $entry,
+                "wlan[$index]",
+                WirelessSensor::channelToFrequency($entry['$index'])
+            );
+        }
+        return $sensors;
+    }
+
+}
