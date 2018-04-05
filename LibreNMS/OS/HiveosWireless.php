@@ -78,7 +78,6 @@ class HiveosWireless extends OS implements
      *
      * @return array Sensors
      */
-
     public function pollWirelessFrequency(array $sensors)
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
@@ -89,20 +88,21 @@ class HiveosWireless extends OS implements
         //$oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
         //$data = snmpwalk_group($this->getDevice(), $oid);
         $data = snmpwalk_group($this->getDevice(), 'ahRadioChannel', 'AH-INTERFACE-MIB');
-
+        $x = 0;
         foreach ($data as $index => $frequency) {
+            //$x = 0;
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
                 'hiveos-wireless',
                 $index,
-                Wlan.[$index],
+                "Wlan$x",
                 WirelessSensor::channelToFrequency($frequency['ahRadioChannel'])
                 //$frequency['ahRadioChannel']
             );
+        $x += 1;
         }
-
         return $sensors;
     }
 }
