@@ -125,9 +125,9 @@ if ($format == "graph") {
         }
     }
 
-    if (!empty($vars['hostname'])) {
-        $where .= " AND hostname LIKE ?";
-        $sql_param[] = "%" . $vars['hostname'] . "%";
+    if (!empty($vars['searchquery'])) {
+        $where .= ' AND (sysName LIKE ? OR hostname LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
+        $sql_param += array_fill(count($param), 5, '%' . $vars['searchquery'] . '%');
     }
     if (!empty($vars['os'])) {
         $where .= " AND os = ?";
