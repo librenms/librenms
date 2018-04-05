@@ -29,6 +29,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
@@ -37,6 +38,7 @@ class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling,
+    WirelessPowerDiscovery,
     ProcessorDiscovery
 {
     /**
@@ -105,4 +107,33 @@ class HiveosWireless extends OS implements
         }
         return $sensors;
     }
+
+   /**
+     * Discover wireless tx power. This is in dBm. Type is power.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessPower()
+    {
+        $sensors = array();
+
+        // aerohive radios
+        $ahTxPow = snmpwalk_group($this->getDevice(), 'ahRadioTxPower', 'AH-INTERFACE-MIB');
+        $x = 0;
+        foreach ($ahTxPow as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.2.' . $index,
+                'hiveos-wireless-tx',
+                $index,
+                "Tx Power: Wlan$x",
+                $entry['ahRadioTxPower']
+            );
+	$x += 1;
+        }
+        return $sensors;
+    }
+
 }
