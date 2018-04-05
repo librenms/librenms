@@ -89,4 +89,3 @@ if ($error) {
 
 header('Content-Type: application/json');
 echo _json_encode($status);
-
