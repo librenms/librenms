@@ -13,7 +13,7 @@ It is also highly recommended that the Web interface is protected with an SSL ce
 provided by [LetsEncrypt](http://www.letsencrypt.org).
 
 When using HTTPS, it is recommended that you use secure, encrypted cookies to prevent session
-hijacking attacks. Set ``$config['secure_cookies'] = true`` in ``config.php`` to enable these.
+hijacking attacks. Set ``$config['secure_cookies'] = true;`` in ``config.php`` to enable these.
 
 Please ensure you keep your install [up to date](Updating.md).
 

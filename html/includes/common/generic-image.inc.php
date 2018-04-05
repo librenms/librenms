@@ -57,6 +57,12 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 </form>';
 } else {
     $widget_settings['title'] = $widget_settings['image_title'];
+    if (strstr($widget_settings['image_url'], '@AUTO_HEIGHT@')) {
+        $widget_settings['image_url'] = str_replace('@AUTO_HEIGHT@', $widget_dimensions['y'], $widget_settings['image_url']);
+    }
+    if (strstr($widget_settings['image_url'], '@AUTO_WIDTH@')) {
+        $widget_settings['image_url'] = str_replace('@AUTO_WIDTH@', $widget_dimensions['x'], $widget_settings['image_url']);
+    }
     if (strstr($widget_settings['image_url'], '?')) {
         $widget_settings['image_url'] .= "&".mt_rand();
     } else {

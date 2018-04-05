@@ -8,10 +8,8 @@ if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     exit 0
 fi
 
-pip install --user --quiet 'jinja2<2.9'
-pip install --user --quiet mkdocs
-pip install --user --quiet pymdown-extensions
-pip install --user --quiet git+git://github.com/aleray/mdx_del_ins.git
+pip install --user 'jinja2<2.9' mkdocs pymdown-extensions
+pip install --user git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out
 

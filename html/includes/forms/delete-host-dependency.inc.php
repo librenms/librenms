@@ -25,7 +25,7 @@ if (is_admin() === false) {
                 $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
             }
         }
-    } else if ($_POST['parent_ids']) {
+    } elseif ($_POST['parent_ids']) {
         $error = false;
         foreach ($_POST['parent_ids'] as $parent) {
             if (is_numeric($parent) && $parent != 0) {
@@ -33,7 +33,7 @@ if (is_admin() === false) {
                     $error = true;
                     $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
                 }
-            } else if ($parent == 0) {
+            } elseif ($parent == 0) {
                 $status = array('status' => 1, 'message' => 'No dependency to delete.');
                 $error = true;
                 break;

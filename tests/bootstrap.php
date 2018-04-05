@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Proc;
 use LibreNMS\Util\Snmpsim;
 
 global $config;

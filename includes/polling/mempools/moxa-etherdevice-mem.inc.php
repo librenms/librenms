@@ -23,7 +23,7 @@
 // Moxa people enjoy creating similar MIBs for each model!
 if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
     $mibmod = 'MOXA-IKS6726A-MIB';
-} else if ($device['sysDescr'] == 'EDS-G508E-T') {
+} elseif ($device['sysDescr'] == 'EDS-G508E-T') {
     $mibmod = 'MOXA-EDSG508E-MIB';
 }
 

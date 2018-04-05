@@ -15,10 +15,10 @@ if (is_admin() === false) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (hostname LIKE '%$searchPhrase%' OR last_polled LIKE '%$searchPhrase%' OR last_polled_timetaken LIKE '%$searchPhrase%')";
+    $sql .= " AND (hostname LIKE '%$searchPhrase%' OR sysName LIKE '%$searchPhrase%' OR last_polled LIKE '%$searchPhrase%' OR last_polled_timetaken LIKE '%$searchPhrase%')";
 }
 
-if ($_POST['type'] == "unpolled") {
+if ($vars['type'] == "unpolled") {
     $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute)";
 }
 

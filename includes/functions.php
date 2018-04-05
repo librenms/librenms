@@ -34,7 +34,7 @@ function set_debug($debug)
     }
 }//end set_debug()
 
-function array_sort($array, $on, $order = SORT_ASC)
+function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
     $new_array = array();
     $sortable_array = array();
@@ -2420,10 +2420,13 @@ function locate_binary($binary)
 {
     if (!str_contains($binary, '/')) {
         $output = `whereis -b $binary`;
-        $target = trim(substr($output, strpos($output, ':') + 1));
+        $list = trim(substr($output, strpos($output, ':') + 1));
+        $targets = explode(' ', $list);
 
-        if (file_exists($target)) {
-            return $target;
+        foreach ($targets as $target) {
+            if (is_executable($target)) {
+                return $target;
+            }
         }
     }
 

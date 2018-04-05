@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2017 Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * Copyright (c) 2018 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -25,6 +25,7 @@ $pagetitle[] = 'Oxidized';
             <div class="tab-content">
                 <div class="tab-pane fade in active" id="list">
                     <div class="table-responsive">
+                        <button type='submit' class='btn btn-success btn-sm' name='btn-reload-nodes' id='btn-reload-nodes'><i class='fa fa-refresh'></i> Reload node list</button>
                         <table id="oxidized-nodes" class="table table-hover table-condensed table-striped">
                             <thead>
                             <tr>
@@ -84,6 +85,24 @@ $pagetitle[] = 'Oxidized';
             },
             error: function () {
                 toastr.error('Error');
+            }
+        });
+    });
+    $("[name='btn-reload-nodes']").on('click', function (event) {
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "reload-oxidized-nodes-list" },
+            dataType: "json",
+            success: function (data) {
+                if(data['status'] == 'ok') {
+                    toastr.success(data['message']);
+                } else {
+                    toastr.error(data['message']);
+                }
+            },
+            error:function(){
+                toastr.error('An error occured while reloading the Oxidized nodes list');
             }
         });
     });

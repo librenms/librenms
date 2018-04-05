@@ -959,6 +959,7 @@ function rewrite_junos_hardware($hardware)
         'jnxProductName'               => '',
         'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
         'jnxProductQFX511048S4Q'       => 'QFX5110-48S4Q',
+        'jnxProductQFX510096S8Q'       => 'QFX5100-96S8Q',
     );
 
 
@@ -1314,8 +1315,11 @@ function rewrite_brocade_fc_switches($descr)
         case "148":
             $hardware = "Brocade 7840 Switch";
             break;
+        case "162":
+            $hardware = "Brocade G620 Switch";
+            break;
         case "170":
-            $hardware = "Brocade 6610 Switch";
+            $hardware = "Brocade G610 Switch";
             break;
         default:
             $hardware = "Unknown Brocade FC Switch";

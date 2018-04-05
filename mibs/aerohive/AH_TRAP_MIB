@@ -1,0 +1,944 @@
+--
+-- Copyright (c) 2006-2013, Aerohive Networks, Inc
+-- All rights reserved.
+                                                                                                
+AH_TRAP_MIB DEFINITIONS ::= BEGIN
+
+--
+-- Imports
+--
+
+IMPORTS MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+		  FROM SNMPv2-SMI
+        DisplayString
+	  	  FROM SNMPv2-TC
+        ahAPTrap, AhString, AhNodeID, AhMACProtocol FROM AH-SMI-MIB;
+	   
+--
+-- Module Identity
+--
+
+
+AhAuthenticationMethod ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Authentication method supported by the HiveAP"
+   SYNTAX        INTEGER {
+   	                   cwp          (0), 
+	                   open         (1), 
+	                   wep-open     (2),                   
+	                   wep-shared   (3),  
+	                   wpa-psk      (4),
+	                   wpa2-psk     (5),
+	                   wpa-8021x    (6),
+	                   wpa2-8021X   (7),                  
+	                   wpa-auto-psk   (8),
+	                   wpa-auto-8021x (9),
+	                   dynamic-wep	(10),
+	                   8021x        (11)                
+                 }
+
+AhEncrytionMethod ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Encryption method supported by the HiveAP"
+   SYNTAX        INTEGER {
+                   AES        (0),  
+                   TKIP       (1), 
+                   WEP        (2),
+                   Non        (3)
+                 }
+
+
+ahTrapModule MODULE-IDENTITY
+         LAST-UPDATED "201608310000Z"  -- Aug 31, 2016
+         ORGANIZATION "Aerohive Networks, Inc."
+         CONTACT-INFO "See AH-SMI-MIB for information."
+         DESCRIPTION
+           "This is the MIB module for access point trap definitions 
+	   for Aerohive Networks Inc."
+
+         ::= {  ahAPTrap  1  }
+
+ahNotificationVarBind  OBJECT IDENTIFIER  ::= { ahAPTrap 2 }
+
+AhState ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "It defines the state for interfaces."
+   SYNTAX        INTEGER {
+                   ahUp     (1), -- Interface up
+                   ahDown   (2)  -- Interface down
+                 }
+
+AhProbableCause ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "It defines the probable cause for a problem on the HiveAP."
+   SYNTAX        INTEGER {
+                   ahClear                  (0),
+                   ahUnknown                (1),
+                   ahFlashFailure           (2), 
+                   ahFanFailure             (3),
+                   ahPowerSupplyFailure     (4),
+                   ahSoftwareUpgradeFailure (5),
+                   ahRadioFailure           (6),
+                   ahConfFailure            (7)                   
+                 }
+
+--
+-- Trap Definitions
+--
+  
+ahFailureTrap  NOTIFICATION-TYPE
+	OBJECTS         { ahAPId,			
+                          ahAPName,
+                          ahObjectName,     -- Failed object name
+                          ahSeverity,
+			  ahProbableCause,
+			  ahFailureSet,
+                          ahCode,
+                          ahTrapDesc   }
+	STATUS          current
+	DESCRIPTION     "This event is generated for any equipment or software failures. 
+                         "
+	::= {  ahTrapModule 1 }
+
+ahThresholdCrossingEvent  NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,
+                          ahAPName,
+                          ahObjectName,         -- Threshold name
+                          ahCurValue,
+                          ahThresholdHigh,
+                          ahThresholdLow,
+                          ahCode,
+                          ahTrapDesc   }
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever a threshold is crossed for the first time."
+	::= { ahTrapModule 2 }
+
+ahStateChangeEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,
+                          ahAPName,
+                          ahObjectName,        -- The object changes state
+                          ahPreviousState,
+                          ahCurrentState,
+                          ahCode,
+                          ahTrapDesc   }
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever an object state change occurs."
+	::= { ahTrapModule 3}
+
+
+ahConnectionChangeEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,
+                          ahAPName,
+                          ahObjectName,
+                          ahIfIndex,           -- Interface index detecting the client/neighbor
+                          ahObjectType,        -- Client connection or neighbor connection
+                          ahRemoteId,          -- MAC addr for the client or neighbour
+                          ahCurrentState,      -- up, or down.
+                          ahSSID,              -- ssid of the client is using if remoteid is a client
+                          ahCLientIP,          -- Client IP address if the remote id is a client
+                          ahClientHostName,    -- Client Host Name if the remote id is a client
+                          ahClientUserName,    -- Client User Name if the remote id is a client
+                          ahClientAuthMethod,  -- The authentication method the client uses to communicate with the HiveAP
+                          ahClientEncryptionMethod,	-- The encryption method the client uses to communicate with the HiveAP
+                          ahClientMACProtocol, 	-- The radio mode the client uses to communicate with the HiveAP
+                          ahClientVLAN,			-- The VLAN used by client to communicate with the HiveAP
+                          ahClientUserProfId, 	-- The user profile id used by client to communicate with the HiveAP
+						  ahClientChannel, 		-- The radio channel used by client to communicate with the HiveAP
+						  ahClientCWPUsed,		-- The boolean indicating whether Captive Web Portal is used
+                          ahBSSID,				-- Basic Service Set Identifier of the client is using if remoteid is a client.
+                          ahAssociationTime,	-- The association time(s) of client connect or disconnect to AP.
+                          ahIfName,         	-- The interface name of client connect or disconnect to AP.
+                          ahIDPRSSI,            -- RSSI information 
+                          ahCode,
+                          ahTrapDesc   }
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever a connection state change
+			 occurs. The connection might be between a HiveAP and its client,
+			 or between a HiveAP and a neighboring HiveAP."
+	::= { ahTrapModule 4}
+
+ahIDPStationEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,              -- reporting APID
+                          ahAPName,            -- reporting AP name
+                          ahIfIndex,           -- interface index detecting the IDP-AP
+                          ahObjectName,
+                          ahStationType,       -- indicating whether it is an AP or client PC event
+                          ahRemoteId,          -- MAC addr for the IDP-AP
+                          ahIDPType,           -- IDP type
+                          ahIDPChannel,        -- channel number detected
+                          ahIDPRSSI,           -- RSSI information 
+                          ahIDPStationData,    -- Station data received (related to the policies)
+                          ahIDPCompliance,
+                          ahSSID,
+                          ahRemoved,
+                          ahIDPInNet,
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever IDP detects an AP 
+			 in its neighborhood. The ahRomoteId indicates the detected AP
+			 MAC address, and the ahIDPCompliance indicates conformance of
+			 IDP policy this AP satisfies. The ahIDPChannel and ahIDPRSSI
+			 indicates the radio channel and Receive Signal Strenth Indication."
+	::= { ahTrapModule 5}
+
+ahClientInfoEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,	       -- reporting APID
+                          ahAPName,            -- reporting AP name
+                          ahObjectName,        -- reporting object name
+			  ahSSID,              -- ssid of the client is using
+			  ahClientMAC,	       -- Client MAC address
+                          ahCLientIP,          -- Client IP address
+                          ahClientHostName,    -- Client Host Name
+                          ahClientUserName,    -- Client User Name
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever HiveAP a new client 
+					makes an association and its IP address, hostname, and
+					User name is obtained."
+	::= { ahTrapModule 6}
+	
+ahPoEEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,			   -- Reporting APID
+                          ahAPName,            -- Reporting HiveAP name
+                          ahObjectName,        -- Reporting object name
+			  			  ahPowerSrc,          -- Power source: adaptor, PoE
+			  			  ahPoEEth0On,		-- On/Off
+			  			  ahPoEEth0Pwr,			-- Power level in watts
+			  			  ahPoEEth0MaxSpeed,	-- Maximum line speed
+			  			  ahPoEWifi0Setting,	-- Auto, 2X3 (xmit/rcv-chain), linkdown
+			  			  ahPoEEth1On,		-- On/Off
+			  			  ahPoEEth1Pwr,			-- Power level in watts
+			  			  ahPoEEth1MaxSpeed,	-- Maximum line speed
+			  			  ahPoEWifi1Setting,	-- Auto, 2X3 (xmit/rcv-chain), linkdown
+			  			  ahPoEWifi2Setting,	-- Auto, 2X3 (xmit/rcv-chain), linkdown
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever a HiveAP (802.11n 
+					product line) boots up or changes power levels."
+	::= { ahTrapModule 7}
+	
+ahChannelPowerChangeEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,			   -- Reporting APID
+                          ahAPName,            -- Reporting HiveAP name
+                          ahObjectName,        -- Reporting object name - interface name
+                          ahIfIndex,           -- Interface index reporting the channel/pwr change
+                          ahRadioChannel,      -- Current channel number in use
+                          ahRadioTxPower,  	   -- Current transmit power in use
+                          ahBeaconInterval,    -- Current beacon interval in use
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever a HiveAP boots up, 
+				or changes channels or power levels."
+	::= { ahTrapModule 8}
+	
+
+ahIDPMitigateEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,              	-- reporting APID
+                          ahAPName,            	-- reporting AP name
+                          ahIfIndex,           	-- interface index detecting the IDP-AP
+                          ahObjectName,		-- Reporting object name
+                          ahRemoteId,          	-- MAC addr for the IDP-Station
+			  ahBSSID,		-- Basic Service Set Identifier of the rogue AP
+			  ahDiscoverAge,
+			  ahUpdateAge,
+			  ahRemoved,
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "This event is generated whenever IDP detects an rogue client
+			 connect to a rogue AP. The ahRomoteId indicates the detected 
+			 Station MAC address. "
+	::= { ahTrapModule 9}
+	
+ahInterferenceMapAlertEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,              	 -- reporting APID
+                          ahAPName,            	 -- reporting AP name
+                          ahIfIndex,           	 -- interface index
+                          ahObjectName,		 -- Reporting object name
+                          ahInterferenceThreshold,            --the configured channel utilizations interference threshold
+                          ahRunningAverageInterference,       --channel utilizations running average interference
+                          ahShortTermInterference,            --channel utilizations short term interference
+                          ahSnapshotInterference,             --channel utilizations snapshot interference
+                          ahCRCErrRateThreshold,                -- the configured CRC error rate threshold
+			  ahCRCErrRate,                         -- CRC error rate
+			  ahSeverity,
+			  ahFailureSet,                         -- indicate whether this is an interference alert or clear alert
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "For every one minute interval, AP will monitor the interference channel utilizations
+	                 (snapshot, short term means average and running average) and CRC error rate 
+	                 against their thresholds, if any one of them is above their threshold 
+	                 (thresholds are settable by CLI), AP should send HM an interference alert event to HM.
+	                 AP will send out clear alert to HM only when: the last short term period��s CRC_error_rate,
+	                 means average Interference CU and the last snapshot interference CU are all below their thresholds."
+	::= { ahTrapModule 10}
+
+ahBandwidthSentinelEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,              	 -- reporting APID
+                          ahAPName,            	 -- reporting AP name
+                          ahIfIndex,           	 -- interface index
+                          ahObjectName,		 -- Reporting object name
+                          ahClientMAC,	         -- Client MAC address
+                          ahBandwidthSentinelStatus,       --Bandwidth sentinel status
+                          ahGuaranteedBandwidth,           --Configured guaranteed-bandwidth
+                          ahActualBandwidth,               --Actual bandwidth usage
+                          ahBandwidthSentinelAction,       --Bandwidth sentinel action
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "HiveOS will send two different kinds of traps: bandwidth sentinel alert trap, and bandwidth sentinel clear trap.
+	                 The ��alert�� trap will serve the purpose to tell HM that the client is violating the bandwidth sentinel,
+	                 the ��clear�� trap will clear the previous ��alert�� trap."
+	::= { ahTrapModule 11}
+
+ahAlarmMsgMapAlertEvent   NOTIFICATION-TYPE
+        OBJECTS         { ahAPId,              	           -- reporting APID
+                          ahAPName,            	           -- reporting AP name
+                          ahIfIndex,           	           -- the wifi interface index
+                          ahObjectName,		           -- Reporting object name
+                          ahLevel,           	           -- the level will tell HM whether this is a interface or client level alert
+                          ahClientMAC,	                   -- Client MAC address, if it is client level alert type
+                          ahSSID,                          -- the Client ssid name, if client level, include the SSID name, interface level, no ssid name
+                          ahAlarmAlertType,                -- the CRC error rate, the TX drop/retry rate, the RX rate, Airtime consumption
+                          ahThresholdValue,                -- the value of HOS setting
+                          ahShortTermValue,                -- the CRC error rate, TX drop/retry rate, RX drop rate percentage of this sampling period
+                          ahSnapshotValue,                 -- the CRC error rate, TX drop/retry rate, RX drop rate of snapshort
+                          ahFailureSet,                    -- indicate whether this is an alert or clear alert
+                          ahCode,
+                          ahTrapDesc}
+                          
+	STATUS          current
+	DESCRIPTION     "HiveOS will send two different kinds of level alert: interface level alert, and client level alert.
+                         There are four alert types, CRC error rate, TX drop/retry rate, Rx drop rate; interface level includes all alert type, 
+                         the client level includes Tx drop/retry rate, Rx drop Rate; the 'set' alert means there is an alert raised, 
+                         with type indicated in the alert type field, the 'clear' alert means the previous alert condition has been cleared."
+	::= { ahTrapModule 12}
+--
+-- Types
+--
+
+ahAPId  OBJECT-TYPE
+	SYNTAX          AhNodeID
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is the node ID (MAC address in hexadecimal format) 
+			of the HiveAP where the trap is generated. If a HiveAP is 
+			configured with 2 hives, the node ID is the first MAC address
+			of the management interface."
+	::= {ahNotificationVarBind 1} 
+
+ahAPName OBJECT-TYPE
+	SYNTAX          AhString
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "The host name of the HiveAP where the trap is generated."
+	::= { ahNotificationVarBind 2}
+
+ahSeverity OBJECT-TYPE
+	SYNTAX          INTEGER {
+                         critical (5),   -- service impact problem
+                         major    (4),   -- Problem requiring user intervension 
+                         minor    (3),   -- Problem not requiring user intervension
+                         info     (2),   -- informational only
+                         undetermined (1)
+                        }
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It contains the serverity of the trap."
+	::= { ahNotificationVarBind 3}
+
+ahObjectName OBJECT-TYPE
+	SYNTAX          DisplayString (SIZE (0..64) )
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It describes the object for which the trap is generated."
+	::= { ahNotificationVarBind 4}
+
+ahProbableCause OBJECT-TYPE
+	SYNTAX          AhProbableCause 
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It describes the probable cause of a problem."
+	::= { ahNotificationVarBind 5}
+
+ahCurValue OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the current value of a threshold counter."
+        ::= { ahNotificationVarBind 6}
+
+ahThresholdHigh OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the value for a high threshold."
+        ::= { ahNotificationVarBind 7}
+
+ahThresholdLow  OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the value for a low threshold."
+        ::= { ahNotificationVarBind 8}
+
+ahPreviousState OBJECT-TYPE
+        SYNTAX          AhState
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the value for a previous state."
+        ::= { ahNotificationVarBind 9}
+
+ahCurrentState OBJECT-TYPE
+        SYNTAX          AhState
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the value for the current state."
+        ::= { ahNotificationVarBind 10}
+
+ahTrapDesc OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the description of the trap."
+        ::= { ahNotificationVarBind 11}
+
+ahCode  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains access information to the Aerohive 
+			logging/action dictionary."
+        ::= { ahNotificationVarBind 12}
+
+ahIfIndex  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The interface index used to identify uniquely
+			an interface (logical or physical)."
+        ::= { ahNotificationVarBind 13}
+
+
+ahObjectType  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                         clientLink   (1),   -- Client link
+                         neighborLink (2)    -- Neighbor link 
+                        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It specifies the object type: a client link or a neighbor link."
+        ::= { ahNotificationVarBind 14}
+
+ahRemoteId  OBJECT-TYPE
+	SYNTAX          AhNodeID
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is the MAC address of the remote node. If the remote 
+			node is a HiveAP, the ID must be the MAC address
+			of its management interface. If the remote node is a
+			client station, it must be the MAC address of the client."
+	::= {ahNotificationVarBind 15}
+	
+ahIDPType OBJECT-TYPE
+	SYNTAX          INTEGER {
+                         rogue         (1),
+                         valid         (2),
+                         external      (3)   
+                        }	
+    MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is used to indicate the AP identified is a
+		rogue, or valid, or compliant, or noncompliant, or external AP."
+	::= {ahNotificationVarBind 16}
+
+ahIDPChannel OBJECT-TYPE
+	SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is the channel number used by the identified AP."
+	::= {ahNotificationVarBind 17}
+	
+ahIDPRSSI OBJECT-TYPE
+	SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is the RSSI for the identified AP or Client."
+	::= {ahNotificationVarBind 18}
+	                       
+ahIDPCompliance OBJECT-TYPE
+	SYNTAX          INTEGER {
+                         open_policy       (1),
+                         wep_policy        (2),
+                         wpa_policy        (4),
+                         wmm_policy        (8),
+                         oui_policy        (16),
+                         ssid_policy       (32),
+                         short_preamble_policy (64),
+                         short_beacon_policy (128),
+                         ad_hoc_policy     (256)                           
+                        }	
+    MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is bit mask to indicate which policy the indentified
+		AP is compliant with (bit is set if it is NOT compliant)."
+	::= {ahNotificationVarBind 19}
+
+ahSSID OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..32) )
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the SSID name for the detected AP."
+        ::= { ahNotificationVarBind 20}
+       
+ahStationType  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                         station_ap       (1),
+                         station_client   (2)
+                         }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates whether it is event for a peer AP 
+        				or client PC"
+        ::= { ahNotificationVarBind 21}
+
+ahIDPStationData OBJECT-TYPE
+	SYNTAX          INTEGER {
+                         open_policy       (1),
+                         wep_policy        (2),
+                         wpa_policy        (4),
+                         wmm_policy        (8),
+                         short_preamble_policy (64),
+                         short_beacon_policy (128),
+                         ad_hoc_policy     (256)                           
+                        }	
+    MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION     "It is bit mask to indicate policies are detected for 
+				the identified AP . Note: the oui_policy and ssid_policy are
+				omitted due to the presence of the ahRemoteID, and SSID in the
+				trap message. "
+	::= {ahNotificationVarBind 22}
+	
+ahRemoved  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                         removed_false    (0),
+                         removed_true     (1)
+                         }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates whether the AP or client can not 
+        				be detected."
+        ::= { ahNotificationVarBind 23}
+        
+
+      
+ahClientMAC OBJECT-TYPE
+        SYNTAX          AhNodeID
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the MAC address of the wireless client. It is 
+        				required."
+        ::= { ahNotificationVarBind 24}
+
+ahCLientIP OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the IP address of the wireless client. It is
+        				optional."
+        ::= { ahNotificationVarBind 25}
+
+ahClientHostName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the host name of the wireless client. It is
+        				optional."
+        ::= { ahNotificationVarBind 26}
+                   
+ahClientUserName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It contains the user name of the wireless client. It is
+        				optional."
+        ::= { ahNotificationVarBind 27}
+
+ahPowerSrc OBJECT-TYPE
+        SYNTAX          INTEGER {
+						 adaptor    (0),
+                         poe        (1)
+                         }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates whether the power source is from the power adaptor or PoE. 
+				If the power source is the adaptor, PoE information in the trap is ignored."
+        ::= { ahNotificationVarBind 28}
+
+ahPoEEth0On	OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates whether PoE is on eth0 or not."
+        ::= { ahNotificationVarBind 29}
+        		  			  
+ahPoEEth0Pwr OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates the power level of PoE in watts
+        				multiply by 10."
+        ::= { ahNotificationVarBind 30}
+        		
+ahPoEEth1On	OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates whether PoE is on eth1 or not."
+        ::= { ahNotificationVarBind 31}
+        		  			  
+ahPoEEth1Pwr OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "It indicates the power level of PoE on eht1 in watts
+        				multiply by 10."
+        ::= { ahNotificationVarBind 32}
+
+ahRadioChannel  OBJECT-TYPE	
+	    SYNTAX	    Integer32
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the channel number currently in use for this radio."
+		::=  {  ahNotificationVarBind 33 }
+	
+ahRadioTxPower  OBJECT-TYPE	
+	    SYNTAX	    Integer32
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the transmit power in dBm that the radio is currently using. The range 
+					is 0 to 20 dBm."
+		::=  {  ahNotificationVarBind 34 }
+	
+ahClientAuthMethod OBJECT-TYPE	
+        SYNTAX	    AhAuthenticationMethod
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the authentication method the client uses when 
+		communicating with the HiveAP."
+		::=  {  ahNotificationVarBind  35  }
+
+ahClientEncryptionMethod OBJECT-TYPE	
+	    SYNTAX	    AhEncrytionMethod
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the encryption method the client uses when communicating
+				with the HiveAP."
+		::=  {  ahNotificationVarBind  36  }
+
+ahClientMACProtocol OBJECT-TYPE	
+	    SYNTAX	    AhMACProtocol
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the radio mode the client uses when communicating
+				with the HiveAP."
+		::=  {  ahNotificationVarBind  37  }
+
+ahClientVLAN OBJECT-TYPE	
+        SYNTAX	    Integer32
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the VLAN that the client uses when communicating
+				with the HiveAP."
+		::=  {  ahNotificationVarBind  38 }
+
+
+ahClientUserProfId OBJECT-TYPE	
+        SYNTAX	    Integer32
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the user profile ID that the client uses when communicating
+				with the HiveAP."
+		::=  {  ahNotificationVarBind  39 }
+
+ahClientChannel OBJECT-TYPE	
+        SYNTAX	    Integer32
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the radio channel that the client uses when communicating
+				with the HiveAP."
+		::=  {  ahNotificationVarBind  40 }
+		
+ahClientCWPUsed OBJECT-TYPE	
+	    SYNTAX	    TruthValue
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the Boolean datatype indicating whether a captive web portal
+				is used."
+		::=  {  ahNotificationVarBind  41 }
+
+ahBSSID OBJECT-TYPE	
+	    SYNTAX	    AhNodeID
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the basic service set identifier of the client
+		 if the ahRemoteId is a client."
+		::=  {  ahNotificationVarBind  42 }
+
+ahPoEEth0MaxSpeed OBJECT-TYPE	
+	    SYNTAX	    INTEGER {
+	    				 linkdown (1),  -- Interface down
+                         eth10   (2),   -- 10 Mbps
+                         eth100  (3),   -- 100 Mbps
+                         eth1000 (4)	-- 1000 Mbps 
+                        }
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the automatically adjusted maximum Ethernet speed 
+		based on the power source and level."
+		::=  {  ahNotificationVarBind  43 }
+
+ahPoEEth1MaxSpeed OBJECT-TYPE	
+	    SYNTAX	    INTEGER {
+	    				 linkdown (1),  -- Interface shutdown
+                         eth10   (2),   -- 10 Mbps
+                         eth100  (3),   -- 100 Mbps
+                         eth1000 (4)	-- 1000 Mbps
+                        }
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the automatically adjusted maximum Ethernet speed 
+		based on the power source and level."
+		::=  {  ahNotificationVarBind  44 }
+
+ahPoEWifi0Setting OBJECT-TYPE	
+	    SYNTAX	    INTEGER {
+	    				 invalid  (0),   -- Interface is invalid
+	    				 linkdown (1),   -- Interface shutdown
+                         config   (2),   -- User configured Wi-Fi tx-rx chain 
+                         tx2rx3   (3)   -- Maximum transmit chain 2 and max. receive chain 3
+                            }
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the automatically adjusted Wi-Fi setting based on the 
+		power source and power level."
+		::=  {  ahNotificationVarBind  45 }
+
+ahPoEWifi1Setting OBJECT-TYPE	
+	    SYNTAX	    INTEGER {
+	    				 invalid  (0),   -- Interface is invalid
+	    				 linkdown (1),   -- Interface shutdown
+                         config   (2),   -- User configured Wi-Fi tx-rx chain 
+                         tx2rx3   (3)   -- Maximum transmit chain 2 and maximum receive chain 3
+                            }
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the automatically adjusted Wi-Fi setting based on the
+		power source and power level."
+		::=  {  ahNotificationVarBind  46 }
+
+ahPoEWifi2Setting OBJECT-TYPE	
+	    SYNTAX	    INTEGER {
+	    				 invalid  (0),   -- Interface is invalid
+	    				 linkdown (1),   -- Interface shutdown
+                         config   (2),   -- User configured Wi-Fi tx-rx chain 
+                         tx2rx3   (3)   -- Maximum transmit chain 2 and maximum receive chain 3
+                            }
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the automatically adjusted Wi-Fi setting based on the
+		power source and power level."
+		::=  {  ahNotificationVarBind  47 }
+		
+ahAssociationTime OBJECT-TYPE	
+	    SYNTAX	    Counter32
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "The association time(s) of client connect or disconnect to AP."
+		::=  {  ahNotificationVarBind  48 }
+ahIDPInNet OBJECT-TYPE	
+	    SYNTAX	TruthValue
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "It is the Boolean datatype indicating whether AP is in local network."
+            ::=  {  ahNotificationVarBind  49 }
+		
+ahDiscoverAge OBJECT-TYPE	
+	    SYNTAX	Counter32
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "It is the age from the rogue client is discovered."
+            ::=  {  ahNotificationVarBind  50 }
+            
+ahUpdateAge OBJECT-TYPE	
+	    SYNTAX	Counter32
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "It is the age from the rogue client is updated."
+            ::=  {  ahNotificationVarBind  51 }
+            
+ahRunningAverageInterference OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "channel utilizations running average interference."
+            ::=  {  ahNotificationVarBind  52 }
+
+ahShortTermInterference OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "channel utilizations short term interference.
+	                 The short term period is defined by CLI config,
+	                  usually, it should be in the range of 5 minutes to 30 minutes. "
+            ::=  {  ahNotificationVarBind  53 }
+
+ahSnapshotInterference OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "channel utilizations snapshot interference. it is the last minute��s means average."
+            ::=  {  ahNotificationVarBind  54 }
+            
+ahFailureSet OBJECT-TYPE	
+	    SYNTAX	TruthValue
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "It is the Boolean datatype indicating whether this failure(alert) is on or off."
+            ::=  {  ahNotificationVarBind  55 }
+
+ahInterferenceThreshold OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "the configured channel utilizations interference threshold.
+	                 it is defined by CLI config."
+            ::=  {  ahNotificationVarBind  56 }
+
+ahCRCErrRateThreshold OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "the configured CRC error rate threshold. it is defined by CLI config."
+            ::=  {  ahNotificationVarBind  57 }
+
+ahCRCErrRate OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "short term CRC error rate. The interval of the refresh of CRC error rate calculation 
+	                 is the same interval as channel utilization short term means average interval."
+            ::=  {  ahNotificationVarBind  58 }
+
+
+ahBandwidthSentinelStatus OBJECT-TYPE	
+	    SYNTAX	    INTEGER {
+	    		alert  (0),   -- good client but does not meet sla
+	    		clear  (1),   -- good client and meet sla
+                        bad   (2)   -- bad client 
+            }
+            MAX-ACCESS  read-only
+            STATUS	    current
+	    DESCRIPTION "Bandwidth sentinel status.
+		         In alert message, the value should be zero. In clear message, the value should be 1."
+            ::=  {  ahNotificationVarBind  59 }
+
+ahGuaranteedBandwidth OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "the configured guaranteed bandwidth(Kbps). it is defined by CLI config."
+            ::=  {  ahNotificationVarBind  60 }
+
+ahActualBandwidth OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "the actual bandwidth(Kbps)."
+            ::=  {  ahNotificationVarBind  61 }
+
+ahBandwidthSentinelAction OBJECT-TYPE
+	    SYNTAX	Counter32
+	    MAX-ACCESS  read-only
+            STATUS	current
+	    DESCRIPTION "bit maps to indicate which action has been taken on this client.
+	                 bit 0: indicate whether log the guaranteed bandwidth violation or not,
+	                 bit 1: indicate whether add more token to meet the minimum guaranteed bandwidth or not."
+            ::=  {  ahNotificationVarBind  62 }
+
+ahBeaconInterval  OBJECT-TYPE
+            SYNTAX      Counter32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION "It is the number of time units between Beacon transmissions, One time unit is
+                         1024 microseconds."
+            ::=  {  ahNotificationVarBind 63 }
+
+ahLevel OBJECT-TYPE
+            SYNTAX      INTEGER {
+                         interface (1),  -- a interface level alert
+                         client    (2)   -- a client level alert
+                        }
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION     "The level value will tell HM whether this is an interface level alert or a client alert."
+            ::= {ahNotificationVarBind 64}
+
+ahAlarmAlertType OBJECT-TYPE
+            SYNTAX      INTEGER {
+                         crcrate     (0),  -- The CRC error rate only applies to interface level alert
+                         txdroprate  (1),  -- The TX drop rate is calculated based on the max retried TX frames over total unicast TX frames
+                         txretryrate (2),  -- The TX retry rate is calculated based on the total retries over total unicast TX frames
+                         rxdroprate  (3),  -- The RX drop rate is calculated based on the dropped RX frames over total RX frames
+                         airtime     (4)   -- The The airtime percentage is the sum of both TX and RX airtime percentages
+                        }
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION     "There are five types, CRC Rate only applies to interface level alert, 
+                             TX drop/retry rate is is calculated based on retries over total unicast TX frames,
+                             RX drop rate is calculated based on the dropped RX frames over total RX frames,
+                             Airtime percentage is the sum of both TX and RX airtime percentages."
+            ::= {ahNotificationVarBind 65}
+
+ahThresholdValue OBJECT-TYPE
+            SYNTAX	INTEGER
+            MAX-ACCESS  read-only
+            STATUS	current
+            DESCRIPTION "the configured CRC error rate, TX drop/retry rate, RX drop rate threshold. it is defined by CLI config."
+            ::= {ahNotificationVarBind 66}
+
+ahShortTermValue OBJECT-TYPE
+            SYNTAX	INTEGER
+            MAX-ACCESS  read-only
+            STATUS	current
+            DESCRIPTION "the percentage of this sampling period, CRC error rate, TX drop/retry rate, RX drop rate."
+            ::= {ahNotificationVarBind 67}
+
+ahSnapshotValue OBJECT-TYPE
+            SYNTAX	INTEGER
+            MAX-ACCESS  read-only
+            STATUS	current
+            DESCRIPTION "the snapshot value of CRC error rate, TX drop/retry rate, RX drop rate."
+            ::= {ahNotificationVarBind 68}
+
+ahIfName OBJECT-TYPE	
+            SYNTAX	    AhString
+	        MAX-ACCESS  read-only
+	        STATUS	    current
+	        DESCRIPTION "Name - uniquely identifies an AP Interface."
+            ::= {ahNotificationVarBind 69}
+
+END

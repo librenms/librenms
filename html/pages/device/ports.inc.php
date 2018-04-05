@@ -154,10 +154,10 @@ foreach ($ports as $key => $port) {
 
 switch ($vars["sort"]) {
     case 'traffic':
-        $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
         break;
     default:
-        $ports = array_sort($ports, 'ifIndex', SORT_ASC);
+        $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
         break;
 }
 

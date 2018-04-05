@@ -11,7 +11,7 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
 
@@ -72,7 +72,7 @@ foreach (dbFetchRows($sql, $param) as $processor) {
         'graph'           => $mini_graph,
         'processor_usage' => $bar_link,
     );
-    if ($_POST['view'] == 'graphs') {
+    if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
         $graph_array['width']  = '216';
         $graph_array['to']     = $config['time']['now'];

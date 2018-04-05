@@ -1559,7 +1559,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1884,6 +1884,16 @@ label {
     color: white;
 }
 
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
 .greenCluster {
     background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
@@ -2183,4 +2193,9 @@ label {
   display: inline-block;
   margin-right: 8px;
   float: left;
+}
+
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
 }
