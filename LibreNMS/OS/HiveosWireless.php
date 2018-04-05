@@ -30,11 +30,13 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
+    WirelessFrequencyPolling,
     ProcessorDiscovery
 {
     /**
@@ -77,60 +79,30 @@ class HiveosWireless extends OS implements
      * @return array Sensors
      */
 
-    /**
+    public function pollWirelessFrequency(array $sensors)
+    {
+        return $this->pollWirelessChannelAsFrequency($sensors);
+    }
+
     public function discoverWirelessFrequency()
     {
-    $data = snmp_get_multi_oid($device, '.1.3.6.1.4.1.26928.1.1.1.2.1.1.1.5 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10', '-OUQn');
-    $apmodel = '.1.3.6.1.4.1.26928.1.1.1.2.1.1.1.5';
-//    $wifi0 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7'] : '';
-//    $wifi1 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8'] : '';
-    //$wifi0 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9'] : '';
-    //$wifi1 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10'] : '';
-    //if ($apmodel == 'AP250') {
-    $wifi0 = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7';
-    $wifi1 = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8';
-    //}
-    return array(
-            new WirelessSensor(
-                'frequency',
-                $this->getDeviceId(),
-                $wifi0,
-                'wifi0',
-                1,
-                'Wifi0 Frequency'
-            ),
-            new WirelessSensor(
-                'frequency',
-                $this->getDeviceId(),
-                $wifi1,
-                'wifi1',
-                1,
-                'Wifi1 Frequency'
-            ),
-        );
-    }
-    */    
+        //$oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
+        //$data = snmpwalk_group($this->getDevice(), $oid);
+        $data = snmpwalk_group($this->getDevice(), 'ahRadioChannel', 'AH-INTERFACE-MIB');
 
-
- public function discoverWirelessFrequency()
-    {
-        $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
-        $data = snmpwalk_group($this->getDevice(), $oid);
-        $sensors = array();
-        foreach ($data as $index => $entry) {
-            $radio = $data[$index];
+        foreach ($data as $index => $frequency) {
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                //'.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
+                'hiveos-wireless',
                 $index,
-                'hiveoswireless',
-                $entry,
-                "wlan[$index]",
-                WirelessSensor::channelToFrequency($entry['$index'])
+                Wlan.[$index],
+                WirelessSensor::channelToFrequency($frequency['ahRadioChannel'])
+                //$frequency['ahRadioChannel']
             );
         }
+
         return $sensors;
     }
-
 }
