@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
@@ -147,9 +148,15 @@ $pagetitle[] = 'Add host';
           <label for="snmpver" class="col-sm-3 control-label">SNMP Version</label>
           <div class="col-sm-3">
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
-              <option value="v1">v1</option>
-              <option value="v2c" selected>v2c</option>
-              <option value="v3">v3</option>
+                <?php
+                foreach (Config::get('snmp.version') as $snmp_version) {
+                    echo "<option value=\"$snmp_version\"";
+                    if ($snmp_version === 'v2c') {
+                        echo " selected";
+                    }
+                    echo ">$snmp_version</option>";
+                }
+                ?>
             </select>
           </div>
           <div class="col-sm-3">
