@@ -71,36 +71,39 @@ class HiveosWireless extends OS implements
     }
 
     /**
-     * Discover wireless frequency.  This is a channel numbver. Type is frequency.
-     * FIXME Need to convert to frequency still
-     * Need to figure out how to name index still?
+     * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
     public function discoverWirelessFrequency()
     {
-        $sensors = array();
+    $data = snmp_get_multi_oid($device, '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9 .1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10', '-OUQn');
+    //$wifi0 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7'] : '';
+    //$wifi1 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8'] : '';
+    //$wifi0 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.9'] : '';
+    //$wifi1 = isset($data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10']) ? $data['.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.10'] : '';
+    $wifi0 = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.7';
+    $wifi1 = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.8';
 
-        // ptmp radios
-        //$ptmpRadioName = $this->getCacheByIndex('mimosaPtmpChPwrRadioName', 'MIMOSA-NETWORKS-PTMP-MIB');
-        $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
-        $ahFreq = snmpwalk_group($this->getDevice(), $oid);
-
-        foreach ($ahFreq as $index => $frequency) {
-            $sensors[] = new WirelessSensor(
+    return array(
+            new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
-                'hiveos-wireless',
-                $index,
-                //$ptmpRadioName[$index],
-                $frequency['oid']
-            );
-        }
-
-        return $sensors;
-        //print_r($sensors);
+                $wifi0,
+                'wifi0',
+                1,
+                'Wifi0 Frequency'
+            ),
+            new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                $wifi1,
+                'wifi1',
+                1,
+                'Wifi1 Frequency'
+            ),
+        );
     }
-}
 
+}
