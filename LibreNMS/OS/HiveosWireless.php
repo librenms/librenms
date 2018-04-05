@@ -28,15 +28,34 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-//use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
 class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
-    //WirelessFrequencyDiscovery,
+    WirelessFrequencyDiscovery,
     ProcessorDiscovery
 {
+    /**
+     * Discover processors.
+     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     *
+     * @return array Processors
+     */
+    public function discoverProcessors()
+    {
+     	$device = $this->getDevice();
+        return array(
+            Processor::discover(
+                $this->getName(),
+                $this->getDeviceId(),
+                '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization
+                0
+            )
+        );
+    }
+
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -50,35 +69,38 @@ class HiveosWireless extends OS implements
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Clients')
         );
     }
+
     /**
-     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Discover wireless frequency.  This is a channel numbver. Type is frequency.
+     * FIXME Need to convert to frequency still
+     * Need to figure out how to name index still?
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    /**
     public function discoverWirelessFrequency()
     {
-        // instant
-        return $this->discoverInstantRadio('frequency', 'ahRadioChannel');
-    }
-    */
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        $device = $this->getDevice();
-        return array(
-            Processor::discover(
-                $this->getName(),
+        $sensors = array();
+
+        // ptmp radios
+        //$ptmpRadioName = $this->getCacheByIndex('mimosaPtmpChPwrRadioName', 'MIMOSA-NETWORKS-PTMP-MIB');
+        $oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
+        $ahFreq = snmpwalk_group($this->getDevice(), $oid);
+
+        foreach ($ahFreq as $index => $frequency) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
                 $this->getDeviceId(),
-                '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization
-                0
-            )
-        );
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
+                'hiveos-wireless',
+                $index,
+                //$ptmpRadioName[$index],
+                $frequency['oid']
+            );
+        }
+
+        return $sensors;
+        //print_r($sensors);
     }
 }
+
