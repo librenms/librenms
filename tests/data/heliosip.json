@@ -11,10 +11,10 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "heliosip",
+                    "type": "appliance",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "2n.svg"
                 }
             ]
         },
@@ -25,14 +25,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.6530",
                     "sysDescr": "2N IP Force",
                     "sysContact": "Peter Griffin",
-                    "version": null,
-                    "hardware": "",
+                    "version": "2.22.0.31.8",
+                    "hardware": "2N IP Force",
                     "features": null,
                     "location": "Front Door",
-                    "os": "generic",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "generic.svg"
+                    "os": "heliosip",
+                    "type": "appliance",
+                    "serial": "54-2354-8708",
+                    "icon": "2n.svg"
                 }
             ]
         }
