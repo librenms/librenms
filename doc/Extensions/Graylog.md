@@ -18,10 +18,10 @@ Config is simple, here's an example:
 
 ```php
 $config['graylog']['server']   = 'http://127.0.0.1';
-$config['graylog']['port']     = 12900;
+$config['graylog']['port']     = 9000;
 $config['graylog']['username'] = 'admin';
 $config['graylog']['password'] = 'admin';
-$config['graylog']['version']  = '2.1';
+$config['graylog']['version']  = '2.4';
 ```
 
 Graylog messages are stored using GMT timezone. You can display graylog messages in LibreNMS webui using your desired timezone by setting following option in config.php:
@@ -32,6 +32,7 @@ $config['graylog']['timezone'] = 'Europe/Bucharest';
 > Timezone must be PHP supported timezones, available at: <a href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a>
 
 > Since Graylog 2.1, the default API path is /api/
+> Also default port for webinterface and api are on 9000`http://127.0.0.1:9000/api/`  
 
 If you are running a version earlier than Graylog then please set `$config['graylog']['version']` to the version 
 number of your Graylog install.
