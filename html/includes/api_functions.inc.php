@@ -304,8 +304,8 @@ function list_devices()
         $order = 'd.`'.$order.'` ASC';
     }
 
-    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname ";
-    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` ";
+    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `lat`, `lng` ";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`location` = `d`.`location`";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
@@ -347,7 +347,7 @@ function list_devices()
         $param[] = $_SESSION['user_id'];
     }
     $devices = array();
-    $dev_query = "SELECT dev.*, lat, lng FROM (SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order) dev LEFT JOIN locations ON locations.location=dev.location";
+    $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
     foreach (dbFetchRows($dev_query, $param) as $device) {
         $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
