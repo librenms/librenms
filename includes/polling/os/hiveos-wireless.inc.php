@@ -38,3 +38,4 @@ if ($apmodel == 'AP250' || $apmodel == 'AP550') {
     // Version has 'HiveOS ' included. We want to remove it so OS doesn't show HiveOS twice.
     $version = preg_replace('/^HiveOS /',  '',  $version2);
     $serial = $data['ahSystemSerial.0'];
+}
