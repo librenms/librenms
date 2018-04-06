@@ -89,8 +89,9 @@ class HiveosWireless extends OS implements
     {
         //$oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1';
         //$data = snmpwalk_group($this->getDevice(), $oid);
+        $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
         $data = snmpwalk_group($this->getDevice(), 'ahRadioChannel', 'AH-INTERFACE-MIB');
-        $x = 0;
+        //$x = 0;
         foreach ($data as $index => $frequency) {
             //$x = 0;
             $sensors[] = new WirelessSensor(
@@ -99,11 +100,12 @@ class HiveosWireless extends OS implements
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
                 'hiveos-wireless',
                 $index,
-                "Wlan$x",
+                $ahRadioName[$index],
+                //"Wlan$x",
                 WirelessSensor::channelToFrequency($frequency['ahRadioChannel'])
                 //$frequency['ahRadioChannel']
             );
-        $x += 1;
+        //$x += 1;
         }
         return $sensors;
     }
@@ -119,8 +121,9 @@ class HiveosWireless extends OS implements
         $sensors = array();
 
         // aerohive radios
+        $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
         $ahTxPow = snmpwalk_group($this->getDevice(), 'ahRadioTxPower', 'AH-INTERFACE-MIB');
-        $x = 0;
+        //$x = 0;
         foreach ($ahTxPow as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -128,10 +131,11 @@ class HiveosWireless extends OS implements
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.2.' . $index,
                 'hiveos-wireless-tx',
                 $index,
-                "Tx Power: Wlan$x",
+                'Tx Power: ' . $ahRadioName[$index],
+                //"Tx Power: Wlan$x",
                 $entry['ahRadioTxPower']
             );
-	$x += 1;
+	//$x += 1;
         }
         return $sensors;
     }
