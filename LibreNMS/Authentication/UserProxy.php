@@ -25,6 +25,11 @@
 
 namespace LibreNMS\Authentication;
 
+/**
+ * @property int level
+ * @property string username
+ * @property int user_id
+ */
 class UserProxy
 {
     public function hasGlobalAdmin()
