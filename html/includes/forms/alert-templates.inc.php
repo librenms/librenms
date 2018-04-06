@@ -25,7 +25,7 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-$error = false;
+$status = 'error';
 $template_id = 0;
 
 $name = mres($_POST['name']);
@@ -45,16 +45,15 @@ if (!empty($name)) {
         if (dbUpdate(array('rule_id' => mres($_REQUEST['rule_id']), 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
             $message = "Updated template and rule id mapping";
         } else {
-            $error = true;
             $message ="Failed to update the template and rule id mapping";
         }
     } elseif ($_REQUEST['template'] && is_numeric($_REQUEST['template_id'])) {
         //Update template-text
 
         if (dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id'])) >= 0) {
+            $status = 'ok';
             $message = "Alert template updated";
         } else {
-            $error = true;
             $message = "Failed to update the template";
         }
     } elseif ($_REQUEST['template']) {
@@ -63,29 +62,22 @@ if (!empty($name)) {
         if ($name != 'Default Alert Template') {
             $template_id = dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates");
             if ($template_id != false) {
+                $status = 'ok';
                 $message = "Alert template has been created.";
             } else {
-                $error = true;
                 $message = "Could not create alert template";
             }
         } else {
-            $error = true;
             $message = "This template name is reserved!";
         }
     } else {
-        $error = true;
         $message = "We could not work out what you wanted to do!";
     }
 } else {
-    $error = true;
     $message = "You haven't given your template a name, it feels sad :( - $name";
 }
 
-if ($error) {
-    $status = array('status' => 1, 'message' => $message);
-} else {
-    $status = array('status' => 0, 'message' => $message, 'newid' => $template_id);
-}
+$response = array('status' => $status, 'message' => $message, 'newid' => $template_id);
 
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo _json_encode($response);

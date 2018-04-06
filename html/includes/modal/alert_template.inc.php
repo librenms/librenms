@@ -224,7 +224,7 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
         data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
         dataType: "json",
         success: function(output){
-            if(output.status == 0) {
+            if(output.status == 'ok') {
                 toastr.success(output.message);
                 $("#alert-template").modal('hide');
 
