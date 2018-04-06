@@ -28,7 +28,9 @@ var grid = $("#ipv4-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-use LibreNMS\Authentication\Auth;$sql = 'SELECT `devices`.`device_id`,`hostname`,`sysName` FROM `devices`';
+use LibreNMS\Authentication\Auth;
+
+$sql = 'SELECT `devices`.`device_id`,`hostname`,`sysName` FROM `devices`';
 
 if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';

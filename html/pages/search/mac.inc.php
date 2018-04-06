@@ -27,7 +27,10 @@ var grid = $("#mac-search").bootgrid({
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
-use LibreNMS\Authentication\Auth;$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+
+use LibreNMS\Authentication\Auth;
+
+$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 
 if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';

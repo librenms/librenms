@@ -23,7 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\Auth;$no_refresh = true;
+use LibreNMS\Authentication\Auth;
+
+$no_refresh = true;
 $pagetitle[] = "Capture";
 
 

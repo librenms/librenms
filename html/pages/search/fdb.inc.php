@@ -29,8 +29,10 @@ var grid = $("#fdb-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 // Select the devices only with FDB tables
-use LibreNMS\Authentication\Auth;$sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
+$sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
 $param = array();
 if (!Auth::user()->hasGlobalRead()) {

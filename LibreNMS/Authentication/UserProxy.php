@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Authentication;
 
-
 class UserProxy
 {
     public function hasGlobalAdmin()
@@ -57,9 +56,9 @@ class UserProxy
     {
         if ($name == 'level') {
             return $_SESSION['userlevel'];
-        } elseif($name == 'username') {
+        } elseif ($name == 'username') {
             return $_SESSION['username'];
-        } elseif($name == 'user_id') {
+        } elseif ($name == 'user_id') {
             return $_SESSION['user_id'];
         }
 

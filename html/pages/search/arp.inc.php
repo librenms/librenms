@@ -30,8 +30,10 @@ var grid = $("#arp-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 // Select the devices only with ARP tables
-use LibreNMS\Authentication\Auth;$sql = 'SELECT D.device_id AS device_id, `hostname`, `D`.`sysName` AS `sysName` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D';
+$sql = 'SELECT D.device_id AS device_id, `hostname`, `D`.`sysName` AS `sysName` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D';
 
 if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
