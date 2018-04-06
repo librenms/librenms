@@ -36,6 +36,6 @@ if ($apmodel == 'AP250' || $apmodel == 'AP550') {
     $hardware = $data['ahDeviceMode.0'];
     $version2 = $data['ahFirmwareVersion.0'];
     // Version has 'HiveOS ' included. We want to remove it so OS doesn't show HiveOS twice.
-    $version = preg_replace('/^HiveOS /',  '',  $version2);
+    $version = preg_replace('/^HiveOS /', '', $version2);
     $serial = $data['ahSystemSerial.0'];
 }
