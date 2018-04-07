@@ -304,8 +304,8 @@ function list_devices()
         $order = 'd.`'.$order.'` ASC';
     }
 
-    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname ";
-    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` ";
+    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `lat`, `lng` ";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`location` = `d`.`location`";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
