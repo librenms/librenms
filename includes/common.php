@@ -365,7 +365,7 @@ function device_by_id_cache($device_id, $refresh = false)
     if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
         $device = $cache['devices']['id'][$device_id];
     } else {
-        $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device = dbFetchRow("SELECT `devices`.*, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.`location`=`locations`.`location` WHERE `device_id` = ?", array($device_id));
         $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
