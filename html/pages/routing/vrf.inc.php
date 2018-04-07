@@ -1,6 +1,8 @@
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalRead()) {
     if (!isset($_GET['optb'])) {
         $_GET['optb'] = 'all';
     }

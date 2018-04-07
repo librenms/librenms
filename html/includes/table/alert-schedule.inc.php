@@ -12,11 +12,13 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
+
 $where = 1;
 
 $sql = " FROM `alert_schedule` AS S WHERE $where";
-if ($_SESSION['userlevel'] < '5') {
-    $param[] = $_SESSION['user_id'];
+if (!Auth::user()->hasGlobalRead()) {
+    $param[] = Auth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -55,7 +57,7 @@ foreach (dbFetchRows($sql, $param) as $schedule) {
         if ($end < $now) {
             $status = 1;
         }
-    
+
         if ($now >= $start && $now < $end) {
             $status = 2;
         }

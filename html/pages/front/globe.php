@@ -29,6 +29,8 @@
 
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 include_once 'includes/object-cache.inc.php';
 echo '<div class="container-fluid">
     <div class="row">
@@ -95,11 +97,11 @@ if ($config['enable_syslog']) {
     echo("</div>");
     echo("</div>");
 } else {
-    if ($_SESSION['userlevel'] == '10') {
+    if (Auth::user()->hasGlobalAdmin()) {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-            P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
+            P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">

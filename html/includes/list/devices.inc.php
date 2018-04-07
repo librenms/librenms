@@ -23,14 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Authentication\Auth;
+
 $query = '';
 $where = [];
 $params = [];
 
-if (!is_admin() && !is_read()) {
+if (!Auth::user()->hasGlobalRead()) {
     $query .= ' LEFT JOIN `devices_perms` USING (`device_id`)';
     $where = '`devices_perms`.`user_id`=?';
-    $params[] = $_SESSION['user_id'];
+    $params[] = Auth::id();
 }
 
 if (!empty($_REQUEST['search'])) {

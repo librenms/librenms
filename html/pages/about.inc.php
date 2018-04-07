@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Authentication\Auth;
+
 $pagetitle[] = 'About';
 $git_log = `git log -10`;
 ?>
@@ -86,7 +89,7 @@ echo "
     <table class='table table-condensed'>
       <tr>";
 
-if (is_admin() === true) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
           Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
         <tr>

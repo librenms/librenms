@@ -14,7 +14,7 @@
 
 use LibreNMS\Authentication\Auth;
 
-if (is_admin() === true) {
+if (Auth::user()->hasGlobalAdmin()) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
     }

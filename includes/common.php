@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -1766,7 +1767,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = Auth::id();
     }
 
     $pref = dbFetchCell(
@@ -1795,7 +1796,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = Auth::id();
     }
 
     $pref = array(

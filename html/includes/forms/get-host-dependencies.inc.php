@@ -11,8 +11,10 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
- 
-if (is_admin() === false) {
+
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
     if (isset($_POST['viewtype'])) {

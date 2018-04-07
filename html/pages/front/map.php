@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -21,6 +21,8 @@
  * @package LibreNMS
  * @subpackage Frontpage
  */
+
+use LibreNMS\Authentication\Auth;
 
 if ($config['map']['engine'] == 'leaflet') {
     require_once 'includes/common/worldmap.inc.php';
@@ -184,11 +186,11 @@ if ($config['enable_syslog']) {
     echo("</div>");
     echo("</div>");
 } else {
-    if ($_SESSION['userlevel'] == '10') {
+    if (Auth::user()->hasGlobalAdmin()) {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-    P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
+    P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">
