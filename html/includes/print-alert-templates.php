@@ -2,14 +2,6 @@
 
 $no_refresh = true;
 
-?>
-
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
-<?php
 require_once 'includes/modal/alert_template.inc.php';
 require_once 'includes/modal/delete_alert_template.inc.php';
 require_once 'includes/modal/attach_alert_template.inc.php';
