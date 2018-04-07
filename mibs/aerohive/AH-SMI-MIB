@@ -21,7 +21,9 @@ aerohive MODULE-IDENTITY
          LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
          ORGANIZATION  "Aerohive Networks, Inc"
          CONTACT-INFO  "info@aerohive.com
-                        1011 McCarthy Boulevard                                                Milpitas, CA 95035"
+                        1011 McCarthy Boulevard
+                        
+                        Milpitas, CA 95035"
          DESCRIPTION
            "This is the MIB module for object type definitions
 	    that are used throughout the Aerohive Networks enterprise MIBs."
@@ -39,10 +41,10 @@ ahAPInterface	   OBJECT IDENTIFIER ::= { ahAPCommon 2 }
 ahAPMRP            OBJECT IDENTIFIER ::= { ahAPCommon 3 }
 ahAPIDP            OBJECT IDENTIFIER ::= { ahAPCommon 4 }
 
-ahAPHiveAP020_ag            OBJECT IDENTIFIER ::= { ahAP 2 }
-ahAPHiveAP028_ag            OBJECT IDENTIFIER ::= { ahAP 3 }
-ahAPHiveAP320_n           OBJECT IDENTIFIER ::= { ahAP 4 }
-ahAPHiveAP340_n           OBJECT IDENTIFIER ::= { ahAP 5 }
+ahAPHiveAP020-ag            OBJECT IDENTIFIER ::= { ahAP 2 }
+ahAPHiveAP028-ag            OBJECT IDENTIFIER ::= { ahAP 3 }
+ahAPHiveAP320-n           OBJECT IDENTIFIER ::= { ahAP 4 }
+ahAPHiveAP340-n           OBJECT IDENTIFIER ::= { ahAP 5 }
 
 AhString ::= TEXTUAL-CONVENTION
    STATUS        current
