@@ -11,6 +11,7 @@
  *
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -894,7 +895,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => $_SESSION['username'] ?: '',
+        'username'  => Auth::user()->username ?: '',
      );
 
     dbInsert($insert, 'eventlog');

@@ -4,7 +4,7 @@ use LibreNMS\Authentication\Auth;
 
 echo '<div style="margin: 10px;">';
 
-if ($_SESSION['userlevel'] < 10 || $_SESSION['userlevel'] > 10) {
+if (!Auth::user()->isAdmin()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     echo '<h3>Delete User</h3>';

@@ -13,10 +13,12 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
+
 $minutes = 15;
 $seconds = ($minutes * 60);
 $top     = $config['front_page_settings']['top']['devices'];
-if (is_admin() === true || is_read() === true) {
+if (Auth::user()->hasGlobalRead()) {
     $query = "
         SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
         FROM ports as p, devices as d
@@ -41,7 +43,7 @@ if (is_admin() === true || is_read() === true) {
         ORDER BY total desc
         LIMIT $top
         ";
-    $param[] = array($_SESSION['user_id']);
+    $param[] = array(Auth::id());
 }//end if
 
 echo "<strong>Top $top devices (last $minutes minutes)</strong>\n";

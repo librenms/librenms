@@ -23,11 +23,13 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 $pagetitle[] = "Capture";
 
 
-if (!is_admin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     print_error("Insufficient Privileges");
 } else {
     ?>

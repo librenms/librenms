@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 require_once 'includes/modal/alert_template.inc.php';
@@ -46,7 +48,7 @@ $(document).ready(function() {
         templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if ($_SESSION['userlevel'] >= '10') { ?>
+<?php if (Auth::user()->hasGlobalAdmin()) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button> \

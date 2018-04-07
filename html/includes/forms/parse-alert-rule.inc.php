@@ -13,8 +13,9 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\Auth;
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }

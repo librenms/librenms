@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $where = '1';
 $param = array();
 
@@ -45,14 +47,14 @@ if (!empty($vars['to'])) {
     $param[] = $vars['to'];
 }
 
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     $sql  = 'FROM syslog AS S';
     $sql .= ' WHERE '.$where;
 } else {
     $sql   = 'FROM syslog AS S, devices_perms AS P ';
     $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ? AND ';
     $sql  .= $where;
-    $param = array_merge(array($_SESSION['user_id']), $param);
+    $param = array_merge(array(Auth::id()), $param);
 }
 
 $count_sql = "SELECT COUNT(*) $sql";

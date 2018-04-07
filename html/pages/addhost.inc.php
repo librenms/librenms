@@ -1,11 +1,12 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if ($_SESSION['userlevel'] < 10) {
+if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/error-no-perm.inc.php';
 
     exit;
@@ -25,7 +26,7 @@ if (!empty($_POST['hostname'])) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
-    if ($_SESSION['userlevel'] > '5') {
+    if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
             $port = clean($_POST['port']);

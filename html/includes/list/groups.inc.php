@@ -23,7 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (!is_admin() && !is_read()) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalRead()) {
     return [];
 }
 
