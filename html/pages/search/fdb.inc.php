@@ -5,7 +5,7 @@
     <table id="fdb-search" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="device" data-order="asc">Device</th>
+                <th data-column-id="device">Device</th>
                 <th data-column-id="mac_address">MAC Address</th>
                 <th data-column-id="ipv4_address">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
@@ -61,6 +61,14 @@ if ($_POST['searchby'] == 'mac') {
 ?>
 
                 ">MAC Address</option>"+
+                "<option value=\"ip\" "+
+<?php
+if ($_POST['searchby'] == 'ip') {
+    echo '" selected "+';
+}
+?>
+
+                ">IP Address</option>"+
                 "<option value=\"vlan\" "+
 <?php
 if ($_POST['searchby'] == 'vlan') {
