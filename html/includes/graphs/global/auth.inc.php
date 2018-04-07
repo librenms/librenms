@@ -1,5 +1,7 @@
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalRead()) {
     $auth = 1;
 }

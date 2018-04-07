@@ -21,7 +21,12 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
-if (is_admin() === false) {
+
+use LibreNMS\Authentication\Auth;
+
+header('Content-type: text/plain');
+
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 

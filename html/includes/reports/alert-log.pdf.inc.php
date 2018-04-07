@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $pdf->AddPage('L');
 $where = '1';
 
@@ -13,11 +15,11 @@ if ($_GET['string']) {
     $param[] = '%'.$_GET['string'].'%';
 }
 
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     $query = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where ORDER BY `humandate` DESC";
 } else {
     $query   = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ? ORDER BY `humandate` DESC";
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 if (isset($_GET['start']) && is_numeric($_GET['start'])) {

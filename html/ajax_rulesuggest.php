@@ -23,8 +23,10 @@
  * @package LibreNMS/Alerts
  */
 
+use LibreNMS\Authentication\Auth;
+
 session_start();
-if (!isset($_SESSION['authenticated'])) {
+if (!Auth::check()) {
     die('Unauthorized.');
 }
 

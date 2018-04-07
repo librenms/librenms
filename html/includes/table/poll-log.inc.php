@@ -1,15 +1,17 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $sql = ' FROM `devices` AS D ';
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $sql .= ", devices_perms AS P ";
 }
 
 $sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
 
-if (is_admin() === false) {
-    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".$_SESSION['user_id']."' AND D.ignore = '0'";
+if (!Auth::user()->hasGlobalAdmin()) {
+    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".Auth::id()."' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';
 }

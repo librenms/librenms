@@ -4,9 +4,9 @@ use LibreNMS\Authentication\Auth;
 
 $no_refresh = true;
 
-if ($_SESSION['userlevel'] < '10') {
+if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/error-no-perm.inc.php';
-} elseif ($_SESSION['userlevel'] == 11) {
+} elseif (Auth::user()->isDemoUser()) {
     demo_account();
 } else {
     echo '<h3>Add User</h3>';

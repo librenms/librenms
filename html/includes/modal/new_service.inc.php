@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() !== false) {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
     $dir = $config['nagios_plugins'];
     if (file_exists($dir) && is_dir($dir)) {
