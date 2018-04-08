@@ -9,8 +9,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='LibreNMS Service - manages polling and other periodic processes')
     parser.add_argument('-g', '--group', type=int, help="Set the poller group for this poller")
     parser.add_argument('-v', '--verbose', action='count', help="Show verbose output.")
-    parser.add_argument('-d', '--debug',  action="store_true", help="Show debug output.")
-    parser.add_argument('-m', '--multiple',  action="store_true", help="Allow multiple instances of the service.")
+    parser.add_argument('-d', '--debug', action="store_true", help="Show debug output.")
+    parser.add_argument('-m', '--multiple', action="store_true", help="Allow multiple instances of the service.")
 
     args = parser.parse_args()
 

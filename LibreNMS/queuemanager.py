@@ -143,8 +143,7 @@ class QueueManager:
         except ImportError:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
-                print("Please install redis-py")
-                print("Either through your os software repository or 'pip install redis'")
+                critical("Please install redis-py, either through your os software repository or from PyPI")
                 exit(2)
         except Exception as e:
             if self.config.distributed:
