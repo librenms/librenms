@@ -185,15 +185,5 @@
                 }
             ]
         }
-    },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }
