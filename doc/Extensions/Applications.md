@@ -843,7 +843,7 @@ and modify your snmpd.conf file accordingly:
 extend smart /usr/bin/sudo /etc/snmp/smart
 ``` 
 
-If you set useSN to 1, it is worth noting that you will loose history for that device each time you change it. You will also need to run camcontrol or the like on said server to figure out what device is actually corresponds with that serial number.
+If you set useSN to 1, it is worth noting that you will loose history for that device each time you change it. You will also need to run camcontrol or the like on said server to figure out what device actually corresponds with that serial number.
 
 ### Squid
 
