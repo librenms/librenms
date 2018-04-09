@@ -33,7 +33,7 @@ foreach (dbFetchRows('SELECT * FROM `routing_resources` where `device_id` = ? OR
         $label = $routing_resources['resource'];
     }
     $descr        = rrdtool_escape($label, 28);
-    $rrd_filename = rrd_name($device['hostname'], array('routing_resources', $routing_resources['id'], $routing_resources['resource']));
+    $rrd_filename = rrd_name($device['hostname'], array('routing_resources', $routing_resources['resource_id'], $routing_resources['resource']));
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_options .= " DEF:used$i=$rrd_filename:used:AVERAGE ";

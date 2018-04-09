@@ -25,7 +25,7 @@ foreach ($routing_resources as $entry) {
         );
     }
 
-    $rrd_name = array('routing_resources', $entry['id'], $entry['resource']);
+    $rrd_name = array('routing_resources', $entry['resource_id'], $entry['resource']);
     $rrd_def = RrdDefinition::make()
         ->addDataset('used', 'GAUGE', 0);
     $used = round($uptodate_oids[$entry['oid_current']] / $uptodate_oids[$entry['oid_maximum']] * 100, 2);

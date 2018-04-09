@@ -1353,7 +1353,7 @@ route:
     device: { Name: device, Columns: [device_id, context_name, ipRouteDest, ipRouteNextHop], Unique: false, Type: BTREE }
 routing_resources:
   Columns:
-    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: resource_id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: oid_current, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: oid_maximum, Type: varchar(255), 'Null': false, Extra: '' }

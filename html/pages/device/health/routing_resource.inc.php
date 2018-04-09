@@ -1,6 +1,6 @@
 <?php
 
-$graph_type = 'routingresources_usage';
+$graph_type = 'routingresource_usage';
 
 $row = 1;
 
@@ -17,9 +17,9 @@ foreach (dbFetchRows('SELECT * FROM `routing_resources` WHERE device_id = ? AND 
         $panel_title = $entry['resource'] . " (" . $entry['feature'] . ")";
     }
 
-    $ru_url = 'graphs/id='.$entry['id'].'/type='.$graph_type.'_'.$entry['feature'].'/';
+    $ru_url = 'graphs/id='.$entry['resource_id'].'/type='.$graph_type.'_'.$entry['feature'].'/';
 
-    $graph_array['id']   = $entry['id'];
+    $graph_array['id']   = $entry['resource_id'];
     $graph_array['type'] = $graph_type;
 
     echo "<div class='panel panel-default'>
