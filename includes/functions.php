@@ -22,6 +22,7 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
 use LibreNMS\Util\MemcacheLock;
 
 function set_debug($debug)
@@ -467,7 +468,7 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array())
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'auto', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array())
 {
     global $config;
 
@@ -481,67 +482,84 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
-    // check if we have the host by IP
-    if ($config['addhost_alwayscheckip'] === true) {
-        $ip = gethostbyname($host);
-    } else {
-        $ip = $host;
-    }
-    if ($force_add !== true && ip_exists($ip)) {
-        throw new HostIpExistsException("Already have host with this IP $host");
-    }
+    // check ip and resolve auto transport (otherwise avoid dns queries)
+    $check_ip = Config::get('addhost_alwayscheckip', false);
+    $transports = [$transport];
+    if ($check_ip || $transport == 'auto') {
+        $ip = dnslookup($host, $transport);
 
-    // Test reachability
-    if (!$force_add) {
-        $address_family = snmpTransportToAddressFamily($transport);
-        $ping_result = isPingable($host, $address_family);
-        if (!$ping_result['result']) {
-            throw new HostUnreachablePingException("Could not ping $host");
+        // check if we have the host by IP
+        if ($check_ip && $force_add !== true && ip_exists($ip)) {
+            $desc = $host == $ip ? $host : "$host ($ip)";
+            throw new HostIpExistsException("Already have host with this IP $desc");
+        }
+
+        // determine transport, if auto (auto assumes udp)
+        if ($transport == 'auto') {
+            $transports = ['udp'];
+            // check if ip is ipv6, if so, try ipv6 first
+            try {
+                if (IP::parse($ip)->getFamily() == 'ipv6') {
+                    $transports = ['udp6', 'udp'];
+                }
+            } catch (InvalidIpException $e) {
+            }
         }
     }
 
-    // if $snmpver isn't set, try each version of snmp
-    if (empty($snmp_version)) {
-        $snmpvers = array('v2c', 'v3', 'v1');
-    } else {
-        $snmpvers = array($snmp_version);
-    }
-
-    if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
-        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
-    }
-    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
-    // try different snmp variables to add the device
-    foreach ($snmpvers as $snmpver) {
-        if ($snmpver === "v3") {
-            // Try each set of parameters from config
-            foreach ($config['snmp']['v3'] as $v3) {
-                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-                if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
-                } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
-                }
+    foreach ($transports as $transport) {
+        // Test reachability
+        if (!$force_add) {
+            $address_family = snmpTransportToAddressFamily($transport);
+            $ping_result = isPingable($host, $address_family);
+            if (!$ping_result['result']) {
+                throw new HostUnreachablePingException("Could not ping $host");
             }
-        } elseif ($snmpver === "v2c" || $snmpver === "v1") {
-            // try each community from config
-            foreach ($config['snmp']['community'] as $community) {
-                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
+        }
 
-                if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
-                } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
-                }
-            }
+        // if $snmpver isn't set, try each version of snmp
+        if (empty($snmp_version)) {
+            $snmpvers = array('v2c', 'v3', 'v1');
         } else {
-            throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
+            $snmpvers = array($snmp_version);
         }
-    }
-    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
-        $additional['snmp_disable'] = 1;
-        $additional['os'] = "ping";
-        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+
+        if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
+            return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+        }
+        $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
+        // try different snmp variables to add the device
+        foreach ($snmpvers as $snmpver) {
+            if ($snmpver === "v3") {
+                // Try each set of parameters from config
+                foreach ($config['snmp']['v3'] as $v3) {
+                    $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
+                    if ($force_add === true || isSNMPable($device)) {
+                        return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
+                    } else {
+                        $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
+                    }
+                }
+            } elseif ($snmpver === "v2c" || $snmpver === "v1") {
+                // try each community from config
+                foreach ($config['snmp']['community'] as $community) {
+                    $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
+
+                    if ($force_add === true || isSNMPable($device)) {
+                        return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
+                    } else {
+                        $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
+                    }
+                }
+            } else {
+                throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
+            }
+        }
+        if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
+            $additional['snmp_disable'] = 1;
+            $additional['os'] = "ping";
+            return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+        }
     }
     throw $host_unreachable_exception;
 }
@@ -1558,32 +1576,38 @@ function oxidized_reload_nodes()
 /**
  * Perform DNS lookup
  *
- * @param array $device Device array from database
- * @param string $type The type of record to lookup
+ * @param $hostname
+ * @param string $type  valid types: auto (ipv6 then ipv4), ipv6, ip, ipv4, udp6, udp, tcp6, tcp
  *
  * @return string ip
  *
-**/
-function dnslookup($device, $type = false, $return = false)
+ */
+function dnslookup($hostname, $type = 'auto')
 {
-    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-        return false;
+    if (IP::isValid($hostname)) {
+        return $hostname;
     }
-    if (empty($type)) {
-        // We are going to use the transport to work out the record type
-        if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
-            $type = DNS_AAAA;
-            $return = 'ipv6';
-        } else {
-            $type = DNS_A;
-            $return = 'ip';
+
+    $lookup_aaaa = ends_with($type, '6');
+
+    // try ipv6
+    if ($type == 'auto' || $lookup_aaaa) {
+        $record = dns_get_record($hostname, DNS_AAAA);
+        if (isset($record[0]['ipv6'])) {
+            return $record[0]['ipv6'];
+        } elseif ($lookup_aaaa) {
+            // we only want ipv6 addresses, don't try ipv4
+            return false;
         }
     }
-    if (empty($return)) {
-        return false;
+
+    // try ipv4, we use gethostbyname here to so we also pull in hosts file
+    $ipv4 = gethostbyname($hostname);
+    if (IPv4::isValid($ipv4)) {
+        return $ipv4;
     }
-    $record = dns_get_record($device['hostname'], $type);
-    return $record[0][$return];
+
+    return false;
 }//end dnslookup
 
 

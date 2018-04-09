@@ -146,7 +146,7 @@ echo "
     <input type=hidden name='editing' value='yes'>
     <div class='form-group'>
     <label for='snmpver' class='col-sm-2 control-label'>SNMP Details</label>
-    <div class='col-sm-1'>
+    <div class='col-sm-2'>
     <select id='snmpver' name='snmpver' class='form-control input-sm' onChange='changeForm();'>
     <option value='v1'>v1</option>
     <option value='v2c' ".($device['snmpver'] == 'v2c' ? 'selected' : '').">v2c</option>
@@ -156,7 +156,7 @@ echo "
     <div class='col-sm-2'>
     <input type='text' name='port' placeholder='port' class='form-control input-sm' value='".($device['port'] == $config['snmp']['port'] ? "" : $device['port'])."'>
     </div>
-    <div class='col-sm-1'>
+    <div class='col-sm-2'>
     <select name='transport' id='transport' class='form-control input-sm'>";
 foreach ($config['snmp']['transports'] as $transport) {
     echo "<option value='".$transport."'";
@@ -173,16 +173,16 @@ echo "      </select>
     <div class='form-group'>
     <div class='col-sm-2'>
     </div>
-    <div class='col-sm-1'>
+    <div class='col-sm-2'>
     <input id='timeout' name='timeout' class='form-control input-sm' value='".($device['timeout'] ? $device['timeout'] : '')."' placeholder='seconds' />
     </div>
-    <div class='col-sm-1'>
+    <div class='col-sm-2'>
     <input id='retries' name='retries' class='form-control input-sm' value='".($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
     </div>
     </div>
     <div class='form-group'>
       <label for='port_assoc_mode' class='col-sm-2 control-label'>Port Association Mode</label>
-      <div class='col-sm-1'>
+      <div class='col-sm-2'>
         <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
 ";
 
@@ -202,19 +202,19 @@ echo "        </select>
     </div>
     <div class='form-group'>
         <label for='max_repeaters' class='col-sm-2 control-label'>Max Repeaters</label>
-        <div class='col-sm-1'>
+        <div class='col-sm-2'>
             <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max rep' />
         </div>
     </div>
     <div class='form-group'>
         <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
-        <div class='col-sm-1'>
+        <div class='col-sm-2'>
             <input id='max_oid' name='max_oid' class='form-control input-sm' value='".$max_oid."' placeholder='max oids' />
         </div>
     </div>
     <div id='snmpv1_2'>
     <div class='form-group'>
-    <label class='col-sm-3 control-label text-left'><h4><strong>SNMPv1/v2c Configuration</strong></h4></label>
+    <label class='col-sm-6 col-sm-offset-2 control-label'><h4 class='text-left'><strong>SNMPv1/v2c Configuration</strong></h4></label>
     </div>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
@@ -225,7 +225,7 @@ echo "        </select>
     </div>
     <div id='snmpv3'>
     <div class='form-group'>
-    <label class='col-sm-3 control-label'><h4><strong>SNMPv3 Configuration</strong></h4></label>
+    <label class='col-sm-6 col-sm-offset-2 control-label'><h4 class='text-left'>SNMPv3 Configuration</strong></h4></label>
     </div>
     <div class='form-group'>
     <label for='authlevel' class='col-sm-2 control-label'>Auth Level</label>

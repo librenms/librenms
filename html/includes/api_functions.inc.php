@@ -382,7 +382,7 @@ function add_device()
 
     $hostname     = $data['hostname'];
     $port         = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
-    $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
+    $transport    = $data['transport'] ? mres($data['transport']) : 'auto';
     $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
     $force_add    = $data['force_add'] ? true : false;
     $snmp_disable = ($data['snmp_disable']);

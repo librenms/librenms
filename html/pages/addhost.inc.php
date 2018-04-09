@@ -37,7 +37,7 @@ if (!empty($_POST['hostname'])) {
         if ($_POST['transport']) {
             $transport = clean($_POST['transport']);
         } else {
-            $transport = 'udp';
+            $transport = 'auto';
         }
 
         $additional = array();
@@ -157,17 +157,18 @@ $pagetitle[] = 'Add host';
             <input type="text" name="port" placeholder="port" class="form-control input-sm">
           </div>
           <div class="col-sm-3">
-            <select name="transport" id="transport" class="form-control input-sm">
-<?php
-foreach ($config['snmp']['transports'] as $transport) {
-    echo "<option value='".$transport."'";
-    if ($transport == $device['transport']) {
-        echo " selected='selected'";
-    }
-
-    echo '>'.$transport.'</option>';
-}
-?>
+            <select name="transport" id="transport" class="form-control input-sm" title="Transport: Connect to device via IPv4 or IPv6 and UDP or TCP">
+                <optgroup label="Auto">
+                    <option value="auto" selected="selected">UDP</option>
+                </optgroup>
+                <optgroup label="IPv4">
+                    <option value="udp">UDP</option>
+                    <option value="tcp">TCP</option>
+                </optgroup>
+                <optgroup label="IPv6">
+                    <option value="udp6">UDP</option>
+                    <option value="tcp6">TCP</option>
+                </optgroup>
             </select>
           </div>
         </div>
