@@ -24,19 +24,21 @@
  */
 use LibreNMS\Config;
 
-$nimble_storage = snmpwalk_cache_oid($device, 'volEntry', null, 'NIMBLE-MIB');
-if (is_array($nimble_storage)) {
-    echo 'volEntry ';
-    foreach ($nimble_storage as $index => $storage) {
-        $units  = 1024*1024;
-        $fstype = $storage['volOnline'];
-        $descr  = $storage['volName'];
-        //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
-        $size = (($storage['volSizeHigh'] << 32 ) + $storage['volSizeLow']) * $units;
-        $used = (($storage['volUsageHigh'] << 32 ) + $storage['volUsageLow']) * $units;
-        if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'nimbleos', $descr, $size, $units, $used);
+if ($device['os'] == 'nimbleos') {
+    $nimble_storage = snmpwalk_cache_oid($device, 'volEntry', null, 'NIMBLE-MIB');
+    if (is_array($nimble_storage)) {
+        echo 'volEntry ';
+        foreach ($nimble_storage as $index => $storage) {
+            $units = 1024 * 1024;
+            $fstype = $storage['volOnline'];
+            $descr = $storage['volName'];
+            //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
+            $size = (($storage['volSizeHigh'] << 32) + $storage['volSizeLow']) * $units;
+            $used = (($storage['volUsageHigh'] << 32) + $storage['volUsageLow']) * $units;
+            if (is_numeric($index)) {
+                discover_storage($valid_storage, $device, $index, $fstype, 'nimbleos', $descr, $size, $units, $used);
+            }
+            unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
         }
-        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }
