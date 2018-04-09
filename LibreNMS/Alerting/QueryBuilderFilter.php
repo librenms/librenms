@@ -101,7 +101,7 @@ class QueryBuilderFilter implements \JsonSerializable
                     continue;
                 }
 
-                $type = $this->getColumnType($column_type);
+                $type = $this->getColumnType($column_type, $column);
 
                 // ignore unsupported types (such as binary and blob)
                 if (is_null($type)) {
@@ -135,9 +135,11 @@ class QueryBuilderFilter implements \JsonSerializable
     }
 
 
-    private function getColumnType($type)
+    private function getColumnType($type, $field)
     {
-        if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
+        if (ends_with($field, ['_perc', '_current'])) {
+            return 'string';
+        } elseif (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
             return 'integer';
