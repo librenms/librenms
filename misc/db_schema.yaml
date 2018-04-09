@@ -1351,7 +1351,7 @@ route:
     - { Field: ipRouteMask, Type: varchar(256), 'Null': false, Extra: '' }
   Indexes:
     device: { Name: device, Columns: [device_id, context_name, ipRouteDest, ipRouteNextHop], Unique: false, Type: BTREE }
-router_utilization:
+routing_resources:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }

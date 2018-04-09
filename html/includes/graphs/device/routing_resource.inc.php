@@ -8,7 +8,7 @@ $iter         = '1';
 $i            = 1;
 $rrd_options .= " COMMENT:'                                  % Used\\n'";
 
-foreach (dbFetchRows('SELECT * FROM `router_utilization` where `device_id` = ? ORDER BY `resource`', array($device['device_id'])) as $router_utilization) {
+foreach (dbFetchRows('SELECT * FROM `routing_resources` where `device_id` = ? ORDER BY `resource`', array($device['device_id'])) as $routing_resources) {
     // FIXME generic colour function
     if ($iter == '1') {
         $colour = 'CC0000';
@@ -27,13 +27,13 @@ foreach (dbFetchRows('SELECT * FROM `router_utilization` where `device_id` = ? O
         unset($iter);
     }
 
-    if ($router_utilization['feature']) {
-        $label = $router_utilization['resource'] . ' - ' . $router_utilization['feature'];
+    if ($routing_resources['feature']) {
+        $label = $routing_resources['resource'] . ' - ' . $routing_resources['feature'];
     } else {
-        $label = $router_utilization['resource'];
+        $label = $routing_resources['resource'];
     }
     $descr        = rrdtool_escape($label, 28);
-    $rrd_filename = rrd_name($device['hostname'], array('router_utilization', $router_utilization['id'], $router_utilization['resource']));
+    $rrd_filename = rrd_name($device['hostname'], array('routing_resources', $routing_resources['id'], $routing_resources['resource']));
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_options .= " DEF:used$i=$rrd_filename:used:AVERAGE ";

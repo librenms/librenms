@@ -1,10 +1,10 @@
 <?php
 
-$graph_type = 'routerutilization_usage';
+$graph_type = 'routingresources_usage';
 
 $row = 1;
 
-foreach (dbFetchRows('SELECT * FROM `router_utilization` WHERE device_id = ? AND forwarding_element = ? ORDER BY `resource`', array($device['device_id'], null)) as $entry) {
+foreach (dbFetchRows('SELECT * FROM `routing_resources` WHERE device_id = ? AND forwarding_element = ? ORDER BY `resource`', array($device['device_id'], null)) as $entry) {
     if (is_integer($row / 2)) {
         $row_colour = $list_colour_a;
     } else {

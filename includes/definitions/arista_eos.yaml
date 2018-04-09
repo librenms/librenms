@@ -16,10 +16,10 @@ poller_modules:
     applications: 0
     services: 0
     ntp: 0
-    router-utilization: 0
+    routing-resources: 0
 discovery_modules:
     cisco-vrf-lite: 0
     services: 0
     ntp: 0
     wireless: 0
-    router-utilization: 0
+    routing-resources: 0

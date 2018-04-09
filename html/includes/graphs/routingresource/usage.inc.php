@@ -11,19 +11,19 @@ $iter = '1';
 
 $rrd_options .= " COMMENT:'                                               % Used\\n'";
 
-$hostname = gethostbyid($router_utilization['device_id']);
+$hostname = gethostbyid($routing_resources['device_id']);
 
 $colour      = 'CC0000';
 $colour_area = 'ffaaaa';
 
-if ($router_utilization['feature']) {
-    $label = $router_utilization['resource'] . ' - ' . $router_utilization['feature'];
+if ($routing_resources['feature']) {
+    $label = $routing_resources['resource'] . ' - ' . $routing_resources['feature'];
 } else {
-    $label = $router_utilization['resource'];
+    $label = $routing_resources['resource'];
 }
 $descr = rrdtool_escape($label, 42);
 
-$percentage = round($router_utilization['current'] / $router_utilization['maximum'] * 100, 0);
+$percentage = round($routing_resources['current'] / $routing_resources['maximum'] * 100, 0);
 
 $background = get_percentage_colours($percentage, 80);
 

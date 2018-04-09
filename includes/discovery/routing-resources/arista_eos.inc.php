@@ -1,9 +1,9 @@
 <?php
 
 // ARISTA-HARDWARE-UTILIZATION-MIB aristaHardwareUtilizationMibObjects aristaHardwareUtilizationTable
-// $router_utilization = snmpwalk_array_num($device, '.1.3.6.1.4.1.30065.3.22.1.1', 1);
+// $routing_resources = snmpwalk_array_num($device, '.1.3.6.1.4.1.30065.3.22.1.1', 1);
 
-$router_utilization = snmpwalk_cache_oid($device, 'aristaHardwareUtilizationTable', array(), 'ARISTA-HARDWARE-UTILIZATION-MIB');
+$routing_resources = snmpwalk_cache_oid($device, 'aristaHardwareUtilizationTable', array(), 'ARISTA-HARDWARE-UTILIZATION-MIB');
 
 $arista_mib['aristaHardwareUtilizationInUseEntries'] = 4;
 $arista_mib['aristaHardwareUtilizationFreeEntries'] = 5;
@@ -12,7 +12,7 @@ $arista_mib['aristaHardwareUtilizationMaxEntries'] = 7;
 $arista_mib['aristaHardwareUtilizationHighWatermark'] = 8;
 $arista_mib['aristaHardwareUtilizationHighWatermarkTime'] = 9;
 
-foreach ($router_utilization as $key_oid => $value) {
+foreach ($routing_resources as $key_oid => $value) {
     $label = explode('.', $key_oid);
     $measure['resource'] = $label[0];
     $measure['feature'] = $label[1];
@@ -34,6 +34,6 @@ foreach ($router_utilization as $key_oid => $value) {
             'current'            => $current,
             'maximum'            => $maximum,
         ),
-        'router_utilization'
+        'routing_resources'
     );
 }
