@@ -444,7 +444,9 @@ class Config
             'db_socket' => '',
         ];
 
-        @include __DIR__ . '/../config.php';
+        if (is_file(__DIR__ . '/../config.php')) {
+            include __DIR__ . '/../config.php';
+        }
 
         // Check for testing database
         if (getenv('DBTEST')) {

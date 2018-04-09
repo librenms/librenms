@@ -56,7 +56,8 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     }
 
     if (is_null($db_host)) {
-        extract(Config::getDatabaseSettings());
+        $db_config = Config::getDatabaseSettings();
+        extract($db_config);
         /** @var string $db_host */
         /** @var string $db_port */
         /** @var string $db_socket */
