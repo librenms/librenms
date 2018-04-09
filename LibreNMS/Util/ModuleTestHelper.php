@@ -682,11 +682,13 @@ class ModuleTestHelper
                         return array_diff_key($row, $keys);
                     }, $rows);
                 }
-
-                if (isset($key)) {
-                    $data[$module][$key][$table] = $rows;
-                } else {
-                    $data[$module][$table] = $rows;
+                
+                if (!empty($rows)) {
+                    if (isset($key)) {
+                        $data[$module][$key][$table] = $rows;
+                    } else {
+                        $data[$module][$table] = $rows;
+                    }
                 }
             }
         }
