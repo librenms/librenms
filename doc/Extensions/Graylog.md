@@ -14,7 +14,7 @@ to your rsyslog config to send the full FQDN so device logs will be associated c
 Graylog itself isn't included within LibreNMS, you will need to install this separately either on the same infrastructure as LibreNMS or as a totally
 standalone appliance.
 
-Config is simple, here's an example:
+Config is simple, here's an example based on Graylog 2.4:
 
 ```php
 $config['graylog']['server']   = 'http://127.0.0.1';
@@ -31,11 +31,8 @@ $config['graylog']['timezone'] = 'Europe/Bucharest';
 ```
 > Timezone must be PHP supported timezones, available at: <a href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a>
 
-> Since Graylog 2.1, the default API path is /api/
-> Also default port for webinterface and api are on 9000`http://127.0.0.1:9000/api/`  
-
 If you are running a version earlier than Graylog then please set `$config['graylog']['version']` to the version 
-number of your Graylog install.
+number of your Graylog install. Earlier versions than 2.1 use the default port `12900` 
 
 If you have altered the default uri for your Graylog setup then you can override the default of `/api/` using 
 `$config['graylog']['base_uri'] = '/somepath/';`
