@@ -1364,7 +1364,7 @@ routing_resources:
     - { Field: maximum, Type: float, 'Null': false, Extra: '' }
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [resource_id], Unique: true, Type: BTREE }
     unique_id: { Name: unique_id, Columns: [device_id, oid_current, oid_maximum], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 sensors:
