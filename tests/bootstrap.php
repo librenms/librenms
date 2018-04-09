@@ -80,9 +80,10 @@ if (getenv('DBTEST')) {
         // restore sql_mode
         dbQuery("SET GLOBAL sql_mode='$sql_mode'");
 
+        $db_name = dbFetchCell('SELECT DATABASE()');
         if ($empty_db) {
-            dbQuery("DROP DATABASE " . $config['db_name']);
-        } elseif (isset($config['test_db_name']) && $config['db_name'] == $config['test_db_name']) {
+            dbQuery("DROP DATABASE $db_name");
+        } elseif (isset($config['test_db_name']) && $config['test_db_name'] == $db_name) {
             // truncate tables
             $tables = dbFetchColumn('SHOW TABLES');
 
