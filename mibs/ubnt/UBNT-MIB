@@ -32,6 +32,7 @@ UBNT-MIB DEFINITIONS ::= BEGIN
     ubntAirVisionGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 6}
     ubntMFiGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 7}
     ubntUniTelGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 8}
+    ubntAFLTUGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 9}
 
     -- --------------------------------------------------------------------------------
     --                         Ubiquiti Networks Products
@@ -43,6 +44,7 @@ UBNT-MIB DEFINITIONS ::= BEGIN
     ubntAirVision OBJECT IDENTIFIER ::= { ubntMIB 7 }
     ubntMFi OBJECT IDENTIFIER ::= { ubntMIB 8 }
     ubntUniTel OBJECT IDENTIFIER ::= { ubntMIB 9 }
+    ubntAFLTU OBJECT IDENTIFIER ::= { ubntMIB 10 }
 
     -- --------------------------------------------------------------------------------
     --                         Ubiquiti Networks OR table
