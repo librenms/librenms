@@ -25,13 +25,12 @@
 
 use LibreNMS\Authentication\Auth;
 
-session_start();
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
 if (!Auth::check()) {
     die('Unauthorized.');
 }
-
-$init_modules = array('web');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
