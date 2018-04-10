@@ -1044,10 +1044,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null') / $divisor * $multiplier;
-                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : dynamic_discovery_get_value('low_warn_limit', $index, $data, $pre_cache, 'null') / $divisor * $multiplier;
-                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null') / $divisor * $multiplier;
-                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null') / $divisor * $multiplier;
+                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : (dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null') / $divisor) * $multiplier;
+                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : (dynamic_discovery_get_value('low_warn_limit', $index, $data, $pre_cache, 'null') / $divisor) * $multiplier;
+                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : (dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null') / $divisor) * $multiplier;
+                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : (dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null') / $divisor) * $multiplier;
 
                     $entPhysicalIndex = str_replace('{{ $index }}', $index, $data['entPhysicalIndex']) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
@@ -1063,7 +1063,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         create_state_index($sensor_name, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipler so it should be safe to do the calculation using both.
-                        $value = $value / $divisor * $multiplier;
+                        $value = ($value / $divisor) * $multiplier;
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, $data['index'] ?: $index);
