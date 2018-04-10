@@ -160,6 +160,7 @@ if ($error_msg) {
                             ob_start();
                                 imagepng($png);
                                 $imagedata = ob_get_contents();
+                                imagedestroy($png);
                             ob_end_clean();
                             
                             $base64_output = base64_encode($imagedata);
