@@ -88,6 +88,7 @@ class ComposerHelper
                 'db_user' => '',
                 'db_pass' => '',
                 'db_socket' => '',
+                'base_url' => '',
             ];
 
             @include 'config.php';
@@ -99,6 +100,7 @@ class ComposerHelper
                 'DB_PASSWORD' => $config['db_pass'],
                 'DB_DATABASE' => $config['db_name'],
                 'DB_SOCKET'   => $config['db_socket'],
+                'APP_URL'     => $config['base_url'],
             ]);
         }
     }
