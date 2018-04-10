@@ -22,8 +22,7 @@
   * WLSX-SWITCH-MIB::sysXMemoryFree.1 = INTEGER: 918976
   */
 
-echo $device['os']
-if ($device['os'] == 'arubaos') {
+if ($device['os'] === 'arubaos') {
     echo 'ARUBAOS-MEMORY-POOL: ';
 
     $total = snmp_get($device, 'sysXMemorySize.1', '-OvQ', 'WLSX-SWITCH-MIB');
