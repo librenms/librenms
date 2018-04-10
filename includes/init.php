@@ -103,7 +103,7 @@ if (!module_selected('nodb', $init_modules)) {
         dbConnect();
 
         // boot Eloquent outside of Laravel
-        if (!defined('LARAVEL_START')) {
+        if (!defined('LARAVEL_START') && class_exists(Capsule::class)) {
             $capsule = new Capsule;
             $db_config = include($install_dir . '/config/database.php');
             $capsule->addConnection($db_config['connections'][$db_config['default']]);

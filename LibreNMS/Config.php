@@ -25,6 +25,8 @@
 
 namespace LibreNMS;
 
+use App\Models\GraphType;
+
 class Config
 {
     /**
@@ -227,17 +229,30 @@ class Config
         global $config;
 
         if ($persist) {
-            $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
-            if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
-                $insert = array(
+            if (defined('LARAVEL_START')) {
+                $config_array = collect([
                     'config_name' => $key,
                     'config_value' => $value,
                     'config_default' => $default,
                     'config_descr' => $descr,
                     'config_group' => $group,
                     'config_sub_group' => $sub_group,
-                );
-                dbInsert($insert, 'config');
+                ])->filter()->toArray();
+
+                \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
+            } else {
+                $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
+                if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
+                    $insert = array(
+                        'config_name' => $key,
+                        'config_value' => $value,
+                        'config_default' => $default,
+                        'config_descr' => $descr,
+                        'config_group' => $group,
+                        'config_sub_group' => $sub_group,
+                    );
+                    dbInsert($insert, 'config');
+                }
             }
         }
 
@@ -292,10 +307,19 @@ class Config
     {
         global $config;
 
-        $db_config = array();
-        foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
-            self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
+        $db_config = [];
+
+        if (defined('LARAVEL_START')) {
+            \App\Models\Config::get(['config_name', 'config_value'])
+                ->each(function ($item) use (&$db_config) {
+                    array_set($db_config, $item->config_name, $item->config_value);
+                });
+        } else {
+            foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
+                self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
+            }
         }
+
         $config = array_replace_recursive($db_config, $config);
     }
 
@@ -312,9 +336,9 @@ class Config
     {
         // type cast value. Is this needed here?
         if (filter_var($value, FILTER_VALIDATE_INT)) {
-            $value = (int)$value;
+            $value = (int) $value;
         } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            $value = (float)$value;
+            $value = (float) $value;
         } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
@@ -333,8 +357,15 @@ class Config
     {
         global $config;
 
+        if (defined('LARAVEL_START')) {
+            $graph_types = GraphType::all()->toArray();
+        } else {
+            $graph_types = dbFetchRows('SELECT * FROM graph_types');
+        }
+
         // load graph types from the database
-        foreach (dbFetchRows('SELECT * FROM graph_types') as $graph) {
+        foreach ($graph_types as $graph) {
+            $g = [];
             foreach ($graph as $k => $v) {
                 if (strpos($k, 'graph_') == 0) {
                     // remove leading 'graph_' from column name
