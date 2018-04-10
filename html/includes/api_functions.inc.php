@@ -247,7 +247,7 @@ function get_graph_generic_by_hostname()
     rrdtool_close();
 
     if ($vars['output'] === 'base64') {
-        // api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
     }
 }
 
