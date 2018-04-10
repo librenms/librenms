@@ -2370,11 +2370,5 @@
             "wireless_sensors": []
         },
         "poller": "matches discovery"
-    },
-    "applications": {
-        "poller": {
-            "applications": [],
-            "application_metrics": []
-        }
     }
 }
