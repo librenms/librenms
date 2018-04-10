@@ -22,6 +22,7 @@
   * WLSX-SWITCH-MIB::sysXMemoryFree.1 = INTEGER: 918976
   */
 
+echo $device['os']
 if ($device['os'] == 'arubaos') {
     echo 'ARUBAOS-MEMORY-POOL: ';
 
