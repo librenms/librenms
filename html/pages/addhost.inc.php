@@ -148,9 +148,9 @@ $pagetitle[] = 'Add host';
           <label for="snmpver" class="col-sm-3 control-label">SNMP Version</label>
           <div class="col-sm-3">
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
-                <option value="v1">v1</option>
-                <option value="v2c" selected>v2c</option>
-                <option value="v3">v3</option>
+              <option value="v1">v1</option>
+              <option value="v2c" selected>v2c</option>
+              <option value="v3">v3</option>
             </select>
           </div>
           <div class="col-sm-3">
