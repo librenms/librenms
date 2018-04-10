@@ -1,6 +1,5 @@
 <?php
 
-use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
