@@ -33,3 +33,4 @@ if ($device['os'] === 'arubaos') {
     if (is_numeric($total) && is_numeric($used)) {
         discover_mempool($valid_mempool, $device, 0, 'arubaos', 'Memory', '1', null, null);
     }
+}
