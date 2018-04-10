@@ -163,13 +163,11 @@ if ($error_msg) {
                             ob_end_clean();
                             
                             $base64_output = base64_encode($imagedata);
-                        }
-                        else {
+                        } else {
                             imagepng($dst_im);
                             imagedestroy($dst_im);
                         }
                     } else {
-
                         if ($output === 'base64') {
                             $fd = fopen($graphfile, 'r');
                             ob_start();
@@ -178,8 +176,7 @@ if ($error_msg) {
                                 fclose($fd);
                             ob_end_clean();
                             $base64_output =  base64_encode($imagedata);
-                        }
-                        else {
+                        } else {
                             $fd = fopen($graphfile, 'r');
                             fpassthru($fd);
                             fclose($fd);
