@@ -9,6 +9,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\Authentication\Auth;
+
 header('Content-type: application/json');
 
 $status    = 'error';
@@ -17,7 +20,7 @@ $message   = 'unknown error';
 $device_id = mres($_POST['device_id']);
 $notes = $_POST['notes'];
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $message = 'Only admin accounts can update notes';
 } elseif (isset($notes) && (dbUpdate(array('notes' => $notes), 'devices', 'device_id = ?', array($device_id)))) {
     $status  = 'ok';

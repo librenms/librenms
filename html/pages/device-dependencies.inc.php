@@ -12,6 +12,8 @@
  */
 
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 $pagetitle[] = 'Device Dependencies';
@@ -57,7 +59,7 @@ var grid = $("#hostdeps").bootgrid({
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if (is_admin()) { ?>
+<?php if (Auth::user()->hasGlobalAdmin()) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Device Dependencies</button> \
@@ -119,7 +121,7 @@ var grid = $("#hostdeps").bootgrid({
     });
 });
 
-$(document).ready(function() { 
+$(document).ready(function() {
     var editSelect = $('#availableparents').select2({
         dropdownParent: $('#edit-dependency'),
         width: 'resolve',
@@ -148,7 +150,7 @@ $(document).ready(function() {
     $.ajax({
         type: "POST",
         url: 'ajax_form.php',
-        data: {type: 'get-host-dependencies', "viewtype": 'fulllist' }, 
+        data: {type: 'get-host-dependencies', "viewtype": 'fulllist' },
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {

@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\Auth;
 
 $no_refresh = true;
 
@@ -73,7 +74,7 @@ echo '<div class="table-responsive">
     </tr>';
 
 echo '<td colspan="7">';
-if (is_admin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
     echo '<i> - OR - </i>';
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
@@ -189,13 +190,13 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
     echo '<td>';
-    if (is_admin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$popover_msg."' data-toggle='modal'>";
     }
 
     echo '</td>';
     echo '<td>';
-    if (is_admin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
         echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
@@ -218,7 +219,7 @@ echo '</table>
     </div>';
 
 if ($count < 1) {
-    if ($_SESSION['userlevel'] >= '10') {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo '<div class="row">
             <div class="col-sm-12">
             <form role="form" method="post">

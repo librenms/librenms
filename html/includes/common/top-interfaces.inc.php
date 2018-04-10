@@ -1,18 +1,18 @@
 <?php
 /* Copyright (C) 2015 Sergiusz Paprzycki <serek@walcz.net>
- * 
+ *
  * This widget is based on legacy frontpage module created by Paul Gear.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -24,6 +24,8 @@
  * @package LibreNMS
  * @subpackage Widgets
  */
+
+use LibreNMS\Authentication\Auth;
 
 if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     $common_output[] = '
@@ -99,8 +101,8 @@ $(function() {
     $interval = $widget_settings['time_interval'];
     (integer) $lastpoll_seconds = ($interval * 60);
     (integer) $interface_count = $widget_settings['interface_count'];
-    $params = array('user' => $_SESSION['user_id'], 'lastpoll' => array($lastpoll_seconds), 'count' => array($interface_count), 'filter' => ($widget_settings['interface_filter']?:(int)1));
-    if (is_admin() || is_read()) {
+    $params = array('user' => Auth::id(), 'lastpoll' => array($lastpoll_seconds), 'count' => array($interface_count), 'filter' => ($widget_settings['interface_filter']?:(int)1));
+    if (Auth::user()->hasGlobalRead()) {
         $query = '
             SELECT p.*, devices.*, p.ifInOctets_rate + p.ifOutOctets_rate as total
             FROM ports as p

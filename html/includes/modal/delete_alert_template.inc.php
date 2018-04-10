@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -54,11 +56,11 @@ $('#alert-template-removal').click('', function(event) {
                 $('[data-row-id="'+template_id+'"]').remove();
             }
             $("#template_id").val('');
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+            toastr.success(msg);
             $("#confirm-delete-alert-template").modal('hide');
         },
         error: function() {
-            $("#message").html('<div class="alert alert-danger">The alert template could not be deleted.</div>');
+            toastr.error("The alert template could not be deleted.");
             $("#confirm-delete-alert-template").modal('hide');
         }
     });

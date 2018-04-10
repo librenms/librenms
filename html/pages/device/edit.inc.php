@@ -1,12 +1,14 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 $link_array = array('page'    => 'device',
     'device'  => $device['device_id'],
     'tab' => 'edit');
 
-if ($_SESSION['userlevel'] < '7') {
+if (!Auth::user()->hasGlobalAdmin()) {
     print_error("Insufficient Privileges");
 } else {
     $panes['device']   = 'Device Settings';

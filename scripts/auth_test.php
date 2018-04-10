@@ -19,14 +19,14 @@ if (isset($options['d'])) {
     $debug = true;
 }
 
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
 if (isset($options['v'])) {
     // Enable debug mode for auth methods that have it
     $config['auth_ad_debug'] = 1;
     $config['auth_ldap_debug'] = 1;
 }
-
-$init_modules = array('web', 'auth');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 echo "Authentication Method: {$config['auth_mechanism']}\n";
 

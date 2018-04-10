@@ -35,7 +35,7 @@ $notifications = new ObjectCache('notifications');
 <?php
 echo '<strong class="count-notif">' . $notifications['count'] . '</strong> Unread Notifications ';
 
-if (is_admin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
 }
 
@@ -87,7 +87,7 @@ foreach ($notifications['sticky'] as $notif) {
     echo "<strong><i class='fa fa-bell-o'></i>&nbsp;${notif['title']}</strong>";
     echo "<span class='pull-right'>";
 
-    if ($notif['user_id'] != $_SESSION['user_id']) {
+    if ($notif['user_id'] != Auth::id()) {
         $sticky_user = Auth::get()->getUser($notif['user_id']);
         echo "<code>Sticky by ${sticky_user['username']}</code>";
     } else {
@@ -127,7 +127,7 @@ foreach ($notifications['unread'] as $notif) {
     }
     echo "<h4 class='$class' id='${notif['notifications_id']}'>${notif['title']}<span class='pull-right'>";
 
-    if (is_admin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
     }
 ?>
@@ -170,7 +170,7 @@ foreach (array_reverse($notifications['read']) as $notif) {
     }
     echo  " id='${notif['notifications_id']}'>${notif['title']}";
 
-    if ($_SESSION['userlevel'] == 10) {
+    if (Auth::user()->isAdmin()) {
         echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
     }
 ?>

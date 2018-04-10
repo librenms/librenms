@@ -368,24 +368,64 @@ class Config
             ini_set('session.cookie_secure', 1);
         }
 
+        // If we're on SSL, let's properly detect it
+        if (isset($_SERVER['HTTPS'])) {
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+        }
+
+        // Define some variables if they aren't set by user definition in config.php
+        self::setDefault('html_dir', '%s/html', ['install_dir']);
+        self::setDefault('rrd_dir', '%s/rrd', ['install_dir']);
+        self::setDefault('mib_dir', '%s/mibs', ['install_dir']);
+        self::setDefault('log_dir', '%s/logs', ['install_dir']);
+        self::setDefault('log_file', '%s/%s.log', ['log_dir', 'project_id']);
+        self::setDefault('plugin_dir', '%s/plugins', ['html_dir']);
+//        self::setDefault('email_from', '"%s" <%s@' . php_uname('n') . '>', ['project_name', 'email_user']);  // FIXME email_from set because alerting config
+
         // deprecated variables
-        if (self::has('rrdgraph_real_95th')) {
-            self::set('rrdgraph_real_percentile', self::get('rrdgraph_real_95th'));
-        }
+        self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
+        self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
+        self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
 
-        if (self::has('fping_options.millisec')) {
-            self::set('fping_options.interval', self::get('fping_options.millisec'));
-        }
-
-        if (self::has('discovery_modules.cisco-vrf')) {
-            self::set('discovery_modules.vrf', self::get('discovery_modules.cisco-vrf'));
-        }
 
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
             if (!is_executable(self::get($bin))) {
                 self::set($bin, locate_binary($bin), true, $bin, "Path to $bin", 'external', 'paths');
             }
+        }
+    }
+
+    /**
+     * Set default values for defaults that depend on other settings, if they are not already loaded
+     *
+     * @param string $key
+     * @param string $value value to set to key or vsprintf() format string for values below
+     * @param array $format_values array of keys to send to vsprintf()
+     */
+    private static function setDefault($key, $value, $format_values = [])
+    {
+        if (!self::has($key)) {
+            if (is_string($value)) {
+                $format_values = array_map('self::get', $format_values);
+                self::set($key, vsprintf($value, $format_values));
+            } else {
+                self::set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * Copy data from old variables to new ones.
+     *
+     * @param $old
+     * @param $new
+     */
+    private static function deprecatedVariable($old, $new)
+    {
+        if (self::has($old)) {
+            d_echo("Copied deprecated config $old to $new\n");
+            self::set($new, self::get($old));
         }
     }
 }

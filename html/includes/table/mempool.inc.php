@@ -15,13 +15,15 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $graph_type = 'mempool_usage';
 $where      = 1;
 $sql        = ' FROM `mempools` AS `M` LEFT JOIN `devices` AS `D` ON `M`.`device_id` = `D`.`device_id`';
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `M`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE $where";

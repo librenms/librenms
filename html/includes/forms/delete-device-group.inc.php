@@ -11,9 +11,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\Authentication\Auth;
+
 header('Content-type: text/plain');
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 

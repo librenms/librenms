@@ -24,10 +24,11 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\Auth;
 
 header('Content-type: application/json');
 
-if (is_admin() === false) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need to be admin',
