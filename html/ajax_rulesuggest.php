@@ -25,7 +25,7 @@
 
 use LibreNMS\Authentication\Auth;
 
-$init_modules = array('web');
+$init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (!Auth::check()) {
