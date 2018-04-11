@@ -1,0 +1,174 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.5875.800.1001.11",
+                    "sysDescr": "AN5516-01",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "fiberhome",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "fiberhome.png"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.5875.800.1001.11",
+                    "sysDescr": "AN5516-01",
+                    "sysContact": "<private>",
+                    "version": "WKE2.115.331R1A - RP0700",
+                    "hardware": "Fiberhome AN5516-01",
+                    "features": "Olt AN5516-01",
+                    "location": "<private>",
+                    "os": "fiberhome",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "fiberhome.png"
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.5875.800.3.9.8.1.1.5.9",
+                    "processor_index": "9",
+                    "processor_type": "fiberhome",
+                    "processor_usage": "5",
+                    "processor_descr": "Hswa 9 Processor",
+                    "processor_precision": "100",
+                    "processor_perc_warn": "75"
+                },
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.5875.800.3.9.8.1.1.5.10",
+                    "processor_index": "10",
+                    "processor_type": "fiberhome",
+                    "processor_usage": "1",
+                    "processor_descr": "Hswa 10 Processor",
+                    "processor_precision": "100",
+                    "processor_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "9",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "fiberhome",
+                    "mempool_precision": "100",
+                    "mempool_descr": "Hswa 9 Memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "10",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "fiberhome",
+                    "mempool_precision": "100",
+                    "mempool_descr": "Hswa 10 Memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "9",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "fiberhome",
+                    "mempool_precision": "100",
+                    "mempool_descr": "Hswa 9 Memory",
+                    "mempool_perc": "59",
+                    "mempool_used": "158376919",
+                    "mempool_free": "110058537",
+                    "mempool_total": "268435456",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "10",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "fiberhome",
+                    "mempool_precision": "100",
+                    "mempool_descr": "Hswa 10 Memory",
+                    "mempool_perc": "59",
+                    "mempool_used": "158376919",
+                    "mempool_free": "110058537",
+                    "mempool_total": "268435456",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                }
+            ]
+        }
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": "0",
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.5875.800.3.9.4.5.0",
+                    "sensor_index": "0",
+                    "sensor_type": "fiberhome",
+                    "sensor_descr": "Internal Temperature 0",
+                    "sensor_divisor": "1",
+                    "sensor_multiplier": "1",
+                    "sensor_current": "45",
+                    "sensor_limit": "100",
+                    "sensor_limit_warn": "55",
+                    "sensor_limit_low": "0",
+                    "sensor_limit_low_warn": "15",
+                    "sensor_alert": "1",
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": []
+        },
+        "poller": "matches discovery"
+    }
+}
