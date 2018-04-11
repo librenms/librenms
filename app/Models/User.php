@@ -10,7 +10,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'level', 'descr'];
+    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
 
     // ---- Helper Functions ----

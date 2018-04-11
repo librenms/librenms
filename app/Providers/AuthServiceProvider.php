@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Extensions\LegacyUserProvider;
+use Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -25,6 +27,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Auth::provider('legacy', function ($app, array $config) {
+            return new LegacyUserProvider();
+        });
     }
 }

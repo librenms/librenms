@@ -18,7 +18,11 @@ Route::get('/laravel', function () {
     session_write_close();
 
     // FIXME real auth
-    Auth::onceUsingId($_SESSION['user_id']);
+    if (!empty($_SESSION['user_id'])) {
+        Auth::onceUsingId($_SESSION['user_id']);
+    } else {
+        return redirect()->to('/');
+    }
 
     $user = Auth::getUser();
     \App\Checks::postAuth();
