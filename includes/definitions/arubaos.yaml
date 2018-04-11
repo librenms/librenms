@@ -5,8 +5,6 @@ icon: aruba
 over:
     - { graph: device_arubacontroller_numaps, text: 'Number of APs' }
     - { graph: device_arubacontroller_numclients, text: 'Number of Clients' }
-mib_dir:
-    - arubaos
 poller_modules:
     aruba-controller: 1
 discovery:
