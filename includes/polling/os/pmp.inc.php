@@ -41,6 +41,7 @@ $ptp = array(
 
 // PMP 100 is defaulted to
 $pmp = array(
+    'MU-MIMO OFDM'  => 'PMP 450m',
     'MIMO OFDM'     => 'PMP 450',
     'OFDM'          => 'PMP 430'
 );
