@@ -8,4 +8,3 @@
   $mempool['used']  = $memory_pool['sysXMemoryUsed.1'];
   $mempool['free']  = $memory_pool['sysXMemoryFree.1'];
   $mempool['perc']  = ($mempool['used'] / $mempool['total'] * 100);
-    

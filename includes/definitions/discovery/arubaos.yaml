@@ -1,4 +1,4 @@
-mib: 'ARUBA-MIB'
+mib: ARUBA-MIB:WLSX-SYSTEMEXT-MIB
 modules:
     processors:
           data:
