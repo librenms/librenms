@@ -114,7 +114,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             Config::get('auth_ad_base_dn'),
             // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
             // limiting to "DN" for shorter array
-            "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+            "(&" . static::userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
             array("DN")
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -129,7 +129,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            static::userFilter($username),
             array('samaccountname')
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -176,7 +176,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            static::userFilter($username),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
@@ -288,7 +288,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            static::userFilter($username),
             $attributes
         );
         $result = ldap_get_entries($this->ldap_connection, $search);
@@ -304,7 +304,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $result = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_user_filter($username),
+            static::userFilter($username),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $result);
@@ -350,7 +350,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $result = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            get_auth_ad_group_filter($samaccountname),
+            static::groupFilter($samaccountname),
             $attributes
         );
         $entries = ldap_get_entries($this->ldap_connection, $result);
@@ -455,5 +455,31 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+    }
+
+    public static function userFilter($username)
+    {
+        // don't return disabled users
+        $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
+
+        $extra = Config::get('auth_ad_user_filter');
+        if ($extra) {
+            $user_filter .= $extra;
+        }
+        $user_filter .= ')';
+
+        return $user_filter;
+    }
+
+    public static function groupFilter($groupname)
+    {
+        $group_filter = "(samaccountname=$groupname)";
+
+        $extra = Config::get('auth_ad_group_filter');
+        if ($extra) {
+            $group_filter = "(&$extra$group_filter)";
+        }
+
+        return $group_filter;
     }
 }
