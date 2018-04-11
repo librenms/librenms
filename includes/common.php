@@ -1466,29 +1466,6 @@ if (!function_exists('starts_with')) {
     }
 }
 
-function get_auth_ad_user_filter($username)
-{
-    global $config;
-
-    // don't return disabled users
-    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
-    if ($config['auth_ad_user_filter']) {
-        $user_filter .= $config['auth_ad_user_filter'];
-    }
-    $user_filter .= ')';
-    return $user_filter;
-}
-
-function get_auth_ad_group_filter($groupname)
-{
-    global $config;
-    $group_filter = "(samaccountname=$groupname)";
-    if ($config['auth_ad_group_filter']) {
-        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
-    }
-    return $group_filter;
-}
-
 /**
  * Print a list of items up to a max amount
  * If over that number, a line will print the total items
