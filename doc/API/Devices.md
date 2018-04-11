@@ -396,6 +396,7 @@ Input:
   - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
   - width: The graph width, defaults to 1075.
   - height: The graph height, defaults to 300.
+  - output: Set how the graph should be outputted (base64, display), defaults to display.
 
 Example:
 ```curl

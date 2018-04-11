@@ -140,6 +140,7 @@ function get_graph_by_port_hostname()
     $vars         = array();
     $vars['port'] = urldecode($router['ifname']);
     $vars['type'] = $router['type'] ?: 'port_bits';
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -164,6 +165,9 @@ function get_graph_by_port_hostname()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -212,6 +216,7 @@ function get_graph_generic_by_hostname()
     $sensor_id    = $router['sensor_id'] ?: null;
     $vars         = array();
     $vars['type'] = $router['type'] ?: 'device_uptime';
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
         if (str_contains($vars['type'], '_wireless')) {
@@ -244,6 +249,10 @@ function get_graph_generic_by_hostname()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
@@ -628,6 +637,7 @@ function get_graph_by_portgroup()
     $group  = $router['group'] ?: '';
     $id     = $router['id'] ?: '';
     $vars   = array();
+    $vars['output'] = $_GET['output'] ?: 'display';
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -662,6 +672,9 @@ function get_graph_by_portgroup()
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
     rrdtool_close();
+    if ($vars['output'] === 'base64') {
+        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
 }
 
 
