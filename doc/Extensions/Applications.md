@@ -980,19 +980,26 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 
 ### ZFS
 
-###### SNMP Extend
-1. Copy the perl script to the desired host (the host must be added to LibreNMS devices)
+##### SNMP Extend
+
+The installation steps are:
+
+1. Copy the polling script to the desired host (the host must be added to LibreNMS devices)
+2. Make the script executable
+3. Edit snmpd.conf to include ZFS stats
+
+###### FreeBSD
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
+chmod +x /etc/snmp/zfs-freebsd
+echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
 ```
 
-2. Make the script executable (chmod +x /etc/snmp/zfs-freebsd)
-
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+###### Linux
 ```
-extend zfs /etc/snmp/zfs-freebsd
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
+chmod +x /etc/snmp/zfs-linux
+echo "extend zfs /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
 
-4. Restart snmpd on your host
-
-At this time, only FreeBSD is support. Linux support is eventually planned.
+Now restart snmpd and you're all set.
