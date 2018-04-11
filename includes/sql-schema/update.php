@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\FileLock;
 use LibreNMS\Util\MemcacheLock;
@@ -21,8 +22,14 @@ global $database_link;
 
 if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    $init_modules = array();
+    $init_modules = array('nodb');
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
+    try {
+        dbConnect();
+    } catch (DatabaseConnectException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit;
+    }
 }
 
 $return = 0;
@@ -37,7 +44,8 @@ try {
     }
 
     // only import build.sql to an empty database
-    $tables = dbFetchRows("SHOW TABLES FROM " . Config::get('db_name'));
+    $tables = dbFetchRows("SHOW TABLES");
+
     if (empty($tables)) {
         echo "-- Creating base database structure\n";
         $step = 0;
@@ -70,7 +78,7 @@ try {
         d_echo("DB Schema already up to date.\n");
     } else {
         // Set Database Character set and Collation
-        dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array(Config::get('db_name'))));
+        dbQuery('ALTER DATABASE CHARACTER SET utf8 COLLATE utf8_unicode_ci;');
 
         $db_rev = get_db_schema();
         $insert = ($db_rev == 0); // if $db_rev == 0, insert the first update
