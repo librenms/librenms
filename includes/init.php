@@ -35,7 +35,6 @@ global $config;
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
 $install_dir = realpath(__DIR__ . '/..');
-$config['install_dir'] = $install_dir;
 chdir($install_dir);
 
 require_once $install_dir . '/includes/common.php';
@@ -93,29 +92,11 @@ if (module_selected('alerts', $init_modules)) {
 // Display config.php errors instead of http 500
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
-Config::load($install_dir);
-// set display_errors back
-ini_set('display_errors', $display_bak);
 
 if (!module_selected('nodb', $init_modules)) {
-    // Check for testing database
-    if (getenv('DBTEST')) {
-        if (isset($config['test_db_name'])) {
-            $config['db_name'] = $config['test_db_name'];
-        }
-        if (isset($config['test_db_user'])) {
-            $config['db_user'] = $config['test_db_user'];
-        }
-        if (isset($config['test_db_pass'])) {
-            $config['db_pass'] = $config['test_db_pass'];
-        }
-    }
-
     // Connect to database
     try {
         dbConnect();
-
-        Config::loadFromDatabase();
     } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
         if (isCli()) {
             echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
@@ -125,6 +106,13 @@ if (!module_selected('nodb', $init_modules)) {
         exit(2);
     }
 }
+
+// try to load from database, otherwise, just process config
+Config::load();
+
+// set display_errors back
+ini_set('display_errors', $display_bak);
+
 
 if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
     ini_set('memory_limit', $config['php_memory_limit'].'M');
