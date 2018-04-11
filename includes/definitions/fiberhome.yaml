@@ -25,7 +25,6 @@ poller_modules:
     ntp: 0
     ospf: 0
     ports: 0
-    sensors: 0
     services: 0
     storage: 0
     stp: 0
