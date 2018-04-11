@@ -1,5 +1,5 @@
-os: ibm-dpi
-text: 'IBM DPI'
+os: dpi
+text: 'DPI'
 type: power
 icon: ibmos
 over:
@@ -29,8 +29,6 @@ discovery_modules:
     stp: 0
     ntp: 0
     wireless: 0
-
 discovery:
-    - sysDescr:
-        - IBM DPI
-
+    - 
+      sysDescr: IBM DPI
