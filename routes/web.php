@@ -17,7 +17,6 @@ Route::get('/laravel', function () {
     session_start();
     session_write_close();
 
-    // FIXME real auth
     if (!empty($_SESSION['user_id'])) {
         Auth::onceUsingId($_SESSION['user_id']);
     } else {
@@ -27,8 +26,6 @@ Route::get('/laravel', function () {
     $user = Auth::getUser();
     \App\Checks::postAuth();
     Toastr::info('Welcome ' . ($user->realname ?: $user->username));
-
-    \LibreNMS\Config::loadFromDatabase();
 
     return view('laravel');
 });

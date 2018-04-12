@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\DatabaseConnectException;
+
+include_once __DIR__ . '/../../includes/dbFacile.php';
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,7 +19,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Config::loadFromDatabase();
+        try {
+            dbConnect();
+        } catch (DatabaseConnectException $e) {
+            // ignore failures here
+        }
+        Config::load();
 
         // direct log output to librenms.log
         Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')));

@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use App\Models\GraphType;
+use LibreNMS\DB\Eloquent;
 
 class Config
 {
@@ -41,16 +42,19 @@ class Config
         self::loadFiles();
 
         // Make sure the database is connected
-        if (dbIsConnected()) {
+        if (Eloquent::isConnected() || (function_exists('dbIsConnected') && dbIsConnected())) {
             // pull in the database config settings
             self::mergeDb();
 
             // load graph types from the database
             self::loadGraphsFromDb();
-        }
 
-        // Process $config to tidy up
-        self::processConfig(dbIsConnected());
+            // process $config to tidy up
+            self::processConfig(true);
+        } else {
+            // just process $config
+            self::processConfig(false);
+        }
 
         return $config;
     }
@@ -229,7 +233,7 @@ class Config
         global $config;
 
         if ($persist) {
-            if (defined('LARAVEL_START')) {
+            if (Eloquent::isConnected()) {
                 $config_array = collect([
                     'config_name' => $key,
                     'config_value' => $value,
@@ -309,7 +313,7 @@ class Config
 
         $db_config = [];
 
-        if (defined('LARAVEL_START')) {
+        if (Eloquent::isConnected()) {
             \App\Models\Config::get(['config_name', 'config_value'])
                 ->each(function ($item) use (&$db_config) {
                     array_set($db_config, $item->config_name, $item->config_value);
@@ -357,7 +361,7 @@ class Config
     {
         global $config;
 
-        if (defined('LARAVEL_START')) {
+        if (Eloquent::isConnected()) {
             $graph_types = GraphType::all()->toArray();
         } else {
             $graph_types = dbFetchRows('SELECT * FROM graph_types');
