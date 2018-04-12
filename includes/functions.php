@@ -504,7 +504,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
 
     // if $snmpver isn't set, try each version of snmp
     if (empty($snmp_version)) {
-        $snmpvers = array('v2c', 'v3', 'v1');
+        $snmpvers = Config::get('snmp.version');
     } else {
         $snmpvers = array($snmp_version);
     }
