@@ -31,7 +31,7 @@ $version = trim(snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.1.13.0', '-Ovq'), '
 $serial = trim(snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.1.4.0', '-Ovq'), '"');
 
 $apmodel = snmp_get($device, 'ahDeviceMode.0', '-Ovq', 'AH-SYSTEM-MIB');
-if ($apmodel == 'AP250' || $apmodel == 'AP550') {
+if ($apmodel == 'AP130' || $apmodel == 'AP250' || $apmodel == 'AP550') {
     $data = snmp_get_multi_oid($device, 'ahSystemSerial.0 ahDeviceMode.0 ahFirmwareVersion.0', '-OQUs', 'AH-SYSTEM-MIB');
     $hardware = $data['ahDeviceMode.0'];
     $version2 = $data['ahFirmwareVersion.0'];
