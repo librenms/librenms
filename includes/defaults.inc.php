@@ -157,7 +157,7 @@ $config['snmp']['transports'] = array(
     'tcp6',
 );
 
-$config['snmp']['version'] = 'v2c';
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];
 // Default version to use
 // SNMPv1/2c default settings
 $config['snmp']['community'][0] = 'public';
