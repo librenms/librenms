@@ -933,7 +933,7 @@ function send_mail($emails, $subject, $message, $html = false)
 
         foreach (parse_email($config['email_from']) as $from => $from_name) {
             if (empty($from_name)) {
-                $from_name = Config::get('email_user', null);
+                $from_name = Config::get('email_user');
             }
             $mail->setFrom($from, $from_name);
         }
