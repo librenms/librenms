@@ -9,6 +9,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
+1. [Entropy](#entropy) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
@@ -185,6 +186,25 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp-status.sh -
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend dhcpstats /etc/snmp/dhcp-status.sh
+```
+
+4. Restart snmpd on your host
+
+
+### Entropy
+A small shell script that checks your system's available random entropy.
+
+##### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/entropy.sh -O /etc/snmp/entropy.sh
+```
+
+2. Make the script executable (chmod +x /etc/snmp/entropy.sh)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend entropy /etc/snmp/entropy.sh
 ```
 
 4. Restart snmpd on your host
