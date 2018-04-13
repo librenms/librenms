@@ -41,4 +41,7 @@ if (preg_match('/(SYS-(SW[0-9]+-)?5-CONFIG_I|VSHD-5-VSHD_SYSLOG_CONFIG_I): Confi
 } elseif (preg_match('/startup-config was changed by (?P<user>.+) from telnet client .*/', $msg, $matches)) {
     $username = $matches['user'];
     oxidized_node_update($hostname, $username, $msg);
+} elseif (preg_match('/HWCM\/4\/CFGCHANGE/', $msg, $matches)) { //Huawei VRP devices CFGCHANGE syslog
+    $username = 'not_provided'; //Huawei VRP syslog does not provide username here.
+    oxidized_node_update($hostname, $username, $msg);
 }
