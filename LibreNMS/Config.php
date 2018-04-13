@@ -86,7 +86,7 @@ class Config
         require $install_dir . '/includes/vmware_guestid.inc.php';
 
         // Load user config
-        include $install_dir . '/config.php';
+        @include $install_dir . '/config.php';
 
         return $config;
     }

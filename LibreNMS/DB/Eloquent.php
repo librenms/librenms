@@ -50,14 +50,9 @@ class Eloquent
 
     public static function isConnected()
     {
-        try {
-            $conn = self::DB();
-            if ($conn) {
-                $conn->getPdo();
-                return true;
-            }
-        } catch (\PDOException $e) {
-            // connection not connected
+        $conn = self::DB();
+        if ($conn) {
+            return (bool)$conn->getDatabaseName();
         }
 
         return false;
