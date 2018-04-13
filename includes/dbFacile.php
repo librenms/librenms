@@ -72,6 +72,7 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     if (!is_numeric($db_port)) {
         $db_port = null;
     }
+    dd(get_defined_vars());
 
     $database_link = mysqli_connect('p:' . $db_host, $db_user, $db_pass, null, $db_port, $db_socket);
     mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
