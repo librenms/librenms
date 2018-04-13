@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use App\Models\GraphType;
+use Illuminate\Database\QueryException;
 use LibreNMS\DB\Eloquent;
 
 class Config
@@ -234,16 +235,20 @@ class Config
 
         if ($persist) {
             if (Eloquent::isConnected()) {
-                $config_array = collect([
-                    'config_name' => $key,
-                    'config_value' => $value,
-                    'config_default' => $default,
-                    'config_descr' => $descr,
-                    'config_group' => $group,
-                    'config_sub_group' => $sub_group,
-                ])->filter()->toArray();
+                try {
+                    $config_array = collect([
+                        'config_name' => $key,
+                        'config_value' => $value,
+                        'config_default' => $default,
+                        'config_descr' => $descr,
+                        'config_group' => $group,
+                        'config_sub_group' => $sub_group,
+                    ])->filter()->toArray();
 
-                \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
+                    \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
+                } catch (QueryException $e) {
+                    // possibly table config doesn't exist yet
+                }
             } else {
                 $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
                 if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
@@ -314,10 +319,15 @@ class Config
         $db_config = [];
 
         if (Eloquent::isConnected()) {
-            \App\Models\Config::get(['config_name', 'config_value'])
-                ->each(function ($item) use (&$db_config) {
-                    array_set($db_config, $item->config_name, $item->config_value);
-                });
+            try {
+                \App\Models\Config::get(['config_name', 'config_value'])
+                    ->each(function ($item) use (&$db_config) {
+                        array_set($db_config, $item->config_name, $item->config_value);
+                    });
+            } catch (QueryException $e) {
+                // possibly table config doesn't exist yet
+            }
+
         } else {
             foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
                 self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
@@ -340,9 +350,9 @@ class Config
     {
         // type cast value. Is this needed here?
         if (filter_var($value, FILTER_VALIDATE_INT)) {
-            $value = (int) $value;
+            $value = (int)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            $value = (float) $value;
+            $value = (float)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
@@ -362,7 +372,12 @@ class Config
         global $config;
 
         if (Eloquent::isConnected()) {
-            $graph_types = GraphType::all()->toArray();
+            try {
+                $graph_types = GraphType::all()->toArray();
+            } catch (QueryException $e) {
+                // possibly table config doesn't exist yet
+                $graph_types = [];
+            }
         } else {
             $graph_types = dbFetchRows('SELECT * FROM graph_types');
         }
