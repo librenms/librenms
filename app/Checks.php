@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Notification;
 use Auth;
 use Carbon\Carbon;
+use Dotenv\Dotenv;
 use Kamaln7\Toastr\Facades\Toastr;
 use LibreNMS\Config;
 
@@ -36,9 +37,34 @@ class Checks
 {
     public static function preBoot()
     {
-        Config::load(); // load without database
+        // check file/folder permissions
+        $check = [
+            self::basePath('bootstrap/cache'),
+            self::basePath('storage'),
+            self::basePath('logs/librenms.log')
+        ];
+        foreach ($check as $path) {
+            if (!is_writable($path)) {
+                // load .env, it isn't loaded
+                $dotenv = new Dotenv(__DIR__ . '/../');
+                $dotenv->load();
 
-        self::checkWriteAccess();
+                $user = env('LIBRENMS_USER', 'librenms');
+                $group = env('LIBRENMS_GROUP', $user);
+
+                $dirs = 'rrd/ logs/ storage/ bootstrap/cache/';
+                self::printMessage(
+                    "Error: $path is not writable! Run these commands to fix:",
+                    [
+                        "cd " . self::basePath(),
+                        "chown -R $user:$group $dirs",
+                        "setfacl -R -m g::rwx $dirs",
+                        "setfacl -d -m g::rwx $dirs"
+                    ],
+                    true
+                );
+            }
+        }
     }
 
     /**
@@ -52,36 +78,6 @@ class Checks
                 './scripts/composer_wrapper.php install --no-dev',
                 true
             );
-        }
-    }
-
-    /**
-     * Mid-boot check for folder access
-     */
-    public static function checkWriteAccess()
-    {
-        // check file/folder permissions
-        $check = [
-            self::basePath('bootstrap/cache'),
-            self::basePath('storage'),
-            self::basePath('logs/librenms.log')
-        ];
-        foreach ($check as $path) {
-            if (!is_writable($path)) {
-                $user = Config::get('user', 'librenms');
-                $group = Config::get('group', $user);
-                $dirs = 'rrd/ logs/ storage/ bootstrap/cache/';
-                self::printMessage(
-                    "Error: $path is not writable! Run these commands to fix:",
-                    [
-                        "cd " . self::basePath(),
-                        "chown -R $user:$group $dirs",
-                        "setfacl -R -m g::rwx $dirs",
-                        "setfacl -d -m g::rwx $dirs"
-                    ],
-                    true
-                );
-            }
         }
     }
 
@@ -111,7 +107,6 @@ class Checks
         } elseif (!is_writable($temp_dir)) {
             Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail.");
         }
-
     }
 
     private static function printMessage($title, $content, $exit = false)

@@ -89,18 +89,22 @@ class ComposerHelper
                 'db_pass' => '',
                 'db_socket' => '',
                 'base_url' => '',
+                'user' => '',
+                'group' => '',
             ];
 
             @include 'config.php';
 
             self::setEnv([
-                'DB_HOST'     => $config['db_host'],
-                'DB_PORT'     => $config['db_port'],
-                'DB_USERNAME' => $config['db_user'],
-                'DB_PASSWORD' => $config['db_pass'],
-                'DB_DATABASE' => $config['db_name'],
-                'DB_SOCKET'   => $config['db_socket'],
-                'APP_URL'     => $config['base_url'],
+                'DB_HOST'        => $config['db_host'],
+                'DB_PORT'        => $config['db_port'],
+                'DB_USERNAME'    => $config['db_user'],
+                'DB_PASSWORD'    => $config['db_pass'],
+                'DB_DATABASE'    => $config['db_name'],
+                'DB_SOCKET'      => $config['db_socket'],
+                'APP_URL'        => $config['base_url'],
+                'LIBRENMS_USER'  => $config['user'],
+                'LIBRENMS_GROUP' => $config['group'],
             ]);
         }
     }
