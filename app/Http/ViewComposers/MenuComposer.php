@@ -184,7 +184,7 @@ class MenuComposer
 
             if (BgpPeer::hasAccess($user)->count()) {
                 $vars['show_peeringdb'] = Config::get('peeringdb.enabled', false);
-                $vars['bgp_alerts'] = BgpPeer::inAlarm()->count();
+                $vars['bgp_alerts'] = BgpPeer::hasAccess($user)->inAlarm()->count();
                 $routing_menu[] = [
                     [
                         'url' => 'bgp/type=all/graph=NULL',
@@ -202,6 +202,9 @@ class MenuComposer
                         'text' => 'BGP Internal',
                     ],
                 ];
+            } else {
+                $vars['show_peeringdb'] = false;
+                $vars['bgp_alerts'] = [];
             }
 
             if (CefSwitching::hasAccess($user)->count()) {

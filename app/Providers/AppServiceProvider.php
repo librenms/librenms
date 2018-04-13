@@ -19,11 +19,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // connect legacy db
+        //FIXME this is for auth right now, remove later
         try {
-            dbConnect();
+            $db_config = config('database.connections')[config('database.default')];
+            dbConnect(
+                $db_config['host'],
+                $db_config['username'],
+                $db_config['password'],
+                $db_config['database'],
+                $db_config['port'],
+                $db_config['unix_socket']
+            );
         } catch (DatabaseConnectException $e) {
             // ignore failures here
         }
+
+        // load config
         Config::load();
 
         // direct log output to librenms.log

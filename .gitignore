@@ -27,6 +27,7 @@ patches
 !/lib/yaml
 /vendor
 composer.phar
+_ide_helper.php
 
 # Docs #
 ########
