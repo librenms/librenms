@@ -578,6 +578,10 @@ class ModuleTestHelper
 
             // insert new data, don't store duplicate data
             foreach ($data as $module => $module_data) {
+                // skip saving modules with no data
+                if ($this->dataIsEmpty($module_data['discovery']) && $this->dataIsEmpty($module_data['poller'])) {
+                    continue;
+                }
                 if ($module_data['discovery'] == $module_data['poller']) {
                     $existing_data[$module] = array(
                         'discovery' => $module_data['discovery'],
@@ -682,7 +686,7 @@ class ModuleTestHelper
                         return array_diff_key($row, $keys);
                     }, $rows);
                 }
-
+                
                 if (isset($key)) {
                     $data[$module][$key][$table] = $rows;
                 } else {
@@ -778,5 +782,16 @@ class ModuleTestHelper
             return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');
         }
         return $this->json_file;
+    }
+
+    private function dataIsEmpty($data)
+    {
+        foreach ($data as $table_data) {
+            if (!empty($table_data)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
