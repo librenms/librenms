@@ -28,8 +28,8 @@ modules:
                     descr: atEnvMonv2VoltageDescription
                     index: 'atEnvMonv2VoltageIndex.{{ $index }}'
                     divisor: 1000
-#                    low_limit: atEnvMonv2VoltageLowerThreshold
-#                    high_limit: atEnvMonv2VoltageUpperThreshold
+                    low_limit: atEnvMonv2VoltageLowerThreshold
+                    high_limit: atEnvMonv2VoltageUpperThreshold
         temperature:
             options:
                 skip_values: 128
