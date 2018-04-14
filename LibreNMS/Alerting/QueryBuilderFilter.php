@@ -101,7 +101,7 @@ class QueryBuilderFilter implements \JsonSerializable
                     continue;
                 }
 
-                $type = $this->getColumnType($column_type, $column);
+                $type = $this->getColumnType($column_type);
 
                 // ignore unsupported types (such as binary and blob)
                 if (is_null($type)) {
@@ -110,8 +110,12 @@ class QueryBuilderFilter implements \JsonSerializable
 
                 $field = "$table.$column";
 
-                // format enums as radios
-                if ($type == 'enum') {
+                if (ends_with($column, ['_perc', '_current'])) {
+                    $this->filter[$field] = [
+                        'id' => $field,
+                        'type' => 'string',
+                    ];
+                } elseif ($type == 'enum') {// format enums as radios
                     $values = explode(',', substr($column_type, 4));
                     $values = array_map(function ($val) {
                         return trim($val, "()' ");
@@ -135,11 +139,9 @@ class QueryBuilderFilter implements \JsonSerializable
     }
 
 
-    private function getColumnType($type, $field)
+    private function getColumnType($type)
     {
-        if (ends_with($field, ['_perc', '_current'])) {
-            return 'string';
-        } elseif (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
+        if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
             return 'integer';
