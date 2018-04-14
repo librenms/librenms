@@ -21,8 +21,8 @@ modules:
                     divisor: 10
                     index: 'mpduOutputPercentLoad.{{ $index }}'
                     descr: 'MPDU #{{ $mpduOutputIndex }} Load'
-                    warn_limit: mpduOutputWarningThreshold
-                    high_limit: mpduOutputCriticalThreshold
+                    warn_limit: 80
+                    high_limit: 90
         power:
             data:
                 -
