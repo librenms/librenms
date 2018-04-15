@@ -23,7 +23,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-MIB');
+$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-DISTRIBUTION-PANEL-MIB');
 
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
