@@ -50,7 +50,7 @@ class SafIntegraW extends OS implements
     {
         return array(
             // SAF-INTEGRAW-MIB::integraWradioTxFrequency
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.2.0',
@@ -62,7 +62,7 @@ class SafIntegraW extends OS implements
                 1000
             ),
             // SAF-INTEGRAW-MIB::integraWradioRxFrequency
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.7.0',
@@ -86,7 +86,7 @@ class SafIntegraW extends OS implements
     {
         return array(
             // SAF-INTEGRAW-MIB::integraWmodemMse
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'mse',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.2.0',
@@ -110,7 +110,7 @@ class SafIntegraW extends OS implements
     {
         return array(
             // SAF-INTEGRAW-MIB::integraWradioTxPower
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.1.0',
@@ -119,7 +119,7 @@ class SafIntegraW extends OS implements
                 'Tx Power'
             ),
             // SAF-INTEGRAW-MIB::integraWradioRxLevel
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.3.0',
@@ -140,7 +140,7 @@ class SafIntegraW extends OS implements
     {
         return array(
             // SAF-INTEGRAW-MIB::integraWmodemRxCapacity
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.10.0',
@@ -151,7 +151,7 @@ class SafIntegraW extends OS implements
                 1000
             ),
             // SAF-INTEGRAW-MIB::integraWmodemTxCapacity
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.11.0',
@@ -174,7 +174,7 @@ class SafIntegraW extends OS implements
     {
         return array(
             // SAF-INTEGRAW-MIB::integraWmodemSignalQuality
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'quality',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.14.0',

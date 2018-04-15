@@ -71,9 +71,9 @@ class Ray extends OS implements
     {
         return array(
             // RAY-MIB::txFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+            WirelessSensor::discover('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
             // RAY-MIB::rxFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
+            WirelessSensor::discover('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
         );
     }
 
@@ -87,9 +87,9 @@ class Ray extends OS implements
     {
         return array(
             // RAY-MIB::rfPowerCurrent.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17', 'racom-pow-cur', 1, 'Tx Power Current'),
+            WirelessSensor::discover('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17', 'racom-pow-cur', 1, 'Tx Power Current'),
             //RAY-MIB::rfPowerConfigured.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12', 'racom-pow-conf', 1, 'Tx Power Configured'),
+            WirelessSensor::discover('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12', 'racom-pow-conf', 1, 'Tx Power Configured'),
         );
     }
 
@@ -103,7 +103,7 @@ class Ray extends OS implements
     {
         $oid = '.1.3.6.1.4.1.33555.1.3.2.1'; // RAY-MIB::rss.0
         return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
+            WirelessSensor::discover('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
         );
     }
 
@@ -117,7 +117,7 @@ class Ray extends OS implements
     {
         $oid = '.1.3.6.1.4.1.33555.1.3.2.2'; // RAY-MIB::snr.0
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
+            WirelessSensor::discover('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
         );
     }
 }

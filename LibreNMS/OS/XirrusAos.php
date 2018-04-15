@@ -56,7 +56,7 @@ class XirrusAos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
         );
     }
 
@@ -145,7 +145,7 @@ class XirrusAos extends OS implements
 
         $sensors = array();
         foreach ($nf as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid_num_prefix . $index,

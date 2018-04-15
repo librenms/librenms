@@ -44,7 +44,7 @@ class Deliberant extends OS implements WirelessClientsDiscovery
 
         $sensors = array();
         foreach ($clients_data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'clients',
                 $device['device_id'],
                 '.1.3.6.1.4.1.32761.3.5.1.2.1.1.16.' . $index,

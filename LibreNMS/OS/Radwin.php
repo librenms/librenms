@@ -46,7 +46,7 @@ class Radwin extends OS implements
     {
         $oid = '.1.3.6.1.4.1.4458.1000.1.5.29.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirLinkDistance.0
         return array(
-            new WirelessSensor('distance', $this->getDeviceId(), $oid, 'radwin', 0, 'Link distance', null, 1, 1000)
+            WirelessSensor::discover('distance', $this->getDeviceId(), $oid, 'radwin', 0, 'Link distance', null, 1, 1000)
         );
     }
 
@@ -63,8 +63,8 @@ class Radwin extends OS implements
         $receive = '.1.3.6.1.4.1.4458.1000.1.5.9.1.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirRxPower.0
 
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $transmit, 'Radwin-Tx', 0, 'Tx Power'),
-            new WirelessSensor('power', $this->getDeviceId(), $receive, 'Radwin-Rx', 0, 'Rx Power')
+            WirelessSensor::discover('power', $this->getDeviceId(), $transmit, 'Radwin-Tx', 0, 'Tx Power'),
+            WirelessSensor::discover('power', $this->getDeviceId(), $receive, 'Radwin-Rx', 0, 'Rx Power')
         );
     }
 
@@ -79,7 +79,7 @@ class Radwin extends OS implements
     {
         $oid = '.1.3.6.1.4.1.4458.1000.1.1.51.7.0'; // RADWIN-MIB-WINLINK1000::winlink1000OduAdmWifiRssi.0
         return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'radwin', 0, 'RSSI')
+            WirelessSensor::discover('rssi', $this->getDeviceId(), $oid, 'radwin', 0, 'RSSI')
         );
     }
 }

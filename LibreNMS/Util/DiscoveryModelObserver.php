@@ -1,8 +1,8 @@
 <?php
 /**
- * wireless.inc.php
+ * DiscoveryModelObserver.php
  *
- * -Description-
+ * Displays +,-,U,. while running discovery and adding,deleting,updating, and doing nothing.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,35 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017-2018 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\WirelessSensor;
+namespace LibreNMS\Util;
 
-WirelessSensor::runDiscovery($os);
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
+class DiscoveryModelObserver
+{
+    public function saving(Eloquent $model)
+    {
+        if (!$model->isDirty()) {
+            echo '.';
+        }
+    }
+
+    public function updated(Eloquent $model)
+    {
+        echo 'U';
+    }
+
+    public function created(Eloquent $model)
+    {
+        echo '+';
+    }
+
+    public function deleted(Eloquent $model)
+    {
+        echo '-';
+    }
+}

@@ -58,7 +58,7 @@ class Routeros extends OS implements
                 continue;
             }
 
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'ccq',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.10.' . $index,
@@ -127,7 +127,7 @@ class Routeros extends OS implements
 
         $sensors = array();
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.2.' . $index,
@@ -136,7 +136,7 @@ class Routeros extends OS implements
                 'SSID: ' . $entry['mtxrWlApSsid'] . ' Tx',
                 $entry['mtxrWlApTxRate']
             );
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.3.' . $index,
@@ -165,7 +165,7 @@ class Routeros extends OS implements
 
         $sensors = array();
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 $type,
                 $this->getDeviceId(),
                 $num_oid_base . $index,

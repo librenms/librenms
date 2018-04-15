@@ -49,7 +49,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.4.1'; // RADIO-BRIDGE-MIB::rfOperationalFrequency.1
         return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),
+            WirelessSensor::discover('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),
         );
     }
 
@@ -63,7 +63,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.42.1'; // RADIO-BRIDGE-MIB::rfTxPower.1
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'siklu', 1, 'Tx Power'),
+            WirelessSensor::discover('power', $this->getDeviceId(), $oid, 'siklu', 1, 'Tx Power'),
         );
     }
 
@@ -77,7 +77,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.19.1'; // RADIO-BRIDGE-MIB::rfAverageRssi.1
         return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'siklu', 1, 'RSSI'),
+            WirelessSensor::discover('rssi', $this->getDeviceId(), $oid, 'siklu', 1, 'RSSI'),
         );
     }
 
@@ -91,7 +91,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.18.1'; // RADIO-BRIDGE-MIB::rfAverageCinr.1
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
+            WirelessSensor::discover('snr', $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
         );
     }
 }

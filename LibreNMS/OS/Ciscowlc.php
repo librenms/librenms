@@ -55,7 +55,7 @@ class Ciscowlc extends Cisco implements
             $total_oids[] = $oid;
             $total += $count;
 
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'clients',
                 $this->getDeviceId(),
                 $oid,
@@ -67,7 +67,7 @@ class Ciscowlc extends Cisco implements
         }
 
         if (!empty($counts)) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'clients',
                 $this->getDeviceId(),
                 $total_oids,
@@ -97,7 +97,7 @@ class Ciscowlc extends Cisco implements
 
         if (isset($data[0]['clsSysApConnectCount'])) {
             return array(
-                new WirelessSensor(
+                WirelessSensor::discover(
                     'ap-count',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.9.9.618.1.8.4.0',

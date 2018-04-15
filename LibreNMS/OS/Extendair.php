@@ -48,7 +48,7 @@ class Extendair extends OS implements
     {
         $oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.1.0'; // ExaltComProducts::locCurrentBER.0
         return array(
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'error-ratio',
                 $this->getDeviceId(),
                 $oid,
@@ -73,7 +73,7 @@ class Extendair extends OS implements
         $tx_oid = '.1.3.6.1.4.1.25651.1.2.3.1.57.4.0'; // ExtendAirG2::extendAirG2TXfrequency.0
         $rx_oid = '.1.3.6.1.4.1.25651.1.2.3.1.57.5.0'; // ExtendAirG2::extendAirG2RXfrequency.0
         return array(
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $tx_oid,
@@ -84,7 +84,7 @@ class Extendair extends OS implements
                 1,
                 1000
             ),
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $rx_oid,
@@ -109,8 +109,8 @@ class Extendair extends OS implements
         $tx_oid = '.1.3.6.1.4.1.25651.1.2.3.1.57.1.0'; // ExtendAirG2::extendAirG2TxPower.0
         $rx_oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.3.0'; // ExaltComProducts::locCurrentRSL.0
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'extendair-tx', 0, 'Tx Power', null, 1, 10),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'extendair-rx', 0, 'Signal Level'),
+            WirelessSensor::discover('power', $this->getDeviceId(), $tx_oid, 'extendair-tx', 0, 'Tx Power', null, 1, 10),
+            WirelessSensor::discover('power', $this->getDeviceId(), $rx_oid, 'extendair-rx', 0, 'Signal Level'),
         );
     }
 
@@ -124,7 +124,7 @@ class Extendair extends OS implements
     {
         $oid = '.1.3.6.1.4.1.25651.1.2.4.5.1.0'; // ExaltComProducts::aggregateUserThroughput.0
         return array(
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 $oid,

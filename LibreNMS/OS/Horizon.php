@@ -14,7 +14,7 @@ class Horizon extends OS implements WirelessSnrDiscovery, WirelessPowerDiscovery
     {
         $oid =  '.1.3.6.1.4.1.7262.2.2.5.1.2.8.0';
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'horizon', 0, 'SNR', null, 1, 10)
+            WirelessSensor::discover('snr', $this->getDeviceId(), $oid, 'horizon', 0, 'SNR', null, 1, 10)
         );
     }
     
@@ -22,7 +22,7 @@ class Horizon extends OS implements WirelessSnrDiscovery, WirelessPowerDiscovery
     {
         $oid =  '.1.3.6.1.4.1.7262.2.2.5.1.3.7.0';
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'horizon', 0, 'Power', null, 1, 10)
+            WirelessSensor::discover('power', $this->getDeviceId(), $oid, 'horizon', 0, 'Power', null, 1, 10)
         );
     }
 }

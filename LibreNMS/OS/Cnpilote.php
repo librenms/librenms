@@ -49,7 +49,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.1.1.14.0'; //CAMBIUM-MIB::cambiumAPTotalClients.0
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Clients')
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Clients')
         );
     }
 
@@ -64,7 +64,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.3.1.11.0'; //CAMBIUM-MIB::cambiumClientSNR.0
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'cnpilot', 1, 'SNR')
+            WirelessSensor::discover('snr', $this->getDeviceId(), $oid, 'cnpilot', 1, 'SNR')
         );
     }
 
@@ -78,7 +78,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.2.1.8.0'; //CAMBIUM-MIB::cambiumRadioTransmitPower.0
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Transmit Power')
+            WirelessSensor::discover('power', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Transmit Power')
         );
     }
 
@@ -92,7 +92,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.2.1.16.0'; //CAMBIUM-MIB::cambiumRadioNoiseFloor.0
         return array(
-            new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Radio Noise Floor')
+            WirelessSensor::discover('noise-floor', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Radio Noise Floor')
         );
     }
 }

@@ -52,7 +52,7 @@ class Arubaos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
         );
     }
 
@@ -113,7 +113,7 @@ class Arubaos extends OS implements
                 $current = $entry[$oid];
             }
 
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid,

@@ -14,14 +14,14 @@ class Ruckuswireless extends OS implements
     {
         $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', 1, 'Clients: Total')
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'ruckuswireless', 1, 'Clients: Total')
         );
     }
     public function discoverWirelessApCount()
     {
         $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.1.0'; //RUCKUS-ZD-SYSTEM-MIB:: ruckusZDSystemStatsNumAP.0
         return array(
-            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless', 1, 'Connected APs')
+            WirelessSensor::discover('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless', 1, 'Connected APs')
         );
     }
 }

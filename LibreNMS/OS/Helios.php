@@ -73,7 +73,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
 
         $sensors = array();
         foreach ($oids as $index => $data) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid_prefix . $index,

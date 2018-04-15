@@ -48,7 +48,7 @@ class Saf extends OS implements
     {
         return array(
             // SAF-IPRADIO::radioTxFrequency.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.9.1',
@@ -60,7 +60,7 @@ class Saf extends OS implements
                 1000
             ),
             // SAF-IPRADIO::radioRxFrequency.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.10.1',
@@ -84,7 +84,7 @@ class Saf extends OS implements
     {
         return array(
             // SAF-IPRADIO::modemRadialMSE.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'mse',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.12.1.10.1',
@@ -108,7 +108,7 @@ class Saf extends OS implements
     {
         return array(
             // SAF-IPRADIO::radioRxLevel.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.5.1',
@@ -117,7 +117,7 @@ class Saf extends OS implements
                 'Rx Power'
             ),
             // SAF-IPRADIO::radioTxPower.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.4.1',
@@ -138,7 +138,7 @@ class Saf extends OS implements
     {
         return array(
             // SAF-IPRADIO::modemACMtotalCapacity.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.12.1.18.1',
@@ -149,7 +149,7 @@ class Saf extends OS implements
                 1000
             ),
             // SAF-IPRADIO::modemTotalCapacity.local
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.12.1.6.1',

@@ -41,7 +41,7 @@ class Airport extends OS implements WirelessClientsDiscovery
     {
         $oid = '.1.3.6.1.4.1.63.501.3.2.1.0'; //AIRPORT-BASESTATION-3-MIB::wirelessNumber.0
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'airport', 0, 'Clients')
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'airport', 0, 'Clients')
         );
     }
 }

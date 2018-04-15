@@ -39,7 +39,7 @@ class Hpmsm extends OS implements WirelessClientsDiscovery
     public function discoverWirelessClients()
     {
         return array(
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'clients',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.8744.5.25.1.7.2.0',

@@ -27,7 +27,7 @@ class Zyxelnwa extends OS implements WirelessClientsDiscovery
     {
         $oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.2.1'; //ZYXEL-ES-SMI::esMgmt.5.1.1.2.1
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'zyxelnwa', 1, 'Clients')
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'zyxelnwa', 1, 'Clients')
         );
     }
 }

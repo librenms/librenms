@@ -72,7 +72,7 @@ class HiveosWireless extends OS implements
     {
         $oid = '.1.3.6.1.4.1.26928.1.2.9.0'; // AH-SYSTEM-MIB::ahClientCount
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Clients')
+            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Clients')
         );
     }
 
@@ -92,7 +92,7 @@ class HiveosWireless extends OS implements
         $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
         $data = snmpwalk_group($this->getDevice(), 'ahRadioChannel', 'AH-INTERFACE-MIB');
         foreach ($data as $index => $frequency) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
@@ -118,7 +118,7 @@ class HiveosWireless extends OS implements
         $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
         $ahTxPow = snmpwalk_group($this->getDevice(), 'ahRadioTxPower', 'AH-INTERFACE-MIB');
         foreach ($ahTxPow as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.2.' . $index,
@@ -137,7 +137,7 @@ class HiveosWireless extends OS implements
         $ahRxNoise = snmpwalk_group($this->getDevice(), 'ahRadioNoiseFloor', 'AH-INTERFACE-MIB');
         $sensors = array();
         foreach ($ahRxNoise as $index => $entry) {
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'noise-floor',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.3.' . $index,

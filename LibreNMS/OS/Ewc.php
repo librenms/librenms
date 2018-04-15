@@ -62,7 +62,7 @@ class Ewc extends OS implements
         $data = snmp_get_multi($this->getDevice(), $oids);
         $licCount = $data[0]['licenseLocalAP'] + $data[0]['licenseForeignAP'];
         return array(
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'ap-count',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.1.0',
@@ -70,7 +70,7 @@ class Ewc extends OS implements
                 0,
                 'Connected APs'
             ),
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'ap-count',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.1.1.0',
@@ -95,7 +95,7 @@ class Ewc extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = array(
-            new WirelessSensor(
+            WirelessSensor::discover(
                 'clients',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.6.1.0',
@@ -111,7 +111,7 @@ class Ewc extends OS implements
         foreach ($apstats as $index => $entry) {
             $apStatsMuCounts = $entry['apStatsMuCounts'];
             $name = $apnames[$index];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'clients',
                 $this->getDeviceId(),
                 '1.3.6.1.4.1.4329.15.3.5.2.2.1.14.' . $index,
@@ -127,7 +127,7 @@ class Ewc extends OS implements
 
         foreach ($wlanstats as $index => $entry) {
             $name = $wlannames[$index];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'clients',
                 $this->getDeviceId(),
                 '1.3.6.1.4.1.4329.15.3.3.4.5.1.2.' . $index,
@@ -153,7 +153,7 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'errors',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
@@ -179,7 +179,7 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.4.1.1.' . $index,
@@ -206,7 +206,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
             $noisefloor = $entry['dot11ExtRadioMaxNfCount'];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'noise-floor',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.1.4.3.1.32.' . $index,
@@ -238,7 +238,7 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
@@ -264,7 +264,7 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'snr',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
@@ -290,7 +290,7 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = new WirelessSensor(
+            $sensors[] = WirelessSensor::discover(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
