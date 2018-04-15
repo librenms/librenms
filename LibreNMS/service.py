@@ -158,7 +158,7 @@ class ServiceConfig:
         # populate config variables
         self.set_name(config.get('distributed_poller_name', None))
         self.distributed = config.get('distributed_poller', ServiceConfig.distributed)
-        self.group = config.get('distributed_poller_group', ServiceConfig.group)
+        self.group = ServiceConfig.parse_group(config.get('distributed_poller_group', ServiceConfig.group))
 
         # backward compatible options
         self.poller.workers = config.get('poller_service_workers', ServiceConfig.poller.workers)
@@ -211,6 +211,20 @@ class ServiceConfig:
             error("ERROR: Could not load or parse configuration! {}: {}"
                   .format(subprocess.list2cmdline(e.cmd), e.output.decode()))
 
+    @staticmethod
+    def parse_group(g):
+        if g is None:
+            return [0]
+        elif type(g) is int:
+            return [g]
+        elif type(g) is str:
+            try:
+                return [int(x) for x in set(g.split(','))]
+            except ValueError:
+                pass
+
+        error("Could not parse group string, defaulting to 0")
+        return [0]
 
 
 class Service:
@@ -265,7 +279,7 @@ class Service:
 
         info("LibreNMS Service: {} started!".format(self.config.unique_name))
         info("Poller group {}. Using Python {} and {} locks and queues"
-             .format('0 (default)' if self.config.group == 0 else self.config.group, python_version(),
+             .format('0 (default)' if self.config.group == [0] else self.config.group, python_version(),
                      'redis' if isinstance(self._lm, LibreNMS.RedisLock) else 'internal'))
         info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
 

@@ -31,7 +31,7 @@ if __name__ == '__main__':
     service.config.single_instance = args.multiple
 
     if args.group:
-        service.config.group = args.group
+        service.config.group = [ args.group ]
 
     print('Starting LibreNMS Service...')
     service.start()

@@ -1,3 +1,4 @@
+import random
 import threading
 import traceback
 from logging import debug, info, error, critical
@@ -48,10 +49,12 @@ class QueueManager:
     def _service_worker(self, work_func, queue_id):
         while not self._stop_event.is_set():
             try:
-                # cannot break blocking request with redis-py, so timeout :(
-                device_id = self.get_queue(queue_id).get(True, 3)
-                if device_id:  # None returned by redis after timeout when empty
-                    work_func(device_id)
+                for id in random.sample(queue_id, len(queue_id)):
+                    # cannot break blocking request with redis-py, so timeout :(
+                    device_id = self.get_queue(id).get(True, 3)
+
+                    if device_id:  # None returned by redis after timeout when empty
+                        work_func(device_id)
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
