@@ -1,22 +1,99 @@
-
 import LibreNMS
 
-
 import json
+import logging
 import os
 import subprocess
 import threading
-import traceback
 import sys
 import time
+import timeit
+
+from contextlib import AbstractContextManager
+from datetime import timedelta
+from logging import debug, info, warning, error, critical
 from platform import python_version
 from time import sleep
-from datetime import timedelta
 from socket import gethostname
 from signal import signal, SIGTERM
 from uuid import uuid1
-import logging
-from logging import debug, info, warning, error, critical
+
+
+class PerformanceCounter(object):
+    """
+    This is a simple counter to record execution time and number of jobs. It's unique to each
+    poller instance, so does not need to be globally syncronised, just locally.
+    """
+
+    def __init__(self):
+        self._count = 0
+        self._jobs = 0
+        self._lock = threading.Lock()
+
+    def add(self, n):
+        """
+        Add n to the counter and increment the number of jobs by 1
+        :param n: Number to increment by
+        """
+        with self._lock:
+            self._count += n
+            self._jobs += 1
+
+    def split(self, precise=False):
+        """
+        Return the current counter value and keep going
+        :param precise: Whether floating point precision is desired
+        :return: ((INT or FLOAT), INT)
+        """
+        return (self._count if precise else int(self._count)), self._jobs
+
+    def reset(self, precise=False):
+        """
+        Return the current counter value and then zero it.
+        :param precise: Whether floating point precision is desired
+        :return: ((INT or FLOAT), INT)
+        """
+        with self._lock:
+            c = self._count
+            j = self._jobs
+            self._count = 0
+            self._jobs = 0
+
+            return (c if precise else int(c)), j
+
+
+class TimeitContext(AbstractContextManager):
+    """
+    Wrapper around timeit to allow the timing of larger blocks of code by wrapping them in "with"
+    """
+
+    def __init__(self):
+        self._t = timeit.default_timer()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        del self._t
+
+    def delta(self):
+        """
+        Calculate the elapsed time since the context was initialised
+        :return: FLOAT
+        """
+        if not self._t:
+            raise ArithmeticError("Timer has not been started, cannot return delta")
+
+        return timeit.default_timer() - self._t
+
+    @classmethod
+    def start(cls):
+        """
+        Factory method for TimeitContext
+        :param cls:
+        :return: TimeitContext
+        """
+        return cls()
 
 
 class ServiceConfig:
@@ -126,7 +203,6 @@ class ServiceConfig:
                 error("Unknown log level {}, must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'".format(self.log_level))
                 logging.getLogger().setLevel(logging.INFO)
 
-
     def _get_config_data(self):
         config_cmd = ['/usr/bin/env', 'php', '{}/config_to_json.php'.format(self.BASE_DIR), '2>&1']
         try:
@@ -134,6 +210,7 @@ class ServiceConfig:
         except subprocess.CalledProcessError as e:
             error("ERROR: Could not load or parse configuration! {}: {}"
                   .format(subprocess.list2cmdline(e.cmd), e.output.decode()))
+
 
 
 class Service:
@@ -160,7 +237,10 @@ class Service:
 
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance)
+        self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats)
         self.is_master = False
+
+        self.performance_stats = {'poll': PerformanceCounter(), 'discover': PerformanceCounter(), 'service': PerformanceCounter()}
 
     def start(self):
         if self.config.single_instance:
@@ -181,6 +261,7 @@ class Service:
                                                             self.dispatch_poll_billing, self.dispatch_calculate_billing)
 
         self.daily_timer.start()
+        self.stats_timer.start()
 
         info("LibreNMS Service: {} started!".format(self.config.unique_name))
         info("Poller group {}. Using Python {} and {} locks and queues"
@@ -232,9 +313,11 @@ class Service:
     def discover_device(self, device_id):
         if self.lock_discovery(device_id):
             try:
-                info("Discovering device {}".format(device_id))
-                self.call_script('discovery.php', ('-h', device_id))
-                info('Discovery complete {}'.format(device_id))
+                with TimeitContext.start() as t:
+                    info("Discovering device {}".format(device_id))
+                    self.call_script('discovery.php', ('-h', device_id))
+                    info('Discovery complete {}'.format(device_id))
+                    self.report_execution_time(t.delta(), 'discover')
             except subprocess.CalledProcessError as e:
                 if e.returncode == 5:
                     info("Device {} is down, cannot discover, waiting {}s for retry"
@@ -263,8 +346,10 @@ class Service:
             self.services_manager.post_work(device[0], device[1])
 
     def poll_services(self, device_id):
-        info("Checking services on device {}".format(device_id))
-        self.call_script('check-services.php', ('-h', device_id))
+        with TimeitContext.start() as t:
+            info("Checking services on device {}".format(device_id))
+            self.call_script('check-services.php', ('-h', device_id))
+            self.report_execution_time(t.delta(), 'service')
 
     # ------------ Billing ------------
     def dispatch_calculate_billing(self):
@@ -300,7 +385,9 @@ class Service:
             info('Polling device {}'.format(device_id))
 
             try:
-                self.call_script('poller.php', ('-h', device_id))
+                with TimeitContext.start() as t:
+                    self.call_script('poller.php', ('-h', device_id))
+                    self.report_execution_time(t.delta(), 'poll')
             except subprocess.CalledProcessError as e:
                 if e.returncode == 6:
                     warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id, self.config.down_retry))
@@ -526,3 +613,16 @@ class Service:
         except IOError:
             warning("Another instance is already running, quitting.")
             exit(2)
+
+    def report_execution_time(self, time, activity):
+        self.performance_stats[activity].add(time)
+
+    def log_performance_stats(self):
+        info("Counting up time spent polling")
+        time, jobs = self.performance_stats['poll'].reset()
+
+        self._db.fetch('INSERT INTO pollers(poller_name, last_polled, devices, time_taken) '
+                       'values("{0}", NOW(), "{1}", "{2}") '
+                       'ON DUPLICATE KEY UPDATE '
+                       'last_polled=values(last_polled), devices=values(devices), time_taken=values(time_taken);'
+                       .format(self.config.name, jobs, time))
