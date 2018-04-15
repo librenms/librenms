@@ -36,7 +36,14 @@
         "palanik/corsslim": "^1.1",
         "influxdb/influxdb-php": "^1.14",
         "laravel/laravel": "5.4.*",
-        "oriceon/toastr-5-laravel": "dev-master"
+        "oriceon/toastr-5-laravel": "dev-master",
+
+        "doctrine/inflector": "1.1.*",
+        "symfony/event-dispatcher": "3.*",
+        "symfony/css-selector": "3.*",
+        "doctrine/instantiator": "1.0.*",
+        "phpdocumentor/reflection-docblock": "3.*",
+        "phpunit/php-token-stream": "1.*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
