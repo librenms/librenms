@@ -16,29 +16,28 @@
  * the source code distribution for details.
  **/
 
-function hexbin ( $hex_string ) // convert the hex OID content to character
+function hexbin($hex_string) // convert the hex OID content to character
 {
-  $chr_string = '';
-  foreach ( explode ( ' ', $hex_string ) as $a )
-    $chr_string .= chr(hexdec($a));
-  return $chr_string;
+    $chr_string = '';
+    foreach (explode(' ', $hex_string) as $a) {
+        $chr_string .= chr(hexdec($a));
+    }
+    return $chr_string;
 }
 
-$sysDescrPieces = explode (" ", snmp_get($device, 'sysDescr.0', '-Oqv', 'SNMPv2-MIB'));   //extract model from sysDescr
+$sysDescrPieces = explode(" ", snmp_get($device, 'sysDescr.0', '-Oqv', 'SNMPv2-MIB'));   //extract model from sysDescr
 
-$hwversion = str_replace (array("\r","\n"),'', snmp_get($device, 'msppDevHwVersion.0', '-Oqv', 'WRI-DEVICE-MIB'));
-if (preg_match("/\b 00 00 00 00 00 00\b/i", $hwversion))  //convert potential hex reading to character
-   {
-     str_replace (" 00","", $hwversion); 
-     $hwversion = rtrim (hexbin ( $hwversion ));
-   } 
+$hwversion = str_replace(array("\r","\n"), '', snmp_get($device, 'msppDevHwVersion.0', '-Oqv', 'WRI-DEVICE-MIB'));
+if (preg_match("/\b 00 00 00 00 00 00\b/i", $hwversion)) {  //convert potential hex reading to character
+    str_replace(" 00", "", $hwversion);
+     $hwversion = rtrim(hexbin($hwversion));
+}
 
-$swversion = str_replace (array("\r","\n"),'', snmp_get($device, 'msppDevSwVersion.0', '-Oqv', 'WRI-DEVICE-MIB'));
-if (preg_match("/\b 00 00 00 00 00 00\b/i", $swversion))  //convert potential hex reading to character
-   {
-     str_replace (" 00","", $swversion);
-     $swversion = rtrim (hexbin ( $swversion ));
-   } 
+$swversion = str_replace(array("\r","\n"), '', snmp_get($device, 'msppDevSwVersion.0', '-Oqv', 'WRI-DEVICE-MIB'));
+if (preg_match("/\b 00 00 00 00 00 00\b/i", $swversion)) {  //convert potential hex reading to character
+    str_replace(" 00", "", $swversion);
+     $swversion = rtrim(hexbin($swversion));
+}
 
 $hardware = 'FHN '.$sysDescrPieces[0].' V '.$hwversion;
 $version  = $swversion;

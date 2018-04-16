@@ -6,7 +6,6 @@ modules:
                  value: cpuUsage
                  num_oid: .1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.{{ $index }}
                  descr: cpuIndexDescr
-                 high_limit: 100
                  precision: 100
   sensors:
     temperature:
@@ -17,8 +16,6 @@ modules:
                  num_oid: .1.3.6.1.4.1.3807.1.8012.1.6.2.1.5.
                  descr: temperatureIndexDescr
                  low_limit: temperatureLThreshold
-                 low_warn_limit: temperatureLThreshold
-                 high_warn_limit: temperatureHThreshold
                  high_limit: temperatureHThreshold
                  divisor: 1
     voltage:
