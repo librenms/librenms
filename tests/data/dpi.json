@@ -11,10 +11,10 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "dpi",
+                    "type": "power",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "ibmos.svg"
                 }
             ]
         },
@@ -25,14 +25,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.2.6.223",
                     "sysDescr": "IBM DPI V01.08.0003",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "V01.08.0003",
                     "hardware": "",
                     "features": null,
                     "location": "<private>",
-                    "os": "generic",
-                    "type": "server",
+                    "os": "dpi",
+                    "type": "power",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "ibmos.svg"
                 }
             ]
         }
