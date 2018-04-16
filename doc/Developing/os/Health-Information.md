@@ -75,10 +75,10 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `num_oid` (required): This is the numerical OID that contains `value`. This should always be without the appended `index`.
   - `divisor` (optional): This is the divisor to use against the returned `value`.
   - `multiplier` (optional): This is the multiplier to use against the returned `value`.
-  - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting).
-  - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting).
-  - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting).
-  - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting).
+  - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
   - `skip_values` (optional): This is an array of values we should skip over (see note below).

@@ -17,6 +17,7 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
 
 function dbIsConnected()
@@ -33,18 +34,18 @@ function dbIsConnected()
  * Connect to the database.
  * Will use global $config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
  *
- * @param string $host
- * @param string $user
- * @param string $password
- * @param string $database
- * @param string $port
- * @param string $socket
+ * @param string $db_host
+ * @param string $db_user
+ * @param string $db_pass
+ * @param string $db_name
+ * @param string $db_port
+ * @param string $db_socket
  * @return mysqli
  * @throws DatabaseConnectException
  */
-function dbConnect($host = null, $user = '', $password = '', $database = '', $port = null, $socket = null)
+function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
 {
-    global $config, $database_link;
+    global $database_link;
 
     if (dbIsConnected()) {
         return $database_link;
@@ -54,32 +55,43 @@ function dbConnect($host = null, $user = '', $password = '', $database = '', $po
         throw new DatabaseConnectException("mysqli extension not loaded!");
     }
 
-    $host = empty($host) ? $config['db_host'] : $host;
-    $user = empty($user) ? $config['db_user'] : $user;
-    $password = empty($password) ? $config['db_pass'] : $password;
-    $database = empty($database) ? $config['db_name'] : $database;
-    $port = empty($port) ? $config['db_port'] : $port;
-    $socket = empty($socket) ? $config['db_socket'] : $socket;
+    if (is_null($db_host)) {
+        $db_config = Config::getDatabaseSettings();
+        extract($db_config);
+        /** @var string $db_host */
+        /** @var string $db_port */
+        /** @var string $db_socket */
+        /** @var string $db_name */
+        /** @var string $db_user */
+        /** @var string $db_pass */
+    }
 
-    $database_link = mysqli_connect('p:' . $host, $user, $password, null, $port, $socket);
+    if (empty($db_socket)) {
+        $db_socket = null;
+    }
+    if (!is_numeric($db_port)) {
+        $db_port = null;
+    }
+
+    $database_link = mysqli_connect('p:' . $db_host, $db_user, $db_pass, null, $db_port, $db_socket);
     mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
     if ($database_link === false) {
         $error = mysqli_connect_error();
         if ($error == 'No such file or directory') {
-            $error = 'Could not connect to ' . $host;
+            $error = 'Could not connect to ' . $db_host;
         }
         throw new DatabaseConnectException($error);
     }
 
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
+    $database_db = mysqli_select_db($database_link, $db_name);
     if (!$database_db) {
-        $db_create_sql = "CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+        $db_create_sql = "CREATE DATABASE $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci";
         mysqli_query($database_link, $db_create_sql);
-        $database_db = mysqli_select_db($database_link, $database);
+        $database_db = mysqli_select_db($database_link, $db_name);
     }
 
     if (!$database_db) {
-        throw new DatabaseConnectException("Could not select database: $database. " . mysqli_error($database_link));
+        throw new DatabaseConnectException("Could not select database: $db_name. " . mysqli_error($database_link));
     }
 
     dbQuery("SET NAMES 'utf8'");

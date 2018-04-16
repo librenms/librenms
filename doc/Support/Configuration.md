@@ -350,7 +350,7 @@ $config['poller_modules']['bgp-peers'] = 0;
 $config['snmp']['timeout'] = 1;            # timeout in seconds
 $config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
-$config['snmp']['version'] = "v2c";         # Default version to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         # Default versions to use
 $config['snmp']['port'] = 161;
 ```
 Default SNMP options including retry and timeout settings and also default version and port.

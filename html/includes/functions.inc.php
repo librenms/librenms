@@ -60,6 +60,9 @@ function nicecase($item)
         case 'dbm':
             return 'dBm';
 
+        case 'entropy':
+            return 'Random entropy';
+
         case 'mysql':
             return ' MySQL';
 
