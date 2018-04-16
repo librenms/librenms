@@ -9,35 +9,11 @@ discovery:
         - .1.3.6.1.4.1.3807.1.481005
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_temperature, text: 'Temperature' }
 mib_dir:
     - fiberhome
 discovery_modules:
-    arp-table: 1
-    bgp-peers: 1
-    cisco-vrf-lite: 0
-    entity-physical: 1
-    ports: 1
-    ports-stack: 1
-    mempools: 1
-    discovery-protocols: 1
-    storage: 0
-    ucd-diskio: 0
-poller_modules:
-    applications: 0
-    bgp-peers: 1
-    entity-physical: 1
-    hr-mib: 1 
-    ipSystemStats: 1
-    ipmi: 0
-    ntp: 0
-    ospf: 1
-    ports: 1
     sensors: 1
-    services: 1
-    storage: 0
-    stp: 1
-    ucd-diskio: 0
-    ucd-mib: 0
-    wireless: 0
+    mempools: 1
+poller_modules:
+    sensors: 1
+    mempools: 1
