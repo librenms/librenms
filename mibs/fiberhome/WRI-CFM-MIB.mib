@@ -1,0 +1,5580 @@
+-- *****************************************************************
+-- WRI-CFM-MIB
+--
+--
+-- Copyright (c) 2009 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+WRI-CFM-MIB DEFINITIONS ::= BEGIN
+
+-- ******************************************************************
+-- IEEE P802.1ag(TM) CFM MIB
+-- ******************************************************************
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32, Counter32,
+    Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]
+    TEXTUAL-CONVENTION,
+    TimeInterval,
+    TimeStamp, RowStatus,
+    TruthValue, MacAddress,
+    TDomain, TAddress        FROM SNMPv2-TC     -- [RFC2579]
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP       FROM SNMPv2-CONF   -- [RFC2580]
+    InterfaceIndex,
+    InterfaceIndexOrZero     FROM IF-MIB        -- [RFC2863]
+    LldpChassisId,
+    LldpChassisIdSubtype,
+    LldpPortId,
+    LldpPortIdSubtype        FROM LLDP-MIB      -- [IEEExxx]
+    VlanIdOrNone, VlanId     FROM Q-BRIDGE-MIB  -- [RFC4363]
+    wri,wriProtocol	         FROM WRI-SMI ;              
+
+	wriCfmMib MODULE-IDENTITY
+       LAST-UPDATED  "201107140000Z" 
+       ORGANIZATION  "FiberHome Networks Systems, Inc"
+       CONTACT-INFO  "http://www.fhn.com.cn"   
+       DESCRIPTION   "reference to rfc4750."
+
+          ::= { wriProtocol 308 }
+
+wriDot1agNotifications      OBJECT IDENTIFIER ::= { wriCfmMib 0 }
+wriDot1agMIBObjects         OBJECT IDENTIFIER ::= { wriCfmMib 1 }
+wriDot1agCfmConformance     OBJECT IDENTIFIER ::= { wriCfmMib 2 }
+
+-- ******************************************************************
+-- Groups in the CFM MIB Module
+-- ******************************************************************
+wriDot1agCfmStack           OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 1 }
+wriDot1agCfmDefaultMd       OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 2 }
+wriDot1agCfmVlan            OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 3 }
+wriDot1agCfmConfigErrorList OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 4 }
+wriDot1agCfmMd              OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 5 }
+wriDot1agCfmMa              OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 6 }
+wriDot1agCfmMep             OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 7 }  
+wriDot1agCfmGenParam        OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 8 }
+wriDot1agCfmInterface       OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 9 }
+wriDot1agCfmMip             OBJECT IDENTIFIER ::= { wriDot1agMIBObjects 10 }
+
+
+-- ******************************************************************
+-- Textual conventions
+-- ******************************************************************
+
+WriDot1agCfmMaintDomainNameType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents a type (and thereby the format)
+        of a WriDot1agCfmMaintDomainName.  The value can be one of
+        the following:
+
+
+        ieeeReserved(0)   Reserved for definition by IEEE 802.1
+                          recommend to not use zero unless
+                          absolutely needed.
+        none(1)           No format specified, usually because
+                          there is not (yet) a Maintenance
+                          Domain Name. In this case, a zero
+                          length OCTET STRING for the Domain
+                          Name field is acceptable.
+        dnsLikeName(2)    Domain Name like string, globally unique
+                          text string derived from a DNS name.
+        macAddrAndUint(3) MAC address + 2-octet (unsigned) integer.
+        charString(4)     RFC2579 DisplayString, except that the
+                          character codes 0-31 (decimal) are not
+                          used.
+        ieeeReserved(xx)  Reserved for definition by IEEE 802.1
+                          xx values can be [5..31] and [64..255]
+        ituReserved(xx)   Reserved for definition by  ITU-T Y.1731
+                          xx values range from [32..63]
+
+        To support future extensions, the WriDot1agCfmMaintDomainNameType
+        textual convention SHOULD NOT be sub-typed in object type
+        definitions.  It MAY be sub-typed in compliance statements in
+        order to require only a subset of these address types for a
+        compliant implementation.
+
+        Implementations MUST ensure that WriDot1agCfmMaintDomainNameType
+        objects and any dependent objects (e.g.,
+        WriDot1agCfmMaintDomainName objects) are consistent.  An
+        inconsistentValue error MUST be generated if an attempt to
+        change an WriDot1agCfmMaintDomainNameType object would, for
+        example, lead to an undefined WriDot1agCfmMaintDomainName value.
+        In particular,
+        WriDot1agCfmMaintDomainNameType/WriDot1agCfmMaintDomainName pairs
+        MUST be changed together if the nameType changes.
+       "
+    REFERENCE
+       "21.6.5, Table 21-19"
+    SYNTAX      INTEGER {
+                  none              (1),
+                  dnsLikeName       (2),
+                  macAddressAndUint (3),
+                  charString        (4)
+                }
+
+WriDot1agCfmMaintDomainName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Denotes a generic Maintenance Domain Name.
+
+        A WriDot1agCfmMaintDomainName value is always interpreted within
+        the context of a WriDot1agCfmMaintDomainNameType value.  Every
+        usage of the WriDot1agCfmMaintDomainName textual convention is
+        required to specify the WriDot1agCfmMaintDomainNameType object
+        that provides the context.  It is suggested that the
+        WriDot1agCfmMaintDomainNameType object be logically registered
+        before the object(s) that use the WriDot1agCfmMaintDomainName
+        textual convention, if they appear in the same logical row.
+
+        The value of a WriDot1agCfmMaintDomainName object MUST always
+        be consistent with the value of the associated
+        WriDot1agCfmMaintDomainNameType object. Attempts to set
+        an WriDot1agCfmMaintDomainName object to a value inconsistent
+        with the associated WriDot1agCfmMaintDomainNameType MUST fail
+        with an inconsistentValue error.
+
+        When this textual convention is used as the syntax of an
+        index object, there may be issues with the limit of 128
+        sub-identifiers specified in SMIv2, IETF STD 58.  In this
+        case, the object definition MUST include a 'SIZE' clause
+        to limit the number of potential instance sub-identifiers;
+        otherwise the applicable constraints MUST be stated in
+        the appropriate conceptual row DESCRIPTION clauses, or
+        in the surrounding documentation if there is no single
+        DESCRIPTION clause that is appropriate.
+
+        A value of none(1) in the associated
+        WriDot1agCfmMaintDomainNameType object means that no Maintenance
+        Domain name is present, and the contents of the
+        WriDot1agCfmMaintDomainName object are meaningless.
+
+        See the DESCRIPTION of the WriDot1agCfmMaintAssocNameType
+        TEXTUAL-CONVENTION for a discussion of the length limits on
+        the Maintenance Domain name and Maintenance Association name.
+       "
+    REFERENCE
+         "21.6.5"
+    SYNTAX      OCTET STRING (SIZE(1..43))
+
+WriDot1agCfmMaintAssocNameType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents a type (and thereby the format)
+        of a wriDot1agCfmMaintAssocName.  The value can be one of
+        the following:
+
+        ieeeReserved(0)   Reserved for definition by IEEE 802.1
+                          recommend to not use zero unless
+                          absolutely needed.
+        primaryVid(1)     Primary VLAN ID.
+                          12 bits represented in a 2-octet integer:
+                          - 4 least significant bits of the first
+                            byte contains the 4 most significant 
+                            bits of the 12 bits primary VID
+                          - second byte contains the 8 least
+                            significant bits of the primary VID
+
+                                 0 1 2 3 4 5 6 7 8
+                                 +-+-+-+-+-+-+-+-+
+                                 |0 0 0 0| (MSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VID   LSB    |
+                                 +-+-+-+-+-+-+-+-+
+
+        charString(2)     RFC2579 DisplayString, except that the
+                          character codes 0-31 (decimal) are not
+                          used. (1..45) octets
+        unsignedInt16 (3) 2-octet integer/big endian
+        rfc2865VpnId(4)   RFC 2685 VPN ID
+                          3 octet VPN authority Organizationally
+                          Unique Identifier followed by 4 octet VPN
+                          index identifying VPN according to the OUI:
+
+                                 0 1 2 3 4 5 6 7 8
+                                 +-+-+-+-+-+-+-+-+
+                                 | VPN OUI (MSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |   VPN OUI     |
+                                 +-+-+-+-+-+-+-+-+
+                                 | VPN OUI (LSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |VPN Index (MSB)|
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VPN Index    |
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VPN Index    |
+                                 +-+-+-+-+-+-+-+-+
+                                 |VPN Index (LSB)|
+                                 +-+-+-+-+-+-+-+-+
+
+        ieeeReserved(xx)  Reserved for definition by IEEE 802.1
+                          xx values can be [5..31] and [64..255]
+        ituReserved(xx)   Reserved for definition by  ITU-T Y.1731
+                          xx values range from [32..63]
+
+        To support future extensions, the WriDot1agCfmMaintAssocNameType
+        textual convention SHOULD NOT be sub-typed in object type
+        definitions.  It MAY be sub-typed in compliance statements in
+        order to require only a subset of these address types for a
+        compliant implementation.
+
+        Implementations MUST ensure that WriDot1agCfmMaintAssocNameType
+        objects and any dependent objects (e.g.,
+        wriDot1agCfmMaintAssocName objects) are consistent.  An
+        inconsistentValue error MUST be generated if an attempt to
+        change an WriDot1agCfmMaintAssocNameType object would, for
+        example, lead to an undefined wriDot1agCfmMaintAssocName value.
+        In particular,
+        WriDot1agCfmMaintAssocNameType/wriDot1agCfmMaintAssocName pairs
+        MUST be changed together if the nameType changes.
+
+        The Maintenance Domain name and Maintenance Association name,
+        when put together into the CCM PDU, MUST total 48 octets or
+        less.  If the WriDot1agCfmMaintDomainNameType object contains
+        none(1), then the wriDot1agCfmMaintAssocName object MUST be
+        45 octets or less in length.  Otherwise, the length of
+        the WriDot1agCfmMaintDomainName object plus the length of the
+        wriDot1agCfmMaintAssocName object, added together, MUST total
+        less than or equal to 44 octets.
+       " 
+    REFERENCE
+       "21.6.5.4, Table 21-20"
+    SYNTAX      INTEGER {
+                  primaryVid        (1),
+                  charString        (2),
+                  unsignedInt16     (3),
+                  rfc2865VpnId      (4)
+                }
+
+WriDot1agCfmMaintAssocName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Denotes a generic Maintenance Association Name. It is the
+        part of the Maintenance Association Identifier which is
+        unique within the Maintenance Domain Name and is appended
+        to the Maintenance Domain Name to form the Maintenance
+        Association Identifier (MAID).
+
+        A wriDot1agCfmMaintAssocName value is always interpreted within
+        the context of a WriDot1agCfmMaintAssocNameType value.  Every
+        usage of the wriDot1agCfmMaintAssocName textual convention is
+        required to specify the WriDot1agCfmMaintAssocNameType object
+        that provides the context.  It is suggested that the
+        WriDot1agCfmMaintAssocNameType object be logically registered
+        before the object(s) that use the wriDot1agCfmMaintAssocName
+        textual convention, if they appear in the same logical row.
+
+        The value of a wriDot1agCfmMaintAssocName object MUST 
+        always be consistent with the value of the associated
+        WriDot1agCfmMaintAssocNameType object. Attempts to set
+        an wriDot1agCfmMaintAssocName object to a value inconsistent
+        with the associated WriDot1agCfmMaintAssocNameType MUST fail
+        with an inconsistentValue error.
+
+        When this textual convention is used as the syntax of an
+        index object, there may be issues with the limit of 128
+        sub-identifiers specified in SMIv2, IETF STD 58.  In this
+        case, the object definition MUST include a 'SIZE' clause
+        to limit the number of potential instance sub-identifiers;
+        otherwise the applicable constraints MUST be stated in
+        the appropriate conceptual row DESCRIPTION clauses, or
+        in the surrounding documentation if there is no single
+        DESCRIPTION clause that is appropriate.
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.4, 21.6.5.5, 21.6.5.6"
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+
+WriDot1agCfmMDLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Integer identifying the Maintenance Domain Level (MD Level).
+        Higher numbers correspond to higher Maintenance Domains,
+        those with the greatest physical reach, with the highest
+        values for customers' CFM PDUs.  Lower numbers correspond
+        to lower Maintenance Domains, those with more limited
+        physical reach, with the lowest values for CFM PDUs
+        protecting single bridges or physical links.
+       "
+    REFERENCE
+       "802.1ag clauses 18.3, 21.4.1"
+    SYNTAX      Integer32 (0..7)
+
+WriDot1agCfmMDLevelOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Integer identifying the Maintenance Domain Level (MD Level).
+        Higher numbers correspond to higher Maintenance Domains,
+        those with the greatest physical reach, with the highest
+        values for customers' CFM packets.  Lower numbers correspond
+        to lower Maintenance Domains, those with more limited
+        physical reach, with the lowest values for CFM PDUs
+        protecting single bridges or physical links.
+
+        The value (-1) is reserved to indicate that no MA Level has
+        been assigned.
+       "
+    REFERENCE
+       "802.1ag clauses 18.3, 12.14.3.1.3:c"
+    SYNTAX      Integer32 (-1 | 0..7)
+
+WriDot1agCfmMpDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the direction in which the Maintenance
+        association (MEP or MIP) faces on the bridge port:
+
+        down(1)    Sends Continuity Check Messages away from the
+                   MAC Relay Entity.
+        up(2)      Sends Continuity Check Messages towards the
+                   MAC Relay Entity.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.6.3.2:c"
+    SYNTAX      INTEGER {
+                  down  (1),
+                  up    (2)
+                }
+
+WriDot1agCfmPortStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value from he Port Status TLV from the last CCM
+        received from the last MEP. It indicates the ability of the
+        Bridge Port on which the transmitting MEP resides to pass
+        ordinary data, regardless of the status of the MAC
+        (Table 21-10).
+
+        psNoPortStateTLV(0) Indicates either that no CCM has been
+                            received or that no port status TLV was
+                            present in the last CCM received.
+
+        psBlocked(1)        Ordinary data cannot pass freely through
+                            the port on which the remote MEP resides.
+                            Value of enableRmepDefect is equal to
+                            false.
+
+        psUp(2):            Ordinary data can pass freely through
+                            the port on which the remote MEP resides.
+                            Value of enableRmepDefect is equal to
+                            true.
+
+        NOTE: A 0 value is used for psNoPortStateTLV, so that
+              additional code points can be added in a manner
+              consistent with the WriDot1agCfmInterfaceStatus textual
+              convention.
+       "
+    REFERENCE
+       "12.14.7.6.3:f, 20.19.3 and 21.5.4"
+    SYNTAX      INTEGER {
+                  psNoPortStateTLV  (0),
+                  psBlocked         (1),
+                  psUp              (2)
+                }
+
+WriDot1agCfmInterfaceStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value from the Interface Status TLV from the 
+        last CCM received from the last MEP. It indicates the status
+        of the Interface within which the MEP transmitting the CCM
+        is configured, or the next lower Interface in the Interface
+        Stack, if the MEP is not configured within an Interface.
+
+    isNoInterfaceStatusTLV(0)  Indicates either that no CCM has been
+                          received or that no interface status TLV
+                          was present in the last CCM received.
+
+    isUp(1)               The interface is ready to pass packets.
+
+    isDown(2)             The interface cannot pass packets
+
+    isTesting(3)          The interface is in some test mode.
+   
+    isUnknown(4)          The interface status cannot be determined
+                          for some reason.
+
+    isDormant(5)          The interface is not in a state to pass
+                          packets but is in a pending state, waiting
+                          for some external event.
+    
+    isNotPresent(6)       Some component of the interface is missing
+    
+    isLowerLayerDown(7)   The interface is down due to state of the
+                          lower layer interfaces
+
+        NOTE: A 0 value is used for isNoInterfaceStatusTLV, so that
+              these code points can be kept consistent with new code
+              points added to ifOperStatus in the IF-MIB.
+
+       "
+    REFERENCE
+       "12.14.7.6.3:g, 20.19.4 and 21.5.5"
+    SYNTAX      INTEGER {
+                  isNoInterfaceStatusTLV  (0),
+                  isUp                    (1),
+                  isDown                  (2),
+                  isTesting               (3),
+                  isUnknown               (4),
+                  isDormant               (5),
+                  isNotPresent            (6),
+                  isLowerLayerDown        (7)
+                }
+
+WriDot1agCfmHighestDefectPri ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value, equal to the contents of the variable
+        highestDefect (20.33.9 and Table 20-1), indicating the
+        highest-priority defect that has been present since the MEP
+        Fault Notification Generator State Machine was last in the 
+        FNG_RESET state, either:
+
+        none(0)           no defects since FNG_RESET
+        defRDICCM(1)      DefRDICCM
+        defMACstatus(2)   DefMACstatus
+        defRemoteCCM(3)   DefRemoteCCM
+        defErrorCCM(4)    DefErrorCCM
+        defXconCCM(5)     DefXconCCM
+
+        The value 0 is used for no defects so that additional higher
+        priority values can be added, if needed, at a later time, and
+        so that these values correspond with those in
+        WriDot1agCfmLowestAlarmPri.
+       "
+    REFERENCE
+       "20.1.2, 12.14.7.7.2:c and 20.33.9"
+    SYNTAX      INTEGER {
+                  none              (0),
+                  defRDICCM         (1),
+                  defMACstatus      (2),
+                  defRemoteCCM      (3),
+                  defErrorCCM       (4),
+                  defXconCCM        (5)
+                }
+
+WriDot1agCfmLowestAlarmPri ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An integer value specifying the lowest priority defect
+        that is allowed to generate a Fault Alarm (20.9.5), either:
+
+        allDef(1)           DefRDICCM, DefMACstatus, DefRemoteCCM,
+                            DefErrorCCM, and DefXconCCM;
+        macRemErrXcon(2)    Only DefMACstatus, DefRemoteCCM,
+                            DefErrorCCM, and DefXconCCM (default);
+        remErrXcon(3)       Only DefRemoteCCM, DefErrorCCM,
+                            and DefXconCCM;
+        errXcon(4)          Only DefErrorCCM and DefXconCCM;
+        xcon(5)             Only DefXconCCM; or
+        noXcon(6)           No defects DefXcon or lower are to be
+                            reported;
+       "
+    REFERENCE
+       "12.14.7.1.3:k and 20.9.5"
+    SYNTAX      INTEGER {
+                  allDef            (1),
+                  macRemErrXcon     (2),
+                  remErrXcon        (3),
+                  errXcon           (4),
+                  xcon              (5),
+                  noXcon            (6)
+                }
+
+WriDot1agCfmMepId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP.
+       "
+    REFERENCE
+       "802.1ag clauses 3.19 and 19.2.1"
+    SYNTAX      Unsigned32 (1..8191)
+
+WriDot1agCfmMepIdOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP.
+ 
+        The special value 0 is allowed to indicate special cases, for
+        example that no MEPID is configured.
+
+        Whenever an object is defined with this SYNTAX, then the
+        DESCRIPTION clause of such an object MUST specify what the
+        special value of 0 means.
+       "
+    REFERENCE
+       "19.2.1"
+    SYNTAX      Unsigned32 (0 | 1..8191)
+
+WriDot1agCfmMhfCreation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates if the Management Entity can create MHFs.
+        The valid values are:
+
+        defMHFnone(1)      No MHFs can be created for this VID.
+        defMHFdefault(2)   MHFs can be created on this VID on any
+                           Bridge port through which this VID can
+                           pass.
+        defMHFexplicit(3)  MHFs can be created for this VID only on
+                           Bridge ports through which this VID can
+                           pass, and only if a MEP is created at some
+                           lower MD Level.
+        defMHFdefer(4)     The creation of MHFs is determined by the
+                           corresponding Maintenance Domain variable
+                           (wriDot1agCfmMaCompMhfCreation).
+       "
+    REFERENCE
+       "12.14.5.1.3:c and 22.2.3"
+    SYNTAX      INTEGER {
+                  defMHFnone     (1),
+                  defMHFdefault  (2),
+                  defMHFexplicit (3),
+                  defMHFdefer    (4)
+                }
+
+WriDot1agCfmIdPermission ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates what, if anything, is to be included in the Sender
+        ID TLV transmitted in CCMs, LBMs, LTMs, and LTRs.  The valid
+        values are:
+
+        sendIdNone(1)      The Sender ID TLV is not to be sent.
+        sendIdChassis(2)   The Chassis ID Length, Chassis ID
+                           Subtype, and Chassis ID fields of  the
+                           Sender ID TLV are to be sent.
+        sendIdManage(3)    The Management Address Length and
+                           Management Address of the Sender ID TLV
+                           are to be sent.
+        sendIdChassisManage(4) The Chassis ID Length, Chassis ID
+                           Subtype, Chassis ID, Management Address
+                           Length and Management Address fields are
+                           all to be sent.
+        sendIdDefer(5)     The contents of the Sender ID TLV are
+                           determined by the corresponding
+                           Maintenance Domain variable
+                           (wriDot1agCfmMaCompIdPermission).
+       "
+    REFERENCE
+       "12.14.6.1.3:d and 21.5.3"
+    SYNTAX      INTEGER {
+                  sendIdNone          (1),
+                  sendIdChassis       (2),
+                  sendIdManage        (3),
+                  sendIdChassisManage (4),
+                  sendIdDefer         (5)
+                }
+
+WriDot1agCfmCcmInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the interval at which CCMs are sent by a MEP.
+        The possible values are:
+        intervalInvalid(0) No CCMs are sent (disabled).
+        interval300Hz(1)   CCMs are sent every 3 1/3 milliseconds
+                           (300Hz).
+        interval10ms(2)    CCMs are sent every 10 milliseconds.
+        interval100ms(3)   CCMs are sent every 100 milliseconds.
+        interval1s(4)      CCMs are sent every 1 second.
+        interval10s(5)     CCMs are sent every 10 seconds.
+        interval1min(6)    CCMs are sent every minute.
+        interval10min(7)   CCMs are sent every 10 minutes.
+
+        Note: enumerations start at zero to match the 'CCM Interval
+              field' protocol field.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.6.1.3:e, 20.8.1 and 21.6.1.3"
+    SYNTAX      INTEGER {
+                  intervalInvalid   (0),
+                  interval300Hz     (1),
+                  interval10ms      (2),
+                  interval100ms     (3),
+                  interval1s        (4),
+                  interval10s       (5),
+                  interval1min      (6),
+                  interval10min     (7)
+                }
+
+WriDot1agCfmFngState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the diferent states of the MEP Fault Notification
+        Generator State Machine.
+
+        fngReset(1)            No defect has been present since the
+                               wriDot1agCfmMepFngResetTime timer
+                               expired, or since the state machine
+                               was last reset.
+
+        fngDefect(2)           A defect is present, but not for a
+                               long enough time to be reported 
+                               (wriDot1agCfmMepFngAlarmTime).
+
+        fngReportDefect(3)     A momentary state during which the
+                               defect is reported by sending a
+                               wriDot1agCfmFaultAlarm notification,
+                               if that action is enabled.
+
+        fngDefectReported(4)   A defect is present, and some defect
+                               has been reported.
+
+        fngDefectClearing(5)   No defect is present, but the
+                               wriDot1agCfmMepFngResetTime timer has
+                               not yet expired.
+       "
+    REFERENCE
+       "12.14.7.1.3:f and 20.35"
+    SYNTAX      INTEGER {
+                  fngReset          (1),
+                  fngDefect         (2),
+                  fngReportDefect   (3),
+                  fngDefectReported (4),
+                  fngDefectClearing (5)
+                }
+
+WriDot1agCfmRelayActionFieldValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Possible values the Relay action field can take."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:g, 20.36.2.5, 21.9.5, and
+        Table 21-27"
+    SYNTAX      INTEGER {
+                  rlyHit     (1),
+                  rlyFdb     (2),
+                  rlyMpdb    (3)
+                }
+               
+WriDot1agCfmIngressActionFieldValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Possible values returned in the ingress action field."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:g, 20.36.2.6, 21.9.8.1, and
+        Table 21-30
+       "
+    SYNTAX      INTEGER {
+                  ingNoTlv    (0),
+                  ingOk       (1),
+                  ingDown     (2),
+                  ingBlocked  (3),
+                  ingVid      (4)
+                }
+
+WriDot1agCfmEgressActionFieldValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Possible values returned in the egress action field"
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:o, 20.36.2.10, 21.9.9.1, and
+        Table 21-32"
+    SYNTAX      INTEGER {
+                  egrNoTlv    (0),
+                  egrOK       (1),
+                  egrDown     (2),
+                  egrBlocked  (3),
+                  egrVid      (4)
+                }
+
+WriDot1agCfmRemoteMepState::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Operational state of the remote MEP state machine.  This
+        state machine monitors the reception of valid CCMs from a
+        remote MEP with a specific MEPID.  It uses a timer that
+        expires in 3.5 times the length of time indicated by the
+        wriDot1agCfmMaNetCcmInterval object.
+
+        rMepIdle(1)            Momentary state during reset.
+
+        rMepStart(2)           The timer has not expired since the
+                               state machine was reset, and no valid
+                               CCM has yet been received.
+
+        rMepFailed(3)          The timer has expired, both since the
+                               state machine was reset, and since a
+                               valid CCM was received.
+
+        rMepOk(4)              The timer has not expired since a
+                               valid CCM was received.
+"
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:b, 20.22"
+    SYNTAX      INTEGER {
+                  rMepIdle    (1),
+                  rMepStart   (2),
+                  rMepFailed  (3),
+                  rMepOk      (4)
+                }
+
+Dot1afCfmIndexIntegerNextFree ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+      "An integer which may be used as a new Index in a table.
+
+       The special value of 0 indicates that no more new entries can
+       be created in the relevant table.
+
+       When a MIB is used for configuration, an object with this
+       SYNTAX always contains a legal value (if non-zero) for an
+       index that is not currently used in the relevant table. The
+       Command Generator (Network Management Application) reads this
+       variable and uses the (non-zero) value read when creating a
+       new row with an SNMP SET.  When the SET is performed, the
+       Command Responder (agent) MUST determine whether the value is
+       indeed still unused; Two Network Management Applications may
+       attempt to create a row (configuration entry) simultaneously
+       and use the same value. If it is currently unused, the SET
+       succeeds and the Command Responder (agent) changes the value
+       of this object, according to an implementation-specific
+       algorithm.  If the value is in use, however, the SET fails.
+       The Network Management Application MUST then re-read this
+       variable to obtain a new usable value.
+
+       An OBJECT-TYPE definition using this SYNTAX MUST specify the
+       relevant table for which the object is providing this
+       functionality.
+      "
+    SYNTAX      Unsigned32 (0..4294967295)
+
+WriDot1agCfmMepDefects ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A MEP can detect and report a number of defects, and multiple
+        defects can be present at the same time. These defects are:
+
+        bDefRDICCM(0) A remote MEP is reported the RDI bit in its
+                     last CCM.
+        bDefMACstatus(1) Either some remote MEP is reporting its
+                     Interface Status TLV as not isUp, or all remote
+                     MEPs are reporting a Port Status TLV that
+                     contains some value other than psUp.
+        bDefRemoteCCM(2) The MEP is not receiving valid CCMs from at
+                     least one of the remote MEPs.
+        bDefErrorCCM(3) The MEP has received at least one invalid CCM
+                     whose CCM Interval has not yet timed out.
+        bDefXconCCM(4) The MEP has received at least one CCM from
+                     either another MAID or a lower MD Level whose
+                     CCM Interval has not yet timed out.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:o, 12.14.7.1.3:p, 12.14.7.1.3:q,
+        12.14.7.1.3:r, and 12.14.7.1.3:s."
+    SYNTAX BITS {
+                bDefRDICCM(0),
+                bDefMACstatus(1),
+                bDefRemoteCCM(2),
+                bDefErrorCCM(3),
+                bDefXconCCM(4)
+               }
+
+WriDot1agCfmConfigErrors ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "While making the MIP creation evaluation described in 802.1ag
+        clause 22.2.3, the management entity can encounter errors in
+        the configuration. These are possible errors that can be
+        encountered:
+
+        CFMleak(0)   MA x is associated with a specific VID list,
+                     one or more of the VIDs in MA x can pass through
+                     the Bridge Port, no Down MEP is configured on
+                     any Bridge Port for MA x, and some other MA y,
+                     at a higher MD Level than MA x, and associated
+                     with at least one of the VID(s) also in MA x,
+                     does have a MEP configured on the Bridge Port.
+
+        conflictingVids(1)  MA x is associated with a specific VID
+                     list, an Up MEP is configured on MA x on the
+                     Bridge Port, and some other MA y, associated
+                     with at least one of the VID(s) also in MA x,
+                     also has an Up MEP configured on some Bridge
+                     Port.
+
+        ExcessiveLevels(2)  The number of different MD Levels at
+                     which MIPs are to be created on this port
+                     exceeds the Bridge's capabilities (see
+                     subclause 22.3).
+
+        OverlappedLevels(3) A MEP is created for one VID at one MD
+                     Level, but a MEP is configured on another
+                     VID at that MD Level or higher, exceeding
+                     the Bridge's capabilities.
+       "
+    REFERENCE
+       "12.14.4.1.3:b and clauses 22.2.3 and 22.2.4"
+    SYNTAX BITS {
+                cfmLeak(0),
+                conflictingVids(1),
+                excessiveLevels(2),
+                overlappedLevels(3)
+                }
+
+WriDot1agCfmPbbComponentIdentifier
+::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A Provider Backbone Bridge (PBB) can comprise a number of
+        components, each of which can be managed in a manner
+        essentially equivalent to an 802.1Q bridge.  In order to access
+        these components easily, an index is used in a number of
+        tables.  If any two tables are indexed by
+        WriDot1agCfmPbbComponentIdentifier, then entries in those tables
+        indexed by the same value of WriDot1agCfmPbbComponentIdentifier
+        correspond to the same component.
+       "
+    REFERENCE
+       "12.3 l)"
+    SYNTAX      Unsigned32 (1..4294967295)
+
+-- ******************************************************************
+-- The Stack Object. This group will contain all the MIBs objects
+-- needed to access the Stack managed object.
+-- ******************************************************************
+
+-- ******************************************************************
+-- The CFM Stack Table
+-- ******************************************************************
+
+wriDot1agCfmStackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "There is one CFM Stack table per bridge. It permits
+        the retrieval of information about the Maintenance Points
+        configured on any given interface.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.2"
+    ::= { wriDot1agCfmStack 1 }
+
+wriDot1agCfmStackEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The Stack table entry
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+"
+    INDEX { wriDot1agCfmStackifIndex, wriDot1agCfmStackVlanIdOrNone,
+            wriDot1agCfmStackMdLevel, wriDot1agCfmStackDirection
+          }
+    ::= { wriDot1agCfmStackTable 1 }
+
+WriDot1agCfmStackEntry ::= SEQUENCE {
+      wriDot1agCfmStackifIndex       InterfaceIndex,
+      wriDot1agCfmStackVlanIdOrNone  VlanIdOrNone,
+      wriDot1agCfmStackMdLevel       WriDot1agCfmMDLevel,
+      wriDot1agCfmStackDirection     WriDot1agCfmMpDirection,
+      wriDot1agCfmStackMdIndex       Unsigned32,
+      wriDot1agCfmStackMaIndex       Unsigned32,
+      wriDot1agCfmStackMepId         WriDot1agCfmMepIdOrZero,
+      wriDot1agCfmStackMacAddress    MacAddress
+    }
+
+wriDot1agCfmStackifIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "This object represents the  Bridge Port or aggregated port
+        on which MEPs or MHFs might be configured.
+
+        Upon a restart of the system, the system SHALL, if necessary,
+        change the value of this variable, and  rearrange the
+        wriDot1agCfmStackTable, so that it indexes the entry in the
+        interface table with the same value of ifAlias that it
+        indexed before the system restart.  If no such entry exists,
+        then the system SHALL delete all entries in the
+        wriDot1agCfmStackTable with the interface index.
+        **NOTE: this object is deprecated due to re-indexing of
+	the table.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.2.1.2:a"
+    ::= { wriDot1agCfmStackEntry 1 }
+
+wriDot1agCfmStackVlanIdOrNone OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "VLAN ID to which the MP is attached, or 0, if none.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.2.1.2:d, 22.1.7"
+    ::= { wriDot1agCfmStackEntry 2 }
+
+wriDot1agCfmStackMdLevel OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMDLevel
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "MD Level of the Maintenance Point.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.2.1.2:b"
+    ::= { wriDot1agCfmStackEntry 3 }
+
+wriDot1agCfmStackDirection OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMpDirection
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "Direction in which the MP faces on the Bridge Port
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.2.1.2:c"
+    ::= { wriDot1agCfmStackEntry 4 }
+
+wriDot1agCfmStackMdIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+       "The index of the Maintenance Domain in the wriDot1agCfmMdTable
+        to which the MP is associated, or 0, if none.
+       "
+    REFERENCE
+       "12.14.2.1.3:b"
+    ::= { wriDot1agCfmStackEntry 5 }
+
+wriDot1agCfmStackMaIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+       "The index of the MA in the wriDot1agCfmMaNetTable and
+        wriDot1agCfmMaCompTable to which the MP is associated, or 0, if
+        none.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.2.1.3:c"
+    ::= { wriDot1agCfmStackEntry 6 }
+
+wriDot1agCfmStackMepId OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+       "If an MEP is configured, the MEPID, else 0"
+    REFERENCE
+       "12.14.2.1.3:d
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    ::= { wriDot1agCfmStackEntry 7 }
+
+wriDot1agCfmStackMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+       "MAC address of the MP.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+      "12.14.2.1.3:e"
+    ::= { wriDot1agCfmStackEntry 8 }
+
+-- ******************************************************************
+-- The VLAN Table
+-- ******************************************************************
+
+wriDot1agCfmVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "This table defines the association of VIDs into VLANs.  There
+        is an entry in this table, for each component of the bridge,
+        for each VID that is:
+            a) a VID belonging to a VLAN associated with more than
+               one VID; and
+            b) not the Primary VLAN of that VID.
+        The entry in this table contains the Primary VID of the VLAN.
+
+        By default, this table is empty, meaning that every VID is
+        the Primary VID of a single-VID VLAN.
+
+        VLANs that are associated with only one VID SHOULD NOT have
+        an entry in this table.
+
+        The writable objects in this table need to be persistent
+        upon reboot or restart of a device.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.3.1.3:a, 12.14.3.2.2:a, 12.14.5.3.2:c,
+        12.14.6.1.3:b, 22.1.5."
+    ::= { wriDot1agCfmVlan 1 }
+
+wriDot1agCfmVlanEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The VLAN table entry.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    INDEX { wriDot1agCfmVlanComponentId, wriDot1agCfmVlanVid }
+    ::= { wriDot1agCfmVlanTable 1 }
+
+WriDot1agCfmVlanEntry ::= SEQUENCE {
+      wriDot1agCfmVlanComponentId WriDot1agCfmPbbComponentIdentifier,
+      wriDot1agCfmVlanVid         VlanId,
+      wriDot1agCfmVlanPrimaryVid  VlanId,
+      wriDot1agCfmVlanRowStatus   RowStatus
+    }
+
+wriDot1agCfmVlanComponentId OBJECT-TYPE
+    SYNTAX      WriDot1agCfmPbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The bridge component within the system to which the information
+        in this wriDot1agCfmVlanEntry applies.  If the system is not a
+        Bridge, or if only one component is present in the Bridge, then
+        this variable (index) MUST be equal to 1.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.3 l)"
+    ::= { wriDot1agCfmVlanEntry 1 }
+
+wriDot1agCfmVlanVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "This is a VLAN ID belonging to a VLAN that is associated with
+        more than one VLAN ID, and this is not the Primary VID of the
+        VLAN.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    ::= { wriDot1agCfmVlanEntry 2 }
+
+wriDot1agCfmVlanPrimaryVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "This is the Primary VLAN ID of the VLAN with which this
+        entry's wriDot1agCfmVlanVid is associated.  This value MUST not
+        equal the value of wriDot1agCfmVlanVid.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    ::= { wriDot1agCfmVlanEntry 3 }
+
+wriDot1agCfmVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns MUST have a valid value before a row
+        can be activated.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    ::= { wriDot1agCfmVlanEntry 4 }
+
+-- *******************************************************************
+-- The Default MD Level object. This group will contain all the
+-- MIB objects needed to access and modify default MD level
+-- managed objects.
+-- *******************************************************************
+
+wriDot1agCfmDefaultMdDefLevel OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMDLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "A value indicating the MD Level at which MHFs are to be
+        created, and Sender ID TLV transmission by those MHFs is to
+        be controlled, for each wriDot1agCfmDefaultMdEntry whose
+        wriDot1agCfmDefaultMdLevel object contains the value -1.
+
+        After this initialization, this object needs to be persistent
+        upon reboot or restart of a device.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.3.1.3:c, 12.14.3.2.2:b"
+    DEFVAL {0}
+    ::= { wriDot1agCfmDefaultMd 1 }
+
+wriDot1agCfmDefaultMdDefMhfCreation OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMhfCreation 
+--                {
+--                  defMHFnone     (1),
+--                  defMHFdefault  (2),
+--                  defMHFexplicit (3)
+--                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "A value indicating if the Management entity can create MHFs
+        (MIP Half Function) for the VID, for each
+        wriDot1agCfmDefaultMdEntry whose wriDot1agCfmDefaultMdMhfCreation
+        object contains the value defMHFdefer.  Since, in this
+        variable, there is no encompassing Maintenance Domain, the
+        value defMHFdefer is not allowed.
+
+        After this initialization, this object needs to be persistent
+        upon reboot or restart of a device.
+       "
+    REFERENCE
+       "12.14.3.1.3:d"
+    DEFVAL {defMHFnone}
+    ::= { wriDot1agCfmDefaultMd 2 }
+
+wriDot1agCfmDefaultMdDefIdPermission OBJECT-TYPE
+    SYNTAX      WriDot1agCfmIdPermission 
+--                {
+--                  sendIdNone          (1),
+--                  sendIdChassis       (2),
+--                  sendIdManage        (3),
+--                  sendIdChassisManage (4)
+--                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Enumerated value indicating what, if anything, is to be
+        included in the Sender ID TLV (21.5.3) transmitted by MHFs
+        created by the Default Maintenance Domain, for each
+        wriDot1agCfmDefaultMdEntry whose wriDot1agCfmDefaultMdIdPermission
+        object contains the value sendIdDefer.  Since, in this
+        variable, there is no encompassing Maintenance Domain, the
+        value sendIdDefer is not allowed.
+
+        After this initialization, this object needs to be persistent
+        upon reboot or restart of a device.
+       "
+    REFERENCE
+       "12.14.3.1.3:e"
+    DEFVAL { sendIdNone }
+    ::= { wriDot1agCfmDefaultMd 3 }
+
+-- *******************************************************************
+-- The Default MD Level Table
+-- *******************************************************************
+
+wriDot1agCfmDefaultMdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmDefaultMdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "For each bridge component, the Default MD Level Managed Object
+        controls MHF creation for VIDs that are not attached to a
+        specific Maintenance Association Managed Object, and Sender ID
+        TLV transmission by those MHFs.
+
+        For each Bridge Port, and for each VLAN ID whose data can
+        pass through that Bridge Port, an entry in this table is
+        used by the algorithm in subclause 22.2.3 only if there is no
+        entry in the Maintenance Association table defining an MA
+        for the same VLAN ID and MD Level as this table's entry, and
+        on which MA an Up MEP is defined.  If there exists such an
+        MA, that MA's objects are used by the algorithm in
+        subclause 22.2.3 in place of this table entry's objects.  The
+        agent maintains the value of wriDot1agCfmDefaultMdStatus to
+        indicate whether this entry is overridden by an MA.
+
+        When first initialized, the agent creates this table
+        automatically with entries for all VLAN IDs,
+        with the default values specified for each object.
+
+        After this initialization, the writable objects in this
+        table need to be persistent upon reboot or restart of a
+        device.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       " 12.14.3"
+    ::= { wriDot1agCfmDefaultMd 4 }
+
+wriDot1agCfmDefaultMdEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmDefaultMdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The Default MD Level table entry.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    INDEX { wriDot1agCfmDefaultMdComponentId,
+            wriDot1agCfmDefaultMdPrimaryVid }
+    ::= { wriDot1agCfmDefaultMdTable 1 }
+
+WriDot1agCfmDefaultMdEntry ::= SEQUENCE {
+      wriDot1agCfmDefaultMdComponentId  WriDot1agCfmPbbComponentIdentifier,
+      wriDot1agCfmDefaultMdPrimaryVid   VlanId,
+      wriDot1agCfmDefaultMdStatus       TruthValue,
+      wriDot1agCfmDefaultMdLevel        WriDot1agCfmMDLevelOrNone,
+      wriDot1agCfmDefaultMdMhfCreation  WriDot1agCfmMhfCreation,
+      wriDot1agCfmDefaultMdIdPermission WriDot1agCfmIdPermission
+    }
+
+wriDot1agCfmDefaultMdComponentId OBJECT-TYPE
+    SYNTAX      WriDot1agCfmPbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The bridge component within the system to which the information
+        in this wriDot1agCfmDefaultMdEntry applies.  If the system is not
+        a Bridge, or if only one component is present in the Bridge,
+        then this variable (index) MUST be equal to 1.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.3 l)"
+    ::= { wriDot1agCfmDefaultMdEntry 1 }
+
+wriDot1agCfmDefaultMdPrimaryVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The Primary VID of the VLAN to which this entry's objects
+        apply.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    ::= { wriDot1agCfmDefaultMdEntry 2 }
+
+wriDot1agCfmDefaultMdStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+       "State of this Default MD Level table entry.  True if there is
+        no entry in the Maintenance Association table defining an MA
+        for the same VLAN ID and MD Level as this table's entry, and
+        on which MA an Up MEP is defined, else false.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.3.1.3:b"
+    ::= { wriDot1agCfmDefaultMdEntry 3 }
+
+wriDot1agCfmDefaultMdLevel OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMDLevelOrNone
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+       "A value indicating the MD Level at which MHFs are to be
+        created, and Sender ID TLV transmission by those MHFs is to
+        be controlled, for the VLAN to which this entry's objects
+        apply.  If this object has the value -1, the MD Level for MHF
+        creation for this VLAN is controlled by
+        wriDot1agCfmDefaultMdDefLevel.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.3.1.3:c, 12.14.3.2.2:b"
+    DEFVAL {-1}
+    ::= { wriDot1agCfmDefaultMdEntry 4 }
+
+wriDot1agCfmDefaultMdMhfCreation OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMhfCreation
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+       "A value indicating if the Management entity can create MHFs
+        (MIP Half Function) for this VID at this MD Level.  If this
+        object has the value defMHFdefer, MHF creation for this VLAN
+        is controlled by wriDot1agCfmDefaultMdDefMhfCreation.
+
+        The value of this variable is meaningless if the values of
+        wriDot1agCfmDefaultMdStatus is false.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.3.1.3:d"
+    DEFVAL {defMHFdefer}
+    ::= { wriDot1agCfmDefaultMdEntry 5 }
+
+wriDot1agCfmDefaultMdIdPermission OBJECT-TYPE
+    SYNTAX      WriDot1agCfmIdPermission
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+       "Enumerated value indicating what, if anything, is to be
+        included in the Sender ID TLV (21.5.3) transmitted by MHFs
+        created by the Default Maintenance Domain.  If this object
+        has the value sendIdDefer, Sender ID TLV transmission for
+        this VLAN is controlled by wriDot1agCfmDefaultMdDefIdPermission.
+
+        The value of this variable is meaningless if the values of
+        wriDot1agCfmDefaultMdStatus is false.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.3.1.3:e"
+    DEFVAL { sendIdDefer }
+    ::= { wriDot1agCfmDefaultMdEntry 6 }
+
+-- ******************************************************************
+-- The CFM configuration error list managed object. This group will
+-- contain all the MIB objects used to read the interfaces and VIDs
+-- configured incorrectly.
+-- ******************************************************************
+
+-- ******************************************************************
+-- The CFM Configuration Error List Table
+-- ******************************************************************
+
+wriDot1agCfmConfigErrorListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmConfigErrorListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The CFM Configuration Error List table provides a list of
+        Interfaces and VIDs that are incorrectly configured.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.4"
+    ::= {wriDot1agCfmConfigErrorList 1}
+
+wriDot1agCfmConfigErrorListEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmConfigErrorListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The Config Error List Table  entry
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    INDEX { wriDot1agCfmConfigErrorListVid,
+            wriDot1agCfmConfigErrorListIfIndex
+          }
+    ::= { wriDot1agCfmConfigErrorListTable 1}
+
+WriDot1agCfmConfigErrorListEntry ::= SEQUENCE {
+      wriDot1agCfmConfigErrorListVid         VlanId,
+      wriDot1agCfmConfigErrorListIfIndex     InterfaceIndex,
+      wriDot1agCfmConfigErrorListErrorType   WriDot1agCfmConfigErrors
+    }
+
+
+wriDot1agCfmConfigErrorListVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The VLAN ID of the VLAN with interfaces in error.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.4.1.2:a"
+    ::= { wriDot1agCfmConfigErrorListEntry 1 }
+
+wriDot1agCfmConfigErrorListIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "This object is the IfIndex of the interface.
+
+        Upon a restart of the system, the system SHALL, if necessary,
+        change the value of this variable so that it indexes the
+        entry in the interface table with the same value of ifAlias
+        that it indexed before the system restart.  If no such
+        entry exists, then the system SHALL delete any entries in
+        wriDot1agCfmConfigErrorListTable indexed by that
+        InterfaceIndex value.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.4.1.2:b"
+    ::= { wriDot1agCfmConfigErrorListEntry 2 }
+
+wriDot1agCfmConfigErrorListErrorType OBJECT-TYPE
+    SYNTAX      WriDot1agCfmConfigErrors
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+       "A vector of Boolean error conditions from 22.2.4, any of
+        which may be true:
+
+        0) CFMleak;
+        1) ConflictingVids;
+        2) ExcessiveLevels;
+        3) OverlappedLevels.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.4.1.3:b"
+    ::= { wriDot1agCfmConfigErrorListEntry 3 }
+
+-- ******************************************************************
+-- The Maintenance Domain Managed Object.  This group contains all  
+-- the MIB objects used to maintain Maintenance Domains.
+-- ******************************************************************
+
+wriDot1agCfmMdTableNextIndex OBJECT-TYPE
+    SYNTAX      Dot1afCfmIndexIntegerNextFree
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains an unused value for wriDot1agCfmMdIndex in
+        the wriDot1agCfmMdTable, or a zero to indicate that none exist.
+       "
+    ::= { wriDot1agCfmMd 1 }
+
+-- ******************************************************************
+-- The Maintenance Domain Table
+-- ******************************************************************
+
+wriDot1agCfmMdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmMdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Domain table. Each row in the table
+        represents a different Maintenance Domain.
+
+        A Maintenance Domain is described in 802.1ag (3.22) as the
+        network or the part of the network for which faults in
+        connectivity are to be managed. The boundary of a Maintenance
+        Domain is defined by a set of DSAPs, each of which can become
+        a point of connectivity to a service instance.
+       "
+    REFERENCE
+       "802.1ag clauses 3.22 and 18.1"
+    ::= { wriDot1agCfmMd 2 }
+
+wriDot1agCfmMdEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Domain table entry. This entry is not lost
+        upon reboot. It is backed up by stable storage.
+       "
+    INDEX {wriDot1agCfmMdIndex }
+    ::= { wriDot1agCfmMdTable 1 }
+
+WriDot1agCfmMdEntry ::= SEQUENCE {
+      wriDot1agCfmMdIndex                Unsigned32,
+      wriDot1agCfmMdFormat               WriDot1agCfmMaintDomainNameType,
+      wriDot1agCfmMdName                 WriDot1agCfmMaintDomainName,
+      wriDot1agCfmMdMdLevel              WriDot1agCfmMDLevel,
+      wriDot1agCfmMdMhfCreation          WriDot1agCfmMhfCreation,
+      wriDot1agCfmMdMhfIdPermission      WriDot1agCfmIdPermission,
+      wriDot1agCfmMdMaNextIndex          Dot1afCfmIndexIntegerNextFree,
+      wriDot1agCfmMdRowStatus            RowStatus,
+      wriDot1agCfmMdMaStat               Unsigned32,
+      wriDot1agCfmMdMipStat              Unsigned32,
+      wriDot1agCfmMdMepStat              Unsigned32,
+      wriDot1agCfmMdRmepStat             Unsigned32,
+      wriDot1agCfmMdOwner                INTEGER
+    }
+
+wriDot1agCfmMdIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The index to the Maintenance Domain table.
+
+        wriDot1agCfmMdTableNextIndex needs to be inspected to find an
+        available index for row-creation.
+
+        Referential integrity is required, i.e., the index needs to be
+        persistent upon a reboot or restart of a device.  The index
+        can never be reused for other Maintenance Domain.  The index
+        value SHOULD keep increasing up to the time that they wrap
+        around. This is to facilitate access control based on OID.
+       "
+    ::= { wriDot1agCfmMdEntry 1 }
+
+wriDot1agCfmMdFormat OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaintDomainNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The type (and thereby format) of the Maintenance Domain Name."
+    REFERENCE
+       "21.6.5.1"
+    DEFVAL { charString }
+    ::= { wriDot1agCfmMdEntry 2 }
+
+wriDot1agCfmMdName OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaintDomainName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Domain name. The type/format of this object
+        is determined by the value of the wriDot1agCfmMdNameType object.
+          
+        Each Maintenance Domain has unique name amongst all those
+        used or available to a service provider or operator.  It
+        facilitates easy identification of administrative
+        responsibility for each Maintenance Domain.
+
+        Clause 3.24 defines a Maintenance Domain name as the
+        identifier, unique over the domain for which CFM is to
+        protect against accidental concatenation of Service
+        Instances, of a particular Maintenance Domain.
+       "
+    REFERENCE
+       "802.1ag clauses 3.24, 12.14.5, and 21.6.5.3"
+    DEFVAL { "DEFAULT" }
+    ::= { wriDot1agCfmMdEntry 3 }
+
+wriDot1agCfmMdMdLevel OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMDLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Domain Level."
+    REFERENCE
+       "12.14.5.1.3:b"
+    DEFVAL { 0 }
+    ::= { wriDot1agCfmMdEntry 4 }
+
+wriDot1agCfmMdMhfCreation OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMhfCreation 
+--                {
+--                  defMHFnone     (1),
+--                  defMHFdefault  (2),
+--                  defMHFexplicit (3)
+--                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Enumerated value indicating whether the management entity can
+        create MHFs (MIP Half Function) for this Maintenance Domain.
+        Since, in this variable, there is no encompassing Maintenance
+        Domain, the value defMHFdefer is not allowed.
+       "
+    REFERENCE
+       "12.14.5.1.3:c"
+    DEFVAL { defMHFnone }
+    ::= { wriDot1agCfmMdEntry 5 }
+
+wriDot1agCfmMdMhfIdPermission OBJECT-TYPE
+    SYNTAX      WriDot1agCfmIdPermission 
+--                {
+--                  sendIdNone          (1),
+--                  sendIdChassis       (2),
+--                  sendIdManage        (3),
+--                  sendIdChassisManage (4)
+--                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Enumerated value indicating what, if anything, is to be
+        included in the Sender ID TLV (21.5.3) transmitted by MPs
+        configured in this Maintenance Domain.  Since, in this
+        variable, there is no encompassing Maintenance Domain, the
+        value sendIdDefer is not allowed.
+       "
+    REFERENCE
+       "12.14.5.1.3:d"
+    DEFVAL { sendIdNone }
+    ::= { wriDot1agCfmMdEntry 6 }
+
+wriDot1agCfmMdMaNextIndex OBJECT-TYPE
+    SYNTAX      Dot1afCfmIndexIntegerNextFree
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Value to be used as the index of the MA table entries, both
+        the wriDot1agCfmMaNetTable and the wriDot1agCfmMaCompTable, for
+        this Maintenance Domain when the management entity wants to
+        create a new row in those tables.
+       "
+   ::= { wriDot1agCfmMdEntry 7 }
+
+wriDot1agCfmMdRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns MUST have a valid value before a row
+        can be activated.
+       "
+    ::= { wriDot1agCfmMdEntry 8 }   
+    
+wriDot1agCfmMdMaStat       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "       "
+    ::= { wriDot1agCfmMdEntry 9 }    
+  
+wriDot1agCfmMdMipStat       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "       "
+    ::= { wriDot1agCfmMdEntry 10 } 
+    
+    
+wriDot1agCfmMdMepStat       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "       "
+    ::= { wriDot1agCfmMdEntry 11 }   
+  
+  wriDot1agCfmMdRmepStat       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "       "
+    ::= { wriDot1agCfmMdEntry 12 }   
+    
+ wriDot1agCfmMdOwner       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "       "
+    ::= { wriDot1agCfmMdEntry 13 }      
+
+-- ******************************************************************
+-- The Maintenance Association Object. This group contains all the
+-- MIB objects used to read, create, modify, and delete Maintenance
+-- Associations in the MIB.
+-- ******************************************************************
+
+-- ******************************************************************
+-- The Maintenance Association (MA) Network Table
+-- ******************************************************************
+
+wriDot1agCfmMaNetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmMaNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Association table.  Each row in the table
+        represents an MA.  An MA is a set of MEPs, each configured
+        with a single service instance.
+
+        This is the part of the complete MA table that is constant
+        across all Bridges in a Maintenance Domain, and across all
+        components of a single Bridge.  That part of the MA table that
+        can vary from Bridge component to Bridge component is contained
+        in the wriDot1agCfmMaCompTable.
+
+        Creation of a Service Instance establishes a connectionless
+        association among the selected DSAPs.  Configuring a
+        Maintenance association End Point (MEP) at each of the
+        DSAPs creates a Maintenance Association (MA) to monitor
+        that connectionless connectivity.  The MA is identified by a
+        Short MA Name that is unique within the Maintenance Domain
+        and chosen to facilitate easy identification of the Service
+        Instance.  Together, the Maintenance Domain Name and the
+        Short MA Name form the Maintenance Association Identifier
+        (MAID) that is carried in CFM Messages to identify
+        incorrect connectivity among Service Instances.  A small
+        integer, the Maintenance association End Point Identifier
+        (MEPID), identifies each MEP among those configured on a
+        single MA (802.1ag clauses 3.19 and 18.2).
+
+        This table uses two indices, first index is the index of the
+        Maintenance Domain table.  The second index is the same as the
+        index of the wriDot1agCfmMaCompEntry for the same MA.
+
+        The writable objects in this table need to be persistent
+        upon reboot or restart of a device.
+
+       "
+    REFERENCE
+       "18.2"
+    ::= { wriDot1agCfmMa 1 }
+
+wriDot1agCfmMaNetEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MA table entry."
+    INDEX {wriDot1agCfmMdIndex, wriDot1agCfmMaIndex }
+    ::= { wriDot1agCfmMaNetTable 1 }
+
+WriDot1agCfmMaNetEntry ::= SEQUENCE {
+      wriDot1agCfmMaIndex                   Unsigned32,
+      wriDot1agCfmMaNetFormat               WriDot1agCfmMaintAssocNameType,
+      wriDot1agCfmMaNetName                 WriDot1agCfmMaintAssocName,
+      wriDot1agCfmMaNetCcmInterval          WriDot1agCfmCcmInterval,
+      wriDot1agCfmMaNetRowStatus            RowStatus,
+      wriDot1agCfmMaMipStat             Unsigned32,
+      wriDot1agCfmMaMepStat             Unsigned32,
+      wriDot1agCfmMaRmepStat            Unsigned32,
+      wriDot1agCfmMaLtrAge              INTEGER, 
+      wriDot1agCfmMaRmepAge             INTEGER,
+      wriDot1agCfmMaMipDbAge            INTEGER,
+      wriDot1agCfmMaCrossCheckState      INTEGER,
+      wriDot1agCfmMaCrossCheckTime      INTEGER, 
+      wriDot1agCfmMaOwner               INTEGER, 
+      wriDot1agCfmMaAisInterval         INTEGER,
+      wriDot1agCfmMaLckInterval         INTEGER,
+      wriDot1agCfmMaCcmLossThreshold    INTEGER, 
+      wriDot1agCfmMaAisLossThreshold    INTEGER,
+      wriDot1agCfmMaLckLossThreshold    INTEGER,
+      wriDot1agCfmMaVlanListAdd         OCTET STRING,  
+      wriDot1agCfmMaVlanListDel         OCTET STRING,
+      wriDot1agCfmMaCcTxStatis          Counter32, 
+      wriDot1agCfmMaCcRxStatis          Counter32
+    }
+
+wriDot1agCfmMaIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+       "Index of the MA table wriDot1agCfmMdMaNextIndex needs to
+        be inspected to find an available index for row-creation.
+       "
+    ::= { wriDot1agCfmMaNetEntry 1 }
+
+wriDot1agCfmMaNetFormat OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaintAssocNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The type (and thereby format) of the Maintenance Association
+        Name.
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.4"
+    ::= { wriDot1agCfmMaNetEntry 2 }
+
+wriDot1agCfmMaNetName OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaintAssocName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Short Maintenance Association name. The type/format of
+        this object is determined by the value of the
+        wriDot1agCfmMaNetNameType object.  This name MUST be unique within
+        a maintenance domain.
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.6, and Table 21-20"
+    ::= { wriDot1agCfmMaNetEntry 3 }
+
+wriDot1agCfmMaNetCcmInterval OBJECT-TYPE
+    SYNTAX      WriDot1agCfmCcmInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Interval between CCM transmissions to be used by all MEPs
+        in the MA.
+       "
+    REFERENCE
+       "12.14.6.1.3:e"
+    DEFVAL { interval1s }
+    ::= { wriDot1agCfmMaNetEntry 4 }
+
+wriDot1agCfmMaNetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns MUST have a valid value before a row
+        can be activated.
+       "
+    ::= { wriDot1agCfmMaNetEntry 5 } 
+    
+  wriDot1agCfmMaMipStat        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 6 }
+    
+    
+ wriDot1agCfmMaMepStat     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 7 }
+    
+         
+ wriDot1agCfmMaRmepStat      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 8 }  
+    
+  wriDot1agCfmMaLtrAge        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 9 }  
+        
+ wriDot1agCfmMaRmepAge            OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 10 }  
+    
+ wriDot1agCfmMaMipDbAge            OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 11 } 
+    
+wriDot1agCfmMaCrossCheckState       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 12 }
+    
+ wriDot1agCfmMaCrossCheckTime       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 13 }
+    
+ wriDot1agCfmMaOwner                OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 14 }
+    
+wriDot1agCfmMaAisInterval          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 15 }
+    
+wriDot1agCfmMaLckInterval          OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 16 }
+    
+wriDot1agCfmMaCcmLossThreshold  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 17 }  
+    
+wriDot1agCfmMaAisLossThreshold     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 18 }   
+    
+wriDot1agCfmMaLckLossThreshold  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 19 }   
+        
+wriDot1agCfmMaVlanListAdd          OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 20}     
+    
+wriDot1agCfmMaVlanListDel       OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 21 } 
+
+wriDot1agCfmMaCcTxStatis   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 22 }  
+ 
+wriDot1agCfmMaCcRxStatis   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "    "
+    ::= { wriDot1agCfmMaNetEntry 23 }       
+    
+-- ******************************************************************
+-- The Maintenance Association (MA) Component Table
+-- ******************************************************************
+
+wriDot1agCfmMaCompTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmMaCompEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The Maintenance Association table.  Each row in the table
+        represents an MA.  An MA is a set of MEPs, each configured
+        with a single service instance.
+
+        This is the part of the complete MA table that is variable
+        across the Bridges in a Maintenance Domain, or across the
+        components of a single Bridge.  That part of the MA table that
+        is constant across the Bridges and their components in a
+        Maintenance Domain is contained in the wriDot1agCfmMaNetTable.
+
+        This table uses three indices, first index is the
+        WriDot1agCfmPbbComponentIdentifier that identifies the component
+        within the Bridge for which the information in the
+        wriDot1agCfmMaCompEntry applies.  The second is the index of the
+        Maintenance Domain table.  The third index is the same as the
+        index of the wriDot1agCfmMaNetEntry for the same MA.
+
+        The writable objects in this table need to be persistent
+        upon reboot or restart of a device.
+
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "18.2"
+    ::= { wriDot1agCfmMa 2 }
+
+wriDot1agCfmMaCompEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaCompEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The MA table entry.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    INDEX {wriDot1agCfmMaComponentId,
+           wriDot1agCfmMdIndex, wriDot1agCfmMaIndex }
+    ::= { wriDot1agCfmMaCompTable 1 }
+
+WriDot1agCfmMaCompEntry ::= SEQUENCE {
+      wriDot1agCfmMaComponentId         WriDot1agCfmPbbComponentIdentifier,
+      wriDot1agCfmMaCompPrimaryVlanId   VlanIdOrNone,
+      wriDot1agCfmMaCompMhfCreation     WriDot1agCfmMhfCreation,
+      wriDot1agCfmMaCompIdPermission    WriDot1agCfmIdPermission,
+      wriDot1agCfmMaCompNumberOfVids    Unsigned32,
+      wriDot1agCfmMaCompRowStatus       RowStatus}
+
+wriDot1agCfmMaComponentId OBJECT-TYPE
+    SYNTAX      WriDot1agCfmPbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+       "The bridge component within the system to which the information
+        in this wriDot1agCfmMaCompEntry applies.  If the system is not a
+        Bridge, or if only one component is present in the Bridge, then
+        this variable (index) MUST be equal to 1.
+	**NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.3 l)"
+    ::= { wriDot1agCfmMaCompEntry 1 }
+
+wriDot1agCfmMaCompPrimaryVlanId OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "The Primary VLAN ID with which the Maintenance Association is
+        associated, or 0 if the MA is not attached to any VID.  If
+        the MA is associated with more than one VID, the
+        wriDot1agCfmVlanTable lists them.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.6.1.3:b"
+    ::= { wriDot1agCfmMaCompEntry 2 }
+
+wriDot1agCfmMaCompMhfCreation OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMhfCreation
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "Indicates if the Management entity can create MHFs (MIP Half
+        Function) for this MA.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.6.1.3:c"
+    DEFVAL { defMHFdefer }
+    ::= { wriDot1agCfmMaCompEntry 3 }
+
+wriDot1agCfmMaCompIdPermission OBJECT-TYPE
+    SYNTAX      WriDot1agCfmIdPermission
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "Enumerated value indicating what, if anything, is to be
+        included in the Sender ID TLV (21.5.3) transmitted by MPs
+        configured in this MA.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.6.1.3:d"
+    DEFVAL { sendIdDefer }
+    ::= { wriDot1agCfmMaCompEntry 4 }
+
+wriDot1agCfmMaCompNumberOfVids OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "The number of VIDs associated with the MA.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    REFERENCE
+       "12.14.6.1.3:b"
+    ::= { wriDot1agCfmMaCompEntry 5 }
+
+wriDot1agCfmMaCompRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns MUST have a valid value before a row
+        can be activated.
+        **NOTE: this object is deprecated due to re-indexing of the 
+	table.
+       "
+    ::= { wriDot1agCfmMaCompEntry 6 }
+
+-- ******************************************************************
+-- The list of known MEPs for a given MA
+-- ******************************************************************
+
+wriDot1agCfmMaMepListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmMaMepListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "List of MEPIDs that belong to this MA.
+ 
+        Clause 12.14.6.1.3 specifies that a list of MEPIDs in all
+        bridges in that MA, but since SNMP SMI does not allow to
+        state in a MIB that an object in a table is an array, the 
+        information has to be stored in another table with two
+        indices, being the first index, the index of the table that 
+        contains the list or array.
+
+        For all bridges in which the same MAID {wriDot1agCfmMdFormat,
+        wriDot1agCfmMdName, wriDot1agCfmMaNetFormat, and wriDot1agCfmMaNetName}
+        is configured, the same set of wriDot1agCfmMaMepListIdentifiers
+        MUST be configured in the bridges' wriDot1agCfmMaMepListTables.
+        This allows each MEP to determine whether or not it is
+        receiving CCMs from all of the other MEPs in the MA.
+
+        For example, if one were creating a new MA whose MAID were
+        {charString, 'Dom1', charString, 'MA1'}, that had 2 MEPs, whose
+        MEPIDs were 1 and 3, one could, in Bridge A:
+         1. Get a new MD index d from wriDot1agCfmMdTableNextIndex.
+         2. Create the Maintenance Domain {charString, 'Dom1'}.
+         3. Get a new MA index a from wriDot1agCfmMdMaNextIndex [d].
+         4. Create the Maintenance Association {charString, 'MA1'}.
+         5. Create a new wriDot1agCfmMaMepListEntry for each of the MEPs
+            in the MA: [d, a, 1] and [d, a, 3].
+         6. Create one of the new MEPs, say [d, a, 1].
+        Then, in Bridge B:
+         7. Do all of these steps 1-6, except for using the other MEPID
+            for the new MEP in Step 6, in this example, MEPID 3.
+        Note that, when creating the MA, MEP List Table, and MEP
+        entries in the second bridge, the indices 'd' and 'a'
+        identifying the MAID {charString, 'Dom1', charString, 'MA1'}
+        may have different values than those in the first Bridge.
+       "
+    REFERENCE
+       "12.14.6.1.3:g"
+    ::= { wriDot1agCfmMa 3 }
+
+wriDot1agCfmMaMepListEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMaMepListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The known MEPS table entry."
+    INDEX { wriDot1agCfmMdIndex,
+            wriDot1agCfmMaIndex,
+            wriDot1agCfmMaMepListIdentifier
+          }
+    ::= { wriDot1agCfmMaMepListTable 1 }
+
+WriDot1agCfmMaMepListEntry ::= SEQUENCE {
+      wriDot1agCfmMaMepListIdentifier  WriDot1agCfmMepId,
+      wriDot1agCfmMaMepListRowStatus   RowStatus
+    }
+
+wriDot1agCfmMaMepListIdentifier OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "MEPID"
+    REFERENCE
+       "12.14.6.1.3:g"
+    ::= { wriDot1agCfmMaMepListEntry 1 }
+
+wriDot1agCfmMaMepListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row. Read SNMPv2-TC (RFC1903) for an
+        explanation of the possible values this object can take.
+       "
+    ::= { wriDot1agCfmMaMepListEntry 2 }
+
+-- ******************************************************************
+-- The MEP Object.  This object represents a Maintenance End
+-- Point as described in 802.1ag document.
+-- ******************************************************************
+
+-- ******************************************************************
+-- The MEP Table
+-- ******************************************************************
+
+wriDot1agCfmMepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance Association End Point (MEP) table.
+
+        Each row in the table represents a different MEP.  A MEP is
+        an actively managed CFM entity, associated with a specific
+        DSAP of a Service Instance, which can generate and receive
+        CFM PDUs and track any responses.  It is an end point of a
+        single Maintenance Association, and is an endpoint of a
+        separate Maintenance Entity for each of the other MEPs in
+        the same Maintenance Association (802.1ag clause 3.19).
+
+        This table uses three indices. The first two indices are the
+        indices of the Maintenance Domain and MA tables, the reason
+        being that a MEP is always related to an MA and Maintenance
+        Domain.
+
+        The MEP table also stores all the managed objects for sending
+        LBM and LTM.
+
+        *LBM Managed objects
+
+        LBM Managed objects in the MEP table
+        enables the management entity to initiate
+        transmission of Loopback messages.  It will signal the MEP
+        that it SHOULD transmit some number of Loopback messages
+        and detect the detection (or lack thereof) of the
+        corresponding Loopback messages.
+
+        Steps to use entries in this table:
+
+        1) Wait for wriDot1agCfmMepTransmitLbmStatus value to be
+           false.  To do this do this sequence:
+           a. an SNMP GET for both SnmpSetSerialNo and
+              wriDot1agCfmMepTransmitLbmStatus objects (in same SNMP
+              PDU).
+           b. Check if value for wriDot1agCfmMepTransmitLbmStatus is false.
+              - if not, wait x seconds, go to step a above.
+              - if yes, save the value of SnmpSetSerialNo and go
+                to step 2) below
+        2) Change wriDot1agCfmMepTransmitLbmStatus value from false to
+           true to ensure no other management entity will use
+           the service. In order to not disturb a possible other NMS
+           do this by sending an SNMP SET for both SnmpSetSerialNo
+           and wriDot1agCfmMepTransmitLbmStatus objects (in same SNMP
+           PDU,  and make sure SNmpSetSerialNo is the first varBind).
+           For the SnmpSetSerialNo varBind, use the value that you
+           obtained in step 1)a.. This ensures that two cooperating
+           NMSes will not step on each others toes.
+           Setting this MIB object does not set the corresponding
+           LBIactive state machine variable.
+        3) Setup the different data to be sent (number of messages,
+           optional TLVs,...), except do not set
+           wriDot1agCfmMepTransmitLbmMessages.
+        4) Record the current values of wriDot1agCfmMepLbrIn,
+           wriDot1agCfmMepLbrInOutOfOrder, and wriDot1agCfmMepLbrBadMsdu.
+        6) Set wriDot1agCfmMepTransmitLbmMessages to a non-zero value to
+           initiate transmission of Loopback messages.
+           The wriDot1agCfmMepTransmitLbmMessages indicates the
+           number of LBMs to be sent and is not decremented as
+           loopbacks are actually sent. wriDot1agCfmMepTransmitLbmMessages
+           is not equivalent to the LBMsToSend state machine variable.
+        7) Check the value of wriDot1agCfmMepTransmitLbmResultOK to
+           find out if the operation was successfully initiated or
+           not.
+        8) Monitor the value of wriDot1agCfmMepTransmitLbmStatus.
+           When it is reset to false, the last LBM has been transmitted.
+           Wait an additional 5 seconds to ensure that all LBRs have
+           been returned.
+        9) Compare wriDot1agCfmMepLbrIn, wriDot1agCfmMepLbrInOutOfOrder,
+           and wriDot1agCfmMepLbrBadMsdu to their old values from step
+           4, above, to get the results of the test.
+
+        *LTM Managed objects
+        The LTM Managed objects in the MEP table are used in a manner
+        similar to that described for LBM transmission, above.  Upon
+        successfully initiating the transmission, the variables
+        wriDot1agCfmMepTransmitLtmSeqNumber and
+        wriDot1agCfmMepTransmitLtmEgressIdentifier return the information
+        required to recover the results of the LTM from the
+        wriDot1agCfmLtrTable.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7 and 19.2"
+    ::= { wriDot1agCfmMep 1 }
+
+wriDot1agCfmMepEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MEP table entry"
+    INDEX { wriDot1agCfmMdIndex,
+            wriDot1agCfmMaIndex,
+            wriDot1agCfmMepIdentifier
+          }
+    ::= { wriDot1agCfmMepTable 1 }
+
+WriDot1agCfmMepEntry ::= SEQUENCE {
+      wriDot1agCfmMepIdentifier                   WriDot1agCfmMepId,
+      wriDot1agCfmMepIfIndex                      InterfaceIndexOrZero,
+      wriDot1agCfmMepDirection                    WriDot1agCfmMpDirection,
+      wriDot1agCfmMepPrimaryVid                   Unsigned32,
+      wriDot1agCfmMepActive                       TruthValue,
+      wriDot1agCfmMepFngState                     WriDot1agCfmFngState,
+      wriDot1agCfmMepCciEnabled                   TruthValue,
+      wriDot1agCfmMepCcmLtmPriority               Unsigned32,
+      wriDot1agCfmMepMacAddress                   MacAddress,
+      wriDot1agCfmMepLowPrDef                     WriDot1agCfmLowestAlarmPri,
+      wriDot1agCfmMepFngAlarmTime                 TimeInterval,
+      wriDot1agCfmMepFngResetTime                 TimeInterval,
+      wriDot1agCfmMepHighestPrDefect              WriDot1agCfmHighestDefectPri,
+      wriDot1agCfmMepDefects                      WriDot1agCfmMepDefects,
+      wriDot1agCfmMepErrorCcmLastFailure          OCTET STRING,
+      wriDot1agCfmMepXconCcmLastFailure           OCTET STRING,
+      wriDot1agCfmMepCcmSequenceErrors            Counter32,
+      wriDot1agCfmMepCciSentCcms                  Counter32,
+      wriDot1agCfmMepNextLbmTransId               Unsigned32,
+      wriDot1agCfmMepLbrIn                        Counter32,
+      wriDot1agCfmMepLbrInOutOfOrder              Counter32,
+      wriDot1agCfmMepLbrBadMsdu                   Counter32,
+      wriDot1agCfmMepLtmNextSeqNumber             Unsigned32,
+      wriDot1agCfmMepUnexpLtrIn                   Counter32,
+      wriDot1agCfmMepLbrOut                       Counter32,
+      wriDot1agCfmMepTransmitLbmStatus            TruthValue,
+      wriDot1agCfmMepTransmitLbmDestMacAddress    MacAddress,
+      wriDot1agCfmMepTransmitLbmDestMepId         WriDot1agCfmMepIdOrZero,
+      wriDot1agCfmMepTransmitLbmDestIsMepId       TruthValue,
+      wriDot1agCfmMepTransmitLbmMessages          Integer32,
+      wriDot1agCfmMepTransmitLbmDataTlv           OCTET STRING,
+      wriDot1agCfmMepTransmitLbmVlanPriority      Integer32,
+      wriDot1agCfmMepTransmitLbmVlanDropEnable    TruthValue,
+      wriDot1agCfmMepTransmitLbmResultOK          TruthValue,
+      wriDot1agCfmMepTransmitLbmSeqNumber         Unsigned32,
+      wriDot1agCfmMepTransmitLtmStatus            TruthValue,
+      wriDot1agCfmMepTransmitLtmFlags             BITS,
+      wriDot1agCfmMepTransmitLtmTargetMacAddress  MacAddress,
+      wriDot1agCfmMepTransmitLtmTargetMepId       WriDot1agCfmMepIdOrZero,
+      wriDot1agCfmMepTransmitLtmTargetIsMepId     TruthValue,
+      wriDot1agCfmMepTransmitLtmTtl               Unsigned32,
+      wriDot1agCfmMepTransmitLtmResult            TruthValue,
+      wriDot1agCfmMepTransmitLtmSeqNumber         Unsigned32,
+      wriDot1agCfmMepTransmitLtmEgressIdentifier  OCTET STRING,
+      wriDot1agCfmMepRowStatus                    RowStatus,
+      wriDot1agCfmMepLbmPktLen                     INTEGER, 
+      wriDot1agCfmMepLbmTimeEnd                    INTEGER,
+	  wriDot1agCfmMepLbmTimeStart                  INTEGER,
+      wriDot1agCfmMepLbmTimeMin                    INTEGER,
+      wriDot1agCfmMepLbmTimeMax                    INTEGER, 
+      wriDot1agCfmMepLbmTimeCurrent                INTEGER,
+      wriDot1agCfmMepLbmTimeAverage                INTEGER,
+      wriDot1agCfmMepLTmTimeEnd                    INTEGER,
+	  wriDot1agCfmMepLTmTimeStart                  INTEGER,
+      wriDot1agCfmMepOwner                         INTEGER, 
+      wriDot1agCfmMepLckDefectCondition            INTEGER,
+      wriDot1agCfmMepAisDefectCondition            INTEGER, 
+      wriDot1agCfmMepTransmitLbmTimeOut            INTEGER, 
+      wriDot1agCfmMepTransmitLtmTimeOut            INTEGER,
+      wriDot1agCfmMepMode                          INTEGER, 
+      wriDot1agCfmMepMccHwTxState                  INTEGER,
+      wriDot1agCfmMepAisInterval                   INTEGER, 
+      wriDot1agCfmMepLckInterval                   INTEGER, 
+      wriDot1agCfmMepAisState                      INTEGER, 
+      wriDot1agCfmMepAisPriority                   INTEGER,
+      wriDot1agCfmMepLckState                      INTEGER, 
+      wriDot1agCfmMepLckPriority                   INTEGER,
+      wriDot1agCfmMepAisEnable                     INTEGER, 
+      wriDot1agCfmMepLckEnable                     INTEGER,  
+      wriDot1agCfmMepStateAisSuppressAlarm         INTEGER, 
+      wriDot1agCfmMepEnableAisSuppressAlarm        INTEGER,
+      wriDot1agCfmMepEnableAisDot3ahCaused         INTEGER,
+      wriDot1agCfmMepResetPdu                      INTEGER,
+      wriDot1agCfmMepCcTxStatis                    Counter32,
+      wriDot1agCfmMepCcRxStatis                    Counter32
+      }
+
+wriDot1agCfmMepIdentifier OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Integer that is unique among all the MEPs in the same MA.
+        Other definition is: a small integer, unique over a given
+        Maintenance Association, identifying a specific Maintenance
+        association End Point (3.19).
+
+        MEP Identifier is also known as the MEPID.
+       "
+    REFERENCE
+       "802.1ag clauses 3.19, 19.2 and 12.14.7"
+    ::= { wriDot1agCfmMepEntry 1 }
+
+wriDot1agCfmMepIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is the interface index of the interface either a
+        bridge port, or an aggregated IEEE 802.1 link within a bridge
+        port, to which the MEP is attached.
+
+        Upon a restart of the system, the system SHALL, if necessary,
+        change the value of this variable so that it indexes the
+        entry in the interface table with the same value of ifAlias
+        that it indexed before the system restart.  If no such
+        entry exists, then the system SHALL set this variable to 0.
+       "
+    REFERENCE
+       "12.14.7.1.3:b"
+    ::= { wriDot1agCfmMepEntry 2 }
+
+wriDot1agCfmMepDirection OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMpDirection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The direction in which the MEP faces on the Bridge port."
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:c and 19.2"
+    ::= { wriDot1agCfmMepEntry 3 }
+
+wriDot1agCfmMepPrimaryVid OBJECT-TYPE
+    SYNTAX      Unsigned32(0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An integer indicating the Primary VID of the MEP, always
+        one of the VIDs assigned to the MEP's MA.  The value 0
+        indicates that either the Primary VID is that of the
+        MEP's MA, or that the MEP's MA is associated with no VID."
+   REFERENCE
+       "802.1ag clauses 12.14.7.1.3:d"
+   DEFVAL { 0 }
+    ::= { wriDot1agCfmMepEntry 4 }
+
+wriDot1agCfmMepActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Administrative state of the MEP
+
+        A Boolean indicating the administrative state of the MEP.
+
+        True indicates that the MEP is to function normally, and
+        false that it is to cease functioning."
+   REFERENCE
+       "802.1ag clauses 12.14.7.1.3:e and 20.9.1"
+   DEFVAL { false }
+   ::= { wriDot1agCfmMepEntry 5 }
+
+wriDot1agCfmMepFngState OBJECT-TYPE
+    SYNTAX      WriDot1agCfmFngState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Current state of the MEP Fault Notification Generator
+        State Machine.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:f and 20.35"
+    DEFVAL { fngReset }
+    ::= { wriDot1agCfmMepEntry 6 }
+
+wriDot1agCfmMepCciEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "If set to true, the MEP will generate CCM messages."
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:g and 20.10.1"
+    DEFVAL { false }
+    ::= { wriDot1agCfmMepEntry 7 }
+
+wriDot1agCfmMepCcmLtmPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The priority value for CCMs and LTMs transmitted by the MEP.
+        Default Value is the highest priority value allowed to pass
+        through the bridge port for any of this MEPs VIDs.
+        The management entity can obtain the default value for this 
+        variable from the priority regeneration table by extracting the 
+        highest priority value in this table on this MEPs bridge port.
+        (1 is lowest, then 2, then 0, then 3-7).
+       "
+    REFERENCE
+       "12.14.7.1.3:h"
+    ::= { wriDot1agCfmMepEntry 8 }
+
+wriDot1agCfmMepMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "MAC address of the MEP."
+    REFERENCE
+      "12.14.7.1.3:i and 19.4"
+    ::= { wriDot1agCfmMepEntry 9 }
+
+wriDot1agCfmMepLowPrDef OBJECT-TYPE
+    SYNTAX      WriDot1agCfmLowestAlarmPri
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An integer value specifying the lowest priority defect 
+        that is allowed to generate fault alarm.
+       "
+    REFERENCE
+       "12.14.7.1.3:k and 20.9.5 and Table 20-1"
+    DEFVAL { macRemErrXcon }
+    ::= { wriDot1agCfmMepEntry 10}
+
+wriDot1agCfmMepFngAlarmTime OBJECT-TYPE
+    SYNTAX      TimeInterval (250..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The time that defects MUST be present before a Fault Alarm is
+        issued (fngAlarmTime. 20.33.3) (default 2.5s).
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:l and 20.33.3"
+    DEFVAL { 250 }
+    ::= { wriDot1agCfmMepEntry 11 }
+
+wriDot1agCfmMepFngResetTime OBJECT-TYPE
+    SYNTAX      TimeInterval (250..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The time that defects MUST be absent before resetting a
+        Fault Alarm (fngResetTime, 20.33.4) (default 10s).
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:m and 20.33.4"
+    DEFVAL { 1000 }
+    ::= { wriDot1agCfmMepEntry 12 }
+   
+wriDot1agCfmMepHighestPrDefect OBJECT-TYPE
+    SYNTAX   WriDot1agCfmHighestDefectPri
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The highest priority defect that has been present since the
+        MEPs Fault Notification Generator State Machine was last in
+        the FNG_RESET state.
+       "
+    REFERENCE
+       "12.14.7.1.3:n  20.33.9 and Table 21-1"
+    ::= { wriDot1agCfmMepEntry 13 }
+
+wriDot1agCfmMepDefects OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepDefects
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A vector of Boolean error conditions from Table 20-1, any of
+        which may be true:
+
+        DefRDICCM(0)
+        DefMACstatus(1)
+        DefRemoteCCM(2)
+        DefErrorCCM(3)
+        DefXconCCM(4)
+       "
+    REFERENCE
+       ".1ag clauses 12.14.7.1.3:o, 12.14.7.1.3:p, 12.14.7.1.3:q,
+        12.14.7.1.3:r, 12.14.7.1.3:s, 20.21.3, 20.23.3, 20.33.5,
+        20.33.6, 20.33.7."
+    ::= { wriDot1agCfmMepEntry 14 }
+
+wriDot1agCfmMepErrorCcmLastFailure OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..1522))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The last-received CCM that triggered an DefErrorCCM fault."
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:t and 20.21.2"
+    ::= { wriDot1agCfmMepEntry 15 }
+
+wriDot1agCfmMepXconCcmLastFailure OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..1522))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The last-received CCM that triggered a DefXconCCM fault."
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:u and 20.23.2"
+    ::= { wriDot1agCfmMepEntry 16 }
+
+wriDot1agCfmMepCcmSequenceErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of out-of-sequence CCMs received from all
+        remote MEPs.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:v and 20.16.12"
+    ::= { wriDot1agCfmMepEntry 17 }
+
+wriDot1agCfmMepCciSentCcms OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of Continuity Check messages transmitted."
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:w and 20.10.2"
+    ::= { wriDot1agCfmMepEntry 18 }
+
+wriDot1agCfmMepNextLbmTransId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Next sequence number/transaction identifier to be sent in a
+        Loopback message. This sequence number can be zero because
+        it wraps around.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:x and 20.28.2"
+    ::= { wriDot1agCfmMepEntry 19 }
+
+wriDot1agCfmMepLbrIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of valid, in-order Loopback Replies received."
+    REFERENCE
+       "12.14.7.1.3:y and 20.31.1"
+    ::= { wriDot1agCfmMepEntry 20 }
+
+wriDot1agCfmMepLbrInOutOfOrder OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of valid, out-of-order Loopback Replies
+        received.
+       "
+    REFERENCE
+       "12.14.7.1.3:z and 20.31.1"
+    ::= { wriDot1agCfmMepEntry 21 }
+
+wriDot1agCfmMepLbrBadMsdu OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of LBRs received whose
+        mac_service_data_unit did not match (except for the OpCode)
+        that of the corresponding LBM (20.2.3).
+       "
+    REFERENCE
+       "12.14.7.1.3:aa  20.2.3"
+    ::= { wriDot1agCfmMepEntry 22}
+
+wriDot1agCfmMepLtmNextSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Next transaction identifier/sequence number to be sent in a
+        Linktrace message. This sequence number can be zero because
+        it wraps around.
+       "
+    REFERENCE
+       "12.14.7.1.3:ab and 20.36.1"
+    ::= { wriDot1agCfmMepEntry 23 }
+
+wriDot1agCfmMepUnexpLtrIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of unexpected LTRs received (20.39.1).
+       "
+    REFERENCE
+       "12.14.7.1.3:ac  20.39.1"
+    ::= { wriDot1agCfmMepEntry 24 }
+
+wriDot1agCfmMepLbrOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of Loopback Replies transmitted."
+    REFERENCE
+       "12.14.7.1.3:ad and 20.26.2"
+    ::= { wriDot1agCfmMepEntry 25 }
+
+wriDot1agCfmMepTransmitLbmStatus OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "A Boolean flag set to true by the MEP Loopback Initiator State
+       Machine or an MIB manager to indicate
+       that another LBM is being transmitted.
+       Reset to false by the MEP Loopback Initiator State Machine."
+   DEFVAL { false }
+   ::= { wriDot1agCfmMepEntry 26 }
+
+wriDot1agCfmMepTransmitLbmDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Target MAC Address Field to be transmitted: A unicast
+        destination MAC address.
+        This address will be used if the value of the column
+        wriDot1agCfmMepTransmitLbmDestIsMepId is 'false'.
+       "
+    REFERENCE
+       "12.14.7.3.2:b"
+    ::= { wriDot1agCfmMepEntry 27 }
+
+wriDot1agCfmMepTransmitLbmDestMepId OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Maintenance association End Point Identifier of another
+        MEP in the same Maintenance Association to which the LBM is
+        to be sent.
+        This address will be used if the value of the column
+        wriDot1agCfmMepTransmitLbmDestIsMepId is 'true'.
+       "
+    REFERENCE
+       "12.14.7.3.2:b"
+    ::= { wriDot1agCfmMepEntry 28 }
+
+wriDot1agCfmMepTransmitLbmDestIsMepId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "True indicates that MEPID of the target MEP is used for
+        Loopback transmission.
+        False indicates that unicast destination MAC address of the
+        target MEP is used for Loopback transmission.
+       "
+    REFERENCE
+       "12.14.7.3.2:b"
+    ::= {wriDot1agCfmMepEntry 29 }
+
+wriDot1agCfmMepTransmitLbmMessages OBJECT-TYPE
+    SYNTAX      Integer32(1..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The number of Loopback messages to be transmitted."
+    REFERENCE
+       "12.14.7.3.2:c"
+    DEFVAL { 1 }
+    ::= {wriDot1agCfmMepEntry 30 }
+
+wriDot1agCfmMepTransmitLbmDataTlv OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An arbitrary amount of data to be included in the Data TLV,
+        if the Data TLV is selected to be sent.  The intent is to be able
+        to fill the frame carrying the CFM PDU to its maximum length.
+        This may lead to fragmentation in some cases.
+       "
+    REFERENCE
+       "12.14.7.3.2:d"
+    ::= { wriDot1agCfmMepEntry 31 }
+
+wriDot1agCfmMepTransmitLbmVlanPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Priority. 3 bit value to be used in the VLAN tag, if present
+        in the transmitted frame.
+
+        The default value is CCM priority.
+       "
+    REFERENCE
+       "12.14.7.3.2:e"
+    ::= { wriDot1agCfmMepEntry 32 }
+
+wriDot1agCfmMepTransmitLbmVlanDropEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Drop Enable bit value to be used in the VLAN tag, if present
+        in the transmitted frame.
+
+        For more information about VLAN Drop Enable, please check
+        IEEE 802.1ad.
+       "
+    REFERENCE
+       "12.14.7.3.2:e"
+    DEFVAL { true }
+    ::= { wriDot1agCfmMepEntry 33 }
+
+wriDot1agCfmMepTransmitLbmResultOK OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the result of the operation:
+
+        - true       The Loopback Message(s) will be
+                     (or has been) sent.
+        - false      The Loopback Message(s) will not
+                     be sent.
+       "
+    REFERENCE
+       "12.14.7.3.3:a"
+    DEFVAL { true }
+    ::= { wriDot1agCfmMepEntry 34 }
+
+wriDot1agCfmMepTransmitLbmSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Loopback Transaction Identifier
+       (wriDot1agCfmMepNextLbmTransId) of the first LBM (to be) sent.
+        The value returned is undefined if
+        wriDot1agCfmMepTransmitLbmResultOK is false.
+       "
+    REFERENCE
+       "12.14.7.3.3:a"
+    ::= { wriDot1agCfmMepEntry 35 }
+
+wriDot1agCfmMepTransmitLtmStatus OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "A Boolean flag set to true by the bridge port to indicate
+       that another LTM may be transmitted. 
+       Reset to false by the MEP Linktrace Initiator State Machine."
+   DEFVAL { true }
+   ::= { wriDot1agCfmMepEntry 36 }
+
+wriDot1agCfmMepTransmitLtmFlags OBJECT-TYPE
+    SYNTAX      BITS {
+                  useFDBonly   (0)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The flags field for LTMs transmitted by the MEP."
+    REFERENCE
+       "12.14.7.4.2:b and 20.37.1"
+    DEFVAL { {useFDBonly } }
+    ::= { wriDot1agCfmMepEntry 37 }
+
+wriDot1agCfmMepTransmitLtmTargetMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Target MAC Address Field to be transmitted: A unicast
+        destination MAC address.
+        This address will be used if the value of the column
+        wriDot1agCfmMepTransmitLtmTargetIsMepId is 'false'.
+       "
+    REFERENCE
+       "12.14.7.4.2:c"
+    ::= { wriDot1agCfmMepEntry 38 }
+
+wriDot1agCfmMepTransmitLtmTargetMepId OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An indication of the Target MAC Address Field to be
+        transmitted:
+        The Maintenance association End Point Identifier of
+        another MEP in the same Maintenance Association
+        This address will be used if the value of the column
+        wriDot1agCfmMepTransmitLtmTargetIsMepId is 'true'.
+       "
+    REFERENCE
+       "12.14.7.4.2:c"
+    ::= { wriDot1agCfmMepEntry 39 }
+
+wriDot1agCfmMepTransmitLtmTargetIsMepId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "True indicates that MEPID of the target MEP is used for
+        Linktrace transmission.
+        False indicates that unicast destination MAC address of the
+        target MEP is used for Loopback transmission.
+       "
+    REFERENCE
+       "12.14.7.4.2:c"
+    ::= { wriDot1agCfmMepEntry 40 }
+
+wriDot1agCfmMepTransmitLtmTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The LTM TTL field. Default value, if not specified, is 64.
+        The TTL field indicates the number of hops remaining to the
+        LTM.  Decremented by 1 by each Linktrace Responder that
+        handles the LTM.  The value returned in the LTR is one less
+        than that received in the LTM.  If the LTM TTL is 0 or 1, the
+        LTM is not forwarded to the next hop, and if 0, no LTR is
+        generated.
+       "
+    REFERENCE
+       "12.14.7.4.2:d and 21.8.4"
+    DEFVAL {64}
+    ::= { wriDot1agCfmMepEntry 41 }
+
+wriDot1agCfmMepTransmitLtmResult OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the result of the operation:
+
+        - true    The Linktrace Message will be (or has been) sent.
+        - false   The Linktrace Message will not be sent"
+    REFERENCE
+       "12.14.7.4.3:a"
+    DEFVAL { true }
+    ::= { wriDot1agCfmMepEntry 42 }
+
+wriDot1agCfmMepTransmitLtmSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The LTM Transaction Identifier
+        (wriDot1agCfmMepLtmNextSeqNumber) of the LTM sent.
+        The value returned is undefined if
+        wriDot1agCfmMepTransmitLtmResult is false.
+       "
+    REFERENCE
+       "12.14.7.4.3:a"
+    ::= { wriDot1agCfmMepEntry 43 }
+
+wriDot1agCfmMepTransmitLtmEgressIdentifier OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Identifies the MEP Linktrace Initiator that is originating,
+        or the Linktrace Responder that is forwarding, this LTM.
+        The low-order six octets contain a 48-bit IEEE MAC address
+        unique to the system in which the MEP Linktrace Initiator
+        or Linktrace Responder resides.  The high-order two octets
+        contain a value sufficient to uniquely identify the MEP
+        Linktrace Initiator or Linktrace Responder within that system.
+
+        For most Bridges, the address of any MAC attached to the
+        Bridge will suffice for the low-order six octets, and 0 for
+        the high-order octets.  In some situations, e.g., if multiple
+        virtual Bridges utilizing emulated LANs are implemented in a
+        single physical system, the high-order two octets can be used
+        to differentiate among the transmitting entities.
+
+        The value returned is undefined if
+        wriDot1agCfmMepTransmitLtmResult is false.
+       "
+    REFERENCE
+       "12.14.7.4.3:b and 21.8.8"
+    ::= { wriDot1agCfmMepEntry 44 }
+   
+wriDot1agCfmMepRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns MUST have a valid value before a row
+        can be activated.
+       "
+   ::= { wriDot1agCfmMepEntry 45 }
+ 
+ wriDot1agCfmMepLbmPktLen   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 46 }
+                
+wriDot1agCfmMepLbmTimeEnd   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 47 }
+
+               
+wriDot1agCfmMepLbmTimeStart  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 48 }
+   
+            
+wriDot1agCfmMepLbmTimeMin   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 49 }
+    
+             
+wriDot1agCfmMepLbmTimeMax    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 50 }
+     
+            
+wriDot1agCfmMepLbmTimeCurrent  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 51 }
+    
+         
+wriDot1agCfmMepLbmTimeAverage   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 52 }
+   
+          
+wriDot1agCfmMepLTmTimeEnd     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 53 }
+       
+        
+wriDot1agCfmMepLTmTimeStart    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 54 }
+   
+          
+wriDot1agCfmMepOwner         OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 55 }
+   
+              
+wriDot1agCfmMepLckDefectCondition   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 56 }
+ 
+        
+wriDot1agCfmMepAisDefectCondition  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 57 }
+   
+        
+wriDot1agCfmMepTransmitLbmTimeOut   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 58 }
+  
+       
+wriDot1agCfmMepTransmitLtmTimeOut  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 59 }
+ 
+         
+wriDot1agCfmMepMode       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 60 }
+            
+       
+wriDot1agCfmMepMccHwTxState     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 61 }
+      
+       
+wriDot1agCfmMepAisInterval     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 62 }
+         
+     
+wriDot1agCfmMepLckInterval      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 63 }
+   
+          
+wriDot1agCfmMepAisState     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 64 }
+         
+  
+wriDot1agCfmMepAisPriority     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 65 }
+ 
+             
+wriDot1agCfmMepLckState        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 66 }
+    
+          
+wriDot1agCfmMepLckPriority     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 67 }
+    
+          
+wriDot1agCfmMepAisEnable     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 68 }
+       
+         
+wriDot1agCfmMepLckEnable         OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 69 }
+    
+        
+wriDot1agCfmMepStateAisSuppressAlarm  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 70 }
+    
+   
+wriDot1agCfmMepEnableAisSuppressAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write                                   
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 71 }
+    
+                                       
+wriDot1agCfmMepEnableAisDot3ahCaused   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 72 }
+      
+
+wriDot1agCfmMepResetPdu    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 73 }
+         
+wriDot1agCfmMepCcTxStatis  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 74 }    
+   
+ wriDot1agCfmMepCcRxStatis  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+   ::= { wriDot1agCfmMepEntry 75 }       
+
+-- ******************************************************************
+-- The Linktrace Reply Table
+-- ******************************************************************
+
+wriDot1agCfmLtrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmLtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table extends the MEP table and contains a list of
+        Linktrace replies received by a specific MEP in response to
+        a linktrace message.
+
+        SNMP SMI does not allow to state in a MIB that an object in
+        a table is an array.  The solution is to take the index (or
+        indices) of the first table and add one or more indices.
+       "
+    REFERENCE
+       "12.14.7.5"
+    ::= { wriDot1agCfmMep 2 }
+
+wriDot1agCfmLtrEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmLtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Linktrace Reply table entry."
+    INDEX { wriDot1agCfmMdIndex,
+            wriDot1agCfmMaIndex,
+            wriDot1agCfmMepIdentifier,
+            wriDot1agCfmLtrSeqNumber,
+            wriDot1agCfmLtrReceiveOrder
+          }
+    ::= { wriDot1agCfmLtrTable 1 }
+
+WriDot1agCfmLtrEntry ::= SEQUENCE {
+      wriDot1agCfmLtrSeqNumber            Unsigned32,
+      wriDot1agCfmLtrReceiveOrder         Unsigned32,
+      wriDot1agCfmLtrTtl                  Unsigned32,
+      wriDot1agCfmLtrForwarded            TruthValue,
+      wriDot1agCfmLtrTerminalMep          TruthValue,
+      wriDot1agCfmLtrLastEgressIdentifier OCTET STRING,
+      wriDot1agCfmLtrNextEgressIdentifier OCTET STRING,
+      wriDot1agCfmLtrRelay            WriDot1agCfmRelayActionFieldValue,
+      wriDot1agCfmLtrChassisIdSubtype     LldpChassisIdSubtype,
+      wriDot1agCfmLtrChassisId            LldpChassisId,
+      wriDot1agCfmLtrManAddressDomain     TDomain,
+      wriDot1agCfmLtrManAddress           TAddress,
+      wriDot1agCfmLtrIngress          WriDot1agCfmIngressActionFieldValue,
+      wriDot1agCfmLtrIngressMac           MacAddress,
+      wriDot1agCfmLtrIngressPortIdSubtype LldpPortIdSubtype,
+      wriDot1agCfmLtrIngressPortId        LldpPortId,
+      wriDot1agCfmLtrEgress           WriDot1agCfmEgressActionFieldValue,
+      wriDot1agCfmLtrEgressMac            MacAddress,
+      wriDot1agCfmLtrEgressPortIdSubtype  LldpPortIdSubtype,
+      wriDot1agCfmLtrEgressPortId         LldpPortId,
+      wriDot1agCfmLtrOrganizationSpecificTlv  OCTET STRING
+    }
+
+wriDot1agCfmLtrSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Transaction identifier/Sequence number returned by a previous
+        transmit linktrace message command, indicating which LTM's
+        response is going to be returned.
+       "
+    REFERENCE
+       "12.14.7.5.2:b"
+    ::= { wriDot1agCfmLtrEntry 1}
+
+wriDot1agCfmLtrReceiveOrder OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An index to distinguish among multiple LTRs with the same LTR
+        Transaction Identifier field value.  wriDot1agCfmLtrReceiveOrder
+        are assigned sequentially from 1, in the order that the
+        Linktrace Initiator received the LTRs.
+       "
+    REFERENCE
+       "12.14.7.5.2:c"
+    ::= { wriDot1agCfmLtrEntry 2 }
+
+wriDot1agCfmLtrTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "TTL field value for a returned LTR."
+    REFERENCE
+       "12.14.7.5 and 20.36.2.2"
+    ::= { wriDot1agCfmLtrEntry 3 }
+
+wriDot1agCfmLtrForwarded OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates if a LTM was forwarded by the responding MP, as
+        returned in the 'FwdYes' flag of the flags field.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:c and 20.36.2.1"
+    ::= { wriDot1agCfmLtrEntry 4 }
+
+wriDot1agCfmLtrTerminalMep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A boolean value stating whether the forwarded LTM reached a
+        MEP enclosing its MA, as returned in the Terminal MEP flag of
+        the Flags field.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:d and 20.36.2.1"
+    ::= { wriDot1agCfmLtrEntry 5 }
+
+wriDot1agCfmLtrLastEgressIdentifier OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "An octet field holding the Last Egress Identifier returned
+        in the LTR Egress Identifier TLV of the LTR.
+        The Last Egress Identifier identifies the MEP Linktrace 
+        Initiator that originated, or the Linktrace Responder that 
+        forwarded, the LTM to which this LTR is the response.  This
+        is the same value as the Egress Identifier TLV of that LTM.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:e and 20.36.2.3"
+    ::= { wriDot1agCfmLtrEntry 6 }
+
+wriDot1agCfmLtrNextEgressIdentifier OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "An octet field holding the Next Egress Identifier returned
+        in the LTR Egress Identifier TLV of the LTR.  The Next Egress
+        Identifier Identifies the Linktrace Responder that
+        transmitted this LTR, and can forward the LTM to the next
+        hop.  This is the same value as the Egress Identifier TLV of
+        the forwarded LTM, if any. If the FwdYes bit of the Flags
+        field is false, the contents of this field are undefined,
+        i.e., any value can be transmitted, and the field is ignored
+        by the receiver.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:f and 20.36.2.4"
+    ::= { wriDot1agCfmLtrEntry 7 }
+
+wriDot1agCfmLtrRelay OBJECT-TYPE
+    SYNTAX      WriDot1agCfmRelayActionFieldValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Value returned in the Relay Action field."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:g and 20.36.2.5"
+    ::= { wriDot1agCfmLtrEntry 8 }
+
+wriDot1agCfmLtrChassisIdSubtype OBJECT-TYPE
+    SYNTAX      LldpChassisIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the format of the Chassis ID returned
+        in the Sender ID TLV of the LTR, if any.  This value is
+        meaningless if the wriDot1agCfmLtrChassisId has a length of 0."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:h and 21.5.3.2"
+    ::= { wriDot1agCfmLtrEntry 9 }
+
+wriDot1agCfmLtrChassisId OBJECT-TYPE
+    SYNTAX      LldpChassisId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Chassis ID returned in the Sender ID TLV of the LTR, if
+        any. The format of this object is determined by the
+        value of the wriDot1agCfmLtrChassisIdSubtype object.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:i and 21.5.3.3"
+    ::= { wriDot1agCfmLtrEntry 10 }
+
+wriDot1agCfmLtrManAddressDomain OBJECT-TYPE
+    SYNTAX      TDomain
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The TDomain that identifies the type and format of
+        the related wriDot1agCfmMepDbManAddress object, used to access
+        the SNMP agent of the system transmitting the LTR.  Received
+        in the LTR Sender ID TLV from that system.
+
+        Typical values will be one of (not all inclusive) list:
+
+
+           snmpUDPDomain          (from SNMPv2-TM, RFC3417)
+           snmpIeee802Domain      (from SNMP-IEEE802-TM-MIB, RFC4789)
+
+        The value 'zeroDotZero' (from RFC2578) indicates 'no management
+        address was present in the LTR', in which case the related
+        object wriDot1agCfmMepDbManAddress MUST have a zero-length OCTET
+        STRING as a value.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:j, 21.5.3.5, 21.9.6"
+    ::= { wriDot1agCfmLtrEntry 11 }
+
+wriDot1agCfmLtrManAddress OBJECT-TYPE
+    SYNTAX      TAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The TAddress that can be used to access the SNMP
+        agent of the system transmitting the CCM, received in the CCM
+        Sender ID TLV from that system.
+
+        If the related object wriDot1agCfmLtrManAddressDomain contains
+        the value 'zeroDotZero', this object wriDot1agCfmLtrManAddress
+        MUST have a zero-length OCTET STRING as a value.
+      "
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:j, 21.5.3.7, 21.9.6"
+    ::= { wriDot1agCfmLtrEntry 12 }
+
+wriDot1agCfmLtrIngress OBJECT-TYPE
+    SYNTAX      WriDot1agCfmIngressActionFieldValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value returned in the Ingress Action Field of the LTM.
+        The value ingNoTlv(0) indicates that no Reply Ingress TLV was
+        returned in the LTM."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:k and 20.36.2.6"
+    ::= { wriDot1agCfmLtrEntry 13 }
+
+wriDot1agCfmLtrIngressMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "MAC address returned in the ingress MAC address field.
+        If the wriDot1agCfmLtrIngress object contains the value
+        ingNoTlv(0), then the contents of this object are meaningless."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:l and 20.36.2.7"
+    ::= { wriDot1agCfmLtrEntry 14 }
+
+wriDot1agCfmLtrIngressPortIdSubtype OBJECT-TYPE
+    SYNTAX      LldpPortIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Format of the Ingress Port ID.
+        If the wriDot1agCfmLtrIngress object contains the value
+        ingNoTlv(0), then the contents of this object are meaningless."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:m and 20.36.2.8"
+   ::= { wriDot1agCfmLtrEntry 15 }
+
+wriDot1agCfmLtrIngressPortId OBJECT-TYPE
+    SYNTAX      LldpPortId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Ingress Port ID. The format of this object is determined by
+        the value of the wriDot1agCfmLtrIngressPortIdSubtype object.
+        If the wriDot1agCfmLtrIngress object contains the value
+        ingNoTlv(0), then the contents of this object are meaningless."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:n and 20.36.2.9"
+    ::= { wriDot1agCfmLtrEntry 16 }
+
+wriDot1agCfmLtrEgress OBJECT-TYPE
+    SYNTAX      WriDot1agCfmEgressActionFieldValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value returned in the Egress Action Field of the LTM.
+        The value egrNoTlv(0) indicates that no Reply Egress TLV was
+        returned in the LTM."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:o and 20.36.2.10"
+    ::= { wriDot1agCfmLtrEntry 17 }
+
+wriDot1agCfmLtrEgressMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "MAC address returned in the egress MAC address field.
+        If the wriDot1agCfmLtrEgress object contains the value
+        egrNoTlv(0), then the contents of this object are meaningless."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:p and 20.36.2.11"
+    ::= { wriDot1agCfmLtrEntry 18 }
+
+wriDot1agCfmLtrEgressPortIdSubtype OBJECT-TYPE
+    SYNTAX      LldpPortIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Format of the egress Port ID.
+        If the wriDot1agCfmLtrEgress object contains the value
+        egrNoTlv(0), then the contents of this object are meaningless."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:q and 20.36.2.12"
+    ::= { wriDot1agCfmLtrEntry 19 }
+
+wriDot1agCfmLtrEgressPortId OBJECT-TYPE
+    SYNTAX      LldpPortId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Egress Port ID. The format of this object is determined by
+        the value of the wriDot1agCfmLtrEgressPortIdSubtype object.
+        If the wriDot1agCfmLtrEgress object contains the value
+        egrNoTlv(0), then the contents of this object are meaningless."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:r and 20.36.2.13"
+    ::= { wriDot1agCfmLtrEntry 20 }
+
+wriDot1agCfmLtrOrganizationSpecificTlv OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0|4..1500))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "All Organization specific TLVs returned in the LTR, if
+        any.  Includes all octets including and following the TLV
+        Length field of each TLV, concatenated together."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:s, 21.5.2"
+    ::= { wriDot1agCfmLtrEntry 21 }
+
+-- ******************************************************************
+-- The MEP Database Table
+-- ******************************************************************
+
+wriDot1agCfmMepDbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WriDot1agCfmMepDbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MEP Database. A database, maintained by every MEP, that
+        maintains received information about other MEPs in the
+        Maintenance Domain.
+
+        The SMI does not allow to state in a MIB that an object in
+        a table is an array. The solution is to take the index (or
+        indices) of the first table and add one or more indices.
+       "
+    REFERENCE
+       "19.2.15"
+    ::= { wriDot1agCfmMep 3 }
+
+wriDot1agCfmMepDbEntry OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepDbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The MEP Database table entry."
+    INDEX { wriDot1agCfmMdIndex,
+            wriDot1agCfmMaIndex,
+            wriDot1agCfmMepIdentifier,
+            wriDot1agCfmMepDbRMepIdentifier
+          }
+    ::= { wriDot1agCfmMepDbTable 1 }
+
+WriDot1agCfmMepDbEntry ::= SEQUENCE {
+      wriDot1agCfmMepDbRMepIdentifier         WriDot1agCfmMepId,
+      wriDot1agCfmMepDbRMepState              WriDot1agCfmRemoteMepState,
+      wriDot1agCfmMepDbRMepFailedOkTime       TimeStamp,
+      wriDot1agCfmMepDbMacAddress             MacAddress,
+      wriDot1agCfmMepDbRdi                    TruthValue,
+      wriDot1agCfmMepDbPortStatusTlv          WriDot1agCfmPortStatus,
+      wriDot1agCfmMepDbInterfaceStatusTlv     WriDot1agCfmInterfaceStatus,
+      wriDot1agCfmMepDbChassisIdSubtype       LldpChassisIdSubtype,
+      wriDot1agCfmMepDbChassisId              LldpChassisId,
+      wriDot1agCfmMepDbManAddressDomain       TDomain,
+      wriDot1agCfmMepDbManAddress             TAddress,
+      wriDot1agCfmMepDbOrgSpeValue            OCTET STRING, 
+      wriDot1agCfmMepDbOrgSpeOui              OCTET STRING,
+      wriDot1agCfmMepDbOrgSpeSubtype          INTEGER,
+      wriDot1agCfmMepDbCcHwRxEnable           INTEGER,  
+      wriDot1agCfmMepDbUncastCcHwRxEnable     INTEGER,
+      wriDot1agCfmMepDbStorageType            INTEGER  
+    }
+
+wriDot1agCfmMepDbRMepIdentifier OBJECT-TYPE
+    SYNTAX      WriDot1agCfmMepId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Maintenance association End Point Identifier of a remote MEP
+        whose information from the MEP Database is to be returned.
+       "
+    REFERENCE
+       "12.14.7.6.2:b"
+    ::= { wriDot1agCfmMepDbEntry 1 }
+
+wriDot1agCfmMepDbRMepState OBJECT-TYPE
+    SYNTAX      WriDot1agCfmRemoteMepState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The operational state of the remote MEP IFF State machines."
+    REFERENCE
+       "12.14.7.6.3:b and 20.22"
+    ::= { wriDot1agCfmMepDbEntry 2}
+
+wriDot1agCfmMepDbRMepFailedOkTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time (SysUpTime) at which the IFF Remote MEP state machine
+        last entered either the RMEP_FAILED or RMEP_OK state.
+       "
+    REFERENCE
+       "12.14.7.6.3:c"
+    ::= { wriDot1agCfmMepDbEntry 3 }
+
+wriDot1agCfmMepDbMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The MAC address of the remote MEP."
+    REFERENCE
+       "12.14.7.6.3:d and 20.19.7"
+    ::= { wriDot1agCfmMepDbEntry 4 }
+
+wriDot1agCfmMepDbRdi OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "State of the RDI bit in the last received CCM (true for
+        RDI=1), or false if none has been received.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:e and 20.19.2"
+    ::= { wriDot1agCfmMepDbEntry 5 }
+
+wriDot1agCfmMepDbPortStatusTlv OBJECT-TYPE
+    SYNTAX      WriDot1agCfmPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value of the Port status TLV received in the
+        last CCM from the remote MEP or the default value
+        psNoPortStateTLV indicating either no CCM has been received,
+        or that nor port status TLV was received in the last CCM.
+       "
+    REFERENCE
+       "12.14.7.6.3:f and 20.19.3"
+    DEFVAL { psNoPortStateTLV }
+    ::= { wriDot1agCfmMepDbEntry 6}
+   
+wriDot1agCfmMepDbInterfaceStatusTlv OBJECT-TYPE
+    SYNTAX      WriDot1agCfmInterfaceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value of the Interface status TLV received
+        in the last CCM from the remote MEP or the default value
+        isNoInterfaceStatus TLV indicating either no CCM has been
+        received, or that no interface status TLV was received in
+        the last CCM.
+       "
+    REFERENCE
+       "12.14.7.6.3:g and 20.19.4"
+    DEFVAL { isNoInterfaceStatusTLV }
+    ::= { wriDot1agCfmMepDbEntry 7}
+
+wriDot1agCfmMepDbChassisIdSubtype OBJECT-TYPE
+    SYNTAX      LldpChassisIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the format of the Chassis ID received
+        in the last CCM."
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:h and 21.5.3.2"
+    ::= { wriDot1agCfmMepDbEntry 8 }
+
+wriDot1agCfmMepDbChassisId OBJECT-TYPE
+    SYNTAX      LldpChassisId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Chassis ID. The format of this object is determined by the
+        value of the wriDot1agCfmLtrChassisIdSubtype object.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:h and 21.5.3.3"
+    ::= { wriDot1agCfmMepDbEntry 9 }
+
+wriDot1agCfmMepDbManAddressDomain OBJECT-TYPE
+    SYNTAX      TDomain
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The TDomain that identifies the type and format of
+        the related wriDot1agCfmMepDbManAddress object, used to access
+        the SNMP agent of the system transmitting the CCM.  Received
+        in the CCM Sender ID TLV from that system.
+
+        Typical values will be one of (not all inclusive) list:
+
+
+           snmpUDPDomain          (from SNMPv2-TM, RFC3417)
+           snmpIeee802Domain      (from SNMP-IEEE802-TM-MIB, RFC4789)
+
+        The value 'zeroDotZero' (from RFC2578) indicates 'no management
+        address was present in the LTR', in which case the related
+        object wriDot1agCfmMepDbManAddress MUST have a zero-length OCTET
+        STRING as a value.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:h, 21.5.3.5, 21.6.7"
+    ::= { wriDot1agCfmMepDbEntry 10 }
+
+wriDot1agCfmMepDbManAddress OBJECT-TYPE
+    SYNTAX      TAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The TAddress that can be used to access the SNMP
+        agent of the system transmitting the CCM, received in the CCM
+        Sender ID TLV from that system.
+
+        If the related object wriDot1agCfmMepDbManAddressDomain contains
+        the value 'zeroDotZero', this object wriDot1agCfmMepDbManAddress
+        MUST have a zero-length OCTET STRING as a value.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:h, 21.5.3.7, 21.6.7"
+    ::= { wriDot1agCfmMepDbEntry 11 }     
+    
+    wriDot1agCfmMepDbOrgSpeValue  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+      ::= { wriDot1agCfmMepDbEntry 12 }  
+         
+   wriDot1agCfmMepDbOrgSpeOui    OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+      ::= { wriDot1agCfmMepDbEntry 13 }     
+      
+   wriDot1agCfmMepDbOrgSpeSubtype   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+      ::= { wriDot1agCfmMepDbEntry 14 } 
+      
+  wriDot1agCfmMepDbCcHwRxEnable       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+      ::= { wriDot1agCfmMepDbEntry 15 }  
+      
+ wriDot1agCfmMepDbUncastCcHwRxEnable   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+      ::= { wriDot1agCfmMepDbEntry 16 }     
+      
+      
+  wriDot1agCfmMepDbStorageType  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       " "
+      ::= { wriDot1agCfmMepDbEntry 17 }    
+  
+ --  Dot1ag Cfm Rmep Table
+wriDot1agCfmRmepTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF WriDot1agCfmRmepEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch cfm test information."
+		::= { wriDot1agCfmMep 4 }
+	
+	wriDot1agCfmRmepEntry OBJECT-TYPE
+		SYNTAX  WriDot1agCfmRmepEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {wriDot1agCfmMdIndex ,wriDot1agCfmMaIndex ,wriDot1agCfmRmepId}
+		::= { wriDot1agCfmRmepTable 1 }
+
+	WriDot1agCfmRmepEntry ::= SEQUENCE{
+	    wriDot1agCfmRmepId                     INTEGER,
+	    wriDot1agCfmRmepMac	                   MacAddress,
+	    wriDot1agCfmRmepState	               INTEGER,
+		wriDot1agCfmRmepOwner	               INTEGER,
+		wriDot1agCfmRmepStorageType	           INTEGER,
+		wriDot1agCfmRmepRowStatus  	           RowStatus,
+		wriDot1agCfmRmepCcHwRxEnabled          INTEGER,
+	    wriDot1agCfmRmepUnicastCcHwTxEnabled   INTEGER,
+	    wriDot1agCfmRmepMode                   INTEGER,
+	    wriDot1agCfmRmepManAddrDomain          INTEGER,
+	    wriDot1agCfmRmepFailedOkTime           INTEGER,
+        wriDot1agCfmRmepOrgSpeValue            OCTET STRING,
+        wriDot1agCfmRmepOrgSpeOui              OCTET STRING, 
+        wriDot1agCfmRmepOrgSpeSubType          INTEGER,
+        wriDot1agCfmRmepChassisId              OCTET STRING,
+        wriDot1agCfmRmepChassisIdSubType       INTEGER, 
+        wriDot1agCfmRmepManAddress             MacAddress,
+        wriDot1agCfmRmepPortStatusTlv          INTEGER,
+        wriDot1agCfmRmepInterfaceStatusTlv     INTEGER, 
+        wriDot1agCfmRmepRdi                    INTEGER
+		}
+    wriDot1agCfmRmepId    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 1}  
+      
+    wriDot1agCfmRmepMac    OBJECT-TYPE
+      SYNTAX     MacAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 2} 
+     
+     wriDot1agCfmRmepState   OBJECT-TYPE
+      SYNTAX     INTEGER{idle(1),start(2),failed(3),ok(4)}
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 3}  
+      
+     wriDot1agCfmRmepOwner   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 4}    
+      
+      
+     wriDot1agCfmRmepStorageType  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 5}  
+      
+      wriDot1agCfmRmepRowStatus  OBJECT-TYPE
+      SYNTAX     RowStatus
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 6}  
+      
+      wriDot1agCfmRmepCcHwRxEnabled  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 7}    
+      
+      wriDot1agCfmRmepUnicastCcHwTxEnabled OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 8} 
+      
+      wriDot1agCfmRmepMode           OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 9} 
+
+	  wriDot1agCfmRmepManAddrDomain   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 10}     
+      	   
+      wriDot1agCfmRmepFailedOkTime  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 11}  
+       
+      wriDot1agCfmRmepOrgSpeValue    OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 12}    
+          
+      wriDot1agCfmRmepOrgSpeOui     OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 13}   
+      
+      wriDot1agCfmRmepOrgSpeSubType    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 14}  
+         
+      wriDot1agCfmRmepChassisId     OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 15} 
+          
+      wriDot1agCfmRmepChassisIdSubType  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 16}  
+         
+      wriDot1agCfmRmepManAddress     OBJECT-TYPE
+      SYNTAX     MacAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 17}  
+            
+      wriDot1agCfmRmepPortStatusTlv  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION                                 
+             ""
+      ::= { wriDot1agCfmRmepEntry 18} 
+             
+     wriDot1agCfmRmepInterfaceStatusTlv   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             ""
+      ::= { wriDot1agCfmRmepEntry 19 } 
+      
+      wriDot1agCfmRmepRdi            OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmRmepEntry 20}    
+           
+ --- Dot1ag Cfm Mep Error Db Table   
+ 
+  wriDot1agCfmMepErrorDbTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF WriDot1agCfmMepErrorDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch wriDot1agCfm mip information."
+		::= { wriDot1agCfmMep 5  }
+	
+	wriDot1agCfmMepErrorDbEntry OBJECT-TYPE
+		SYNTAX  WriDot1agCfmMepErrorDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { wriDot1agCfmMdIndex ,wriDot1agCfmMaIndex,wriDot1agCfmMepIdentifier,wriDot1agCfmRmepId}
+		::= { wriDot1agCfmMepErrorDbTable 1 }
+
+	WriDot1agCfmMepErrorDbEntry ::= SEQUENCE{
+      wriDot1agCfmMepErrorDbMac     MacAddress,
+      wriDot1agCfmMepErrorDbRmepId  INTEGER,   
+      wriDot1agCfmMepErrorDbIcc     OCTET STRING,
+      wriDot1agCfmMepErrorDbUmc     OCTET STRING,
+      wriDot1agCfmMepErrorDbErrType INTEGER,
+      wriDot1agCfmMepErrorDbLevel   INTEGER,
+      wriDot1agCfmMepErrorDbInterval   INTEGER	 
+      }
+	 wriDot1agCfmMepErrorDbMac  OBJECT-TYPE
+      SYNTAX        MacAddress 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 1  } 
+      
+      wriDot1agCfmMepErrorDbRmepId  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 2  } 
+      
+     wriDot1agCfmMepErrorDbIcc  OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 3  }
+      
+      wriDot1agCfmMepErrorDbUmc OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 4 }
+      
+    wriDot1agCfmMepErrorDbErrType  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 5 }
+      
+      wriDot1agCfmMepErrorDbLevel	OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 6 }   
+      
+      wriDot1agCfmMepErrorDbInterval  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMepErrorDbEntry 7 } 
+      
+-- dot1ag global var        
+wriDot1agCfmMepPmNumber    OBJECT-TYPE
+   SYNTAX      INTEGER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION  
+   	""
+   ::= { wriDot1agCfmGenParam 1 }
+ 
+wriDot1agCfmFpgaIfNum	   OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm fpga interface number."
+     ::= { wriDot1agCfmGenParam 2 }   
+    
+wriDot1agCfmFpgaCcIfTxNum	   OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm fpga CC interface send number."
+     ::= { wriDot1agCfmGenParam 3 }  
+
+wriDot1agCfmFpgaCcIfRxNum	   OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm fpga CC interface receive number."
+     ::= { wriDot1agCfmGenParam 4 } 
+     
+wriDot1agCfmIfMaxNum	   OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm interface max number."
+     ::= { wriDot1agCfmGenParam 5 } 
+ 
+wriDot1agCfmIfUsedCnt	   OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm interface used count."
+     ::= { wriDot1agCfmGenParam 6 }  
+     
+wriDot1agCfmMipDbMaxNum  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm  mip Db max number."
+     ::= { wriDot1agCfmGenParam 7 }  
+     
+wriDot1agCfmMipDbUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm ip db used count."
+     ::= { wriDot1agCfmGenParam 8 }  
+     
+wriDot1agCfmMipMaxNum  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mip max number."
+     ::= { wriDot1agCfmGenParam 9 }
+       
+wriDot1agCfmMipUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mip used count."
+     ::= { wriDot1agCfmGenParam 10 }     
+     
+wriDot1agCfmLtrMaxNum  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm Ltr max number."
+     ::= { wriDot1agCfmGenParam 11 }  
+   
+wriDot1agCfmLtrUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm Ltr used  count."
+     ::= { wriDot1agCfmGenParam 12 }
+   
+wriDot1agCfmMepDbMaxNum  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mep Db max number."
+     ::= { wriDot1agCfmGenParam 13 }
+   
+wriDot1agCfmMepDbUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mep Db used count."
+     ::= { wriDot1agCfmGenParam 14 }
+   
+wriDot1agCfmMepErrDbMaxNum  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mep error Db max number."
+     ::= { wriDot1agCfmGenParam 15 }
+   
+wriDot1agCfmMepErrDbUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mep error Db used count."
+     ::= { wriDot1agCfmGenParam 16 }
+    
+ wriDot1agCfmMepMaxCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mep max count."
+     ::= { wriDot1agCfmGenParam 17 }   
+     
+wriDot1agCfmMepUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm mep used count."
+     ::= { wriDot1agCfmGenParam 18 }
+
+
+wriDot1agCfmMaMaxCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm ma max count."
+     ::= { wriDot1agCfmGenParam 19 }
+
+wriDot1agCfmMaUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm ma used count."
+     ::= { wriDot1agCfmGenParam 20}
+
+wriDot1agCfmMdMaxCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm ma max count."
+     ::= { wriDot1agCfmGenParam 21 }
+
+wriDot1agCfmMdUsedCnt  OBJECT-TYPE
+     SYNTAX INTEGER 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "wriDot1agCfm ma used count."
+     ::= { wriDot1agCfmGenParam 22}
+      
+wriDot1agCfmGenParamMipCcDbAge  OBJECT-TYPE
+      SYNTAX INTEGER(1..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm mip Db aging time."
+      ::= { wriDot1agCfmGenParam 23 } 
+    
+wriDot1agCfmGenParamMepCcDbAge  OBJECT-TYPE
+      SYNTAX INTEGER(1..65535) 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm mep Db aging time."
+      ::= { wriDot1agCfmGenParam 24 }
+    
+wriDot1agCfmGenParamMepLtrAge  OBJECT-TYPE
+      SYNTAX INTEGER(1..65535) 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm mep Ltr aging time."
+      ::= { wriDot1agCfmGenParam 25 }
+    
+wriDot1agCfmGenParamCrossCheckTime  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm time cross check."
+      ::= { wriDot1agCfmGenParam 26 } 
+          
+ wriDot1agCfmGenParamManAddrDomainUdp  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmGenParam 27 }
+    
+wriDot1agCfmGenParamManAddrDomainIeee802  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmGenParam 28 }
+    
+     wriDot1agCfmGenParamDeviceName  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "device name"
+      ::= { wriDot1agCfmGenParam 29 }
+    
+    
+     wriDot1agCfmGenParamSnmpTrap  OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "snmp trap£¬value 0xffffffff is enable,0 is disable"
+      ::= { wriDot1agCfmGenParam 30 }
+    
+     wriDot1agCfmGenParamRsvProtoVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm reserve protocol version"
+      ::= { wriDot1agCfmGenParam 31 }
+    
+    wriDot1agCfmGenParamProtoVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm protocol version"
+      ::= { wriDot1agCfmGenParam 32 }
+    
+    wriDot1agCfmGenParamDeviceVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm  device version"
+      ::= { wriDot1agCfmGenParam 33 }
+    
+     
+    wriDot1agCfmGenParamSoftPmVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm  soft pm version"
+      ::= { wriDot1agCfmGenParam 34 }
+    
+    wriDot1agCfmGenParamSpeVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm  spe version"
+      ::= { wriDot1agCfmGenParam 35 }
+      
+    wriDot1agCfmOrgOui  OBJECT-TYPE
+      SYNTAX OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "wriDot1agCfm organization oui"
+      ::= { wriDot1agCfmGenParam 36 }   
+      
+    wriDot1agCfmAutoCfgMipAddVlanlist OBJECT-TYPE
+      SYNTAX OCTET STRING 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 37 }   
+      
+   wriDot1agCfmAutoCfgMipDelVlanlist  OBJECT-TYPE
+      SYNTAX OCTET STRING 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 38 }     
+    
+   wriDot1agCfmAutoCfgMipLevel  OBJECT-TYPE
+      SYNTAX    INTEGER(0..7)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 39 }
+    
+    wriDot1agCpuTimeThreshold  OBJECT-TYPE
+      SYNTAX    INTEGER
+       MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 40 }  
+      
+    wriDot1agCpuUtilizationThreshold  OBJECT-TYPE
+      SYNTAX    INTEGER
+       MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 41 }    
+      
+     wriDot1agCpuTimeBombThreshold  OBJECT-TYPE
+      SYNTAX    INTEGER
+       MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 42 }  
+    
+    wriDot1agRmepMaxNum  OBJECT-TYPE
+      SYNTAX    INTEGER
+       MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 43 }   
+      
+    wriDot1agRmepUsedNum  OBJECT-TYPE
+      SYNTAX    INTEGER
+       MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 44 }
+      
+    wriDot1agMdValidateName  OBJECT-TYPE
+      SYNTAX    OCTET STRING
+       MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 45 }     
+      
+    wriDot1agGenState  OBJECT-TYPE
+      SYNTAX    INTEGER
+       MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmGenParam 46 }     
+         
+-- Dot1ag Cfm Interface Table
+wriDot1agCfmInterfaceTable   OBJECT-TYPE
+		SYNTAX  SEQUENCE OF WriDot1agCfmInterfaceEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch CFM interface information."
+		::= { wriDot1agCfmInterface 1 }
+	
+wriDot1agCfmInterfaceEntry OBJECT-TYPE
+		SYNTAX  WriDot1agCfmInterfaceEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { wriDot1agCfmIfIndex}
+		::= { wriDot1agCfmInterfaceTable 1 }
+  
+WriDot1agCfmInterfaceEntry ::= SEQUENCE{ 
+		wriDot1agCfmIfIndex              INTEGER,
+		wriDot1agCfmIfCcmTxCnt			 Counter32,
+		wriDot1agCfmIfCcmRxCnt		   	 Counter32,
+		wriDot1agCfmIfLbrTxCnt  	     Counter32,
+		wriDot1agCfmIfLbrRxCnt			 Counter32,
+		wriDot1agCfmIfLbmTxCnt           Counter32,
+		wriDot1agCfmIfLbmRxCnt           Counter32,
+		wriDot1agCfmIfLtrTxCnt           Counter32,
+		wriDot1agCfmIfLtrRxCnt           Counter32,
+		wriDot1agCfmIfLtmTxCnt           Counter32,
+		wriDot1agCfmIfLtmRxCnt           Counter32,
+		wriDot1agCfmIfAisTxCnt           Counter32,
+		wriDot1agCfmIfAisRxCnt           Counter32,
+		wriDot1agCfmIfLckTxCnt           Counter32,
+		wriDot1agCfmIfLckRxCnt           Counter32,   
+			
+		wriDot1agCfmIfFwdPduCnt          Counter32, 
+		wriDot1agCfmIfFailInPduCnt       Counter32, 
+		wriDot1agCfmIfFailOutPduCnt      Counter32,
+		wriDot1agCfmIfMacPingReqTxCnt    Counter32, 
+		wriDot1agCfmIfMacPingReqRxCnt    Counter32,
+        wriDot1agCfmIfMacPingReplyTxCnt  Counter32, 
+        wriDot1agCfmIfMacPingReplyRxCnt  Counter32, 
+        wriDot1agCfmIfMacTraceReqTxCnt   Counter32, 
+		wriDot1agCfmIfMacTraceReqRxCnt   Counter32,
+        wriDot1agCfmIfMacTraceReplyTxCnt Counter32, 
+        wriDot1agCfmIfMacTraceReplyRxCnt Counter32, 
+        wriDot1agCfmIfMepCnt             INTEGER, 
+        wriDot1agCfmIfMipCnt             INTEGER,    
+        wriDot1agCfmIfEfpsdState   INTEGER,
+        wriDot1agCfmIfLbRcvMode    INTEGER, 
+        wriDot1agCfmIfLtRcvMode    INTEGER,
+        wriDot1agCfmIfResetCnt     INTEGER
+		} 
+		
+ wriDot1agCfmIfIndex	   OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              "wriDot1agCfm interface index."
+      ::= { wriDot1agCfmInterfaceEntry 1 }
+
+wriDot1agCfmIfCcmTxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 2 }  
+      
+wriDot1agCfmIfCcmRxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 3}    
+      
+wriDot1agCfmIfLbrTxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 4}  
+  
+wriDot1agCfmIfLbrRxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 5}   
+                                                                     
+wriDot1agCfmIfLbmTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 6}              
+      
+wriDot1agCfmIfLbmRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 7}  
+      
+     wriDot1agCfmIfLtrTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 8} 
+      
+wriDot1agCfmIfLtrRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 9} 
+             
+wriDot1agCfmIfLtmTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 10} 
+       
+wriDot1agCfmIfLtmRxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 11} 
+          
+wriDot1agCfmIfAisTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 12} 
+             
+wriDot1agCfmIfAisRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 13} 
+             
+       
+wriDot1agCfmIfLckTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 14} 
+             
+       
+wriDot1agCfmIfLckRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 15} 
+                         
+wriDot1agCfmIfFwdPduCnt    OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 16} 
+             
+      
+wriDot1agCfmIfFailInPduCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 17} 
+             
+      
+wriDot1agCfmIfFailOutPduCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 18} 
+             
+     
+wriDot1agCfmIfMacPingReqTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 19} 
+             
+  
+wriDot1agCfmIfMacPingReqRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 20} 
+             
+  
+wriDot1agCfmIfMacPingReplyTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 21} 
+             
+   
+wriDot1agCfmIfMacPingReplyRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 22} 
+             
+wriDot1agCfmIfMacTraceReqTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 23} 
+             
+wriDot1agCfmIfMacTraceReqRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 24} 
+             
+  
+wriDot1agCfmIfMacTraceReplyTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 25} 
+             
+   
+wriDot1agCfmIfMacTraceReplyRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 26} 
+                          
+wriDot1agCfmIfMepCnt   OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 27} 
+             
+ 
+wriDot1agCfmIfMipCnt   OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 28} 
+             
+ 
+wriDot1agCfmIfEfpsdState OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 29} 
+             
+   
+wriDot1agCfmIfLbRcvMode  OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 30} 
+             
+  
+wriDot1agCfmIfLtRcvMode OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 31} 
+      
+wriDot1agCfmIfResetCnt OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { wriDot1agCfmInterfaceEntry 32}              
+ 
+ 
+-- Dot1ag Cfm Mip Table  
+
+wriDot1agCfmMipTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF WriDot1agCfmMipEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch dot1ag Cfm mip information."
+		::= { wriDot1agCfmMip 1  }
+	
+	wriDot1agCfmMipEntry OBJECT-TYPE
+		SYNTAX  WriDot1agCfmMipEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { wriDot1agCfmMipIfIndex ,wriDot1agCfmMipLevel,wriDot1agCfmMipVlan}
+		::= { wriDot1agCfmMipTable 1 }
+
+	WriDot1agCfmMipEntry ::= SEQUENCE{
+      wriDot1agCfmMipIfIndex        INTEGER,
+      wriDot1agCfmMipLevel          INTEGER,   
+      wriDot1agCfmMipVlan           INTEGER,
+      wriDot1agCfmMipMac            MacAddress,
+      wriDot1agCfmMipFid            INTEGER,
+      wriDot1agCfmMipRowStatus      RowStatus,
+      wriDot1agCfmMipCcTxStatis     Counter32,
+      wriDot1agCfmMipCcRxStatis     Counter32
+      }      
+      
+      
+	 wriDot1agCfmMipIfIndex  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 1  } 
+      
+      wriDot1agCfmMipLevel  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 2  } 
+      
+     wriDot1agCfmMipVlan  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 3  }
+      
+      wriDot1agCfmMipMac OBJECT-TYPE
+      SYNTAX        MacAddress 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 4 }
+      
+    wriDot1agCfmMipFid  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 5 }
+     
+     wriDot1agCfmMipRowStatus  OBJECT-TYPE
+      SYNTAX        RowStatus 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 6 } 
+    
+    wriDot1agCfmMipCcTxStatis  OBJECT-TYPE
+      SYNTAX        Counter32 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 7 }      
+     
+     wriDot1agCfmMipCcRxStatis  OBJECT-TYPE
+      SYNTAX        Counter32 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipEntry 8 }                 
+      
+--   
+ wriDot1agCfmMipDbTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF WriDot1agCfmMipDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch dot1ag Cfm mipDb information."
+		::= { wriDot1agCfmMip 2  }
+	
+	wriDot1agCfmMipDbEntry OBJECT-TYPE
+		SYNTAX  WriDot1agCfmMipDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { wriDot1agCfmMipIfIndex ,wriDot1agCfmMipLevel,wriDot1agCfmMipVlan,wriDot1agCfmMipDbRmepId}
+		::= { wriDot1agCfmMipDbTable 1 }
+
+	WriDot1agCfmMipDbEntry ::= SEQUENCE{
+      wriDot1agCfmMipDbRmepId        INTEGER,
+      wriDot1agCfmMipDbAge           INTEGER,   
+      wriDot1agCfmMipDbRdi           INTEGER,
+      wriDot1agCfmMipDbMac           MacAddress,
+      wriDot1agCfmMipDbFwdStatus     INTEGER,
+      wriDot1agCfmMipDbOperStatus    INTEGER  }      
+      
+      
+	 wriDot1agCfmMipDbRmepId  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipDbEntry 1  } 
+      
+      wriDot1agCfmMipDbAge  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipDbEntry 2  } 
+      
+     wriDot1agCfmMipDbRdi  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipDbEntry 3  }
+      
+      wriDot1agCfmMipDbMac OBJECT-TYPE
+      SYNTAX        MacAddress 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipDbEntry 4 }
+      
+    wriDot1agCfmMipDbFwdStatus  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipDbEntry 5 }
+     
+     wriDot1agCfmMipDbOperStatus  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { wriDot1agCfmMipDbEntry 6 }  
+
+   
+     
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- whenever a MEP loses/restores contact with one or more other MEPs.
+-- ******************************************************************
+
+    -- 1.3.6.1.4.1.3807.2.303.0.1
+		wriDot1agCfmCcLoop NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmMepErrorDbMac}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 1 }        
+
+		-- 1.3.6.1.4.1.3807.2.303.0.2
+		wriDot1agCfmCcUnexpectedLevel NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier,
+			          wriDot1agCfmRmepId,			  
+			          wriDot1agCfmMepErrorDbLevel}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 2 }        
+
+		-- 1.3.6.1.4.1.3807.2.303.0.3
+		wriDot1agCfmCcCrossConnect NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMdName,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMaNetName}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 3 }        
+
+		-- 1.3.6.1.4.1.3807.2.303.0.4
+		wriDot1agCfmCcRmepUnknown NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmMepErrorDbRmepId}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 4 }        
+
+		-- 1.3.6.1.4.1.3807.2.303.0.5
+		wriDot1agCfmCcUnexpectedPrd NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier,
+			          wriDot1agCfmRmepId,			        
+			          wriDot1agCfmMepErrorDbInterval}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 5 } 
+			
+		-- 1.3.6.1.4.1.3807.2.303.0.6
+		wriDot1agCfmCcRdi NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmRmepMac,
+			          wriDot1agCfmRmepState,
+			          wriDot1agCfmRmepOwner,
+			          wriDot1agCfmRmepStorageType,
+			          wriDot1agCfmRmepRowStatus,
+			          wriDot1agCfmRmepCcHwRxEnabled,
+			          wriDot1agCfmRmepUnicastCcHwTxEnabled}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 6 } 
+			
+		-- 1.3.6.1.4.1.3807.2.303.0.7
+		wriDot1agCfmCcLinkUp NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmRmepMac,
+			          wriDot1agCfmRmepState,
+			          wriDot1agCfmRmepOwner,
+			          wriDot1agCfmRmepStorageType,
+			          wriDot1agCfmRmepRowStatus,
+			          wriDot1agCfmRmepCcHwRxEnabled,
+			          wriDot1agCfmRmepUnicastCcHwTxEnabled}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 7 } 	
+  
+    -- 1.3.6.1.4.1.3807.2.303.0.8
+		wriDot1agCfmCcLinkDown NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmRmepMac,
+			          wriDot1agCfmRmepState,
+			          wriDot1agCfmRmepOwner,
+			          wriDot1agCfmRmepStorageType,
+			          wriDot1agCfmRmepRowStatus,
+			          wriDot1agCfmRmepCcHwRxEnabled,
+			          wriDot1agCfmRmepUnicastCcHwTxEnabled}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 8 } 
+			
+		-- 1.3.6.1.4.1.3807.2.303.0.9
+		wriDot1agCfmCcRmepMissing NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmRmepMac,
+			          wriDot1agCfmRmepState,
+			          wriDot1agCfmRmepOwner,
+			          wriDot1agCfmRmepStorageType,
+			          wriDot1agCfmRmepRowStatus,
+			          wriDot1agCfmRmepCcHwRxEnabled,
+			          wriDot1agCfmRmepUnicastCcHwTxEnabled}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 9 }
+
+    -- 1.3.6.1.4.1.3807.2.303.0.10
+		wriDot1agCfmCcMacStatusDefect NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmRmepMac,
+			          wriDot1agCfmRmepState,
+			          wriDot1agCfmRmepOwner,
+			          wriDot1agCfmRmepStorageType,
+			          wriDot1agCfmRmepRowStatus,
+			          wriDot1agCfmRmepCcHwRxEnabled,
+			          wriDot1agCfmRmepUnicastCcHwTxEnabled}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 10 } 	
+			
+	-- 1.3.6.1.4.1.3807.2.303.0.10
+		wriDot1agCfmCcServiceStatusDefect NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmRmepId,
+			          wriDot1agCfmRmepMac,
+			          wriDot1agCfmRmepState,
+			          wriDot1agCfmRmepOwner,
+			          wriDot1agCfmRmepStorageType,
+			          wriDot1agCfmRmepRowStatus,
+			          wriDot1agCfmRmepCcHwRxEnabled,
+			          wriDot1agCfmRmepUnicastCcHwTxEnabled}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 11 } 		
+					
+		-- 1.3.6.1.4.1.3807.2.303.0.11
+		wriDot1agCfmUPingSuccess NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 12 }
+			 
+    -- 1.3.6.1.4.1.3807.2.303.0.12
+		wriDot1agCfmUPingFailed NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 13 }
+		
+		-- 1.3.6.1.4.1.3807.2.303.0.13
+		wriDot1agCfmMPingSuccess NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 14 }
+			
+	  -- 1.3.6.1.4.1.3807.2.303.0.14
+		wriDot1agCfmMPingFailed NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 15 }	
+			
+	  -- 1.3.6.1.4.1.3807.2.303.0.13
+		wriDot1agCfmTraceSuccess NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 16 }
+			
+	  -- 1.3.6.1.4.1.3807.2.303.0.14
+		wriDot1agCfmTraceFailed NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 17 }		
+			
+		-- 1.3.6.1.4.1.3807.2.303.0.15
+		wriDot1agCfmAis NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier,
+			          wriDot1agCfmMepAisDefectCondition}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 18 }		
+			
+		-- 1.3.6.1.4.1.3807.2.303.0.16
+		wriDot1agCfmLck NOTIFICATION-TYPE
+			OBJECTS { wriDot1agCfmMdIndex,
+			          wriDot1agCfmMaIndex,
+			          wriDot1agCfmMepIdentifier,
+			          wriDot1agCfmMepLckDefectCondition}
+			STATUS current
+			DESCRIPTION 
+				""
+			::= { wriDot1agNotifications 19 }		
+
+-- ******************************************************************
+-- IEEE 802.1ag MIB Module - Conformance Information
+-- ******************************************************************
+
+wriDot1agCfmCompliances OBJECT IDENTIFIER ::= { wriDot1agCfmConformance 1 }
+wriDot1agCfmGroups      OBJECT IDENTIFIER ::= { wriDot1agCfmConformance 2 }
+
+-- ******************************************************************
+-- Units of conformance
+-- ******************************************************************
+wriDot1agCfmStackGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmStackMdIndex,
+      wriDot1agCfmStackMaIndex,
+      wriDot1agCfmStackMepId,
+      wriDot1agCfmStackMacAddress
+    }
+    STATUS      deprecated
+    DESCRIPTION
+       "Objects for the Stack group."
+    ::= { wriDot1agCfmGroups 1 }
+
+wriDot1agCfmDefaultMdGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmDefaultMdDefLevel,
+      wriDot1agCfmDefaultMdDefMhfCreation,
+      wriDot1agCfmDefaultMdDefIdPermission,
+      wriDot1agCfmDefaultMdStatus,
+      wriDot1agCfmDefaultMdLevel,
+      wriDot1agCfmDefaultMdMhfCreation,
+      wriDot1agCfmDefaultMdIdPermission
+    }
+    STATUS      deprecated
+    DESCRIPTION
+       "Objects for the Default MD Level group."
+    ::= { wriDot1agCfmGroups 2 }
+
+wriDot1agCfmVlanIdGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmVlanPrimaryVid,
+      wriDot1agCfmVlanRowStatus
+   }
+    STATUS      deprecated
+    DESCRIPTION
+       "Objects for the VLAN ID group."
+    ::= { wriDot1agCfmGroups 3 }
+
+wriDot1agCfmConfigErrorListGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmConfigErrorListErrorType
+    }
+    STATUS deprecated
+    DESCRIPTION
+       "Objects for the CFM Configuration Error List Group."
+    ::= {wriDot1agCfmGroups 4 }
+
+wriDot1agCfmMdGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmMdTableNextIndex,
+      wriDot1agCfmMdName,
+      wriDot1agCfmMdFormat,
+      wriDot1agCfmMdMdLevel,
+      wriDot1agCfmMdMhfCreation,
+      wriDot1agCfmMdMhfIdPermission,
+      wriDot1agCfmMdMaNextIndex,
+      wriDot1agCfmMdRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Maintenance Domain Group."
+    ::={wriDot1agCfmGroups 5 }
+
+wriDot1agCfmMaGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmMaNetFormat,
+      wriDot1agCfmMaNetName,
+      wriDot1agCfmMaNetCcmInterval,
+      wriDot1agCfmMaNetRowStatus,
+      wriDot1agCfmMaCompPrimaryVlanId,
+      wriDot1agCfmMaCompMhfCreation,
+      wriDot1agCfmMaCompIdPermission,
+      wriDot1agCfmMaCompRowStatus,
+      wriDot1agCfmMaCompNumberOfVids,
+      wriDot1agCfmMaMepListRowStatus
+    }
+    STATUS      deprecated
+    DESCRIPTION
+       "Objects for the MA group."
+    ::= { wriDot1agCfmGroups 6 }
+
+wriDot1agCfmMepGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmMepIfIndex,
+      wriDot1agCfmMepDirection,
+      wriDot1agCfmMepPrimaryVid,
+      wriDot1agCfmMepActive,
+      wriDot1agCfmMepFngState,
+      wriDot1agCfmMepCciEnabled,
+      wriDot1agCfmMepCcmLtmPriority,
+      wriDot1agCfmMepMacAddress,
+      wriDot1agCfmMepLowPrDef,
+      wriDot1agCfmMepFngAlarmTime,
+      wriDot1agCfmMepFngResetTime,
+      wriDot1agCfmMepHighestPrDefect,
+      wriDot1agCfmMepDefects,
+      wriDot1agCfmMepErrorCcmLastFailure,
+      wriDot1agCfmMepXconCcmLastFailure,
+      wriDot1agCfmMepCcmSequenceErrors,
+      wriDot1agCfmMepCciSentCcms,
+      wriDot1agCfmMepNextLbmTransId,
+      wriDot1agCfmMepLbrIn,
+      wriDot1agCfmMepLbrInOutOfOrder,
+      wriDot1agCfmMepLbrBadMsdu,
+      wriDot1agCfmMepLtmNextSeqNumber,
+      wriDot1agCfmMepUnexpLtrIn,
+      wriDot1agCfmMepLbrOut,
+      wriDot1agCfmMepTransmitLbmStatus,
+      wriDot1agCfmMepTransmitLbmDestMacAddress,
+      wriDot1agCfmMepTransmitLbmDestMepId,
+      wriDot1agCfmMepTransmitLbmDestIsMepId,
+      wriDot1agCfmMepTransmitLbmMessages,
+      wriDot1agCfmMepTransmitLbmDataTlv,
+      wriDot1agCfmMepTransmitLbmVlanPriority,
+      wriDot1agCfmMepTransmitLbmVlanDropEnable,
+      wriDot1agCfmMepTransmitLbmResultOK,
+      wriDot1agCfmMepTransmitLbmSeqNumber,
+      wriDot1agCfmMepTransmitLtmStatus,
+      wriDot1agCfmMepTransmitLtmFlags,
+      wriDot1agCfmMepTransmitLtmTargetMacAddress,
+      wriDot1agCfmMepTransmitLtmTargetMepId,
+      wriDot1agCfmMepTransmitLtmTargetIsMepId,
+      wriDot1agCfmMepTransmitLtmTtl,
+      wriDot1agCfmMepTransmitLtmResult,
+      wriDot1agCfmMepTransmitLtmSeqNumber,
+      wriDot1agCfmMepTransmitLtmEgressIdentifier,
+      wriDot1agCfmMepRowStatus,
+      wriDot1agCfmLtrForwarded,
+      wriDot1agCfmLtrRelay,
+      wriDot1agCfmLtrChassisIdSubtype,
+      wriDot1agCfmLtrChassisId,
+      wriDot1agCfmLtrManAddress,
+      wriDot1agCfmLtrManAddressDomain,
+      wriDot1agCfmLtrIngress,
+      wriDot1agCfmLtrIngressMac,
+      wriDot1agCfmLtrIngressPortIdSubtype,
+      wriDot1agCfmLtrIngressPortId,
+      wriDot1agCfmLtrEgress,
+      wriDot1agCfmLtrEgressMac,
+      wriDot1agCfmLtrEgressPortIdSubtype,
+      wriDot1agCfmLtrEgressPortId,
+      wriDot1agCfmLtrTerminalMep,
+      wriDot1agCfmLtrLastEgressIdentifier,
+      wriDot1agCfmLtrNextEgressIdentifier,
+      wriDot1agCfmLtrTtl,
+      wriDot1agCfmLtrOrganizationSpecificTlv
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the MEP group."
+    ::= { wriDot1agCfmGroups 7 }
+
+wriDot1agCfmMepDbGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmMepDbRMepState,
+      wriDot1agCfmMepDbRMepFailedOkTime,
+      wriDot1agCfmMepDbMacAddress,
+      wriDot1agCfmMepDbRdi,
+      wriDot1agCfmMepDbPortStatusTlv,
+      wriDot1agCfmMepDbInterfaceStatusTlv,
+      wriDot1agCfmMepDbChassisIdSubtype,
+      wriDot1agCfmMepDbChassisId,
+      wriDot1agCfmMepDbManAddressDomain,
+      wriDot1agCfmMepDbManAddress
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the MEP group."
+    ::= { wriDot1agCfmGroups 8 }
+
+wriDot1agCfmNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      wriDot1agCfmFaultAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Notifications group."
+    ::= { wriDot1agCfmGroups 9 }
+
+
+wriCfmMaNetGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmMaNetFormat,
+      wriDot1agCfmMaNetName,
+      wriDot1agCfmMaNetCcmInterval,
+      wriDot1agCfmMaNetRowStatus,
+      wriDot1agCfmMaMepListRowStatus
+
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the MA Net group."
+    ::= { wriDot1agCfmGroups 10 }
+
+wriCfmDefaultMdDefGroup OBJECT-GROUP
+    OBJECTS {
+      wriDot1agCfmDefaultMdDefLevel,
+      wriDot1agCfmDefaultMdDefMhfCreation,
+      wriDot1agCfmDefaultMdDefIdPermission
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Default MD default Level group."
+    ::= { wriDot1agCfmGroups 11 }
+
+-- ******************************************************************
+-- MIB Module Compliance statements
+-- ******************************************************************
+
+wriDot1agCfmCompliance MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+       "The compliance statement for support of the CFM MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            wriDot1agCfmStackGroup,
+            wriDot1agCfmDefaultMdGroup,
+            wriDot1agCfmConfigErrorListGroup,
+            wriDot1agCfmMdGroup,
+            wriDot1agCfmMaGroup,
+            wriDot1agCfmMepGroup,
+            wriDot1agCfmMepDbGroup,
+            wriDot1agCfmNotificationsGroup
+         }
+
+    GROUP wriDot1agCfmVlanIdGroup
+    DESCRIPTION "The VLAN ID group is optional."
+
+    OBJECT wriDot1agCfmMepLbrBadMsdu
+    MIN-ACCESS not-accessible
+    DESCRIPTION "The wriDot1agCfmMepLbrBadMsdu variable is optional.  It
+                 MUST not be present if the system cannot compare a
+                 received LBR to the corresponding LBM."
+
+    OBJECT wriDot1agCfmMdRowStatus
+--      SYNTAX       RowStatus { active(1), notInService(2) }
+--      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+--                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT wriDot1agCfmMaNetRowStatus
+--      SYNTAX       RowStatus { active(1), notInService(2) }
+--      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+--                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT wriDot1agCfmMaCompRowStatus
+--      SYNTAX       RowStatus { active(1), notInService(2) }
+--      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+--                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT wriDot1agCfmVlanRowStatus
+--      SYNTAX       RowStatus { active(1), notInService(2) }
+--      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+--                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  wriDot1agCfmMaMepListRowStatus
+--      SYNTAX       RowStatus { active(1), notInService(2) }
+--      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+--                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  wriDot1agCfmMepRowStatus
+--      SYNTAX       RowStatus { active(1), notInService(2) }
+--      WRITE-SYNTAX RowStatus { notInService(2), createAndGo(4),
+--                               destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { wriDot1agCfmCompliances 1 }
+END
+

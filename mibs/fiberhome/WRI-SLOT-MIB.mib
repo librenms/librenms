@@ -1,0 +1,948 @@
+WRI-SLOT-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,Unsigned32,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriMgmt			FROM WRI-SMI;
+	
+	
+
+	-- slot monitor
+	
+	msppSlot			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the slots of device."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Init version for slot."
+        ::=   {msppChassis 20}
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+
+	slotGeneral			OBJECT IDENTIFIER ::=   {msppSlot 1}
+	
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		                        
+	    EntryStatus ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"entry status."
+			SYNTAX INTEGER
+				{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+				}
+	
+		slotMonitorEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable slot monitor or not."
+				::= { slotGeneral 1 }
+
+		slotNumber OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Slots number"
+				::= { slotGeneral 2 }
+		
+		slotTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF SlotEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Slot information table."
+			::= { msppSlot 2 }
+
+		slotEntry OBJECT-TYPE
+			SYNTAX SlotEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the slot table."
+			INDEX {slotSysIndex,
+				   slotIndex }
+			::= { slotTable 1 }
+		
+		SlotEntry ::=
+		    SEQUENCE {
+			slotSysIndex		Integer32,
+		    slotIndex          	Integer32,
+		    slotDescr          	OCTET STRING,
+		    slotReboot			INTEGER,
+		    slotType	       	INTEGER,  
+		    slotSerial			OCTET STRING,
+		    slotHwVer        	OCTET STRING, 
+		    slotSwVer        	OCTET STRING,   
+		    slotCpldVer        	OCTET STRING,
+		    slotBiosVer        	OCTET STRING,
+		    slotIfNum			INTEGER,
+		    slotMaxIfNum		INTEGER,
+		    slotSubSlotNum		INTEGER,   
+		    slotStatus			INTEGER,
+		    slotIfBits			OCTET STRING,
+		    slotWarn			INTEGER,
+		    slotCpuPresent		INTEGER,       
+		    slotTrapEnable		INTEGER,		    
+		    slotAllSetting		OCTET STRING,
+		    slotFpgaVer			OCTET STRING,
+			slotCanbusVer 		OCTET STRING,
+			slotUrpfState       INTEGER
+			}
+		-- The following section describes the components of the table.
+			slotSysIndex OBJECT-TYPE
+				SYNTAX  Integer32(1..20)
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique sysindex for the slot."
+				::= { slotEntry 1 }
+				
+			slotIndex OBJECT-TYPE
+				SYNTAX  Integer32(1..20)
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique index for the slot."
+				::= { slotEntry 2 }
+
+			slotDescr OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Description for the slot."
+				::= { slotEntry 3 }
+				
+			slotReboot OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"1 for reboot the slot, the others no use."
+				::= { slotEntry 4 }
+				
+			slotType OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Slot type."
+				::= { slotEntry 5 }  
+			
+			slotSerial OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Serials of the slot."
+				::= { slotEntry 6 }
+			
+			slotHwVer OBJECT-TYPE
+				SYNTAX  OCTET STRING(SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Hardware version of the slot."
+				::= { slotEntry 7 }
+				
+			slotSwVer OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Software version of the slot."
+				::= { slotEntry 8 }
+				
+			slotCpldVer OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"CPLD version of the slot."
+				::= { slotEntry 9 }	
+				
+			slotBiosVer OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"BIOS version of the slot."
+				::= { slotEntry 10 }				
+				
+			slotIfNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"interface numbers of the slot."
+				::= { slotEntry 11 }   
+				
+			slotMaxIfNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"max interface numbers of the slot."
+				::= { slotEntry 12 }  
+				
+			slotSubSlotNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Subslot number of the slot."
+				::= { slotEntry 13 }	   
+				
+			slotStatus OBJECT-TYPE
+				SYNTAX  INTEGER{
+					cardin(1),
+					nocard(2)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Insert card in the slot or not."
+				::= { slotEntry 14 }	
+				
+			slotIfBits OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"interface bitmap of the slot."
+				::= { slotEntry 15}	 
+				
+			slotWarn OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					abnormal(0),
+					inserting(1),
+					normal(2)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Warning information of the slot."
+				::= { slotEntry 16 }	  
+				
+			slotCpuPresent OBJECT-TYPE
+				SYNTAX  INTEGER{
+					present(1),
+					notpresent(2)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"There is cpu on the card of the slot or not."
+				::= { slotEntry 17 }   
+				
+			slotTrapEnable	  OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Trap enable or not of the slot."
+				::= { slotEntry 18 }   				 
+			
+		  	slotAllSetting OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"All oid operation of this table."
+				::= { slotEntry 19 }
+				
+				slotFpgaVer OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Fpga  information of the slot."
+				::= { slotEntry 20 } 
+				
+				slotCanbusVer OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Canbus information of the slot."
+				::= { slotEntry 21 }
+
+		        slotUrpfState OBJECT-TYPE
+				SYNTAX  INTEGER{enable(1),disable(2)}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"urpf state of the slot."
+				::= { slotEntry 22 }
+				
+		slotInfoTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF SlotInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "the info about slot."
+			::= { msppSlot 3 }
+
+		slotInfoEntry OBJECT-TYPE
+			SYNTAX SlotInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"the info about slot."
+			INDEX {slotInfoSysIndex,
+			       slotInfoIndex }
+			::= { slotInfoTable 1 }
+		
+		SlotInfoEntry ::=
+		    SEQUENCE {
+			slotInfoSysIndex		Integer32,
+		    slotInfoIndex          	Integer32,
+		    slotInfoOnline	       	INTEGER,
+		    slotInfoPower        	INTEGER,
+		    slotInfoRegister	    INTEGER,
+		    slotInfoPrimary         INTEGER,
+			slotInfoDCPStatus       INTEGER,
+			slotInfoStartTime       TimeTicks,
+			slotInfoCompliedTime    OCTET STRING,
+			slotInfoLinuxCompliedTime    OCTET STRING			  
+			}
+		-- The following section describes the components of the
+		-- table.
+			slotInfoSysIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"System index."
+				::= { slotInfoEntry 1 }
+
+			slotInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"SLOT index."
+				::= { slotInfoEntry 2 }
+
+			slotInfoOnline OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					present(1),
+					absent(0)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the online status of slot."
+				::= { slotInfoEntry 3 }
+				
+			slotInfoPower OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					powerOn(1),
+					poweroff(0)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the power status of slot"
+				::= { slotInfoEntry 4 }
+				
+			slotInfoRegister OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					registered(1),
+					unregistered(0)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the register status of slot."
+				::= { slotInfoEntry 5 }
+				  
+		   slotInfoPrimary OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					master(1),
+					slave(2)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the status of slot:master\slave."
+				::= { slotInfoEntry 6 }
+
+        	slotInfoDCPStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					nonexist(0),
+					opensend(1),
+					openrecv(2),
+					loading(3),
+					operation(4)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the dcp status of slot."
+				::= { slotInfoEntry 7 }
+
+			slotInfoStartTime OBJECT-TYPE
+				SYNTAX  TimeTicks
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the start up time  of slot."
+				::= { slotInfoEntry 8}
+
+			slotInfoCompliedTime OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the compile time."
+				::= { slotInfoEntry 9 }
+
+			slotInfoLinuxCompliedTime OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the linux compile time."
+				::= { slotInfoEntry 10 }
+
+        				
+		slotConfigTable  OBJECT-TYPE
+			SYNTAX  SEQUENCE OF SlotConfigEntry 
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "the config info about slot."
+			::= { msppSlot 4 }
+
+		slotConfigEntry OBJECT-TYPE
+			SYNTAX SlotConfigEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"the info about slot."
+			INDEX {slotConfigSysIndex,
+			       slotConfigIndex }
+			::= { slotConfigTable 1 }
+		
+		SlotConfigEntry ::=
+		    SEQUENCE {
+			slotConfigSysIndex	Integer32,
+		    	slotConfigIndex         Integer32,
+		    	slotConfigl2HashMode    INTEGER,
+		    	slotConfigl3HashMode	INTEGER,
+		    	slotConfigTcamCfgMode	INTEGER,
+		    	slotConfigTcamSize	Integer32,
+		    	slotConfigTcamCurMode   INTEGER,
+		    	slotConfigl2AuxHashMode INTEGER,
+		    	slotConfigAclCfgMode	INTEGER,		 
+		    	slotConfigAclCurMode    INTEGER,
+		    	slotConfigIpv6CfgMode	INTEGER,		 
+		    	slotConfigIpv6CurMode   INTEGER
+		    			 
+			}
+		-- The following section describes the components of the
+		-- table.
+			slotConfigSysIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the system index."
+				::= { slotConfigEntry 1}
+				
+			slotConfigIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the slot index."
+				::= { slotConfigEntry 2}
+				
+			slotConfigl2HashMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					crc32-upper(1),
+					crc32-lower(2),
+					lsb(3),
+					crc16-lower(4),
+					crc16-upper(5)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the l2 hash ."
+				::= { slotConfigEntry 3}
+				
+			slotConfigl3HashMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					crc32-upper(1),
+					crc32-lower(2),
+					lsb(3),
+					crc16-lower(4),
+					crc16-upper(5)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the l3 hash."
+				::= { slotConfigEntry 4}
+								
+			slotConfigTcamCfgMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					closeall(0),
+					bigmac(1),
+					bigipv4(2),
+					macacl(3),
+					ipv4acl(4),
+					bigipv6(5),
+					ipv6acl(6),
+					l3acl(7),
+					l2acl(8)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the cfg mode of slot."
+				::= { slotConfigEntry 5}
+				
+			slotConfigTcamSize OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the count of tcam ."
+				::= { slotConfigEntry 6}
+				
+			slotConfigTcamCurMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					closeall(0),
+					bigmac(1),
+					bigipv4(2),
+					macacl(3),
+					ipv4acl(4),
+					bigipv6(5),
+					ipv6acl(6),
+					l3acl(7),
+					l2acl(8)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the cur mode of slot."
+				::= { slotConfigEntry 7}  
+				
+			slotConfigl2AuxHashMode	 OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					crc32-upper(1),
+					crc32-lower(2),
+					lsb(3),
+					crc16-lower(4),
+					crc16-upper(5)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the l2 aux hash."
+				::= { slotConfigEntry 8}
+				
+			slotConfigAclCfgMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					cm(1),
+					cu(2),
+					ct(3)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+					"The configure acl mode of slot."
+				::= { slotConfigEntry 9} 
+				
+			slotConfigAclCurMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					cm(1),
+					cu(2),
+					ct(3)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+					"The current acl mode of slot."
+				::= { slotConfigEntry 10} 
+				
+			slotConfigIpv6CfgMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+					"The configure ipv6 mode of slot."
+				::= { slotConfigEntry 11} 
+				
+			slotConfigIpv6CurMode OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+					"The current ipv6 mode of slot."
+				::= { slotConfigEntry 12} 
+			
+						
+		--关于某个槽位的内存信息
+		slotMemoryTable  OBJECT-TYPE
+			SYNTAX  SEQUENCE OF SlotMemoryEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "the memory info about slot."
+			::= { msppSlot 5 }
+
+		slotMemoryEntry OBJECT-TYPE
+			SYNTAX SlotMemoryEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"the memory info  about slot."
+			INDEX {slotMemorySysIndex,slotMemoryIndex }
+			::= { slotMemoryTable 1 }
+		
+		SlotMemoryEntry ::=
+		    SEQUENCE {
+					slotMemorySysIndex					Integer32,
+		    		slotMemoryIndex 					Integer32,
+					slotMemorySdramSize        			Counter32,
+					slotMemorySdramUsed					Counter32,
+					slotMemoryFlashSize        			Counter32,
+					slotMemoryFlashUsed					Counter32,
+					slotMemorySdramHThreshold			Counter32,
+					slotMemoryNvram						Counter32,
+					slotMemorySDCard					Counter32
+			}
+			slotMemorySysIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the system index."
+				::= { slotMemoryEntry 1}
+				
+			slotMemoryIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the slot index."
+				::= { slotMemoryEntry 2}
+				
+				slotMemorySdramSize OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the sdram size of slot."
+				::= { slotMemoryEntry 3}
+				
+				slotMemorySdramUsed OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the sdram used size of slot."
+				::= { slotMemoryEntry 4}
+								
+				slotMemoryFlashSize OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the flash size  of slot."
+				::= { slotMemoryEntry 5}
+				
+				slotMemoryFlashUsed OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the flash used size of slot ."
+				::= { slotMemoryEntry 6}
+				
+				slotMemorySdramHThreshold OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the sdram high threshold of slot."
+				::= { slotMemoryEntry 7}
+				
+				slotMemoryNvram OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the nvram size of slot."
+				::= { slotMemoryEntry 8}
+				
+				slotMemorySDCard OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The sd card size of slot ."
+				::= { slotMemoryEntry 9}
+						
+						
+		slotCardInfoTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF SlotCardInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "the info about slot."
+			::= { msppSlot 6 }
+
+		slotCardInfoEntry OBJECT-TYPE
+			SYNTAX SlotCardInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"the info about slot."
+			INDEX {slotCardSysIndex,slotCardInfoIndex,slotCardIndex }
+			::= { slotCardInfoTable 1 }
+		
+		SlotCardInfoEntry ::=
+		    SEQUENCE {
+			slotCardSysIndex			Integer32,
+		    slotCardInfoIndex          	Integer32,
+			slotCardIndex          		Integer32,
+		    slotCardInfoOnline	       	INTEGER,
+		    slotCardInfoPower        	INTEGER,
+		    slotCardInfoRegister	    INTEGER,
+		    slotCardInfoPrimary         INTEGER,
+			slotCardInfoDCPStatus       INTEGER,
+			slotCardInfoStartTime       TimeTicks,
+			slotCardInfoCompliedTime    OCTET STRING,
+			slotCardType				Integer32,
+			slotCardIfNum               Integer32,    
+			slotCardFpgaVer             OCTET STRING
+			}
+	-- The following section describes the components of the
+	-- table.
+		slotCardSysIndex OBJECT-TYPE
+			SYNTAX  Integer32
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"Sys index."
+			::= { slotCardInfoEntry 1 }
+			
+		slotCardInfoIndex OBJECT-TYPE
+			SYNTAX  Integer32
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"Slot index."
+			::= { slotCardInfoEntry 2 }
+			
+		slotCardIndex OBJECT-TYPE
+			SYNTAX  Integer32
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The card index."
+			::= { slotCardInfoEntry 3 }
+
+		slotCardInfoOnline OBJECT-TYPE
+			SYNTAX  INTEGER
+			{
+				present(1),
+				absent(0)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"the online status of card."
+			::= { slotCardInfoEntry 4 }
+			
+		slotCardInfoPower OBJECT-TYPE
+			SYNTAX  INTEGER
+			{
+				powerOn(1),
+				poweroff(0)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"the power status of card"
+			::= { slotCardInfoEntry 5 }
+			
+		slotCardInfoRegister OBJECT-TYPE
+			SYNTAX  INTEGER
+			{
+				registered(1),
+				unregistered(0)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"the register status of card."
+			::= { slotCardInfoEntry 6 }
+			  
+	   slotCardInfoPrimary OBJECT-TYPE
+			SYNTAX  INTEGER
+			{
+				master(1),
+				slave(2)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"the status of card:master\slave."
+			::= { slotCardInfoEntry 7 }
+
+        slotCardInfoDCPStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					nonexist(0),
+					opensend(1),
+					openrecv(2),
+					loading(3),
+					operation(4)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the dcp status of slot."
+				::= { slotCardInfoEntry 8 }
+
+		slotCardInfoStartTime OBJECT-TYPE
+				SYNTAX  TimeTicks
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the start up time  of card."
+				::= { slotCardInfoEntry 9}
+
+		slotCardInfoCompliedTime OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..64))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"the compile time."
+				::= { slotCardInfoEntry 10 }
+				
+		slotCardType OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The card type."
+				::= { slotCardInfoEntry 11 }
+
+		slotCardIfNum OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The numbers of interface on the card."
+				::= { slotCardInfoEntry 12 }
+				                             
+		slotCardFpgaVer OBJECT-TYPE
+			SYNTAX  OCTET STRING(SIZE(0..64))
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"FPGA version of the card."
+			::= { slotCardInfoEntry 13 }
+				                             
+		slotTrap		OBJECT IDENTIFIER ::=   {msppSlot 7}
+
+		slotUp NOTIFICATION-TYPE
+       		OBJECTS {slotInfoOnline}
+       		STATUS  current
+       		DESCRIPTION
+               	"slot up."
+			::= { slotTrap 1}
+		
+		slotDown NOTIFICATION-TYPE
+	       	OBJECTS {slotInfoOnline}
+       		STATUS  current
+       		DESCRIPTION
+               	"slot down."
+			::= { slotTrap 2}
+		
+		mcuMaster NOTIFICATION-TYPE
+       		OBJECTS {slotInfoPrimary}
+       		STATUS  current
+       		DESCRIPTION
+               	"mcu master."
+			::= { slotTrap 3}
+		
+		mcuSlave NOTIFICATION-TYPE
+	       	OBJECTS {slotInfoPrimary}
+       		STATUS  current
+       		DESCRIPTION
+               	"mcu slave."
+			::= { slotTrap 4}
+			
+		cardUp NOTIFICATION-TYPE
+       		OBJECTS {slotCardInfoOnline}
+       		STATUS  current
+       		DESCRIPTION
+               	"mcu master."
+			::= { slotTrap 5}
+		
+		cardDown NOTIFICATION-TYPE
+	       	OBJECTS {slotCardInfoOnline}
+       		STATUS  current
+       		DESCRIPTION
+               	"mcu slave."
+			::= { slotTrap 6}
+END
+

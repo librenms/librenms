@@ -1,0 +1,262 @@
+WRI-GVRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,enterprises,
+    NOTIFICATION-TYPE,Integer32			FROM SNMPv2-SMI
+    MacAddress							FROM SNMPv2-TC
+    wri,wriProtocol 	 				FROM WRI-SMI;
+   
+wri MODULE-IDENTITY
+	LAST-UPDATED 	"201010110000Z"
+	ORGANIZATION 	"FiberHome Networks Systems, Inc."
+	CONTACT-INFO	"http://www.fhn.com.cn"
+	DESCRIPTION		"The Structure of Management Information for the FHN enterprise."
+	::= { enterprises 3807 }	-- assigned by IANA
+	
+wriProtocol		OBJECT IDENTIFIER ::= { wri 2 }
+wriGVRP			OBJECT IDENTIFIER ::= { wriProtocol 703 }
+
+--WRI GVRP Common Information	
+	gvrpEnable OBJECT-TYPE
+		SYNTAX  INTEGER 
+		{
+			enable(1),
+			disable(2)
+		}
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+			"The GVRP Protocol Common status
+			enable to start the protocol,disable to stop the protocol."
+	    REFERENCE
+	           "IEEE 802.1D-1990: Section 4.5.5.2"
+	    ::= { wriGVRP 1 }
+
+
+--WRI GVRP Port Config Table
+
+	gvrpIfTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF GvrpIfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "A table of gvrp control information about every bridge
+	        port.  This is indexed by dot1dBaseIfEntry."
+	    ::= { wriGVRP 2 }
+
+	gvrpIfEntry OBJECT-TYPE
+	    SYNTAX      GvrpIfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "gvrp control information for a bridge port."
+	    INDEX {gvrpIfIndex }
+	    ::= { gvrpIfTable 1 }
+
+	GvrpIfEntry ::= SEQUENCE 
+	{
+		gvrpIfIndex			Integer32,
+		gvrpIfEnable		INTEGER,
+		gvrpIfRegister		INTEGER,
+		gvrpIfFailedRegister	Integer32, 
+		gvrpIfLastPduOrigin	MacAddress,
+		gvrpIfReset		    INTEGER	
+	}
+
+	gvrpIfIndex OBJECT-TYPE
+		SYNTAX  	Integer32 
+		MAX-ACCESS  not-accessible
+	    STATUS  	current
+	    DESCRIPTION
+			"The index of port"
+	    REFERENCE
+	           "IEEE 802.1D-1990: Section 4.5.5.2"
+	    ::= { gvrpIfEntry 1 }
+	    
+	gvrpIfEnable OBJECT-TYPE
+		SYNTAX  INTEGER 
+		{
+			enable(1),
+			disable(2)
+		}
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+			"The enabled/disabled status of the ports for all
+			gvrp protocol instances.  This should be set
+			according to the current link state of the port"
+	    REFERENCE
+	           "IEEE 802.1D-1990: Section 4.5.5.2"
+	    ::= { gvrpIfEntry 2 }
+		
+	gvrpIfRegister OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			 normal(1),
+			 fixed (2),
+			 forbidden (3)
+		}
+		MAX-ACCESS	read-write		
+		STATUS		current
+		DESCRIPTION
+			"The register type of the interface."
+		::= { gvrpIfEntry 3 }  
+		
+	gvrpIfFailedRegister OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"."
+		::= { gvrpIfEntry 4 }
+		
+	gvrpIfLastPduOrigin OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"."
+		::= { gvrpIfEntry 5 }
+		
+    gvrpIfReset OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"reset the Statistics information"
+		::= { gvrpIfEntry 6 }
+
+
+--WRI GVRP If Statistics Table
+
+	gvrpIfStatsTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF GvrpIfStatsEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "A table of gvrp statistics information about every bridge
+	        If."
+	    ::= { wriGVRP 3 }
+
+	gvrpIfStatsEntry OBJECT-TYPE
+	    SYNTAX      GvrpIfStatsEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "gvrp statistics information for a bridge port."
+	    INDEX {gvrpIfIndex }
+	    ::= { gvrpIfStatsTable 1 }
+
+	GvrpIfStatsEntry ::= SEQUENCE 
+	{
+		gvrpIfStatsRevLeaveAll		Integer32,
+		gvrpIfStatsRevJoinEmpty	    Integer32,
+		gvrpIfStatsRevJoinIn	    Integer32,
+		gvrpIfStatsRevLeaveEmpty	Integer32,
+		gvrpIfStatsRevLeaveIn	    Integer32,
+		gvrpIfStatsRevEmpty	        Integer32,
+		gvrpIfStatsSendLeaveAll		Integer32,
+		gvrpIfStatsSendJoinEmpty	Integer32,
+		gvrpIfStatsSendJoinIn	    Integer32,
+		gvrpIfStatsSendLeaveEmpty	Integer32,
+		gvrpIfStatsSendLeaveIn	    Integer32,
+		gvrpIfStatsSendEmpty	    Integer32	
+	}
+	
+    gvrpIfStatsRevLeaveAll OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The LeaveAll pkt receive on this interface."
+		::= { gvrpIfStatsEntry 1 }
+
+	gvrpIfStatsRevJoinEmpty OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The JoinEmpty pkt receive on this interface."
+		::= { gvrpIfStatsEntry 2 }  
+		
+	 gvrpIfStatsRevJoinIn OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The JoinIn pkt receive on this interface."
+		::= { gvrpIfStatsEntry 3 } 
+		
+     gvrpIfStatsRevLeaveEmpty OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The LeaveEmpty pkt receive on this interface."
+		::= { gvrpIfStatsEntry 4 }
+     
+     gvrpIfStatsRevLeaveIn  OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The LeaveIn pkt receive on this interface."
+		::= { gvrpIfStatsEntry 5 }
+    
+    gvrpIfStatsRevEmpty OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The Empty pkt receive on this interface."
+		::= { gvrpIfStatsEntry 6 }  
+	
+	  gvrpIfStatsSendLeaveAll OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The LeaveAll pkt receive on this interface."
+		::= { gvrpIfStatsEntry 7 }
+
+	gvrpIfStatsSendJoinEmpty OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The JoinEmpty pkt receive on this interface."
+		::= { gvrpIfStatsEntry 8 }  
+		
+	 gvrpIfStatsSendJoinIn OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The JoinIn pkt receive on this interface."
+		::= { gvrpIfStatsEntry 9 } 
+		
+     gvrpIfStatsSendLeaveEmpty OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The LeaveEmpty pkt receive on this interface."
+		::= { gvrpIfStatsEntry 10 }
+     
+     gvrpIfStatsSendLeaveIn  OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The LeaveIn pkt receive on this interface."
+		::= { gvrpIfStatsEntry 11}
+    
+    gvrpIfStatsSendEmpty OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The Empty pkt receive on this interface."
+		::= { gvrpIfStatsEntry 12 }  
+
+	END

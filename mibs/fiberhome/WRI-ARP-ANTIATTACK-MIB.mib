@@ -1,0 +1,289 @@
+WRI-ARP-ANTIATTACK-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter64, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+	
+
+  wriArpAntiAttack		OBJECT IDENTIFIER ::= { wriProtocol 105 }
+		
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		
+	
+ arpAntiAttackGeneral			OBJECT IDENTIFIER ::=   {wriArpAntiAttack 1}
+			
+				
+		arpAntiAttackSrcIPEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable or disable source IP conflict check."
+				::= { arpAntiAttackGeneral 1 }
+				
+		arpAntiAttackSrcMacEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable or disable source MAC conflict check."
+				::= { arpAntiAttackGeneral 2 }
+				
+		arpAntiAttackArpCheatEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable or disable arp cheat."
+				::= { arpAntiAttackGeneral 3 }
+		
+		arpAntiAttackGratuitousArpEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable or disable arp cheat."
+				::= { arpAntiAttackGeneral 4 }
+		
+		arpAntiAttackLogEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable or disable log."
+				::= { arpAntiAttackGeneral 5 }		
+
+				
+		arpAntiAttackAntiSrcIpNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"source Ip conflict statistic."
+				::= { arpAntiAttackGeneral 6 }		
+				
+		arpAntiAttackAntiSrcMacNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"source Mac conflict statistic."
+				::= { arpAntiAttackGeneral 7 }			
+				
+		arpAntiAttackAntiArpCheatNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Arp cheat statistic."
+				::= { arpAntiAttackGeneral 8 }		
+
+	
+	arpAntiAttackIfTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF ArpAntiAttackIfEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "arp-antiattack interface table."
+			::= { wriArpAntiAttack 2 }
+
+		arpAntiAttackIfEntry OBJECT-TYPE
+			SYNTAX ArpAntiAttackIfEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"arp-antiattack interface table."
+			INDEX { arpAntiAttackIfIndex }
+			::= { arpAntiAttackIfTable 1 }
+		
+		ArpAntiAttackIfEntry ::=
+		    SEQUENCE {
+		    arpAntiAttackIfIndex                INTEGER,
+		    arpAntiAttackIfDaiStatus                  INTEGER,
+		    arpAntiAttackIfCheckItem               OCTET STRING,
+		    arpAntiAttackIfAlarmStatus             INTEGER,
+		    arpAntiAttackIfAlarmLimit              Integer32,
+		    arpAntiAttackIfArpPktDrop              Counter64,
+		    arpAntiAttackIfReset                   INTEGER
+			}
+			
+		arpAntiAttackIfIndex OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"interface index."
+				::= { arpAntiAttackIfEntry 1 }
+
+		arpAntiAttackIfDaiStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"enable or disable arp-antiattack."
+				::= { arpAntiAttackIfEntry 2 }
+
+		arpAntiAttackIfCheckItem OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { arpAntiAttackIfEntry 3 }
+
+		arpAntiAttackIfAlarmStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"."
+				::= { arpAntiAttackIfEntry 4 }
+		
+		arpAntiAttackIfAlarmLimit OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"."
+				::= { arpAntiAttackIfEntry 5 }
+				
+		arpAntiAttackIfArpPktDrop OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"."
+				::= { arpAntiAttackIfEntry 6 }	
+				
+		arpAntiAttackIfReset OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"."
+				::= { arpAntiAttackIfEntry 7 }		
+	
+
+arpAntiattackTrap		OBJECT IDENTIFIER ::=   {wriArpAntiAttack 3}
+				
+	  arpAntiattackSourceIpConflict NOTIFICATION-TYPE
+       		OBJECTS {arpAntiAttackSourceIP}
+       		STATUS  current
+       		DESCRIPTION
+               	""
+			::= { arpAntiattackTrap 1} 	
+			
+		arpAntiattackSourceMacConflict NOTIFICATION-TYPE
+       		OBJECTS {arpAntiAttackSourceMac}
+       		STATUS  current
+       		DESCRIPTION
+               	""
+			::= { arpAntiattackTrap 2} 	
+			
+		arpAntiattackArpCheat NOTIFICATION-TYPE
+       		OBJECTS {arpAntiAttackCheatSourceIP,
+       		         arpAntiAttackCheatSourceMac}
+       		STATUS  current
+       		DESCRIPTION
+               	""
+			::= { arpAntiattackTrap 3} 	
+			
+		arpAntiattackArpPktOver NOTIFICATION-TYPE
+       		OBJECTS {arpAntiAttackIfIndex,
+       		         arpAntiAttackIfArpPktDrop}
+       		STATUS  current
+       		DESCRIPTION
+               	""
+			::= { arpAntiattackTrap 4} 
+		
+		
+				
+arpAntiAttackTrapObjects			OBJECT IDENTIFIER ::=   {wriArpAntiAttack 4}
+     
+			arpAntiAttackSourceIP OBJECT-TYPE
+				SYNTAX  InetAddress
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { arpAntiAttackTrapObjects 1 }
+				
+			arpAntiAttackSourceMac OBJECT-TYPE
+				SYNTAX  MacAddress
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { arpAntiAttackTrapObjects 2 }
+				
+		arpAntiAttackCheatSourceIP OBJECT-TYPE
+				SYNTAX  InetAddress
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { arpAntiAttackTrapObjects 3 }
+				
+			arpAntiAttackCheatSourceMac OBJECT-TYPE
+				SYNTAX  MacAddress
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { arpAntiAttackTrapObjects 4 }
+				
+				
+END	
+

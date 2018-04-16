@@ -1,0 +1,82 @@
+WRI-GARP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,enterprises,
+    NOTIFICATION-TYPE,Integer32,Unsigned32			FROM SNMPv2-SMI
+    wri,wriProtocol 	 				            FROM WRI-SMI;
+   
+wri MODULE-IDENTITY
+	LAST-UPDATED 	"201010110000Z"
+	ORGANIZATION 	"FiberHome Networks Systems, Inc."
+	CONTACT-INFO	"http://www.fhn.com.cn"
+	DESCRIPTION		"The Structure of Management Information for the FHN enterprise."
+	::= { enterprises 3807 }	-- assigned by IANA
+	
+wriProtocol		OBJECT IDENTIFIER ::= { wri 2 }
+wriGARP			OBJECT IDENTIFIER ::= { wriProtocol 700 }
+
+--WRI GARP Port Config Table
+
+	garpIfTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF GarpIfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "A table of GARP control information about every bridge
+	        port.  This is indexed by dot1dBasePortEntry."
+	    ::= { wriGARP 1 }
+
+	garpIfEntry OBJECT-TYPE
+	    SYNTAX      GarpIfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "GARP control information for a bridge port."
+	    INDEX {garpIfIndex }
+	    ::= { garpIfTable 1 }
+
+	GarpIfEntry ::= SEQUENCE 
+	{
+		garpIfIndex			Unsigned32,
+		garpJoinInterval		Unsigned32,
+		garpLeaveInterval		Unsigned32,
+		garpLeaveAllInterval	Unsigned32
+	}
+
+	garpIfIndex OBJECT-TYPE
+		SYNTAX  	Unsigned32 	    
+		MAX-ACCESS  not-accessible
+	    STATUS  	current
+	    DESCRIPTION
+			"The index of port"
+	    REFERENCE
+	           "IEEE 802.1D-1990: Section 4.5.5.2"
+	    ::= { garpIfEntry 1 }
+	    
+		
+	garpJoinInterval OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"The interval of sending jion message,in millisecond."
+		::= { garpIfEntry 2 }
+		
+	garpLeaveInterval OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"The interval of leave message,in millisecond."
+		::= { garpIfEntry 3 }
+	
+	
+	garpLeaveAllInterval OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"The interval of leaveall message,in millisecond."
+		::= { garpIfEntry 4 }		    
+	     
+END

@@ -1,0 +1,860 @@
+-- created 2011-04-01 -pitao
+   WRI-RIPNG-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+       TimeTicks, IpAddress                     FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, RowStatus            FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP          FROM SNMPv2-CONF  
+       InetAddressIPv6           	            FROM INET-ADDRESS-MIB   
+	   wri,wriProtocol 	 		                FROM WRI-SMI;
+
+		
+	wriProtocol		OBJECT IDENTIFIER ::= { wri 2 }
+	ripng		OBJECT IDENTIFIER ::= { wriProtocol 1816 }
+	
+ 	ripngGlobals OBJECT IDENTIFIER ::= { ripng 1 }   
+ 	   
+    ripngMaxProcessNum OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The max support number of process."
+       ::= { ripngGlobals 1 }             
+
+	ripngCurrentProcessNum OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current number of process."
+       ::= { ripngGlobals 2 }
+
+ 	ripngMaxRouteNum  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The max support number of route."
+       ::= { ripngGlobals 3 }
+
+  	ripngCurrentRouteNum  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current  number of route."
+       ::= { ripngGlobals 4 }
+       
+ 	ripngMaxIfNum  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The max support number of interface."
+       ::= { ripngGlobals 5 }
+
+ 	ripngCurrentIfNum  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current number of interface."
+       ::= { ripngGlobals 6 }
+
+ 	ripngMaxPeerNum OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The max support number of peer."
+       ::= { ripngGlobals 7 }
+  
+ 	ripngCurrentPeerNum OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current number of peer."
+       ::= { ripngGlobals 8 }
+      
+         
+     ripngProcessTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF RipngProcessEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of Process subnets which require separate
+           status monitoring in RIPng."
+       ::= { ripng 2}  
+       
+   ripngProcessEntry OBJECT-TYPE
+       SYNTAX   RipngProcessEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "."
+      INDEX { ripngProcessId }
+      ::= { ripngProcessTable 1 }
+
+    RipngProcessEntry ::=  
+    	SEQUENCE {
+    		ripngProcessId	 
+                INTEGER,
+           	ripngProcessEnable	 
+                INTEGER,
+            ripngProcessRedistributeStatic
+            	INTEGER,
+    	    ripngProcessRedistributeStaticCost
+				INTEGER,
+			ripngProcessRedistributeStaticPolicy
+				INTEGER,
+			ripngProcessRedistributeOspf
+				INTEGER,
+			ripngProcessRedistributeOspfCost
+				INTEGER,
+			ripngProcessRedistributeOspfPolicy
+				INTEGER,
+			ripngProcessRedistributeConnect
+				INTEGER,
+			ripngProcessRedistributeConnectCost
+				INTEGER,
+			ripngProcessRedistributeConnectPolicy
+				INTEGER,
+			ripngProcessRedistributeBgp
+				INTEGER,
+			ripngProcessRedistributeBgpCost
+				INTEGER,
+			ripngProcessRedistributeBgpPolicy
+				INTEGER,
+			ripngProcessRedistributeIsis
+				INTEGER,
+			ripngProcessRedistributeIsisCost
+				INTEGER,
+			ripngProcessRedistributeIsisPolicy
+				INTEGER,      
+			ripngProcessStaticFilterPolicy
+				INTEGER,
+			ripngProcessConnectFilterPolicy
+				INTEGER,
+			ripngProcessOspfFilterPolicy
+				INTEGER,
+			ripngProcessBgpFilterPolicy
+				INTEGER,
+			ripngProcessIsisFilterPolicy
+				INTEGER,
+			ripngProcessFilterInPolicy
+				INTEGER,
+			ripngProcessFilterOutPolicy
+				INTEGER,		
+			ripngProcessRouteDefault	
+                INTEGER, 
+            ripngProcessCheckZero
+				INTEGER,
+            ripngProcessDefaultMetric
+				INTEGER, 
+			ripngProcessUpdateTime	
+				INTEGER, 
+            ripngProcessExpireTime 
+            	INTEGER, 
+            ripngProcessGarbageTime 
+            	INTEGER,
+         	ripngProcessVpnId
+				INTEGER,
+			ripngProcessRouteCnt
+				Counter32,
+			ripngProcessRouteChanges
+				Counter32,
+			ripngProcessQueries
+				Counter32,	
+			ripngProcessPeriodUpdates
+				Counter32,
+			ripngProcessTriggeredUpdates
+				Counter32				           	
+  	}
+    ripngProcessId  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The process id of the table."
+       ::= { ripngProcessEntry 1 }
+
+    ripngProcessEnable OBJECT-TYPE
+        SYNTAX   INTEGER{enable(1),disable(2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The admin state of process."
+       ::= { ripngProcessEntry 2 } 
+       
+    ripngProcessRedistributeStatic OBJECT-TYPE
+        SYNTAX   INTEGER{enable(1),disable(2)}  
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The admin state of Redistributing Static route."
+       ::= { ripngProcessEntry 3 }
+    
+    ripngProcessRedistributeStaticCost OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)  
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Redistributing Static route's cost."
+       ::= { ripngProcessEntry 4 }    
+       
+       
+	ripngProcessRedistributeStaticPolicy  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route policy of Redistributing static route."
+       ::= { ripngProcessEntry 5 }    
+
+    ripngProcessRedistributeOspf OBJECT-TYPE
+        SYNTAX   INTEGER {enable (1),disable (2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The admin state of Redistributing ospf route."
+       ::= { ripngProcessEntry 6 }     
+       
+       
+      ripngProcessRedistributeOspfCost OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)  
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Redistributing Ospf route's cost."
+       ::= { ripngProcessEntry 7 }    
+       
+       
+	ripngProcessRedistributeOspfPolicy  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route policy of Redistributing Ospf route."
+       ::= { ripngProcessEntry 8 }    
+   
+      ripngProcessRedistributeConnect OBJECT-TYPE
+        SYNTAX   INTEGER {enable (1),disable (2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The admin state of Redistributing Connect route."
+       ::= { ripngProcessEntry 9 }     
+       
+       
+      ripngProcessRedistributeConnectCost OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)  
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Redistributing Connect route's cost."
+       ::= { ripngProcessEntry 10 }    
+       
+       
+	ripngProcessRedistributeConnectPolicy  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route policy of Redistributing Connect route."
+       ::= { ripngProcessEntry 11 } 
+       
+    ripngProcessRedistributeBgp OBJECT-TYPE
+        SYNTAX   INTEGER {enable (1),disable (2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The admin state of Redistributing Bgp route."
+       ::= { ripngProcessEntry 12 }     
+       
+       
+     ripngProcessRedistributeBgpCost OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)  
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Redistributing Bgp route's cost."
+       ::= { ripngProcessEntry 13 }    
+       
+       
+	ripngProcessRedistributeBgpPolicy  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route policy of Redistributing Bgp route."
+       ::= { ripngProcessEntry 14 }      
+     
+     
+    ripngProcessRedistributeIsis OBJECT-TYPE
+        SYNTAX   INTEGER {enable (1),disable (2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The admin state of Redistributing Isis route."
+       ::= { ripngProcessEntry 15 }     
+       
+       
+      ripngProcessRedistributeIsisCost OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)  
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Redistributing Isis route's cost."
+       ::= { ripngProcessEntry 16 }    
+       
+       
+	ripngProcessRedistributeIsisPolicy  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route policy of Redistributing Isis route."
+       ::= { ripngProcessEntry 17 }   
+       
+    ripngProcessStaticFilterPolicy   OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The static filter policy."
+       ::= { ripngProcessEntry 18 }              
+       
+    ripngProcessConnectFilterPolicy   OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Connect filter policy."
+       ::= { ripngProcessEntry 19 }
+       
+     ripngProcessOspfFilterPolicy   OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Ospf filter policy."
+       ::= { ripngProcessEntry 20 }        
+      
+      ripngProcessBgpFilterPolicy   OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Ospf filter policy."
+       ::= { ripngProcessEntry 21 } 
+                                        
+      ripngProcessIsisFilterPolicy   OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The Ospf filter policy."
+       ::= { ripngProcessEntry 22 } 
+                                  
+        
+ 	  ripngProcessFilterInPolicy    OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route in filter policy."
+       ::= { ripngProcessEntry 23 } 
+                                 
+			
+   	  ripngProcessFilterOutPolicy OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The route out filter policy."
+       ::= { ripngProcessEntry 24 } 
+       				
+	  ripngProcessRouteDefault	OBJECT-TYPE
+        SYNTAX   INTEGER{enable(1),disable(2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Route Default state."
+       ::= { ripngProcessEntry 25 } 
+       
+      ripngProcessCheckZero OBJECT-TYPE
+        SYNTAX   INTEGER{enable(1),disable(2)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Check Zero state."
+       ::= { ripngProcessEntry 26 }     
+     
+      ripngProcessDefaultMetric OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Default Metric."
+       ::= { ripngProcessEntry 27 }
+       
+     ripngProcessUpdateTime OBJECT-TYPE
+        SYNTAX   INTEGER(30..500)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Update Time."
+       ::= { ripngProcessEntry 28 }	    
+       
+     ripngProcessExpireTime  OBJECT-TYPE
+        SYNTAX   INTEGER(120..2000)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Expire Time "
+       ::= { ripngProcessEntry 29 }
+
+
+     ripngProcessGarbageTime OBJECT-TYPE
+        SYNTAX   INTEGER(240..4000)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Garbage Time."
+       ::= { ripngProcessEntry 30 }
+
+    ripngProcessVpnId OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "vpn instance id."
+       ::= { ripngProcessEntry 31 }
+				          	
+  	ripngProcessRouteCnt OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "process route counter."
+       ::= { ripngProcessEntry 32 }
+  	
+  	ripngProcessRouteChanges  OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "process route counter."
+       ::= { ripngProcessEntry 33 }
+	ripngProcessQueries    OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "process route counter."
+       ::= { ripngProcessEntry 34 }
+	
+	ripngProcessPeriodUpdates   OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "process route counter."
+       ::= { ripngProcessEntry 35 }   
+       
+	ripngProcessTriggeredUpdates  OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "process route counter."
+       ::= { ripngProcessEntry 36 }
+				      
+    ripngIfTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF RipngIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of subnets which require separate
+           status monitoring in RIPng."
+       ::= { ripng 3}  
+       
+   ripngIfEntry OBJECT-TYPE
+       SYNTAX   RipngIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A Single Routing Domain in a single Subnet."
+      INDEX { ripngProcessId,ripngIfIndex }
+      ::= { ripngIfTable 1 }
+
+    RipngIfEntry ::=
+        SEQUENCE {  
+            ripngIfAddress
+                InetAddressIPv6, 
+            ripngIfProtocolStatus
+                INTEGER,
+            ripngIfMetricIn
+                INTEGER,
+            ripngIfMetricOut
+                INTEGER,
+            ripngIfPassiveMode
+                INTEGER,
+            ripngIfSplithorizen
+                INTEGER,
+            ripngIfIndex
+                INTEGER,
+            ripngIfBfdState
+                INTEGER,
+            ripngIfAdminStatus    
+                INTEGER , 
+            ripngIfDefaultRouteType 
+     	        INTEGER , 
+            ripngIfDefaultRouteMetric
+           		INTEGER,
+           	ripngIfFilterInPolicy
+           		INTEGER,
+           	ripngIfFilterOutPolicy
+           		INTEGER,	
+           	ripngIfInBadPackets
+           		Counter32,	 	
+           	ripngIfInBadRoutes
+           		Counter32,
+           	ripngIfOutUpdates
+           		Counter32	 		
+       }
+
+    ripngIfAddress OBJECT-TYPE
+        SYNTAX   InetAddressIPv6
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP Address of this system ."
+       ::= { ripngIfEntry 1 }
+
+    ripngIfProtocolStatus OBJECT-TYPE
+        SYNTAX   INTEGER{
+             enable(1),
+             disable(2)
+        	}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "interface configure status"
+       ::= { ripngIfEntry 2 }
+
+    ripngIfMetricIn OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "interface in metric value."
+       ::= { ripngIfEntry 3 }
+
+    ripngIfMetricOut OBJECT-TYPE
+        SYNTAX   INTEGER(0..15)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "interface out metric value."
+       ::= { ripngIfEntry 4 }
+
+    ripngIfPassiveMode OBJECT-TYPE
+        SYNTAX   INTEGER{
+             enable(1),
+             disable(2)
+        	}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "passive mode of interface."
+       ::= { ripngIfEntry 5 }
+  
+  	ripngIfSplithorizen  OBJECT-TYPE
+        SYNTAX   INTEGER{
+             enable(1),
+             disable(2)
+        	}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "if  vaule is enable Split horizen enable and split horizon with 
+           poisoned reverse disable,if set value to disable the Split horizen
+           disable and the poisoned reverse enable"
+       ::= { ripngIfEntry 6}  
+   
+   ripngIfIndex OBJECT-TYPE
+        SYNTAX   INTEGER        
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "the index of interface."
+       ::= { ripngIfEntry 7 } 
+       
+   ripngIfBfdState OBJECT-TYPE
+    SYNTAX   INTEGER{enable(1),disable(2)}        
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+       "Bfd  state."
+   ::= { ripngIfEntry 8 }
+
+
+   ripngIfAdminStatus OBJECT-TYPE
+    SYNTAX   INTEGER        
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+       "the stae of interface."
+   ::= { ripngIfEntry 9 }  
+   
+    
+    ripngIfDefaultRouteType OBJECT-TYPE
+	    SYNTAX   INTEGER{none(0),only(2),originate(3)}        
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 10 }     
+	 
+	ripngIfDefaultRouteMetric OBJECT-TYPE
+	    SYNTAX   INTEGER(1..15)        
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 11 }   
+     
+    ripngIfFilterInPolicy  OBJECT-TYPE
+	    SYNTAX   INTEGER        
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 12 }     
+	   
+   	ripngIfFilterOutPolicy OBJECT-TYPE
+	    SYNTAX   INTEGER        
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 13 }      
+	   
+     ripngIfInBadPackets OBJECT-TYPE
+	    SYNTAX   Counter32        
+	    MAX-ACCESS   read-only
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 14 }
+           		 	
+   	ripngIfInBadRoutes OBJECT-TYPE
+	    SYNTAX   Counter32        
+	    MAX-ACCESS   read-only
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 15 }
+
+     ripngIfOutUpdates OBJECT-TYPE
+	    SYNTAX   Counter32        
+	    MAX-ACCESS   read-only
+	    STATUS   current
+	    DESCRIPTION
+	       ""
+	   ::= { ripngIfEntry 16 }
+      	    
+   -- The RIPNG Route Configuration Table.
+
+    ripngRouteTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF RipngRouteEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of subnets which require separate
+           configuration in RIPng."
+       ::= { ripng 4 }
+
+   ripngRouteEntry OBJECT-TYPE
+       SYNTAX   RipngRouteEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A Single Routing Domain in a single Subnet."
+      INDEX { ripngProcessId,ripngRouteDstIpAdress,ripngRouteDstIpPrexLen,ripngRouteNextHop,ripngRouteProto}
+      ::= { ripngRouteTable 1 }
+
+    RipngRouteEntry ::=
+        SEQUENCE {
+            ripngRouteDstIpAdress
+                InetAddressIPv6,
+            ripngRouteDstIpPrexLen
+                INTEGER,
+            ripngRouteNextHop
+                InetAddressIPv6,
+            ripngRouteProto
+                INTEGER,
+            ripngRouteMetric
+                INTEGER,
+            ripngRouteAge
+                INTEGER,
+            ripngRouteFlag
+                INTEGER,
+            ripngRouteTag
+                INTEGER
+              }
+
+    ripngRouteDstIpAdress OBJECT-TYPE
+        SYNTAX   InetAddressIPv6
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngRouteEntry 1 }
+
+    ripngRouteDstIpPrexLen OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngRouteEntry 2 }
+
+    ripngRouteNextHop OBJECT-TYPE
+        SYNTAX   InetAddressIPv6 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           ""
+       ::= { ripngRouteEntry 3 }
+
+    ripngRouteProto OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           ""
+      ::= { ripngRouteEntry 4 }
+
+    ripngRouteMetric OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+     ::= { ripngRouteEntry 5 }
+
+    ripngRouteAge OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           ""
+    ::= { ripngRouteEntry 6 }
+
+    ripngRouteFlag OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngRouteEntry 7 }  
+       
+    ripngRouteTag OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngRouteEntry 8 }      
+       
+-- The RIPNG Peer Configuration Table.
+
+    ripngPeerTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF RipngPeerEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of subnets which require separate
+           configuration in RIPng."
+       ::= { ripng 5 }
+
+   ripngPeerEntry OBJECT-TYPE
+       SYNTAX   RipngPeerEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A Single Routing Domain in a single Subnet."
+      INDEX { ripngProcessId,ripngPeerIpAdress}
+      ::= { ripngPeerTable 1 }
+
+    RipngPeerEntry ::=
+        SEQUENCE {
+          ripngPeerIpAdress
+          	  InetAddressIPv6,
+          ripngPeerLastUpdate
+          	  INTEGER,
+          ripngPeerVersion
+           	  INTEGER,
+          ripngPeerIfIndex
+          	   INTEGER,	 	  
+          ripngPeerInBadPackets
+          	   Counter32,
+          ripngPeerInBadRoutes
+          	   Counter32
+	    }	  	  		  
+            
+       ripngPeerIpAdress OBJECT-TYPE
+        SYNTAX   InetAddressIPv6 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngPeerEntry 1 }   
+       
+       ripngPeerLastUpdate  OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngPeerEntry 2 }       
+            
+      ripngPeerVersion OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngPeerEntry 3 } 
+       
+      ripngPeerIfIndex OBJECT-TYPE
+        SYNTAX   INTEGER 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngPeerEntry 4 }   
+       
+      ripngPeerInBadPackets OBJECT-TYPE
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngPeerEntry 5 } 
+       
+     ripngPeerInBadRoutes OBJECT-TYPE
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "."
+       ::= { ripngPeerEntry 6 }  
+            
+END
+

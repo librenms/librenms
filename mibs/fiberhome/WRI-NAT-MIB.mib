@@ -1,0 +1,708 @@
+WRI-NAT-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,Counter32
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    
+		wriNat OBJECT IDENTIFIER ::= { wriProtocol 1407 }
+     
+		natCommon OBJECT IDENTIFIER ::= { wriNat 1 }
+		
+		natIcmpTimeOut OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Icmp timeout seconds."
+			::= { natCommon 1 } 
+			
+		natUdpTimeOut OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Udp timeout seconds."
+			::= { natCommon 2 } 
+			
+		natTcpTimeOut OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Tcp timeout seconds."
+			::= { natCommon 3 } 
+			
+		natOtherTcpTimeOut OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Other tcp timeout seconds."
+			::= { natCommon 4 } 
+			
+		natSessionLimitNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Session limit num on global."
+			::= { natCommon 5 } 
+			
+		natVrfSessionLimitNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Vrf session limit num."
+			::= { natCommon 6 } 
+			
+		natIcmpLinkNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Icmp link num."
+			::= { natCommon 7 } 
+			
+		natUdpLinkNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Udp link num."
+			::= { natCommon 8 } 
+			
+		natTcpLinkNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Tcp link num."
+			::= { natCommon 9 } 
+			
+		natMaxSessionNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Max session num."
+			::= { natCommon 10 } 
+			
+		natStaticSessionNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Static session num."
+			::= { natCommon 11} 
+			
+		natDynamicSessionNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dynamic session num."
+			::= { natCommon 12} 
+			
+		natIfNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface num."
+			::= { natCommon 13} 
+			
+		natPoolNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Pool num."
+			::= { natCommon 14} 
+			
+		natUserNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"User num."
+			::= { natCommon 15} 
+			
+		natFilterNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Filterlist num."
+			::= { natCommon 16} 
+			
+		natPoolFreeId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Pool free num."
+			::= { natCommon 17} 
+			
+		natReset OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reset translation."
+			::= { natCommon 18} 
+			
+		natAlg OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Nat alg."
+			::= { natCommon 19} 
+		
+---WRI NAT Address Pool Table
+		natPoolTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF NatPoolEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"Nat Pool table."
+			::= { wriNat 2 }
+	       
+		natPoolEntry OBJECT-TYPE
+			SYNTAX        NatPoolEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The pool entry of the nat address pool table."
+			INDEX { natPoolIndex }
+			::= { natPoolTable 1 }
+	
+		NatPoolEntry ::= SEQUENCE 
+		{
+			natPoolIndex				Unsigned32,
+			natPoolName					OCTET STRING,
+			natPoolLIp					IpAddress,
+			natPoolHIp		      		IpAddress,
+			natPoolMask					IpAddress,
+			natPoolRowStatus			RowStatus,
+			natPoolRefCnt				Unsigned32
+		}
+	
+		natPoolIndex OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The index of the nat pool table."
+			::= { natPoolEntry 1 }
+		
+		natPoolName OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Pool name."
+			::= { natPoolEntry 2 }
+			
+		natPoolLIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The low ip address of a nat pool entry."
+			::= { natPoolEntry 3 }
+			
+		natPoolHIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The high ip address of a nat pool entry."
+			::= { natPoolEntry 4 }
+			
+		natPoolMask OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The mask of ip address."
+			::= { natPoolEntry 5 }
+			
+		natPoolRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The rowstatus of a nat pool entry."
+			::= { natPoolEntry 6 }
+			
+		natPoolRefCnt OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The refcount of a nat pool entry."
+			::= { natPoolEntry 7 }
+
+---WRI NAT Filter Bind Table
+		natFilterBindTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF NatFilterBindEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"Nat FilterBind table."
+			::= { wriNat 3}
+	       
+		natFilterBindEntry OBJECT-TYPE
+			SYNTAX        NatFilterBindEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The entry of the nat filter bind table."
+			INDEX {natFilterListId,natFilterDirection,natFilterVrfId}
+			::= { natFilterBindTable 1 }
+	
+		NatFilterBindEntry ::= SEQUENCE 
+		{
+			natFilterListId				Unsigned32,
+			natFilterDirection			Unsigned32,
+			natFilterVrfId				Unsigned32,
+			natFilterPoolId		      	Unsigned32,
+			natFilterIfUnit				Unsigned32,
+			natFilterOverload			INTEGER,
+			natFilterBindType			INTEGER,
+			natFilterRowStatus			RowStatus
+		}
+	
+		natFilterListId OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The filterlist id."
+			::= { natFilterBindEntry 1 }
+			
+		natFilterDirection OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The direction of nat."
+			::= { natFilterBindEntry 2 }
+			
+		natFilterVrfId OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The vrf id."
+			::= { natFilterBindEntry 3}
+			
+		natFilterPoolId OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The pool id."
+			::= { natFilterBindEntry 4 }
+			
+		natFilterIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The interface unit."
+			::= { natFilterBindEntry 5 }
+		
+		natFilterOverload OBJECT-TYPE
+			SYNTAX		INTEGER
+			{
+				true(1),
+				false(0)
+			}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The interface unit."
+			::= { natFilterBindEntry 6 }
+			
+		natFilterBindType OBJECT-TYPE
+			SYNTAX		INTEGER
+			{
+				bindPool(1),
+				bindInterface(0)
+			}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface unit."
+			::= { natFilterBindEntry 7 }
+		 
+		natFilterRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The rowstatus of a nat filterbind entry."
+			::= { natFilterBindEntry 8 }
+			
+---WRI NAT Session Table
+		natSessionTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF NatSessionEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"Nat session table."
+			::= { wriNat 4}
+	       
+		natSessionEntry OBJECT-TYPE
+			SYNTAX        NatSessionEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The session entry of the nat session table."
+			INDEX {natSessionVrfId,natSessionInLocalIp, natSessionInLocalPort,natSessionInGlobalIp,natSessionInGlobalPort,
+			natSessionOutLocalIp,natSessionOutLocalPort,natSessionOutGlobalIp,natSessionOutGlobalPort,natSessionProtoType}
+			::= { natSessionTable 1 }
+	
+		NatSessionEntry ::= SEQUENCE 
+		{
+			natSessionVrfId				Unsigned32,
+			natSessionInLocalIp			IpAddress,
+			natSessionInLocalPort		Unsigned32,
+			natSessionInGlobalIp		IpAddress,
+			natSessionInGlobalPort		Unsigned32,
+			natSessionOutLocalIp 		IpAddress,
+			natSessionOutLocalPort 		Unsigned32,
+			natSessionOutGlobalIp 		IpAddress,
+			natSessionOutGlobalPort 	Unsigned32,
+			natSessionProtoType 		INTEGER,
+			natSessionBindType	        INTEGER,
+			natSessionCfgType           INTEGER,
+			natSessionRowStatus 		RowStatus
+		}
+	
+		natSessionVrfId OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The vrf id."
+			::= { natSessionEntry 1 }
+			
+		natSessionInLocalIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The inside local ip address."
+			::= { natSessionEntry 2 }
+			
+		natSessionInLocalPort OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The inside local port num."
+			::= { natSessionEntry 3 }
+			
+		natSessionInGlobalIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The inside global ip address."
+			::= { natSessionEntry 4 }
+			
+		natSessionInGlobalPort OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The inside global port num."
+			::= { natSessionEntry 5 }
+			
+		natSessionOutLocalIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The outside local ip address."
+			::= { natSessionEntry 6 }
+			
+		natSessionOutLocalPort OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The outside local port num."
+			::= { natSessionEntry 7 }
+			
+		natSessionOutGlobalIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The outside global ip address."
+			::= { natSessionEntry 8 }
+			
+		natSessionOutGlobalPort OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The outside global port num."
+			::= { natSessionEntry 9 }
+			
+		natSessionProtoType OBJECT-TYPE
+			SYNTAX		INTEGER
+			{
+				icmp(1),
+				tcp(6),
+				udp(17)
+			}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The protocol type."
+			::= { natSessionEntry 10 }
+			
+		natSessionBindType OBJECT-TYPE
+			SYNTAX		INTEGER
+			{
+				static(1),
+				dynamic(2)
+			}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The session binding type."
+			::= { natSessionEntry 11}
+		
+		natSessionCfgType OBJECT-TYPE
+			SYNTAX		INTEGER
+			{
+				config(1),
+				interface(2)
+			}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The session config type."
+			::= { natSessionEntry 12}
+		
+		natSessionRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The session status."
+			::= { natSessionEntry 13}
+			
+---WRI NAT INTERFACE Table
+		natIfTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF NatIfEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"Nat interface table."
+			::= { wriNat 5}
+	       
+		natIfEntry OBJECT-TYPE
+			SYNTAX        NatIfEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The nat interface table."
+			INDEX {natIfUnit }
+			::= { natIfTable 1 }
+	
+		NatIfEntry ::= SEQUENCE 
+		{
+			natIfUnit			Unsigned32,
+			natIfMode			INTEGER,
+			natIfIp             IpAddress,
+			natIfRowstatus      RowStatus
+		}
+	
+		natIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface unit."
+			::= { natIfEntry 1 }
+			
+		natIfMode OBJECT-TYPE
+			SYNTAX		INTEGER
+			{
+				none(0),
+				inside(1),
+				outside(2)
+			}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The mode of nat interface."
+			::= { natIfEntry 2 }
+			
+		natIfIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The ip address of nat interface."
+			::= { natIfEntry 3 }
+			
+		natIfRowstatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The status of nat interface."
+			::= { natIfEntry 4}
+			
+--WRI NAT VRF Table
+		natVrfTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF NatVrfEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"Nat vrf table."
+			::= { wriNat 6}
+	       
+		natVrfEntry OBJECT-TYPE
+			SYNTAX        NatVrfEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The nat vrf table."
+			INDEX {natVrfId }
+			::= { natVrfTable 1 }
+	
+		NatVrfEntry ::= SEQUENCE 
+		{
+			natVrfId		Unsigned32,
+			natVrfNum		Unsigned32,
+			natVrfRowStatus	RowStatus
+		}
+	
+		natVrfId OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The vrf id."
+			::= { natVrfEntry 1 }
+			
+		natVrfNum OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The linknum of vrf instance."
+			::= { natVrfEntry 2 }
+			
+		natVrfRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The rowstatus of vrf table."
+			::= { natVrfEntry 3 }
+			
+			
+--WRI NAT USER Table
+		natUserTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF NatUserEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"Nat user table."
+			::= { wriNat 7}
+	       
+		natUserEntry OBJECT-TYPE
+			SYNTAX        NatUserEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The nat user table."
+			INDEX {natUserVrfId, natUserIp}
+			::= { natUserTable 1 }
+	
+		NatUserEntry ::= SEQUENCE 
+		{
+			natUserVrfId			Unsigned32,
+			natUserIp				IpAddress,
+			natUserTcpSessionNum	Unsigned32,
+			natUserUdpSessionNum	Unsigned32,
+			natUserIcmpSessionNum	Unsigned32,
+			natUserMaxSessionNum	Unsigned32,
+			natUserRowStatus		RowStatus
+		}
+	
+		natUserVrfId OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The user vrf id."
+			::= { natUserEntry 1 }
+			
+		natUserIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The user ip address."
+			::= { natUserEntry 2 }
+			
+		natUserTcpSessionNum OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The tcp session num of user."
+			::= { natUserEntry 3 }
+			
+		natUserUdpSessionNum OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The udp session num of user."
+			::= { natUserEntry 4 }
+			
+		natUserIcmpSessionNum OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The icmp session num of user."
+			::= { natUserEntry 5 }
+			
+		natUserMaxSessionNum OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The max session num of user."
+			::= { natUserEntry 6 }
+						
+		natUserRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The rowstatus of user table."
+			::= { natUserEntry 7 }
+
+END
+								

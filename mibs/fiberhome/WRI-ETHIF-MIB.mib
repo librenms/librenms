@@ -1,0 +1,2126 @@
+WRI-ETHIF-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,RowStatus,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+
+	-- Multiple Services Ring (MSPP)
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	msppDev			OBJECT IDENTIFIER ::=   {mspp 2}
+
+	
+
+
+
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}  
+			
+	--interface table
+
+		ethIfTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF EthIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+				"A list of interface entries.  The number of
+				entries is given by the value of ifNumber."
+			::= { msppDev 4 }
+	
+	
+		ethIfEntry OBJECT-TYPE
+			SYNTAX  EthIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"An interface entry containing objects at the
+					subnetwork layer and below for a particular
+					interface."
+			INDEX   { ethIfIndex }
+			::= { ethIfTable 1 }
+
+		EthIfEntry ::=
+			SEQUENCE {
+				ethIfIndex					Unsigned32,
+				ethIfDescr					DisplayString,
+				ethIfType					INTEGER,
+				ethIfMtu					INTEGER,
+				ethIfSpeed					INTEGER,
+				ethIfConnector				INTEGER,
+				ethIfFlowCtrl				INTEGER,
+				ethIfDuplex				    INTEGER,
+				ethIfAutoNego				INTEGER,
+				ethIfBroadcastStormCtrl	    INTEGER,
+				ethIfBroadcastStorm		    Unsigned32,
+				ethIfMulticastStormCtrl	    INTEGER,
+				ethIfMulticastStorm		    Unsigned32,
+				ethIfDlfCtrl				INTEGER,
+				ethIfDlf					Unsigned32,
+				ethIfPriority				INTEGER,
+				ethIfBWInLimitCtrl			INTEGER,
+				ethIfBWInLimit				Unsigned32,
+				ethIfBWOutLimitCtrl			INTEGER,
+				ethIfBWOutLimit				Unsigned32,
+
+				ethIfAdminStatus			INTEGER,				
+				ethIfOperStatus			    INTEGER,
+				ethIfLastChange			    TimeTicks,
+				ethIfBWGranularity			INTEGER,
+				ethIfFlushMac				OCTET STRING,
+
+				ethIfMirrorPort			    INTEGER,
+				ethIfMirroredIngress		INTEGER,
+				ethIfMirroredEgress		    INTEGER,
+				ethIfInbandEnable			INTEGER,
+				ethIfUnregMulticast		    INTEGER,
+				ethIfInbandVID		        INTEGER,
+				ethIfInbandTag		        INTEGER,
+				ethIfAll					DisplayString,
+				ethIfMacLimit				INTEGER,
+				ethIfCrossLink				INTEGER,
+				ethIfCrossLinkSupport		INTEGER,
+				ethIfComboPortSupport		INTEGER,
+				ethIfComboPortType			INTEGER,
+				ethIfLinkDuplexSpeedCapabilities	BITS,
+				ethIfLinkDuplexSpeed		INTEGER,
+				---add by xiongfang 2011-1-4
+				ethIfAddrLearning           INTEGER,
+				ethIfMacVlanEnable          INTEGER,
+				ethIfIpsubnetVlanEnable     INTEGER,
+				ethIfVlanPrecedence         INTEGER,
+				ethIfMacAddrPriority        INTEGER,
+				ethIfAutoCapabilities       DisplayString,
+				ethIfAutoLocalAdver         DisplayString,
+				ethIfAlias					DisplayString,
+				ethIfStormCtlType           INTEGER,
+				ethIfWorkMode			    INTEGER,
+				ethifMffNetPort             INTEGER,
+				---add by pitao 2011-1-4
+				ethIfSecurityEnable		    INTEGER,
+				ethIfSecurityAction         INTEGER,
+				ethIfSecurityMacSticky      INTEGER,
+				ethIfSecurityMaxMac         INTEGER,
+				ethIfPhyType                INTEGER,
+				ethIfStatisInterframeState  INTEGER,
+				ethIfStaticVlan    			DisplayString,       
+				ethIfMauType                BITS,
+				ethIfMauDfltType            INTEGER,
+				ethIfMauDfltDfltType        INTEGER,
+				ethIfAutoNegoSupport        INTEGER,              
+				---add by pitao 2013-8-23 for combo 
+				ethIfComboFiberAutoNegoSupport   INTEGER,
+				ethIfComboFiberAutoNego          INTEGER, 
+				ethIfComboFiberMauType           BITS,
+				ethIfComboFiberMauDfltType       INTEGER, 
+				ethIfComboFiberMauDfltDfltType       INTEGER,
+                ethIfComboFiberAutoCapabilities  DisplayString,
+				ethIfComboFiberAutoLocalAdver    DisplayString,
+                ethIfComboFiberFlowCtrl          INTEGER,
+                ethIfLaserUnsupportTransceiver   INTEGER,
+                ethIfErrDisableDetectCauseInvalidGbic INTEGER,
+                ethIfStaticIpAddress 	InetAddress
+				}
+				
+			ethIfIndex OBJECT-TYPE
+		    	SYNTAX  Unsigned32
+		    	MAX-ACCESS  read-only
+		    	STATUS  current
+		    	DESCRIPTION
+					"from 1 to msppIfNum"
+		    	::= { ethIfEntry 1 }
+		
+			ethIfDescr OBJECT-TYPE
+				SYNTAX  DisplayString (SIZE(0..64))
+		    	MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+		            "A textual string containing information about the
+		            interface.  This string may include the name of
+		            the manufacturer, the product name and the version
+		            of the hardware interface."
+		    	::= { ethIfEntry 2 }
+		
+			ethIfType OBJECT-TYPE
+		    	SYNTAX  INTEGER{
+                          other(1),          -- none of the following
+                          regular1822(2),
+                          hdh1822(3),
+                          ddn-x25(4),
+                          rfc877-x25(5),
+                          ethernet-csmacd(6),
+                          iso88023-csmacd(7),
+                          iso88024-tokenBus(8),
+                          iso88025-tokenRing(9),
+                          iso88026-man(10),
+                          starLan(11),
+                          proteon-10Mbit(12),
+                          proteon-80Mbit(13),
+                          hyperchannel(14),
+                          fddi(15),
+                          lapb(16),
+                          sdlc(17),
+                          ds1(18),           -- T-1
+                          e1(19),            -- european equiv. of T-1
+                          basicISDN(20),
+                          primaryISDN(21),   -- proprietary serial
+                          propPointToPointSerial(22),
+                          ppp(23),
+                          softwareLoopback(24),
+                          eon(25),            -- CLNP over IP [11]
+                          ethernet-3Mbit(26),
+                             nsip(27),           -- XNS over IP
+                          slip(28),           -- generic SLIP
+                          ultra(29),          -- ULTRA technologies
+                          ds3(30),            -- T-3
+                          sip(31),            -- SMDS
+                          frame-relay(32)
+                      }		    
+                MAX-ACCESS  read-only
+		    	STATUS  current
+		    	DESCRIPTION
+		            "The type of interface, distinguished according to
+		            the physical/link protocol(s) immediately `below'
+		            the network layer in the protocol stack."
+		    	::= { ethIfEntry 3 }
+		
+			ethIfMtu OBJECT-TYPE
+			SYNTAX  INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The size of the largest datagram which can be
+					sent/received on the interface, specwriIfied in
+					octets.  For interfaces that are used for
+					transmitting network datagrams, this is the size
+					of the largest network datagram that can be sent
+					on the interface."
+			::= { ethIfEntry 4 }
+
+			ethIfSpeed OBJECT-TYPE
+			SYNTAX  INTEGER {
+					m2(2),
+					m100(100),
+					m1000(1000),
+					m10000(10000)
+					}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"An estimate of the interface's current bandwidth
+					in bits per second.  For interfaces which do not
+					vary in bandwidth or for those where no accurate
+					estimation can be made, this object should contain
+					the nominal bandwidth."
+			::= { ethIfEntry 5 }
+	
+		ethIfConnector	OBJECT-TYPE
+        SYNTAX INTEGER{
+                optical(0),
+                electronic(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Show the type of interface of this port."
+        ::= { ethIfEntry 6 }
+        	
+	
+		ethIfFlowCtrl	OBJECT-TYPE
+        SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "full or Half duplex flow control (802.3X)."
+        ::= { ethIfEntry 7 }
+
+		ethIfDuplex	OBJECT-TYPE
+        SYNTAX INTEGER{
+                half(0),
+                full(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "duplex mode."
+        ::= { ethIfEntry 8 }
+        
+	
+	
+		ethIfAutoNego	OBJECT-TYPE
+        SYNTAX INTEGER{
+                autonegotiate(1),
+                noauto(2)                
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+            The desired speed and duplex for this interface. If the selected
+            control is not possible on the interface, a value of illegal(99)
+            is returned.  If the port type does NOT support the default
+            of autonegotiate(1), then the application initializes the
+            port to a valid value (e.g., full-1000(7)).  Note that not all
+            controls are possible for all interfaces."
+        DEFVAL { autonegotiate }
+        ::= { ethIfEntry 9 }
+	
+	
+	
+		ethIfBroadcastStormCtrl	OBJECT-TYPE
+        SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Broadcast storm control."
+        ::= { ethIfEntry 10 }
+	
+	
+		ethIfBroadcastStorm	OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Broadcast storm number."
+        ::= { ethIfEntry 11 }
+	
+		ethIfMulticastStormCtrl	OBJECT-TYPE
+        SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Broadcast storm control."
+        ::= { ethIfEntry 12 }
+	
+	
+		ethIfMulticastStorm	OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Broadcast storm number."
+        ::= { ethIfEntry 13 }
+	
+		ethIfDlfCtrl	OBJECT-TYPE
+        SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Broadcast storm control."
+        ::= { ethIfEntry 14 }
+	
+
+		ethIfDlf	OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Broadcast storm control."
+        ::= { ethIfEntry 15 }
+
+		ethIfPriority OBJECT-TYPE
+			SYNTAX  INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The card number of tributary."
+			::= { ethIfEntry 16 }
+		
+				
+		ethIfBWInLimitCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"band width limit control of tributary."
+			DEFVAL {disable}
+			::= { ethIfEntry 17 }
+		
+		ethIfBWInLimit OBJECT-TYPE
+			SYNTAX  Unsigned32
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"band width value of tributary."
+			::= { ethIfEntry 18 }
+		
+		
+		ethIfBWOutLimitCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"band width limit control tributary."
+			DEFVAL {disable}
+
+			::= { ethIfEntry 19 }
+		
+		ethIfBWOutLimit OBJECT-TYPE
+			SYNTAX  Unsigned32
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"band width value of tributary."
+			::= { ethIfEntry 20 }
+                       	                          
+		ethIfAdminStatus OBJECT-TYPE
+			SYNTAX  INTEGER {                          
+				up(1),       
+				down(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The desired status of the interface.  The
+					testing(3) status indicates that no operational
+					packets can be passed."
+			::= { ethIfEntry 21}
+
+
+		
+
+		ethIfOperStatus OBJECT-TYPE
+			SYNTAX  INTEGER
+			{                          
+				up(1),       
+				down(2)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The current operational status of the interface.
+					The testing(3) status indicates that no operational
+					packets can be passed."
+			::= { ethIfEntry 22 }
+
+                                   		
+		ethIfLastChange OBJECT-TYPE
+			SYNTAX  TimeTicks
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The value of sysUpTime at the time the interface
+					entered its current operational state.  If the
+					current state was entered prior to the last re-
+					initialization of the local network management
+					subsystem, then this object contains a zero
+					value."
+			::= { ethIfEntry 23 }
+                 
+                 
+                 
+		ethIfBWGranularity OBJECT-TYPE
+			SYNTAX  INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"minimum unit granularity.64 k/bits for TCE"
+			::= { ethIfEntry 24 }
+	
+		ethIfFlushMac OBJECT-TYPE
+			SYNTAX  OCTET STRING
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"minimum unit granularity.64 k/bits for TCE"
+			::= { ethIfEntry 25 }
+	
+
+
+		ethIfMirrorPort OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"mirror Port."
+			::= { ethIfEntry 26 }
+
+		ethIfMirroredIngress OBJECT-TYPE
+			SYNTAX   INTEGER{
+					disable(2),
+					enable(1)
+				}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"enable or disable mirror ingress."
+			::= { ethIfEntry 27 }
+
+		ethIfMirroredEgress OBJECT-TYPE
+			SYNTAX   INTEGER{
+					disable(2),
+					enable(1)
+				}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"enable or disable mirror egress."
+			::= { ethIfEntry 28 }
+		
+
+		ethIfInbandEnable OBJECT-TYPE
+			SYNTAX   INTEGER{
+					disable(2),
+					enable(1)
+				}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"enable or disable inband network management."
+			::= { ethIfEntry 29 }
+			
+		ethIfUnregMulticast OBJECT-TYPE
+			SYNTAX   INTEGER{
+				forward(0),
+				drop(1)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"forward or drop unregistered multicast address."
+			::= { ethIfEntry 30 }
+
+		ethIfInbandVID  OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"forward or drop unregistered multicast address."
+			::= { ethIfEntry 31 }
+			
+		ethIfInbandTag  OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"forward or drop unregistered multicast address."
+			::= { ethIfEntry 32 }
+
+		ethIfAll	OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"get if all information."
+			::= { ethIfEntry 33 }
+	
+	
+		ethIfMacLimit	OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"system mac address number limit."
+			::= { ethIfEntry 34 }
+		
+		ethIfCrossLink	OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"cross link config."
+			::= { ethIfEntry 35 }
+		
+		
+		ethIfCrossLinkSupport	OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"support cross link."
+			::= { ethIfEntry 36 }
+			
+		ethIfComboPortSupport	OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"support combo port."
+			::= { ethIfEntry 37 }
+			
+		ethIfComboPortType	OBJECT-TYPE
+			SYNTAX   INTEGER{
+				auto(1),
+				fiber(2),
+				copper(3)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"combo port is copper or fiber."
+			::= { ethIfEntry 38 }
+			
+		ethIfLinkDuplexSpeedCapabilities	OBJECT-TYPE
+			SYNTAX   BITS{
+				auto(0),
+				full10(1),
+				half10(2),
+				full100(3),
+				half100(4),
+				full1000(5),
+				half1000(6),
+				full10000(7),
+				half10000(8),
+				noauto(9),
+				invalid(10)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed capabilities."
+			::= { ethIfEntry 39 }
+		
+		ethIfLinkDuplexSpeed	OBJECT-TYPE
+			SYNTAX   INTEGER{
+				auto(0),
+				full10(1),
+				half10(2),
+				full100(3),
+				half100(4),
+				full1000(5),
+				half1000(6),
+				full10000(7)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed."
+			::= { ethIfEntry 40 }
+			
+			---ADD BY XIONGFANG 2011-1-4
+			ethIfAddrLearning	OBJECT-TYPE
+			SYNTAX   INTEGER{
+			disable(2),
+			enable(1)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed."
+			::= { ethIfEntry 41 }
+			
+			ethIfMacVlanEnable	OBJECT-TYPE
+			SYNTAX   INTEGER{
+				disable(2),
+				enable(1)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed."
+			::= { ethIfEntry 42 }
+			
+			ethIfIpsubnetVlanEnable	OBJECT-TYPE
+			SYNTAX   INTEGER{
+				disable(2),
+				enable(1)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed."
+			::= { ethIfEntry 43 }
+			
+			ethIfVlanPrecedence	OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed."
+			::= { ethIfEntry 44 }
+			
+			ethIfMacAddrPriority	OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"link duplex & speed."
+			::= { ethIfEntry 45 }
+			
+			ethIfAutoCapabilities	OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The negotiation duplex & speed capabilities."
+			::= { ethIfEntry 46 }
+			
+			ethIfAutoLocalAdver	OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The negotiation local advertised duplex & speed capabilities ."
+			::= { ethIfEntry 47 }
+			
+			ethIfAlias OBJECT-TYPE
+				SYNTAX  DisplayString (SIZE(0..64))
+		    MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+		            "A textual string containing information about the
+		            interface.  This string may include the alias name of
+		            the manufacturer, the product name and the version
+		            of the hardware interface."
+		    	::= { ethIfEntry 48 }
+		    	
+			ethIfStormCtlType	OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				percent(1),
+				pps(2),
+				bps(3)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The type of storm ctrl ."
+			::= { ethIfEntry 49 }
+			
+			ethIfWorkMode OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				bridgemode(0),
+				routermode(1)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The work mode of interface."
+			::= { ethIfEntry 50 }
+			
+			ethifMffNetPort OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The network port of interface."
+			::= { ethIfEntry 51 }
+		       
+			ethIfSecurityEnable	OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The state of interface security function."
+			::= { ethIfEntry 52 } 
+	  
+	        ethIfSecurityAction  	OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				protect(0),
+				restrict(1),
+				shutdown(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"when the interface breach the security function,the action of the interface ."
+			::= { ethIfEntry 53 } 
+     
+		    ethIfSecurityMacSticky 	OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The state of interface sticky-mac function."
+            ::= { ethIfEntry 54 } 
+
+		    ethIfSecurityMaxMac  	OBJECT-TYPE
+			SYNTAX   INTEGER(1..4094)
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The max mac address number the interface can learn."
+            ::= { ethIfEntry 55 }      
+            
+          ethIfPhyType   OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				fe(1),
+				ge(2),
+				xge(3),
+				ethAgg(4),
+				vlan(5),
+				tunnel(6),
+				loopback(7),
+				null(8),
+				tdmE1(9),
+				tdmStm1(10),
+				atm(12),
+				stm(13),
+				pos(14),
+				gePon(15),
+				xgePon(16),
+				gPon(17),
+				ponAgg(18),
+				rs232(19),
+				rs485(20)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The interface phy type."
+            ::= { ethIfEntry 56 }      
+         
+          ethIfStatisInterframeState OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The state of flow statistic include interframe ."
+            ::= { ethIfEntry 57 } 
+			
+		ethIfStaticVlan	OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"Static vlan."
+			::= { ethIfEntry 58 }
+	   
+	    ethIfMauType  OBJECT-TYPE
+	      	SYNTAX       BITS {
+	              bOther(0),          -- other or unknown
+	              bAUI(1),            -- AUI
+	              b10base5(2),        -- 10BASE-5
+	              bFoirl(3),          -- FOIRL
+	
+	              b10base2(4),        -- 10BASE-2
+	              b10baseT(5),        -- 10BASE-T duplex mode unknown
+	              b10baseFP(6),       -- 10BASE-FP
+	              b10baseFB(7),       -- 10BASE-FB
+	              b10baseFL(8),       -- 10BASE-FL duplex mode unknown
+	              b10broad36(9),      -- 10BROAD36
+	              b10baseTHD(10),     -- 10BASE-T  half duplex mode
+	              b10baseTFD(11),     -- 10BASE-T  full duplex mode
+	              b10baseFLHD(12),    -- 10BASE-FL half duplex mode
+	              b10baseFLFD(13),    -- 10BASE-FL full duplex mode
+	              b100baseT4(14),     -- 100BASE-T4
+	              b100baseTXHD(15),   -- 100BASE-TX half duplex mode
+	              b100baseTXFD(16),   -- 100BASE-TX full duplex mode
+	              b100baseFXHD(17),   -- 100BASE-FX half duplex mode
+	              b100baseFXFD(18),   -- 100BASE-FX full duplex mode
+	              b100baseT2HD(19),   -- 100BASE-T2 half duplex mode
+	              b100baseT2FD(20),   -- 100BASE-T2 full duplex mode
+	
+	              b1000baseXHD(21),   -- 1000BASE-X half duplex mode
+	              b1000baseXFD(22),   -- 1000BASE-X full duplex mode
+	              b1000baseLXHD(23),  -- 1000BASE-LX half duplex mode
+	              b1000baseLXFD(24),  -- 1000BASE-LX full duplex mode
+	              b1000baseSXHD(25),  -- 1000BASE-SX half duplex mode
+	              b1000baseSXFD(26),  -- 1000BASE-SX full duplex mode
+	              b1000baseCXHD(27),  -- 1000BASE-CX half duplex mode
+	              b1000baseCXFD(28),  -- 1000BASE-CX full duplex mode
+	              b1000baseTHD(29),   -- 1000BASE-T half duplex mode
+	              b1000baseTFD(30),   -- 1000BASE-T full duplex mode
+	
+	              b10GbaseX(31),      -- 10GBASE-X
+	              b10GbaseLX4(32),    -- 10GBASE-LX4
+	
+	              b10GbaseR(33),      -- 10GBASE-R
+	              b10GbaseER(34),     -- 10GBASE-ER
+	              b10GbaseLR(35),     -- 10GBASE-LR
+	              b10GbaseSR(36),     -- 10GBASE-SR
+	              b10GbaseW(37),      -- 10GBASE-W
+	              b10GbaseEW(38),     -- 10GBASE-EW
+	              b10GbaseLW(39),     -- 10GBASE-LW
+	              b10GbaseSW(40),     -- 10GBASE-SW
+	              -- new since RFC 3636
+	              b10GbaseCX4(41),    -- 10GBASE-CX4
+	              b2BaseTL(42),       -- 2BASE-TL
+	              b10PassTS(43),      -- 10PASS-TS
+	              b100BaseBX10D(44),  -- 100BASE-BX10D
+	              b100BaseBX10U(45),  -- 100BASE-BX10U
+	              b100BaseLX10(46),   -- 100BASE-LX10
+	              b1000BaseBX10D(47), -- 1000BASE-BX10D
+	              b1000BaseBX10U(48), -- 1000BASE-BX10U
+	              b1000BaseLX10(49),  -- 1000BASE-LX10
+	              b1000BasePX10D(50), -- 1000BASE-PX10D
+	              b1000BasePX10U(51), -- 1000BASE-PX10U
+	              b1000BasePX20D(52), -- 1000BASE-PX20D
+	              b1000BasePX20U(53), -- 1000BASE-PX20U
+	              b10GbaseT(54),      -- 10GBASE-T
+	              b10GbaseLRM(55),    -- 10GBASE-LRM
+	              b1000baseKX(56),    -- 1000BASE-KX
+	              b10GbaseKX4(57),    -- 10GBASE-KX4
+	              b10GbaseKR(58),     -- 10GBASE-KR
+	              b10G1GbasePRXD1(59),-- 10/1GBASE-PRX-D1
+	              b10G1GbasePRXD2(60),-- 10/1GBASE-PRX-D2
+	              b10G1GbasePRXD3(61),-- 10/1GBASE-PRX-D3
+	              b10G1GbasePRXU1(62),-- 10/1GBASE-PRX-U1
+	              b10G1GbasePRXU2(63),-- 10/1GBASE-PRX-U2
+	              b10G1GbasePRXU3(64),-- 10/1GBASE-PRX-U3
+	              b10GbasePRD1(65),   -- 10GBASE-PR-D1
+	              b10GbasePRD2(66),   -- 10GBASE-PR-D2
+	              b10GbasePRD3(67),   -- 10GBASE-PR-D3
+	              b10GbasePRU1(68),   -- 10GBASE-PR-U1
+	              b10GbasePRU3(69)    -- 10GBASE-PR-U3
+        	 } 
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"mau type,bit list,each bit express different speed and duplex. "
+			::= { ethIfEntry 59 }
+	
+		ethIfMauDfltType  OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The speed and duplex in operating mode."
+            ::= { ethIfEntry 60} 
+        
+        ethIfMauDfltDfltType  OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The default speed and duplex in operating mode."
+            ::= { ethIfEntry 61} 
+        
+	    ethIfAutoNegoSupport OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				support(1),
+				nonsupport(2)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"whether support atuo negotiation."
+            ::= { ethIfEntry 62} 
+
+        ethIfComboFiberAutoNegoSupport  OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				support(1),
+				nonsupport(2)
+			}
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"whether support atuo negotiation,only can be used by combo interface in fiber."
+            ::= { ethIfEntry 63} 
+       
+        ethIfComboFiberAutoNego  OBJECT-TYPE
+	        SYNTAX INTEGER{
+	                autonegotiate(1),
+	                noauto(2)                
+	        }
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	            "DURABLE:
+	            The desired speed and duplex for this interface. If the selected
+	            control is not possible on the interface, a value of illegal(99)
+	            is returned.  If the port type does NOT support the default
+	            of autonegotiate(1), then the application initializes the
+	            port to a valid value (e.g., full-1000(7)).  Note that not all
+	            controls are possible for all interfaces.only can be used by combo interface in fiber"
+	        DEFVAL { autonegotiate }
+	        ::= { ethIfEntry 64}
+        
+	   ethIfComboFiberMauType  OBJECT-TYPE
+	      	SYNTAX       BITS {
+	              bOther(0),          -- other or unknown
+	              bAUI(1),            -- AUI
+	              b10base5(2),        -- 10BASE-5
+	              bFoirl(3),          -- FOIRL
+	
+	              b10base2(4),        -- 10BASE-2
+	              b10baseT(5),        -- 10BASE-T duplex mode unknown
+	              b10baseFP(6),       -- 10BASE-FP
+	              b10baseFB(7),       -- 10BASE-FB
+	              b10baseFL(8),       -- 10BASE-FL duplex mode unknown
+	              b10broad36(9),      -- 10BROAD36
+	              b10baseTHD(10),     -- 10BASE-T  half duplex mode
+	              b10baseTFD(11),     -- 10BASE-T  full duplex mode
+	              b10baseFLHD(12),    -- 10BASE-FL half duplex mode
+	              b10baseFLFD(13),    -- 10BASE-FL full duplex mode
+	              b100baseT4(14),     -- 100BASE-T4
+	              b100baseTXHD(15),   -- 100BASE-TX half duplex mode
+	              b100baseTXFD(16),   -- 100BASE-TX full duplex mode
+	              b100baseFXHD(17),   -- 100BASE-FX half duplex mode
+	              b100baseFXFD(18),   -- 100BASE-FX full duplex mode
+	              b100baseT2HD(19),   -- 100BASE-T2 half duplex mode
+	              b100baseT2FD(20),   -- 100BASE-T2 full duplex mode
+	
+	              b1000baseXHD(21),   -- 1000BASE-X half duplex mode
+	              b1000baseXFD(22),   -- 1000BASE-X full duplex mode
+	              b1000baseLXHD(23),  -- 1000BASE-LX half duplex mode
+	              b1000baseLXFD(24),  -- 1000BASE-LX full duplex mode
+	              b1000baseSXHD(25),  -- 1000BASE-SX half duplex mode
+	              b1000baseSXFD(26),  -- 1000BASE-SX full duplex mode
+	              b1000baseCXHD(27),  -- 1000BASE-CX half duplex mode
+	              b1000baseCXFD(28),  -- 1000BASE-CX full duplex mode
+	              b1000baseTHD(29),   -- 1000BASE-T half duplex mode
+	              b1000baseTFD(30),   -- 1000BASE-T full duplex mode
+	
+	              b10GbaseX(31),      -- 10GBASE-X
+	              b10GbaseLX4(32),    -- 10GBASE-LX4
+	
+	              b10GbaseR(33),      -- 10GBASE-R
+	              b10GbaseER(34),     -- 10GBASE-ER
+	              b10GbaseLR(35),     -- 10GBASE-LR
+	              b10GbaseSR(36),     -- 10GBASE-SR
+	              b10GbaseW(37),      -- 10GBASE-W
+	              b10GbaseEW(38),     -- 10GBASE-EW
+	              b10GbaseLW(39),     -- 10GBASE-LW
+	              b10GbaseSW(40),     -- 10GBASE-SW
+	              -- new since RFC 3636
+	              b10GbaseCX4(41),    -- 10GBASE-CX4
+	              b2BaseTL(42),       -- 2BASE-TL
+	              b10PassTS(43),      -- 10PASS-TS
+	              b100BaseBX10D(44),  -- 100BASE-BX10D
+	              b100BaseBX10U(45),  -- 100BASE-BX10U
+	              b100BaseLX10(46),   -- 100BASE-LX10
+	              b1000BaseBX10D(47), -- 1000BASE-BX10D
+	              b1000BaseBX10U(48), -- 1000BASE-BX10U
+	              b1000BaseLX10(49),  -- 1000BASE-LX10
+	              b1000BasePX10D(50), -- 1000BASE-PX10D
+	              b1000BasePX10U(51), -- 1000BASE-PX10U
+	              b1000BasePX20D(52), -- 1000BASE-PX20D
+	              b1000BasePX20U(53), -- 1000BASE-PX20U
+	              b10GbaseT(54),      -- 10GBASE-T
+	              b10GbaseLRM(55),    -- 10GBASE-LRM
+	              b1000baseKX(56),    -- 1000BASE-KX
+	              b10GbaseKX4(57),    -- 10GBASE-KX4
+	              b10GbaseKR(58),     -- 10GBASE-KR
+	              b10G1GbasePRXD1(59),-- 10/1GBASE-PRX-D1
+	              b10G1GbasePRXD2(60),-- 10/1GBASE-PRX-D2
+	              b10G1GbasePRXD3(61),-- 10/1GBASE-PRX-D3
+	              b10G1GbasePRXU1(62),-- 10/1GBASE-PRX-U1
+	              b10G1GbasePRXU2(63),-- 10/1GBASE-PRX-U2
+	              b10G1GbasePRXU3(64),-- 10/1GBASE-PRX-U3
+	              b10GbasePRD1(65),   -- 10GBASE-PR-D1
+	              b10GbasePRD2(66),   -- 10GBASE-PR-D2
+	              b10GbasePRD3(67),   -- 10GBASE-PR-D3
+	              b10GbasePRU1(68),   -- 10GBASE-PR-U1
+	              b10GbasePRU3(69)    -- 10GBASE-PR-U3
+        	 } 
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"mau type,bit list,each bit express different speed and duplex.only can be used by combo interface in fiber"
+			::= { ethIfEntry 65}
+         
+	    ethIfComboFiberMauDfltType OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The speed and duplex in operating mode.only can be used by combo interface in fiber"
+            ::= { ethIfEntry 66}      
+            
+        ethIfComboFiberMauDfltDfltType OBJECT-TYPE
+        	SYNTAX   INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The default speed and duplex in operating mode.only can be used by combo interface in fiber"
+            ::= { ethIfEntry 67}      
+            
+        ethIfComboFiberAutoCapabilities OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The negotiation duplex & speed capabilities.only can be used by combo interface in fiber"
+			::= { ethIfEntry 68 }
+			
+		ethIfComboFiberAutoLocalAdver  OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The negotiation local advertised duplex & speed capabilities .only can be used by combo interface in fiber"
+			::= { ethIfEntry 69 }  	     
+	    
+	    ethIfComboFiberFlowCtrl    OBJECT-TYPE
+	       SYNTAX INTEGER{
+					enable(1),
+	                disable(2)
+				  }
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	                "full or Half duplex flow control (802.3X).only can be used by combo interface in fiber"
+	        ::= { ethIfEntry 70 } 
+        
+        ethIfLaserUnsupportTransceiver    OBJECT-TYPE
+	       SYNTAX INTEGER{
+					enable(1),
+	                disable(2)
+				  }
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	                "Unsupport Transceiver support state"
+	        ::= { ethIfEntry 71}  
+	        
+        ethIfErrDisableDetectCauseInvalidGbic   OBJECT-TYPE
+	       SYNTAX INTEGER{
+					enable(1),
+	                disable(2)
+				  }
+	        MAX-ACCESS read-write
+	        STATUS current
+	        DESCRIPTION
+	                "ErrDisable Detect state that Cause by Invalid Gbic" 
+	    ::= { ethIfEntry 72}  
+
+		ethIfStaticIpAddress OBJECT-TYPE
+			SYNTAX      InetAddress
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"IP address."			
+			::= { ethIfEntry 73 }
+	                			
+			--if trunk table
+		ethIfTrunkTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF EthIfTrunkEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { msppDev 5 }
+
+		ethIfTrunkEntry  OBJECT-TYPE
+			SYNTAX 	EthIfTrunkEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			INDEX {ethIfIndex }
+			::= { ethIfTrunkTable 1 }
+
+		EthIfTrunkEntry ::= SEQUENCE {				
+				ethIfTrunkEnable		INTEGER,
+				ethIfTrunkPort			Unsigned32
+			}
+
+
+		ethIfTrunkEnable  OBJECT-TYPE
+			SYNTAX     INTEGER{
+				disable(2),
+				enable(1)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"NULL"
+			::= { ethIfTrunkEntry 1 }
+
+		ethIfTrunkPort  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"NULL"
+			::= { ethIfTrunkEntry 2}
+			
+	
+		-- trunk interface
+		ethTrunkIfTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF EthTrunkIfEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { msppDev 6 }
+
+		ethTrunkIfEntry  OBJECT-TYPE
+			SYNTAX 	EthTrunkIfEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			INDEX {ethIfIndex }
+			::= { ethTrunkIfTable 1 }
+
+		EthTrunkIfEntry ::= SEQUENCE {				
+				ethTrunkIfBaseIndex		Counter32,
+				ethTrunkIfType			INTEGER,
+				ethTrunkIfMode		  	INTEGER,
+				ethTrunkIfPortsList 		OCTET STRING,
+				ethTrunkIfPortsNum		Counter32,
+				ethTrunkIfRemovePorts	OCTET STRING,
+				ethTrunkIfEntryStatus	RowStatus,
+				ethTrunkIfPSMode	INTEGER,
+				--add by xiongfang 2011-4-4
+				ethTrunkIfMinActiveLinkNum Integer32,
+				ethTrunkIfMLMode  INTEGER,
+				ethTrunkIfSchduleProfileMode Integer32,
+				ethTrunkIfMaxActiveLinkNum Integer32
+			}
+
+
+		ethTrunkIfBaseIndex  OBJECT-TYPE
+			SYNTAX     Counter32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"A unique value for each interface.  Its value
+					ranges between 1 and the value of trunkIfNumber.  The
+					value for each interface must remain constant at
+					least from one re-initialization of the entity's
+					network management system to the next re-
+					initialization."
+			::= { ethTrunkIfEntry 1 }
+
+		ethTrunkIfType  OBJECT-TYPE
+			SYNTAX     INTEGER{
+			    	fe(0),
+		    		ge(1),
+		    		xge(2),
+		    		tdm2m(3),
+		    		trunk(4)
+		    		}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The standard type of interface."
+			::= { ethTrunkIfEntry 2}
+
+		ethTrunkIfMode  OBJECT-TYPE
+			SYNTAX     INTEGER{
+						srcmac(0),
+						destmac(1),
+						srcanddestmac(2),
+						srcip(3),
+						destip(4),
+						srcanddestip(5)
+				}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The load-balance schedule of the the trunk interface."
+			::= { ethTrunkIfEntry 3}
+
+		ethTrunkIfPortsList OBJECT-TYPE
+			SYNTAX       OCTET STRING (SIZE(0..1024))
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"The member ports of trunk interface."
+			::= { ethTrunkIfEntry 4}
+
+		ethTrunkIfPortsNum OBJECT-TYPE
+			SYNTAX      Counter32
+			MAX-ACCESS  read-only
+			STATUS      current
+			DESCRIPTION
+					"the bitmap of the member in vlan interface,the value is from 1 to 4096."
+			::= { ethTrunkIfEntry 5}
+
+		ethTrunkIfRemovePorts OBJECT-TYPE
+			SYNTAX       OCTET STRING (SIZE(0..1024))
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"Remove ports from the trunk interface."
+			::= { ethTrunkIfEntry 6}
+
+		ethTrunkIfEntryStatus  OBJECT-TYPE
+			SYNTAX      RowStatus
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"The row status of the the trunk interface."
+			::= { ethTrunkIfEntry 7}
+
+		ethTrunkIfPSMode  OBJECT-TYPE
+			SYNTAX      INTEGER
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"Null."
+			::= { ethTrunkIfEntry 8}
+			
+			--add by xiongfang 2011-1-4
+			ethTrunkIfMinActiveLinkNum  OBJECT-TYPE
+			SYNTAX      Integer32
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"The least active link num."
+			::= { ethTrunkIfEntry 9}
+			
+			ethTrunkIfMLMode  OBJECT-TYPE
+			SYNTAX      INTEGER
+			{
+				manual(0),
+				staticlacp(1),
+				dynamiclacp(2)
+			}
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"Trunk mode."
+			::= { ethTrunkIfEntry 10}
+			
+                                            
+			ethTrunkIfSchduleProfileMode  OBJECT-TYPE
+			SYNTAX      Integer32
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"The schdule profile index."
+			::= { ethTrunkIfEntry 11}
+		
+		ethTrunkIfMaxActiveLinkNum  OBJECT-TYPE
+			SYNTAX      Integer32
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"The least active link num."
+			::= { ethTrunkIfEntry 12}	  
+			  	  
+			                                   
+			--interface statistics table
+	
+	ethIfStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF EthIfStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A list of interface entries.  The number of
+			entries is given by the value of ifNumber."
+		::= { msppDev 7 }
+	
+	ethIfStatsEntry OBJECT-TYPE
+		SYNTAX  EthIfStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"An interface entry containing objects at the
+			subnetwork layer and below for a particular
+			interface."
+		INDEX   { ethIfStatsIndex }
+		::= { ethIfStatsTable 1 }
+
+	EthIfStatsEntry ::=
+		SEQUENCE {
+				ethIfStatsIndex					Unsigned32,
+				ethIfStatsTxPkts					Counter64,
+				ethIfStatsRxPkts					Counter64,
+				ethIfStatsTxOctets					Counter64,
+				ethIfStatsRxOctets					Counter64,
+				ethIfStatsRxFragments				Counter64,
+				ethIfStatsRxJabbers				Counter64,
+				
+				ethIfStatsRxCRCAlignErrors			Counter64,
+				
+				ethIfStatsCollisions				Counter64,
+				ethIfStatsRxUndersizePkts			Counter64,
+				ethIfStatsRxOversizePkts			Counter64,
+				
+				ethIfStatsTxPkts64Octets			Counter64,
+				ethIfStatsTxPkts65to127Octets		Counter64,
+				ethIfStatsTxPkts128to255Octets		Counter64,
+				ethIfStatsTxPkts256to511Octets		Counter64,
+				ethIfStatsTxPkts512to1023Octets	Counter64,
+				ethIfStatsTxPkts1024to1518Octets	Counter64,
+				ethIfStatsTxPkts1519toMaxOctets	Counter64,
+				
+				ethIfStatsRxPkts64Octets			Counter64,
+				ethIfStatsRxPkts65to127Octets		Counter64,
+				ethIfStatsRxPkts128to255Octets		Counter64,
+				ethIfStatsRxPkts256to511Octets		Counter64,
+				ethIfStatsRxPkts512to1023Octets	Counter64,
+				ethIfStatsRxPkts1024to1518Octets	Counter64,
+				ethIfStatsRxPkts1519toMaxOctets	Counter64,
+				
+				ethIfStatsTxUnicastPkts			Counter64,
+				ethIfStatsTxMulticastPkts			Counter64,
+				ethIfStatsTxBroadcastPkts			Counter64,
+				
+				ethIfStatsRxUnicastPkts			Counter64,
+				ethIfStatsRxMulticastPkts			Counter64,
+				ethIfStatsRxBroadcastPkts			Counter64,
+				ethIfStatsAll						DisplayString,
+				ethIfStatsReset					INTEGER,
+				ethIfStatsLast5MinsRxPkts		Counter64,
+				ethIfStatsLast5MinsTxPkts		Counter64,
+				ethIfStatsLast5MinsRxOctets		Counter64,
+				ethIfStatsLast5MinsTxOctets		Counter64,
+				ethIfStatsLast5MinsRxUtilizationRate		INTEGER,
+				ethIfStatsLast5MinsTxUtilizationRate		INTEGER,
+				ethIfStatsDropEvent				Counter64,
+	    		ethIfStatsRxDiscard				Counter64,
+			    ethIfStatsRxPause					Counter64,
+			    ethIfStatsTxPause					Counter64,
+			    ethIfStatsSymErr					Counter64,
+			    ethIfStatsRxUnknownOpcode	Counter64,
+			    ethIfStatsSingleColl			Counter64,	
+			    ethIfStatsMultiColl				Counter64,
+			    ethIfStatsLateColl				Counter64,
+			    ethIfStatsExcessColl			Counter64,
+			    ethIfStatsDeferTrans			Counter64,				
+				ethIfStatsTxErr  Counter64,
+				ethIfStatsRxErr  Counter64
+		}
+
+
+	ethIfStatsIndex	OBJECT-TYPE
+        SYNTAX Unsigned32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "interface index."
+        ::= { ethIfStatsEntry 1 }
+												
+				
+	ethIfStatsTxPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "include unicast packets,multicast packets,broadcast packets."
+        ::= { ethIfStatsEntry 2 }
+
+
+	ethIfStatsRxPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "include unicast packets,multicast packets,broadcast packets."
+        ::= { ethIfStatsEntry 3 }				
+
+	ethIfStatsTxOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "64 bits count of the number of transmitted octets of
+                data (including those in bad packets)."
+        ::= { ethIfStatsEntry 4 }
+
+	ethIfStatsRxOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "64 bits count of the number of received octets of
+                data (including those in bad packets)."
+        ::= { ethIfStatsEntry 5 }
+        
+
+	ethIfStatsRxFragments	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets received that were less
+				than 64 octets in length (excluding framing bits but
+				including FCS octets) and had either a bad Frame
+				Check Sequence (FCS) with an integral number of
+				octets (FCS Error) or a bad FCS with a non-integral
+				number of octets (Alignment Error). 	
+				Note that it is entirely normal for
+				etherStatsFragments to increment.  This is because
+				it counts both runts (which are normal occurrences
+				due to collisions) and noise hits."
+        ::= { ethIfStatsEntry 6 }
+
+
+	ethIfStatsRxJabbers	OBJECT-TYPE
+		SYNTAX Counter64 
+		MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets received that were
+				longer than 1518 octets (excluding framing bits,
+				but including FCS octets), and had either a bad
+				Frame Check Sequence (FCS) with an integral number
+				of octets (FCS Error) or a bad FCS with a
+				non-integral number of octets (Alignment Error). 	
+				Note that this definition of jabber is different
+				than the definition in IEEE-802.3 section 8.2.1.5
+				(10BASE5) and section 10.3.1.4 (10BASE2).  These
+				documents define jabber as the condition where any
+				packet exceeds 20 ms.  The allowed range to detect
+				jabber is between 20 ms and 150 ms."
+        ::= { ethIfStatsEntry 7 }
+		
+		
+	ethIfStatsRxCRCAlignErrors	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets received that
+				had a length (excluding framing bits, but
+				including FCS octets) of between 64 and 1518
+				octets, inclusive, but but had either a bad
+				Frame Check Sequence (FCS) with an integral
+				number of octets (FCS Error) or a bad FCS with
+				a non-integral number of octets (Alignment Error)."
+        ::= { ethIfStatsEntry 8 }
+		
+		
+		
+	ethIfStatsCollisions	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The best estimate of the total number of collisions
+				on this Ethernet segment.
+				The value returned will depend on the location of
+				the RMON probe. Section 8.2.1.3 (10BASE-5) and
+				section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+				states that a station must detect a collision, in
+				the receive mode, if three or more stations are
+				transmitting simultaneously.  A repeater port must
+				detect a collision when two or more stations are
+				transmitting simultaneously.  Thus a probe placed on
+				a repeater port could record more collisions than a
+				probe connected to a station on the same segment
+				would.
+				Probe location plays a much smaller role when
+				considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+				standard 802.3 defines a collision as the
+				simultaneous presence of signals on the DO and RD
+				circuits (transmitting and receiving at the same
+				time).  A 10BASE-T station can only detect
+				collisions when it is transmitting.  Thus probes
+				placed on a station and a repeater, should report
+				the same number of collisions."
+        ::= { ethIfStatsEntry 9 }
+        
+        
+        
+        
+	ethIfStatsRxUndersizePkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets received that were
+				less than 64 octets long (excluding framing bits,
+				but including FCS octets) and were otherwise well
+				formed."
+        ::= { ethIfStatsEntry 10 }
+
+
+	ethIfStatsRxOversizePkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets received that were
+				longer than 1518 octets (excluding framing bits,
+				but including FCS octets) and were otherwise
+				well formed."
+        ::= { ethIfStatsEntry 11 }
+
+
+
+	ethIfStatsTxPkts64Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were 64 octets in length."
+        ::= { ethIfStatsEntry 12 }
+
+
+	ethIfStatsTxPkts65to127Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were between 65 and 127 octets in length."
+        ::= { ethIfStatsEntry 13 }
+
+
+	ethIfStatsTxPkts128to255Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were between 128 and 255 octets in length."
+        ::= { ethIfStatsEntry 14 }
+
+
+
+	ethIfStatsTxPkts256to511Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were between 256 and 511 octets in length."
+        ::= { ethIfStatsEntry 15 }
+
+
+
+	ethIfStatsTxPkts512to1023Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were between 512 and 1023 octets in length."
+        ::= { ethIfStatsEntry 16 }
+
+	ethIfStatsTxPkts1024to1518Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were between 1024 and 1518 octets in length."
+        ::= { ethIfStatsEntry 17 }
+
+
+	ethIfStatsTxPkts1519toMaxOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of packets (including bad packets) transmitted
+                that were between 1024 and 1518 octets in length."
+        ::= { ethIfStatsEntry 18 }
+
+	ethIfStatsRxPkts64Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were 64 octets in length
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 19 }
+
+
+	ethIfStatsRxPkts65to127Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were between
+				65 and 127 octets in length inclusive
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 20 }
+
+	ethIfStatsRxPkts128to255Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were between
+				128 and 255 octets in length inclusive
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 21 }
+
+
+	ethIfStatsRxPkts256to511Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were between
+				256 and 511 octets in length inclusive
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 22 }
+       
+
+
+	ethIfStatsRxPkts512to1023Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were between
+				512 and 1023 octets in length inclusive
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 23 }
+
+
+	ethIfStatsRxPkts1024to1518Octets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were between
+				1024 and 1518 octets in length inclusive
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 24 }
+
+
+	ethIfStatsRxPkts1519toMaxOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of packets (including bad
+				packets) received that were between
+				1024 and 1518 octets in length inclusive
+				(excluding framing bits but including FCS octets)."
+        ::= { ethIfStatsEntry 25 }
+
+	ethIfStatsTxUnicastPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of good unicast packets transmitted."
+        ::= { ethIfStatsEntry 26 }
+
+	ethIfStatsTxMulticastPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of good multicast packets transmitted."
+        ::= { ethIfStatsEntry 27 }
+
+	ethIfStatsTxBroadcastPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of good broadcast packets transmitted."
+        ::= { ethIfStatsEntry 28 }
+
+
+	
+	ethIfStatsRxUnicastPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 29 }
+
+	ethIfStatsRxMulticastPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a multicast address.  Note that this
+				number does not include packets directed to the
+				broadcast address."
+        ::= { ethIfStatsEntry 30 }
+
+	ethIfStatsRxBroadcastPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to the broadcast address.  Note that this
+				does not include multicast packets."
+        ::= { ethIfStatsEntry 31 }
+	
+	ethIfStatsAll	OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "NULL"
+        ::= { ethIfStatsEntry 32 }
+	
+	ethIfStatsReset	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "clear counter."
+        ::= { ethIfStatsEntry 33 }
+
+		
+	ethIfStatsLast5MinsRxPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 34 }
+        
+	ethIfStatsLast5MinsTxPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 35 }
+        
+	ethIfStatsLast5MinsRxOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 36 }
+        
+	ethIfStatsLast5MinsTxOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 37 }
+        
+	ethIfStatsLast5MinsRxUtilizationRate	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 38 }
+        
+	ethIfStatsLast5MinsTxUtilizationRate	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of good packets received that were
+				directed to a unicast address."
+        ::= { ethIfStatsEntry 39 }
+                                      
+   ethIfStatsDropEvent	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of drop event."
+        ::= { ethIfStatsEntry 40 } 
+            
+  ethIfStatsRxDiscard	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of Rx discard."
+        ::= { ethIfStatsEntry 41 }
+        
+  ethIfStatsRxPause	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of Rx pause."
+        ::= { ethIfStatsEntry 42 }    
+    
+  ethIfStatsTxPause	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of Tx pause."
+        ::= { ethIfStatsEntry 43 }   
+
+  ethIfStatsSymErr	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of symbol error."
+        ::= { ethIfStatsEntry 44 }
+    
+  ethIfStatsRxUnknownOpcode	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of rx unknown opcode."
+        ::= { ethIfStatsEntry 45 }
+          
+  ethIfStatsSingleColl	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of single collison."
+        ::= { ethIfStatsEntry 46 }
+  
+  ethIfStatsMultiColl	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of multi collision."
+        ::= { ethIfStatsEntry 47 }
+        
+  ethIfStatsLateColl	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of late collision."
+        ::= { ethIfStatsEntry 48 }
+        
+  ethIfStatsExcessColl	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of excess collision."
+        ::= { ethIfStatsEntry 49 }  
+
+  ethIfStatsDeferTrans	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of defer trans."
+        ::= { ethIfStatsEntry 50 }                                       
+                                   
+   --add by xiongfang 2011-1-4
+   ethIfStatsTxErr	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of err packets transmitted ."
+        ::= { ethIfStatsEntry 51 }
+        
+    ethIfStatsRxErr	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The total number of err packets received ."
+        ::= { ethIfStatsEntry 52 }
+        
+	ethIfTrap				OBJECT IDENTIFIER ::=   {msppDev 20}
+		
+	ethIfLinkUp NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex,ethIfOperStatus}
+       	STATUS  current
+       	DESCRIPTION
+               "mspp interface link-up trap."
+		::= { ethIfTrap 1}
+	
+
+	 ethIfLinkDown NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex,ethIfOperStatus}
+       	STATUS  current
+       	DESCRIPTION
+               "mspp interface link-down trap."
+		::= { ethIfTrap 2}    
+		
+	ethIfSecurityAlarm  NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex,ethIfSecurityMaxMac}
+       	STATUS  current
+       	DESCRIPTION
+               "mspp interface security trap."
+		::= { ethIfTrap 3}
+		
+	ethIfLaserTransceiverUnsupport  NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex}
+       	STATUS  current
+       	DESCRIPTION
+               "unsupport Laser Transceiver."
+		::= { ethIfTrap 4}	  
+		                    
+	ethIfLaserTransceiverSupport  NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex}
+       	STATUS  current
+       	DESCRIPTION
+               "support Laser Transceiver."
+		::= { ethIfTrap 5}	                    
+	
+	ethIfLaserTXDisable  NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex}
+       	STATUS  current
+       	DESCRIPTION
+               "disable Laser TX."
+		::= { ethIfTrap 6}
+	
+	ethIfLaserTXEnable  NOTIFICATION-TYPE
+       	OBJECTS {ethIfIndex}
+       	STATUS  current
+       	DESCRIPTION
+               "enable Laser TX."
+		::= { ethIfTrap 7}
+	
+	ethIfHigigLinkUp  NOTIFICATION-TYPE
+       	OBJECTS {ethIfHigigMcSlot,ethIfHigigSlot, ethIfHigigChipId, ethIfHigigId}
+       	STATUS  current
+       	DESCRIPTION
+               "enable Laser TX."
+		::= { ethIfTrap 8}
+	                 
+	ethIfHigigLinkDown  NOTIFICATION-TYPE
+       	OBJECTS {ethIfHigigMcSlot,ethIfHigigSlot, ethIfHigigChipId, ethIfHigigId}
+       	STATUS  current
+       	DESCRIPTION
+               "enable Laser TX."
+		::= { ethIfTrap 9}                 
+	                    
+	ethTrunkGeneral OBJECT IDENTIFIER ::= { msppDev 21 }      
+	
+	ethTrunkUknownUnicastMode OBJECT-TYPE
+			SYNTAX INTEGER 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The load-balance method of unknown unicast."
+			::= { ethTrunkGeneral 1 }
+	
+	ethTrunkGlobalMode OBJECT-TYPE
+			SYNTAX     INTEGER{
+						srcmac(0),
+						destmac(1),
+						srcanddestmac(2),
+						srcip(3),
+						destip(4),
+						srcanddestip(5)
+				}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"Global load-balance schedule."
+			::= { ethTrunkGeneral 2 }   
+			
+			
+	ethIfHigigTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF EthIfHigigEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A list of higig interface entries.  The number of
+			entries is given by the value of ifNumber."
+		::= { msppDev 22}
+	
+	ethIfHigigEntry OBJECT-TYPE
+		SYNTAX  EthIfHigigEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"An interface entry containing objects at the
+			subnetwork layer and below for a particular
+			interface."
+		INDEX   { ethIfHigigMcSlot,ethIfHigigSlot, ethIfHigigChipId, ethIfHigigId}
+		::= { ethIfHigigTable 1 }
+
+	EthIfHigigEntry ::=
+		SEQUENCE { 
+			ethIfHigigMcSlot        INTEGER,
+			ethIfHigigSlot          INTEGER,
+			ethIfHigigChipId		INTEGER,
+            ethIfHigigId            INTEGER,
+            ethIfHigigState         INTEGER
+		}   
+		
+	ethIfHigigMcSlot    	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Higig main card slot number."
+        ::= { ethIfHigigEntry 1 }
+        
+    
+    ethIfHigigSlot    	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Higig slot number."
+        ::= { ethIfHigigEntry 2 }
+        
+ 	ethIfHigigChipId 	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Higig Chip Id."
+        ::= { ethIfHigigEntry 3 }
+        
+    ethIfHigigId 	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Higig Id."
+        ::= { ethIfHigigEntry 4 }          
+          		
+	ethIfHigigState   	OBJECT-TYPE
+        SYNTAX INTEGER{linkDown(0),linkUp(1)} 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Higig state."
+        ::= { ethIfHigigEntry 5 }
+	
+END

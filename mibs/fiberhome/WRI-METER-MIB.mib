@@ -1,0 +1,357 @@
+WRI-METER-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+	
+
+	-- Multiple Services Ring (MSPP)
+
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	meter			OBJECT IDENTIFIER ::=   {mspp 7}
+
+
+	InetAddressPrefixLength ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes the length of a generic Internet network address
+         prefix. A value of n corresponds to an IP address mask
+         which has n contiguous 1-bits from the most significant
+         bit (MSB) and all other bits set to 0.
+
+         An InetAddressPrefixLength value is always interpreted within
+         the context of an InetAddressType value. Every usage of the
+         InetAddressPrefixLength textual convention is required to
+         specify the InetAddressType object which provides the
+         context.  It is suggested that the InetAddressType object is
+         logically registered before the object(s) which use the
+         InetAddressPrefixLength textual convention if they appear in
+         the same logical row.
+
+         InetAddressPrefixLength values that are larger than
+         the maximum length of an IP address for a specific
+         InetAddressType are treated as the maximum significant
+         value applicable for the InetAddressType. The maximum
+         significant value is 32 for the InetAddressType
+         'ipv4(1)' and 'ipv4z(3)' and 128 for the InetAddressType
+         'ipv6(2)' and 'ipv6z(4)'. The maximum significant value
+         for the InetAddressType 'dns(16)' is 0.
+
+         The value zero is object-specific and must be defined as
+         part of the description of any object which uses this
+         syntax. Examples of the usage of zero might include
+         situations where the Internet network address prefix
+         is unknown or does not apply."
+    SYNTAX      Unsigned32
+
+	InetPortNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a 16 bit port number of an Internet transport
+         layer protocol. Port numbers are assigned by IANA. A
+         current list of all assignments is available from
+         <http://www.iana.org/>.
+
+         The value zero is object-specific and must be defined as
+         part of the description of any object which uses this
+         syntax. Examples of the usage of zero might include
+         situations where a port number is unknown, or when the
+         value zero is used as a wildcard in a filter."
+    REFERENCE  "STD 6 (RFC 768), STD 7 (RFC 793) and RFC 2960"
+    SYNTAX      Unsigned32 (0..65535)
+    
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+	--meter configuration
+			
+		meterGeneral	OBJECT IDENTIFIER ::=   {meter 1}
+		
+		meterMaxNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { meterGeneral 1 }
+				
+		meterCurrNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { meterGeneral 2 }
+		
+		meterTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF MeterEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { meter 2 }
+
+		meterEntry  OBJECT-TYPE
+			SYNTAX 	MeterEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					" 
+					1. Introduction
+					The Two Rate Three Color Marker (trTCM) meters an IP packet stream
+   					and marks its packets either green, yellow, or red.  A packet is
+   					marked red if it exceeds the Peak Information Rate (PIR).  Otherwise
+   					it is marked either yellow or green depending on whether it exceeds
+   					or doesn't exceed the Committed Information Rate (CIR).  The trTCM is
+   					useful, for example, for ingress policing of a service, where a peak
+   					rate needs to be enforced separately from a committed rate.
+   					2. Configuration
+   					The trTCM is configured by setting its mode and by assigning values
+   					to four traffic parameters: a Peak Information Rate (PIR) and its
+   					associated Peak Burst Size (PBS) and a Committed Information Rate
+   					(CIR) and its associated Committed Burst Size (CBS).
+					The PIR and CIR are measured in bytes of IP packets per second, i.e.,
+   					it includes the IP header, but not link specific headers.  The PIR
+   					must be equal to or greater than the CIR.
+
+   					The PBS and the CBS and are measured in bytes and both of them must
+   					be configured to be greater than 0.  It is recommended that they be
+   					configured to be equal to or greater than the size of the largest
+   					possible IP packet in the stream."
+			INDEX {meterId}
+			::= { meterTable 1 }
+
+		MeterEntry ::= SEQUENCE {
+				meterId						INTEGER,
+				meterType					INTEGER,
+				meterMode					INTEGER,
+				meterInterval				Unsigned32,
+
+				meterCBS					Unsigned32,	--Committed Burst Size
+				meterEBS					Unsigned32,	--Excess Burst Size
+				meterPBS					Unsigned32,	--Peak Burst Size
+				meterCIR					Unsigned32,	--Committed Information Rate
+				meterEIR					Unsigned32,	--Committed Information Rate
+				meterPIR					Unsigned32,	--Peak Information Rate
+				meterExceedAction			INTEGER,
+				meterName					DisplayString,
+				meterAddAcl					DisplayString,
+				meterDelAcl					DisplayString,
+				meterRefCnt					Unsigned32,
+				meterStatus					EntryStatus
+			}
+
+
+		meterId  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"meter index."
+			::= { meterEntry 1 }
+		    
+		meterType  OBJECT-TYPE
+			SYNTAX     INTEGER
+			{
+			sR-TCM(1),
+			tR-TCM(2)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"Standard values for generic algorithms:
+ 			diffServTBParamSimpleTokenBucket, diffServTBParamAvgRate,
+ 			diffServTBParamSrTCMBlind, diffServTBParamSrTCMAware,
+ 			diffServTBParamTrTCMBlind, diffServTBParamTrTCMAware, and
+ 			diffServTBParamTswTCM are specified in this MIB as OBJECT-
+ 			IDENTITYs; additional values may be further specified in other
+ 			MIBs."
+			::= { meterEntry 2 }
+			
+		meterMode  OBJECT-TYPE
+			SYNTAX     INTEGER
+			{
+			blind(1),
+			aware(2)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"Standard values for generic algorithms:
+ 			diffServTBParamSimpleTokenBucket, diffServTBParamAvgRate,
+ 			diffServTBParamSrTCMBlind, diffServTBParamSrTCMAware,
+ 			diffServTBParamTrTCMBlind, diffServTBParamTrTCMAware, and
+ 			diffServTBParamTswTCM are specified in this MIB as OBJECT-
+ 			IDENTITYs; additional values may be further specified in other
+ 			MIBs."
+			::= { meterEntry 3 }
+						
+		meterInterval  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The time interval used with the token bucket.  For:
+ 			1. Average Rate Meter, the Informal Differentiated Services Model
+ 	   			section 5.2.1, - Delta.
+ 			2. Simple Token Bucket Meter, the Informal Differentiated
+ 	   			Services Model section 5.1, - time interval t.
+ 			3. RFC 2859 TSWTCM, - AVG_INTERVAL.
+ 			4. RFC 2697 srTCM, RFC 2698 trTCM, - token bucket update time
+ 	   			interval."
+			::= { meterEntry 4 }
+					
+		meterCBS  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The maximum number of bytes in a single transmission burst. This
+ 			attribute is used for:
+ 			1. CBS and EBS in RFC 2697 for srTCM
+ 			2. CBS and PBS in RFC 2698 for trTCM
+ 			3. Burst Size in RFC 3290."
+			::= { meterEntry 5 }
+
+		                        
+		meterEBS  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The maximum number of bytes in a single transmission burst. This
+ 			attribute is used for:
+ 			1. CBS and EBS in RFC 2697 for srTCM
+ 			2. CBS and PBS in RFC 2698 for trTCM
+ 			3. Burst Size in RFC 3290."
+			::= { meterEntry 6 }
+			
+		
+		meterPBS  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The maximum number of bytes in a single transmission burst. This
+ 			attribute is used for:
+ 			1. CBS and EBS in RFC 2697 for srTCM
+ 			2. CBS and PBS in RFC 2698 for trTCM
+ 			3. Burst Size in RFC 3290."
+			::= { meterEntry 7 }
+
+		meterCIR  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The token-bucket rate, in kilobits per second (kbps). This
+ 			attribute is used for:
+ 			1. CIR in RFC 2697 for srTCM
+ 			2. CIR and PIR in RFC 2698 for trTCM
+ 			3. CTR and PTR in RFC 2859 for TSWTCM
+ 			4. AverageRate in RFC 3290."
+			::= { meterEntry 8 }
+
+		meterEIR  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The token-bucket rate, in kilobits per second (kbps). This
+ 			attribute is used for:
+ 			1. CIR in RFC 2697 for srTCM
+ 			2. CIR and PIR in RFC 2698 for trTCM
+ 			3. CTR and PTR in RFC 2859 for TSWTCM
+ 			4. AverageRate in RFC 3290."
+			::= { meterEntry 9 }
+
+
+		meterPIR  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The token-bucket rate, in kilobits per second (kbps). This
+ 			attribute is used for:
+ 			1. CIR in RFC 2697 for srTCM
+ 			2. CIR and PIR in RFC 2698 for trTCM
+ 			3. CTR and PTR in RFC 2859 for TSWTCM
+ 			4. AverageRate in RFC 3290."
+			::= { meterEntry 10 }
+
+		meterExceedAction OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"blind,aware."
+			::= { meterEntry 11 }
+					
+					
+		meterName OBJECT-TYPE
+			SYNTAX     DisplayString (SIZE(0..64))
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"blind,aware."
+			::= { meterEntry 12 }
+		
+		meterAddAcl OBJECT-TYPE
+			SYNTAX     DisplayString (SIZE(0..1024))
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"add acl."
+			::= { meterEntry 13 }
+			
+		meterDelAcl OBJECT-TYPE
+			SYNTAX     DisplayString (SIZE(0..1024))
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"add acl."
+			::= { meterEntry 14 }
+		
+		meterRefCnt OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"add acl."
+			::= { meterEntry 15 }
+		
+		meterStatus  OBJECT-TYPE
+			SYNTAX     EntryStatus
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"Entry status."
+			::= { meterEntry 16 }
+
+
+END

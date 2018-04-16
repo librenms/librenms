@@ -1,0 +1,373 @@
+WRI-TIMERANGE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Unsigned32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+
+	-- Multiple Services Ring (MSPP)
+
+	rer				OBJECT IDENTIFIER ::=   {wriProtocol 1804}
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	msppDev			OBJECT IDENTIFIER ::=   {mspp 2}
+	msppLayer2		OBJECT IDENTIFIER ::=   {mspp 3}
+	msppLayer3		OBJECT IDENTIFIER ::=   {mspp 4}
+	msppTimeRange	OBJECT IDENTIFIER ::=   {mspp 5}
+	msppFilter		OBJECT IDENTIFIER ::=   {mspp 6}
+	
+
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+
+
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+	
+	   		--time range  list
+	timeRangeListTable OBJECT-TYPE
+		SYNTAX   SEQUENCE OF TimeRangeListEntry
+		MAX-ACCESS   not-accessible
+		STATUS   current
+		DESCRIPTION
+		"access control list table."
+		::= { msppTimeRange 1 }
+
+	timeRangeListEntry OBJECT-TYPE
+		SYNTAX   TimeRangeListEntry
+		MAX-ACCESS   not-accessible
+		STATUS   current
+		DESCRIPTION
+		"access control list entry."
+		INDEX {timeRangeListIndex}
+		::= { timeRangeListTable 1 }
+
+	TimeRangeListEntry ::=
+		SEQUENCE {
+		timeRangeListIndex				INTEGER,
+		timeRangeListName				DisplayString,
+		timeRangeListExistBits			DisplayString,
+		timeRangeListRefCnt				Unsigned32,
+		timeRangeListSize				Unsigned32,
+		timeRangeListCnt				Unsigned32,
+		timeRangeListActive				INTEGER,
+		timeRangeListStatus				EntryStatus
+	}
+
+	timeRangeListIndex OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 1 }
+
+
+	timeRangeListName OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..64))
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 2 }
+	
+	timeRangeListExistBits OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..64))
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 3 }
+	
+	timeRangeListRefCnt OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 4 }
+		
+	timeRangeListSize OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 5 }
+		
+	timeRangeListCnt OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 6 }
+
+	timeRangeListActive OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 7 }
+		
+	timeRangeListStatus OBJECT-TYPE
+		SYNTAX   EntryStatus
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeListEntry 8 }
+	
+	
+	
+   		--time range
+	timeRangeTable OBJECT-TYPE
+		SYNTAX   SEQUENCE OF TimeRangeEntry
+		MAX-ACCESS   not-accessible
+		STATUS   current
+		DESCRIPTION
+		"access control list table."
+		::= { msppTimeRange 2 }
+
+	timeRangeEntry OBJECT-TYPE
+		SYNTAX   TimeRangeEntry
+		MAX-ACCESS   not-accessible
+		STATUS   current
+		DESCRIPTION
+		"access control list entry."
+		INDEX {timeRangeListIndex,timeRangeIndex}
+		::= { timeRangeTable 1 }
+
+	TimeRangeEntry ::=
+		SEQUENCE {
+		timeRangeIndex				INTEGER,
+		--下面的时间是到达的时间，不需要指定开始时间，对于要处理在未来一段时间生效的
+		--应用可以用两条timerange实现，一条为到指定时间生效，一条为到指定时间失效
+		--对于除绝对时间以外的类型，都是指可周期运行的timerange
+		--对于定时关闭-开启这一类的应用，都需要用两条timerange来实现
+		--本timerange只实现周期性定时及对未来时间段的处理
+		timeRangeType				INTEGER,	--absolute,based monthday,based weekday,based month
+		timeRangeYear				Unsigned32,
+		timeRangeMonth				Unsigned32,
+		timeRangeMonthDay			Unsigned32,
+		timeRangeWhichWeek			Unsigned32,
+		timeRangeWeekDay			Unsigned32,
+		timeRangeHour				Unsigned32,
+		timeRangeMinute				Unsigned32,
+		timeRangeSecond				Unsigned32,
+		timeRangeToYear				Unsigned32,
+		timeRangeToMonth			Unsigned32,
+		timeRangeToMonthDay			Unsigned32,
+		timeRangeToWhichWeek		Unsigned32,
+		timeRangeToWeekDay			Unsigned32,
+		timeRangeToHour				Unsigned32,
+		timeRangeToMinute			Unsigned32,
+		timeRangeToSecond			Unsigned32,
+		timeRangeExistBits			Unsigned32,
+		timeRangeRefCnt				Unsigned32,
+		timeRangeStatus				EntryStatus
+	}
+
+	timeRangeIndex OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+		::= { timeRangeEntry 1 }
+
+
+	timeRangeType OBJECT-TYPE
+		SYNTAX   INTEGER{
+					invalid(0),
+					absolute(1),
+					basedyear(2),
+					basedonth(3),
+					basedweekday(4),
+					basedweekend(5),
+					basedweek(6),
+					basedday(7),
+					basedhour(8)
+					}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"timerange type."
+		::= { timeRangeEntry 2 }
+	
+
+	timeRangeYear OBJECT-TYPE
+		SYNTAX   Unsigned32 (2005..10000)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 3 }
+		
+	timeRangeMonth OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..12)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 4 }
+		
+	timeRangeMonthDay OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..31)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 5 }
+		
+
+	timeRangeWhichWeek OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..4)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 6 }
+			
+	timeRangeWeekDay OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..7)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 7 }
+		
+	timeRangeHour OBJECT-TYPE
+		SYNTAX   Unsigned32 (0..23)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 8 }
+		
+	timeRangeMinute OBJECT-TYPE
+		SYNTAX   Unsigned32 (0..59)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 9 }
+		
+	timeRangeSecond OBJECT-TYPE
+		SYNTAX   Unsigned32 (0..59)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 10 }
+	
+	timeRangeToYear OBJECT-TYPE
+		SYNTAX   Unsigned32 (2005..10000)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 11 }
+		
+	timeRangeToMonth OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..12)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 12 }
+		
+	timeRangeToMonthDay OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..31)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 13 }
+		
+	timeRangeToWhichWeek OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..4)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 14 }
+		
+	timeRangeToWeekDay OBJECT-TYPE
+		SYNTAX   Unsigned32 (1..7)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 15 }
+		
+	timeRangeToHour OBJECT-TYPE
+		SYNTAX   Unsigned32 (0..23)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 16 }
+		
+	timeRangeToMinute OBJECT-TYPE
+		SYNTAX   Unsigned32 (0..59)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 17 }
+		
+	timeRangeToSecond OBJECT-TYPE
+		SYNTAX   Unsigned32 (0..59)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 18 }
+		
+	timeRangeExistBits OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 19 }
+	
+	timeRangeRefCnt OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		""
+		::= { timeRangeEntry 20 }
+	
+	timeRangeStatus OBJECT-TYPE
+		SYNTAX   EntryStatus
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"time value"
+		::= { timeRangeEntry 21 }
+
+
+END

@@ -1,0 +1,1690 @@
+
+ WRI-PAE-MIB DEFINITIONS ::= BEGIN
+
+  -- ---------------------------------------------------------- --
+  -- IEEE 802.1X MIB
+  -- ---------------------------------------------------------- --
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises,IpAddress,
+	Gauge32,Counter32,Counter64,Integer32,TimeTicks,Unsigned32,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	MacAddress,PhysAddress, TruthValue, RowStatus,TimeStamp, DisplayString
+		FROM SNMPv2-TC
+	SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+  sysName,ifIndex
+        FROM RFC1213-MIB
+  wri,wriProtocol	
+        FROM WRI-SMI ;
+
+	wriPae OBJECT IDENTIFIER ::= { wriProtocol 1621 }
+
+    wriPaeMIBObjects OBJECT IDENTIFIER ::= { wriPae 1 }
+
+
+ -- ---------------------------------------------------------- --
+
+ -- ---------------------------------------------------------- --
+ -- groups in the PAE MIB
+ -- ---------------------------------------------------------- --
+
+ wridot1xPaeSystem        OBJECT IDENTIFIER ::= { wriPaeMIBObjects 1 }
+ wridot1xPaeAuthenticator OBJECT IDENTIFIER ::= { wriPaeMIBObjects 2 }
+ wridot1xPaeSupplicant    OBJECT IDENTIFIER ::= { wriPaeMIBObjects 3 }
+
+ -- ---------------------------------------------------------- --
+
+ -- ---------------------------------------------------------- --
+ -- The PAE System 
+ -- ---------------------------------------------------------- --
+
+wridot1xPaeSystemAuthControl OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative enable/disable state for
+         Port Access Control in a System."
+    REFERENCE
+        "9.6.1, SystemAuthControl"
+    ::= { wridot1xPaeSystem 1  }   
+    
+wridot1xPaeSystemAuthAAAName  OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+			"The system authenticate method name which
+			 is currently used by aaa authenticate."
+	::= { wridot1xPaeSystem 2 }
+	 
+wridot1xPaeSystemAccountAAAName  OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+			"The system account method name which
+			 is currently used by aaa authenticate."
+	::= { wridot1xPaeSystem 3 } 
+	
+wridot1xPaeSystemInterfaceAAAEnable  OBJECT-TYPE
+	SYNTAX      INTEGER { disabled(0) ,enabled(1) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+			"Eenable interface can be authenticated by aaa."
+	::= { wridot1xPaeSystem 4 }  
+
+wridot1xPaeSystemMaxUser  OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"the max user."
+	::= { wridot1xPaeSystem 5 } 
+
+wridot1xPaeSystemCurrentUser  OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"the current user."
+	::= { wridot1xPaeSystem 6 } 
+	
+wridot1xPaeSystemSuppSupport OBJECT-TYPE
+	SYNTAX      INTEGER{normal(1),sep(2)} 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+			""
+	::= { wridot1xPaeSystem 7 } 	
+	
+wridot1xPaeSystemvlanAssignMode OBJECT-TYPE
+	SYNTAX      INTEGER{string(1),integer(2)} 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+			""
+	::= { wridot1xPaeSystem 8 } 				
+ -- ---------------------------------------------------------- --
+ -- The PAE Port Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xPaePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xPaePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    REFERENCE
+        "9.6.1"
+    ::= { wridot1xPaeSystem 9 }
+
+ wridot1xPaePortEntry OBJECT-TYPE
+    SYNTAX      Wridot1xPaePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number, protocol version, and
+        initialization control for a Port."
+    INDEX { wridot1xPaePortNumber }
+    ::= { wridot1xPaePortTable 1 }
+
+ Wridot1xPaePortEntry ::=
+    SEQUENCE {
+        wridot1xPaePortNumber
+            Unsigned32,
+        wridot1xPaePortProtocolVersion
+            Unsigned32,
+        wridot1xPaePortCapabilities
+            BITS,
+        wridot1xPaePortInitialize
+            TruthValue,
+        wridot1xPaePortReauthenticate
+            INTEGER
+        }
+
+ wridot1xPaePortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number associated with this Port."
+    REFERENCE
+        "9.6.1, Port number"
+    ::= { wridot1xPaePortEntry 1 }
+
+ wridot1xPaePortProtocolVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version associated with this Port."
+    REFERENCE
+        "9.6.1, Protocol version"
+    ::= { wridot1xPaePortEntry 2 }
+
+ wridot1xPaePortCapabilities OBJECT-TYPE
+    SYNTAX      BITS {
+                    wridot1xPaePortAuthCapable(0),
+                        -- Authenticator functions are supported
+                    wridot1xPaePortSuppCapable(1)
+                        -- Supplicant functions are supported
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the PAE functionality that this Port
+        supports and that may be managed through this MIB."
+    REFERENCE
+        "9.6.1, PAE Capabilities"
+    ::= { wridot1xPaePortEntry 3 }
+
+ wridot1xPaePortInitialize OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The initialization control for this Port. Setting this
+        attribute TRUE causes the Port to be initialized.
+        The attribute value reverts to FALSE once initialization
+        has completed."
+    REFERENCE
+        "9.6.1.2, Initialize Port"
+    ::= { wridot1xPaePortEntry 4 }
+
+ wridot1xPaePortReauthenticate OBJECT-TYPE
+    SYNTAX INTEGER{true(1),false(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "The reauthentication control for this port. Setting
+       this attribute TRUE causes the Authenticator PAE state
+       machine for the Port to reauthenticate the Supplicant.
+       Setting this attribute FALSE has no effect.
+       This attribute always returns FALSE when it is read."
+    REFERENCE
+       "9.4.1.3 Reauthenticate"
+     ::= { wridot1xPaePortEntry 5 }
+
+ -- ---------------------------------------------------------- --
+ -- The PAE Authenticator Group
+ -- ---------------------------------------------------------- --
+
+ -- ---------------------------------------------------------- --
+ -- The Authenticator Configuration Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xAuthConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Authenticator PAE associated with each port.
+        An entry appears in this table for each port that may
+        authenticate access to itself."
+    REFERENCE
+        "9.4.1 Authenticator Configuration"
+    ::= { wridot1xPaeAuthenticator 1 }
+
+ wridot1xAuthConfigEntry OBJECT-TYPE
+    SYNTAX      Wridot1xAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The configuration information for an Authenticator
+        PAE."
+    INDEX {wridot1xPaePortNumber }
+    ::= { wridot1xAuthConfigTable 1 }
+
+ Wridot1xAuthConfigEntry ::=
+    SEQUENCE {
+        wridot1xAuthPaeState
+            INTEGER,
+        wridot1xAuthBackendAuthState
+            INTEGER,
+        wridot1xAuthAdminControlledDirections
+            INTEGER,
+        wridot1xAuthOperControlledDirections
+            INTEGER,
+        wridot1xAuthAuthControlledPortStatus
+            INTEGER,
+        wridot1xAuthAuthControlledPortControl
+            INTEGER,
+        wridot1xAuthQuietPeriod
+            Unsigned32,
+        wridot1xAuthTxPeriod
+            Unsigned32,
+        wridot1xAuthSuppTimeout
+            Unsigned32,
+        wridot1xAuthServerTimeout
+            Unsigned32,
+        wridot1xAuthMaxReq
+            Unsigned32,
+        wridot1xAuthReAuthPeriod
+            Unsigned32,
+        wridot1xAuthReAuthEnabled
+            INTEGER,
+        wridot1xAuthKeyTxEnabled
+            INTEGER,
+        wridot1xPortAdminState
+            INTEGER,
+        wridot1xBindingMode
+            INTEGER,
+        wridot1xLogicalPortMode
+            INTEGER,
+        wridot1xRadiusClientName
+            DisplayString,
+        wridot1xMaxSuppNumber
+            Counter32,
+        wridot1xCurrBindNumber
+            Counter32, 
+        wridot1xAuthReAuthNumber
+        	Unsigned32, 
+        wridot1xAuthLinkMode
+        	INTEGER,
+        wridot1xAuthMethod
+            INTEGER,  
+        wridot1xAuthAAAName
+        	OCTET STRING, 
+        wridot1xAccountAAAName
+        	OCTET STRING,
+       	wridot1xGuestVlan
+       		INTEGER,
+       	wridot1xSuppSupport
+       		INTEGER,
+       	wridot1xVlanAssginMode	
+       		INTEGER	   
+        }
+
+ wridot1xAuthPaeState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initialize(1),
+                    disconnected(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    aborting(6),
+                    held(7),
+                    forceAuth(8),
+                    forceUnauth(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, Authenticator PAE state"
+    ::= { wridot1xAuthConfigEntry 1 }
+
+ wridot1xAuthBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    request(1),
+                    response(2),
+                    success(3),
+                    fail(4),
+                    timeout(5),
+                    idle(6),
+                    initialize(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Backend Authentication
+        state machine."
+    REFERENCE
+        "9.4.1, Backend Authentication state"
+    ::= { wridot1xAuthConfigEntry 2 }
+
+ wridot1xAuthAdminControlledDirections OBJECT-TYPE
+    SYNTAX      INTEGER {  both(0),in(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current value of the administrative controlled
+        directions parameter for the Port."
+    REFERENCE
+        "9.4.1, Admin Control Mode"
+    ::= { wridot1xAuthConfigEntry 3 }
+
+ wridot1xAuthOperControlledDirections OBJECT-TYPE
+    SYNTAX      INTEGER {  both(0),in(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the operational controlled
+        directions parameter for the Port."
+    REFERENCE
+        "9.4.1, Oper Control Mode"
+    ::= { wridot1xAuthConfigEntry 4 }
+
+ wridot1xAuthAuthControlledPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {authorized(1),unauthorized(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        status parameter for the Port."
+    REFERENCE
+        "9.4.1, AuthControlledPortStatus"
+    ::= { wridot1xAuthConfigEntry 5 }
+
+ wridot1xAuthAuthControlledPortControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forceUnauthorized(1),
+                    auto(2),
+                    forceAuthorized(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        control parameter for the Port."
+    REFERENCE
+        "9.4.1, AuthControlledPortControl"
+    ::= { wridot1xAuthConfigEntry 6 }
+
+ wridot1xAuthQuietPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the quietPeriod constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, quietPeriod"
+    DEFVAL { 60 }
+    ::= { wridot1xAuthConfigEntry 7 }
+
+ wridot1xAuthTxPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the txPeriod constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, txPeriod"
+    DEFVAL { 30 }
+    ::= { wridot1xAuthConfigEntry 8 }
+
+ wridot1xAuthSuppTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the suppTimeout constant
+        currently in use by the Backend Authentication state
+        machine."
+    REFERENCE
+        "9.4.1, suppTimeout"
+    DEFVAL { 30 }
+    ::= { wridot1xAuthConfigEntry 9 }
+
+ wridot1xAuthServerTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the serverTimeout constant
+        currently in use by the Backend Authentication state
+        machine."
+    REFERENCE
+        "9.4.1, serverTimeout"
+    DEFVAL { 30 }
+    ::= { wridot1xAuthConfigEntry 10 }
+
+ wridot1xAuthMaxReq OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the maxReq constant currently in use by
+        the Backend Authentication state machine."
+    REFERENCE
+        "9.4.1, maxReq"
+    DEFVAL { 2 }
+    ::= { wridot1xAuthConfigEntry 11 }
+
+ wridot1xAuthReAuthPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the reAuthPeriod constant
+        currently in use by the Reauthentication Timer state
+        machine."
+    REFERENCE
+        "9.4.1, reAuthPeriod"
+    DEFVAL { 3600 }
+    ::= { wridot1xAuthConfigEntry 12 }
+
+ wridot1xAuthReAuthEnabled OBJECT-TYPE
+    SYNTAX      INTEGER{true(1),false(0)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enable/disable control used by the Reauthentication
+        Timer state machine (8.5.5.1)."
+    REFERENCE
+        "9.4.1, reAuthEnabled"
+    DEFVAL { false }
+    ::= { wridot1xAuthConfigEntry 13 }
+
+ wridot1xAuthKeyTxEnabled OBJECT-TYPE
+    SYNTAX      INTEGER{enable(1),disbale(0)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the keyTransmissionEnabled constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, keyTransmissionEnabled"
+    ::= { wridot1xAuthConfigEntry 14 }
+
+wridot1xPortAdminState OBJECT-TYPE
+    SYNTAX      INTEGER{
+                  adminup(0),
+                  admindown(1)
+                  }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the dot1xPortAdminState currently
+        in use by the Authenticator PAE control."
+    REFERENCE
+        "9.4.1, dot1xPortAdminState"
+    ::= { wridot1xAuthConfigEntry 15 }
+
+wridot1xBindingMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+                  bindusername(1),
+                  bindmacaddress(2),
+                  bindvlanid(3)
+                  }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the dot1xBindingMode currently
+        in use by the Authenticator PAE control."
+    REFERENCE
+        "9.4.1, dot1xBindingMode"
+    ::= { wridot1xAuthConfigEntry 16 }
+
+wridot1xLogicalPortMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+                  port(1),
+                  portplusmac(2),
+                  portplusmacplusvlan(3)
+                  }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the dot1xLogicalPortMode currently
+        in use by the Authenticator PAE control."
+    REFERENCE
+        "9.4.1, dot1xLogicalPortMode"
+    ::= { wridot1xAuthConfigEntry 17 }
+
+wridot1xRadiusClientName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the dot1xRadiusClientName currently
+        in use by the Authenticator PAE control."
+    REFERENCE
+        "9.4.1, dot1xRadiusClientName"
+    ::= { wridot1xAuthConfigEntry 18 }
+
+wridot1xMaxSuppNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the dot1xMaxSuppNumber currently
+        in use by the Authenticator PAE control."
+    REFERENCE
+        "9.4.1, dot1xMaxSuppNumber"
+    ::= { wridot1xAuthConfigEntry 19 }
+wridot1xCurrBindNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the currently bind number (mac,user,or vlan)
+        in use by the Authenticator PAE control."
+    REFERENCE
+        "9.4.1, dot1xMaxSuppNumber"
+    ::= { wridot1xAuthConfigEntry 20 }
+     
+ wridot1xAuthReAuthNumber  OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The max number of reauthentication times."
+    REFERENCE
+        "9.4.1, dot1xMaxSuppNumber"
+    ::= { wridot1xAuthConfigEntry 21 }
+     
+ wridot1xAuthLinkMode  OBJECT-TYPE
+     SYNTAX		INTEGER{ 
+        			passive(1),
+        			active(0)
+					}
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The link mode of authenticator."
+    REFERENCE
+        "9.4.1, dot1xMaxSuppNumber"
+    ::= { wridot1xAuthConfigEntry 22 }
+        
+ wridot1xAuthMethod  OBJECT-TYPE
+      SYNTAX      INTEGER{
+      				chap(0),
+      				eap(1)
+      				}
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The auth method of authenticator."
+    REFERENCE
+        "9.4.1, dot1xMaxSuppNumber"
+    ::= { wridot1xAuthConfigEntry 23 }     
+  
+  wridot1xAuthAAAName OBJECT-TYPE                                    
+        SYNTAX      OCTET STRING
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"The port authenticate method name that is currently used by aaa authenticate."   
+		::= { wridot1xAuthConfigEntry 24 }
+		
+ wridot1xAccountAAAName	OBJECT-TYPE                                    
+        SYNTAX      OCTET STRING
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"The port account method name that is currently used by aaa authenticate."   
+		::= { wridot1xAuthConfigEntry 25 }
+					
+  wridot1xGuestVlan	OBJECT-TYPE                                    
+        SYNTAX      INTEGER(0..4094)
+        MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"The user vlan id."   
+		::= { wridot1xAuthConfigEntry 26 }	
+		
+  wridot1xSuppSupport	OBJECT-TYPE                                    
+        SYNTAX      INTEGER{normal(1),sep(2)}
+        MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			""   
+		::= { wridot1xAuthConfigEntry 27 }	
+
+  wridot1xVlanAssginMode	OBJECT-TYPE                                    
+        SYNTAX      INTEGER{string(1),integer(2)}
+        MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			""   
+		::= { wridot1xAuthConfigEntry 28}	
+                        
+ -- ---------------------------------------------------------- --
+ -- The Authenticator Statistics Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xAuthStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the statistics objects for the
+         Authenticator PAE associated with each Port.
+         An entry appears in this table for each port that may
+         authenticate access to itself."
+    REFERENCE
+        "9.4.2 Authenticator Statistics"
+    ::= { wridot1xPaeAuthenticator 2 }
+
+ wridot1xAuthStatsEntry OBJECT-TYPE
+    SYNTAX      Wridot1xAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics information for an Authenticator PAE."
+    INDEX {wridot1xPaePortNumber }
+    ::= { wridot1xAuthStatsTable 1 }
+
+ Wridot1xAuthStatsEntry ::=
+    SEQUENCE {
+        wridot1xAuthEapolFramesRx
+            Counter32,
+        wridot1xAuthEapolFramesTx
+            Counter32,
+        wridot1xAuthEapolStartFramesRx
+            Counter32,
+        wridot1xAuthEapolLogoffFramesRx
+            Counter32,
+        wridot1xAuthEapolRespIdFramesRx
+            Counter32,
+        wridot1xAuthEapolRespFramesRx
+            Counter32,
+        wridot1xAuthEapolReqIdFramesTx
+            Counter32,
+        wridot1xAuthEapolReqFramesTx
+            Counter32,
+        wridot1xAuthInvalidEapolFramesRx
+            Counter32,
+        wridot1xAuthEapLengthErrorFramesRx
+            Counter32,
+        wridot1xAuthLastEapolFrameVersion
+            Unsigned32,
+        wridot1xAuthLastEapolFrameSource
+            MacAddress, 
+        wridot1xAuthEapolSuccessTx
+            Counter32,
+        wridot1xAuthEapolFailureTx 
+        	Counter32   
+        }
+
+ wridot1xAuthEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAPOL frames of any type
+        that have been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL frames received"
+    ::= { wridot1xAuthStatsEntry 1 }
+
+ wridot1xAuthEapolFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames of any type
+        that have been transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL frames transmitted"
+    ::= { wridot1xAuthStatsEntry 2 }
+
+ wridot1xAuthEapolStartFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Start frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Start frames received"
+    ::= { wridot1xAuthStatsEntry 3 }
+
+ wridot1xAuthEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Logoff frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Logoff frames received"
+    ::= { wridot1xAuthStatsEntry 4 }
+
+ wridot1xAuthEapolRespIdFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Resp/Id frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Resp/Id frames received"
+    ::= { wridot1xAuthStatsEntry 5 }
+
+ wridot1xAuthEapolRespFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAP Response frames
+        (other than Resp/Id frames) that have been
+        received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Response frames received"
+    ::= { wridot1xAuthStatsEntry 6 }
+
+ wridot1xAuthEapolReqIdFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Req/Id frames that have been
+        transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Req/Id frames transmitted"
+    ::= { wridot1xAuthStatsEntry 7 }
+
+ wridot1xAuthEapolReqFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Request frames
+        (other than Rq/Id frames) that have been
+        transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Request frames transmitted"
+    ::= { wridot1xAuthStatsEntry 8 }
+
+ wridot1xAuthInvalidEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been
+        received by this Authenticator in which the
+        frame type is not recognized."
+    REFERENCE
+        "9.4.2, Invalid EAPOL frames received"
+    ::= { wridot1xAuthStatsEntry 9 }
+
+ wridot1xAuthEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been received
+        by this Authenticator in which the Packet Body
+        Length field is invalid."
+    REFERENCE
+        "9.4.2, EAP length error frames received"
+    ::= { wridot1xAuthStatsEntry 10 }
+
+ wridot1xAuthLastEapolFrameVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version number carried in the
+        most recently received EAPOL frame."
+    REFERENCE
+        "9.4.2, Last EAPOL frame version"
+    ::= { wridot1xAuthStatsEntry 11 }
+
+ wridot1xAuthLastEapolFrameSource OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address carried in the
+        most recently received EAPOL frame."
+    REFERENCE
+        "9.4.2, Last EAPOL frame source"
+    ::= { wridot1xAuthStatsEntry 12 }
+      
+  wridot1xAuthEapolSuccessTx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+       ::= { wridot1xAuthStatsEntry 13 }
+       
+  wridot1xAuthEapolFailureTx   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+       ::= { wridot1xAuthStatsEntry 14}
+     
+ -- ---------------------------------------------------------- --
+ -- The Authenticator Diagnostics Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xAuthDiagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xAuthDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the diagnostics objects for the
+         Authenticator PAE associated with each Port.
+         An entry appears in this table for each port that may
+         authenticate access to itself."
+    REFERENCE
+        "9.4.3 Authenticator Diagnostics"
+    ::= { wridot1xPaeAuthenticator 3 }
+
+ wridot1xAuthDiagEntry OBJECT-TYPE
+    SYNTAX      Wridot1xAuthDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The diagnostics information for an Authenticator PAE."
+    INDEX {wridot1xPaePortNumber }
+    ::= { wridot1xAuthDiagTable 1 }
+
+ Wridot1xAuthDiagEntry ::=
+    SEQUENCE {
+        wridot1xAuthEntersConnecting
+            Counter32,
+        wridot1xAuthEapLogoffsWhileConnecting
+            Counter32,
+        wridot1xAuthEntersAuthenticating
+            Counter32,
+        wridot1xAuthAuthSuccessWhileAuthenticating
+            Counter32,
+        wridot1xAuthAuthTimeoutsWhileAuthenticating
+            Counter32,
+        wridot1xAuthAuthFailWhileAuthenticating
+            Counter32,
+        wridot1xAuthAuthReauthsWhileAuthenticating
+            Counter32,
+        wridot1xAuthAuthEapStartsWhileAuthenticating
+            Counter32,
+        wridot1xAuthAuthEapLogoffWhileAuthenticating
+            Counter32,
+        wridot1xAuthAuthReauthsWhileAuthenticated
+            Counter32,
+        wridot1xAuthAuthEapStartsWhileAuthenticated
+            Counter32,
+        wridot1xAuthAuthEapLogoffWhileAuthenticated
+            Counter32,
+        wridot1xAuthBackendResponses
+            Counter32,
+        wridot1xAuthBackendAccessChallenges
+            Counter32,
+        wridot1xAuthBackendOtherRequestsToSupplicant
+            Counter32,
+        wridot1xAuthBackendNonNakResponsesFromSupplicant
+            Counter32,
+        wridot1xAuthBackendAuthSuccesses
+            Counter32,
+        wridot1xAuthBackendAuthFails
+            Counter32
+        }
+
+ wridot1xAuthEntersConnecting OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions to the CONNECTING state from any other
+        state."
+    REFERENCE
+        "9.4.2, 8.5.4.2.1"
+    ::= { wridot1xAuthDiagEntry 1 }
+
+ wridot1xAuthEapLogoffsWhileConnecting OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from CONNECTING to DISCONNECTED as a result
+        of receiving an EAPOL-Logoff message."
+    REFERENCE
+        "9.4.2, 8.5.4.2.2"
+    ::= { wridot1xAuthDiagEntry 2 }
+
+ wridot1xAuthEntersAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from CONNECTING to AUTHENTICATING, as a
+        result of an EAP-Response/Identity message being
+        received from the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.3"
+    ::= { wridot1xAuthDiagEntry 3 }
+
+ wridot1xAuthAuthSuccessWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to AUTHENTICATED, as a
+        result of the Backend Authentication state machine
+        indicating successful authentication of the Supplicant
+        (authSuccess = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.4"
+    ::= { wridot1xAuthDiagEntry 4 }
+
+ wridot1xAuthAuthTimeoutsWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to ABORTING, as a result
+        of the Backend Authentication state machine indicating
+        authentication timeout (authTimeout = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.5"
+    ::= { wridot1xAuthDiagEntry 5 }
+
+ wridot1xAuthAuthFailWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to HELD, as a result
+        of the Backend Authentication state machine indicating
+        authentication failure (authFail = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.6"
+    ::= { wridot1xAuthDiagEntry 6 }
+
+ wridot1xAuthAuthReauthsWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to ABORTING, as a result
+        of a reauthentication request (reAuthenticate = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.7"
+    ::= { wridot1xAuthDiagEntry 7 }
+
+ wridot1xAuthAuthEapStartsWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to ABORTING, as a result
+        of an EAPOL-Start message being received
+        from the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.8"
+    ::= { wridot1xAuthDiagEntry 8 }
+
+ wridot1xAuthAuthEapLogoffWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to ABORTING, as a result
+        of an EAPOL-Logoff message being received
+        from the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.9"
+    ::= { wridot1xAuthDiagEntry 9 }
+
+ wridot1xAuthAuthReauthsWhileAuthenticated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATED to CONNECTING, as a
+        result of a reauthentication request
+        (reAuthenticate = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.10"
+    ::= { wridot1xAuthDiagEntry 10 }
+
+ wridot1xAuthAuthEapStartsWhileAuthenticated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATED to CONNECTING, as a
+        result of an EAPOL-Start message being received from the
+        Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.11"
+    ::= { wridot1xAuthDiagEntry 11 }
+
+ wridot1xAuthAuthEapLogoffWhileAuthenticated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATED to DISCONNECTED, as a
+        result of an EAPOL-Logoff message being received from
+        the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.12"
+    ::= { wridot1xAuthDiagEntry 12 }
+
+ wridot1xAuthBackendResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine sends
+        an initial Access-Request packet to the Authentication
+        server (i.e., executes sendRespToServer on entry to the
+        RESPONSE state). Indicates that the Authenticator
+        attempted communication with the Authentication Server."
+    REFERENCE
+        "9.4.2, 8.5.6.2.1"
+    ::= { wridot1xAuthDiagEntry 13 }
+
+ wridot1xAuthBackendAccessChallenges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives an initial Access-Challenge packet from the
+        Authentication server (i.e., aReq becomes TRUE,
+        causing exit from the RESPONSE state). Indicates that
+        the Authentication Server has communication with
+        the Authenticator."
+    REFERENCE
+        "9.4.2, 8.5.6.2.2"
+    ::= { wridot1xAuthDiagEntry 14 }
+
+ wridot1xAuthBackendOtherRequestsToSupplicant OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        sends an EAP-Request packet (other than an Identity,
+        Notification, Failure or Success message) to the
+        Supplicant (i.e., executes txReq on entry to the
+        REQUEST state). Indicates that the Authenticator chose
+        an EAP-method."
+    REFERENCE
+        "9.4.2, 8.5.6.2.3"
+    ::= { wridot1xAuthDiagEntry 15 }
+
+ wridot1xAuthBackendNonNakResponsesFromSupplicant OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives a response from the Supplicant to an initial
+        EAP-Request, and the response is something other than
+        EAP-NAK (i.e., rxResp becomes TRUE, causing the state
+        machine to transition from REQUEST to RESPONSE,
+        and the response is not an EAP-NAK). Indicates that
+        the Supplicant can respond to the Authenticator's
+        chosen EAP-method."
+    REFERENCE
+        "9.4.2, 8.5.6.2.4"
+    ::= { wridot1xAuthDiagEntry 16 }
+
+ wridot1xAuthBackendAuthSuccesses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives an EAP-Success message from the Authentication
+        Server (i.e., aSuccess becomes TRUE, causing a
+        transition from RESPONSE to SUCCESS). Indicates that
+        the Supplicant has successfully authenticated to
+        the Authentication Server."
+    REFERENCE
+        "9.4.2, 8.5.6.2.5"
+    ::= { wridot1xAuthDiagEntry 17 }
+
+ wridot1xAuthBackendAuthFails OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives an EAP-Failure message from the Authentication
+        Server (i.e., aFail becomes TRUE, causing a transition
+        from RESPONSE to FAIL). Indicates that the Supplicant
+        has not authenticated to the Authentication Server."
+    REFERENCE
+        "9.4.2, 8.5.6.2.6"
+    ::= { wridot1xAuthDiagEntry 18 }
+
+ -- ---------------------------------------------------------- --
+ -- The Authenticator Session Statistics Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xAuthSessionStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xAuthSessionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the session statistics objects
+        for the Authenticator PAE associated with each Port.
+        An entry appears in this table for each port that may
+        authenticate access to itself."
+    REFERENCE
+        "9.4.4"
+    ::= { wridot1xPaeAuthenticator 4 }
+
+ wridot1xAuthSessionStatsEntry OBJECT-TYPE
+    SYNTAX      Wridot1xAuthSessionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The session statistics information for an Authenticator
+        PAE.  This shows the current values being collected for
+        each session that is still in progress, or the final
+        values for the last valid session on each port where
+        there is no session currently active."
+    INDEX {wridot1xPaePortNumber }
+    ::= { wridot1xAuthSessionStatsTable 1 }
+
+ Wridot1xAuthSessionStatsEntry ::=
+    SEQUENCE {
+        wridot1xAuthSessionOctetsRx
+            Counter64,
+        wridot1xAuthSessionOctetsTx
+            Counter64,
+        wridot1xAuthSessionFramesRx
+            Counter32,
+        wridot1xAuthSessionFramesTx
+            Counter32,
+        wridot1xAuthSessionId
+            SnmpAdminString,
+        wridot1xAuthSessionAuthenticMethod
+            INTEGER,
+        wridot1xAuthSessionTime
+            Unsigned32,
+        wridot1xAuthSessionTerminateCause
+            INTEGER,
+        wridot1xAuthSessionUserName
+            SnmpAdminString
+    }
+
+ wridot1xAuthSessionOctetsRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets received in user data
+        frames on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Octets Received"
+    ::= { wridot1xAuthSessionStatsEntry 1 }
+
+ wridot1xAuthSessionOctetsTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets transmitted in user data
+        frames on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Octets Transmitted"
+    ::= { wridot1xAuthSessionStatsEntry 2 }
+
+ wridot1xAuthSessionFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user data frames received
+        on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Frames Received"
+    ::= { wridot1xAuthSessionStatsEntry 3 }
+
+ wridot1xAuthSessionFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user data frames transmitted
+        on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Frames Transmitted"
+    ::= { wridot1xAuthSessionStatsEntry 4 }
+
+ wridot1xAuthSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier for the session, in the
+        form of a printable ASCII string of at least
+        three characters."
+    REFERENCE
+        "9.4.4, Session Identifier"
+    ::= { wridot1xAuthSessionStatsEntry 5 }
+
+ wridot1xAuthSessionAuthenticMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    remoteAuthServer(1),
+                    localAuthServer(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication method used to establish the
+        session."
+    REFERENCE
+        "9.4.4, Session Authentication Method"
+    ::= { wridot1xAuthSessionStatsEntry 6 }
+
+ wridot1xAuthSessionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The duration of the session in seconds."
+    REFERENCE
+        "9.4.4, Session Time"
+    ::= { wridot1xAuthSessionStatsEntry 7 }
+
+ wridot1xAuthSessionTerminateCause OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    supplicantLogoff(1),
+                    portFailure(2),
+                    supplicantRestart(3),
+                    reauthFailed(4),
+                    authControlForceUnauth(5),
+                    portReInit(6),
+                    portAdminDisabled(7),
+                    notTerminatedYet(999)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason for the session termination."
+    REFERENCE
+        "9.4.4, Session Terminate Cause"
+    ::= { wridot1xAuthSessionStatsEntry 8 }
+
+ wridot1xAuthSessionUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The User-Name representing the identity of the
+        Supplicant PAE."
+    REFERENCE
+        "9.4.4, Session User Name"
+    ::= { wridot1xAuthSessionStatsEntry 9 }
+
+
+ -- ---------------------------------------------------------- --
+ -- The PAE Supplicant Group
+ -- ---------------------------------------------------------- --
+
+ -- ---------------------------------------------------------- --
+ -- The Supplicant Configuration Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xSuppConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xSuppConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Supplicant PAE associated with each port.
+        An entry appears in this table for each port that may
+        authenticate itself when challenged by a remote system."
+    REFERENCE
+        "9.5.1"
+    ::= { wridot1xPaeSupplicant 1 }
+
+ wridot1xSuppConfigEntry OBJECT-TYPE
+    SYNTAX      Wridot1xSuppConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The configuration information for a Supplicant PAE."
+    INDEX {wridot1xPaePortNumber }
+    ::= { wridot1xSuppConfigTable 1 }
+
+ Wridot1xSuppConfigEntry ::=
+    SEQUENCE {
+        wridot1xSuppPaeState
+            INTEGER,
+        wridot1xSuppHeldPeriod
+            Unsigned32,
+        wridot1xSuppAuthPeriod
+            Unsigned32,
+        wridot1xSuppStartPeriod
+            Unsigned32,
+        wridot1xSuppMaxStart
+            Unsigned32
+        }
+
+ wridot1xSuppPaeState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disconnected(1),
+                    logoff(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    acquired(6),
+                    held(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Supplicant PAE state
+        machine (8.5.8)."
+    REFERENCE
+        "9.5.1, Supplicant PAE State"
+    ::= { wridot1xSuppConfigEntry 1 }
+
+ wridot1xSuppHeldPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the heldPeriod
+        constant currently in use by the Supplicant
+        PAE state machine (8.5.8.1.2)."
+    REFERENCE
+        "9.5.1, heldPeriod"
+    DEFVAL { 60 }
+    ::= { wridot1xSuppConfigEntry 2 }
+
+ wridot1xSuppAuthPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the authPeriod
+        constant currently in use by the Supplicant
+        PAE state machine (8.5.8.1.2)."
+    REFERENCE
+        "9.5.1, authPeriod"
+    DEFVAL { 30 }
+    ::= { wridot1xSuppConfigEntry 3 }
+
+ wridot1xSuppStartPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the startPeriod
+        constant currently in use by the Supplicant
+        PAE state machine (8.5.8.1.2)."
+    REFERENCE
+        "9.5.1, startPeriod"
+    DEFVAL { 30 }
+    ::= { wridot1xSuppConfigEntry 4 }
+
+ wridot1xSuppMaxStart OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the maxStart constant currently in use by
+        the Supplicant PAE state machine (8.5.8.1.2)."
+    REFERENCE
+        "9.5.1, maxStart"
+    DEFVAL { 3}
+    ::= { wridot1xSuppConfigEntry 5 }
+
+ -- ---------------------------------------------------------- --
+ -- The Supplicant Statistics Table
+ -- ---------------------------------------------------------- --
+
+ wridot1xSuppStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Wridot1xSuppStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the statistics objects for the
+        Supplicant PAE associated with each port.
+        An entry appears in this table for each port that may
+        authenticate itself when challenged by a remote system."
+    REFERENCE
+        "9.5.2"
+    ::= { wridot1xPaeSupplicant 2 }
+
+ wridot1xSuppStatsEntry OBJECT-TYPE
+    SYNTAX      Wridot1xSuppStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics information for a Supplicant PAE."
+    INDEX { wridot1xPaePortNumber }
+    ::= { wridot1xSuppStatsTable 1 }
+
+ Wridot1xSuppStatsEntry ::=
+    SEQUENCE {
+        wridot1xSuppEapolFramesRx
+            Counter32,
+        wridot1xSuppEapolFramesTx
+            Counter32,
+        wridot1xSuppEapolStartFramesTx
+            Counter32,
+        wridot1xSuppEapolLogoffFramesTx
+            Counter32,
+        wridot1xSuppEapolRespIdFramesTx
+            Counter32,
+        wridot1xSuppEapolRespFramesTx
+            Counter32,
+        wridot1xSuppEapolReqIdFramesRx
+            Counter32,
+        wridot1xSuppEapolReqFramesRx
+            Counter32,
+        wridot1xSuppInvalidEapolFramesRx
+            Counter32,
+        wridot1xSuppEapLengthErrorFramesRx
+            Counter32,
+        wridot1xSuppLastEapolFrameVersion
+            Unsigned32,
+        wridot1xSuppLastEapolFrameSource
+            MacAddress
+        }
+
+ wridot1xSuppEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames of any type
+        that have been received by this Supplicant."
+    REFERENCE
+        "9.5.2, EAPOL frames received"
+    ::= { wridot1xSuppStatsEntry 1 }
+
+ wridot1xSuppEapolFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames of any type
+        that have been transmitted by this Supplicant."
+    REFERENCE
+        "9.5.2, EAPOL frames transmitted"
+    ::= { wridot1xSuppStatsEntry 2 }
+
+ wridot1xSuppEapolStartFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Start frames
+        that have been transmitted by this Supplicant."
+    REFERENCE
+        "9.5.2, EAPOL Start frames transmitted"
+    ::= { wridot1xSuppStatsEntry 3 }
+
+ wridot1xSuppEapolLogoffFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Logoff frames
+        that have been transmitted by this Supplicant."
+    REFERENCE
+        "9.5.2, EAPOL Logoff frames transmitted"
+    ::= { wridot1xSuppStatsEntry 4 }
+
+ wridot1xSuppEapolRespIdFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Resp/Id frames
+        that have been transmitted by this Supplicant."
+    REFERENCE
+        "9.5.2, EAP Resp/Id frames transmitted"
+    ::= { wridot1xSuppStatsEntry 5 }
+
+ wridot1xSuppEapolRespFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAP Response frames
+        (other than Resp/Id frames)
+        that have been transmitted by this Supplicant."
+    REFERENCE
+        "9.5.2, EAP Resp frames transmitted"
+    ::= { wridot1xSuppStatsEntry 6 }
+
+ wridot1xSuppEapolReqIdFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Req/Id frames
+        that have been received by this Supplicant."
+    REFERENCE
+        "9.5.2, EAP Req/Id frames received"
+    ::= { wridot1xSuppStatsEntry 7 }
+
+ wridot1xSuppEapolReqFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Request frames (other than Rq/Id
+        frames) that have been received by this Supplicant."
+    REFERENCE
+        "9.5.2, EAP Req frames received"
+    ::= { wridot1xSuppStatsEntry 8 }
+
+ wridot1xSuppInvalidEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been
+        received by this Supplicant in which the
+        frame type is not recognized."
+    REFERENCE
+        "9.5.2, Invalid EAPOL frames received"
+    ::= { wridot1xSuppStatsEntry 9 }
+
+ wridot1xSuppEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been
+        received by this Supplicant in which the Packet
+        Body Length field (7.5.5) is invalid."
+    REFERENCE
+        "9.5.2, EAP length error frames received"
+    ::= { wridot1xSuppStatsEntry 10 }
+
+ wridot1xSuppLastEapolFrameVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version number carried in the
+        most recently received EAPOL frame."
+    REFERENCE
+        "9.5.2, Last EAPOL frame version"
+    ::= { wridot1xSuppStatsEntry 11 }
+
+ wridot1xSuppLastEapolFrameSource OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address carried in the
+        most recently received EAPOL frame."
+    REFERENCE
+        "9.5.2, Last EAPOL frame source"
+    ::= { wridot1xSuppStatsEntry 12 }
+
+-- ---------------------------------------------------------- --
+-- The 802.1x Port Current User Information Table
+-- ---------------------------------------------------------- --
+	wriPaePortUserTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF WriPaePortUserEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"."
+		::= { wridot1xPaeSupplicant 3 }
+	 
+	wriPaePortUserEntry OBJECT-TYPE
+		SYNTAX      WriPaePortUserEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"."
+		INDEX { wridot1xPaePortNumber,wriPaePortUserMac}
+		::= { wriPaePortUserTable 1 }
+	
+	WriPaePortUserEntry ::= SEQUENCE 
+	{
+		wriPaePortUserMac			MacAddress,
+		wriPaePortUserVlan			Unsigned32,
+		wriPaePortUserName			OCTET STRING,
+		wriPaePortUserState			INTEGER
+	}
+			
+	wriPaePortUserMac OBJECT-TYPE
+		SYNTAX      MacAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"User MAC address."
+		::= { wriPaePortUserEntry 2 }
+		
+	wriPaePortUserVlan OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"User VLAN information."
+		::= { wriPaePortUserEntry 3 }
+		
+	wriPaePortUserName OBJECT-TYPE
+		SYNTAX      OCTET STRING
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"User name."
+		::= { wriPaePortUserEntry 4 }
+		
+	wriPaePortUserState OBJECT-TYPE
+		SYNTAX      INTEGER{authenticated(1),authenticating(2)}
+		MAX-ACCESS	read-write
+		STATUS      current
+		DESCRIPTION
+			"Port User state."
+		::= { wriPaePortUserEntry 5 }
+END

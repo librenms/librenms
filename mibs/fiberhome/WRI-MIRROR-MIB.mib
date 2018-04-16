@@ -1,0 +1,657 @@
+WRI-MIRROR-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+				MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+						mib-2, Integer32, Unsigned32, Counter32, Counter64, enterprises
+						FROM SNMPv2-SMI
+
+				TEXTUAL-CONVENTION, TruthValue, MacAddress
+						FROM SNMPv2-TC
+					
+					InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+
+				InterfaceIndexOrZero
+						FROM IF-MIB
+						
+				wri,wriProtocol				
+            FROM WRI-SMI;
+						
+				wriMirror MODULE-IDENTITY
+				LAST-UPDATED "200909231200Z" -- 23 September 2009 12:00:00 EST
+				ORGANIZATION "FiberHome Networks Systems, Inc."
+				CONTACT-INFO "http://www.fhn.com.cn"
+				DESCRIPTION  "Local Switched Port Analyzer (mirror) and Remote mirror (Rmirror)."
+				::= { wriProtocol 1310 }	
+
+
+ -- Textual Conventions
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+				
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+				
+ -- mirror general variables
+		mirrorGeneral		OBJECT IDENTIFIER ::= { wriMirror 1 }
+		
+	mirrorGenMaxGroup	OBJECT-TYPE
+		SYNTAX			Unsigned32 (1..16)
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+				"the max current group number of port mirroring."
+		::= { mirrorGeneral 1 }
+		
+	mirrorGenCapSupport	OBJECT-TYPE
+		SYNTAX			BITS {
+            interface(0),
+            vlan(1),
+            macBasedIf(2),
+            macBasedVlan(3)
+            }
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+				"Bitmap shows that which source port is in use.
+				
+				Each bit in the bitmap corresponds to a source port type.
+				
+				Having the bit 'interface(0)' set indicates that the source
+				port support the interface type, etc."
+		::= { mirrorGeneral 2 }
+		
+	mirrorGenIfCapSupport	OBJECT-TYPE
+		SYNTAX			BITS {
+            ingress(0),
+            egress(1)
+            }
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+				""
+		::= { mirrorGeneral 3 }
+		
+	mirrorGenIfMacCapSupport	OBJECT-TYPE
+		SYNTAX			BITS {
+            ingress(0),
+            egress(1)
+            }
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+				""
+		::= { mirrorGeneral 4 }
+		
+	mirrorGenVlanCapSupport	OBJECT-TYPE
+		SYNTAX			BITS {
+            ingress(0),
+            egress(1)
+            }
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+				""
+		::= { mirrorGeneral 5 }
+		
+	mirrorGenVlanMacCapSupport	OBJECT-TYPE
+		SYNTAX			BITS {
+            ingress(0),
+            egress(1)
+            }
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+				""
+		::= { mirrorGeneral 6 }
+		 
+  	
+ -- mirrorGroupTable.
+	mirrorGroupTable OBJECT-TYPE
+		SYNTAX			SEQUENCE OF MirrorGroupEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"mirror group information table"
+		::= { wriMirror 2 }	
+	
+	mirrorGroupEntry	OBJECT-TYPE	
+		SYNTAX			MirrorGroupEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { mirrorGroupIndex }
+		::= { mirrorGroupTable 1 }
+		
+	MirrorGroupEntry ::= 
+	SEQUENCE
+	{
+		mirrorGroupIndex					Unsigned32,
+		mirrorGroupMirrorToPort		Unsigned32,
+		mirrorGroupVlan						Unsigned32,
+		mirrorGroupTpId						Unsigned32,		
+		mirrorGroupStatus					EntryStatus,
+		--add by xiongfang 2010-12-23
+		mirrorGroupSrcIpAddr      InetAddress,
+		mirrorGroupSrcIpType      InetAddressType,
+		mirrorGroupDestIpAddr     InetAddress,
+		mirrorGroupDestIpType     InetAddressType,
+		mirrorGroupDscp           Integer32,
+		mirrorGroupIpVlan         Integer32,
+		mirrorGroupRefcnt         Integer32,
+		mirrorGroupType           INTEGER
+	}
+	
+	mirrorGroupIndex OBJECT-TYPE
+			SYNTAX			Unsigned32 (1..16)
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"group index"
+			::= {mirrorGroupEntry 1}
+	
+			
+	mirrorGroupMirrorToPort OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"mirror port that is the observing port"
+			::= {mirrorGroupEntry 2}
+	
+			
+	mirrorGroupVlan OBJECT-TYPE
+			SYNTAX			Unsigned32 (1..4094)
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"rspan vlan. 
+					(1..4094): the remote mode is enable 
+					and the number is the vlan ID(1..4094)."
+			::= {mirrorGroupEntry 3}
+			
+		
+	mirrorGroupTpId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..65535)
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the rspan vlan tpid."
+			::= {mirrorGroupEntry 4}
+			
+	mirrorGroupStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			DEFVAL { underCreation } 
+			::= {mirrorGroupEntry 5}
+ --add by xiongfang 2011-1-4      
+    mirrorGroupSrcIpAddr OBJECT-TYPE
+			SYNTAX		InetAddress 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the source ip address of mirror group."
+			::= {mirrorGroupEntry 6}
+
+    mirrorGroupSrcIpType OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the source ip address type :1:ipv4,2:ipv6."
+			::= {mirrorGroupEntry 7}
+
+    mirrorGroupDestIpAddr OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the destination address of mirror group."
+			::= {mirrorGroupEntry 8}
+   
+   mirrorGroupDestIpType OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the destination ip address type:1:ipv4,2:ipv6."
+			::= {mirrorGroupEntry 9}
+
+    mirrorGroupDscp OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the dscp."
+			::= {mirrorGroupEntry 10}
+
+    mirrorGroupIpVlan OBJECT-TYPE
+			SYNTAX	 Integer32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"vlan id."
+			::= {mirrorGroupEntry 11}
+
+    mirrorGroupRefcnt OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"the refnt."
+			::= {mirrorGroupEntry 12}
+			
+		mirrorGroupType OBJECT-TYPE
+			SYNTAX   INTEGER 
+			{
+	        	local(0),
+	        	l2remote(1),
+	        	l3remote(2)
+        	}
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"The type of mirror group."
+			::= {mirrorGroupEntry 13}
+	
+	-- mirrorIfTable.
+	mirrorIfTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE OF MirrorIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"mirror interface information table"
+		::= { wriMirror 3 }
+		
+	mirrorIfEntry	OBJECT-TYPE	
+		SYNTAX			MirrorIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { mirrorIfIndex }
+		::= { mirrorIfTable 1 }
+		
+	MirrorIfEntry ::=
+	SEQUENCE
+	{
+		mirrorIfIndex			Unsigned32,
+		mirrorIfStatus			EntryStatus,
+		mirrorIfInGroupId		DisplayString,
+		mirrorIfOutGroupId		DisplayString		
+	}
+	
+	mirrorIfIndex OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"interface index of source port."
+			::= {mirrorIfEntry 1}
+			
+	mirrorIfStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= {mirrorIfEntry 2}
+	
+	mirrorIfInGroupId OBJECT-TYPE
+			SYNTAX			DisplayString 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which 
+					source port ingress direction is join in."
+			::= {mirrorIfEntry 3}
+			
+	mirrorIfOutGroupId OBJECT-TYPE
+			SYNTAX			DisplayString
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which
+					source port egress direction is join in."
+			::= {mirrorIfEntry 4}						
+			
+		
+	-- mirrorVlanTable.
+	mirrorVlanTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE OF MirrorVlanEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"mirror vlan information table"
+		::= { wriMirror 4 }
+		
+	mirrorVlanEntry	OBJECT-TYPE	
+		SYNTAX			MirrorVlanEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { mirrorVlanVid }
+		::= { mirrorVlanTable 1 }
+		
+	MirrorVlanEntry ::=
+	SEQUENCE
+	{
+		mirrorVlanVid						Unsigned32,
+		mirrorVlanStatus			EntryStatus,
+		mirrorVlanInGroupId			Unsigned32,
+		mirrorVlanOutGroupId		Unsigned32,
+		mirrorVlanInEnable			INTEGER,
+		mirrorVlanOutEnable			INTEGER		
+	}
+	
+	mirrorVlanVid OBJECT-TYPE
+			SYNTAX			Unsigned32 (1..4094)
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"vlan index of source port."
+			::= {mirrorVlanEntry 1}
+			
+	mirrorVlanStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= {mirrorVlanEntry 2}
+			
+	mirrorVlanInGroupId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..15)
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which 
+					source vlan ingress direction is join in."
+			DEFVAL { 0 }
+			::= {mirrorVlanEntry 3}
+			
+	mirrorVlanOutGroupId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..15)
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which
+					source port egress direction is join in."
+			DEFVAL { 0 }
+			::= {mirrorVlanEntry 4}
+			
+	mirrorVlanInEnable OBJECT-TYPE
+			SYNTAX			INTEGER{
+									enable(1),
+									disable(2)}
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"enable/disable the ingress source port.
+					enable(1), disable(2)."
+			DEFVAL { disable }
+			::= {mirrorVlanEntry 5}
+			
+	mirrorVlanOutEnable OBJECT-TYPE
+			SYNTAX			INTEGER{
+									enable(1),
+									disable(2)}
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"enable/disable the egress source port,
+					enable(1), disable(2)."
+			DEFVAL { disable }
+			::= {mirrorVlanEntry 6}
+					
+	
+	-- mirrorIfMacTable.
+	mirrorIfMacTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE OF MirrorIfMacEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"mirror mac based interface information table"
+		::= { wriMirror 5 }
+		
+	mirrorIfMacEntry	OBJECT-TYPE	
+		SYNTAX				MirrorIfMacEntry
+		MAX-ACCESS		not-accessible
+		STATUS				current
+		DESCRIPTION
+			""
+		INDEX { mirrorIfMacIf,mirrorIfMacAddr,mirrorIfMacMask }
+		::= { mirrorIfMacTable 1 }
+		
+	MirrorIfMacEntry ::=
+	SEQUENCE
+	{
+		mirrorIfMacIf							Unsigned32,
+		mirrorIfMacAddr						MacAddress,
+		mirrorIfMacMask						Unsigned32,
+		mirrorIfMacStatus			EntryStatus,
+		mirrorIfMacInGroupId			Unsigned32,
+		mirrorIfMacOutGroupId			Unsigned32,
+		mirrorIfMacInEnable				INTEGER,
+		mirrorIfMacOutEnable			INTEGER
+	}
+	
+	mirrorIfMacIf OBJECT-TYPE
+			SYNTAX			Unsigned32  
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"interface index of the source port."
+			::= {mirrorIfMacEntry 1}
+				
+	mirrorIfMacAddr OBJECT-TYPE
+			SYNTAX			MacAddress  
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"interface mac address of the source port."
+			::= {mirrorIfMacEntry 2}
+			
+	mirrorIfMacMask OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..48)  
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"interface mac address of the source port."
+			::= {mirrorIfMacEntry 3}
+			
+	mirrorIfMacStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= {mirrorIfMacEntry 4}
+						
+	mirrorIfMacInGroupId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..15)
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which 
+					source port ingress direction is join in."
+			DEFVAL { 0 }
+			::= {mirrorIfMacEntry 5}
+			
+	mirrorIfMacOutGroupId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..15)
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which 
+					source port egress direction is join in."
+			DEFVAL { 0 }
+			::= {mirrorIfMacEntry 6}
+			
+	mirrorIfMacInEnable OBJECT-TYPE
+			SYNTAX			INTEGER{
+									enable(1),
+									disable(2)} 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"enable/disable the source port ingress direction.
+					enable(1), disable(2)."
+			DEFVAL { disable }
+			::= {mirrorIfMacEntry 7}
+			
+	mirrorIfMacOutEnable OBJECT-TYPE
+			SYNTAX			INTEGER{
+									enable(1),
+									disable(2)} 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"enable/disable the source port egress direction.
+					enable(1), disable(2)."
+			DEFVAL { disable }
+			::= {mirrorIfMacEntry 8}
+			
+	
+	-- mirrorVlanMacTable.
+	mirrorVlanMacTable	OBJECT-TYPE
+		SYNTAX				SEQUENCE OF MirrorVlanMacEntry
+		MAX-ACCESS		not-accessible
+		STATUS				current
+		DESCRIPTION
+		"mirror mac based vlan information table"
+		::= { wriMirror 6 }
+		
+	mirrorVlanMacEntry	OBJECT-TYPE	
+		SYNTAX			MirrorVlanMacEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { mirrorVlanMacVid,mirrorVlanMacAddr,mirrorVlanMacMask }
+		::= { mirrorVlanMacTable 1 }
+	
+	MirrorVlanMacEntry ::=
+	SEQUENCE
+	{
+		mirrorVlanMacVid						Unsigned32,
+		mirrorVlanMacAddr						MacAddress,
+		mirrorVlanMacMask						Unsigned32,
+		mirrorVlanMacStatus			EntryStatus,
+		mirrorVlanMacInGroupId			Unsigned32,
+		mirrorVlanMacOutGroupId			Unsigned32,
+		mirrorVlanMacInEnable				INTEGER,
+		mirrorVlanMacOutEnable			INTEGER		
+	}
+			
+	mirrorVlanMacVid OBJECT-TYPE
+			SYNTAX			Unsigned32 
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"vlan index of the source port."
+			::= {mirrorVlanMacEntry 1}
+			
+	mirrorVlanMacAddr OBJECT-TYPE
+			SYNTAX			MacAddress 
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"interface mac address of the source port."
+			::= {mirrorVlanMacEntry 2}
+			
+	mirrorVlanMacMask OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..48) 
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"interface mac address of the source port."
+			::= {mirrorVlanMacEntry 3}
+			
+	mirrorVlanMacStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= {mirrorVlanMacEntry 4}
+	
+	mirrorVlanMacInGroupId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..15) 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which 
+					source port ingress direction is join in."
+			DEFVAL { 0 }
+			::= {mirrorVlanMacEntry 5}
+			
+	mirrorVlanMacOutGroupId OBJECT-TYPE
+			SYNTAX			Unsigned32 (0..15) 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"the group id of the observing port which 
+					source port egress direction is join in."
+			DEFVAL { 0 }
+			::= {mirrorVlanMacEntry 6}
+			
+	mirrorVlanMacInEnable OBJECT-TYPE
+			SYNTAX			INTEGER{
+									enable(1),
+									disable(2)} 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"enable/disable the source port ingress direction.
+					enable(1), disable(2)."
+			DEFVAL { disable }
+			::= {mirrorVlanMacEntry 7}
+			
+	mirrorVlanMacOutEnable OBJECT-TYPE
+			SYNTAX			INTEGER{
+									enable(1),
+									disable(2)} 
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"enable/disable the source port egress direction.
+					enable(1), disable(2)."
+			DEFVAL { disable }
+			::= {mirrorVlanMacEntry 8}	
+			
+		
+		
+END

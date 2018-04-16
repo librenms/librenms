@@ -1,0 +1,663 @@
+WRI-AUTO-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+      TimeTicks, Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,IpAddress    FROM SNMPv2-SMI            
+      MacAddress, RowStatus,TEXTUAL-CONVENTION            FROM SNMPv2-TC
+      enterprises	               FROM RFC1155-SMI
+      InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+      wri,wriProtocol,wriProducts				FROM WRI-SMI;
+      
+    -- 1.3.6.1.4.1.3807.2.120
+		autoConfig OBJECT IDENTIFIER ::= { wriProtocol  120}
+		
+		EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+					
+		-- 1.3.6.1.4.1.3807.2.120.1
+		autoConfigCommonTable OBJECT IDENTIFIER ::= { autoConfig 1 }
+		
+		autoConfigEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					enable(1),
+					disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Start or stop the function of smart install."
+			::= { autoConfigCommonTable 1 }
+		
+		autoConfigDirectorEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					enable(1),
+					disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Start or stop the director function of smart install."
+			::= { autoConfigCommonTable 2 }
+			
+		autoConfigDirectorIpAddrType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the director ip address type(ipv4 or ipv6)."
+			::= { autoConfigCommonTable 3 }
+			
+		autoConfigDirectorIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the director ip address."
+			::= { autoConfigCommonTable 4 }
+			
+		autoConfigDefaultImageType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					local(1),
+					remote(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the default image file type."
+			::= { autoConfigCommonTable 5 }
+					
+		autoConfigDefaultImage OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the default image file name and path of the director."
+			::= { autoConfigCommonTable 6 }
+		
+		autoConfigDefaultConfigType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					local(1),
+					remote(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the default config file name and path of the director."
+			::= { autoConfigCommonTable 7 }
+			
+		autoConfigDefaultConfig OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the default config file name and path of the director."
+			::= { autoConfigCommonTable 8 }
+			
+		autoConfigRcvImage OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"The image file name of the recieved packet form client."
+			::= { autoConfigCommonTable 9 }
+		
+		autoConfigRcvConfig OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"The config file name of the recieved packet form client."
+			::= { autoConfigCommonTable 10 }
+		
+		autoConfigCustomGrpMaxNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"The max number of the custom group."
+			::= { autoConfigCommonTable 11 }
+				
+		autoConfigBuiltInGrpMaxNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"The max number of the built-in group."
+			::= { autoConfigCommonTable 12 }
+			
+		autoConfigClientMaxNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"The max number of the client."
+			::= { autoConfigCommonTable 13 }
+			
+		autoConfigImageDownLoad OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Bytes of the image file download."
+			::= { autoConfigCommonTable 14 }
+			
+		autoConfigConfigDownLoad OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Bytes of the config file download."
+			::= { autoConfigCommonTable 15 }
+		
+		autoConfigFlush OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Flush director database."
+			::= { autoConfigCommonTable 16 }
+		
+		autoConfigPidAndMacMaxNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Max number of the pid and mac."
+			::= { autoConfigCommonTable 17 }
+		
+		autoConfigCustomGrpFreeIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Get free index of custom group."
+			::= { autoConfigCommonTable 18 }
+		
+		autoConfigNotifyDhcpClient OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Notity dhcp client to get ip."
+			::= { autoConfigCommonTable 19 }
+		
+		autoConfigReload OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				reload(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Begine to update again."
+			::= { autoConfigCommonTable 20 }
+		
+		autoConfigDhcpClientVlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the dhcp client vlan."
+			::= { autoConfigCommonTable 21 }
+			
+		autoConfigDhcpsnoopVlanAdd OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the dhcpsnoop vlan."
+			::= { autoConfigCommonTable 22 }
+			
+		autoConfigDhcpsnoopVlanDel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Configure the dhcpsnoop vlan."
+			::= { autoConfigCommonTable 23 }
+		
+		autoConfigDownloadConfig OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					download(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Download configuration."
+			::= { autoConfigCommonTable 24 }
+		
+		autoConfigConfigReload OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					reload(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Reloads the switch."
+			::= { autoConfigCommonTable 25 }
+		
+		autoConfigConfigReloadTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Reloads the switch after seconds later."
+			::= { autoConfigCommonTable 26 }
+		
+		autoConfigDownloadImage OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					download(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Download configuration."
+			::= { autoConfigCommonTable 27 }
+		
+		autoConfigImageReload OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					reload(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Reloads the switch."
+			::= { autoConfigCommonTable 28 }
+		
+		autoConfigImageReloadTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"Reloads the switch after seconds later."
+			::= { autoConfigCommonTable 29 }
+		
+		
+		
+		autoConfigCustomGrpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AutoConfigCustomGrpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			::= { autoConfig 2 }
+			                       
+		autoConfigCustomGrpEntry OBJECT-TYPE
+			SYNTAX AutoConfigCustomGrpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			INDEX { autoConfigCustomGrpIndex }
+			::= { autoConfigCustomGrpTable 1 }
+  
+		AutoConfigCustomGrpEntry ::=
+			SEQUENCE {
+				autoConfigCustomGrpIndex              Unsigned32, 
+				autoConfigCustomGrpName            OCTET STRING,
+				autoConfigCustomGrpType            INTEGER,
+				autoConfigCustomGrpImageType        INTEGER,
+				autoConfigCustomGrpImage           OCTET STRING,
+				autoConfigCustomGrpConfigType        INTEGER,
+				autoConfigCustomGrpConfig           OCTET STRING,
+				autoConfigCustomGrpEntryStatus         EntryStatus 
+			}
+			
+		autoConfigCustomGrpIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 1 }		
+		
+		autoConfigCustomGrpName OBJECT-TYPE
+			SYNTAX OCTET STRING(SIZE (1..63))
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 2 }
+		
+		autoConfigCustomGrpType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				unknown(0),
+				stack(1),
+				mac(2),
+				connect(3),
+				pid(4)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 3 }
+		
+		autoConfigCustomGrpImageType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					local(1),
+					remote(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 4 }
+		
+		autoConfigCustomGrpImage OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 5 }
+		
+		autoConfigCustomGrpConfigType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					local(1),
+					remote(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 6 }
+		
+		autoConfigCustomGrpConfig OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 7 }
+		
+		autoConfigCustomGrpEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpEntry 8 }
+		
+		
+		autoConfigBuiltInTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AutoConfigBuiltInEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			::= { autoConfig 3 }
+			                       
+		autoConfigBuiltInEntry OBJECT-TYPE
+			SYNTAX AutoConfigBuiltInEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			INDEX { autoConfigBuiltInPid }
+			::= { autoConfigBuiltInTable 1 }
+  
+		AutoConfigBuiltInEntry ::=
+			SEQUENCE { 
+				autoConfigBuiltInPid            Unsigned32,
+				autoConfigBuiltInImageType       INTEGER,
+				autoConfigBuiltInImage           OCTET STRING,
+				autoConfigBuiltInConfigType       INTEGER,
+				autoConfigBuiltInConfig           OCTET STRING,
+				autoConfigBuiltInEntryStatus         EntryStatus 
+			}
+		
+		autoConfigBuiltInPid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigBuiltInEntry 1 }
+		
+		autoConfigBuiltInImageType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					local(1),
+					remote(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigBuiltInEntry 2 }
+		
+		autoConfigBuiltInImage OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigBuiltInEntry 3 }
+		
+		autoConfigBuiltInConfigType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					local(1),
+					remote(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigBuiltInEntry 4 }
+		
+		autoConfigBuiltInConfig OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigBuiltInEntry 5 }
+		
+		autoConfigBuiltInEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigBuiltInEntry 6 }
+		
+		
+		autoConfigClientTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AutoConfigClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			::= { autoConfig 4 }
+			                       
+		autoConfigClientEntry OBJECT-TYPE
+			SYNTAX AutoConfigClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			INDEX { autoConfigClientIndex }
+			::= { autoConfigClientTable 1 }
+  
+		AutoConfigClientEntry ::=
+			SEQUENCE { 
+				autoConfigClientIndex            Unsigned32,
+				autoConfigClientIpAddrType       InetAddressType,
+				autoConfigClientIp            InetAddress,
+				autoConfigClientMac           MacAddress,
+				autoConfigClientPid           Unsigned32,
+				autoConfigClientEntryStatus         EntryStatus 
+			}
+		
+		autoConfigClientIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigClientEntry 1 }
+		
+		autoConfigClientIpAddrType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigClientEntry 2 }
+		
+		autoConfigClientIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigClientEntry 3 }
+		
+		autoConfigClientMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigClientEntry 4 }
+		
+		autoConfigClientPid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigClientEntry 5 }
+		
+		autoConfigClientEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigClientEntry 6 }
+			
+		
+		autoConfigCustomGrpMacTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AutoConfigCustomGrpMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			::= { autoConfig 5 }
+			                       
+		autoConfigCustomGrpMacEntry OBJECT-TYPE
+			SYNTAX AutoConfigCustomGrpMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			INDEX { autoConfigCustomGrpMacGrpIndex,autoConfigCustomGrpMac }
+			::= { autoConfigCustomGrpMacTable 1 }
+  
+		AutoConfigCustomGrpMacEntry ::=
+			SEQUENCE { 
+				autoConfigCustomGrpMacGrpIndex     Unsigned32,
+				autoConfigCustomGrpMac             MacAddress,
+				autoConfigCustomGrpMacEntryStatus         EntryStatus 
+			}
+		
+		autoConfigCustomGrpMacGrpIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpMacEntry 1 }		
+
+		autoConfigCustomGrpMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpMacEntry 2 }
+		
+		autoConfigCustomGrpMacEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpMacEntry 3 }
+		
+		
+		autoConfigCustomGrpPidTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AutoConfigCustomGrpPidEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			::= { autoConfig 6 }
+			                       
+		autoConfigCustomGrpPidEntry OBJECT-TYPE
+			SYNTAX AutoConfigCustomGrpPidEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			    ""
+			INDEX { autoConfigCustomGrpPidGrpIndex,autoConfigCustomGrpPid }
+			::= { autoConfigCustomGrpPidTable 1 }
+  
+		AutoConfigCustomGrpPidEntry ::=
+			SEQUENCE { 
+				autoConfigCustomGrpPidGrpIndex      Unsigned32,
+				autoConfigCustomGrpPid             Unsigned32,
+				autoConfigCustomGrpPidEntryStatus         EntryStatus 
+			}
+			
+		autoConfigCustomGrpPidGrpIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpPidEntry 1 }
+		
+		autoConfigCustomGrpPid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpPidEntry 2 }
+			
+		autoConfigCustomGrpPidEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				""
+			::= { autoConfigCustomGrpPidEntry 3 }
+		
+END		

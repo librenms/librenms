@@ -1,0 +1,2917 @@
+   WRI-MPLS-TE-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Integer32, Unsigned32, Counter32, Counter64, TimeTicks,
+      zeroDotZero
+         FROM SNMPv2-SMI                                    -- [RFC2578]
+      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                                   -- [RFC2580]
+      TruthValue, RowStatus, RowPointer, StorageType,
+      TimeStamp,TEXTUAL-CONVENTION
+         FROM SNMPv2-TC                                     -- [RFC2579]
+      InterfaceIndexOrZero, ifGeneralInformationGroup,
+      ifCounterDiscontinuityGroup
+         FROM IF-MIB                                        -- [RFC2863]
+      mplsStdMIB, MplsBitRate, MplsBurstSize, MplsLSPID,
+      MplsTunnelIndex, MplsTunnelInstanceIndex,
+      MplsTunnelAffinity, MplsExtendedTunnelId, MplsPathIndex,
+      MplsPathIndexOrZero, MplsOwner, TeHopAddressType,
+      TeHopAddress, TeHopAddressAS, TeHopAddressUnnum
+         FROM MPLS-TC-STD-MIB                               -- [RFC3811]
+      SnmpAdminString
+         FROM SNMP-FRAMEWORK-MIB                            -- [RFC3411]
+      IndexIntegerNextFree
+         FROM DIFFSERV-MIB                                  -- [RFC3289]
+      InetAddressPrefixLength
+         FROM INET-ADDRESS-MIB                              -- [RFC3291]
+	  InetAddress, InetAddressType       FROM INET-ADDRESS-MIB
+      wri,wriProtocol	        		 FROM WRI-SMI ; 
+
+   wriMplsTeMIB		      OBJECT IDENTIFIER ::= { wriProtocol 1337 }
+  
+
+   -- Top level components of this MIB module.
+
+   -- traps
+   wriMplsTeNotifications OBJECT IDENTIFIER ::= { wriMplsTeMIB 0 }
+   -- tables, scalars
+   wriMplsTeScalars       OBJECT IDENTIFIER ::= { wriMplsTeMIB 1 }
+   wriMplsTeObjects       OBJECT IDENTIFIER ::= { wriMplsTeMIB 2 }
+   -- conformance
+   wriMplsTeConformance   OBJECT IDENTIFIER ::= { wriMplsTeMIB 3 }
+
+   -- MPLS Tunnel scalars.
+
+   wriMplsTeConfigured OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The number of tunnels configured on this device. A
+             tunnel is considered configured if the
+             wriMplsTeRowStatus is active(1)."
+      ::= { wriMplsTeScalars 1 }
+
+   wriMplsTeActive OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The number of tunnels active on this device. A
+             tunnel is considered active if the
+             wriMplsTeOperStatus is up(1)."
+      ::= { wriMplsTeScalars 2 }
+
+   wriMplsTeTEDistProto OBJECT-TYPE
+
+      SYNTAX        BITS {
+             other (0),
+             ospf (1),
+             isis (2)
+         }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The traffic engineering distribution protocol(s)
+             used by this LSR. Note that an LSR may support more
+             than one distribution protocol simultaneously."
+      ::= { wriMplsTeScalars 3 }
+
+   wriMplsTeMaxHops OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The maximum number of hops that can be specified for
+             a tunnel on this device."
+      ::= { wriMplsTeScalars 4 }
+
+   wriMplsTeNotificationMaxRate OBJECT-TYPE
+      SYNTAX       Unsigned32
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+           "This variable indicates the maximum number of
+             notifications issued per second. If events occur
+             more rapidly, the implementation may simply fail to
+             emit these notifications during that period, or may
+             queue them until an appropriate time. A value of 0
+             means no throttling is applied and events may be
+             notified at the rate at which they occur."
+      DEFVAL       { 0 }
+      ::= { wriMplsTeScalars 5 }
+	  
+		wriMplsTeEnable OBJECT-TYPE
+      SYNTAX       INTEGER
+      {
+      			enable(1),
+      			disable(2)
+      }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+           "Enable or disable the protocol of mpls te."
+      ::= { wriMplsTeScalars 6 }
+
+		wriMplsTeSrlgEnable OBJECT-TYPE
+      SYNTAX       INTEGER
+      {
+      			enable(1),
+      			disable(2)
+      }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+           "Enable or disable the SRLG."
+      ::= { wriMplsTeScalars 7 }
+          
+    wriMplsTeBCModel OBJECT-TYPE
+      SYNTAX       INTEGER
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+           "."
+      ::= { wriMplsTeScalars 8 }
+      
+		wriMplsTeHopFreeIndex OBJECT-TYPE
+      SYNTAX       INTEGER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+           "."
+      ::= { wriMplsTeScalars 9 }
+      
+	  wriMplsTeLspAttrFreeIndex OBJECT-TYPE
+      SYNTAX       INTEGER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+           "."
+      ::= { wriMplsTeScalars 10 }
+    
+    --xf add 2014-6-12
+	  wriMplsTeAutoFrr OBJECT-TYPE
+      SYNTAX       INTEGER
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+           "Enable or disable auto frr."
+      ::= { wriMplsTeScalars 11 }
+      
+	
+   -- End of MPLS Tunnel scalars.
+
+   -- MPLS tunnel table.
+
+   wriMplsTeTunnelIndexNext OBJECT-TYPE
+      SYNTAX        IndexIntegerNextFree (0..65535)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object contains an unused value for
+           wriMplsTeIndex, or a zero to indicate
+           that none exist. Negative values are not allowed,
+           as they do not correspond to valid values of
+           wriMplsTeIndex.
+
+           Note that this object offers an unused value
+           for an wriMplsTeIndex value at the ingress
+           side of a tunnel. At other LSRs the value
+           of wriMplsTeIndex SHOULD be taken from the
+           value signaled by the MPLS signaling protocol.
+          "
+      ::= { wriMplsTeObjects 1 }
+
+   wriMplsTeTunnelTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeTunnelEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The wriMplsTeTunnelTable allows new MPLS tunnels to be
+             created between an LSR and a remote endpoint, and
+             existing tunnels to be reconfigured or removed.
+             Note that only point-to-point tunnel segments are
+             supported, although multipoint-to-point and point-
+             to-multipoint connections are supported by an LSR
+             acting as a cross-connect.  Each MPLS tunnel can
+             thus have one out-segment originating at this LSR
+             and/or one in-segment terminating at this LSR."
+      ::= { wriMplsTeObjects 2 }
+
+   wriMplsTeTunnelEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeTunnelEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents an MPLS tunnel.
+             An entry can be created by a network administrator
+             or by an SNMP agent as instructed by an MPLS
+             signalling protocol. Whenever a new entry is
+             created with wriMplsTeIsIf set to true(1), then a
+             corresponding entry is created in ifTable as well
+             (see RFC 2863). The ifType of this entry is
+             wriMplsTe(150).
+
+           A tunnel entry needs to be uniquely identified across
+             a MPLS network. Indices wriMplsTeIndex and
+             wriMplsTeInstance uniquely identify a tunnel on
+             the LSR originating the tunnel.  To uniquely
+             identify a tunnel across an MPLS network requires
+             index wriMplsTeIngressLSRId.  The last index
+             wriMplsTeEgressLSRId is useful in identifying all
+             instances of a tunnel that terminate on the same
+             egress LSR."
+      REFERENCE
+           "1. RFC 2863 - The TunnelIfs Group MIB, McCloghrie,
+             K., and F. Kastenholtz, June 2000 "
+      INDEX {  wriMplsTeTunnelIndex,
+               wriMplsTeTunnelInstance,
+               wriMplsTeTunnelIngressLSRId,
+               wriMplsTeTunnelEgressLSRId
+            }
+      ::= { wriMplsTeTunnelTable 1 }
+
+   WriMplsTeTunnelEntry ::= SEQUENCE {
+         wriMplsTeTunnelIndex              MplsTunnelIndex,
+         wriMplsTeTunnelInstance           MplsTunnelInstanceIndex,
+         wriMplsTeTunnelIngressLSRId       MplsExtendedTunnelId,
+         wriMplsTeTunnelEgressLSRId        MplsExtendedTunnelId,
+         wriMplsTeTunnelName               SnmpAdminString,
+         wriMplsTeTunnelDescr              SnmpAdminString,
+         wriMplsTeTunnelIsIf               TruthValue,
+         wriMplsTeTunnelIfIndex            InterfaceIndexOrZero,
+         wriMplsTeTunnelOwner              MplsOwner,
+         wriMplsTeTunnelRole               INTEGER,
+         wriMplsTeTunnelXCPointer          RowPointer,
+         wriMplsTeTunnelSignallingProto    INTEGER,
+         wriMplsTeTunnelSetupPrio          Integer32,
+         wriMplsTeTunnelHoldingPrio        Integer32,
+         wriMplsTeTunnelSessionAttributes  BITS,
+         wriMplsTeTunnelLocalProtectInUse  TruthValue,
+         wriMplsTeTunnelResourcePointer    RowPointer,
+         wriMplsTeTunnelPrimaryInstance    MplsTunnelInstanceIndex,
+         wriMplsTeTunnelInstancePriority   Unsigned32,
+         wriMplsTeTunnelHopTableIndex      MplsPathIndexOrZero,
+         wriMplsTeTunnelPathInUse          MplsPathIndexOrZero,
+         wriMplsTeTunnelARHopTableIndex    MplsPathIndexOrZero,
+         wriMplsTeTunnelCHopTableIndex     MplsPathIndexOrZero,
+         wriMplsTeTunnelIncludeAnyAffinity MplsTunnelAffinity,
+         wriMplsTeTunnelIncludeAllAffinity MplsTunnelAffinity,
+         wriMplsTeTunnelExcludeAnyAffinity MplsTunnelAffinity,
+         wriMplsTeTunnelTotalUpTime        TimeTicks,
+         wriMplsTeTunnelInstanceUpTime     TimeTicks,
+         wriMplsTeTunnelPrimaryUpTime      TimeTicks,
+         wriMplsTeTunnelPathChanges        Counter32,
+         wriMplsTeTunnelLastPathChange     TimeTicks,
+         wriMplsTeTunnelCreationTime       TimeStamp,
+         wriMplsTeTunnelStateTransitions   Counter32,
+         wriMplsTeTunnelAdminStatus        INTEGER,
+         wriMplsTeTunnelOperStatus         INTEGER,
+         wriMplsTeTunnelRowStatus          RowStatus,
+         wriMplsTeTunnelStorageType        StorageType,
+         wriMplsTeTunnelLspType        INTEGER,
+         wriMplsTeTunnelBandwidth         Unsigned32,
+         wriMplsTeTunnelClassType        INTEGER,
+         wriMplsTeTunnelInIfIndex        Unsigned32,
+         wriMplsTeTunnelOutIfIndex        Unsigned32,
+		 --xf add 2014-6-12
+		 wriMplsTeTunnelIncludeAnyAff	  Unsigned32,
+		 wriMplsTeTunnelIncludeAllAff	  Unsigned32,
+		 wriMplsTeTunnelExcludeAnyAff	  Unsigned32,
+		 wriMplsTeTunnelRecordReoute	  INTEGER,
+		 wriMplsTeTunnelFastReoute	  	  INTEGER,
+		 wriMplsTeTunnelFastReouteBandwidth	  	  INTEGER,
+		 wriMplsTeTunnelBypasstunnel	  	  	INTEGER,
+		 wriMplsTeTunnelBypassBandwidth	  	  	Unsigned32,
+		 wriMplsTeTunnelBypassSetupPriority	  	  	Unsigned32,
+		 wriMplsTeTunnelBypassHoldPriority	  	  	Unsigned32,
+		 --xf add 2014-6-12
+		 wriMplsTeTunnelUsingBypass			INTEGER,
+		 wriMplsTeTunnelBypasstunnelUnit	INTEGER,
+		 wriMplsTeTunnelRecordRouterLabel	INTEGER,
+		 --xf add 2014-10-9
+		 wriMplsTeTunnelCspfMetricType 	    INTEGER,
+		 wriMplsTeTunnelHopLimit			INTEGER
+		 }
+
+   wriMplsTeTunnelIndex OBJECT-TYPE
+      SYNTAX        MplsTunnelIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Uniquely identifies a set of tunnel instances
+             between a pair of ingress and egress LSRs.
+             Managers should obtain new values for row
+             creation in this table by reading
+             wriMplsTunnelIndexNext. When
+             the MPLS signalling protocol is rsvp(2) this value
+             SHOULD be equal to the value signaled in the
+             Tunnel Id of the Session object. When the MPLS
+             signalling protocol is crldp(3) this value
+             SHOULD be equal to the value signaled in the
+             LSP ID."
+      ::= { wriMplsTeTunnelEntry 1 }
+
+   wriMplsTeTunnelInstance OBJECT-TYPE
+      SYNTAX        MplsTunnelInstanceIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Uniquely identifies a particular instance of a
+             tunnel between a pair of ingress and egress LSRs.
+             It is useful to identify multiple instances of
+             tunnels for the purposes of backup and parallel
+             tunnels. When the MPLS signaling protocol is
+             rsvp(2) this value SHOULD be equal to the LSP Id
+             of the Sender Template object. When the signaling
+             protocol is crldp(3) there is no equivalent
+             signaling object."
+      ::= { wriMplsTeTunnelEntry 2 }
+
+   wriMplsTeTunnelIngressLSRId OBJECT-TYPE
+      SYNTAX        MplsExtendedTunnelId
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Identity of the ingress LSR associated with this
+             tunnel instance. When the MPLS signalling protocol
+             is rsvp(2) this value SHOULD be equal to the Tunnel
+             Sender Address in the Sender Template object and MAY
+             be equal to the Extended Tunnel Id field in the
+             SESSION object. When the MPLS signalling protocol is
+             crldp(3) this value SHOULD be equal to the Ingress
+             LSR Router ID field in the LSPID TLV object."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001
+            2. Constraint-Based LSP Setup using LDP, Jamoussi
+             (Editor), RFC 3212, January 2002"
+      ::= { wriMplsTeTunnelEntry 3 }
+
+   wriMplsTeTunnelEgressLSRId OBJECT-TYPE
+      SYNTAX        MplsExtendedTunnelId
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Identity of the egress LSR associated with this
+             tunnel instance."
+      ::= { wriMplsTeTunnelEntry 4 }
+
+   wriMplsTeTunnelName OBJECT-TYPE
+      SYNTAX        SnmpAdminString
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The canonical name assigned to the tunnel. This name
+             can be used to refer to the tunnel on the LSR's
+             console port.  If wriMplsTunnelIsIf is set to true
+             then the ifName of the interface corresponding to
+             this tunnel should have a value equal to
+             wriMplsTunnelName.  Also see the description of ifName
+             in RFC 2863."
+      REFERENCE
+           "RFC 2863 - The TunnelIfs Group MIB, McCloghrie, K.,
+             and F. Kastenholtz, June 2000"
+      DEFVAL {""}
+      ::= { wriMplsTeTunnelEntry 5 }
+
+   wriMplsTeTunnelDescr OBJECT-TYPE
+      SYNTAX        SnmpAdminString
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "A textual string containing information about the
+             tunnel.  If there is no description this object
+             contains a zero length string. This object is may
+             not be signaled by MPLS signaling protocols,
+             consequentally the value of this object at transit
+             and egress LSRs MAY be automatically generated or
+             absent."
+      DEFVAL {""}
+      ::= { wriMplsTeTunnelEntry 6 }
+
+   wriMplsTeTunnelIsIf OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Denotes whether or not this tunnel corresponds to an
+             interface represented in the interfaces group
+             table. Note that if this variable is set to true
+             then the ifName of the interface corresponding to
+             this tunnel should have a value equal to
+             wriMplsTeTunnelName.  Also see the description of ifName
+             in RFC 2863.  This object is meaningful only at the
+             ingress and egress LSRs."
+      REFERENCE
+           "RFC 2863 - The TunnelIfs Group MIB, McCloghrie, K.,
+             and F. Kastenholtz, June 2000"
+      DEFVAL { false }
+      ::= { wriMplsTeTunnelEntry 7 }
+
+   wriMplsTeTunnelIfIndex OBJECT-TYPE
+      SYNTAX        InterfaceIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTeTunnelIsIf is set to true, then this value
+             contains the LSR-assigned ifIndex which corresponds
+             to an entry in the interfaces table.  Otherwise
+             this variable should contain the value of zero
+             indicating that a valid ifIndex was not assigned to
+             this tunnel interface."
+      REFERENCE
+           "RFC 2863 - The TunnelIfs Group MIB, McCloghrie, K.,
+             and F. Kastenholtz, June 2000"
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 8 }
+
+   wriMplsTeTunnelOwner OBJECT-TYPE
+      SYNTAX        MplsOwner
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Denotes the entity that created and is responsible
+             for managing this tunnel. This column is
+             automatically filled by the agent on creation of a
+             row."
+      ::= { wriMplsTeTunnelEntry 9 }
+
+   wriMplsTeTunnelRole OBJECT-TYPE
+      SYNTAX        INTEGER { head(1),
+                              transit(2),
+                              tail(3),
+                              headTail(4) }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This value signifies the role that this tunnel
+             entry/instance represents. This value MUST be set
+             to head(1) at the originating point of the tunnel.
+             This value MUST be set to transit(2) at transit
+             points along the tunnel, if transit points are
+             supported. This value MUST be set to tail(3) at the
+             terminating point of the tunnel if tunnel tails are
+             supported.
+
+            The value headTail(4) is provided for tunnels that
+             begin and end on the same LSR."
+      DEFVAL { head }
+      ::= { wriMplsTeTunnelEntry 10 }
+
+   wriMplsTeTunnelXCPointer OBJECT-TYPE
+      SYNTAX        RowPointer
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable points to a row in the wriMplsXCTable.
+             This table identifies the segments that compose
+             this tunnel, their characteristics, and
+             relationships to each other. A value of zeroDotZero
+             indicates that no LSP has been associated with this
+             tunnel yet."
+      REFERENCE
+           "Srinivasan, C., Viswanathan, A., and T. Nadeau,
+             Multiprotocol Label Switching (MPLS) Label Switching
+             Router (LSR) Management Information Base (MIB), RFC 3813,
+             June 2004"
+      DEFVAL        { zeroDotZero }
+      ::= { wriMplsTeTunnelEntry 11 }
+
+   wriMplsTeTunnelSignallingProto OBJECT-TYPE
+      SYNTAX       INTEGER {
+                        none(1),
+                        rsvp(2),
+                        crldp(3),
+                        other(4)
+                        }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The signalling protocol, if any, used to setup this
+             tunnel."
+      DEFVAL        { none }
+      ::= { wriMplsTeTunnelEntry 12 }
+
+   wriMplsTeTunnelSetupPrio OBJECT-TYPE
+      SYNTAX        Integer32 (0..7)
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Indicates the setup priority of this tunnel."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001
+            2. Constraint-Based LSP Setup using LDP, Jamoussi
+             (Editor), RFC 3212, January 2002"
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 13 }
+
+   wriMplsTeTunnelHoldingPrio OBJECT-TYPE
+      SYNTAX        Integer32 (0..7)
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Indicates the holding priority for this tunnel."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001
+
+            2. Constraint-Based LSP Setup using LDP, Jamoussi
+             (Editor), RFC 3212, January 2002"
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 14 }
+
+   wriMplsTeTunnelSessionAttributes OBJECT-TYPE
+      SYNTAX      BITS {
+                     fastReroute (0),
+                     mergingPermitted (1),
+                     isPersistent (2),
+                     isPinned (3),
+                     recordRoute(4)
+                    }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This bit mask indicates optional session values for
+             this tunnel. The following describes these bit
+             fields:
+
+           fastRerouteThis flag indicates that the any tunnel
+             hop may choose to reroute this tunnel without
+             tearing it down.  This flag permits transit routers
+             to use a local repair mechanism which may result in
+             violation of the explicit routing of this tunnel.
+             When a fault is detected on an adjacent downstream
+             link or node, a transit router can re-route traffic
+             for fast service restoration.
+
+           mergingPermitted This flag permits transit routers
+             to merge this session with other RSVP sessions for
+             the purpose of reducing resource overhead on
+             downstream transit routers, thereby providing
+             better network scaling.
+
+           isPersistent  Indicates whether this tunnel should
+             be restored automatically after a failure occurs.
+
+           isPinned   This flag indicates whether the loose-
+             routed hops of this tunnel are to be pinned.
+
+           recordRouteThis flag indicates whether or not the
+             signalling protocol should remember the tunnel path
+             after it has been signaled."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001."
+      ::= { wriMplsTeTunnelEntry 15 }
+
+   wriMplsTeTunnelLocalProtectInUse  OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Indicates that the local repair mechanism is in use
+             to maintain this tunnel (usually in the face of an
+             outage of the link it was previously routed over)."
+      DEFVAL { false }
+      ::= { wriMplsTeTunnelEntry 16 }
+	  
+   wriMplsTeTunnelResourcePointer OBJECT-TYPE
+      SYNTAX        RowPointer
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable represents a pointer to the traffic
+             parameter specification for this tunnel.  This
+             value may point at an entry in the
+             wriMplsTeTunnelResourceEntry to indicate which
+             wriMplsTeTunnelResourceEntry is to be assigned to this
+             LSP instance.  This value may optionally point at
+             an externally defined traffic parameter
+             specification table.  A value of zeroDotZero
+             indicates best-effort treatment.  By having the
+             same value of this object, two or more LSPs can
+             indicate resource sharing."
+      DEFVAL        { zeroDotZero }
+      ::= { wriMplsTeTunnelEntry 17 }
+
+   wriMplsTeTunnelPrimaryInstance OBJECT-TYPE
+      SYNTAX        MplsTunnelInstanceIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the instance index of the primary instance
+             of this tunnel. More details of the definition of
+             tunnel instances and the primary tunnel instance
+             can be found in the description of the TEXTUAL-CONVENTION
+             MplsTunnelInstanceIndex."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 18 }
+
+   wriMplsTeTunnelInstancePriority OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This value indicates which priority, in descending
+             order, with 0 indicating the lowest priority,
+             within a group of tunnel instances. A group of
+             tunnel instances is defined as a set of LSPs with
+             the same wriMplsTeTunnelIndex in this table, but with a
+             different wriMplsTeTunnelInstance. Tunnel instance
+             priorities are used to denote the priority at which
+             a particular tunnel instance will supercede
+             another. Instances of tunnels containing the same
+             wriMplsTeTunnelInstancePriority will be used for load
+             sharing."
+      DEFVAL        { 0 }
+      ::= { wriMplsTeTunnelEntry 19 }
+
+   wriMplsTeTunnelHopTableIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Index into the wriMplsTeTunnelHopTable entry that
+             specifies the explicit route hops for this tunnel.
+             This object is meaningful only at the head-end of
+             the tunnel."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 20 }
+
+   wriMplsTeTunnelPathInUse OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This value denotes the configured path that was
+             chosen for this tunnel. This value reflects the
+             secondary index into wriMplsTeTunnelHopTable. This path
+             may not exactly match the one in
+             wriMplsTeTunnelARHopTable due to the fact that some CSPF
+             modification may have taken place. See
+             wriMplsTeTunnelARHopTable for the actual path being
+             taken by the tunnel. A value of zero denotes that
+             no path is currently in use or available."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 21 }
+
+   wriMplsTeTunnelARHopTableIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Index into the wriMplsTeTunnelARHopTable entry that
+             specifies the actual hops traversed by the tunnel.
+             This is automatically updated by the agent when the
+             actual hops becomes available."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 22 }
+
+   wriMplsTeTunnelCHopTableIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Index into the wriMplsTeTunnelCHopTable entry that
+             specifies the computed hops traversed by the
+             tunnel. This is automatically updated by the agent
+             when computed hops become available or when
+             computed hops get modified."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 23 }
+
+   wriMplsTeTunnelIncludeAnyAffinity OBJECT-TYPE
+      SYNTAX        MplsTunnelAffinity
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "A link satisfies the include-any constraint if and
+             only if the constraint is zero, or the link and the
+             constraint have a resource class in common."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001."
+      ::= { wriMplsTeTunnelEntry 24 }
+
+   wriMplsTeTunnelIncludeAllAffinity OBJECT-TYPE
+      SYNTAX        MplsTunnelAffinity
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "A link satisfies the include-all constraint if and
+             only if the link contains all of the administrative
+             groups specified in the constraint."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001."
+      ::= { wriMplsTeTunnelEntry 25 }
+
+   wriMplsTeTunnelExcludeAnyAffinity OBJECT-TYPE
+      SYNTAX        MplsTunnelAffinity
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "A link satisfies the exclude-any constraint if and
+             only if the link contains none of the
+             administrative groups specified in the constraint."
+      REFERENCE
+           "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+             Awduche et al, RFC 3209, December 2001."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelEntry 26 }
+
+   wriMplsTeTunnelTotalUpTime OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This value represents the aggregate up time for all
+             instances of this tunnel, if available. If this
+             value is unavailable, it MUST return a value of 0."
+         ::= { wriMplsTeTunnelEntry 27 }
+
+   wriMplsTeTunnelInstanceUpTime OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This value identifies the total time that this
+             tunnel instance's operStatus has been Up(1)."
+         ::= { wriMplsTeTunnelEntry 28 }
+
+   wriMplsTeTunnelPrimaryUpTime OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the total time the primary instance of
+             this tunnel has been active. The primary instance
+             of this tunnel is defined in
+             wriMplsTeTunnelPrimaryInstance."
+      ::= { wriMplsTeTunnelEntry 29 }
+
+   wriMplsTeTunnelPathChanges OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the number of times the actual path for
+            this tunnel instance has changed."
+      ::= { wriMplsTeTunnelEntry 30 }
+
+   wriMplsTeTunnelLastPathChange OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the time since the last change to the
+            actual path for this tunnel instance."
+      ::= { wriMplsTeTunnelEntry 31 }
+
+   wriMplsTeTunnelCreationTime OBJECT-TYPE
+      SYNTAX        TimeStamp
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the value of SysUpTime when the first
+             instance of this tunnel came into existence.
+             That is, when the value of wriMplsTeTunnelOperStatus
+             was first set to up(1)."
+      ::= { wriMplsTeTunnelEntry 32 }
+
+   wriMplsTeTunnelStateTransitions OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Specifies the number of times the state
+             (wriMplsTeTunnelOperStatus) of this tunnel instance has
+             changed."
+      ::= { wriMplsTeTunnelEntry 33 }
+
+   wriMplsTeTunnelAdminStatus OBJECT-TYPE
+      SYNTAX     INTEGER {
+                      -- ready to pass packets
+                      up(1),
+                      down(2),
+                      -- in some test mode
+                      testing(3)
+                }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Indicates the desired operational status of this
+             tunnel."
+      ::= { wriMplsTeTunnelEntry 34 }
+
+   wriMplsTeTunnelOperStatus OBJECT-TYPE
+      SYNTAX     INTEGER {
+                  -- ready to pass packets
+                  up(1),
+                  down(2),
+                  -- in some test mode
+                  testing(3),
+                  -- status cannot be determined
+                  unknown(4),
+                  dormant(5),
+                  -- some component is missing
+                  notPresent(6),
+                  -- down due to the state of
+                  -- lower layer interfaces
+                  lowerLayerDown(7),
+                  building(8),
+                  pending(9)
+                }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Indicates the actual operational status of this
+             tunnel, which is typically but not limited to, a
+             function of the state of individual segments of
+             this tunnel."
+      ::= { wriMplsTeTunnelEntry 35 }
+
+   wriMplsTeTunnelRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable is used to create, modify, and/or
+             delete a row in this table.  When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified by the agent except
+             wriMplsTeTunnelAdminStatus, wriMplsTeTunnelRowStatus and
+             wriMplsTeTunnelStorageType."
+      ::= { wriMplsTeTunnelEntry 36 }
+
+   wriMplsTeTunnelStorageType OBJECT-TYPE
+      SYNTAX        StorageType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The storage type for this tunnel entry.
+                    Conceptual rows having the value 'permanent'
+                    need not allow write-access to any columnar
+                    objects in the row."
+      DEFVAL { volatile }
+      ::= { wriMplsTeTunnelEntry 37 }
+
+		wriMplsTeTunnelLspType OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			invalid(0),
+      			prime(1),
+      			hotstandby(2),
+      			ordinary(3),
+      			besteft(4),
+      			primemodify(5),
+      			hotstandbymodify(6),
+      			ordinarymodify(7),
+      			besteftmodify(8)
+      }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 38 }
+
+		wriMplsTeTunnelBandwidth OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 39 }
+      
+    wriMplsTeTunnelClassType  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 40 }
+      
+		wriMplsTeTunnelInIfIndex  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 41 }
+
+		wriMplsTeTunnelOutIfIndex  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 42 }
+	  
+	  --xf add 2014-6-12
+	  wriMplsTeTunnelIncludeAnyAff  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 43 }
+	  
+	  wriMplsTeTunnelIncludeAllAff  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 44 }
+	  
+	  wriMplsTeTunnelExcludeAnyAff  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 45 }
+	  
+	  
+	  wriMplsTeTunnelRecordReoute  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 46 }
+	  
+	  
+	  wriMplsTeTunnelFastReoute  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 47 }
+	  
+	  wriMplsTeTunnelFastReouteBandwidth  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 48 }
+	  
+	  wriMplsTeTunnelBypasstunnel  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 49 }
+	  
+	  wriMplsTeTunnelBypassBandwidth  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 50 }
+	  
+	  wriMplsTeTunnelBypassSetupPriority  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 51 }
+	  
+	  wriMplsTeTunnelBypassHoldPriority  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 52 }
+	  
+	  --xf add 2014-6-12
+	  wriMplsTeTunnelUsingBypass  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 53 }
+	  
+	  wriMplsTeTunnelBypasstunnelUnit  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 54 }
+	  
+	  wriMplsTeTunnelRecordRouterLabel  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 55 }
+	  
+	  --xf add 2014-10-9
+	  wriMplsTeTunnelCspfMetricType  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 56 }
+	  
+	  wriMplsTeTunnelHopLimit  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelEntry 57 }
+	  
+   -- End of wriMplsTeTunnelTable
+    
+   
+   wriMplsTeERHopListIndexNext OBJECT-TYPE
+      SYNTAX        MplsPathIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object contains an appropriate value to be used
+             for wriMplsTeTunnelHopListIndex when creating entries in
+             the wriMplsTeTunnelHopTable.  If the number of
+             unassigned entries is exhausted, a retrieval
+             operation will return a value of 0.  This object
+             may also return a value of 0 when the LSR is unable
+             to accept conceptual row creation, for example, if
+             the wriMplsTeTunnelHopTable is implemented as read-only.
+             To obtain the value of wriMplsTeTunnelHopListIndex for a
+             new entry in the wriMplsTeTunnelHopTable, the manager
+             issues a management protocol retrieval operation to
+             obtain the current value of wriMplsTeTunnelHopIndex.
+
+            When the SET is performed to create a row in the
+             wriMplsTeTunnelHopTable, the Command Responder (agent)
+             must determine whether the value is indeed still
+             unused; Two Network Management Applications may
+             attempt to create a row (configuration entry)
+             simultaneously and use the same value. If it is
+             currently unused, the SET succeeds and the Command
+             Responder (agent) changes the value of this object,
+             according to an implementation-specific algorithm.
+             If the value is in use, however, the SET fails.  The
+             Network Management Application must then re-read
+             this variable to obtain a new usable value."
+      ::= { wriMplsTeObjects 3 }
+
+   wriMplsTeERHopTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeERHopEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The wriMplsTunnelHopTable is used to indicate the hops,
+             strict or loose, for an instance of an MPLS tunnel
+             defined in wriMplsTunnelTable, when it is established
+             via signalling, for the outgoing direction of the
+             tunnel. Thus at a transit LSR, this table contains
+             the desired path of the tunnel from this LSR
+             onwards. Each row in this table is indexed by
+             wriMplsTunnelHopListIndex which corresponds to a group
+             of hop lists or path options.  Each row also has a
+             secondary index wriMplsTunnelHopIndex, which indicates
+             a group of hops (also known as a path option).
+             Finally, the third index, wriMplsTunnelHopIndex
+             indicates the specific hop information for a path
+             option. In case we want to specify a particular
+             interface on the originating LSR of an outgoing
+             tunnel by which we want packets to exit the LSR,
+             we specify this as the first hop for this tunnel in
+             wriMplsTunnelHopTable."
+      ::= { wriMplsTeObjects 4 }
+
+   wriMplsTeERHopEntry  OBJECT-TYPE
+      SYNTAX        WriMplsTeERHopEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a tunnel hop.  An
+             entry is created by a network administrator for
+             signaled ERLSP set up by an MPLS signalling
+             protocol."
+      INDEX {
+         wriMplsTeERHopListIndex,
+         wriMplsTeERHopPathOptionIndex,
+         wriMplsTeERHopIndex
+      }
+      ::= { wriMplsTeERHopTable 1 }
+
+   WriMplsTeERHopEntry ::= SEQUENCE {
+         wriMplsTeERHopListIndex          MplsPathIndex,
+         wriMplsTeERHopPathOptionIndex    MplsPathIndex,
+         wriMplsTeERHopIndex              MplsPathIndex,
+         wriMplsTeERHopAddrType           TeHopAddressType,
+         wriMplsTeERHopIpAddr             TeHopAddress,
+         wriMplsTeERHopIpPrefixLen        InetAddressPrefixLength,
+         wriMplsTeERHopAsNumber           TeHopAddressAS,
+         wriMplsTeERHopAddrUnnum          TeHopAddressUnnum,
+         wriMplsTeERHopLspId              MplsLSPID,
+         wriMplsTeERHopType               INTEGER,
+         wriMplsTeERHopInclude            INTEGER,
+         wriMplsTeERHopPathOptionName     SnmpAdminString,
+         wriMplsTeERHopEntryPathComp      INTEGER,
+         wriMplsTeERHopRowStatus          RowStatus,
+         wriMplsTeERHopStorageType        StorageType,
+         wriMplsTeERHopInsertBefore       Unsigned32,
+         wriMplsTeERHopInsertAfter        Unsigned32
+      }
+
+   wriMplsTeERHopListIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Primary index into this table identifying a
+             particular explicit route object."
+      ::= { wriMplsTeERHopEntry 1 }
+
+   wriMplsTeERHopPathOptionIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "Secondary index into this table identifying a
+             particular group of hops representing a particular
+             configured path. This is otherwise known as a path
+             option."
+      ::= { wriMplsTeERHopEntry 2 }
+
+   wriMplsTeERHopIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Tertiary index into this table identifying a
+             particular hop."
+      ::= { wriMplsTeERHopEntry 3 }
+
+   wriMplsTeERHopAddrType OBJECT-TYPE
+       SYNTAX        TeHopAddressType
+       MAX-ACCESS    read-create
+       STATUS        current
+       DESCRIPTION  "The Hop Address Type of this tunnel hop.
+
+                     The value of this object cannot be changed
+                     if the value of the corresponding
+                     wriMplsTunnelHopRowStatus object is 'active'.
+
+                     Note that lspid(5) is a valid option only
+                     for tunnels signaled via CRLDP.
+                    "
+       DEFVAL        { ipv4 }
+       ::= { wriMplsTeERHopEntry 4 }
+
+   wriMplsTeERHopIpAddr OBJECT-TYPE
+       SYNTAX        TeHopAddress
+       MAX-ACCESS    read-create
+       STATUS        current
+       DESCRIPTION  "The Tunnel Hop Address for this tunnel hop.
+
+                     The type of this address is determined by the
+                     value of the corresponding wriMplsTunnelHopAddrType.
+
+                     The value of this object cannot be changed
+                     if the value of the corresponding
+                     wriMplsTunnelHopRowStatus object is 'active'.
+                    "
+       DEFVAL       { '00000000'h }  -- IPv4 address 0.0.0.0
+       ::= { wriMplsTeERHopEntry 5 }
+
+    wriMplsTeERHopIpPrefixLen OBJECT-TYPE
+
+       SYNTAX        InetAddressPrefixLength
+       MAX-ACCESS    read-create
+       STATUS        current
+       DESCRIPTION  "If wriMplsTunnelHopAddrType is set to ipv4(1) or
+                     ipv6(2), then this value will contain an
+                     appropriate prefix length for the IP address in
+                     object wriMplsTunnelHopIpAddr. Otherwise this value
+                     is irrelevant and should be ignored.
+                    "
+       DEFVAL         { 32 }
+       ::= { wriMplsTeERHopEntry 6 }
+
+   wriMplsTeERHopAsNumber OBJECT-TYPE
+      SYNTAX        TeHopAddressAS
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTunnelHopAddrType is set to asnumber(3), then
+             this value will contain the AS number of this hop.
+             Otherwise the agent should set this object to zero-
+             length string and the manager should ignore this."
+      ::= { wriMplsTeERHopEntry 7 }
+
+   wriMplsTeERHopAddrUnnum OBJECT-TYPE
+      SYNTAX        TeHopAddressUnnum
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTunnelHopAddrType is set to unnum(4), then
+             this value will contain the interface identifier of
+             the unnumbered interface for this hop. This object
+             should be used in conjunction with
+             wriMplsTunnelHopIpAddress which would contain the LSR
+             Router ID in this case. Otherwise the agent should
+             set this object to zero-length string and the
+             manager should ignore this."
+      ::= { wriMplsTeERHopEntry 8 }
+
+   wriMplsTeERHopLspId OBJECT-TYPE
+      SYNTAX        MplsLSPID
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTunnelHopAddrType is set to lspid(5), then
+             this value will contain the LSPID of a tunnel of
+             this hop. The present tunnel being configured is
+             tunneled through this hop (using label stacking).
+             This object is otherwise insignificant and should
+             contain a value of 0 to indicate this fact."
+      ::= { wriMplsTeERHopEntry 9 }
+
+   wriMplsTeERHopType OBJECT-TYPE
+      SYNTAX        INTEGER {
+                         strict(1),
+                         loose(2)
+                        }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "Denotes whether this tunnel hop is routed in a
+             strict or loose fashion. The value of this object
+             has no meaning if the wriMplsTunnelHopInclude object
+             is set to 'false'."
+      ::= { wriMplsTeERHopEntry 10 }
+
+   wriMplsTeERHopInclude OBJECT-TYPE
+      SYNTAX        INTEGER
+	  {
+		false (0),
+		true (1)
+	  }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "If this value is set to true, then this indicates
+             that this hop must be included in the tunnel's
+             path. If this value is set to 'false', then this hop
+             must be avoided when calculating the path for this
+             tunnel. The default value of this object is 'true',
+             so that by default all indicated hops are included
+             in the CSPF path computation. If this object is set
+             to 'false' the value of wriMplsTunnelHopType should be
+             ignored."
+      DEFVAL { true }
+      ::= { wriMplsTeERHopEntry 11 }
+
+   wriMplsTeERHopPathOptionName OBJECT-TYPE
+      SYNTAX        SnmpAdminString
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The description of this series of hops as they
+             relate to the specified path option. The
+             value of this object SHOULD be the same for
+             each hop in the series that comprises a
+             path option."
+      ::= { wriMplsTeERHopEntry 12 }
+
+   wriMplsTeERHopEntryPathComp OBJECT-TYPE
+      SYNTAX        INTEGER {
+                         dynamic(1),    -- CSPF computed
+                         explicit(2)    -- strict hop
+                     }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "If this value is set to dynamic, then the user
+             should only specify the source and destination of
+             the path and expect that the CSPF will calculate
+             the remainder of the path.  If this value is set to
+             explicit, the user should specify the entire path
+             for the tunnel to take.  This path may contain
+             strict or loose hops.  Each hop along a specific
+             path SHOULD have this object set to the same value"
+      ::= { wriMplsTeERHopEntry 13 }
+
+   wriMplsTeERHopRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable is used to create, modify, and/or
+             delete a row in this table.  When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified by the agent except
+             wriMplsTunnelHopRowStatus and
+             wriMplsTunnelHopStorageType."
+      ::= { wriMplsTeERHopEntry 14 }
+
+   wriMplsTeERHopStorageType OBJECT-TYPE
+      SYNTAX        StorageType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The storage type for this Hop entry. Conceptual
+            rows having the value 'permanent' need not
+            allow write-access to any columnar objects
+            in the row."
+      DEFVAL { volatile }
+      ::= { wriMplsTeERHopEntry 15 }
+
+		wriMplsTeERHopInsertBefore  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+           ""
+      ::= { wriMplsTeERHopEntry 16 }
+      
+		wriMplsTeERHopInsertAfter  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+           ""
+      ::= { wriMplsTeERHopEntry 17 }
+ 
+   -- End of wriMplsTeERHopTable
+
+
+   -- Begin of wriMplsTeTunnelResourceTable
+
+   wriMplsTeTunnelResourceIndexNext OBJECT-TYPE
+      SYNTAX        Unsigned32 (0.. 2147483647)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "This object contains the next appropriate value to
+             be used for wriMplsTunnelResourceIndex when creating
+             entries in the wriMplsTunnelResourceTable. If the
+             number of unassigned entries is exhausted, a
+             retrieval operation will return a value of 0.  This
+             object may also return a value of 0 when the LSR is
+             unable to accept conceptual row creation, for
+             example, if the wriMplsTunnelTable is implemented as
+             read-only.  To obtain the wriMplsTunnelResourceIndex
+             value for a new entry, the manager must first issue
+             a management protocol retrieval operation to obtain
+             the current value of this object.
+
+            When the SET is performed to create a row in the
+             wriMplsTunnelResourceTable, the Command Responder
+             (agent) must determine whether the value is indeed
+             still unused; Two Network Management Applications
+             may attempt to create a row (configuration entry)
+             simultaneously and use the same value. If it is
+             currently unused, the SET succeeds and the Command
+             Responder (agent) changes the value of this object,
+             according to an implementation-specific algorithm.
+             If the value is in use, however, the SET fails.  The
+             Network Management Application must then re-read
+             this variable to obtain a new usable value."
+      ::= { wriMplsTeObjects 5 }
+
+   wriMplsTeTunnelResourceTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeTunnelResourceEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The wriMplsTunnelResourceTable allows a manager to
+             specify which resources are desired for an MPLS
+             tunnel.  This table also allows several tunnels to
+             point to a single entry in this table, implying
+             that these tunnels should share resources."
+      ::= { wriMplsTeObjects 6 }
+
+   wriMplsTeTunnelResourceEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeTunnelResourceEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a set of resources
+             for an MPLS tunnel.  An entry can be created by a
+             network administrator or by an SNMP agent as
+             instructed by any MPLS signalling protocol.
+            An entry in this table referenced by a tunnel instance
+             with zero wriMplsTunnelInstance value indicates a
+             configured set of resource parameter. An entry
+             referenced by a tunnel instance with a non-zero
+             wriMplsTunnelInstance reflects the in-use resource
+             parameters for the tunnel instance which may have
+             been negotiated or modified by the MPLS signaling
+             protocols."
+      INDEX         { wriMplsTeTunnelResourceIndex }
+      ::= { wriMplsTeTunnelResourceTable 1 }
+
+   WriMplsTeTunnelResourceEntry ::= SEQUENCE {
+         wriMplsTeTunnelResourceIndex                Unsigned32,
+         wriMplsTeTunnelResourceMaxRate              MplsBitRate,
+         wriMplsTeTunnelResourceMeanRate             MplsBitRate,
+         wriMplsTeTunnelResourceMaxBurstSize         MplsBurstSize,
+         wriMplsTeTunnelResourceMeanBurstSize        MplsBurstSize,
+         wriMplsTeTunnelResourceExBurstSize          MplsBurstSize,
+         wriMplsTeTunnelResourceFrequency            INTEGER,
+         wriMplsTeTunnelResourceWeight               Unsigned32,
+         wriMplsTeTunnelResourceRowStatus            RowStatus,
+         wriMplsTeTunnelResourceStorageType          StorageType
+      }
+
+   wriMplsTeTunnelResourceIndex OBJECT-TYPE
+      SYNTAX        Unsigned32 (1..2147483647)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Uniquely identifies this row."
+      ::= { wriMplsTeTunnelResourceEntry 1 }
+
+   wriMplsTeTunnelResourceMaxRate OBJECT-TYPE
+      SYNTAX        MplsBitRate
+      UNITS         "kilobits per second"
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The maximum rate in bits/second.  Note that setting
+             wriMplsTunnelResourceMaxRate,
+             wriMplsTunnelResourceMeanRate, and
+             wriMplsTunnelResourceMaxBurstSize to 0 indicates best-
+             effort treatment."
+      ::= { wriMplsTeTunnelResourceEntry 2 }
+
+   wriMplsTeTunnelResourceMeanRate OBJECT-TYPE
+     SYNTAX        MplsBitRate
+      UNITS         "kilobits per second"
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This object is copied into an instance of
+             wriMplsTrafficParamMeanRate in the
+             wriMplsTrafficParamTable. The OID of this table entry
+             is then copied into the corresponding
+             wriMplsInSegmentTrafficParamPtr."
+      ::= { wriMplsTeTunnelResourceEntry 3 }
+
+   wriMplsTeTunnelResourceMaxBurstSize OBJECT-TYPE
+      SYNTAX        MplsBurstSize
+      UNITS         "bytes"
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The maximum burst size in bytes."
+      ::= { wriMplsTeTunnelResourceEntry 4 }
+
+   wriMplsTeTunnelResourceMeanBurstSize OBJECT-TYPE
+      SYNTAX       MplsBurstSize
+      UNITS        "bytes"
+      MAX-ACCESS   read-create
+      STATUS       current
+      DESCRIPTION
+           "The mean burst size in bytes.  The implementations
+             which do not implement this variable must return
+             a noSuchObject exception for this object and must
+             not allow a user to set this object."
+      ::= { wriMplsTeTunnelResourceEntry 5 }
+
+   wriMplsTeTunnelResourceExBurstSize OBJECT-TYPE
+      SYNTAX       MplsBurstSize
+      UNITS        "bytes"
+      MAX-ACCESS   read-create
+      STATUS       current
+      DESCRIPTION
+           "The Excess burst size in bytes.  The implementations
+             which do not implement this variable must return
+             noSuchObject exception for this object and must
+             not allow a user to set this value."
+      REFERENCE
+           "CR-LDP Specification, Section 4.3."
+      ::= { wriMplsTeTunnelResourceEntry 6 }
+
+   wriMplsTeTunnelResourceFrequency  OBJECT-TYPE
+      SYNTAX       INTEGER { unspecified(1),
+                             frequent(2),
+                             veryFrequent(3)
+                            }
+      MAX-ACCESS   read-create
+      STATUS       current
+      DESCRIPTION
+           "The granularity of the availability of committed
+             rate.  The implementations which do not implement
+             this variable must return unspecified(1) for this
+             value and must not allow a user to set this value."
+      REFERENCE
+           "CR-LDP Specification, Section 4.3."
+      ::= { wriMplsTeTunnelResourceEntry 7 }
+
+   wriMplsTeTunnelResourceWeight    OBJECT-TYPE
+      SYNTAX       Unsigned32(0..255)
+      MAX-ACCESS   read-create
+      STATUS       current
+      DESCRIPTION
+           "The relative weight for using excess bandwidth above
+             its committed rate.  The value of 0 means that
+             weight is not applicable for the CR-LSP."
+      REFERENCE
+           "CR-LDP Specification, Section 4.3."
+      ::= { wriMplsTeTunnelResourceEntry 8 }
+
+   wriMplsTeTunnelResourceRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable is used to create, modify, and/or
+             delete a row in this table.  When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified by the agent except
+             wriMplsTunnelResourceRowStatus and
+             wriMplsTunnelResourceStorageType."
+      ::= { wriMplsTeTunnelResourceEntry 9 }
+
+   wriMplsTeTunnelResourceStorageType OBJECT-TYPE
+      SYNTAX        StorageType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The storage type for this Hop entry. Conceptual
+            rows having the value 'permanent' need not
+            allow write-access to any columnar objects
+            in the row."
+      DEFVAL { volatile }
+
+      ::= { wriMplsTeTunnelResourceEntry 10 }
+
+   -- End wriMplsTeTunnelResourceTable
+   
+   
+   
+   -- Tunnel Actual Route Hop table.
+
+   wriMplsTeARHopTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeARHopEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The wriMplsTeARHopTable is used to indicate the
+             hops for an MPLS tunnel defined in wriMplsTunnelTable,
+             as reported by the MPLS signalling protocol. Thus at
+             a transit LSR, this table (if the table is supported
+             and if the signaling protocol is recording actual
+             route information) contains the actual route of the
+             whole tunnel. If the signaling protocol is not
+             recording the actual route, this table MAY report
+             the information from the wriMplsTunnelHopTable or the
+             wriMplsTunnelCHopTable.
+
+            Each row in this table is indexed by
+             wriMplsTeARHopListIndex. Each row also has a
+             secondary index wriMplsTeARHopIndex, corresponding
+             to the next hop that this row corresponds to.
+
+            Please note that since the information necessary to
+             build entries within this table is not provided by
+             some MPLS signalling protocols, implementation of
+             this table is optional. Furthermore, since the
+             information in this table is actually provided by
+             the MPLS signalling protocol after the path has
+             been set-up, the entries in this table are provided
+             only for observation, and hence, all variables in
+             this table are accessible exclusively as read-
+             only.
+
+            Note also that the contents of this table may change
+             while it is being read because of re-routing
+             activities. A network administrator may verify that
+             the actual route read is consistent by reference to
+             the wriMplsTunnelLastPathChange object."
+      ::= { wriMplsTeObjects 7 }
+
+   wriMplsTeARHopEntry  OBJECT-TYPE
+      SYNTAX        WriMplsTeARHopEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a tunnel hop.  An
+             entry is created by the agent for signaled ERLSP
+             set up by an MPLS signalling protocol."
+      INDEX { wriMplsTeARHopListIndex, wriMplsTeARHopIndex }
+      ::= { wriMplsTeARHopTable 1 }
+
+   WriMplsTeARHopEntry ::= SEQUENCE {
+         wriMplsTeARHopListIndex          MplsPathIndex,
+         wriMplsTeARHopIndex              MplsPathIndex,
+         wriMplsTeARHopAddrType           TeHopAddressType,
+         wriMplsTeARHopIpAddr             TeHopAddress,
+         wriMplsTeARHopAddrUnnum          TeHopAddressUnnum,
+         wriMplsTeARHopLspId              MplsLSPID,
+		 --xf add 2014-6-12
+		 wriMplsTeARHopLabel 			  INTEGER
+      }
+
+   wriMplsTeARHopListIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Primary index into this table identifying a
+             particular recorded hop list."
+      ::= { wriMplsTeARHopEntry 1 }
+
+   wriMplsTeARHopIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Secondary index into this table identifying the
+             particular hop."
+      ::= { wriMplsTeARHopEntry 2 }
+
+   wriMplsTeARHopAddrType OBJECT-TYPE
+      SYNTAX        TeHopAddressType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The Hop Address Type of this tunnel hop.
+
+            Note that lspid(5) is a valid option only
+            for tunnels signaled via CRLDP."
+      DEFVAL        { ipv4 }
+      ::= { wriMplsTeARHopEntry 3 }
+
+   wriMplsTeARHopIpAddr OBJECT-TYPE
+      SYNTAX        TeHopAddress
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The Tunnel Hop Address for this tunnel hop.
+
+            The type of this address is determined by the
+            value of the corresponding wriMplsTeARHopAddrType.
+            If wriMplsTeARHopAddrType is set to unnum(4),
+             then this value contains the LSR Router ID of the
+             unnumbered interface. Otherwise the agent SHOULD
+             set this object to the zero-length string and the
+             manager should ignore this object."
+       DEFVAL       { '00000000'h }  -- IPv4 address 0.0.0.0
+      ::= { wriMplsTeARHopEntry 4 }
+
+   wriMplsTeARHopAddrUnnum OBJECT-TYPE
+      SYNTAX        TeHopAddressUnnum
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTeARHopAddrType is set to unnum(4), then
+             this value will contain the interface identifier of
+             the unnumbered interface for this hop. This object
+             should be used in conjunction with
+             wriMplsTeARHopIpAddr which would contain the LSR
+             Router ID in this case. Otherwise the agent should
+             set this object to zero-length string and the
+             manager should ignore this."
+      ::= { wriMplsTeARHopEntry 5 }
+
+   wriMplsTeARHopLspId OBJECT-TYPE
+      SYNTAX        MplsLSPID
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTeARHopAddrType is set to lspid(5), then
+             this value will contain the LSP ID of this hop.
+             This object is otherwise insignificant and should
+             contain a value of 0 to indicate this fact."
+      ::= { wriMplsTeARHopEntry 6 }
+	  
+	--xf add 2014-6-12
+	wriMplsTeARHopLabel	OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           ""
+      ::= { wriMplsTeARHopEntry 7 }
+	
+   -- End of wriMplsTeARHopTable
+
+   -- Tunnel Computed Hop table.
+
+   wriMplsTeCHopTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeCHopEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The wriMplsTeCHopTable is used to indicate the
+             hops, strict or loose, for an MPLS tunnel defined
+             in wriMplsTunnelTable, as computed by a constraint-
+             based routing protocol, based on the
+             wriMplsTunnelHopTable for the outgoing direction of
+             the tunnel. Thus at a transit LSR, this table (if
+             the table is supported) MAY contain the path
+             computed by the CSPF engine on (or on behalf of)
+             this LSR. Each row in this table is indexed by
+             wriMplsTeCHopListIndex.  Each row also has a
+             secondary index wriMplsTeCHopIndex, corresponding
+             to the next hop that this row corresponds to. In
+             case we want to specify a particular interface on
+             the originating LSR of an outgoing tunnel by which
+             we want packets to exit the LSR, we specify this as
+             the first hop for this tunnel in
+             wriMplsTeCHopTable.
+
+            Please note that since the information necessary to
+             build entries within this table may not be
+             supported by some LSRs, implementation of this
+             table is optional. Furthermore, since the
+             information in this table describes the path
+             computed by the CSPF engine the entries in this
+             table are read-only."
+      ::= { wriMplsTeObjects 8 }
+
+   wriMplsTeCHopEntry  OBJECT-TYPE
+      SYNTAX        WriMplsTeCHopEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a tunnel hop.  An
+             entry in this table is created by a path
+             computation engine using CSPF techniques applied to
+             the information collected by routing protocols and
+             the hops specified in the corresponding
+             wriMplsTunnelHopTable."
+      INDEX { wriMplsTeCHopListIndex, wriMplsTeCHopIndex }
+      ::= { wriMplsTeCHopTable 1 }
+
+   WriMplsTeCHopEntry ::= SEQUENCE {
+         wriMplsTeCHopListIndex          MplsPathIndex,
+         wriMplsTeCHopIndex              MplsPathIndex,
+         wriMplsTeCHopAddrType           TeHopAddressType,
+         wriMplsTeCHopIpAddr             TeHopAddress,
+         wriMplsTeCHopIpPrefixLen        InetAddressPrefixLength,
+         wriMplsTeCHopAsNumber           TeHopAddressAS,
+         wriMplsTeCHopAddrUnnum          TeHopAddressUnnum,
+         wriMplsTeCHopLspId              MplsLSPID,
+         wriMplsTeCHopType               INTEGER
+      }
+
+   wriMplsTeCHopListIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Primary index into this table identifying a
+             particular computed hop list."
+      ::= { wriMplsTeCHopEntry 1 }
+
+   wriMplsTeCHopIndex OBJECT-TYPE
+      SYNTAX        MplsPathIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Secondary index into this table identifying the
+             particular hop."
+      ::= { wriMplsTeCHopEntry 2 }
+
+   wriMplsTeCHopAddrType OBJECT-TYPE
+      SYNTAX        TeHopAddressType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The Hop Address Type of this tunnel hop.
+
+            Note that lspid(5) is a valid option only
+            for tunnels signaled via CRLDP."
+      DEFVAL        { ipv4 }
+      ::= { wriMplsTeCHopEntry 3 }
+
+   wriMplsTeCHopIpAddr OBJECT-TYPE
+      SYNTAX        TeHopAddress
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "The Tunnel Hop Address for this tunnel hop.
+            The type of this address is determined by the
+             value of the corresponding wriMplsTeCHopAddrType.
+
+            If wriMplsTeCHopAddrType is set to unnum(4), then
+             this value will contain the LSR Router ID of the
+             unnumbered interface. Otherwise the agent should
+             set this object to the zero-length string and the
+             manager SHOULD ignore this object."
+       DEFVAL       { '00000000'h }  -- IPv4 address 0.0.0.0
+      ::= { wriMplsTeCHopEntry 4 }
+
+   wriMplsTeCHopIpPrefixLen OBJECT-TYPE
+      SYNTAX        InetAddressPrefixLength
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "If wriMplsTeCHopAddrType is set to ipv4(1) or
+              ipv6(2), then this value will contain an
+              appropriate prefix length for the IP address in
+              object wriMplsTeCHopIpAddr. Otherwise this value
+              is irrelevant and should be ignored.
+             "
+       DEFVAL         { 32 }
+      ::= { wriMplsTeCHopEntry 5 }
+
+   wriMplsTeCHopAsNumber OBJECT-TYPE
+      SYNTAX        TeHopAddressAS
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTeCHopAddrType is set to asnumber(3),
+             then this value will contain the AS number of this
+             hop. Otherwise the agent should set this object to
+             zero-length string and the manager should ignore
+             this."
+      ::= { wriMplsTeCHopEntry 6 }
+
+   wriMplsTeCHopAddrUnnum OBJECT-TYPE
+      SYNTAX        TeHopAddressUnnum
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTeCHopAddrType is set to unnum(4), then
+             this value will contain the unnumbered interface
+             identifier of this hop. This object should be used
+             in conjunction with wriMplsTeCHopIpAddr which
+             would contain the LSR Router ID in this case.
+             Otherwise the agent should set this object to zero-
+             length string and the manager should ignore this."
+      ::= { wriMplsTeCHopEntry 7 }
+
+   wriMplsTeCHopLspId OBJECT-TYPE
+      SYNTAX        MplsLSPID
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "If wriMplsTeCHopAddrType is set to lspid(5), then
+             this value will contain the LSP ID of this hop.
+             This object is otherwise insignificant and should
+             contain a value of 0 to indicate this fact."
+      ::= { wriMplsTeCHopEntry 8 }
+
+   wriMplsTeCHopType OBJECT-TYPE
+      SYNTAX        INTEGER { strict(1),
+                              loose(2)
+                            }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Denotes whether this is tunnel hop is routed in a
+             strict or loose fashion."
+      ::= { wriMplsTeCHopEntry 9 }
+
+   -- End of wriMplsTeCHopTable
+
+
+   -- MPLS Tunnel Performance Table.
+
+   wriMplsTeTunnelPerfTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeTunnelPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides per-tunnel instance MPLS
+             performance information."
+      ::= { wriMplsTeObjects 9 }
+
+   wriMplsTeTunnelPerfEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeTunnelPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the LSR for
+             every tunnel.  Its is an extension to
+             wriMplsTeTunnelEntry."
+      AUGMENTS { wriMplsTeTunnelEntry }
+      ::= { wriMplsTeTunnelPerfTable 1 }
+
+   WriMplsTeTunnelPerfEntry ::= SEQUENCE {
+         wriMplsTeTunnelPerfPackets           Counter32,
+         wriMplsTeTunnelPerfHCPackets         Counter64,
+         wriMplsTeTunnelPerfErrors            Counter32,
+         wriMplsTeTunnelPerfBytes             Counter32,
+         wriMplsTeTunnelPerfHCBytes           Counter64
+      }
+
+   wriMplsTeTunnelPerfPackets OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Number of packets forwarded by the tunnel.
+            This object should represents the 32-bit
+            value of the least significant part of the
+            64-bit value if both wriMplsTunnelPerfHCPackets
+            is returned."
+      ::= { wriMplsTeTunnelPerfEntry 1 }
+
+   wriMplsTeTunnelPerfHCPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "High capacity counter for number of packets
+            forwarded by the tunnel. "
+      ::= { wriMplsTeTunnelPerfEntry 2 }
+
+   wriMplsTeTunnelPerfErrors OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Number of packets dropped because of errors or for
+            other reasons."
+      ::= { wriMplsTeTunnelPerfEntry 3 }
+
+   wriMplsTeTunnelPerfBytes OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "Number of bytes forwarded by the tunnel.
+            This object should represents the 32-bit
+            value of the least significant part of the
+            64-bit value if both wriMplsTunnelPerfHCBytes
+            is returned."
+      ::= { wriMplsTeTunnelPerfEntry 4 }
+
+   wriMplsTeTunnelPerfHCBytes OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "High capacity counter for number of bytes forwarded
+             by the tunnel."
+      ::= { wriMplsTeTunnelPerfEntry 5 }
+
+   -- End of wriMplsTeTunnelPerfTable
+
+
+   -- CR-LDP Tunnel Resource Table
+
+   wriMplsTeTunnelCRLDPResTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeTunnelCRLDPResEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The wriMplsTunnelCRLDPResTable allows a manager to
+             specify which CR-LDP-specific resources are desired
+             for an MPLS tunnel if that tunnel is signaled using
+             CR-LDP. Note that these attributes are in addition
+             to those specified in mplsTunnelResourceTable. This
+             table also allows several tunnels to point to a
+             single entry in this table, implying that these
+             tunnels should share resources."
+      ::= { wriMplsTeObjects 10 }
+
+   wriMplsTeTunnelCRLDPResEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeTunnelCRLDPResEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table represents a set of resources
+             for an MPLS tunnel established using CRLDP
+             (mplsTunnelSignallingProto equal to crldp (3)). An
+             entry can be created by a network administrator or
+             by an SNMP agent as instructed by any MPLS
+             signalling protocol."
+      INDEX { wriMplsTeTunnelResourceIndex }
+      ::= { wriMplsTeTunnelCRLDPResTable 1 }
+
+   WriMplsTeTunnelCRLDPResEntry ::= SEQUENCE {
+         wriMplsTeTunnelCRLDPResMeanBurstSize   MplsBurstSize,
+         wriMplsTeTunnelCRLDPResExBurstSize     MplsBurstSize,
+         wriMplsTeTunnelCRLDPResFrequency       INTEGER,
+         wriMplsTeTunnelCRLDPResWeight          Unsigned32,
+         wriMplsTeTunnelCRLDPResFlags           Unsigned32,
+         wriMplsTeTunnelCRLDPResRowStatus       RowStatus,
+         wriMplsTeTunnelCRLDPResStorageType     StorageType
+      }
+
+   wriMplsTeTunnelCRLDPResMeanBurstSize OBJECT-TYPE
+      SYNTAX        MplsBurstSize
+      UNITS         "bytes"
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The mean burst size in bytes."
+      ::= { wriMplsTeTunnelCRLDPResEntry 1 }
+
+   wriMplsTeTunnelCRLDPResExBurstSize OBJECT-TYPE
+      SYNTAX        MplsBurstSize
+      UNITS         "bytes"
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+        "The Excess burst size in bytes."
+      REFERENCE
+        "CR-LDP Specification, Section 4.3."
+      ::= { wriMplsTeTunnelCRLDPResEntry 2 }
+
+   wriMplsTeTunnelCRLDPResFrequency OBJECT-TYPE
+      SYNTAX  INTEGER {
+            unspecified(1),
+            frequent(2),
+            veryFrequent(3)
+         }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The granularity of the availability of committed
+             rate."
+      REFERENCE
+           "CR-LDP Specification, Section 4.3."
+      ::= { wriMplsTeTunnelCRLDPResEntry 3 }
+
+   wriMplsTeTunnelCRLDPResWeight OBJECT-TYPE
+      SYNTAX        Unsigned32(0..255)
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The relative weight for using excess bandwidth above
+             its committed rate.  The value of 0 means that
+             weight is not applicable for the CR-LSP."
+      REFERENCE
+           "CR-LDP Specification, Section 4.3."
+      DEFVAL { 0 }
+      ::= { wriMplsTeTunnelCRLDPResEntry 4 }
+
+   wriMplsTeTunnelCRLDPResFlags OBJECT-TYPE
+      SYNTAX        Unsigned32 (0..63)
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The value of the 1 byte Flags conveyed as part of
+             the traffic parameters during the establishment of
+             the CRLSP. The bits in this object are to be
+             interpreted as follows.
+
+             +--+--+--+--+--+--+--+--+
+             | Res |F6|F5|F4|F3|F2|F1|
+             +--+--+--+--+--+--+--+--+
+
+           Res - These bits are reserved. Zero on transmission.
+             Ignored on receipt.
+           F1 - Corresponds to the PDR.
+           F2 - Corresponds to the PBS.
+           F3 - Corresponds to the CDR.
+           F4 - Corresponds to the CBS.
+           F5 - Corresponds to the EBS.
+           F6 - Corresponds to the Weight.
+
+           Each flag if is a Negotiable Flag corresponding to a
+             Traffic Parameter. The Negotiable Flag value zero
+             denotes Not Negotiable and value one denotes
+             Negotiable."
+       REFERENCE
+           "1. Section 4.3, Constraint-Based LSP Setup using
+             LDP, Jamoussi (Editor), RFC 3212, January 2002"
+       DEFVAL { 0 }
+       ::= { wriMplsTeTunnelCRLDPResEntry 5 }
+
+   wriMplsTeTunnelCRLDPResRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "This variable is used to create, modify, and/or
+             delete a row in this table.  When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified by the agent except
+             wriMplsTunnelCRLDPResRowStatus and
+             wriMplsTunnelCRLDPResStorageType."
+      ::= { wriMplsTeTunnelCRLDPResEntry 6 }
+
+   wriMplsTeTunnelCRLDPResStorageType OBJECT-TYPE
+      SYNTAX        StorageType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+           "The storage type for this CR-LDP Resource entry.
+            Conceptual rows having the value 'permanent'
+            need not allow write-access to any columnar
+            objects in the row."
+      DEFVAL { volatile }
+      ::= { wriMplsTeTunnelCRLDPResEntry 7 }
+  
+  
+   -- Notifications.
+
+   wriMplsTeTunnelNotificationEnable OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+           "If this object is true, then it enables the
+             generation of wriMplsTunnelUp and wriMplsTunnelDown
+             traps, otherwise these traps are not emitted."
+      DEFVAL { false }
+      ::= { wriMplsTeObjects 11 }
+
+
+
+	-- Mpls tunnel interface Table
+
+   wriMplsTeTunnelIfTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeTunnelIfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "   "
+      ::= { wriMplsTeObjects 12 }
+
+   wriMplsTeTunnelIfEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeTunnelIfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "    "
+      INDEX { wriMplsTeTunnelIfIfIndex }
+      ::= { wriMplsTeTunnelIfTable 1 }
+
+   WriMplsTeTunnelIfEntry ::= SEQUENCE {
+         wriMplsTeTunnelIfIfIndex          Unsigned32,
+         wriMplsTeTunnelIfName           OCTET STRING,
+         wriMplsTeTunnelIfAdminStatus    INTEGER,
+         wriMplsTeTunnelIfOperStatus     INTEGER,
+         wriMplsTeTunnelIfCurLspType     INTEGER,
+         wriMplsTeTunnelIfBandwidth      Unsigned32,
+         wriMplsTeTunnelIfSignallingProto   INTEGER,
+         wriMplsTeTunnelIfSetupPrio      Unsigned32,
+         wriMplsTeTunnelIfHoldingPrio    Unsigned32,
+
+         wriMplsTeTunnelIfHopLimit          Unsigned32,
+         wriMplsTeTunnelIfRecordRoute     INTEGER,
+         wriMplsTeTunnelIfLockRoute       INTEGER,
+         wriMplsTeTunnelIfPrimeHopIndex       Unsigned32,
+         wriMplsTeTunnelIfHotStandbyHopIndex      Unsigned32,
+         wriMplsTeTunnelIfOrdinaryStandbyHopIndex      Unsigned32,
+         wriMplsTeTunnelIfIGPMetricType                INTEGER,
+         wriMplsTeTunnelIflGPMetric                    Unsigned32,
+         wriMplsTeTunnelIfCrLspAttribute               Unsigned32,
+         wriMplsTeTunnelIfPrimeAffinity             Unsigned32,
+         wriMplsTeTunnelIfPrimeAffinityMask         Unsigned32,
+         wriMplsTeTunnelIfStandbyAffinity              Unsigned32,
+         wriMplsTeTunnelIfStandbyAffinityMask          Unsigned32,
+         wriMplsTeTunnelIfBestAffinity              Unsigned32,
+         wriMplsTeTunnelIfBestAffinityMask              Unsigned32,
+         wriMplsTeTunnelIfCommit                   INTEGER,
+         wriMplsTeTunnelIfBackupType                INTEGER,
+         wriMplsTeTunnelIfBackupEnable              INTEGER,
+         wriMplsTeTunnelIfBackupHopIndex            Unsigned32,
+         wriMplsTeTunnelIfBestEffortEnable          INTEGER,              
+         wriMplsTeTunnelIfIGPType                   INTEGER,
+         wriMplsTeTunnelIfBandwidthType               INTEGER,
+         wriMplsTeTunnelIfCSPF                        INTEGER,
+         wriMplsTeTunnelIfReserveStyle                INTEGER,
+         wriMplsTeTunnelIfIngressLsrId                Unsigned32,
+         wriMplsTeTunnelIfEgressLsrId                Unsigned32,
+         wriMplsTeTunnelIfTunnelId                   Unsigned32,
+         wriMplsTeTunnelIfCspfEnable                 INTEGER,
+         wriMplsTeTunnelIfBackupHotStandbyWtr          Unsigned32,
+		 --xf add 2014-6-12
+		 wriMplsTeTunnelIfFastReroute				INTEGER,
+		 wriMplsTeTunnelIfFastRerouteBandwidth				INTEGER,
+		 wriMplsTeTunnelIfBypassTunnel				INTEGER,
+		 wriMplsTeTunnelIfBypassAttributesBandwidth		Unsigned32,
+		 wriMplsTeTunnelIfBypassAttributesSetupPri		Unsigned32,
+		 wriMplsTeTunnelIfBypassAttributesHoldPri		Unsigned32,
+		 wriMplsTeTunnelIfAffinityProperty				Unsigned32,
+		 wriMplsTeTunnelIfAffinityPropertyMask			Unsigned32,
+		 wriMplsTeTunnelIfAffinityPropertySecondary		Unsigned32,
+		 wriMplsTeTunnelIfAffinityPropertyMaskSecondary	Unsigned32,
+		 wriMplsTeTunnelIfAffinityPropertyBestEffort	Unsigned32,
+		 wriMplsTeTunnelIfAffinityPropertyMaskBestEffort	Unsigned32,
+		 --xf add 2014-6-12
+		 wriMplsTeTunnelIfRecordRouteLabel				INTEGER,
+		 wriMplsTeTunnelIfAddProtectedInterface		    OCTET STRING,
+		 wriMplsTeTunnelIfDelProtectedInterface			OCTET STRING,
+		 --xf add 2014-10-9
+		 wriMplsTeTunnelIfCspfMetricType				INTEGER,
+		 wriMplsTeTunnelIfScndHopLimit					INTEGER,
+		 wriMplsTeTunnelIfBestHopLimit					INTEGER
+      }
+
+   wriMplsTeTunnelIfIfIndex OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "  "
+      ::= { wriMplsTeTunnelIfEntry 1 }
+
+   wriMplsTeTunnelIfName OBJECT-TYPE
+      SYNTAX        OCTET STRING
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "  "
+      ::= { wriMplsTeTunnelIfEntry 2 }
+      
+    wriMplsTeTunnelIfAdminStatus OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			up(1),
+      			down(2),
+      			testing(3)
+      }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "  "
+      ::= { wriMplsTeTunnelIfEntry 3 }
+      
+		wriMplsTeTunnelIfOperStatus OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			up(1),
+      			down(2)
+      }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+           "  "
+      ::= { wriMplsTeTunnelIfEntry 4 }
+	
+		wriMplsTeTunnelIfCurLspType OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			invalid(0),
+      			prime(1),
+      			hotstandby(2),
+      			ordinary(3),
+      			besteft(4),
+      			primemodify(5),
+      			hotstandbymodify(6),
+      			ordinarymodify(7),
+      			besteftmodify(8)
+      }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 5 }
+
+		wriMplsTeTunnelIfBandwidth OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 6 }
+	
+		wriMplsTeTunnelIfSignallingProto OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		static(1),
+      		crstatic(2),
+      		rsvp(3),
+      		crldp(4)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 7 }
+		
+		wriMplsTeTunnelIfSetupPrio OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 8 }
+		
+		wriMplsTeTunnelIfHoldingPrio OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 9 }
+		
+		wriMplsTeTunnelIfHopLimit OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 10 }
+
+		wriMplsTeTunnelIfRecordRoute OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		enable(1),
+      		disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 11 }
+
+		wriMplsTeTunnelIfLockRoute OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		enable(1),
+      		disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 12 }
+
+		wriMplsTeTunnelIfPrimeHopIndex OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 13 }
+
+		wriMplsTeTunnelIfHotStandbyHopIndex OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 14 }
+
+		wriMplsTeTunnelIfOrdinaryStandbyHopIndex OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 15 }
+
+		wriMplsTeTunnelIfIGPMetricType OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		absolute(1),
+      		relative(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 16 }
+
+		wriMplsTeTunnelIflGPMetric OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 17 }
+
+		wriMplsTeTunnelIfCrLspAttribute OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 18 }
+
+		wriMplsTeTunnelIfPrimeAffinity OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 19 }
+
+		wriMplsTeTunnelIfPrimeAffinityMask OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 20 }
+
+		wriMplsTeTunnelIfStandbyAffinity OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 21 }
+
+		wriMplsTeTunnelIfStandbyAffinityMask OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 22 }
+
+		wriMplsTeTunnelIfBestAffinity OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 23 }
+
+		wriMplsTeTunnelIfBestAffinityMask OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 24 }
+	
+		wriMplsTeTunnelIfCommit OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		commit(1)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 25 }
+		
+		wriMplsTeTunnelIfBackupType  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		none(0),
+      		ordinary(1),
+      		hotstandby(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 26 }
+		
+		wriMplsTeTunnelIfBackupEnable  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		enable(1),
+      		disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 27 }
+      
+    wriMplsTeTunnelIfBackupHopIndex  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 28 }
+		
+		wriMplsTeTunnelIfBestEffortEnable  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      				enable(1),
+      				disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 29 }
+		
+		wriMplsTeTunnelIfIGPType  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		none(0),
+      		shortcut(1),
+      		advertise(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 30 }
+		
+		wriMplsTeTunnelIfBandwidthType  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		ct0(0),
+      		ct1(1)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 31 }
+		
+		wriMplsTeTunnelIfCSPF  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		enable(1),
+      		disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 32 }
+		
+		wriMplsTeTunnelIfReserveStyle  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      		ff(1),
+      		se(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 33 }
+      
+    wriMplsTeTunnelIfIngressLsrId  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 34 }
+      
+    wriMplsTeTunnelIfEgressLsrId  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 35 }
+    
+    wriMplsTeTunnelIfTunnelId   OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 36 }
+    
+    wriMplsTeTunnelIfCspfEnable  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			enable(1),
+      			disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 37 }
+   
+   wriMplsTeTunnelIfBackupHotStandbyWtr  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeTunnelIfEntry 38 }
+	  
+	  --xf add 2014-6-12
+	  	  
+	  wriMplsTeTunnelIfFastReroute  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			enable(1),
+      			disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Enable or disable fast route."
+      ::= { wriMplsTeTunnelIfEntry 39 }
+	  
+	  wriMplsTeTunnelIfFastRerouteBandwidth  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			enable(1),
+      			disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Enable or disable fast route bandwidth."
+      ::= { wriMplsTeTunnelIfEntry 40 }
+	  
+	  wriMplsTeTunnelIfBypassTunnel  OBJECT-TYPE
+      SYNTAX        INTEGER
+      {
+      			enable(1),
+      			disable(2)
+      }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Enable or disable bypass tunnel."
+      ::= { wriMplsTeTunnelIfEntry 41 }
+	  
+	  wriMplsTeTunnelIfBypassAttributesBandwidth  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Bypass attributes bandwidth."
+      ::= { wriMplsTeTunnelIfEntry 42 }
+	  
+	  wriMplsTeTunnelIfBypassAttributesSetupPri  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Bypass attributes setup priority."
+      ::= { wriMplsTeTunnelIfEntry 43 }
+	  
+	  wriMplsTeTunnelIfBypassAttributesHoldPri  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Bypass attributes hold priority."
+      ::= { wriMplsTeTunnelIfEntry 44 }
+	  
+	  wriMplsTeTunnelIfAffinityProperty  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Affinity property."
+      ::= { wriMplsTeTunnelIfEntry 45 }
+	  
+	  wriMplsTeTunnelIfAffinityPropertyMask  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Affinity property mask."
+      ::= { wriMplsTeTunnelIfEntry 46 }
+	  
+	  wriMplsTeTunnelIfAffinityPropertySecondary  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Affinity property secondary."
+      ::= { wriMplsTeTunnelIfEntry 47 }
+	  
+	   wriMplsTeTunnelIfAffinityPropertyMaskSecondary  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Affinity property mask secondary."
+      ::= { wriMplsTeTunnelIfEntry 48 }
+	  
+	  wriMplsTeTunnelIfAffinityPropertyBestEffort  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Affinity property best effort."
+      ::= { wriMplsTeTunnelIfEntry 49 }
+	  
+	  wriMplsTeTunnelIfAffinityPropertyMaskBestEffort  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Affinity property mask best effort."
+      ::= { wriMplsTeTunnelIfEntry 50 }
+   
+	  --xf add 2014-6-12		 
+	  wriMplsTeTunnelIfRecordRouteLabel  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Record Route Label."
+      ::= { wriMplsTeTunnelIfEntry 51 }
+	  
+	  wriMplsTeTunnelIfAddProtectedInterface  OBJECT-TYPE
+      SYNTAX        OCTET STRING
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Add Protected Interface."
+      ::= { wriMplsTeTunnelIfEntry 52 }
+	  
+	  wriMplsTeTunnelIfDelProtectedInterface  OBJECT-TYPE
+      SYNTAX        OCTET STRING
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Delete Protected Interface."
+      ::= { wriMplsTeTunnelIfEntry 53 }
+	  
+	  --xf add 2014-10-9
+	  wriMplsTeTunnelIfCspfMetricType  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Record Route Label."
+      ::= { wriMplsTeTunnelIfEntry 54 }
+	  
+	  wriMplsTeTunnelIfScndHopLimit  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Record Route Label."
+      ::= { wriMplsTeTunnelIfEntry 55 }
+	  
+	  wriMplsTeTunnelIfBestHopLimit  OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Record Route Label."
+      ::= { wriMplsTeTunnelIfEntry 56 }
+	  
+	-- ER hop ip index table
+		wriMplsTeERHopIpTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeERHopIpEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "   "
+      ::= { wriMplsTeObjects 13 }
+
+   wriMplsTeERHopIpEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeERHopIpEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "    "
+      INDEX { wriMplsTeERHopIpListIndex,wriMplsTeERHopIpAddressType, wriMplsTeERHopIpAddress}
+      ::= { wriMplsTeERHopIpTable 1 } 
+	 
+   WriMplsTeERHopIpEntry ::= SEQUENCE {
+         wriMplsTeERHopIpListIndex   Unsigned32,
+         wriMplsTeERHopIpAddressType   InetAddressType,
+         wriMplsTeERHopIpAddress         InetAddress,
+         wriMplsTeERHopIpHopId       Unsigned32    
+         }
+	 
+		wriMplsTeERHopIpListIndex  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopIpEntry 1 }
+	
+		wriMplsTeERHopIpAddressType  OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopIpEntry 2 }
+      
+    wriMplsTeERHopIpAddress  OBJECT-TYPE
+      SYNTAX        InetAddress
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopIpEntry 3 }
+	
+		wriMplsTeERHopIpHopId  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopIpEntry 4 }
+	
+		
+		-- tunnel hop list index table
+		wriMplsTeERHopListTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeERHopListEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "   "
+      ::= { wriMplsTeObjects 14 }
+
+   wriMplsTeERHopListEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeERHopListEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "    "
+      INDEX { wriMplsTeERHopListListIndex }
+      ::= { wriMplsTeERHopListTable 1 } 
+	 
+   WriMplsTeERHopListEntry ::= SEQUENCE {
+         wriMplsTeERHopListListIndex        Unsigned32,
+         wriMplsTeERHopListRowStatus      RowStatus,
+         wriMplsTeERHopListName            OCTET STRING,
+         wriMplsTeERHopListFreeHopId        Unsigned32
+         }
+	 
+		wriMplsTeERHopListListIndex  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopListEntry 1 }
+	
+		wriMplsTeERHopListRowStatus  OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopListEntry 2 }
+	
+		wriMplsTeERHopListName  OBJECT-TYPE
+      SYNTAX        OCTET STRING
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopListEntry 3 }
+	
+		wriMplsTeERHopListFreeHopId  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeERHopListEntry 4 }
+	
+
+--  interface table
+		wriMplsTeIfTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF WriMplsTeIfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "   "
+      ::= { wriMplsTeObjects 15 }
+
+   wriMplsTeIfEntry OBJECT-TYPE
+      SYNTAX        WriMplsTeIfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "    "
+      INDEX { wriMplsTeIfIndex }
+      ::= { wriMplsTeIfTable 1 } 
+	 
+   WriMplsTeIfEntry ::= SEQUENCE {
+         wriMplsTeIfIndex            Unsigned32,
+         wriMplsTeIfRowStatus      RowStatus,
+         wriMplsTeIfMaxBandwidth     Unsigned32,
+         wriMplsTeIfMaxReserveBandwidth        Unsigned32,
+         wriMplsTeIfAdminGroup             Unsigned32,
+         wriMplsTeIfSrlg            Unsigned32,
+         wriMplsTeIfTeMetric            Unsigned32,
+         wriMplsTeIfBC0            Unsigned32,
+         wriMplsTeIfBC1            Unsigned32,
+         wriMplsTeIfCT            OCTET STRING,
+		 --xf add 2014-6-12
+		 wriMplsTeIfAutoFrr			INTEGER
+         }
+	 
+		wriMplsTeIfIndex  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 1 }
+      
+		wriMplsTeIfRowStatus  OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 2 }
+      
+		wriMplsTeIfMaxBandwidth  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 3 }
+      
+		wriMplsTeIfMaxReserveBandwidth  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 4 }
+      
+		wriMplsTeIfAdminGroup  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 5 }
+      
+		wriMplsTeIfSrlg  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 6 }
+      
+		wriMplsTeIfTeMetric  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 7 }
+      
+		wriMplsTeIfBC0  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 8 }
+      
+		wriMplsTeIfBC1  OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 9 }
+      
+		wriMplsTeIfCT  OBJECT-TYPE
+      SYNTAX        OCTET STRING
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  ""
+      ::= { wriMplsTeIfEntry 10 }
+      
+	  wriMplsTeIfAutoFrr OBJECT-TYPE
+      SYNTAX        INTEGER
+	  {
+		  enable(1),
+          disable(2)
+	  }
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION  
+		"Enable or disable auto frr."
+      ::= { wriMplsTeIfEntry 11 }
+      
+END

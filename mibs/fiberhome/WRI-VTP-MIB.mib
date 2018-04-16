@@ -1,0 +1,342 @@
+WRI-VTP-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,NOTIFICATION-TYPE
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.2203
+		wriVtp OBJECT IDENTIFIER ::= { wriProtocol 2203 }
+		
+		
+		EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+		-- 1.3.6.1.4.1.3807.2.2203.1
+		vtpCommon OBJECT IDENTIFIER ::= { wriVtp 1 }
+		
+		-- 1.3.6.1.4.1.3807.2.2203.1.1
+		vtpDomainFreeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The free index of vty domain."
+			::= { vtpCommon 1 } 
+			
+		-- 1.3.6.1.4.1.3807.2.2203.1.2
+		vtpDomainNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of vty domain."
+			::= { vtpCommon 2 } 
+			
+		--WRI VTP DOMAIN Table	
+	  vtpDomainTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VtpDomainEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"vtp domain table."
+			::= { wriVtp 2 }
+		
+		vtpDomainEntry OBJECT-TYPE
+			SYNTAX VtpDomainEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"vtp domain table."
+			INDEX {vtpDomainIndex}
+			::= { vtpDomainTable 1 }
+		
+		VtpDomainEntry ::=
+			SEQUENCE { 
+				vtpDomainIndex					        	INTEGER,
+				vtpDomainName				        		  OCTET STRING,
+				vtpDomainPassword					        OCTET STRING,
+				vtpDomainMode      			          INTEGER,
+				vtpDomainEntryStatus							EntryStatus,
+				vtpDomainCfgRevisionNum							INTEGER,
+				vtpDomainVlan				        		  OCTET STRING,
+				vtpDomainUpdateTime				        OCTET STRING,
+				vtpDomainUpdateIp				        	IpAddress
+			 }	
+	
+	  vtpDomainIndex OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain index."
+			 ::= { vtpDomainEntry 1 }
+			 
+		vtpDomainName OBJECT-TYPE
+			 SYNTAX  OCTET STRING
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain name."
+			 ::= { vtpDomainEntry 2 }
+			 
+		vtpDomainPassword OBJECT-TYPE
+			 SYNTAX  OCTET STRING
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain password."
+			 ::= { vtpDomainEntry 3 }
+			 
+		vtpDomainMode OBJECT-TYPE
+			 SYNTAX  INTEGER
+			 {
+			    server(1),
+			    client(2),
+			    transparent(3)
+			 }
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain mode."
+			 ::= { vtpDomainEntry 4 }
+		
+		vtpDomainEntryStatus OBJECT-TYPE
+			 SYNTAX  EntryStatus
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "Create or delete a vtp domain."
+			 ::= { vtpDomainEntry 5 }
+			 
+		vtpDomainCfgRevisionNum OBJECT-TYPE
+			 SYNTAX  INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain configuration revision number."
+			 ::= { vtpDomainEntry 6 }
+			 
+		vtpDomainVlan OBJECT-TYPE
+			 SYNTAX  OCTET STRING
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The vlans in the vtp domain."
+			 ::= { vtpDomainEntry 7 }	 
+		
+		vtpDomainUpdateTime OBJECT-TYPE
+			 SYNTAX  OCTET STRING
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain update time."
+			 ::= { vtpDomainEntry 8 }	 
+			 
+		vtpDomainUpdateIp OBJECT-TYPE
+			 SYNTAX  IpAddress
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp domain update ip address."
+			 ::= { vtpDomainEntry 9 }	 	 	 
+			 
+ --WRI VTP INTERFACE Table	
+	  vtpIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VtpIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"vtp domain table."
+			::= { wriVtp 3 }
+		
+		vtpIfEntry OBJECT-TYPE
+			SYNTAX VtpIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"vtp interface table."
+			INDEX {vtpIfIndex}
+			::= { vtpIfTable 1 }
+		
+		VtpIfEntry ::=
+			SEQUENCE { 
+				vtpIfIndex					        INTEGER,
+				vtpIfDomain      			      INTEGER,
+				vtpIfEnable							    INTEGER,
+				vtpIfPktCntClr              INTEGER,
+				vtpIfSendSumPkt             INTEGER,
+				vtpIfSendSubPkt             INTEGER,
+				vtpIfSendRequestPkt         INTEGER,
+				vtpIfSendWrongPkt           INTEGER,
+				vtpIfRcvSumPkt              INTEGER,
+				vtpIfRcvSubPkt              INTEGER,
+				vtpIfRcvRequestPkt          INTEGER,
+				vtpIfRcvWrongPkt            INTEGER
+			 }	
+	
+	  vtpIfIndex OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp interface index."
+			 ::= { vtpIfEntry 1 }
+			 
+		vtpIfDomain OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "The vtp interface add or remove from a vtp domain."
+			 ::= { vtpIfEntry 2 }
+			 
+		vtpIfEnable OBJECT-TYPE
+			 SYNTAX INTEGER
+			 {
+			    enable(1),
+			    disable(0)
+			 }
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "Enable or disable vtp."
+			 ::= { vtpIfEntry 3 }	
+			 
+		vtpIfPktCntClr OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "Clear the packet counter of interface."
+			 ::= { vtpIfEntry 4 }
+			 
+		vtpIfSendSumPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of sumary send packets."
+			 ::= { vtpIfEntry 5 }
+			 
+		vtpIfSendSubPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of subset send packets."
+			 ::= { vtpIfEntry 6 }
+			 
+		vtpIfSendRequestPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of request send packets."
+			 ::= { vtpIfEntry 7 }
+			 
+		vtpIfSendWrongPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of wrong send packets."
+			 ::= { vtpIfEntry 8 }
+			 
+		vtpIfRcvSumPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of sumary send packets."
+			 ::= { vtpIfEntry 9 }
+			 
+		vtpIfRcvSubPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of subset send packets."
+			 ::= { vtpIfEntry 10 }
+			 
+		vtpIfRcvRequestPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of request send packets."
+			 ::= { vtpIfEntry 11 }
+			 
+		vtpIfRcvWrongPkt OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of wrong send packets."
+			 ::= { vtpIfEntry 12 }
+
+ --WRI VTP TRAP	
+	vtpTraps OBJECT IDENTIFIER ::= { wriVtp 4 }
+		
+	vtpConfigRevNumberError NOTIFICATION-TYPE
+    OBJECTS         { vtpDomainIndex,
+                      vtpDomainCfgRevisionNum }
+    STATUS          current
+    DESCRIPTION
+        "A configuration revision number error notification
+        signifies that a device has incremented its
+        vtpConfigRevNumberErrors counter.
+
+        Generation of this notification is suppressed if the
+        vtpNotificationsEnabled has the value 'false'.
+
+        The device must throttle the generation of consecutive
+        vtpConfigRevNumberError notifications so that there is at
+        least a five-second gap between notification of this type.
+        When notification are throttled, they are dropped, not
+        queued for sending at a future time.  (Note that
+        'generating' a notification means sending to all configured
+        recipients.)"
+   ::= { vtpTraps 1 }
+		
+  vtpAuthFailed NOTIFICATION-TYPE
+    OBJECTS         { vtpDomainIndex}
+    STATUS          current
+    DESCRIPTION
+        "A authentication failed notification signifies that
+        packets received are mismatch with the interface domain."
+   ::= { vtpTraps 2 }	
+	
+	vtpLocalModeChanged NOTIFICATION-TYPE
+    OBJECTS         { vtpDomainIndex,
+                      vtpDomainMode }
+    STATUS          current
+    DESCRIPTION
+        "A vtpLocalModeChanged notification is generated
+        by a device when the value of the object 
+        managementDomainLocalMode is changed."
+   ::= { vtpTraps 3 }	
+   
+  vtpVlanChanged NOTIFICATION-TYPE
+    OBJECTS         {vtpDomainIndex,
+                     vtpDomainVlan }
+    STATUS          current
+    DESCRIPTION
+        "A vtpVlanChanged notification is generated by a
+        device when a VLAN is created or deleted."
+   ::= { vtpTraps 4 }
+						 		 
+END

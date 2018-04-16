@@ -1,0 +1,326 @@
+WRI-UDLD-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI   
+			MacAddress		FROM SNMPv2-TC 	
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+	
+	--uniDirectional Link Detection	
+	udld         	OBJECT IDENTIFIER ::= { wriProtocol 2100 }
+
+  --udld general information
+	udldGeneral			OBJECT IDENTIFIER ::=   {udld 1}
+		
+	udldAdvertiseInterval	OBJECT-TYPE
+  		SYNTAX INTEGER
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+			"UDLD Advertisement Interval time. from 2s to 15s"
+      ::= { udldGeneral 1 }
+        
+	udldWorkMode	OBJECT-TYPE
+		SYNTAX INTEGER{
+			normal(1),
+			aggressive(2)
+			}
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+			"UDLD work mode"
+  		::= { udldGeneral 2 }
+  		
+  	udldUniShutdown	OBJECT-TYPE
+		SYNTAX INTEGER{
+			auto(1),
+			hand(2)
+			}
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+			"UDLD shutdown mode when unidirectional link was detected."
+  		::= { udldGeneral 3 }
+  	
+  	udldDeviceId	OBJECT-TYPE
+		  SYNTAX OCTET STRING
+  		MAX-ACCESS read-only
+  		STATUS current
+  		DESCRIPTION
+			"UDLD device id."
+  		::= { udldGeneral 4 }
+  		
+  	udldDeviceName	OBJECT-TYPE
+		  SYNTAX OCTET STRING
+  		MAX-ACCESS read-only
+  		STATUS current
+  		DESCRIPTION
+			"UDLD device name."
+  		::= { udldGeneral 5 }	
+  	
+		udldTrapEnable	OBJECT-TYPE
+		  SYNTAX INTEGER
+		  {
+		     enable(1),
+		     disable(0)	  
+		  }
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+			"Enable or disable udld trap."
+  		::= { udldGeneral 6 }	
+  		
+  		
+	--udld interface table
+	udldIfTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF UdldIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table containing interface information of udld."
+		::= { udld 2 }
+	
+	udldIfEntry OBJECT-TYPE
+		SYNTAX      UdldIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+				"A entry containing interface information of udld."
+		INDEX   { udldIfIndex }
+		::= { udldIfTable 1 }
+	
+	UdldIfEntry ::=
+    	SEQUENCE {                              
+			udldIfIndex					  Unsigned32,
+			udldIfEnable		      INTEGER,
+			udldIfAggressiveEnable			  INTEGER,		
+			udldIfUdldState			  INTEGER,
+			udldIfPeerNum			    INTEGER,
+			udldIfBidirectNum		  INTEGER,
+			udldIfBidirectState		INTEGER,
+			udldIfCheckSumType		INTEGER			
+	    }
+	
+	udldIfIndex OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+				"The logical index of udld port."
+		::= { udldIfEntry 1 }
+			
+	udldIfEnable OBJECT-TYPE
+		SYNTAX   INTEGER{
+			enable(1),
+			disable(0)
+		}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+			"enable or disable udld protocol on this port."
+		::= { udldIfEntry 2 }
+
+	udldIfAggressiveEnable OBJECT-TYPE
+		SYNTAX   INTEGER{
+			enable(2),
+			disable(1)
+			}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+			"Enable or disable UDLD aggressive mode on this port."
+		::= { udldIfEntry 3 }	
+			
+	udldIfUdldState OBJECT-TYPE
+		SYNTAX   INTEGER{
+			 init(1),
+			 linkup(2),
+			 linkdown(3),
+			 advertise(4),
+			 decetion(5),
+			 disable(6)
+		}
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"UDLD interface state."
+		::= { udldIfEntry 4 }	
+	
+	udldIfPeerNum OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"UDLD interface peer number."
+		::= { udldIfEntry 5 }	
+		
+	udldIfBidirectNum OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"UDLD interface peer bidirectional number."
+		::= { udldIfEntry 6 }	
+		
+	udldIfBidirectState OBJECT-TYPE
+		SYNTAX   INTEGER
+		{
+		    unknown(1),
+		    decetion(2),
+		    unidirectional(3),
+		    bidirectional(4)	
+		}
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"UDLD interface peer bidirectional status."
+		::= { udldIfEntry 7 }	
+	
+	
+	udldIfCheckSumType OBJECT-TYPE
+		SYNTAX   INTEGER
+		{
+		    enable(1),
+		    disable(0)
+		}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+			"When connected with oter switches,if check error happend,please
+			configure this value to 1."
+		::= { udldIfEntry 8 }	
+	
+	
+				
+	--udld peer table
+	udldIfPeerTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF UdldIfPeerEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table containing interface information of udld neighbor."
+		::= { udld 3 }
+	
+	udldIfPeerEntry OBJECT-TYPE
+		SYNTAX      UdldIfPeerEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+				"A entry containing interface information of udld neighbor."
+		INDEX   { udldIfPeerIf,udldIfPeerMac }
+		::= { udldIfPeerTable 1 }
+	
+	UdldIfPeerEntry ::=
+    	SEQUENCE {   
+    		udldIfPeerIf				           Unsigned32,                         
+			  udldIfPeerMac			             MacAddress,
+			  udldIfPeerState                INTEGER,
+			  udldIfPeerDeviecId		         OCTET STRING,
+			  udldIfPeerPortId			         OCTET STRING,
+			  udldIfPeerDeviceName	         OCTET STRING,
+			  udldIfPeerMsgInterval          INTEGER,
+			  udldIfPeerTimeoutInterval      INTEGER,
+			  udldIfPeerExpireTime           INTEGER
+	    }
+	    
+	udldIfPeerIf OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+				"The logical index of udld port."
+		::= { udldIfPeerEntry 1 }
+	
+	udldIfPeerMac OBJECT-TYPE
+		SYNTAX   MacAddress
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+				"The mac address of neighbor."
+		::= { udldIfPeerEntry 2 }
+		
+	udldIfPeerState OBJECT-TYPE
+		SYNTAX   INTEGER
+		{
+		    unknown(1),
+		    unidirectional(2),
+		    bidirectional(3),
+		    aged(4)	
+		}		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor status."
+		::= { udldIfPeerEntry 3 }	
+		
+		
+			
+	udldIfPeerDeviecId OBJECT-TYPE
+		SYNTAX   OCTET STRING		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor device id."
+		::= { udldIfPeerEntry 4 }
+
+  udldIfPeerPortId OBJECT-TYPE
+		SYNTAX   OCTET STRING		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor port id."
+		::= { udldIfPeerEntry 5 }
+
+  udldIfPeerDeviceName OBJECT-TYPE
+		SYNTAX   OCTET STRING		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor device name."
+		::= { udldIfPeerEntry 6 }  
+		
+	udldIfPeerMsgInterval OBJECT-TYPE
+		SYNTAX   INTEGER		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor message interval."
+		::= { udldIfPeerEntry 7 }	
+		
+	udldIfPeerTimeoutInterval OBJECT-TYPE
+		SYNTAX   INTEGER		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor timeout interval."
+		::= { udldIfPeerEntry 8 }
+		
+	 udldIfPeerExpireTime OBJECT-TYPE
+		SYNTAX   INTEGER		
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+			"neighbor expire time."
+		::= { udldIfPeerEntry 9 }
+		
+		
+		
+		 	
+	
+--udld trap		
+	udldTrap			OBJECT IDENTIFIER ::=   {udld 4}
+		
+		udldUniDir NOTIFICATION-TYPE
+       		OBJECTS {udldIfIndex}
+       		STATUS  current
+       		DESCRIPTION
+               	"udld trap when detect unidirection."
+			::= { udldTrap 1} 
+			
+		udldBiDir NOTIFICATION-TYPE
+       		OBJECTS {udldIfIndex}
+       		STATUS  current
+       		DESCRIPTION
+               	"udld trap when detect Bidirection."
+			::= { udldTrap 2}
+			
+	END

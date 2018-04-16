@@ -1,0 +1,375 @@
+WRI-POLICYROUTE-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+				MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+						mib-2, Integer32, Unsigned32, Counter32, Counter64, enterprises
+						FROM SNMPv2-SMI
+
+				TEXTUAL-CONVENTION, TruthValue, MacAddress
+						FROM SNMPv2-TC
+
+				InterfaceIndexOrZero
+						FROM IF-MIB
+						
+				wri,wriProtocol				
+            FROM WRI-SMI;
+						
+				wriPolicyRoute MODULE-IDENTITY
+				LAST-UPDATED "201103151200Z" -- 23 September 2009 12:00:00 EST
+				ORGANIZATION "FiberHome Networks Systems, Inc."
+				CONTACT-INFO "http://www.fhn.com.cn"
+				DESCRIPTION  "Policy Route."
+				::= { wriProtocol 1616 }	
+
+
+ -- Textual Conventions
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			} 	
+
+  -- policyRoute general variables
+		policyRouteGeneral		OBJECT IDENTIFIER ::= { wriPolicyRoute 1 }
+	
+	policyRouteFreeId OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route free id."
+			::= {policyRouteGeneral 1}
+	
+	policyRouteMaxNum OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route maxium policy number."
+			::= {policyRouteGeneral 2}
+	
+	policyRouteMaxNodeNum OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route maxium policy node number."
+			::= {policyRouteGeneral 3}
+	
+	policyRoutePolicyNum OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route policy number."
+			::= {policyRouteGeneral 4}
+	
+	policyRouteDebug OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route debug switch."
+			::= {policyRouteGeneral 5}
+			
+	-- policyRouteTable.
+	policyRouteTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE OF PolicyRouteEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"policyRoute information table"
+		::= { wriPolicyRoute 2 }
+		
+	policyRouteEntry	OBJECT-TYPE	
+		SYNTAX			PolicyRouteEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { policyRouteId }
+		::= { policyRouteTable 1 }
+		
+	PolicyRouteEntry ::=
+	SEQUENCE
+	{
+	  policyRouteId      Unsigned32,
+		policyRouteName    OCTET STRING,
+		policyRouteStatus			EntryStatus,
+		policyRouteRefCnt			Unsigned32		
+	}
+	
+	policyRouteId OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route policy id."			
+			::= {policyRouteEntry 1}	
+	
+	policyRouteName OBJECT-TYPE
+			SYNTAX			OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route name."
+			::= {policyRouteEntry 2}	
+			
+	policyRouteStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= {policyRouteEntry 3}
+	
+	policyRouteRefCnt OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route reference count."			
+			::= {policyRouteEntry 4}
+		
+	-- policyRouteNodeTable.
+	policyRouteNodeTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE OF PolicyRouteNodeEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"policyRoute node information table"
+		::= { wriPolicyRoute 3 }
+		
+	policyRouteNodeEntry	OBJECT-TYPE	
+		SYNTAX			PolicyRouteNodeEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { policyRouteNodeIdx,policyRouteNodePolicyId }
+		::= { policyRouteNodeTable 1 }
+		
+	PolicyRouteNodeEntry ::=
+	SEQUENCE
+	{
+	  policyRouteNodePolicyId       Unsigned32,
+		policyRouteNodeIdx					Unsigned32,			
+		policyRouteNodeStatus			EntryStatus,
+		policyRouteNodeMinPktLen			Unsigned32,
+		policyRouteNodeMaxPktLen			Unsigned32,
+		policyRouteNodeAclNum			Unsigned32,
+		policyRouteIpVer			Unsigned32,
+		policyRouteNodeIpPri			Unsigned32,
+		policyRouteNodeOutIfUnit			Unsigned32,
+		policyRouteNodeNextHop1    OCTET STRING,
+		policyRouteNodeNextHop2    OCTET STRING,
+		policyRouteNodeDefOutIfUnit			Unsigned32,
+		policyRouteNodeDefNextHop    OCTET STRING,		
+		policyRouteNodeAction			Unsigned32		
+	}
+	
+	policyRouteNodePolicyId OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route policy id."
+			::= {policyRouteNodeEntry 1}
+	
+	policyRouteNodeIdx OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node index."
+			::= {policyRouteNodeEntry 2}	
+			
+	policyRouteNodeStatus OBJECT-TYPE
+			SYNTAX			EntryStatus
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= {policyRouteNodeEntry 3}
+	
+	policyRouteNodeMinPktLen OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node minimum packet length."			
+			::= {policyRouteNodeEntry 4}
+			
+	policyRouteNodeMaxPktLen OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node maximum packet length."			
+			::= {policyRouteNodeEntry 5}
+	
+	policyRouteNodeAclNum OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node access-list number."			
+			::= {policyRouteNodeEntry 6}
+	
+	policyRouteIpVer OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node ip version."			
+			::= {policyRouteNodeEntry 7}
+	
+	policyRouteNodeIpPri OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node ip priority."			
+			::= {policyRouteNodeEntry 8}
+	
+	policyRouteNodeOutIfUnit OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node out if unit."			
+			::= {policyRouteNodeEntry 9}
+	
+	policyRouteNodeNextHop1  OBJECT-TYPE
+			SYNTAX			OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node next hop add."			
+			::= {policyRouteNodeEntry 10}
+	
+	policyRouteNodeNextHop2  OBJECT-TYPE
+			SYNTAX			OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node next hop delete."			
+			::= {policyRouteNodeEntry 11}
+	
+	policyRouteNodeDefOutIfUnit OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node default out if unit."			
+			::= {policyRouteNodeEntry 12}
+	
+	policyRouteNodeDefNextHop  OBJECT-TYPE
+			SYNTAX			OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node default next hop add."			
+			::= {policyRouteNodeEntry 13}	
+	
+	policyRouteNodeAction OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route node action."			
+			::= {policyRouteNodeEntry 14}		
+	
+	-- policyRouteIfTable.
+	policyRouteIfTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE OF PolicyRouteIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+		"policyRoute if information table"
+		::= { wriPolicyRoute 4 }
+		
+	policyRouteIfEntry	OBJECT-TYPE	
+		SYNTAX			PolicyRouteIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS			current
+		DESCRIPTION
+			""
+		INDEX { policyRouteIfIndex,policyRouteIfPolicyId }
+		::= { policyRouteIfTable 1 }
+		
+	PolicyRouteIfEntry ::=
+	SEQUENCE
+	{
+		policyRouteIfIndex				Unsigned32,
+		policyRouteIfPolicyId			Unsigned32,		
+		policyRouteIfNodeBit    		OCTET STRING,		
+		policyRouteIfEnable	   			Unsigned32,
+		policyRouteIfEntryStatus	   	Unsigned32,		
+		policyRouteIfDirection         	INTEGER
+	}
+	
+	policyRouteIfIndex OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route if index."			
+			::= {policyRouteIfEntry 1}
+	
+	policyRouteIfPolicyId OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route if policy ID."			
+			::= {policyRouteIfEntry 2}
+				
+	policyRouteIfNodeBit OBJECT-TYPE
+			SYNTAX			OCTET STRING
+			MAX-ACCESS	read-only
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route if enabled policynode list."			
+			::= {policyRouteIfEntry 3}
+				
+	policyRouteIfEnable OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route if enable."			
+			::= {policyRouteIfEntry 4}
+	
+	policyRouteIfEntryStatus OBJECT-TYPE
+			SYNTAX			Unsigned32
+			MAX-ACCESS	read-write
+			STATUS			current
+			DESCRIPTION
+					"policy-based-route if entry status."			
+			::= {policyRouteIfEntry 5}
+			                               
+	policyRouteIfDirection OBJECT-TYPE
+		SYNTAX  INTEGER{
+			in(0),
+		 	out(1)
+    	}				
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"policy-based-route if direction."
+		::= { policyRouteIfEntry 6 }
+			                               
+END

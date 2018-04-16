@@ -1,0 +1,503 @@
+WRI-EAPS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				RowStatus,MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+
+	wriEaps       OBJECT IDENTIFIER ::= { wriProtocol 501 }
+
+	DisplayString ::=   OCTET STRING
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER
+		{
+			valid(1),
+			createRequest(2),
+			underCreation(3),
+			invalid(4)
+		}
+         
+         
+   	eapsGeneral	 	OBJECT IDENTIFIER ::= { wriEaps 1 }
+   	
+	eapsProtoState OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			disable(2),
+			enable(1)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsGeneral 1 }
+				
+	eapsCapability OBJECT-TYPE
+		SYNTAX    Integer32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsGeneral 2 }
+		
+	eapsFreeInst OBJECT-TYPE
+		SYNTAX    Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsGeneral 3 }
+
+	eapsRingTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF EapsRingEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			" NULL"
+		::= { wriEaps 2}
+
+	eapsRingEntry OBJECT-TYPE
+		SYNTAX     EapsRingEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry representing a ftp server with which the client shares
+         	a secret."
+		INDEX      { eapsRingDomainIndex,eapsRingIndex }
+		::= { eapsRingTable 1 }
+
+	EapsRingEntry ::= SEQUENCE {
+			eapsRingDomainIndex					INTEGER,
+			eapsRingIndex						INTEGER,
+			eapsRingName						DisplayString,
+			eapsRingMode						INTEGER,
+			eapsRingHelloTime					Unsigned32,
+			eapsRingFailTime					Unsigned32,
+			eapsRingPrimaryPort					INTEGER,
+			eapsRingPrimaryPortState			INTEGER,
+			eapsRingSecondaryPort				INTEGER,
+			eapsRingSecondaryPortState			INTEGER,
+			eapsRingRunningState				INTEGER,
+			eapsRingCtrlVlanId					INTEGER,
+			eapsRingAddProtectVlanList			OCTET STRING,
+			eapsRingDelProtectVlanList			OCTET STRING,
+			eapsRingPeerHelloEnable				INTEGER,
+			eapsRingFailTimerEnable				INTEGER,
+			eapsRingLevel						INTEGER,
+			eapsRingEntryStatus					EntryStatus,
+			eapsRingPeerHelloTime    			Unsigned32,
+			eapsRingPreforwardEnable			INTEGER,
+			eapsRingPreforwardTime				Unsigned32
+		}
+		
+	eapsRingDomainIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 1 }
+		
+	eapsRingIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 2 }
+
+	eapsRingName OBJECT-TYPE
+		SYNTAX     DisplayString (SIZE (0..64))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 3 }
+
+	eapsRingMode OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			master(0),
+			transit(1)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 4 }
+
+	eapsRingHelloTime OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 5 }
+
+	eapsRingFailTime OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 6 }
+
+	eapsRingPrimaryPort OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 7 }
+
+	eapsRingPrimaryPortState OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			disabled(0),
+			down(1),
+			up(2),
+			forwarding(3),
+			blocking(4)
+		}
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 8 }
+
+	eapsRingSecondaryPort OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 9 }
+
+	eapsRingSecondaryPortState OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			disabled(0),
+			down(1),
+			up(2),
+			forwarding(3),
+			blocking(4)
+		}
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 10 }
+
+
+	eapsRingRunningState OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			idle(0),
+			complete(1),
+			failed(2),
+			linkup(3),
+			linkdown(4),
+			pre-forwarding(5)
+		}
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 11 }
+		
+	eapsRingCtrlVlanId OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 12 }
+
+	eapsRingAddProtectVlanList OBJECT-TYPE
+		SYNTAX     OCTET STRING(SIZE (0..512))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 13 }
+
+
+	eapsRingDelProtectVlanList OBJECT-TYPE
+		SYNTAX     OCTET STRING(SIZE (0..512))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 14 }
+
+
+	eapsRingPeerHelloEnable OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 15 }
+
+
+	eapsRingFailTimerEnable OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 16 }
+
+	eapsRingLevel OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 17 }
+
+	eapsRingEntryStatus OBJECT-TYPE
+		SYNTAX     EntryStatus
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsRingEntry 18 }
+		
+	--xfadd 2011-9-13
+	eapsRingPeerHelloTime OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Hello time of eaps."
+		::= { eapsRingEntry 19 }
+		
+	eapsRingPreforwardEnable OBJECT-TYPE
+		SYNTAX     INTEGER
+		{
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Forsward enable or disable of esps."
+		::= { eapsRingEntry 20 }
+		
+	eapsRingPreforwardTime OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Forward time of eaps."
+		::= { eapsRingEntry 21 }
+	--domain table
+	eapsDomainTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF EapsDomainEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			" NULL"
+		::= { wriEaps 3}
+
+	eapsDomainEntry OBJECT-TYPE
+		SYNTAX     EapsDomainEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry representing a ftp server with which the client shares
+         	a secret."
+		INDEX      { eapsDomainIndex }
+		::= { eapsDomainTable 1 }
+
+	EapsDomainEntry ::= SEQUENCE {
+			eapsDomainIndex						INTEGER,
+			eapsDomainName						DisplayString,
+			eapsDomainCtrlVlanId				INTEGER,
+			eapsDomainAddProtectVlanList		OCTET STRING,
+			eapsDomainDelProtectVlanList		OCTET STRING,
+			eapsDomainRingList					OCTET STRING,
+			eapsDomainHelloTime					TimeTicks,
+			eapsDomainFailTime					TimeTicks,
+			eapsDomainEntryStatus				EntryStatus
+		}
+		
+	eapsDomainIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 1 }
+
+	eapsDomainName OBJECT-TYPE
+		SYNTAX     DisplayString (SIZE (0..64))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 2 }
+		
+	eapsDomainCtrlVlanId OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 3 }
+		
+
+	eapsDomainAddProtectVlanList OBJECT-TYPE
+		SYNTAX     OCTET STRING	(SIZE (0..512))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 4 }
+		
+	eapsDomainDelProtectVlanList OBJECT-TYPE
+		SYNTAX     OCTET STRING	(SIZE (0..512))
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 5 }
+		
+	eapsDomainRingList OBJECT-TYPE
+		SYNTAX     OCTET STRING
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 6 }
+		
+	eapsDomainHelloTime OBJECT-TYPE
+		SYNTAX     TimeTicks
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 7 }
+		
+	eapsDomainFailTime OBJECT-TYPE
+		SYNTAX     TimeTicks
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 8 }
+
+	eapsDomainEntryStatus OBJECT-TYPE
+		SYNTAX     EntryStatus
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsDomainEntry 9 }
+		
+		
+	--interface table
+	eapsIfTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF EapsIfEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			" NULL"
+		::= { wriEaps 4}
+
+	eapsIfEntry OBJECT-TYPE
+		SYNTAX     EapsIfEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry representing a ftp server with which the client shares
+         	a secret."
+		INDEX      { eapsIfIndex,eapsIfDomainIndex,eapsIfRingIndex }
+		::= { eapsIfTable 1 }
+
+	EapsIfEntry ::= SEQUENCE {
+			eapsIfIndex					Unsigned32,
+			eapsIfDomainIndex				INTEGER,
+			eapsIfRingIndex					INTEGER,
+			eapsIfRole					INTEGER,
+			eapsIfEntryStatus				EntryStatus
+		}
+		
+	eapsIfIndex OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsIfEntry 1 }
+		
+	eapsIfDomainIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsIfEntry 2 }
+
+	eapsIfRingIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsIfEntry 3 }
+		
+	eapsIfRole OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsIfEntry 4 }
+
+	eapsIfEntryStatus OBJECT-TYPE
+		SYNTAX     EntryStatus
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"NULL."
+		::= { eapsIfEntry 5 }
+
+	eapsRingTrap				OBJECT IDENTIFIER ::=   {wriEaps 5}
+		
+	eapsRingFail NOTIFICATION-TYPE
+       	OBJECTS {eapsRingDomainIndex,eapsRingIndex}
+       	STATUS  current
+       	DESCRIPTION
+               "eaps ring fail trap."
+		::= { eapsRingTrap 1}
+	
+
+	 eapsRingComplete NOTIFICATION-TYPE
+       	OBJECTS {eapsRingDomainIndex,eapsRingIndex}
+       	STATUS  current
+       	DESCRIPTION
+               "eaps ring complete trap."
+		::= { eapsRingTrap 2}
+
+END

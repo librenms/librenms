@@ -1,0 +1,225 @@
+WRI-IPPREFIXLST-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       			wri,wriProtocol 	 		FROM WRI-SMI 
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB;			
+
+wriIPPrefixLst        OBJECT IDENTIFIER ::= { wriProtocol 922 }
+
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+	
+	ipPrefixGeneral OBJECT IDENTIFIER ::= { wriIPPrefixLst 1 } 
+	
+	ipPrefixGenEnable	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+				enable(1),
+				disable(2)
+				}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		      ""
+        ::= { ipPrefixGeneral 1 }
+        
+    ipPrefixGenFreeLst	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		       ""
+        ::= { ipPrefixGeneral 2 } 
+	
+	ipPrefixListTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IpPrefixListEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { wriIPPrefixLst 2 }
+
+	ipPrefixListEntry OBJECT-TYPE
+		SYNTAX  IpPrefixListEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { ipPrefixListIdx }
+		::= { ipPrefixListTable 1 }
+
+	IpPrefixListEntry ::=
+		SEQUENCE {
+			ipPrefixListIdx		    INTEGER,
+			ipPrefixListEntryStatus		EntryStatus,
+			ipPrefixListName		OCTET STRING,
+			ipPrefixListIpFamily		INTEGER,
+			ipPrefixListFreeRule		INTEGER
+		}
+
+	ipPrefixListIdx	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "ip prefix list index."
+        ::= { ipPrefixListEntry 1 }
+        
+    ipPrefixListEntryStatus	   OBJECT-TYPE
+        SYNTAX EntryStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "ip prefix list entrystatus."
+        ::= { ipPrefixListEntry 2 }
+
+
+	ipPrefixListName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { ipPrefixListEntry 3 }
+
+	ipPrefixListIpFamily	OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+				ipv4(1),
+				ipv6(2)
+				}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { ipPrefixListEntry 4 }        
+                
+	ipPrefixListFreeRule	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		        ""
+        ::= { ipPrefixListEntry 5 }
+        
+  ipPrefixRuleTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IpPrefixRuleEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { wriIPPrefixLst 3 }
+
+	ipPrefixRuleEntry OBJECT-TYPE
+		SYNTAX  IpPrefixRuleEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { ipPrefixListIdx, ipPrefixRuleIdx }
+		::= { ipPrefixRuleTable 1 }
+
+	IpPrefixRuleEntry ::=
+		SEQUENCE {
+			ipPrefixRuleIdx		    INTEGER,
+			ipPrefixRuleEntryStatus		EntryStatus,
+			ipPrefixRuleIpFamily		INTEGER,
+			ipPrefixRuleAddress		InetAddress,
+			ipPrefixRulePrefix		InetAddressPrefixLength,
+			ipPrefixRuleRangeMin		INTEGER,
+			ipPrefixRuleRangeMax		INTEGER,
+			ipPrefixRuleAction		INTEGER
+		}
+
+	ipPrefixRuleIdx	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "ip prefix rule index."
+        ::= { ipPrefixRuleEntry 1 }
+
+    ipPrefixRuleEntryStatus	   OBJECT-TYPE
+        SYNTAX EntryStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "ip prefix rule entrystatus."
+        ::= { ipPrefixRuleEntry 2 }
+
+	ipPrefixRuleIpFamily	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+				ipv4(1),
+				ipv6(2)
+				}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { ipPrefixRuleEntry 3 }        
+
+	ipPrefixRuleAddress	OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		        ""
+        ::= { ipPrefixRuleEntry 4 }
+
+  ipPrefixRulePrefix	   OBJECT-TYPE
+        SYNTAX     InetAddressPrefixLength
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "ip prefix rule prefix length."
+        ::= { ipPrefixRuleEntry 5 }
+
+  ipPrefixRuleRangeMin	   OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "ip prefix rule prefix low range."
+        ::= { ipPrefixRuleEntry 6 }
+
+  ipPrefixRuleRangeMax	   OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "ip prefix rule prefix high range."
+        ::= { ipPrefixRuleEntry 7 }
+
+  ipPrefixRuleAction	   OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+				deny(1),
+				permit(0)
+				}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "ip prefix rule action."
+        ::= { ipPrefixRuleEntry 8 }
+
+
+END

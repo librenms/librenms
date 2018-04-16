@@ -1,0 +1,290 @@
+WRI-FDB-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,Unsigned32,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+
+	-- Multiple Services Ring (MSPP)
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	msppDev			OBJECT IDENTIFIER ::=   {mspp 2}
+
+	
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING                                                 
+		
+		-- dynamic or static mac database
+		
+		msppFdb	 	OBJECT IDENTIFIER ::= { msppDev 3 }
+		fdbGeneral	 	OBJECT IDENTIFIER ::= { msppFdb 1 }
+		
+		fdbAgingTime  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"mac aging time.in seconds"
+			--DVAL{180}
+			::= { fdbGeneral 1 }
+			
+		fdbFlush  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"mac aging time.in seconds"
+			--DVAL{180}
+			::= { fdbGeneral 2 }
+			
+		fdbNum  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"mac aging time.in seconds"
+			--DVAL{180}
+			::= { fdbGeneral 3 }
+			
+		ipStrictForward  OBJECT-TYPE
+			SYNTAX     INTEGER{enable(1),disable(2)}
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"ip strict forward"
+			::= { fdbGeneral 4 }
+		
+		fdbTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF FdbEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"A list of interface entries.  The number of
+					entries is given by the value of ifNumber."
+			::= { msppFdb 2 }
+	
+		fdbEntry OBJECT-TYPE
+			SYNTAX  FdbEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"An interface entry containing objects at the
+					subnetwork layer and below for a particular
+					interface."
+			INDEX   { fdbVID, fdbMacAddr }
+			::= { fdbTable 1 }
+
+		FdbEntry ::=
+			SEQUENCE {
+				fdbVID				INTEGER,
+				fdbMacAddr			MacAddress,
+				fdbPorts			DisplayString,
+				fdbType				INTEGER,	--static/dynamic
+				fdbOperType			INTEGER,	--forwarding/cpu/forwarding&cpu
+				fdbRowStatus		EntryStatus,
+				fdbAll				DisplayString
+			}		        
+				
+		fdbVID	OBJECT-TYPE
+	        SYNTAX INTEGER 
+        	MAX-ACCESS read-only
+        	STATUS current
+        	DESCRIPTION
+                	"Vlan id."
+        	::= { fdbEntry 1 }
+	
+		fdbMacAddr	OBJECT-TYPE
+        	SYNTAX MacAddress 
+        	MAX-ACCESS read-only
+        	STATUS current
+        	DESCRIPTION
+                	"Mac address."
+        	::= { fdbEntry 2 }
+        
+		fdbPorts	OBJECT-TYPE
+	        SYNTAX DisplayString (SIZE(0..1024))
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"The value to specify a port or a trunk."
+        	::= { fdbEntry 3 }        
+	
+		fdbType	OBJECT-TYPE
+	        SYNTAX INTEGER{
+        		static(1),
+        		dynamic(2)
+        	}
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"Mac address type."
+        	::= { fdbEntry 4 }        
+		
+		
+		fdbOperType	OBJECT-TYPE
+	        SYNTAX INTEGER{
+        		discard(1),
+        		cpuonly(2),
+        		forward(3),
+        		forwardingcpu(4),
+        		bind(5)
+        		}
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+            	    "Mac address operation type."
+        	::= { fdbEntry 5 }      
+	
+		fdbRowStatus	OBJECT-TYPE
+	        SYNTAX EntryStatus
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"The table status."
+        	::= { fdbEntry 6 }
+	
+		fdbAll	OBJECT-TYPE
+	        SYNTAX   DisplayString (SIZE(0..64))
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"Get fdb all information."
+        	::= { fdbEntry 7 }
+			
+			
+		fdbVpnTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF FdbVpnEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"A list of interface entries.  The number of
+					entries is given by the value of ifNumber."
+			::= { msppFdb 3 }
+	
+		fdbVpnEntry OBJECT-TYPE
+			SYNTAX  FdbVpnEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"An interface entry containing objects at the
+					subnetwork layer and below for a particular
+					interface."
+			INDEX   { fdbVpnKeyType,fdbVpnVID,fdbVpnMacAddr }
+			::= { fdbVpnTable 1 }
+
+		FdbVpnEntry ::=
+			SEQUENCE {
+				fdbVpnKeyType			INTEGER,
+				fdbVpnVID				INTEGER,
+				fdbVpnMacAddr			MacAddress,
+				fdbVpnPorts			DisplayString,
+				fdbVpnType				INTEGER,	--static/dynamic
+				fdbVpnOperType			INTEGER,	--forwarding/cpu/forwarding&cpu
+				fdbVpnRowStatus		EntryStatus,
+				fdbVpnAll				DisplayString
+			}		        
+		
+		fdbVpnKeyType	OBJECT-TYPE
+	        SYNTAX INTEGER {
+				bridge(0),
+        		vp(1),
+        		vfi(2)
+        	}
+        	MAX-ACCESS read-only
+        	STATUS current
+        	DESCRIPTION
+                	"Fdb vpn type."
+        	::= { fdbVpnEntry 1 }
+			
+		fdbVpnVID	OBJECT-TYPE
+	        SYNTAX INTEGER 
+        	MAX-ACCESS read-only
+        	STATUS current
+        	DESCRIPTION
+                	"Vlan id."
+        	::= { fdbVpnEntry 2 }
+	
+		fdbVpnMacAddr	OBJECT-TYPE
+        	SYNTAX MacAddress 
+        	MAX-ACCESS read-only
+        	STATUS current
+        	DESCRIPTION
+                	"Mac address."
+        	::= { fdbVpnEntry 3 }
+        
+		fdbVpnPorts	OBJECT-TYPE
+	        SYNTAX DisplayString (SIZE(0..1024))
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"The value to specify a port or a trunk."
+        	::= { fdbVpnEntry 4 }        
+	
+		fdbVpnType	OBJECT-TYPE
+	        SYNTAX INTEGER{
+        		static(1),
+        		dynamic(2)
+        	}
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"Mac address type."
+        	::= { fdbVpnEntry 5 }        
+		
+		
+		fdbVpnOperType	OBJECT-TYPE
+	        SYNTAX INTEGER{
+        		discard(1),
+        		cpuonly(2),
+        		forward(3),
+        		forwardingcpu(4),
+        		bind(5)
+        		}
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+            	    "Mac address operation type."
+        	::= { fdbVpnEntry 6 }      
+	
+		fdbVpnRowStatus	OBJECT-TYPE
+	        SYNTAX EntryStatus
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"The table status."
+        	::= { fdbVpnEntry 7 }
+	
+		fdbVpnAll	OBJECT-TYPE
+	        SYNTAX   DisplayString (SIZE(0..64))
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+                	"Get fdb all information."
+        	::= { fdbVpnEntry 8 }
+        	
+        	
+    
+END

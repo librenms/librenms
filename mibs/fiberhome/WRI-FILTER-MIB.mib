@@ -1,0 +1,1559 @@
+-- File Name : filter.mib
+-- Date      : Sat Nov 07 16:58:01 CST 2009
+
+-- Modify history
+-- Add wriFilterCarId in wriFilterTable		Thur. Feb. 25  10:57 2010 zy
+-- Add wriFilterLayerType in wriFilterTable		Thur. Feb. 25  10:57 2010 zy
+-- Add wriFilterPosTable		Thur. Feb. 25  10:57 2010 zy
+-- Rename wriFilterProviderVID to wriFilterOutVID		Thur. Feb. 25  10:57 2010 zy
+-- Rename wriFilterProviderRangeVID to wriFilterOutEndVID		Thur. Feb. 25  10:57 2010 zy
+-- Rename wriFilterCustomerVID to wriFilterInVID		Thur. Feb. 25  10:57 2010 zy
+-- Rename wriFilterCustomerRangeVID to wriFilterInEndVID		Thur. Feb. 25  10:57 2010 zy
+-- Rename wriFilterProviderPri to wriFilterOutPri		Thur. Feb. 25  10:57 2010 zy
+-- Rename wriFilterCustomerPri to wriFilterInPri		Thur. Feb. 25  10:57 2010 zy
+-- Add wriFilterSrcIpPrefixAddr¡¢wriFilterDstIpPrefixAddr¡¢wriFilterSrcMacPrefixAddr¡¢wriFilterDstMacPrefixAddr 2011-3-3 xf
+-- End modify history
+
+
+WRI-FILTER-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+	
+
+
+
+	-- Multiple Services Ring (MSPP)
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppFilter		OBJECT IDENTIFIER ::=   {mspp 6}
+    
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+    
+	--Filter table
+
+	-- access control list 
+	
+	-- access control list 
+	wriFilterTable OBJECT-TYPE
+		SYNTAX   SEQUENCE OF WriFilterEntry
+		MAX-ACCESS   not-accessible
+		STATUS   current
+		DESCRIPTION
+		"access control list table."
+		::= { msppFilter 4 }
+
+	wriFilterEntry OBJECT-TYPE
+		SYNTAX   WriFilterEntry
+		MAX-ACCESS   not-accessible
+		STATUS   current
+		DESCRIPTION
+		"access control list entry."
+		INDEX {wriFilterNum ,wriFilterSeqNum}
+		::= { wriFilterTable 1 }
+
+	WriFilterEntry ::=
+		SEQUENCE {
+		wriFilterNum				INTEGER,
+		wriFilterSeqNum			INTEGER,
+		wriFilterName				DisplayString,
+		wriFilterExistBits			DisplayString,
+		wriFilterEncapType			INTEGER,
+		wriFilterDtag				INTEGER,
+		wriFilterProtoType			INTEGER,		
+		wriFilterProtoSubType		INTEGER,
+		wriFilterAddrType			InetAddressType,
+		wriFilterSrcAddr			InetAddress,
+		wriFilterSrcPrefixLength	InetAddressPrefixLength,
+		wriFilterDstAddr			InetAddress,
+		wriFilterDstPrefixLength	InetAddressPrefixLength,
+		wriFilterSrcPort			InetPortNumber,
+		wriFilterSrcRangePort		InetPortNumber,
+		wriFilterDstPort			InetPortNumber,
+		wriFilterDstRangePort		InetPortNumber,
+		wriFilterIpTos				INTEGER,
+		wriFilterTcpState			INTEGER,
+		wriFilterIpOptions			INTEGER,
+		wriFilterFragment			INTEGER,
+		wriFilterIpTtl				INTEGER,
+		wriFilterEthType			INTEGER,
+		wriFilterInPri		Unsigned32,
+		wriFilterInVid		Unsigned32,
+		wriFilterOutPri		Unsigned32,
+		wriFilterOutvVID		Unsigned32,
+		wriFilterSrcMac			PhysAddress,
+		wriFilterDstMac			PhysAddress,
+		wriFilterAppContent		Unsigned32,
+		wriFilterCounterId			Unsigned32,
+		wriFilterTbId				Unsigned32,
+		wriFilterOutAction			DisplayString,
+		wriFilterAction			DisplayString,
+		wriFilterActionParameter	DisplayString,
+		wriFilterRowStatus			EntryStatus,
+		wriFilterAll				DisplayString,
+		wriFilterRefCnt			Unsigned32,
+		wriFilterTimeRange			Unsigned32,
+		wriFilterUserDefinedData	DisplayString,
+		wriFilterStatusMask		DisplayString,
+		wriFilterStatusBit		DisplayString,
+		wriFilterOutActionParameter	DisplayString,
+		wriFilterMeterId			Unsigned32,
+		wriFilterIsid				Unsigned32,
+		wriFilterPosition				Unsigned32,
+		wriFilterIpDscp					INTEGER,
+		wriFilterSrcMacPrefixLength			INTEGER,
+		wriFilterDstMacPrefixLength			INTEGER,
+		wriFilterInEndVID		INTEGER,
+		wriFilterOutEndVID		INTEGER,
+		wriFilterLayerType		INTEGER,
+		wriFilterCarId		INTEGER,
+		wriFilterSrcIpPrefixAddr  InetAddress,
+		wriFilterDstIpPrefixAddr  InetAddress,
+		wriFilterSrcMacPrefixAddr PhysAddress,
+		wriFilterDstMacPrefixAddr PhysAddress,
+		wriFilterHopLimit         INTEGER,
+		wriFilterIcmpType         INTEGER,
+		wriFilterIcmpCode         INTEGER,
+		--xf add 2014-9-8
+		wriFilterVrfId			  INTEGER
+	}
+                   
+	wriFilterNum OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"access control list table index."
+		::= { wriFilterEntry 1 }    
+        
+	wriFilterSeqNum OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"access control list table index."
+		::= { wriFilterEntry 2 }
+
+	wriFilterName	 OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..64))
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table name."
+		::= { wriFilterEntry 3 }
+	
+	
+	wriFilterExistBits	 OBJECT-TYPE
+		SYNTAX   DisplayString
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION
+		"access control list table item exist bits."
+		::= { wriFilterEntry 4 }
+	
+	wriFilterEncapType OBJECT-TYPE
+		SYNTAX   INTEGER
+		{
+			eth(0),
+			pppoe(1),
+			dot1ah(2)
+		}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table protocol type."
+		::= { wriFilterEntry 5 }
+											
+	wriFilterDtag  OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table protocol type."
+		::= { wriFilterEntry 6 }
+	
+											
+	wriFilterProtoType OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table protocol type."
+		::= { wriFilterEntry 7 }						
+	
+	wriFilterProtoSubType OBJECT-TYPE
+		SYNTAX   INTEGER
+		{
+			icmporarprequest(1),
+			igmporarpreponse(2),
+			tcp(6),
+			udp(17),
+			ospf(89),
+			any(255)
+		}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"the value is different when wriFilterType is ip or arp."
+		::= { wriFilterEntry 8 }
+	      
+	wriFilterAddrType OBJECT-TYPE
+		SYNTAX       InetAddressType
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"An implementation is only required to support IPv4 and IPv6 addresses.{
+				unknown(0),
+				ipv4(1),
+				ipv6(2)
+				}"
+		::= { wriFilterEntry 9 }
+	
+	
+	wriFilterSrcAddr OBJECT-TYPE
+		SYNTAX   InetAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table source ip address.
+		An implementation is only required to support IPv4 and IPv6 addresses."
+		::= { wriFilterEntry 10 }
+       
+	wriFilterSrcPrefixLength OBJECT-TYPE
+		SYNTAX       InetAddressPrefixLength
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table source ip mask.
+		An implementation is only required to support IPv4 and IPv6 addresses."
+		::= { wriFilterEntry 11 }
+
+             
+	wriFilterDstAddr OBJECT-TYPE
+		SYNTAX   InetAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table destination ip address.
+		An implementation is only required to support IPv4 and IPv6 addresses."
+		::= { wriFilterEntry 12 }
+       
+	wriFilterDstPrefixLength OBJECT-TYPE
+		SYNTAX       InetAddressPrefixLength
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table destination ip mask.
+		An implementation is only required to support IPv4 and IPv6 addresses."
+		::= { wriFilterEntry 13 }
+             
+
+	wriFilterSrcPort OBJECT-TYPE
+		SYNTAX   InetPortNumber       
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"port number,or icmp type."
+		::= { wriFilterEntry 14 }
+               
+	wriFilterSrcRangePort OBJECT-TYPE
+		SYNTAX   InetPortNumber       
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"port range index."
+		::= { wriFilterEntry 15 }
+
+	wriFilterDstPort OBJECT-TYPE
+		SYNTAX   InetPortNumber       
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"port number,or icmp code."
+		::= { wriFilterEntry 16 }
+	
+	wriFilterDstRangePort OBJECT-TYPE
+		SYNTAX   InetPortNumber       
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"port range index."
+		::= { wriFilterEntry 17 }
+
+	wriFilterIpTos OBJECT-TYPE
+		SYNTAX   INTEGER       
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"tos or descp."
+		::= { wriFilterEntry 18 }
+	
+	wriFilterTcpState OBJECT-TYPE
+		SYNTAX   INTEGER{
+        tcpsyn(2),
+				tcpack(16),
+				tcpsynack(18),
+				tcpfin(1),
+				tcpfinack(17),
+				tcpurg(32),
+				tcprst(4),
+				tcppsh(8)
+			}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"tcp fsm."
+		::= { wriFilterEntry 19 }	
+        
+	wriFilterIpOptions OBJECT-TYPE
+		SYNTAX   INTEGER{
+				enable(1),
+                disable(0)
+			}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"ip option control."
+		::= { wriFilterEntry 20 }
+        
+	wriFilterFragment OBJECT-TYPE
+		SYNTAX   INTEGER{
+				enable(1),
+                disable(0)
+			}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"ip fragment control."
+		::= { wriFilterEntry 21 }
+        
+	wriFilterIpTtl OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"ip ttl control."
+		::= { wriFilterEntry 22 }
+    
+    wriFilterEthType OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table protocol type."
+		::= { wriFilterEntry 23 }    
+    
+	wriFilterInPri OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"dot1p priority control."
+		::= { wriFilterEntry 24 }
+	
+	wriFilterInVid OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"vlan id control."
+		::= { wriFilterEntry 25 }
+	
+	wriFilterOutPri OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"dot1p priority control."
+		::= { wriFilterEntry 26 }
+	
+	wriFilterOutvVID OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"vlan id control."
+		::= { wriFilterEntry 27 }
+	
+	
+	wriFilterSrcMac OBJECT-TYPE
+		SYNTAX   PhysAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"source mac control."
+		::= { wriFilterEntry 28 }
+		
+	wriFilterDstMac OBJECT-TYPE
+		SYNTAX   PhysAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"destination mac control."
+		::= { wriFilterEntry 29 }
+	
+	wriFilterAppContent OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"APP_P2P_EDONKEY(0),
+		APP_P2P_EMULE(1),
+		APP_P2P_FASTTRUNK(2),
+		APP_P2P_BITTORRENT(3),
+		APP_P2P_GNUTELLA(4),
+		APP_P2P_MP2P(5),
+		APP_P2P_DIRECTCONNECT(6),
+		APP_P2P_ARES(7),
+		APP_P2P_KAZAA(8),
+		APP_P2P_PORT(9),
+		APP_FTP(10),
+		APP_DHCP(11),
+		APP_OSPF(12),
+		APP_BGP(13),
+		APP_RIP(14),
+		APP_TELNET(15),
+		APP_SNMP(16),
+		APP_HTTP(17),
+		APP_SMTP(18),
+		APP_POP3(19),
+		APP_SSH(20),
+		APP_SYSLOG(21),
+		"
+		::= { wriFilterEntry 30 }
+
+
+	wriFilterCounterId OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"counter ID"
+		::= { wriFilterEntry 31 }
+
+	wriFilterTbId OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"Token bucket ID"
+		::= { wriFilterEntry 32 }
+
+	wriFilterOutAction OBJECT-TYPE
+		SYNTAX   DisplayString
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"RULE_OUTACTION_PERMIT(1),
+		RULE_OUTACTION_DROP(2),
+		RULE_OUTACTION_RP_DROP(4),
+		RULE_OUTACTION_YP_DROP(8),
+		RULE_OUTACTION_RP_DSCP(16),
+		RULE_OUTACTION_YP_DSCP(32),
+		RULE_OUTACTION_RP_DOT1P(64),
+		RULE_OUTACTION_YP_DOT1P(128),
+		RULE_OUTACTION_RP_CFI(256),
+		RULE_OUTACTION_YP_CFI(512),
+			"
+		::= { wriFilterEntry 33 }
+
+	wriFilterAction OBJECT-TYPE
+		SYNTAX   DisplayString
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"RULE_ACTION_INVALID=0,
+		RULE_ACTION_AWARE,
+		RULE_ACTION_PERMIT,
+		RULE_ACTION_DENY,
+		RULE_ACTION_OUTPUT_PORT,
+		RULE_ACTION_OUTPUT_CPU,
+		RULE_ACTION_OUTPUT_NEXTHOP,
+		RULE_ACTION_OUTPUT_MULTIHOP,
+		RULE_ACTION_OUTER_DOT1P,
+		RULE_ACTION_INNER_DOT1P,
+		RULE_ACTION_NONE,
+		RULE_ACTION_CPU,
+		RULE_ACTION_COS,
+		RULE_ACTION_TOS,
+		RULE_ACTION_MIRROR,
+		RULE_ACTION_MIRROR_CPU,
+		RULE_ACTION_MIRROR_GROUP,
+		RULE_ACTION_PRI2TOS,
+		RULE_ACTION_TOS2PRI,
+		RULE_ACTION_DA_REWRITE,
+		RULE_ACTION_VID_REWRITE,
+		RULE_ACTION_INSERT_OVID,		
+		RULE_ACTION_REPLACE_OVID,	
+		RULE_ACTION_DELETE_OVID,		
+		RULE_ACTION_INSERT_IVID,		
+		RULE_ACTION_REPLACE_IVID,	
+		RULE_ACTION_DELETE_IVID,		
+		RULE_ACTION_VFP_INSERT_OVID,		
+		RULE_ACTION_VFP_REPLACE_OVID,	
+		RULE_ACTION_VFP_DELETE_OVID,		
+		RULE_ACTION_VFP_INSERT_IVID,		
+		RULE_ACTION_VFP_REPLACE_IVID,	
+		RULE_ACTION_VFP_DELETE_IVID,		
+		RULE_ACTION_VFP_DENY,			
+		RULE_ACTION_DSCP,
+		RULE_ACTION_CPU_QUEUE,	
+		RULE_ACTION_ISID,
+		RULE_ACTION_MAC_SWAP,
+		RULE_ACTION_IP_SWAP,
+		RULE_ACTION_PORT_SWAP,
+			"
+		::= { wriFilterEntry 34 }
+
+
+	wriFilterActionParameter OBJECT-TYPE
+		SYNTAX   DisplayString
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"ACT_PARAM_TOS				0
+		ACT_PARAM_COS				1
+		ACT_PARAM_OUTER_DOT1P		1
+		ACT_PARAM_INNER_DOT1P		2
+		ACT_PARAM_MIRROR			3		
+		ACT_PARAM_VID				4
+		ACT_PARAM_OUTER_VID			5
+		ACT_PARAM_INNER_VID			6
+
+		ACT_PARAM_MACL				7
+		ACT_PARAM_MACH				8
+		ACT_PARAM_DSCP				9
+		ACT_PARAM_COUNTER			10	
+		ACT_PARAM_OUTPUT			11
+		ACT_PARAM_OUTPUT1			12
+		ACT_PARAM_OUTPUT2			13
+		ACT_PARAM_OUTPUT3			14
+		ACT_PARAM_OUTPUT4			15
+		ACT_PARAM_OUTPUT5			16
+		ACT_PARAM_OUTPUT6			17
+		ACT_PARAM_MAXOUTPUT			18
+		ACT_PARAM_CPU_QUEUE 		19
+		ACT_PARAM_ISID				20
+		ACT_PARAM_VRFID				21
+		ACT_PARAM_VRFID1			22
+		ACT_PARAM_VRFID2			23
+		ACT_PARAM_VRFID3			24
+		ACT_PARAM_MAX				25
+			
+		FILTER_PKT_COUNTER			0
+		FILTER_BYTE_COUNTER			1
+		FILTER_ALL_COUNTER			2"
+
+		::= { wriFilterEntry 35 }
+
+	wriFilterRowStatus OBJECT-TYPE
+		SYNTAX       EntryStatus
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION
+		"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+		::= { wriFilterEntry 36 }	
+
+
+	wriFilterAll OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..1024))
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION
+		"The status of this conceptual row. All writable objects in this
+			row may be modified at any time."
+		::= { wriFilterEntry 37 }
+		
+	wriFilterRefCnt OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+		"The status of this conceptual row. All writable objects in this
+			row may be modified at any time."
+		::= { wriFilterEntry 38 }
+
+	wriFilterTimeRange OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION
+		"The status of this conceptual row. All writable objects in this
+			row may be modified at any time."
+		::= { wriFilterEntry 39 }
+		               
+	wriFilterUserDefinedData OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..128))
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION
+		""
+		::= { wriFilterEntry 40 }
+
+	wriFilterStatusMask	 OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..16))
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION
+		"loopkup status bit mask."
+		::= { wriFilterEntry 41 }
+		
+	wriFilterStatusBit	 OBJECT-TYPE
+		SYNTAX   DisplayString (SIZE(0..16))
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION
+		"loopkup status bit."
+		::= { wriFilterEntry 42 }
+	
+	wriFilterOutActionParameter OBJECT-TYPE
+		SYNTAX   DisplayString
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+			"OUTACT_PARAM_RP_DSCP	0
+			OUTACT_PARAM_YP_DSCP	1
+			OUTACT_PARAM_RP_DOT1P	2
+			OUTACT_PARAM_YP_DOT1P	3
+			OUTACT_PARAM_RP_CFI		4
+			OUTACT_PARAM_YP_CFI		5
+			OUTACT_PARAM_MAX		6"
+		::= { wriFilterEntry 43 }
+		
+	wriFilterMeterId OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"yellow action."
+		::= { wriFilterEntry 44 }
+		
+	wriFilterIsid OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"yellow action parameter"
+		::= { wriFilterEntry 45 }
+	
+	wriFilterPosition OBJECT-TYPE
+		SYNTAX   Unsigned32
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"yellow action."
+		::= { wriFilterEntry 46 }
+	
+	wriFilterIpDscp OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"yellow action."
+		::= { wriFilterEntry 47 }
+		
+		wriFilterSrcMacPrefixLength OBJECT-TYPE
+		SYNTAX   INTEGER	
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"The prefix length of source mac address."
+		::= { wriFilterEntry 48 }
+		
+		wriFilterDstMacPrefixLength OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"The prefix length of destination mac address."
+		::= { wriFilterEntry 49 }
+		
+		wriFilterInEndVID OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"yellow action."
+		::= { wriFilterEntry 50 }
+		
+		wriFilterOutEndVID OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"yellow action."
+		::= { wriFilterEntry 51 }
+		
+		wriFilterLayerType OBJECT-TYPE
+		SYNTAX		INTEGER{
+							layer2(1),
+							layer3(2),
+							layermix(3)
+		}
+		MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"layer type"
+		::= { wriFilterEntry 52 }
+		
+		wriFilterCarId OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"car id"
+		::= { wriFilterEntry 53 }
+		
+		wriFilterSrcIpPrefixAddr OBJECT-TYPE
+		SYNTAX   InetAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table source ip address.
+		An implementation is only required to support IPv4 and IPv6 addresses."
+		::= { wriFilterEntry 54 }
+		
+		wriFilterDstIpPrefixAddr OBJECT-TYPE
+		SYNTAX   InetAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+		"access control list table source ip address.
+		An implementation is only required to support IPv4 and IPv6 addresses."
+		::= { wriFilterEntry 55 }
+		
+		wriFilterSrcMacPrefixAddr OBJECT-TYPE
+		SYNTAX   PhysAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"source mac prfefix address."
+		::= { wriFilterEntry 56 }
+		
+		wriFilterDstMacPrefixAddr OBJECT-TYPE
+		SYNTAX   PhysAddress
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"destiation mac prefix address."
+		::= { wriFilterEntry 57 }
+		
+		wriFilterHopLimit    OBJECT-TYPE
+		SYNTAX   INTEGER(1..255)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"hop limit"
+		::= { wriFilterEntry 58 }
+		
+		wriFilterIcmpType    OBJECT-TYPE
+		SYNTAX   INTEGER(1..255)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"icmp type "
+		::= { wriFilterEntry 59 }
+		
+		wriFilterIcmpCode    OBJECT-TYPE
+		SYNTAX   INTEGER(1..255)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"icmp code"
+		::= { wriFilterEntry 60 }
+
+		--xf add 2014-9-9
+		wriFilterVrfId    OBJECT-TYPE
+		SYNTAX   INTEGER(1..255)
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION
+				"Vpn vrfid"
+		::= { wriFilterEntry 61 }
+		
+		
+	--filter statistics
+	wriFilterIfStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF WriFilterIfStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"NULL"
+		::= { msppFilter 5 }
+	
+	wriFilterIfStatsEntry OBJECT-TYPE
+		SYNTAX  WriFilterIfStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"NULL"
+		INDEX   { wriFilterIfStatsIfIndex,wriFilterIfStatsListNum,wriFilterIfStatsRuleNum,wriFilterIfStatsDir}
+		::= { wriFilterIfStatsTable 1 }
+
+	WriFilterIfStatsEntry ::=
+		SEQUENCE {
+				wriFilterIfStatsIfIndex					Unsigned32,
+				wriFilterIfStatsListNum					INTEGER,
+				wriFilterIfStatsRuleNum					INTEGER,
+				wriFilterIfStatsDir						INTEGER,				
+				wriFilterIfStatsSupportBit				BITS,
+				wriFilterIfStatsPkts					Counter64,
+				wriFilterIfStatsOctets					Counter64,
+				wriFilterIfStatsTotalPkts				Counter64,
+				wriFilterIfStatsTotalOctets				Counter64,
+				wriFilterIfStatsResetCounter			INTEGER,
+				wriFilterIfStatsCounterType				INTEGER,
+				wriFilterIfStatsCounterId				INTEGER
+		}
+
+	wriFilterIfStatsIfIndex	OBJECT-TYPE
+        SYNTAX Unsigned32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 1 }
+        
+	wriFilterIfStatsListNum	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 2 }
+        
+        
+	wriFilterIfStatsRuleNum	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 3 }
+
+	wriFilterIfStatsDir	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 4 }
+                     
+	wriFilterIfStatsSupportBit	OBJECT-TYPE
+        SYNTAX BITS{
+        		greenbit(0),
+        		yellowbit(1),
+        		redbit(2),
+        		totalbit(3)		
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "bitmap."
+        ::= { wriFilterIfStatsEntry 5}
+
+	wriFilterIfStatsPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 6}
+
+
+	wriFilterIfStatsOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 7}
+        
+	wriFilterIfStatsTotalPkts	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 8}
+
+
+	wriFilterIfStatsTotalOctets	OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 9}
+        
+	wriFilterIfStatsResetCounter	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 10}
+
+	wriFilterIfStatsCounterType	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 11}
+
+	wriFilterIfStatsCounterId	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "octets number."
+        ::= { wriFilterIfStatsEntry 12}
+        
+
+
+    --filter interface table
+	wriFilterIfTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF WriFilterIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+				"A list of interface entries.  The number of
+				entries is given by the value of ifNumber."
+			::= { msppFilter 6 }
+	
+	
+		wriFilterIfEntry OBJECT-TYPE
+			SYNTAX  WriFilterIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"An interface entry containing objects at the
+					subnetwork layer and below for a particular
+					interface."
+			INDEX   { wriFilterIfIndex }
+			::= { wriFilterIfTable 1 }
+
+		WriFilterIfEntry ::=
+			SEQUENCE {
+				wriFilterIfIndex					Unsigned32,
+				wriFilterIfFilterInCtrl				INTEGER,
+				wriFilterIfFilterInNum				INTEGER,
+				wriFilterIfFilterOutCtrl			INTEGER,
+				wriFilterIfFilterOutNum				INTEGER,
+				wriFilterIfFilterAddInLst			DisplayString,
+				wriFilterIfFilterAddOutLst			DisplayString,
+				wriFilterIfFilterDelInLst			DisplayString,
+				wriFilterIfFilterDelOutLst			DisplayString,
+				wriFilterIfStatus             EntryStatus
+		}
+		wriFilterIfIndex OBJECT-TYPE
+		    SYNTAX  Unsigned32
+		    MAX-ACCESS  read-only
+		    STATUS  current
+		    DESCRIPTION
+					"from 1 to msppIfNum"
+		    ::= { wriFilterIfEntry 1 }
+		
+		wriFilterIfFilterInCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"the state of access control list."
+			DEFVAL {disable}
+			::= { wriFilterIfEntry 2 }
+		
+		wriFilterIfFilterInNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"access control list index of tributary."
+			::= { wriFilterIfEntry 3 }    
+		
+		wriFilterIfFilterOutCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The state of access control list."
+			DEFVAL {disable}
+			::= { wriFilterIfEntry 4 }
+	
+		wriFilterIfFilterOutNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterIfEntry 5  }
+
+		wriFilterIfFilterAddInLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterIfEntry 6  }
+			
+		wriFilterIfFilterAddOutLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterIfEntry 7  }
+			
+		wriFilterIfFilterDelInLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterIfEntry 8  }
+			
+		wriFilterIfFilterDelOutLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterIfEntry 9  }
+			
+		wriFilterIfStatus OBJECT-TYPE
+			SYNTAX   EntryStatus
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The status of filterlist on interface."
+			::= { wriFilterIfEntry 10 }    
+
+	--filter list table
+		wriFilterListTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF WriFilterListEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+				"A list of interface entries.  The number of
+				entries is given by the value of ifNumber."
+			::= { msppFilter 8 }
+	
+	
+		wriFilterListEntry OBJECT-TYPE
+			SYNTAX  WriFilterListEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"An interface entry containing objects at the
+					subnetwork layer and below for a particular
+					interface."
+			INDEX   { wriFilterListIndex }
+			::= { wriFilterListTable 1 }
+
+		WriFilterListEntry ::=
+			SEQUENCE {
+				wriFilterListIndex				Unsigned32,
+				wriFilterListName				DisplayString,
+				wriFilterListIfInEnable			DisplayString,
+				wriFilterListIfInDisable		DisplayString,
+				wriFilterListIfOutEnable		DisplayString,
+				wriFilterListIfOutDisable		DisplayString,
+				wriFilterListExistBits			DisplayString,
+				wriFilterListRefCnt				Unsigned32,
+				wriFilterListSize				Unsigned32,
+				wriFilterListCnt				Unsigned32,
+				wriFilterListTimeRange			Unsigned32,
+				wriFilterListOrder				INTEGER,
+				wriFilterListNextFreeFilterNum	Unsigned32,
+				wriFilterListRowStatus			EntryStatus,
+				--xf add 2011-12-6
+				wriFilterListCounterType      		INTEGER,
+				wriFilterListMeterType        		INTEGER
+		}
+		wriFilterListIndex OBJECT-TYPE
+		    SYNTAX  Unsigned32
+		    MAX-ACCESS  read-only
+		    STATUS  current
+		    DESCRIPTION
+					"from 1 to msppIfNum"
+		    ::= { wriFilterListEntry 1 }
+		
+		wriFilterListName	 OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..64))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+			"access control list table name."
+			::= { wriFilterListEntry 2 }
+		
+		wriFilterListIfInEnable OBJECT-TYPE
+			SYNTAX   DisplayString
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"interface index."
+			::= { wriFilterListEntry 3 }
+		
+		wriFilterListIfInDisable OBJECT-TYPE
+			SYNTAX   DisplayString
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"interface index."
+			::= { wriFilterListEntry 4 }    
+		
+		wriFilterListIfOutEnable OBJECT-TYPE
+			SYNTAX   DisplayString
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"interface index."
+			::= { wriFilterListEntry 5 }
+		
+		wriFilterListIfOutDisable OBJECT-TYPE
+			SYNTAX   DisplayString
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"interface index."
+			::= { wriFilterListEntry 6 }
+
+		wriFilterListExistBits OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..64))
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 7 }
+	
+		wriFilterListRefCnt OBJECT-TYPE
+			SYNTAX   Unsigned32
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 8 }
+		
+		wriFilterListSize OBJECT-TYPE
+			SYNTAX   Unsigned32
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 9 }
+		
+		wriFilterListCnt OBJECT-TYPE
+			SYNTAX   Unsigned32
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 10 }
+			
+		wriFilterListTimeRange OBJECT-TYPE
+			SYNTAX   Unsigned32
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 11 }
+		
+		wriFilterListOrder OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 12 }
+		
+		wriFilterListNextFreeFilterNum OBJECT-TYPE
+			SYNTAX   Unsigned32
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+			"set and get string format: 'yyyy/mm/dd hh:mm:ss'."
+			::= { wriFilterListEntry 13 }
+		
+		wriFilterListRowStatus OBJECT-TYPE
+			SYNTAX   EntryStatus
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"valid(1),
+					createRequest(2),
+					underCreation(3),
+					invalid(4)"
+			::= { wriFilterListEntry 14 }
+		
+		wriFilterListCounterType OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				shared(1),
+				noshared(2)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The counter type:shared or no-shared"
+			::= { wriFilterListEntry 15 }
+			
+		wriFilterListMeterType OBJECT-TYPE
+			SYNTAX   INTEGER
+			{
+				shared(1),
+				noshared(2)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The meter type:shared or no-shared"
+			::= { wriFilterListEntry 16 }
+			
+
+
+		wriFilterGeneral	OBJECT IDENTIFIER ::=   {msppFilter 7}
+		
+		wriFilterListMaxNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { wriFilterGeneral 1 }
+				
+		wriFilterListCurrNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { wriFilterGeneral 2 }
+				
+		wriFilterListMaxSubNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { wriFilterGeneral 3 }
+								
+		wriFilterListAllOrder OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { wriFilterGeneral 4 }
+				
+		wriFilterListNextFreeNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { wriFilterGeneral 5 }
+				
+		--xf add 2014-11-17
+		wriFilterListNameToID OBJECT-TYPE
+			SYNTAX   OCTET STRING
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"Filter name to oid."
+			::= { wriFilterGeneral 6 }
+			
+		--xf add 2015-3-31
+		wriFilterInCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"the state of access control list."
+			::= { wriFilterGeneral 7 }
+		
+		wriFilterInNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"access control list index of tributary."
+			::= { wriFilterGeneral 8 }    
+		
+		wriFilterOutCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(2)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The state of access control list."
+			DEFVAL {disable}
+			::= { wriFilterGeneral 9 }
+	
+		wriFilterOutNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterGeneral 10  }
+
+		wriFilterAddInLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterGeneral 11  }
+			
+		wriFilterAddOutLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterGeneral 12  }
+			
+		wriFilterDelInLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterGeneral 13  }
+			
+		wriFilterDelOutLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterGeneral 14  }
+			
+			
+ --filter vlan table
+	wriFilterVlanTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF WriFilterVlanEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+				"A list of vlan entries.  The number of
+				entries is given by the value of vlan id."
+			::= { msppFilter 9 }
+	
+	
+		wriFilterVlanEntry OBJECT-TYPE
+			SYNTAX  WriFilterVlanEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"An vlan entry containing objects at the
+					subnetwork layer and below for a particular
+					interface."
+			INDEX   { wriFilterVlanIndex }
+			::= { wriFilterVlanTable 1 }
+
+		WriFilterVlanEntry ::=
+			SEQUENCE {
+				wriFilterVlanIndex					Unsigned32,
+				wriFilterVlanFilterInCtrl				INTEGER,
+				wriFilterVlanFilterInNum				INTEGER,
+				wriFilterVlanFilterOutCtrl			INTEGER,
+				wriFilterVlanFilterOutNum				INTEGER,
+				wriFilterVlanFilterAddInLst			DisplayString,
+				wriFilterVlanFilterAddOutLst			DisplayString,
+				wriFilterVlanFilterDelInLst			DisplayString,
+				wriFilterVlanFilterDelOutLst			DisplayString
+		}
+		wriFilterVlanIndex OBJECT-TYPE
+		    SYNTAX  Unsigned32
+		    MAX-ACCESS  read-only
+		    STATUS  current
+		    DESCRIPTION
+					"from 1 to msppVlanNum"
+		    ::= { wriFilterVlanEntry 1 }
+		
+		wriFilterVlanFilterInCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(0)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"the state of access control list."
+			DEFVAL {disable}
+			::= { wriFilterVlanEntry 2 }
+		
+		wriFilterVlanFilterInNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"access control list index of tributary."
+			::= { wriFilterVlanEntry 3 }    
+		
+		wriFilterVlanFilterOutCtrl OBJECT-TYPE
+			SYNTAX   INTEGER{
+				enable(1),
+                disable(0)
+			}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The state of access control list."
+			DEFVAL {disable}
+			::= { wriFilterVlanEntry 4 }
+	
+		wriFilterVlanFilterOutNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterVlanEntry 5  }
+
+		wriFilterVlanFilterAddInLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterVlanEntry 6  }
+			
+		wriFilterVlanFilterAddOutLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterVlanEntry 7  }
+			
+		wriFilterVlanFilterDelInLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterVlanEntry 8  }
+			
+		wriFilterVlanFilterDelOutLst OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..128))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+				"access control list index of."
+			::= { wriFilterVlanEntry 9  }
+
+				
+				
+		--filter list position
+		wriFilterPosTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF WriFilterPosEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+				""
+			::= { msppFilter 10 }
+	
+	
+		wriFilterPosEntry OBJECT-TYPE
+			SYNTAX  WriFilterPosEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					""
+			INDEX   { wriFilterListIndex }
+			::= { wriFilterPosTable 1 }
+
+		WriFilterPosEntry ::=
+			SEQUENCE {
+				wriFilterPosIfIndex			Unsigned32,
+				wriFilterPosListIndex			Unsigned32,
+				wriFilterPosRuleIndex			Unsigned32,
+				wriFilterPosDir				INTEGER,
+				wriFilterPosValue			INTEGER			
+			}
+			
+		wriFilterPosIfIndex	OBJECT-TYPE
+			SYNTAX	Unsigned32
+			MAX-ACCESS			read-only
+			STATUS	current
+			DESCRIPTION
+			"interface index"
+			::= {wriFilterPosEntry 1}
+			
+		wriFilterPosListIndex	OBJECT-TYPE
+			SYNTAX	Unsigned32
+			MAX-ACCESS			read-only
+			STATUS	current
+			DESCRIPTION
+			"filter-list index"
+			::= {wriFilterPosEntry 2}
+			
+		wriFilterPosRuleIndex	OBJECT-TYPE
+			SYNTAX	Unsigned32
+			MAX-ACCESS			read-only
+			STATUS	current
+			DESCRIPTION
+			"filter rule index"
+			::= {wriFilterPosEntry 3}
+			
+		wriFilterPosDir	OBJECT-TYPE
+			SYNTAX	INTEGER
+			MAX-ACCESS			read-only
+			STATUS	current
+			DESCRIPTION
+			"position direction"
+			::= {wriFilterPosEntry 4}
+		
+		wriFilterPosValue	OBJECT-TYPE
+			SYNTAX	INTEGER
+			MAX-ACCESS			read-only
+			STATUS	current
+			DESCRIPTION
+			"position value"
+			::= {wriFilterPosEntry 5}
+			
+							
+END

@@ -1,0 +1,358 @@
+--
+-- ra.mib
+-- Edited by hy 20110816 
+--
+
+	WRI-RA-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+	        Integer32,MODULE-IDENTITY, OBJECT-TYPE, mib-2, Counter32, Gauge32,
+            Unsigned32, TimeTicks           
+           		FROM SNMPv2-SMI
+			wriProtocol			
+				FROM WRI-SMI 
+			InetAddress, InetAddressType    
+      			FROM INET-ADDRESS-MIB
+			RowStatus,TruthValue             
+			    FROM SNMPv2-TC
+			systemIndex			
+				FROM WRI-SYSTEM-INDEX-MIB;
+	
+	
+		-- 1.3.6.1.4.1.3807.2.1816
+		wriRA MODULE-IDENTITY 
+			LAST-UPDATED "201108162000Z"		
+			ORGANIZATION 
+				"Organization."
+			CONTACT-INFO 
+				"Contact-info."
+			DESCRIPTION 
+				"Description."
+			::= { wriProtocol 1817 }
+
+		
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.3807.2.1816.1
+		wriRAIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WriRAIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wriRA 1 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.1.1
+		wriRAIfEntry OBJECT-TYPE
+			SYNTAX WriRAIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { wriRAIfIndex }
+			::= { wriRAIfTable 1 }
+
+		
+		WriRAIfEntry ::=
+			SEQUENCE { 
+				wriRAIfIndex
+					Integer32,
+				wriRAIfStatus
+					TruthValue,
+				wriRAIfLifetime
+                    Integer32,
+				wriRAIfMaxInterval
+				    Integer32,				
+				wriRAIfMinInterval
+				    Integer32,
+				wriRAIfManagedFlag
+                    TruthValue,
+                wriRAIfOtherFlag	
+				    TruthValue,
+				wriRAIfLinkMtu
+				    Integer32,
+				wriRAIfTransTimer
+				    Integer32,
+				wriRAIfCurHopLimit
+				    Integer32,
+				wriRAIfRaOutput 
+				    Counter32,
+				wriRAIfRaInput 
+				    Counter32,
+				wriRAIfRaInconsistent
+				    Counter32,
+				wriRAIfRsInput
+				    Counter32					
+			 }
+
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.1
+		wriRAIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS  read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.2
+		wriRAIfStatus OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 2 }
+
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.3
+		wriRAIfLifetime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 3 }
+		
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.4
+		wriRAIfMaxInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 4 }
+						
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.5
+		wriRAIfMinInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 5 }
+			
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.6
+		wriRAIfManagedFlag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 6 }
+			
+			
+	    -- 1.3.6.1.4.1.3807.2.1816.1.1.7
+		wriRAIfOtherFlag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 7 }
+			
+			
+	    -- 1.3.6.1.4.1.3807.2.1816.1.1.8
+		wriRAIfLinkMtu OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 8 }
+		
+	
+	    -- 1.3.6.1.4.1.3807.2.1816.1.1.9
+		wriRAIfTransTimer OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 9 }
+			
+			
+	    -- 1.3.6.1.4.1.3807.2.1816.1.1.10                    
+		wriRAIfCurHopLimit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 10 }
+
+
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.11                    
+		wriRAIfRaOutput OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 11 }
+			
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.12                    
+		wriRAIfRaInput OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 12 }	
+			
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.13                   
+		wriRAIfRaInconsistent OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 13 }		
+
+			
+		-- 1.3.6.1.4.1.3807.2.1816.1.1.14                   
+		wriRAIfRsInput OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAIfEntry 14 }	
+			
+			
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2
+		wriRAPrefixTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WriRAPrefixEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRA 2 }
+
+			
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1
+		wriRAPrefixEntry OBJECT-TYPE
+			SYNTAX WriRAPrefixEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { wriRAPrefixUnit,wriRAPrefixAddr,wriRAPrefixLen}
+			::= { wriRAPrefixTable 1 }
+
+		
+		WriRAPrefixEntry ::=
+			SEQUENCE { 
+			    wriRAPrefixUnit
+					Integer32,
+				wriRAPrefixAddr
+                    InetAddress,
+                wriRAPrefixLen
+                    Integer32,
+                wriRAPrefixValidLifeTime
+                    Integer32,
+                wriRAPrefixPrefLifeTime
+     				Integer32,
+				wriRAPrefixOnlinkFlag
+				    TruthValue,
+				wriRAPrefixAutoConfig
+                    TruthValue,
+                wriRAPrefixRowStatus
+                    RowStatus				
+			 }
+
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.1
+		wriRAPrefixUnit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.2
+		wriRAPrefixAddr OBJECT-TYPE
+			SYNTAX  InetAddress (SIZE(4|16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.3
+		wriRAPrefixLen OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.4
+		wriRAPrefixValidLifeTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.5
+		wriRAPrefixPrefLifeTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.6
+		wriRAPrefixOnlinkFlag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.7
+		wriRAPrefixAutoConfig OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.1816.2.1.8
+		wriRAPrefixRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { wriRAPrefixEntry 8 }
+	
+	END
+
+--
+-- ra.mib
+--

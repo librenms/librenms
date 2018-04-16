@@ -1,0 +1,531 @@
+WRI-XLATEVLAN-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+	
+
+
+	-- Multiple Services Ring (MSPP)
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppLayer2		OBJECT IDENTIFIER ::=   {mspp 3}
+
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+			
+	xlateVlan			OBJECT IDENTIFIER ::=   {msppLayer2 6}
+
+		--translation vlan map table
+		xlateVlanMapTable OBJECT-TYPE
+	    	SYNTAX      SEQUENCE OF XlateVlanMapEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+					"A table containing static configuration information for
+					each xlatevlan configured into the device by (local or
+					network) management.  All entries are permanent and will
+					be restored after the device is reset."
+			::= { xlateVlan 1 }
+	
+		xlateVlanMapEntry OBJECT-TYPE
+			SYNTAX      XlateVlanMapEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+					"Static information for a VLAN configured into the
+					device by (local or network) management."
+			INDEX   { xlateVlanMapIndex }
+			::= { xlateVlanMapTable 1 }
+	
+		XlateVlanMapEntry ::=
+	    	SEQUENCE {                              
+				xlateVlanMapIndex			INTEGER,         
+				xlateVlanMapVID				INTEGER,
+				xlateVlanMapMapedVID		INTEGER,
+				xlateVlanMapAction			INTEGER,
+				xlateVlanMapMapedPri		INTEGER,
+				xlateVlanMapMapedPriCtrl	INTEGER,
+				xlateVlanMapPortsNum		INTEGER,
+				xlateVlanMapPortBits		DisplayString,
+				xlateVlanMapAddInPortBits	DisplayString,
+				xlateVlanMapAddOutPortBits	DisplayString,
+				xlateVlanMapDelInPortBits	DisplayString,
+				xlateVlanMapDelOutPortBits	DisplayString,
+				xlateVlanMapPorts			DisplayString,
+				xlateVlanMapAddInPorts		DisplayString,
+				xlateVlanMapAddOutPorts		DisplayString,
+				xlateVlanMapDelInPorts		DisplayString,
+				xlateVlanMapDelOutPorts		DisplayString,
+				xlateVlanMapRefCount		INTEGER,
+				xlateVlanMapStatus			EntryStatus,
+				xlateVlanMapRangeVID		INTEGER,
+				xlateVlanMapStartOutVid     INTEGER,
+				xlateVlanMapEndOutVid       INTEGER,
+				xlateVlanMapStartInVid      INTEGER,
+				xlateVlanMapEndInVid        INTEGER,
+				xlateVlanMapStartOutPri     INTEGER,
+				xlateVlanMapEndOutPri       INTEGER,
+                xlateVlanMapStartInPri      INTEGER,
+				xlateVlanMapEndInPri        INTEGER,
+				xlateVlanMapOutMapedVid		INTEGER,
+				xlateVlanMapInMapedVid		INTEGER,
+			    xlateVlanMapOutMapedPri		INTEGER,
+				xlateVlanMapInMapedPri		INTEGER,
+				xlateVlanMapInnerAction	    INTEGER,                        
+				xlateVlanMapOuterAction		INTEGER, 
+				xlateVlanMapNto1State		INTEGER }
+	
+		xlateVlanMapIndex OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"The xlatevlan list index."
+			::= { xlateVlanMapEntry 1 }
+			                                       
+		xlateVlanMapVID OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The vlan id of xlatevlan list."
+			::= { xlateVlanMapEntry 2 }
+			
+		xlateVlanMapMapedVID OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The mapped vlan id of xlatevlan list."
+			::= { xlateVlanMapEntry 3 }			
+			
+		xlateVlanMapAction OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The action of xlatevlan list."
+			::= { xlateVlanMapEntry 4 }
+			
+		xlateVlanMapMapedPri OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The mapped priority of xlatevlan list."
+			::= { xlateVlanMapEntry 5 }
+			
+		xlateVlanMapMapedPriCtrl OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The mapped priority control of xlatevlan list."
+			::= { xlateVlanMapEntry 6 }
+			
+		xlateVlanMapPortsNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"The port number of the xlatevlan list."
+			::= { xlateVlanMapEntry 7 }
+
+		xlateVlanMapPortBits OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"Port bits."
+			::= { xlateVlanMapEntry 8 }
+			
+
+		xlateVlanMapAddInPortBits OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The add in direction port bits."
+			::= { xlateVlanMapEntry 9 }
+			
+			
+		xlateVlanMapAddOutPortBits OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The add out direction port bits."
+			::= { xlateVlanMapEntry 10 }
+			
+		xlateVlanMapDelInPortBits OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The delete in direction port bits."
+			::= { xlateVlanMapEntry 11 }
+						
+		xlateVlanMapDelOutPortBits OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The deltet outer direction port bits."
+			::= { xlateVlanMapEntry 12 }
+
+		xlateVlanMapPorts OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"The ports in the list."
+			::= { xlateVlanMapEntry 13 }
+			
+		xlateVlanMapAddInPorts OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The add in ports in the xlatevlan list."
+			::= { xlateVlanMapEntry 14 }
+			
+			
+		xlateVlanMapAddOutPorts OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The add out ports in the xlatevlan list."
+			::= { xlateVlanMapEntry 15 }
+			
+		xlateVlanMapDelInPorts OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The delete in ports in the xlatevlan list."
+			::= { xlateVlanMapEntry 16 }
+			
+			
+		xlateVlanMapDelOutPorts OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The delete out ports in the xlatevlan list."
+			::= { xlateVlanMapEntry 17 }
+			
+		xlateVlanMapRefCount OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"The reference count of the xlate vlan list,if the connt is greater than 0,the xlatevlan list can't be modified."
+			::= { xlateVlanMapEntry 18 }
+
+		xlateVlanMapStatus OBJECT-TYPE
+			SYNTAX   EntryStatus
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The state of xlatevlan list."
+			::= { xlateVlanMapEntry 19 }
+			
+		xlateVlanMapRangeVID OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The vlan id range of the xlatevlan list."
+			::= { xlateVlanMapEntry 20 }
+						                                       
+		xlateVlanMapStartOutVid OBJECT-TYPE
+			SYNTAX   INTEGER(1..4094)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The start outer vlan ID."
+			::= { xlateVlanMapEntry 21 }
+			
+		xlateVlanMapEndOutVid OBJECT-TYPE
+			SYNTAX   INTEGER (1..4094)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The end outer vlan ID."
+			::= { xlateVlanMapEntry 22 }  
+			
+		xlateVlanMapStartInVid OBJECT-TYPE
+			SYNTAX   INTEGER (1..4094)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The start inner vlan ID."
+			::= { xlateVlanMapEntry 23 }
+			
+		xlateVlanMapEndInVid OBJECT-TYPE
+			SYNTAX   INTEGER(1..4094)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The end inner vlan ID."
+			::= { xlateVlanMapEntry 24 } 
+						
+		xlateVlanMapStartOutPri  OBJECT-TYPE
+			SYNTAX   INTEGER (0..7)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The start outer priority."
+			::= { xlateVlanMapEntry 25 }
+			
+		xlateVlanMapEndOutPri       OBJECT-TYPE
+			SYNTAX   INTEGER (0..7)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The end outer priority."
+			::= { xlateVlanMapEntry 26 }
+			
+        xlateVlanMapStartInPri      OBJECT-TYPE
+			SYNTAX   INTEGER (0..7)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The start inner priority."
+			::= { xlateVlanMapEntry 27 }
+			
+		xlateVlanMapEndInPri        OBJECT-TYPE
+			SYNTAX   INTEGER (0..7)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The end inner priority."
+			::= { xlateVlanMapEntry 28 }
+			                                
+		xlateVlanMapOutMapedVid		 OBJECT-TYPE
+			SYNTAX   INTEGER (1..4094)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The maped outer vlan ID."
+			::= { xlateVlanMapEntry 29 }
+
+		xlateVlanMapInMapedVid	OBJECT-TYPE
+			SYNTAX   INTEGER (1..4094)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The maped inner vlan ID."
+			::= { xlateVlanMapEntry 30 }
+			
+		xlateVlanMapOutMapedPri	OBJECT-TYPE
+			SYNTAX   INTEGER (0..7)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The maped outer priority."
+			::= { xlateVlanMapEntry 31 }
+
+	    xlateVlanMapInMapedPri		OBJECT-TYPE
+			SYNTAX   INTEGER (0..7)
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The maped in priority."
+			::= { xlateVlanMapEntry 32 }
+							
+		xlateVlanMapInnerAction OBJECT-TYPE
+			SYNTAX   INTEGER 
+			{
+	        	insert(1),
+	        	replace(2),
+	        	delete(3)
+        	}
+
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The action of the inner vlan."
+			::= { xlateVlanMapEntry 33 } 
+		
+		xlateVlanMapOuterAction OBJECT-TYPE
+			SYNTAX   INTEGER 
+			{
+	        	insert(1),
+	        	replace(2),
+	        	delete(3)
+        	}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The action of the outer vlan."
+			::= { xlateVlanMapEntry 34}
+				
+		xlateVlanMapNto1State  OBJECT-TYPE
+		    SYNTAX   INTEGER{enable(1),disable(2)}
+		    MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"The state of nto1."
+			::= { xlateVlanMapEntry 35} 
+							
+
+		-- translation interface table
+		xlateVlanIfTable OBJECT-TYPE
+	    	SYNTAX      SEQUENCE OF XlateVlanIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+					"A table containing static configuration information for
+					each VLAN configured into the device by (local or
+					network) management.  All entries are permanent and will
+					be restored after the device is reset."
+			::= { xlateVlan 2 }
+	
+		xlateVlanIfEntry OBJECT-TYPE
+			SYNTAX      XlateVlanIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+					"Static information for a VLAN configured into the
+					device by (local or network) management."
+			INDEX   { xlateVlanIfIndex }
+			::= { xlateVlanIfTable 1 }
+	
+		XlateVlanIfEntry ::=
+	    	SEQUENCE {                              
+				xlateVlanIfIndex			Unsigned32,
+				xlateVlanIfXvlanList		DisplayString,
+				xlateVlanIfXvlanNum			INTEGER,
+				xlateVlanIfAddInXvlanList	DisplayString,
+				xlateVlanIfAddOutXvlanList	DisplayString,		
+				xlateVlanIfDelInXvlanList	DisplayString,
+				xlateVlanIfDelOutXvlanList	DisplayString, 
+				xlateVlanIfEnable			INTEGER,
+				xlateVlanIfMissAction		INTEGER
+	    }
+	
+		xlateVlanIfIndex OBJECT-TYPE
+			SYNTAX   Unsigned32
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"The state of access control list."
+			::= { xlateVlanIfEntry 1 }
+			
+
+		xlateVlanIfXvlanList OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"all vlan list."
+			::= { xlateVlanIfEntry 2 }
+			
+		xlateVlanIfXvlanNum OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-only
+			STATUS   current
+			DESCRIPTION
+					"vlan list number(all)."
+			::= { xlateVlanIfEntry 3 }
+
+		xlateVlanIfAddInXvlanList OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"untagged vlan list."
+			::= { xlateVlanIfEntry 4 }
+			
+			
+		xlateVlanIfAddOutXvlanList OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"untagged vlan list."
+			::= { xlateVlanIfEntry 5 } 
+			
+		
+		xlateVlanIfDelInXvlanList OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"untagged vlan list."
+			::= { xlateVlanIfEntry 6 }
+			
+			
+		xlateVlanIfDelOutXvlanList OBJECT-TYPE
+			SYNTAX   DisplayString (SIZE(0..1024))
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"untagged vlan list."
+			::= { xlateVlanIfEntry 7 } 
+						
+		xlateVlanIfEnable OBJECT-TYPE
+			SYNTAX   INTEGER{
+									enable(1),
+									disable(2)}
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"enable or disable."
+			::= { xlateVlanIfEntry 8 }
+			
+		xlateVlanIfMissAction OBJECT-TYPE
+			SYNTAX   INTEGER
+			MAX-ACCESS   read-write
+			STATUS   current
+			DESCRIPTION
+					"enable or disable."
+			::= { xlateVlanIfEntry 9 }
+
+
+		xlateVlanGeneral			OBJECT IDENTIFIER ::=   {xlateVlan 3}
+		
+		xlateVlanMaxNum	OBJECT-TYPE
+        		SYNTAX INTEGER
+        		MAX-ACCESS read-only
+        		STATUS current
+        		DESCRIPTION
+			"The max xlatevlan number"
+        		::= { xlateVlanGeneral 1 }
+        
+		xlateVlanCurrNum	OBJECT-TYPE
+        		SYNTAX INTEGER
+        		MAX-ACCESS read-only
+        		STATUS current
+        		DESCRIPTION
+			"The current xlatevlan number"
+        		::= { xlateVlanGeneral 2 }
+		
+END

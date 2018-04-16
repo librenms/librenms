@@ -1,0 +1,540 @@
+WRI-CPUDEFEND-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol,wriMgmt				FROM WRI-SMI;
+	
+
+  wriCpuDefend		MODULE-IDENTITY 
+			LAST-UPDATED "201102241500Z"		-- Feb 24, 2011 at 15:00 GMT
+			ORGANIZATION 
+				"FiberHome Networks Systems, Inc."
+			CONTACT-INFO 
+				"http://www.fhn.com.cn"
+			DESCRIPTION 
+				" The info of ip source trail   ." 
+  ::= { wriMgmt 302 }
+		
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		 
+	policyInfoTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PolicyInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Policy info table."
+			::= { wriCpuDefend 1 }
+
+	policyInfoEntry OBJECT-TYPE
+			SYNTAX PolicyInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"Policy info Entry."
+			INDEX { policyInfoIndex}
+			::= { policyInfoTable 1 }
+		
+	PolicyInfoEntry ::=
+		    SEQUENCE {
+		    policyInfoIndex      					Integer32,
+		    policyInfoDescrption          OCTET STRING,
+        policyInfoBindSlotList        OCTET STRING,
+				policyInfoWhiteListPri				INTEGER,
+				policyInfoBlacklistPri				INTEGER,
+				policyInfoUserDefinedFlowPri  INTEGER,
+				policyInfoRefCnt              Integer32,
+				policyInfoEntryStatus         EntryStatus
+			}
+			
+			policyInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The index of policy table."
+				::= { policyInfoEntry 1 }
+			
+		 policyInfoDescrption OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The destination of policy table."
+				::= { policyInfoEntry 2 }
+								
+			policyInfoBindSlotList OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The slot list of binging to some policy  ."
+				::= { policyInfoEntry 3 }
+								
+						
+		policyInfoWhiteListPri OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The priority of white list ."
+				::= { policyInfoEntry 4 }
+				
+		policyInfoBlacklistPri OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The priority of blacklist ."
+				::= { policyInfoEntry 5 }
+				
+		policyInfoUserDefinedFlowPri OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The priority of user defined flow  ."
+				::= { policyInfoEntry 6 }
+
+		policyInfoRefCnt  OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The binging info of some policy ."
+				::= { policyInfoEntry 7 }
+				
+		 policyInfoEntryStatus OBJECT-TYPE
+				SYNTAX  EntryStatus
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Entry Status ."
+				::= { policyInfoEntry 8 }
+				
+		policyWhiteListTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PolicyWhiteListEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The white table of someone policy ."
+			::= { wriCpuDefend 2 }
+
+		policyWhiteListEntry OBJECT-TYPE
+			SYNTAX PolicyWhiteListEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The white table of policy."
+			INDEX { policyWhiteListInfoIndex,policyWhiteListId}
+			::= { policyWhiteListTable 1 }
+		
+		PolicyWhiteListEntry ::=
+		    SEQUENCE {
+		    policyWhiteListInfoIndex       Integer32,
+		    policyWhiteListId          		 Integer32,
+        policyWhiteListFiletrId        Integer32,
+				policyWhiteListEntryStatus     EntryStatus
+			}
+			
+			policyWhiteListInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The index of policy table."
+				::= { policyWhiteListEntry 1 }
+			
+		 policyWhiteListId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"White list id."
+				::= { policyWhiteListEntry 2 }
+								
+			policyWhiteListFiletrId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The filter id  ."
+				::= { policyWhiteListEntry 3 }
+								
+
+						
+		 policyWhiteListEntryStatus OBJECT-TYPE
+				SYNTAX  EntryStatus
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Entry Status ."
+				::= { policyWhiteListEntry 4 }
+	
+	
+	--blacklist table
+	
+	
+	policyBlacklistTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PolicyBlacklistEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The black list table of someone policy ."
+			::= { wriCpuDefend 3 }
+
+		policyBlacklistEntry OBJECT-TYPE
+			SYNTAX PolicyBlacklistEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The black list table of policy."
+			INDEX { policyBlacklistInfoIndex,policyBlacklistId}
+			::= { policyBlacklistTable 1 }
+		
+		PolicyBlacklistEntry ::=
+		    SEQUENCE {
+		    policyBlacklistInfoIndex       Integer32,
+		    policyBlacklistId          		 Integer32,
+        policyBlacklistFiletrId        Integer32,
+				policyBlacklistEntryStatus     EntryStatus
+			}
+			
+			policyBlacklistInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The index of policy table."
+				::= { policyBlacklistEntry 1 }
+			
+		 policyBlacklistId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Black list id."
+				::= { policyBlacklistEntry 2 }
+								
+			policyBlacklistFiletrId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The filter id  ."
+				::= { policyBlacklistEntry 3 }
+								
+						
+		 policyBlacklistEntryStatus OBJECT-TYPE
+				SYNTAX  EntryStatus
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Entry Status ."
+				::= { policyBlacklistEntry 4 }
+				
+			--user defind flow table
+			
+		policyUserDefinedFlowTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PolicyUserDefinedFlowEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The ser defind flow table of someone policy ."
+			::= { wriCpuDefend 4 }
+
+		policyUserDefinedFlowEntry OBJECT-TYPE
+			SYNTAX PolicyUserDefinedFlowEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The ser defind flow table of policy."
+			INDEX { policyUserDefinedFlowInfoIndex,policyUserDefinedFlowId}
+			::= { policyUserDefinedFlowTable 1 }
+		
+		PolicyUserDefinedFlowEntry ::=
+		    SEQUENCE {
+		    policyUserDefinedFlowInfoIndex       Integer32,
+		    policyUserDefinedFlowId          		 Integer32,
+        policyUserDefinedFlowFiletrId        Integer32,
+        policyUserDefinedFlowAction 				 INTEGER,
+				policyUserDefinedFlowMeterID				 Integer32,
+				policyUserDefinedFlowEntryStatus     EntryStatus
+			}
+			
+			policyUserDefinedFlowInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The index of policy table."
+				::= { policyUserDefinedFlowEntry 1 }
+			
+		 policyUserDefinedFlowId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"User defind flow list id."
+				::= { policyUserDefinedFlowEntry 2 }
+								
+			policyUserDefinedFlowFiletrId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The filter id  ."
+				::= { policyUserDefinedFlowEntry 3 }
+				
+		 policyUserDefinedFlowAction 	OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The action of user defined flow  ."
+				::= { policyUserDefinedFlowEntry 4 }			 
+		 
+		 policyUserDefinedFlowMeterID		OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The meter id   ."
+				::= { policyUserDefinedFlowEntry 5 }	
+		 	
+		 policyUserDefinedFlowEntryStatus OBJECT-TYPE
+				SYNTAX  EntryStatus
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Entry Status ."
+				::= { policyUserDefinedFlowEntry 6 }
+				
+		--policyPacketTable
+		
+		policyPacketTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PolicyPacketEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The packet of policy table ."
+			::= { wriCpuDefend 5 }
+
+		policyPacketEntry OBJECT-TYPE
+			SYNTAX PolicyPacketEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The packet of policy table."
+			INDEX { policyPacketInfoIndex,policyPacketType}
+			::= { policyPacketTable 1 }
+		
+		PolicyPacketEntry ::=
+		    SEQUENCE {
+		    policyPacketInfoIndex        	Integer32,
+		    policyPacketType          	 	INTEGER,
+        policyPacketAction           	INTEGER,
+        policyPacketCir             	Integer32,
+				policyPacketCbs     					Integer32,
+				policyPacketQueueID 					Integer32
+	
+			}
+			
+			policyPacketInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The index of policy and packet table."
+				::= { policyPacketEntry 1 }
+			
+		 policyPacketType OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The packte type ."
+				::= { policyPacketEntry 2 }
+								
+			policyPacketAction OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The action of packet  ."
+				::= { policyPacketEntry 3 }
+								
+		 policyPacketCir OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The cir value of packet  ."
+				::= { policyPacketEntry 4 }
+				
+		policyPacketCbs OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The cbs value of packet  ."
+				::= { policyPacketEntry 5 }
+								
+		 policyPacketQueueID OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The queue id of packet  ."
+				::= { policyPacketEntry 6 }
+						
+
+				
+			--policySlotPacketTable
+			
+		policySlotPacketTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PolicySlotPacketEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The slot and packet of policy table ."
+			::= { wriCpuDefend 6}
+
+	policySlotPacketEntry OBJECT-TYPE
+			SYNTAX PolicySlotPacketEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The slot and packet of policy table ."
+			INDEX { policySlotPacketId,policySlotPacketType}
+			::= { policySlotPacketTable 1 }
+		
+		PolicySlotPacketEntry ::=
+		    SEQUENCE {
+		    policySlotPacketId        	  Integer32,
+		    policySlotPacketType          Integer32,
+        policySlotPacketAction        INTEGER,
+        policySlotPacketCir           Integer32,
+				policySlotPacketCbs     			Integer32,
+				policySlotPacketQueueID 			Integer32,
+				policySlotPacketPassBytes 		Counter64,
+				policySlotPacketPassPackets   Counter64,
+				policySlotPacketDropBytes     Counter64,
+				policySlotPacketDropPackets   Counter64,
+				policySlotPacketReset         Integer32
+			}
+			
+		policySlotPacketId OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The index of slot and packet table."
+				::= { policySlotPacketEntry 1 }
+			
+		 policySlotPacketType OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The packte type ."
+				::= { policySlotPacketEntry 2 }
+								
+			policySlotPacketAction OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The action of packet  ."
+				::= { policySlotPacketEntry 3 }
+								
+		 policySlotPacketCir OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The cir value of packet  ."
+				::= { policySlotPacketEntry 4 }
+				
+		policySlotPacketCbs OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The cbs value of packet  ."
+				::= { policySlotPacketEntry 5 }
+								
+		policySlotPacketQueueID OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The queue id of packet  ."
+				::= { policySlotPacketEntry 6 }
+				
+						
+		 policySlotPacketPassBytes OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The pass bytes of slot and packet table ."
+				::= { policySlotPacketEntry 7 }
+				
+		 policySlotPacketPassPackets OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The pass packets of slot and packet table ."
+				::= { policySlotPacketEntry 8 }
+				
+		 policySlotPacketDropBytes OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The drop bytes of slot and packet table ."
+				::= { policySlotPacketEntry 9 }
+				
+			policySlotPacketDropPackets OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The drop packets of slot and packet table ."
+				::= { policySlotPacketEntry 10 }
+				
+			policySlotPacketReset OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The drop packets of slot and packet table ."
+				::= { policySlotPacketEntry 11 }
+		
+END
+

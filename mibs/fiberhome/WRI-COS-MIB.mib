@@ -1,0 +1,181 @@
+WRI-COS-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+
+	-- Multiple Services Ring (MSPP)
+
+	rer				OBJECT IDENTIFIER ::=   {wriProtocol 1804}
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	msppDev			OBJECT IDENTIFIER ::=   {mspp 2}
+	msppLayer2		OBJECT IDENTIFIER ::=   {mspp 3}
+	msppLayer3		OBJECT IDENTIFIER ::=   {mspp 4}
+	msppTimeRange	OBJECT IDENTIFIER ::=   {mspp 5}
+	msppFilter		OBJECT IDENTIFIER ::=   {mspp 6}
+	
+
+		--cos queue
+		msppCos			OBJECT IDENTIFIER ::=   {msppDev 9}
+		
+		cosGeneral	OBJECT IDENTIFIER ::=   {msppCos 3}
+		
+		cosSchedulingAlg		OBJECT-TYPE
+              SYNTAX  INTEGER
+			  MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                      "enable or disable snmp."
+              ::= { cosGeneral 1 }
+
+		cosQueueBitmap  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"sp+drr|wrr|rr."
+			::= { cosGeneral 2 }
+	  
+	  cosTrustMode  OBJECT-TYPE
+			SYNTAX     INTEGER
+			{
+			    un-trust(0),
+			    trust-inner-dot1p(1),
+			    trust-outer-dot1p(2),
+			    trust-dscp(3)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The cos trust mode."
+			::= { cosGeneral 3 }
+		
+		cosRemarkMode  OBJECT-TYPE
+			SYNTAX     INTEGER
+			{
+			    remark-none(0),
+			    remark-dot1p(1),
+			    remark-dscp(2),
+			    remark-all(3)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"The cos remark mode."
+			::= { cosGeneral 4 }
+
+		cosQueueTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF CosQueueEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { msppCos 4 }
+
+		cosQueueEntry  OBJECT-TYPE
+			SYNTAX 	CosQueueEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			INDEX {cosQueueIndex}
+			::= { cosQueueTable 1 }
+
+		CosQueueEntry ::= SEQUENCE {
+				cosQueueIndex					INTEGER,
+				cosQueueBWGranularity			INTEGER,
+				cosQueueMinBW					INTEGER,
+				cosQueueMaxBW					INTEGER,
+				cosQueueWeight					INTEGER
+			}
+
+
+		cosQueueIndex  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"cos queue index."
+			::= { cosQueueEntry 1 }
+
+		cosQueueBWGranularity  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"bandwidth granularity."
+			::= { cosQueueEntry 2 }
+			
+		cosQueueMinBW  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosQueueEntry 3 }
+
+		cosQueueMaxBW  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosQueueEntry 4 }
+			
+		cosQueueWeight  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosQueueEntry 5 }
+
+	  cosPriTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF CosPriEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { msppCos 5 }
+
+		cosPriEntry  OBJECT-TYPE
+			SYNTAX 	CosPriEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			INDEX {cosPriIndex}
+			::= { cosPriTable 1 }
+
+		CosPriEntry ::= SEQUENCE {
+				cosPriIndex					   INTEGER,
+				cosPriMapQueue		     INTEGER
+			}
+
+
+		cosPriIndex  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"cos priority index."
+			::= { cosPriEntry 1 }
+		
+		cosPriMapQueue  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					""
+			::= { cosPriEntry 2 }
+			
+END

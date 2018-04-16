@@ -1,0 +1,655 @@
+WRI-DHCPCLIENT-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,Counter32
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.411
+		dhcpClient OBJECT IDENTIFIER ::= { wriProtocol 411 }
+     
+    -- 1.3.6.1.4.1.3807.2.411.1
+		dhcpClientCommon OBJECT IDENTIFIER ::= { dhcpClient 1 }
+		
+		
+	-- 1.3.6.1.4.1.3807.2.411.1.1
+		  dhcpClinetIfMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"If max number."
+			::= { dhcpClientCommon 1 } 
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.2
+		  dhcpClinetFtpNameOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Name Opt."
+			::= { dhcpClientCommon 2 }  
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.3
+		  dhcpClinetFtpPasswordOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Password Opt."
+			::= { dhcpClientCommon 3 }    
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.4
+		  dhcpClinetFtpServerIPOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Server IP Opt."
+			::= { dhcpClientCommon 4 } 
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.5
+		  dhcpClinetImageFileOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Edition Opt."
+			::= { dhcpClientCommon 5 }     
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.6
+		  dhcpClinetRebootTimeOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reboot Time Opt."
+			::= { dhcpClientCommon 6 }
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.7		  
+	dhcpClinetAuthMsgOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"authenticate message Opt."
+			::= { dhcpClientCommon 7 }   
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.8		  
+	dhcpClinetImageListOpt OBJECT-TYPE
+			SYNTAX INTEGER 		
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Image List Opt."
+			::= { dhcpClientCommon 8 }
+
+    -- 1.3.6.1.4.1.3807.2.411.1.9
+		  dhcpClinetFtpNameSubOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Name SubOpt."
+			::= { dhcpClientCommon 9 }  
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.10
+		  dhcpClinetFtpPasswordSubOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Password SubOpt."
+			::= { dhcpClientCommon 10 }    
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.11
+		  dhcpClinetFtpServerIPSubOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Server IP SubOpt."
+			::= { dhcpClientCommon 11 } 
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.12
+		  dhcpClinetImageFileSubOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"FTP Edition SubOpt."
+			::= { dhcpClientCommon 12 }     
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.13
+		  dhcpClinetRebootTimeSubOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reboot Time SubOpt."
+			::= { dhcpClientCommon 13 }
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.14		  
+	dhcpClinetAuthMsgSubOpt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"authenticate message SubOpt."
+			::= { dhcpClientCommon 14 }   
+				
+	-- 1.3.6.1.4.1.3807.2.411.1.15		  
+	dhcpClinetImageListSubOpt OBJECT-TYPE
+			SYNTAX INTEGER 		
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Image List SubOpt."
+			::= { dhcpClientCommon 15 }
+
+			
+	-- 1.3.6.1.4.1.3807.2.411.1.16		  
+	dhcpClinetAutoConfigureMode OBJECT-TYPE
+			SYNTAX INTEGER {  
+			compatible(2), 
+			userdefine(3),
+			default(1),
+			no(0)		
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"AutoConfigure Mode."
+			::= { dhcpClientCommon 16 }
+				
+	
+		
+--WRI DHCP CLIENT IF Table	 
+     dhcpClientIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpClientIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Client If table."
+			::= { dhcpClient 2 }  
+			
+	dhcpClientIfEntry OBJECT-TYPE
+			SYNTAX DhcpClientIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Client If table."
+			INDEX {dhcpClientIfUnit}
+			::= { dhcpClientIfTable 1 }
+		
+	DhcpClientIfEntry ::=
+			SEQUENCE { 
+				dhcpClientIfUnit		Unsigned32,
+				dhcpClientIfEnable	    INTEGER,
+				dhcpClientIfRenew       INTEGER,
+				dhcpClientIfRelease     INTEGER, 
+				dhcpClientIfState       INTEGER, 
+				dhcpClientIfTransactionID       INTEGER,  
+				dhcpClientIfClientID    OCTET STRING,
+                dhcpClientIfServerIp     IpAddress,
+                dhcpClientIfClientIp     IpAddress,
+                dhcpClientIfClientMask   IpAddress, 
+                dhcpClientIfLeaseTime    INTEGER,  
+                dhcpClientIfT1           INTEGER,
+                dhcpClientIfT2           INTEGER,
+                dhcpClientIfDns          OCTET STRING,   
+                dhcpClientIfGetway       OCTET STRING,
+                dhcpClientIfDomain       OCTET STRING,
+                dhcpClientIfLeaseStart    INTEGER,
+                dhcpClinetIfFtpName    OCTET STRING,
+                dhcpClinetIfFtpPassword    OCTET STRING,
+                dhcpClinetIfFtpServerIP    IpAddress,
+                dhcpClinetIfImageFile    OCTET STRING,
+                dhcpClinetIfRebootTime    INTEGER,
+                dhcpClinetIfAuthMsg    OCTET STRING,
+                dhcpClinetIfImageList    OCTET STRING,
+                dhcpClinetIfTftpServerName    OCTET STRING, 
+                dhcpClinetIfTftpServerIP    IpAddress, 
+                dhcpClinetIfConfigFile    OCTET STRING
+			 } 
+			 
+	dhcpClientIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface unit."
+			::= { dhcpClientIfEntry 1 }   
+			
+	dhcpClientIfEnable OBJECT-TYPE
+			SYNTAX  INTEGER 
+			 {
+			   enable(1),  
+			   diseble(2) 
+			 }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Interface status."
+			::= { dhcpClientIfEntry 2 } 
+			
+	dhcpClientIfRenew OBJECT-TYPE
+			SYNTAX  INTEGER 
+			 {
+			   renew(1)  
+			 }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Interface Renew."
+			::= { dhcpClientIfEntry 3 } 
+			
+	dhcpClientIfRelease OBJECT-TYPE
+			SYNTAX  INTEGER 
+			 {
+			   release(1) 
+			 }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Interface Release."
+			::= { dhcpClientIfEntry 4 }     
+			
+	dhcpClientIfState OBJECT-TYPE
+			SYNTAX  INTEGER 
+			 {
+			   init(0),
+               selecting(1),
+               requesting(2),
+               initreboot(3),
+               rebooting(4),    
+               bound(5),
+               renew(6),
+               rebind(7),
+               informing(8),
+               release(9)
+			 }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Client state."
+			::= { dhcpClientIfEntry 5 } 
+			
+	dhcpClientIfTransactionID OBJECT-TYPE
+			SYNTAX  INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Transaction ID."
+			::= { dhcpClientIfEntry 6 }  
+			
+	dhcpClientIfClientID OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Client ID."
+			::= { dhcpClientIfEntry 7 }
+                                       
+    dhcpClientIfServerIp OBJECT-TYPE
+			SYNTAX  IpAddress 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" Client Server Ip."
+			::= { dhcpClientIfEntry 8 }   
+			
+	dhcpClientIfClientIp OBJECT-TYPE
+			SYNTAX  IpAddress 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" Client Client Ip."
+			::= { dhcpClientIfEntry 9 }  
+			
+	dhcpClientIfClientMask OBJECT-TYPE
+			SYNTAX  IpAddress 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" Client Client Mask."
+			::= { dhcpClientIfEntry 10 } 
+			
+	dhcpClientIfLeaseTime OBJECT-TYPE
+			SYNTAX  INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Lease Time."
+			::= { dhcpClientIfEntry 11 } 
+                                         
+    dhcpClientIfT1 OBJECT-TYPE
+			SYNTAX  INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface T1."
+			::= { dhcpClientIfEntry 12 }
+                                        
+    dhcpClientIfT2 OBJECT-TYPE
+			SYNTAX  INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface T2."
+			::= { dhcpClientIfEntry 13 } 
+			
+	dhcpClientIfDns OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface DNS."
+			::= { dhcpClientIfEntry 14 }
+			
+	dhcpClientIfGetway OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Getway."
+			::= { dhcpClientIfEntry 15 }
+			
+	dhcpClientIfDomain OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Domain."
+			::= { dhcpClientIfEntry 16 }  
+			
+	dhcpClientIfLeaseStart OBJECT-TYPE
+			SYNTAX  INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Lease Time."
+			::= { dhcpClientIfEntry 17}  
+			
+			
+	 dhcpClinetIfFtpName OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"FTP Name ."
+			::= { dhcpClientIfEntry 18 }  
+			
+	 dhcpClinetIfFtpPassword OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"FTP Password ."
+			::= { dhcpClientIfEntry 19 }    
+			
+	dhcpClinetIfFtpServerIP OBJECT-TYPE
+			SYNTAX  IpAddress 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"FTP Server IP."
+			::= { dhcpClientIfEntry 20 } 
+			
+	dhcpClinetIfImageFile OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Image File ."
+			::= { dhcpClientIfEntry 21 }     
+					  
+	dhcpClinetIfRebootTime OBJECT-TYPE
+			SYNTAX  INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" Reboot Time."
+			::= { dhcpClientIfEntry 22 }
+				  
+	dhcpClinetIfAuthMsg OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" authenticate message."
+			::= { dhcpClientIfEntry 23 }   
+				
+		  
+	dhcpClinetIfImageList OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Image List."
+			::= { dhcpClientIfEntry 24 }    
+			
+			  
+	dhcpClinetIfTftpServerName OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Tftp Server Name."
+			::= { dhcpClientIfEntry 25 }   
+			
+		  
+	dhcpClinetIfTftpServerIP OBJECT-TYPE
+			SYNTAX  IpAddress 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Tftp Server IP."
+			::= { dhcpClientIfEntry 26 }    
+			
+  	  
+	dhcpClinetIfConfigFile OBJECT-TYPE
+			SYNTAX  OCTET STRING 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Config File."
+			::= { dhcpClientIfEntry 27 }  
+
+			
+--WRI DHCP CLIENT IF STATISTICS Table	 
+     dhcpClientIfStatisticsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpClientIfStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Client If Statistics table."
+			::= { dhcpClient 3 }  
+			
+	dhcpClientIfStatisticsEntry OBJECT-TYPE
+			SYNTAX DhcpClientIfStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Client If Statistics table."
+			INDEX {dhcpClientIfStatisticsIndex}
+			::= { dhcpClientIfStatisticsTable 1 }
+            
+    DhcpClientIfStatisticsEntry ::=
+			SEQUENCE { 
+			
+		     	dhcpClientIfStatisticsIndex       INTEGER,
+		     	dhcpClientIfStatisticsErrorDHCPSend   Counter32,  
+		     	dhcpClientIfStatisticsArpSend     Counter32, 
+		     	dhcpClientIfStatisticsDiscoverSend     Counter32, 
+		     	dhcpClientIfStatisticsRequestSend     Counter32,
+		     	dhcpClientIfStatisticsPktSendTotal     Counter32, 
+		     	dhcpClientIfStatisticsDeclineSend     Counter32,
+		     	dhcpClientIfStatisticsReleaseSend     Counter32,
+                dhcpClientIfStatisticsInformSend     Counter32,
+                dhcpClientIfStatisticsArpRecv     Counter32, 
+              	dhcpClientIfStatisticsErrorDHCPRecv   Counter32,
+			    dhcpClientIfStatisticsOfferRecv   Counter32,
+			    dhcpClientIfStatisticsAckRecv   Counter32, 
+			    dhcpClientIfStatisticsNakRecv   Counter32,
+			    dhcpClientIfStatisticsReset  INTEGER,
+			    dhcpClientIfStatisticsPktRecvTotal   Counter32,
+			    dhcpClientIfStatisticsErrorARPSend   Counter32,
+			    dhcpClientIfStatisticsErrorARPRecv   Counter32
+		
+			     }
+                   
+      dhcpClientIfStatisticsIndex  OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface Statistics Index."
+			::= { dhcpClientIfStatisticsEntry 1 }           
+                                       
+     dhcpClientIfStatisticsErrorDHCPSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Error Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 2 } 
+			
+     dhcpClientIfStatisticsArpSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Arp Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 3 }  
+			
+    dhcpClientIfStatisticsDiscoverSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Discover Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 4 }
+			
+	dhcpClientIfStatisticsRequestSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Request Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 5 }  
+			
+	dhcpClientIfStatisticsPktSendTotal  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Pkt Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 6 }
+
+    dhcpClientIfStatisticsDeclineSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Decline Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 7 }
+                                                 
+    dhcpClientIfStatisticsReleaseSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Release Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 8 }  
+			
+	dhcpClientIfStatisticsInformSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Inform Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 9 }                                            
+                                                     
+     dhcpClientIfStatisticsArpRecv  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Arp Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 10 } 
+			
+	dhcpClientIfStatisticsErrorDHCPRecv  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Error Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 11 }                                                
+                                                    
+     dhcpClientIfStatisticsOfferRecv   OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Offer Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 12 } 
+			
+	 dhcpClientIfStatisticsAckRecv  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Ack Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 13 } 		
+			
+	dhcpClientIfStatisticsNakRecv  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Nak Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 14 } 
+			
+	dhcpClientIfStatisticsReset    OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   reset (1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" Statistics Reset."
+			::= { dhcpClientIfStatisticsEntry 15 }
+			
+	dhcpClientIfStatisticsPktRecvTotal  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PKT Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 16 }
+			
+	dhcpClientIfStatisticsErrorARPSend  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PKT ARP Send Statistics ."
+			::= { dhcpClientIfStatisticsEntry 17 }  
+			
+	dhcpClientIfStatisticsErrorARPRecv  OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PKT ARP Recv Statistics ."
+			::= { dhcpClientIfStatisticsEntry 18 }		
+			                                              
+                                                     
+END
+								

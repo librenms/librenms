@@ -1,0 +1,195 @@
+-- created 2012-11-28 -pitao
+   VLANMAPPING-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Counter32  FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, RowStatus            FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP          FROM SNMPv2-CONF  
+	   wri,wriProtocol 	 		                FROM WRI-SMI;
+        
+        
+   	EntryStatus ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+			"entry status."
+	SYNTAX INTEGER 
+		{
+			valid(1),
+			createRequest(2),
+			underCreation(3),
+			invalid(4)
+		}
+    
+	vlanMapping		OBJECT IDENTIFIER ::= { wriProtocol 1810 }
+
+    vlanMappingMaxIfNum  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The max support number of interface."
+       ::= { vlanMapping 1 }
+
+    vlanMappingMaxMapNum OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The max support number of interface vlan mapping list."
+       ::= { vlanMapping 2 } 
+       
+    vlanMappingCurrentMapNum OBJECT-TYPE
+        SYNTAX   INTEGER  
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current using number of interface vlan mapping list."
+       ::= { vlanMapping 3 }
+    
+    
+    vlanMappingIfTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF VlanMappingIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of subnets which require separate
+           status monitoring in vlan Mapping."
+       ::= { vlanMapping 4}  
+       
+   vlanMappingIfEntry OBJECT-TYPE
+       SYNTAX   VlanMappingIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A Single Routing Domain in a single Subnet."
+      INDEX { vlanMappingIfIndex,vlanMappingIfStartOutVid,vlanMappingIfStartOutPri,vlanMappingIfStartInVid}
+      ::= { vlanMappingIfTable 1 }
+
+    VlanMappingIfEntry ::=
+        SEQUENCE {
+            vlanMappingIfIndex
+                INTEGER,
+            vlanMappingIfStartOutVid
+                INTEGER,
+            vlanMappingIfStartOutPri
+                INTEGER,
+            vlanMappingIfStartInVid
+                INTEGER,
+            vlanMappingIfEndOutVid
+                INTEGER,
+            vlanMappingIfEndOutPri
+                INTEGER,
+            vlanMappingIfEndInVid
+                INTEGER,                     
+            vlanMappingIfMappedOutVid
+                INTEGER,  
+            vlanMappingIfMappedOutPri    
+                INTEGER , 
+            vlanMappingIfMappedInVid 
+     	        INTEGER,    	        
+            vlanMappingIfStatus
+           		EntryStatus,
+           	vlanMappingIfMappedInPri
+           		INTEGER	 	
+       }
+
+    vlanMappingIfIndex OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The interface unit ."
+       ::= { vlanMappingIfEntry 1 }
+
+    vlanMappingIfStartOutVid OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "Start out vlan id"
+       ::= { vlanMappingIfEntry 2 }
+
+    vlanMappingIfStartOutPri OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "start out vlan priority."
+       ::= { vlanMappingIfEntry 3 }
+
+    vlanMappingIfStartInVid OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "start in vlan priority."
+       ::= { vlanMappingIfEntry 4 }
+
+    vlanMappingIfEndOutVid OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "end out vlan id."
+       ::= { vlanMappingIfEntry 5 }
+  
+    vlanMappingIfEndOutPri  OBJECT-TYPE
+        SYNTAX   INTEGER
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "end out vlan priority"
+       ::= { vlanMappingIfEntry 6}  
+   
+   vlanMappingIfEndInVid OBJECT-TYPE
+        SYNTAX   INTEGER        
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "end in vlan id."
+       ::= { vlanMappingIfEntry 7 }                                  
+                                        
+   vlanMappingIfMappedOutVid OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+       "mapped out vlan id."
+   ::= { vlanMappingIfEntry 8 }
+
+
+   vlanMappingIfMappedOutPri OBJECT-TYPE
+    SYNTAX   INTEGER        
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+       "mapped out priority"
+   ::= { vlanMappingIfEntry 9 }  
+   
+    
+    vlanMappingIfMappedInVid OBJECT-TYPE
+	    SYNTAX   INTEGER
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       "mapped in vlan id"
+	   ::= { vlanMappingIfEntry 10 }     
+	 
+	vlanMappingIfStatus OBJECT-TYPE
+	    SYNTAX   EntryStatus        
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       "vlan map list status"
+	   ::= { vlanMappingIfEntry 11 }     
+	   
+	vlanMappingIfMappedInPri  OBJECT-TYPE
+	    SYNTAX   INTEGER
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+	       "mapped in vlan priority"
+	   ::= { vlanMappingIfEntry 12 }      
+
+END
+

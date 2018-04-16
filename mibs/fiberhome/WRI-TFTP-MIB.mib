@@ -1,0 +1,212 @@
+     
+WRI-TFTP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+       Counter32, Integer32, Gauge32,
+       IpAddress, TimeTicks, mib-2,enterprises      FROM SNMPv2-SMI 
+       RowStatus, DisplayString         FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+       wriProtocol       FROM WRI-SMI;
+	
+	wriTFTP     	OBJECT IDENTIFIER ::= { wriProtocol 2008}
+	tftpCommon     	OBJECT IDENTIFIER ::= { wriTFTP 1}
+
+	tftpStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+            enable (1),        
+            disable (2)        
+            }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object is used to set the status of tftp. The default value is disable"
+      ::= { tftpCommon 1 }  
+      
+tftpConnTimeout OBJECT-TYPE
+      SYNTAX  INTEGER  (1..255)
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+            "DURABLE:
+             The timeout of tftp connection."
+      ::= { tftpCommon 2 }
+      
+tftpd OBJECT-TYPE
+      SYNTAX  INTEGER  
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+            "DURABLE:
+             tftpd."
+      ::= { tftpCommon 3 }    
+      
+tftpdL2 OBJECT-TYPE
+      SYNTAX  INTEGER  
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+            "DURABLE:
+           l2 layer  tftpd."
+      ::= { tftpCommon 4 }    
+
+      
+
+tftpServerTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF TftpServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            " the ftp server table."
+      ::= { wriTFTP 2}
+
+tftpServerEntry OBJECT-TYPE
+      SYNTAX     TftpServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "An entry representing a ftp server with which the client shares
+             a secret."
+      INDEX      { tftpServerIndex }
+      ::= { tftpServerTable 1 }
+
+TftpServerEntry ::= SEQUENCE {
+      tftpServerIndex       INTEGER,    
+      tftpServerAddressType     INTEGER, 
+      tftpServerAddress     OCTET STRING,  
+      tftpServerOperType    INTEGER,
+      tftpFileName          DisplayString,
+      tftpServerRowStatus	RowStatus,
+      tftpFileType          INTEGER,
+      tftpServerStatus      INTEGER,
+      tftpServerPort        INTEGER,
+      tftpFileDstName       DisplayString
+}
+
+tftpServerIndex OBJECT-TYPE
+      SYNTAX     INTEGER (1..5)
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+             "A number uniquely identifying each tftp server 
+             which this client communicates with."
+      ::= { tftpServerEntry 1 } 
+      
+tftpServerAddressType OBJECT-TYPE
+      SYNTAX     INTEGER
+      {  
+      ipv4(0),
+      ipv6(1), 
+      mac(2)
+            }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+             "The tftp server address type."
+      ::= { tftpServerEntry 2 }
+
+
+tftpServerAddress OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The address of the tFTP server
+             referred to in this table entry."
+      ::= { tftpServerEntry 3 }  
+      
+tftpServerOperType OBJECT-TYPE
+      SYNTAX     INTEGER { 
+                  get (1),
+                  put (2)
+                 }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The operation type of tftp server: get(1),put(2)"
+      ::= { tftpServerEntry 4 }
+
+tftpFileName OBJECT-TYPE
+      SYNTAX     DisplayString 
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "the file Name which is transfered between tftp client and server"
+      ::= { tftpServerEntry 5 } 
+
+tftpServerRowStatus OBJECT-TYPE
+      SYNTAX     RowStatus
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "the rowstatus object"
+      ::= { tftpServerEntry 6 }       
+
+tftpFileType OBJECT-TYPE
+      SYNTAX     INTEGER { 
+                  configurationFile (1),
+                  softwareImage (2)
+                 }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "File type."
+      ::= { tftpServerEntry 7 }
+
+tftpServerStatus OBJECT-TYPE
+      SYNTAX     INTEGER { 
+                  completed         (1),
+                  inProgress        (2),
+                  fileNameLenErr    (3),
+                  fileNameErr       (4),
+                  fileOpenErr       (5),
+                  authErr           (6),
+                  ioErr             (7),
+                  noEnoughSpace	    (8),
+                  noReply           (9),
+                  quitCommandErr    (10),
+                  connectServerErr  (11),
+                  timeout           (12),
+                  argumentErr       (13),  
+                  descrptorErr      (14), 
+                  modeErr            (15),  
+                  other              (16)
+      }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+            "The status of the ftp operation.
+            completed:the last operation is successful.
+            inProgress:upload/download operation is in progress.
+            fileNameLenErr:the length of file name exceed 128 bytes.
+            fileNameErr:the file name include invalid character.such as'\', '/', ':', '*','?','<', '>','|',double quotation marks.
+            fileOperErr:failed to open the file which user want to download/upload.
+            authErr:the user name or/and password is error.
+            ioErr:failed to read/write file.eg:the bytes writen in the fact not equal with the expectation.
+            noEnoughSpace:current device has not enough space to continue the operation.
+            noReply:return error if unexpected eof encountered.
+            quitCommandErr:send 'quit' command to the tftp server,but server excute it error.
+            connectServerErr:failed to connect the ftp server.
+            timeout:connect tftp server timeout.
+            argumentErr: tftp transfer mode is null.l2tftp mode is binary.  
+            descrptorErr: l2tftpInit error.
+            modeErr:set tftp mode error."
+      ::= { tftpServerEntry 8 }
+
+tftpServerPort OBJECT-TYPE
+      SYNTAX     INTEGER 
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The ftp server 's port."
+      ::= { tftpServerEntry 9 }
+
+tftpFileDstName OBJECT-TYPE
+      SYNTAX     DisplayString 
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "the file destnation Name which is transfered between tftp client and server"
+      ::= { tftpServerEntry 10 }
+
+END

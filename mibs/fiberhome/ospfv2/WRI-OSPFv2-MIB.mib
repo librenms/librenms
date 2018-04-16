@@ -1,0 +1,5673 @@
+--pi tao creat 2011-4-6
+WRI-OSPFv2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+    Integer32, Unsigned32, IpAddress, mib-2
+                 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus, TimeStamp
+                 FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                 FROM SNMPv2-CONF
+    InterfaceIndexOrZero
+                 FROM IF-MIB  
+     wri,wriProtocol	
+        FROM WRI-SMI ;              
+
+wriOspfv2 MODULE-IDENTITY
+       LAST-UPDATED  "201104060000Z" 
+       ORGANIZATION  "FiberHome Networks Systems, Inc"
+       CONTACT-INFO  "http://www.fhn.com.cn"   
+       DESCRIPTION   "reference to rfc4750."
+
+          ::= { wriProtocol 1516 }
+
+AreaID ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "An OSPF Area Identifier.
+           Note that the Area ID, in OSPF, has the same format
+           as an IP address, but has the function of defining
+           a summarization point for link state advertisements."
+       SYNTAX       IpAddress
+
+RouterID ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "A OSPF Router Identifier.
+           Note that the Router ID, in OSPF, has the same format
+           as an IP address, but identifies the router independent 
+                      of its IP address."
+       SYNTAX       IpAddress
+
+Metric ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The OSPF internal metric.
+           Note that the OSPF metric is defined as an unsigned value
+           in the range."
+       SYNTAX       Integer32 (0..'FFFF'h)
+
+BigMetric ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The OSPF external metric."
+       SYNTAX       Integer32 (0..'FFFFFF'h)
+
+Status ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "An indication of the operability of an OSPF
+          function or feature.  For example, the status
+          of an interface: 'enabled' indicates that
+          it is willing to communicate with other OSPF routers,
+          and 'disabled' indicates that it is not."
+       SYNTAX       INTEGER { enabled (1), disabled (2) }
+
+PositiveInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "A positive integer.  Values in excess are precluded as
+          unnecessary and prone to interoperability issues."
+       SYNTAX       Integer32 (0..'7FFFFFFF'h)
+
+HelloRange ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The range of intervals in seconds on which Hello messages
+          are exchanged."
+       SYNTAX       Integer32 (1..'FFFF'h)
+
+UpToMaxAge ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current 
+             DESCRIPTION
+          "The values in seconds that one might find or configure
+          for variables bounded by the maximum age of an LSA."
+       SYNTAX       Integer32 (0..3600)
+
+DesignatedRouterPriority ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The range of values defined for the priority of a system
+          for becoming the designated router."
+       SYNTAX       Integer32 (0..'FF'h)
+
+TOSType ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS      current
+       DESCRIPTION
+        "Type of Service (TOS) is defined as a mapping to the IP
+        Type of Service Flags as defined in the IP Forwarding
+        Table MIB
+
+            +-----+-----+-----+-----+-----+-----+-----+-----+
+            |                 |                       |     |
+            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |
+            |                 |                       |     |
+            +-----+-----+-----+-----+-----+-----+-----+-----+
+
+                     IP TOS                IP TOS
+                Field     Policy      Field     Policy
+
+                Contents    Code      Contents    Code
+                0 0 0 0  ==>   0      0 0 0 1  ==>   2
+                0 0 1 0  ==>   4      0 0 1 1  ==>   6
+                0 1 0 0  ==>   8      0 1 0 1  ==>  10
+                0 1 1 0  ==>  12      0 1 1 1  ==>  14
+                1 0 0 0  ==>  16      1 0 0 1  ==>  18
+                1 0 1 0  ==>  20      1 0 1 1  ==>  22
+                1 1 0 0  ==>  24      1 1 0 1  ==>  26
+                1 1 1 0  ==>  28      1 1 1 1  ==>  30
+
+         The remaining values are left for future definition."
+           SYNTAX       Integer32 (0..30)
+
+OspfAuthenticationType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "The authentication type."
+       SYNTAX       INTEGER {  
+                       none (0),
+                       simplePassword (1),
+                       md5 (2)
+                       -- reserved for specification by IANA (> 2)
+                    }
+
+--  OSPF General Variables
+
+--      Note: These parameters apply globally to the Router's
+--      OSPF Process.
+
+wriOspfGeneralTable  OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfGeneralEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "the General table of ospf"
+       ::= { wriOspfv2 1 }
+
+  wriOspfGeneralEntry OBJECT-TYPE
+       SYNTAX       WriOspfGeneralEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "the General table of ospf"
+       INDEX { wriOspfProcessId }
+       ::= { wriOspfGeneralTable 1 }     
+       
+ WriOspfGeneralEntry ::=
+        SEQUENCE {
+        	wriOspfProcessId
+        		INTEGER,
+        	wriOspfRouterId	
+        		RouterID,
+       		wriOspfAdminStat
+       			Status,
+       		wriOspfVersionNumber
+       			INTEGER,
+       		wriOspfAreaBdrRtrStatus	
+       			TruthValue,
+       		wriOspfASBdrRtrStatus
+       			TruthValue,
+       		wriOspfExternLsaCount
+       			Gauge32,
+       		wriOspfExternLsaCksumSum
+       			Integer32,
+			wriOspfTOSSupport
+				TruthValue,
+			wriOspfOriginateNewLsas			
+				Counter32,
+			wriOspfRxNewLsas	
+				Counter32,
+			wriOspfExtLsdbLimit
+				Integer32,
+			wriOspfMulticastExtensions
+				Integer32,
+			wriOspfExitOverflowInterval
+				PositiveInteger,	
+			wriOspfDemandExtensions	
+				TruthValue ,
+			wriOspfRFC1583Compatibility
+				TruthValue,
+			wriOspfOpaqueLsaSupport	
+				TruthValue,	
+			wriOspfReferenceBandwidth
+				Unsigned32,
+			wriOspfRestartSupport
+				INTEGER,
+			wriOspfRestartInterval
+				Integer32,
+			wriOspfRestartStrictLsaChecking
+				TruthValue,
+			wriOspfRestartStatus
+				INTEGER	,
+			wriOspfRestartAge
+				Unsigned32,
+			wriOspfRestartExitReason
+				INTEGER,
+			wriOspfAsLsaCount
+				Gauge32,
+			wriOspfAsLsaCksumSum
+				Unsigned32,
+			wriOspfStubRouterSupport
+				TruthValue,
+			wriOspfStubRouterAdvertisement
+				INTEGER	,
+			wriOspfDiscontinuityTime
+				TimeStamp,		
+			wriOspfRedistributeLocal	
+				INTEGER,
+			wriOspfRedistributeRip
+				INTEGER,
+			wriOspfRedistributeBgp
+				INTEGER,
+			wriOspfRedistributeStatic
+				INTEGER,
+			wriOspfRedistributeIsis
+				INTEGER,
+			wriOspfTrapEnable
+				OCTET STRING,
+			wriOspfTrapError
+				INTEGER,
+			wriOspfTrapType
+				INTEGER,
+			wriOspfTrapSource
+				INTEGER,
+			wriOspfSpfInterval	
+				INTEGER,
+			wriOspfRestartHelplerEnable
+				INTEGER,
+			wriOspfRestartReason
+				INTEGER,
+			wriOspfRestartBegin
+				INTEGER,
+			wriOspfRouteNumber
+				Counter32,
+			wriOspfBusyPacketRate
+				INTEGER,
+			wriOspfSpfRun
+				INTEGER,
+			wriOspfNetWorkRouteNumber
+				Counter32,
+			wriOspfIntraRouteNumber
+				Counter32,
+			wriOspfInterRouteNumber
+				Counter32,
+			wriOspfExternalRouteNumber
+				Counter32,
+			wriOspfWildCardRouteNumber
+				Counter32,	
+			wriOspfAbrRouteNumber
+				Counter32,
+			wriOspfAsbrRouteNumber
+				Counter32,
+			wriOspfGlobeReset
+				INTEGER,
+			wriOspfClrStatis
+				INTEGER,
+			wriOspfType5LsaCount
+				Counter32,
+			wriOspfType11LsaCount
+				Counter32,
+			wriOspfValidTtl
+				INTEGER,
+			wriOspfVrid
+				INTEGER,
+			wriOspfDomain
+				OCTET STRING,
+			wriOspfRouteTag
+				INTEGER,
+			wriOspfDefaultRouteEffect
+			    INTEGER,
+			wriOspfNetWorkRoutePathNumber
+				Counter32,
+			wriOspfIntraRoutePathNumber
+				Counter32,
+			wriOspfInterRoutePathNumber
+				Counter32,
+			wriOspfExternalRoutePathNumber
+				Counter32,
+			wriOspfAbrRoutePathNumber
+				Counter32,
+			wriOspfAsbrRoutePathNumber
+				Counter32,
+			wriOspfFrrState
+				INTEGER,
+			wriOspfLoopPreventState
+				INTEGER,
+			--xf add 2015-5-15
+			wriOspfDefaultRouteCost
+				INTEGER,
+			wriOspfDefaultRouteType
+				INTEGER
+				}
+                     
+   wriOspfProcessId OBJECT-TYPE
+      SYNTAX     INTEGER(1..8)
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " ospf instance id"
+      ::= { wriOspfGeneralEntry 1}     
+                          
+  wriOspfRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the
+          router in the Autonomous System.
+          By convention, to ensure uniqueness, this
+          should default to the value of one of the
+          router's IP interface addresses.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile storage."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters"
+       ::= { wriOspfGeneralEntry 2 }
+
+  wriOspfAdminStat OBJECT-TYPE
+       SYNTAX       Status
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The administrative status of OSPF in the
+          router.  The value 'enabled' denotes that the
+          OSPF Process is active on at least one interface;
+          'disabled' disables it on all interfaces.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile storage."
+       ::= { wriOspfGeneralEntry 3 }
+
+  wriOspfVersionNumber OBJECT-TYPE
+       SYNTAX       INTEGER { version2 (2) }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The current version number of the OSPF protocol is 2."
+       REFERENCE
+          "OSPF Version 2, Title"
+       ::= { wriOspfGeneralEntry 4 }
+
+  wriOspfAreaBdrRtrStatus OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A flag to note whether this router is an Area
+          Border Router."
+       REFERENCE
+          "OSPF Version 2, Section 3 Splitting the AS into
+          Areas"
+       ::= { wriOspfGeneralEntry 5 }
+
+  wriOspfASBdrRtrStatus OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "A flag to note whether this router is configured as
+           an Autonomous System Border Router.
+
+           This object is persistent and when written the
+           entity SHOULD save the change to non-volatile storage."
+       REFERENCE
+          "OSPF Version 2, Section 3.3 Classification of
+          routers"
+       ::= { wriOspfGeneralEntry 6 }
+
+  wriOspfExternLsaCount OBJECT-TYPE
+        SYNTAX       Gauge32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+           "The number of external (LS type-5) link state
+           advertisements in the link state database."
+        REFERENCE
+           "OSPF Version 2, Appendix A.4.5 AS external link
+           advertisements"
+        ::= { wriOspfGeneralEntry 7 }
+
+  wriOspfExternLsaCksumSum OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+           "The 32-bit sum of the LS checksums of
+           the external link state advertisements
+           contained in the link state database.  This sum
+           can be used to determine if there has been a
+           change in a router's link state database and
+           to compare the link state database of two
+           routers.  The value should be treated as unsigned
+           when comparing two sums of checksums."
+        ::= { wriOspfGeneralEntry 8 }
+
+  wriOspfTOSSupport OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The router's support for type-of-service routing.
+
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+       REFERENCE
+          "OSPF Version 2, Appendix F.1.2 Optional TOS
+          support"
+       ::= { wriOspfGeneralEntry 9 }
+
+   wriOspfOriginateNewLsas OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of new link state advertisements
+          that have been originated.  This number is
+          incremented each time the router originates a new
+          LSA.
+
+          Discontinuities in the value of this counter can
+          occur at re-initialization of the management system,
+          and at other times as indicated by the value of
+          wriOspfDiscontinuityTime."
+        ::= { wriOspfGeneralEntry 10 }
+
+  wriOspfRxNewLsas OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of link state advertisements received
+          that are determined to be new instantiations.
+          This number does not include newer instantiations
+          of self-originated link state advertisements.
+
+          Discontinuities in the value of this counter can
+          occur at re-initialization of the management system,
+          and at other times as indicated by the value of
+          wriOspfDiscontinuityTime."
+       ::= { wriOspfGeneralEntry 11 }
+
+  wriOspfExtLsdbLimit OBJECT-TYPE
+       SYNTAX       Integer32 (-1..'7FFFFFFF'h)
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The maximum number of non-default
+          AS-external LSAs entries that can be stored in the
+          link state database.  If the value is -1, then
+          there is no limit.
+
+          When the number of non-default AS-external LSAs
+          in a router's link state database reaches
+          wriOspfExtLsdbLimit, the router enters
+          overflow state.  The router never holds more than
+          wriOspfExtLsdbLimit non-default AS-external LSAs
+          in its database.  OspfExtLsdbLimit MUST be set
+          identically in all routers attached to the OSPF
+          backbone and/or any regular OSPF area (i.e.,
+          OSPF stub areas and NSSAs are excluded).
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+        DEFVAL { -1 }
+        ::= { wriOspfGeneralEntry 12 }
+
+  wriOspfMulticastExtensions OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "A bit mask indicating whether the router is
+          forwarding IP multicast (Class D) datagrams
+          based on the algorithms defined in the
+          multicast extensions to OSPF.
+
+          Bit 0, if set, indicates that the router can
+          forward IP multicast datagrams in the router's
+          directly attached areas (called intra-area
+          multicast routing).
+
+          Bit 1, if set, indicates that the router can
+          forward IP multicast datagrams between OSPF
+          areas (called inter-area multicast routing).
+
+          Bit 2, if set, indicates that the router can
+          forward IP multicast datagrams between
+          Autonomous Systems (called inter-AS multicast
+          routing).
+
+          Only certain combinations of bit settings are
+          allowed, namely: 0 (no multicast forwarding is
+          enabled), 1 (intra-area multicasting only), 3
+          (intra-area and inter-area multicasting), 5
+          (intra-area and inter-AS multicasting), and 7
+          (multicasting everywhere).  By default, no
+          multicast forwarding is enabled.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+       DEFVAL { 0 }
+       ::= { wriOspfGeneralEntry 13 }
+
+  wriOspfExitOverflowInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds that, after entering
+          OverflowState, a router will attempt to leave
+          OverflowState.  This allows the router to again
+          originate non-default AS-external LSAs.  When
+          set to 0, the router will not leave
+          overflow state until restarted.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+       DEFVAL { 0 }
+       ::= { wriOspfGeneralEntry 14 }
+
+  wriOspfDemandExtensions OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The router's support for demand routing.
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+       REFERENCE
+          "Extending OSPF to Support Demand Circuits"
+       ::= { wriOspfGeneralEntry 15 }
+
+  wriOspfRFC1583Compatibility  OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Indicates metrics used to choose among multiple
+          AS-external LSAs.  When RFC1583Compatibility is set to
+          enabled, only cost will be used when choosing among
+          multiple AS-external LSAs advertising the same
+          destination.  When RFC1583Compatibility is set to
+          disabled, preference will be driven first by type of
+          path using cost only to break ties.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+        REFERENCE
+           "OSPF Version 2, Section 16.4.1 External path
+            preferences"
+        ::= { wriOspfGeneralEntry 16 }
+
+ wriOspfOpaqueLsaSupport  OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The router's support for Opaque LSA types."
+       REFERENCE
+          "The OSPF Opaque LSA Option"
+       ::= { wriOspfGeneralEntry 17 }
+
+  wriOspfReferenceBandwidth OBJECT-TYPE
+       SYNTAX       Unsigned32
+       UNITS        "kilobits per second"
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Reference bandwidth in kilobits/second for
+          calculating default interface metrics.  The
+          default value is 100,000 KBPS (100 MBPS).
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+       ::= { wriOspfGeneralEntry 18}
+
+  wriOspfRestartSupport OBJECT-TYPE
+       SYNTAX       INTEGER { none (1),
+                              plannedOnly (2),
+                              plannedAndUnplanned (3)
+                            }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "The router's support for OSPF graceful restart.
+          Options include: no restart support, only planned
+          restarts, or both planned and unplanned restarts.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+       ::= { wriOspfGeneralEntry 19 }
+
+  wriOspfRestartInterval OBJECT-TYPE
+       SYNTAX       Integer32 (1..1800)
+       UNITS        "seconds"
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Configured OSPF graceful restart timeout interval.
+
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+       ::= { wriOspfGeneralEntry 20 }
+
+  wriOspfRestartStrictLsaChecking OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Indicates if strict LSA checking is enabled for
+           graceful restart.
+
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+       ::= { wriOspfGeneralEntry 21 }
+
+
+  wriOspfRestartStatus OBJECT-TYPE
+       SYNTAX       INTEGER { notRestarting (1),
+                              plannedRestart (2),
+                              unplannedRestart (3)
+                            }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Current status of OSPF graceful restart."
+       ::= { wriOspfGeneralEntry 22 }
+
+  wriOspfRestartAge OBJECT-TYPE
+       SYNTAX       Unsigned32
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Remaining time in current OSPF graceful restart
+          interval."
+       ::= { wriOspfGeneralEntry 23 }
+
+  wriOspfRestartExitReason OBJECT-TYPE
+       SYNTAX       INTEGER { none (1),           -- none attempted
+                              inProgress (2),     -- restart in
+                                                  -- progress
+                              completed (3),      -- successfully
+                                                  -- completed
+                              timedOut (4),       -- timed out
+                              topologyChanged (5) -- aborted due to
+                                                  -- topology change.
+                            }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Describes the outcome of the last attempt at a
+          graceful restart.  If the value is 'none', no restart
+          has yet been attempted.  If the value is 'inProgress',
+          a restart attempt is currently underway."
+       ::= { wriOspfGeneralEntry 24 }
+
+  wriOspfAsLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "The number of AS-scope link state
+           advertisements in the AS-scope link state database."
+       ::= { wriOspfGeneralEntry 25 }
+
+  wriOspfAsLsaCksumSum OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "The 32-bit unsigned sum of the LS checksums of
+           the AS link state advertisements contained in the AS-scope
+           link state database.  This sum can be used to determine
+           if there has been a change in a router's AS-scope link
+           state database, and to compare the AS-scope link state
+           database of two routers."
+       ::= { wriOspfGeneralEntry 26 }
+
+   wriOspfStubRouterSupport OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "The router's support for stub router functionality."
+       REFERENCE
+           "OSPF Stub Router Advertisement"
+       ::= { wriOspfGeneralEntry 27 }
+
+   wriOspfStubRouterAdvertisement OBJECT-TYPE
+       SYNTAX       INTEGER {
+                          doNotAdvertise (1),
+                          advertise(2)
+                          }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+           "This object controls the advertisement of
+           stub router LSAs by the router.  The value
+           doNotAdvertise will result in the advertisement
+           of a standard router LSA and is the default value.
+
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+       ::= { wriOspfGeneralEntry 28 }
+
+  wriOspfDiscontinuityTime OBJECT-TYPE
+      SYNTAX     TimeStamp
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "The value of sysUpTime on the most recent occasion
+          at which any one of this MIB's counters suffered
+          a discontinuity.
+
+          If no such discontinuities have occurred since the last
+          re-initialization of the local management subsystem,
+          then this object contains a zero value."
+      ::= { wriOspfGeneralEntry 29 }
+  
+  wriOspfRedistributeLocal OBJECT-TYPE
+      SYNTAX     INTEGER{
+                          enable(1),
+                          disable(2)
+                          }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Redistribute local route"
+      ::= { wriOspfGeneralEntry 30 }  
+     
+  wriOspfRedistributeRip OBJECT-TYPE
+      SYNTAX     INTEGER{
+                          enable(1),
+                          disable(2)
+                          }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Redistribute rip route"
+      ::= { wriOspfGeneralEntry 31 }
+ 
+   wriOspfRedistributeBgp OBJECT-TYPE
+      SYNTAX     INTEGER{
+                          enable(1),
+                          disable(2)
+                          }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Redistribute rip route"
+      ::= { wriOspfGeneralEntry 32 }
+   
+   wriOspfRedistributeStatic OBJECT-TYPE
+      SYNTAX     INTEGER{
+                          enable(1),
+                          disable(2)
+                          }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Redistribute static route"
+      ::= { wriOspfGeneralEntry 33 }     
+      
+   wriOspfRedistributeIsis OBJECT-TYPE
+      SYNTAX     INTEGER{
+                          enable(1),
+                          disable(2)
+                          }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Redistribute isis route"
+      ::= { wriOspfGeneralEntry 34 }
+   
+       
+   wriOspfTrapEnable OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "trap state "
+      ::= { wriOspfGeneralEntry 35 } 
+      
+    wriOspfTrapError OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "trap error "
+      ::= { wriOspfGeneralEntry 36 } 
+      
+    wriOspfTrapType OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "trap type "
+      ::= { wriOspfGeneralEntry 37 }
+     
+    wriOspfTrapSource OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "trap soure "
+      ::= { wriOspfGeneralEntry 38 }  
+    
+    wriOspfSpfInterval OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "trap soure "
+      ::= { wriOspfGeneralEntry 39} 
+     
+    wriOspfRestartHelplerEnable OBJECT-TYPE
+      SYNTAX     INTEGER{
+                          enable(1),
+                          disable(2)
+                          }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Restart helpler state "
+      ::= { wriOspfGeneralEntry 40}  
+    
+    wriOspfRestartReason OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Restart reason"
+      ::= { wriOspfGeneralEntry 41} 
+      
+    wriOspfRestartBegin OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Restart reason"
+      ::= { wriOspfGeneralEntry 42} 
+    
+    wriOspfRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "Route number"
+      ::= { wriOspfGeneralEntry 43}  
+    
+    wriOspfBusyPacketRate OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Busy Packet Rate"
+      ::= { wriOspfGeneralEntry 44}  
+      
+    wriOspfSpfRun OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "calculate routing table"
+      ::= { wriOspfGeneralEntry 45}  
+   
+   wriOspfNetWorkRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network route number"
+      ::= { wriOspfGeneralEntry 46}    
+      
+   wriOspfIntraRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network intra number"
+      ::= { wriOspfGeneralEntry 47} 
+      
+   wriOspfInterRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network intra number"
+      ::= { wriOspfGeneralEntry 48}  
+   
+   wriOspfExternalRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network intra number"
+      ::= { wriOspfGeneralEntry 49}
+   
+   wriOspfWildCardRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network intra number"
+      ::= { wriOspfGeneralEntry 50}
+      
+   wriOspfAbrRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network intra number"
+      ::= { wriOspfGeneralEntry 51} 
+      
+   wriOspfAsbrRouteNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "network intra number"
+      ::= { wriOspfGeneralEntry 52} 
+  
+  wriOspfGlobeReset OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Globe Reset "
+      ::= { wriOspfGeneralEntry 53}    
+  
+  wriOspfClrStatis OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Clear Statistic  information"
+      ::= { wriOspfGeneralEntry 54}  
+        
+   wriOspfType5LsaCount OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " Type 5 Lsa Count"
+      ::= { wriOspfGeneralEntry 55} 
+      
+   wriOspfType11LsaCount OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " Type 11 Lsa Count"
+      ::= { wriOspfGeneralEntry 56}    
+   
+   wriOspfValidTtl OBJECT-TYPE
+      SYNTAX     INTEGER(0..255)
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " ospf valid ttl value"
+      ::= { wriOspfGeneralEntry 57}   
+      
+   wriOspfVrid OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " ospf VPN name"
+      ::= { wriOspfGeneralEntry 58}  
+      
+    wriOspfDomain OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " the domain information of ospf,it makes up by follow structure 
+         1byte   2byte        4byte           2byte
+         --------------------------------------------
+        | role|   type  |     domain id   |   value |
+         --------------------------------------------,
+         every 9 byte is a element."
+      ::= { wriOspfGeneralEntry 59} 
+      
+    wriOspfRouteTag  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 60}  
+      
+      
+    wriOspfDefaultRouteEffect   OBJECT-TYPE
+      SYNTAX     INTEGER{
+                       advertise (1),
+                       doNotAdvertise(2)
+                       }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 61}                                         
+    
+    
+    wriOspfNetWorkRoutePathNumber  OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 62}  
+				
+				
+	wriOspfIntraRoutePathNumber  OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 63}
+				
+	wriOspfInterRoutePathNumber   OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 64}
+			
+	wriOspfExternalRoutePathNumber OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 65}
+				
+	wriOspfAbrRoutePathNumber    OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 66}
+				
+	wriOspfAsbrRoutePathNumber    OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         " "
+      ::= { wriOspfGeneralEntry 67}
+				
+    wriOspfFrrState   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " fast retoute function"
+      ::= { wriOspfGeneralEntry 68}
+      
+    wriOspfLoopPreventState  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         " loop prevent function"
+      ::= { wriOspfGeneralEntry 69}
+	  
+	--xf add 2015-5-15
+	wriOspfDefaultRouteCost  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Default route cost"
+      ::= { wriOspfGeneralEntry 70}
+	  
+	wriOspfDefaultRouteType  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "Default route type"
+      ::= { wriOspfGeneralEntry 71}
+ 
+--  OSPF Area Table
+--     The OSPF Area Table contains information
+--     regarding the various areas.
+
+  wriOspfAreaTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information describing the configured parameters and
+          cumulative statistics of the router's attached areas.
+          The interfaces and virtual links are configured
+          as part of these areas.  Area 0.0.0.0, by definition,
+          is the backbone area."
+       REFERENCE
+          "OSPF Version 2, Section 6 The Area Data Structure"
+       ::= { wriOspfv2 2 }
+
+  wriOspfAreaEntry OBJECT-TYPE
+       SYNTAX       WriOspfAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information describing the configured parameters and
+          cumulative statistics of one of the router's attached areas.
+          The interfaces and virtual links are configured as part of
+          these areas.  Area 0.0.0.0, by definition, is the backbone
+          area.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX { wriOspfProcessId,wriOspfAreaId }
+       ::= { wriOspfAreaTable 1 }
+  WriOspfAreaEntry ::=
+        SEQUENCE {
+           wriOspfAreaId
+              AreaID,
+           wriOspfAuthType
+              OspfAuthenticationType,
+           wriOspfImportAsExtern
+              INTEGER,
+           wriOspfSpfRuns
+              Counter32,
+           wriOspfAreaBdrRtrCount
+              Gauge32,
+           wriOspfAsBdrRtrCount
+              Gauge32,
+           wriOspfAreaLsaCount
+              Gauge32,
+           wriOspfAreaLsaCksumSum
+              Integer32,
+           wriOspfAreaSummary
+              INTEGER,
+           wriOspfAreaStatus
+              RowStatus,
+           wriOspfAreaNssaTranslatorRole
+              INTEGER,
+           wriOspfAreaNssaTranslatorState
+              INTEGER,
+           wriOspfAreaNssaTranslatorStabilityInterval
+              PositiveInteger,
+           wriOspfAreaNssaTranslatorEvents
+              Counter32,
+           wriOspfAreaTeEnable
+              INTEGER,
+           wriOspfAreaNssaDefaultCost
+              INTEGER,
+           wriOspfAreaAuthKeyId
+              INTEGER,
+           wriOspfAreaAuthKey
+              OCTET STRING,
+           wriOspfAreaEachLsaCount
+              OCTET STRING
+  }
+
+  wriOspfAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally
+                              -- an SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying an area.
+          Area ID 0.0.0.0 is used for the OSPF backbone."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaEntry 1 }
+
+  wriOspfAuthType OBJECT-TYPE
+       SYNTAX       OspfAuthenticationType
+       MAX-ACCESS   read-create
+       STATUS       obsolete
+       DESCRIPTION
+          "The authentication type specified for an area."
+       REFERENCE
+          "OSPF Version 2, Appendix D Authentication"
+       DEFVAL { none } -- no authentication, by default
+       ::= { wriOspfAreaEntry 2 }
+
+  wriOspfImportAsExtern OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      importExternal (1),
+                      importNoExternal (2),
+                      importNssa (3)
+                      }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Indicates if an area is a stub area, NSSA, or standard
+          area.  Type-5 AS-external LSAs and type-11 Opaque LSAs are
+          not imported into stub areas or NSSAs.  NSSAs import
+          AS-external data as type-7 LSAs"
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       DEFVAL { importExternal }
+       ::= { wriOspfAreaEntry 3 }
+
+  wriOspfSpfRuns OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times that the intra-area route
+          table has been calculated using this area's
+          link state database.  This is typically done
+          using Dijkstra's algorithm.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of wriOspfDiscontinuityTime."
+       ::= { wriOspfAreaEntry 4 }
+
+  wriOspfAreaBdrRtrCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of Area Border Routers reachable
+          within this area.  This is initially zero and is
+          calculated in each Shortest Path First (SPF) pass."
+       ::= { wriOspfAreaEntry 5 }
+
+  wriOspfAsBdrRtrCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of Autonomous System Border
+          Routers reachable within this area.  This is
+          initially zero and is calculated in each SPF
+          pass."
+       ::= { wriOspfAreaEntry 6 }
+
+  wriOspfAreaLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of link state advertisements
+          in this area's link state database, excluding
+          AS-external LSAs."
+       ::= { wriOspfAreaEntry 7 }
+
+  wriOspfAreaLsaCksumSum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit sum of the link state
+          advertisements' LS checksums contained in this
+          area's link state database.  This sum excludes
+          external (LS type-5) link state advertisements.
+          The sum can be used to determine if there has
+          been a change in a router's link state
+          database, and to compare the link state database of
+          two routers.  The value should be treated as unsigned
+          when comparing two sums of checksums."
+       DEFVAL { 0 }
+       ::= { wriOspfAreaEntry 8 }
+
+  wriOspfAreaSummary OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       noAreaSummary (1),
+                       sendAreaSummary (2)
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The variable wriOspfAreaSummary controls the
+          import of summary LSAs into stub and NSSA areas.
+          It has no effect on other areas.
+
+          If it is noAreaSummary, the router will not
+          originate summary LSAs into the stub or NSSA area.
+          It will rely entirely on its default route.
+
+          If it is sendAreaSummary, the router will both
+          summarize and propagate summary LSAs."
+       DEFVAL { noAreaSummary }
+       ::= { wriOspfAreaEntry 9 }
+
+  wriOspfAreaStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfAreaEntry 10 }
+
+  wriOspfAreaNssaTranslatorRole OBJECT-TYPE
+       SYNTAX       INTEGER { always (1), candidate (2) }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Indicates an NSSA border router's ability to
+          perform NSSA translation of type-7 LSAs into
+          type-5 LSAs."
+       DEFVAL { candidate }
+       ::= { wriOspfAreaEntry 11 }
+
+  wriOspfAreaNssaTranslatorState OBJECT-TYPE
+       SYNTAX       INTEGER { enabled (1),
+                       elected (2),
+                       disabled (3)
+                       }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Indicates if and how an NSSA border router is
+          performing NSSA translation of type-7 LSAs into type-5
+          LSAs.  When this object is set to enabled, the NSSA Border
+          router's OspfAreaNssaExtTranslatorRole has been set to
+          always.  When this object is set to elected, a candidate
+          NSSA Border router is Translating type-7 LSAs into type-5.
+          When this object is set to disabled, a candidate NSSA
+          border router is NOT translating type-7 LSAs into type-5."
+       ::= { wriOspfAreaEntry 12 }
+
+  wriOspfAreaNssaTranslatorStabilityInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds after an elected translator
+          determines its services are no longer required, that
+          it should continue to perform its translation duties."
+       DEFVAL { 40 }
+       ::= { wriOspfAreaEntry 13 }
+
+  wriOspfAreaNssaTranslatorEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates the number of translator state changes
+          that have occurred since the last boot-up.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of wriOspfDiscontinuityTime."
+       ::= { wriOspfAreaEntry 14 }
+  
+  wriOspfAreaTeEnable OBJECT-TYPE
+       SYNTAX       INTEGER{ enabled (1),
+                       disabled (2)
+                       }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Area te state."
+       ::= { wriOspfAreaEntry 15 } 
+       
+   wriOspfAreaNssaDefaultCost  OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Area nssa default cost ."
+       ::= { wriOspfAreaEntry 16 } 
+       
+   wriOspfAreaAuthKeyId  OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Area Auth KeyId ."
+       ::= { wriOspfAreaEntry 17 } 
+     
+    wriOspfAreaAuthKey  OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Area Auth KeyId ."
+       ::= { wriOspfAreaEntry 18 }   
+       
+    wriOspfAreaEachLsaCount  OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Area LSA count."
+       ::= { wriOspfAreaEntry 19 } 
+   
+ 
+ 
+--  OSPF Area Default Metric Table
+
+  wriOspfStubAreaTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfStubAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The set of metrics that will be advertised
+          by a default Area Border Router into a stub area."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2, Area Parameters"
+       ::= { wriOspfv2 3 }
+
+  wriOspfStubAreaEntry OBJECT-TYPE
+       SYNTAX       WriOspfStubAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS      current
+       DESCRIPTION
+          "The metric for a given Type of Service that
+          will be advertised by a default Area Border
+          Router into a stub area.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2, Area Parameters"
+       INDEX { wriOspfProcessId,wriOspfStubAreaId, wriOspfStubTOS }
+       ::= { wriOspfStubAreaTable 1 }
+
+  WriOspfStubAreaEntry ::=
+       SEQUENCE {
+          wriOspfStubAreaId
+             AreaID,
+          wriOspfStubTOS
+             TOSType,
+          wriOspfStubMetric
+             BigMetric,
+          wriOspfStubStatus
+             RowStatus,
+          wriOspfStubMetricType
+             INTEGER
+          }
+
+  wriOspfStubAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit identifier for the stub area.  On
+          creation, this can be derived from the
+          instance."
+       ::= { wriOspfStubAreaEntry 1 }
+
+  wriOspfStubTOS OBJECT-TYPE
+       SYNTAX       TOSType
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Type of Service associated with the
+          metric.  On creation, this can be derived from
+          the instance."
+       ::= { wriOspfStubAreaEntry 2 }
+
+  wriOspfStubMetric OBJECT-TYPE
+       SYNTAX       BigMetric
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The metric value applied at the indicated Type
+          of Service.  By default, this equals the least
+          metric at the Type of Service among the
+          interfaces to other areas."
+       ::= { wriOspfStubAreaEntry 3 }
+
+  wriOspfStubStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfStubAreaEntry 4 }
+
+  wriOspfStubMetricType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       wriOspfMetric (1),  -- OSPF Metric
+                       comparableCost (2), -- external type 1
+                       nonComparable  (3) -- external type 2
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This variable displays the type of metric
+          advertised as a default route."
+       DEFVAL { wriOspfMetric }
+       ::= { wriOspfStubAreaEntry 5 }
+
+--  OSPF Link State Database
+
+  wriOspfLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Process's link state database (LSDB).
+           The LSDB contains the link state advertisements
+           from throughout the areas that the device is attached to."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State Advertisements"
+       ::= { wriOspfv2 4 }
+
+  wriOspfLsdbEntry OBJECT-TYPE
+       SYNTAX   WriOspfLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX { wriOspfProcessId,wriOspfLsdbAreaId, wriOspfLsdbType,
+               wriOspfLsdbLsid, wriOspfLsdbRouterId }
+       ::= { wriOspfLsdbTable 1 }
+
+  WriOspfLsdbEntry ::=
+       SEQUENCE {
+          wriOspfLsdbAreaId
+             AreaID,
+          wriOspfLsdbType
+             INTEGER,
+          wriOspfLsdbLsid
+             IpAddress,
+          wriOspfLsdbRouterId
+             RouterID,
+          wriOspfLsdbSequence
+             Integer32,
+          wriOspfLsdbAge
+             Integer32,
+          wriOspfLsdbChecksum
+             Integer32,
+          wriOspfLsdbAdvertisement
+             OCTET STRING,
+          wriOspfLsdbLen
+             INTEGER   
+          }
+
+  wriOspfLsdbAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit identifier of the area from which
+          the LSA was received."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfLsdbEntry 1 }
+
+  wriOspfLsdbType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       routerLink (1),
+                       networkLink (2),
+                       summaryLink (3),
+                       asSummaryLink (4),
+                       asExternalLink (5), -- but see wriOspfAsLsdbTable
+                       multicastLink (6),
+                       nssaExternalLink (7),
+                       areaOpaqueLink (10)
+                       }
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate advertisement
+          format.
+
+          Note: External link state advertisements are permitted
+          for backward compatibility, but should be displayed
+          in the wriOspfAsLsdbTable rather than here."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { wriOspfLsdbEntry 2 }
+
+  wriOspfLsdbLsid OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing either a Router ID or an IP address;
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { wriOspfLsdbEntry 3 }
+
+  wriOspfLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { wriOspfLsdbEntry 4 }
+
+  wriOspfLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate Link State
+          Advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.6 LS sequence
+          number"
+       ::= { wriOspfLsdbEntry 5 }
+
+  wriOspfLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the age of the link state advertisement
+          in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { wriOspfLsdbEntry 6 }
+
+  wriOspfLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the checksum of the complete contents of
+          the advertisement, excepting the age field.  The age field
+          is excepted so that an advertisement's age can be
+          incremented without updating the checksum.  The checksum
+          used is the same that is used for ISO connectionless
+          datagrams; it is commonly referred to as the
+          Fletcher checksum."
+        REFERENCE
+           "OSPF Version 2, Section 12.1.7 LS checksum"
+        ::= { wriOspfLsdbEntry 7 }
+
+  wriOspfLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE (1..65535))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header.
+
+          Note that for variable length LSAs, SNMP agents
+          may not be able to return the largest string size."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State Advertisements"
+       ::= { wriOspfLsdbEntry 8 }   
+       
+   wriOspfLsdbLen OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The Lsdb length."
+       ::= { wriOspfLsdbEntry 9 }
+
+
+--  Address Range Table
+
+  wriOspfAreaRangeTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfAreaRangeEntry
+       MAX-ACCESS   not-accessible
+       STATUS       obsolete
+       DESCRIPTION
+          "The Address Range Table acts as an adjunct to the Area
+           Table.  It describes those Address Range Summaries that
+           are configured to be propagated from an Area to reduce
+           the amount of information about it that is known beyond
+           its borders.  It contains a set of IP address ranges
+           specified by an IP address/IP network mask pair.
+           For example, class B address range of X.X.X.X
+           with a network mask of 255.255.0.0 includes all IP
+           addresses from X.X.0.0 to X.X.255.255.
+
+           Note that this table is obsoleted and is replaced
+           by the Area Aggregate Table."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2  Area parameters"
+       ::= { wriOspfv2 5 }
+
+  wriOspfAreaRangeEntry OBJECT-TYPE
+       SYNTAX       WriOspfAreaRangeEntry
+       MAX-ACCESS   not-accessible
+       STATUS       obsolete
+       DESCRIPTION
+          "A single area address range.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2  Area parameters"
+       INDEX { wriOspfProcessId,wriOspfAreaRangeAreaId, wriOspfAreaRangeNet,wriOspfAreaRangeMask }
+       ::= { wriOspfAreaRangeTable 1 }
+
+  WriOspfAreaRangeEntry ::=
+       SEQUENCE {
+          wriOspfAreaRangeAreaId
+             AreaID,
+          wriOspfAreaRangeNet
+             IpAddress,
+          wriOspfAreaRangeMask
+             IpAddress,
+          wriOspfAreaRangeStatus
+             RowStatus,
+          wriOspfAreaRangeEffect
+             INTEGER
+          }
+
+  wriOspfAreaRangeAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       obsolete
+       DESCRIPTION
+          "The area that the address range is to be found
+          within."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaRangeEntry 1 }
+
+  wriOspfAreaRangeNet OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       obsolete
+       DESCRIPTION
+          "The IP address of the net or subnet indicated
+          by the range."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaRangeEntry 2 }
+       
+  wriOspfAreaRangeMask OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       obsolete
+       DESCRIPTION
+          "The subnet mask that pertains to the net or
+          subnet."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaRangeEntry 3 }
+
+  wriOspfAreaRangeStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       obsolete
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfAreaRangeEntry 4 }
+
+  wriOspfAreaRangeEffect OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       advertiseMatching (1),
+                       doNotAdvertiseMatching (2)
+                       }
+       MAX-ACCESS   read-create
+       STATUS       obsolete
+       DESCRIPTION
+          "Subnets subsumed by ranges either trigger the
+          advertisement of the indicated summary
+         (advertiseMatching) or result in the subnet's not
+          being advertised at all outside the area."
+       DEFVAL { advertiseMatching }
+       ::= { wriOspfAreaRangeEntry 5 }
+
+--  OSPF Host Table
+
+  wriOspfHostTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfHostEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Host/Metric Table indicates what hosts are directly
+          attached to the router, what metrics and types
+          of service should be advertised for them,
+          and what areas they are found within."
+       REFERENCE
+          "OSPF Version 2, Appendix C.7 Host route
+          parameters"
+       ::= { wriOspfv2 6 }
+
+  wriOspfHostEntry OBJECT-TYPE
+       SYNTAX       WriOspfHostEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A metric to be advertised, for a given type of
+          service, when a given host is reachable.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX {wriOspfProcessId,wriOspfHostIpAddress, wriOspfHostTOS }
+       ::= { wriOspfHostTable 1 }
+
+  WriOspfHostEntry ::=
+       SEQUENCE {
+          wriOspfHostIpAddress
+             IpAddress,
+          wriOspfHostTOS
+             TOSType,
+          wriOspfHostMetric
+             Metric,
+          wriOspfHostStatus
+             RowStatus,
+          wriOspfHostAreaID
+             AreaID,
+          wriOspfHostCfgAreaID
+             AreaID
+          }
+
+  wriOspfHostIpAddress OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the host."
+       REFERENCE
+          "OSPF Version 2, Appendix C.7 Host route parameters"
+       ::= { wriOspfHostEntry 1 }   
+       
+  wriOspfHostTOS OBJECT-TYPE
+       SYNTAX       TOSType
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Type of Service of the route being configured."
+       REFERENCE
+          "OSPF Version 2, Appendix C.7 Host route parameters"
+       ::= { wriOspfHostEntry 2 }
+
+  wriOspfHostMetric OBJECT-TYPE
+       SYNTAX       Metric
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The metric to be advertised."
+       REFERENCE
+          "OSPF Version 2, Appendix C.7 Host route parameters"
+       ::= { wriOspfHostEntry 3 }
+
+  wriOspfHostStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfHostEntry 4 }
+
+  wriOspfHostAreaID OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only
+       STATUS       deprecated
+       DESCRIPTION
+          "The OSPF area to which the host belongs.
+          Deprecated by wriOspfHostCfgAreaID."
+       REFERENCE
+          "OSPF Version 2, Appendix C.7 Host parameters"
+       ::= { wriOspfHostEntry 5 }
+
+  wriOspfHostCfgAreaID OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "To configure the OSPF area to which the host belongs."
+       REFERENCE
+          "OSPF Version 2, Appendix C.7 Host parameters"
+       ::= { wriOspfHostEntry 6 }
+
+--  OSPF Interface Table
+
+  wriOspfIfTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Interface Table describes the interfaces
+          from the viewpoint of OSPF.
+          It augments the ipAddrTable with OSPF specific information."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3  Router interface
+          parameters"
+       ::= { wriOspfv2 7 }
+
+  wriOspfIfEntry OBJECT-TYPE
+       SYNTAX       WriOspfIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF interface entry describes one interface
+          from the viewpoint of OSPF.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX {wriOspfProcessId,wriOspfIfIpAddress, wriOspfAddressLessIf }
+       ::= { wriOspfIfTable 1 }
+
+  WriOspfIfEntry ::=
+       SEQUENCE {
+          wriOspfIfIpAddress
+             IpAddress,
+          wriOspfAddressLessIf
+             InterfaceIndexOrZero,
+          wriOspfIfAreaId
+             AreaID,
+          wriOspfIfType
+             INTEGER,
+          wriOspfIfAdminStat
+             Status,
+          wriOspfIfRtrPriority
+             DesignatedRouterPriority,
+          wriOspfIfTransitDelay
+             UpToMaxAge,
+          wriOspfIfRetransInterval
+             UpToMaxAge,
+          wriOspfIfHelloInterval
+             HelloRange,
+          wriOspfIfRtrDeadInterval
+             PositiveInteger,
+          wriOspfIfPollInterval
+             PositiveInteger,
+          wriOspfIfState
+             INTEGER,
+          wriOspfIfDesignatedRouter
+             IpAddress,
+          wriOspfIfBackupDesignatedRouter
+             IpAddress,
+          wriOspfIfEvents
+             Counter32,
+          wriOspfIfAuthKey
+             OCTET STRING,
+          wriOspfIfStatus
+             RowStatus,
+          wriOspfIfMulticastForwarding
+             INTEGER,
+          wriOspfIfDemand
+             TruthValue,
+          wriOspfIfAuthType
+             OspfAuthenticationType,
+          wriOspfIfLsaCount
+             Gauge32,
+          wriOspfIfLsaCksumSum
+             Unsigned32,
+          wriOspfIfDesignatedRouterId
+             RouterID,
+          wriOspfIfBackupDesignatedRouterId
+             RouterID,
+          wriOspfIfPassive 
+          	 INTEGER,
+          wriOspfIfMtu	 
+             INTEGER,
+          wriOspfIfTeAdminGroup
+             INTEGER,
+       	  wriOspfIfTeCost 	
+             INTEGER,
+          wriOspfIfTeEnable 
+          	 INTEGER,
+          wriOspfIfTeMaxBandWidth 
+          	 INTEGER,
+          wriOspfIfTeMaxRsvdBandWidth 
+          	 INTEGER,
+          wriOspfIfStaticCost 
+          	 INTEGER,
+          wriOspfIfAuthKeyId 
+          	 INTEGER,
+          wriOspfIfBfdState 
+          	 INTEGER,
+          wriOspfIfFloodGroup
+          	 INTEGER,
+          wriOspfIfFastChange
+          	 INTEGER,
+          wriOspfIfIndex
+          	 INTEGER,
+          wriOspfIfMtuIgnore
+          	 INTEGER	 
+          	 }
+  wriOspfIfIpAddress OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The IP address of this OSPF interface."
+       ::= { wriOspfIfEntry 1 }
+
+  wriOspfAddressLessIf OBJECT-TYPE
+       SYNTAX       InterfaceIndexOrZero
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "For the purpose of easing the instancing of
+          addressed and addressless interfaces; this
+          variable takes the value 0 on interfaces with
+          IP addresses and the corresponding value of
+          ifIndex for interfaces having no IP address."
+       ::= { wriOspfIfEntry 2 }
+
+  wriOspfIfAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the area
+          to which the interface connects.  Area ID
+          0.0.0.0 is used for the OSPF backbone."
+       DEFVAL { '00000000'H }  -- 0.0.0.0
+       ::= { wriOspfIfEntry 3 }
+
+  wriOspfIfType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       broadcast (1),
+                       nbma (2),
+                       pointToPoint (3),
+                       pointToMultipoint (5)
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The OSPF interface type.
+          By way of a default, this field may be intuited
+          from the corresponding value of ifType.
+          Broadcast LANs, such as Ethernet and IEEE 802.5,
+          take the value 'broadcast', X.25 and similar
+          technologies take the value 'nbma', and links
+          that are definitively point to point take the
+          value 'pointToPoint'."
+        ::= { wriOspfIfEntry 4 }
+
+  wriOspfIfAdminStat OBJECT-TYPE
+       SYNTAX       Status
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The OSPF interface's administrative status.
+          The value formed on the interface, and the interface
+          will be advertised as an internal route to some area.
+          The value 'disabled' denotes that the interface is
+          external to OSPF."
+       DEFVAL { enabled }
+       ::= { wriOspfIfEntry 5 }
+
+  wriOspfIfRtrPriority OBJECT-TYPE
+       SYNTAX       DesignatedRouterPriority
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The priority of this interface.  Used in
+          multi-access networks, this field is used in
+          the designated router election algorithm.  The
+          value 0 signifies that the router is not eligible
+          to become the designated router on this particular
+          network.  In the event of a tie in this value,
+          routers will use their Router ID as a tie breaker."
+        DEFVAL { 1 }
+        ::= { wriOspfIfEntry 6 }
+
+  wriOspfIfTransitDelay OBJECT-TYPE
+        SYNTAX       UpToMaxAge
+        UNITS        "seconds"
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+           "The estimated number of seconds it takes to
+           transmit a link state update packet over this
+           interface.  Note that the minimal value SHOULD be
+           1 second."
+        DEFVAL { 1 }
+        ::= { wriOspfIfEntry 7 }
+
+  wriOspfIfRetransInterval OBJECT-TYPE
+       SYNTAX       UpToMaxAge
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds between link state advertisement
+          retransmissions, for adjacencies belonging to this
+          interface.  This value is also used when retransmitting
+          database description and Link State request packets.
+          Note that minimal value SHOULD be 1 second."
+       DEFVAL { 5 }
+       ::= { wriOspfIfEntry 8 }
+
+  wriOspfIfHelloInterval OBJECT-TYPE
+       SYNTAX       HelloRange
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The length of time, in seconds, between the Hello packets
+          that the router sends on the interface.  This value must be
+          the same for all routers attached to a common network."
+       DEFVAL { 10 }
+       ::= { wriOspfIfEntry 9 }
+
+  wriOspfIfRtrDeadInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds that a router's Hello packets have
+          not been seen before its neighbors declare the router down.
+          This should be some multiple of the Hello interval.  This
+          value must be the same for all routers attached to a common
+          network."
+        DEFVAL { 40 }
+        ::= { wriOspfIfEntry 10 }
+
+  wriOspfIfPollInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The larger time interval, in seconds, between the Hello
+          packets sent to an inactive non-broadcast multi-access
+          neighbor."
+       DEFVAL { 120 }
+       ::= { wriOspfIfEntry 11 }
+
+  wriOspfIfState OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       down (1),
+                       loopback (2),
+                       waiting (3),
+                       pointToPoint (4),
+                       designatedRouter (5),
+                       backupDesignatedRouter (6),
+                       otherDesignatedRouter (7)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Interface State."
+       DEFVAL { down }
+       ::= { wriOspfIfEntry 12 }
+
+  wriOspfIfDesignatedRouter OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the designated router."
+       DEFVAL { '00000000'H } -- 0.0.0.0
+       ::= { wriOspfIfEntry 13 }
+
+  wriOspfIfBackupDesignatedRouter OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the backup designated
+          router."
+       DEFVAL { '00000000'H }  -- 0.0.0.0
+       ::= { wriOspfIfEntry 14 }
+
+  wriOspfIfEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times this OSPF interface has
+          changed its state or an error has occurred.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of wriOspfDiscontinuityTime."
+       ::= { wriOspfIfEntry 15 }
+
+  wriOspfIfAuthKey OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE (0..256))
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The cleartext password used as an OSPF
+          authentication key when simplePassword security
+          is enabled.  This object does not access any OSPF
+          cryptogaphic (e.g., MD5) authentication key under
+          any circumstance.
+
+          If the key length is shorter than 8 octets, the
+          agent will left adjust and zero fill to 8 octets.
+
+          Unauthenticated interfaces need no authentication
+          key, and simple password authentication cannot use
+          a key of more than 8 octets.
+
+          Note that the use of simplePassword authentication
+          is NOT recommended when there is concern regarding
+          attack upon the OSPF system.  SimplePassword
+          authentication is only sufficient to protect against
+          accidental misconfigurations because it re-uses
+          cleartext passwords [RFC1704].
+
+          When read, wriOspfIfAuthKey always returns an octet
+          string of length zero."
+       REFERENCE
+          "OSPF Version 2, Section 9 The Interface Data
+          Structure"
+       DEFVAL { '0000000000000000'H } -- 0.0.0.0.0.0.0.0
+       ::= { wriOspfIfEntry 16 }
+
+  wriOspfIfStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfIfEntry 17 }
+
+  wriOspfIfMulticastForwarding OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       blocked (1), -- no multicast forwarding
+                       multicast (2), -- using multicast address
+                       unicast (3) -- to each OSPF neighbor
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The way multicasts should be forwarded on this
+          interface: not forwarded, forwarded as data
+          link multicasts, or forwarded as data link
+          unicasts.  Data link multicasting is not
+          meaningful on point-to-point and NBMA interfaces,
+          and setting wriOspfMulticastForwarding to 0 effectively
+          disables all multicast forwarding."
+       DEFVAL { blocked }
+       ::= { wriOspfIfEntry 18 }
+
+  wriOspfIfDemand OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Indicates whether Demand OSPF procedures (hello
+          suppression to FULL neighbors and setting the
+          DoNotAge flag on propagated LSAs) should be
+          performed on this interface."
+       DEFVAL { false }
+       ::= { wriOspfIfEntry 19 }
+
+  wriOspfIfAuthType OBJECT-TYPE
+       SYNTAX       OspfAuthenticationType
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The authentication type specified for an interface.
+
+          Note that this object can be used to engage
+          in significant attacks against an OSPF router."
+       REFERENCE
+          "OSPF Version 2, Appendix D Authentication"
+       DEFVAL { none } -- no authentication, by default
+       ::= { wriOspfIfEntry 20 }
+
+  wriOspfIfLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of link-local link state advertisements
+          in this interface's link-local link state database."
+       ::= { wriOspfIfEntry 21 } 
+       
+  wriOspfIfLsaCksumSum OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit unsigned sum of the Link State
+          Advertisements' LS checksums contained in this
+          interface's link-local link state database.
+          The sum can be used to determine if there has
+          been a change in the interface's link state
+          database and to compare the interface link state
+          database of routers attached to the same subnet."
+       ::= { wriOspfIfEntry 22 }
+
+  wriOspfIfDesignatedRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the designated router."
+       ::= { wriOspfIfEntry 23 }
+
+  wriOspfIfBackupDesignatedRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the backup designated router."
+       ::= { wriOspfIfEntry 24 }  
+       
+  wriOspfIfPassive  OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface passive mode."   
+       ::= { wriOspfIfEntry 25 }
+   
+   wriOspfIfMtu  OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface MTU."   
+       ::= { wriOspfIfEntry 26 }
+    
+   wriOspfIfTeAdminGroup OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface MTU."   
+       ::= { wriOspfIfEntry 27 } 
+      
+    wriOspfIfTeCost OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface te cost."   
+       ::= { wriOspfIfEntry 28 } 
+       
+    wriOspfIfTeEnable OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface te state."   
+       ::= { wriOspfIfEntry 29 }
+       
+    wriOspfIfTeMaxBandWidth OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface max bind width."   
+       ::= { wriOspfIfEntry 30 } 
+       
+    wriOspfIfTeMaxRsvdBandWidth OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface max rsvd bind width."   
+       ::= { wriOspfIfEntry 31 }
+       
+     wriOspfIfStaticCost OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface static cost."   
+       ::= { wriOspfIfEntry 32 }
+      
+     wriOspfIfAuthKeyId OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface auth key ID."   
+       ::= { wriOspfIfEntry 33 } 
+       
+    wriOspfIfBfdState OBJECT-TYPE
+       SYNTAX       INTEGER{enable(1),disable(2)}
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface bfd state."   
+       ::= { wriOspfIfEntry 34 }   
+      
+    wriOspfIfFloodGroup  OBJECT-TYPE
+       SYNTAX       INTEGER(0..64)
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface flood group."   
+       ::= { wriOspfIfEntry 35 } 
+     
+     wriOspfIfFastChange  OBJECT-TYPE
+       SYNTAX       INTEGER{enable(1),disable(0)}
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "interface fast change state."   
+       ::= { wriOspfIfEntry 36 }
+       
+    wriOspfIfIndex   OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "interface index."   
+       ::= { wriOspfIfEntry 37 }  
+       
+    wriOspfIfMtuIgnore   OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "ignore interface index."   
+       ::= { wriOspfIfEntry 38 }  
+   
+--  OSPF Interface Metric Table
+
+  wriOspfIfMetricTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfIfMetricEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Metric Table describes the metrics to be advertised
+          for a specified interface at the various types of service.
+          As such, this table is an adjunct of the OSPF Interface
+          Table.
+
+          Types of service, as defined by RFC 791, have the ability
+          to request low delay, high bandwidth, or reliable linkage.
+
+          For the purposes of this specification, the measure of
+          bandwidth:
+
+          Metric = referenceBandwidth / ifSpeed
+
+          is the default value.
+          The default reference bandwidth is 10^8.
+          For multiple link interfaces, note that ifSpeed is the sum
+          of the individual link speeds.  This yields a number having
+          the following typical values:
+
+          Network Type/bit rate   Metric
+
+          >= 100 MBPS                 1
+          Ethernet/802.3             10
+          E1                         48
+          T1 (ESF)                   65
+          64 KBPS                    1562
+          56 KBPS                    1785
+          19.2 KBPS                  5208
+          9.6 KBPS                   10416
+
+          Routes that are not specified use the default
+          (TOS 0) metric.
+
+          Note that the default reference bandwidth can be configured
+          using the general group object wriOspfReferenceBandwidth."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3 Router interface
+          parameters"
+       ::= { wriOspfv2 8 }
+
+  wriOspfIfMetricEntry OBJECT-TYPE
+       SYNTAX       WriOspfIfMetricEntry
+       MAX-ACCESS   not-accessible
+       STATUS      current
+       DESCRIPTION
+          "A particular TOS metric for a non-virtual interface
+          identified by the interface index.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3 Router interface
+          parameters"
+       INDEX { wriOspfProcessId,wriOspfIfMetricIpAddress,
+          wriOspfIfMetricAddressLessIf,
+          wriOspfIfMetricTOS }
+       ::= { wriOspfIfMetricTable 1 }
+
+  WriOspfIfMetricEntry ::=
+       SEQUENCE {
+          wriOspfIfMetricIpAddress
+             IpAddress,
+          wriOspfIfMetricAddressLessIf
+             InterfaceIndexOrZero,
+          wriOspfIfMetricTOS
+             TOSType,
+          wriOspfIfMetricValue
+             Metric,
+          wriOspfIfMetricStatus
+             RowStatus
+          }
+
+  wriOspfIfMetricIpAddress OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The IP address of this OSPF interface.  On row
+          creation, this can be derived from the instance."
+       ::= { wriOspfIfMetricEntry 1 }
+
+  wriOspfIfMetricAddressLessIf OBJECT-TYPE
+       SYNTAX       InterfaceIndexOrZero
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "For the purpose of easing the instancing of
+          addressed and addressless interfaces; this
+          variable takes the value 0 on interfaces with
+          IP addresses and the value of ifIndex for
+          interfaces having no IP address.  On row
+          creation, this can be derived from the instance."
+        ::= { wriOspfIfMetricEntry 2 }
+
+  wriOspfIfMetricTOS OBJECT-TYPE
+       SYNTAX       TOSType
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Type of Service metric being referenced.
+          On row creation, this can be derived from the
+          instance."
+       ::= { wriOspfIfMetricEntry 3 }
+
+  wriOspfIfMetricValue OBJECT-TYPE
+       SYNTAX       Metric
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The metric of using this Type of Service on
+          this interface.  The default value of the TOS 0
+          metric is 10^8 / ifSpeed."
+       ::= { wriOspfIfMetricEntry 4 }
+
+  wriOspfIfMetricStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfIfMetricEntry 5 }
+
+--  OSPF Virtual Interface Table
+
+  wriOspfVirtIfTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfVirtIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information about this router's virtual interfaces
+          that the OSPF Process is configured to carry on."
+       REFERENCE
+          "OSPF Version 2, Appendix C.4  Virtual link
+          parameters"
+       ::= { wriOspfv2 9 }
+
+  wriOspfVirtIfEntry OBJECT-TYPE
+       SYNTAX       WriOspfVirtIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information about a single virtual interface.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX {wriOspfProcessId, wriOspfVirtIfAreaId, wriOspfVirtIfNeighbor }
+       ::= { wriOspfVirtIfTable 1 }
+
+  WriOspfVirtIfEntry ::=
+       SEQUENCE {
+          wriOspfVirtIfAreaId
+             AreaID,
+          wriOspfVirtIfNeighbor
+             RouterID,
+          wriOspfVirtIfTransitDelay
+             UpToMaxAge,
+          wriOspfVirtIfRetransInterval
+             UpToMaxAge,
+          wriOspfVirtIfHelloInterval
+             HelloRange,
+          wriOspfVirtIfRtrDeadInterval
+             PositiveInteger,
+          wriOspfVirtIfState
+             INTEGER,
+          wriOspfVirtIfEvents
+             Counter32,
+          wriOspfVirtIfAuthKey
+             OCTET STRING,
+          wriOspfVirtIfStatus
+             RowStatus,
+          wriOspfVirtIfAuthType
+             OspfAuthenticationType,
+          wriOspfVirtIfLsaCount
+             Gauge32,
+          wriOspfVirtIfLsaCksumSum
+             Unsigned32,
+          wriOspfVirtIfAuthKeyId
+          	  INTEGER  
+          }
+
+  wriOspfVirtIfAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The transit area that the virtual link
+          traverses.  By definition, this is not 0.0.0.0."
+       ::= { wriOspfVirtIfEntry 1 }
+
+  wriOspfVirtIfNeighbor OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the virtual neighbor."
+       ::= { wriOspfVirtIfEntry 2 }
+
+  wriOspfVirtIfTransitDelay OBJECT-TYPE
+       SYNTAX       UpToMaxAge
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The estimated number of seconds it takes to
+          transmit a Link State update packet over this
+          interface.  Note that the minimal value SHOULD be
+          1 second."
+       DEFVAL { 1 }
+       ::= { wriOspfVirtIfEntry 3 }
+
+  wriOspfVirtIfRetransInterval OBJECT-TYPE
+       SYNTAX       UpToMaxAge
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds between link state
+          avertisement retransmissions, for adjacencies
+          belonging to this interface.  This value is
+          also used when retransmitting database
+          description and Link State request packets.  This
+          value should be well over the expected
+          round-trip time.  Note that the minimal value SHOULD be
+          1 second."
+       DEFVAL { 5 }
+       ::= { wriOspfVirtIfEntry 4 }
+
+  wriOspfVirtIfHelloInterval OBJECT-TYPE
+       SYNTAX       HelloRange
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The length of time, in seconds, between the
+          Hello packets that the router sends on the
+          interface.  This value must be the same for the
+          virtual neighbor."
+       DEFVAL { 10 }
+       ::= { wriOspfVirtIfEntry 5 }
+
+  wriOspfVirtIfRtrDeadInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds that a router's Hello
+          packets have not been seen before its
+          neighbors declare the router down.  This should be
+          some multiple of the Hello interval.  This
+          value must be the same for the virtual neighbor."
+       DEFVAL { 60 }
+       ::= { wriOspfVirtIfEntry 6 }
+
+  wriOspfVirtIfState OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       down (1), -- these use the same encoding
+                       pointToPoint (4) -- as the wriOspfIfTable
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "OSPF virtual interface states."
+       DEFVAL { down }
+       ::= { wriOspfVirtIfEntry 7 }
+
+  wriOspfVirtIfEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of state changes or error events on
+          this virtual link.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of wriOspfDiscontinuityTime."
+       ::= { wriOspfVirtIfEntry 8 }
+
+  wriOspfVirtIfAuthKey OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE(0..256))
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The cleartext password used as an OSPF
+          authentication key when simplePassword security
+          is enabled.  This object does not access any OSPF
+          cryptogaphic (e.g., MD5) authentication key under
+          any circumstance.
+
+          If the key length is shorter than 8 octets, the
+          agent will left adjust and zero fill to 8 octets.
+
+          Unauthenticated interfaces need no authentication
+          key, and simple password authentication cannot use
+          a key of more than 8 octets.
+
+          Note that the use of simplePassword authentication
+          is NOT recommended when there is concern regarding
+          attack upon the OSPF system.  SimplePassword
+          authentication is only sufficient to protect against
+          accidental misconfigurations because it re-uses
+          cleartext passwords.  [RFC1704]
+
+          When read, wriOspfIfAuthKey always returns an octet
+          string of length zero."
+       REFERENCE
+          "OSPF Version 2, Section 9 The Interface Data
+          Structure"
+       DEFVAL { '0000000000000000'H } -- 0.0.0.0.0.0.0.0
+       ::= { wriOspfVirtIfEntry 9 }
+
+  wriOspfVirtIfStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+        ::= { wriOspfVirtIfEntry 10 }
+
+  wriOspfVirtIfAuthType OBJECT-TYPE
+       SYNTAX       OspfAuthenticationType
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The authentication type specified for a virtual interface.
+
+          Note that this object can be used to engage
+          in significant attacks against an OSPF router."
+       REFERENCE
+          "OSPF Version 2, Appendix E Authentication"
+       DEFVAL { none } -- no authentication, by default
+       ::= { wriOspfVirtIfEntry 11 }
+
+  wriOspfVirtIfLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of link-local link state advertisements
+          in this virtual interface's link-local link state database."
+       ::= { wriOspfVirtIfEntry 12 }
+
+  wriOspfVirtIfLsaCksumSum OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit unsigned sum of the link state
+          advertisements' LS checksums contained in this
+          virtual interface's link-local link state database.
+          The sum can be used to determine if there has
+          been a change in the virtual interface's link state
+          database, and to compare the virtual interface
+          link state database of the virtual neighbors."
+       ::= { wriOspfVirtIfEntry 13 }
+  
+  wriOspfVirtIfAuthKeyId OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "Virt interface auth KeyId."
+       ::= { wriOspfVirtIfEntry 14}
+
+
+--  OSPF Neighbor Table
+
+  wriOspfNbrTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A table describing all non-virtual neighbors
+          in the locality of the OSPF router."
+       REFERENCE
+          "OSPF Version 2, Section 10 The Neighbor Data
+          Structure"
+       ::= { wriOspfv2 10 }
+
+  wriOspfNbrEntry OBJECT-TYPE
+       SYNTAX       WriOspfNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The information regarding a single neighbor.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Section 10 The Neighbor Data
+          Structure"
+       INDEX {wriOspfProcessId,wriOspfNbrIpAddr, wriOspfNbrAddressLessIndex }
+       ::= { wriOspfNbrTable 1 }
+
+  WriOspfNbrEntry ::=
+       SEQUENCE {
+          wriOspfNbrIpAddr
+             IpAddress,
+          wriOspfNbrAddressLessIndex
+             InterfaceIndexOrZero,
+          wriOspfNbrRtrId
+             RouterID,
+          wriOspfNbrOptions
+             Integer32,
+          wriOspfNbrPriority
+             DesignatedRouterPriority,
+          wriOspfNbrState
+             INTEGER,
+          wriOspfNbrEvents
+             Counter32,
+          wriOspfNbrLsRetransQLen
+             Gauge32,
+          wriOspfNbmaNbrStatus
+             RowStatus,
+          wriOspfNbmaNbrPermanence
+             INTEGER,
+          wriOspfNbrHelloSuppressed
+             TruthValue,
+          wriOspfNbrRestartHelperStatus
+             INTEGER,
+          wriOspfNbrRestartHelperAge
+             Unsigned32,
+          wriOspfNbrRestartHelperExitReason
+             INTEGER,
+          wriOspfNbrAge
+          	 INTEGER,
+          wriOspfNbrBfdSession
+          	 INTEGER,
+          wriOspfNbrUpTime
+          	 INTEGER,
+		  wriOspfNbrIfIndex
+		     INTEGER
+          }
+
+  wriOspfNbrIpAddr OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The IP address this neighbor is using in its
+          IP source address.  Note that, on addressless
+          links, this will not be 0.0.0.0 but the
+         address of another of the neighbor's interfaces."
+       ::= { wriOspfNbrEntry 1 }
+
+   wriOspfNbrAddressLessIndex OBJECT-TYPE
+       SYNTAX       InterfaceIndexOrZero
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "On an interface having an IP address, zero.
+          On addressless interfaces, the corresponding
+          value of ifIndex in the Internet Standard MIB.
+          On row creation, this can be derived from the
+          instance."
+        ::= { wriOspfNbrEntry 2 }
+
+  wriOspfNbrRtrId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer (represented as a type
+          IpAddress) uniquely identifying the neighboring
+          router in the Autonomous System."
+       DEFVAL { '00000000'H } -- 0.0.0.0
+       ::= { wriOspfNbrEntry 3 }
+
+  wriOspfNbrOptions OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A bit mask corresponding to the neighbor's
+          options field.
+
+          Bit 0, if set, indicates that the system will
+          operate on Type of Service metrics other than
+          TOS 0.  If zero, the neighbor will ignore all
+          metrics except the TOS 0 metric.
+
+          Bit 1, if set, indicates that the associated
+          area accepts and operates on external
+          information; if zero, it is a stub area.
+
+          Bit 2, if set, indicates that the system is
+          capable of routing IP multicast datagrams, that is
+          that it implements the multicast extensions to
+          OSPF.
+          Bit 3, if set, indicates that the associated
+          area is an NSSA.  These areas are capable of
+          carrying type-7 external advertisements, which
+          are translated into type-5 external advertisements
+          at NSSA borders."
+       REFERENCE
+           "OSPF Version 2, Section 12.1.2 Options"
+       DEFVAL { 0 }
+       ::= { wriOspfNbrEntry 4 }
+
+   wriOspfNbrPriority OBJECT-TYPE
+       SYNTAX       DesignatedRouterPriority
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The priority of this neighbor in the designated
+          router election algorithm.  The value 0 signifies
+          that the neighbor is not eligible to become
+          the designated router on this particular network."
+
+       DEFVAL { 1 }
+       ::= { wriOspfNbrEntry 5 }
+
+   wriOspfNbrState OBJECT-TYPE
+        SYNTAX       INTEGER {
+                         down (1),
+                         attempt (2),
+                         init (3),
+                         twoWay (4),
+                         exchangeStart (5),
+                         exchange (6),
+                         loading (7),
+                         full (8)
+                         }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "The state of the relationship with this neighbor."
+         REFERENCE
+            "OSPF Version 2, Section 10.1 Neighbor States"
+         DEFVAL { down }
+         ::= { wriOspfNbrEntry 6 }
+
+  wriOspfNbrEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times this neighbor relationship
+          has changed state or an error has occurred.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of wriOspfDiscontinuityTime."
+       ::= { wriOspfNbrEntry 7 }
+
+  wriOspfNbrLsRetransQLen OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The current length of the retransmission
+          queue."
+       ::= { wriOspfNbrEntry 8 }
+
+  wriOspfNbmaNbrStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfNbrEntry 9 }
+
+  wriOspfNbmaNbrPermanence OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       dynamic (1), -- learned through protocol
+                       permanent (2) -- configured address
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This variable displays the status of the entry;
+          'dynamic' and 'permanent' refer to how the neighbor
+          became known."
+       DEFVAL { permanent }
+       ::= { wriOspfNbrEntry 10 }
+
+   wriOspfNbrHelloSuppressed OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates whether Hellos are being suppressed
+          to the neighbor."
+       ::= { wriOspfNbrEntry 11 }
+
+  wriOspfNbrRestartHelperStatus OBJECT-TYPE
+       SYNTAX       INTEGER { notHelping (1),
+                              helping (2)
+                            }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates whether the router is acting
+          as a graceful restart helper for the neighbor."
+          ::= { wriOspfNbrEntry 12 }
+
+  wriOspfNbrRestartHelperAge OBJECT-TYPE
+       SYNTAX       Unsigned32
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Remaining time in current OSPF graceful restart
+          interval, if the router is acting as a restart
+          helper for the neighbor."
+       ::= { wriOspfNbrEntry 13 }
+
+  wriOspfNbrRestartHelperExitReason OBJECT-TYPE
+       SYNTAX       INTEGER { none (1),           -- not attempted
+                              inProgress (2),     -- restart in
+                                                  -- progress
+                              completed (3),      -- successfully
+                                                  -- completed
+                              timedOut (4),       -- timed out
+                              topologyChanged (5) -- aborted due to
+                                                  -- topology
+                                                  -- change.
+                            }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Describes the outcome of the last attempt at acting
+           as a graceful restart helper for the neighbor."
+       ::= { wriOspfNbrEntry 14 }   
+       
+  wriOspfNbrAge   OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "."
+       ::= { wriOspfNbrEntry 15 }
+
+   wriOspfNbrBfdSession   OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "."
+       ::= { wriOspfNbrEntry 16 }
+  
+   wriOspfNbrUpTime   OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "."
+       ::= { wriOspfNbrEntry 17 }
+	   
+	wriOspfNbrIfIndex   OBJECT-TYPE
+       SYNTAX       INTEGER
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "."
+       ::= { wriOspfNbrEntry 18}
+       
+--  OSPF Virtual Neighbor Table
+  wriOspfVirtNbrTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfVirtNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "This table describes all virtual neighbors.
+          Since virtual links are configured
+          in the Virtual Interface Table, this table is read-only."
+       REFERENCE
+          "OSPF Version 2, Section 15 Virtual Links"
+       ::= { wriOspfv2 11 }
+
+  wriOspfVirtNbrEntry OBJECT-TYPE
+       SYNTAX       WriOspfVirtNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Virtual neighbor information."
+       INDEX { wriOspfProcessId,wriOspfVirtNbrArea, wriOspfVirtNbrRtrId }
+       ::= { wriOspfVirtNbrTable 1 }
+
+  WriOspfVirtNbrEntry ::=
+       SEQUENCE {
+          wriOspfVirtNbrArea
+             AreaID,
+          wriOspfVirtNbrRtrId
+             RouterID,
+          wriOspfVirtNbrIpAddr
+             IpAddress,
+          wriOspfVirtNbrOptions
+             Integer32,
+          wriOspfVirtNbrState
+             INTEGER,
+          wriOspfVirtNbrEvents
+             Counter32,
+          wriOspfVirtNbrLsRetransQLen
+             Gauge32,
+          wriOspfVirtNbrHelloSuppressed
+             TruthValue,
+          wriOspfVirtNbrRestartHelperStatus
+             INTEGER,
+          wriOspfVirtNbrRestartHelperAge
+             Unsigned32,
+          wriOspfVirtNbrRestartHelperExitReason
+             INTEGER
+          }
+
+  wriOspfVirtNbrArea OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                             -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Transit Area Identifier."
+       ::= { wriOspfVirtNbrEntry 1 }
+
+  wriOspfVirtNbrRtrId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS      current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the
+          neighboring router in the Autonomous System."
+       ::= { wriOspfVirtNbrEntry 2 }
+
+  wriOspfVirtNbrIpAddr OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The IP address this virtual neighbor is using."
+       ::= { wriOspfVirtNbrEntry 3 }
+
+  wriOspfVirtNbrOptions OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A bit mask corresponding to the neighbor's
+          options field.
+
+          Bit 1, if set, indicates that the system will
+          operate on Type of Service metrics other than
+          TOS 0.  If zero, the neighbor will ignore all
+          metrics except the TOS 0 metric.
+
+          Bit 2, if set, indicates that the system is
+          network multicast capable, i.e., that it
+          implements OSPF multicast routing."
+       ::= { wriOspfVirtNbrEntry 4 }
+
+   wriOspfVirtNbrState OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       down (1),
+                       attempt (2),
+                       init (3),
+                       twoWay (4),
+                       exchangeStart (5),
+                       exchange (6),
+                       loading (7),
+                       full (8)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The state of the virtual neighbor relationship."
+       ::= { wriOspfVirtNbrEntry 5 }
+
+  wriOspfVirtNbrEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times this virtual link has
+          changed its state or an error has occurred.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of wriOspfDiscontinuityTime."
+       ::= { wriOspfVirtNbrEntry 6 }
+
+  wriOspfVirtNbrLsRetransQLen OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The current length of the retransmission
+          queue."
+       ::= { wriOspfVirtNbrEntry 7 }
+
+  wriOspfVirtNbrHelloSuppressed OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates whether Hellos are being suppressed
+          to the neighbor."
+       ::= { wriOspfVirtNbrEntry 8 }
+
+  wriOspfVirtNbrRestartHelperStatus OBJECT-TYPE
+       SYNTAX       INTEGER { notHelping (1),
+                              helping (2)
+                            }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates whether the router is acting
+          as a graceful restart helper for the neighbor."
+       ::= { wriOspfVirtNbrEntry 9 }
+
+  wriOspfVirtNbrRestartHelperAge OBJECT-TYPE
+       SYNTAX       Unsigned32
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Remaining time in current OSPF graceful restart
+          interval, if the router is acting as a restart
+          helper for the neighbor."
+       ::= { wriOspfVirtNbrEntry 10 }
+
+  wriOspfVirtNbrRestartHelperExitReason OBJECT-TYPE
+       SYNTAX       INTEGER { none (1),           -- not attempted
+                              inProgress (2),     -- restart in
+                                                  -- progress
+                              completed (3),      -- successfully
+                                                  -- completed
+                              timedOut (4),       -- timed out
+                              topologyChanged (5) -- aborted due to
+                                                  -- topology
+                                                  -- change.
+                            }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Describes the outcome of the last attempt at acting
+           as a graceful restart helper for the neighbor."
+       ::= { wriOspfVirtNbrEntry 11 }
+
+--  OSPF Link State Database, External
+
+  wriOspfExtLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfExtLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       deprecated
+       DESCRIPTION
+          "The OSPF Process's external LSA link state database.
+
+          This table is identical to the OSPF LSDB Table
+          in format, but contains only external link state
+          advertisements.  The purpose is to allow external
+          LSAs to be displayed once for the router rather
+          than once in each non-stub area.
+
+          Note that external LSAs are also in the AS-scope link state
+          database."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State Advertisements"
+       ::= { wriOspfv2 12 }
+
+  wriOspfExtLsdbEntry OBJECT-TYPE
+       SYNTAX       WriOspfExtLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       deprecated
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX {wriOspfProcessId,wriOspfExtLsdbType, wriOspfExtLsdbLsid, wriOspfExtLsdbRouterId }
+       ::= { wriOspfExtLsdbTable 1 }
+
+  WriOspfExtLsdbEntry ::=
+       SEQUENCE {
+          wriOspfExtLsdbType
+             INTEGER,
+          wriOspfExtLsdbLsid
+             IpAddress,
+          wriOspfExtLsdbRouterId
+             RouterID,
+          wriOspfExtLsdbSequence
+             Integer32,
+          wriOspfExtLsdbAge
+             Integer32,
+          wriOspfExtLsdbChecksum
+             Integer32,
+          wriOspfExtLsdbAdvertisement
+             OCTET STRING
+          }
+
+  wriOspfExtLsdbType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                      asExternalLink (5)
+                      }
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       deprecated
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate advertisement
+          format."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+
+       ::= { wriOspfExtLsdbEntry 1 }
+
+  wriOspfExtLsdbLsid OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       deprecated
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing either a Router ID or an IP address;
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { wriOspfExtLsdbEntry 2 }
+
+  wriOspfExtLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       deprecated
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { wriOspfExtLsdbEntry 3 }
+
+  wriOspfExtLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       deprecated
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate link state
+          advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version  2,  Section  12.1.6  LS  sequence
+          number"
+       ::= { wriOspfExtLsdbEntry 4 }
+
+  wriOspfExtLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       deprecated
+       DESCRIPTION
+          "This field is the age of the link state
+          advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { wriOspfExtLsdbEntry 5 }
+
+  wriOspfExtLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       deprecated
+       DESCRIPTION
+          "This field is the checksum of the complete
+          contents of the advertisement, excepting the
+          age field.  The age field is excepted so that
+          an advertisement's age can be incremented
+          without updating the checksum.  The checksum
+          used is the same that is used for ISO
+          connectionless datagrams; it is commonly referred
+          to as the Fletcher checksum."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.7 LS checksum"
+       ::= { wriOspfExtLsdbEntry 6 }
+
+  wriOspfExtLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE(36))
+       MAX-ACCESS   read-only
+       STATUS       deprecated
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header."
+       REFERENCE
+          "OSPF Version 2, Section 12  Link State
+          Advertisements"
+       ::= { wriOspfExtLsdbEntry 7 }
+
+--  OSPF Use of the CIDR Route Table
+
+  wriOspfRouteGroup    OBJECT IDENTIFIER ::= { wriOspfv2 13 }
+
+--     The IP Forwarding Table defines a number of objects for use by
+--     the routing protocol to externalize its information.  Most of
+--     the variables (ipForwardDest, ipForwardMask, ipForwardPolicy,
+--     ipForwardNextHop, ipForwardIfIndex, ipForwardType,
+--     ipForwardProto, ipForwardAge, and ipForwardNextHopAS) are
+--     defined there.
+
+--     Those that leave some discretion are defined here.
+
+--     ipCidrRouteProto is, of course, wriOspf (13).
+
+--     ipCidrRouteAge is the time since the route was first
+--     calculated, as opposed to the time since the last SPF run.
+--     ipCidrRouteInfo is an OBJECT IDENTIFIER for use by the routing
+--     protocol.  The following values shall be found there depending
+--     on the way the route was calculated.
+
+  wriOspfIntraArea      OBJECT IDENTIFIER ::= { wriOspfRouteGroup 1 }
+  wriOspfInterArea      OBJECT IDENTIFIER ::= { wriOspfRouteGroup 2 }
+  wriOspfExternalType1  OBJECT IDENTIFIER ::= { wriOspfRouteGroup 3 }
+  wriOspfExternalType2  OBJECT IDENTIFIER ::= { wriOspfRouteGroup 4 }
+
+--     ipCidrRouteMetric1 is, by definition, the primary routing
+--     metric.  Therefore, it should be the metric that route
+--     selection is based on.  For intra-area and inter-area routes,
+--     it is an OSPF metric.  For External Type 1 (comparable value)
+--     routes, it is an OSPF metric plus the External Metric.  For
+--     external Type 2 (non-comparable value) routes, it is the
+--     external metric.
+
+--     ipCidrRouteMetric2 is, by definition, a secondary routing
+--     metric.  Therefore, it should be the metric that breaks a tie
+--     among routes having equal metric1 values and the same
+--     calculation rule.  For intra-area, inter-area routes, and
+--     External Type 1 (comparable value) routes, it is unused.  For
+--     External Type 2 (non-comparable value) routes, it is the metric
+--     to the AS border router.
+
+--     ipCidrRouteMetric3, ipCidrRouteMetric4, and ipCidrRouteMetric5
+--     are unused.
+
+--  The OSPF Area Aggregate Table
+--
+--     This table replaces the OSPF Area Summary Table, being an
+--     extension of that for CIDR routers.
+
+   wriOspfAreaAggregateTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfAreaAggregateEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Area Aggregate Table acts as an adjunct
+           to the Area Table.  It describes those address aggregates
+           that are configured to be propagated from an area.
+           Its purpose is to reduce the amount of information
+           that is known beyond an Area's borders.
+
+           It contains a set of IP address ranges
+           specified by an IP address/IP network mask pair.
+           For example, a class B address range of X.X.X.X
+           with a network mask of 255.255.0.0 includes all IP
+           addresses from X.X.0.0 to X.X.255.255.
+
+           Note that if ranges are configured such that one range
+           subsumes another range (e.g., 10.0.0.0 mask 255.0.0.0
+           and 10.1.0.0 mask 255.255.0.0),
+           the most specific match is the preferred one."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2  Area parameters"
+       ::= { wriOspfv2 14 }
+
+  wriOspfAreaAggregateEntry OBJECT-TYPE
+       SYNTAX   WriOspfAreaAggregateEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A single area aggregate entry.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2  Area parameters"
+       INDEX { wriOspfProcessId,wriOspfAreaAggregateAreaID, wriOspfAreaAggregateLsdbType,
+          wriOspfAreaAggregateNet, wriOspfAreaAggregateMask }
+       ::= { wriOspfAreaAggregateTable 1 }
+
+  WriOspfAreaAggregateEntry ::=
+       SEQUENCE {
+          wriOspfAreaAggregateAreaID
+             AreaID,
+          wriOspfAreaAggregateLsdbType
+             INTEGER,
+          wriOspfAreaAggregateNet
+             IpAddress,
+          wriOspfAreaAggregateMask
+             IpAddress,
+          wriOspfAreaAggregateStatus
+             RowStatus,
+          wriOspfAreaAggregateEffect
+             INTEGER,
+          wriOspfAreaAggregateExtRouteTag
+             Unsigned32
+          }
+
+  wriOspfAreaAggregateAreaID OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The area within which the address aggregate is to be
+          found."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaAggregateEntry 1 }
+
+  wriOspfAreaAggregateLsdbType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       summaryLink (3),
+                       nssaExternalLink (7)
+                       }
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The type of the address aggregate.  This field
+          specifies the Lsdb type that this address
+          aggregate applies to."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { wriOspfAreaAggregateEntry 2 }
+
+  wriOspfAreaAggregateNet OBJECT-TYPE
+       SYNTAX   IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS   current
+       DESCRIPTION
+          "The IP address of the net or subnet indicated
+          by the range."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaAggregateEntry 3 }
+
+  wriOspfAreaAggregateMask OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS      current
+       DESCRIPTION
+          "The subnet mask that pertains to the net or
+          subnet."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { wriOspfAreaAggregateEntry 4 }
+
+  wriOspfAreaAggregateStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { wriOspfAreaAggregateEntry 5 }
+
+  wriOspfAreaAggregateEffect OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       advertiseMatching (1),
+                       doNotAdvertiseMatching (2)
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Subnets subsumed by ranges either trigger the
+          advertisement of the indicated aggregate
+         (advertiseMatching) or result in the subnet's not
+          being advertised at all outside the area."
+       DEFVAL { advertiseMatching }
+       ::= { wriOspfAreaAggregateEntry 6 }
+
+  wriOspfAreaAggregateExtRouteTag OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "External route tag to be included in NSSA (type-7)
+           LSAs."
+       DEFVAL { 0 }
+       ::= { wriOspfAreaAggregateEntry 7 }
+
+--  OSPF Link State Database, link-local for non-virtual links
+
+
+  wriOspfLocalLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfLocalLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Process's link-local link state database
+          for non-virtual links.
+          This table is identical to the OSPF LSDB Table
+          in format, but contains only link-local Link State
+          Advertisements for non-virtual links.  The purpose is
+          to allow link-local LSAs to be displayed for each
+          non-virtual interface.  This table is implemented to
+          support type-9 LSAs that are defined
+          in 'The OSPF Opaque LSA Option'."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State Advertisements
+          and The OSPF Opaque LSA Option"
+       ::= { wriOspfv2 17 }
+
+  wriOspfLocalLsdbEntry OBJECT-TYPE
+       SYNTAX       WriOspfLocalLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX {wriOspfProcessId, wriOspfLocalLsdbIpAddress, wriOspfLocalLsdbAddressLessIf,
+          wriOspfLocalLsdbType, wriOspfLocalLsdbLsid, wriOspfLocalLsdbRouterId
+          }
+       ::= { wriOspfLocalLsdbTable 1 }
+
+  WriOspfLocalLsdbEntry ::=
+       SEQUENCE {
+          wriOspfLocalLsdbIpAddress
+             IpAddress,
+          wriOspfLocalLsdbAddressLessIf
+             InterfaceIndexOrZero,
+          wriOspfLocalLsdbType
+             INTEGER,
+          wriOspfLocalLsdbLsid
+             IpAddress,
+          wriOspfLocalLsdbRouterId
+             RouterID,
+          wriOspfLocalLsdbSequence
+             Integer32,
+          wriOspfLocalLsdbAge
+             Integer32,
+          wriOspfLocalLsdbChecksum
+             Integer32,
+          wriOspfLocalLsdbAdvertisement
+             OCTET STRING
+          }
+
+  wriOspfLocalLsdbIpAddress OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the interface from
+          which the LSA was received if the interface is
+          numbered."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3 Interface parameters"
+       ::= { wriOspfLocalLsdbEntry 1 }
+
+  wriOspfLocalLsdbAddressLessIf OBJECT-TYPE
+       SYNTAX       InterfaceIndexOrZero
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The interface index of the interface from
+          which the LSA was received if the interface is
+          unnumbered."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3 Interface parameters"
+       ::= { wriOspfLocalLsdbEntry 2 }
+
+  wriOspfLocalLsdbType OBJECT-TYPE
+       SYNTAX       INTEGER { localOpaqueLink (9) }
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate
+          advertisement format."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { wriOspfLocalLsdbEntry 3 }
+
+  wriOspfLocalLsdbLsid OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing a 32-bit identifier in IP address format;
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+         "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { wriOspfLocalLsdbEntry 4 }
+
+  wriOspfLocalLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { wriOspfLocalLsdbEntry 5 }
+
+  wriOspfLocalLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate link state
+          advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.6 LS sequence
+          number"
+       ::= { wriOspfLocalLsdbEntry 6 }
+
+  wriOspfLocalLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the age of the link state
+          advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { wriOspfLocalLsdbEntry 7 }
+
+  wriOspfLocalLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the checksum of the complete
+          contents of the advertisement, excepting the
+          age field.  The age field is excepted so that
+          an advertisement's age can be incremented
+          without updating the checksum.  The checksum
+          used is the same that is used for ISO
+          connectionless datagrams; it is commonly referred
+          to as the Fletcher checksum."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.7 LS checksum"
+       ::= { wriOspfLocalLsdbEntry 8 }
+
+  wriOspfLocalLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE (1..65535))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header.
+
+          Note that for variable length LSAs, SNMP agents
+          may not be able to return the largest string size."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements"
+       ::= { wriOspfLocalLsdbEntry 9 }
+
+--  OSPF Link State Database, link-local for virtual Links
+
+  wriOspfVirtLocalLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfVirtLocalLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Process's link-local link state database
+          for virtual links.
+          This table is identical to the OSPF LSDB Table
+          in format, but contains only link-local Link State
+          Advertisements for virtual links.  The purpose is to
+          allow link-local LSAs to be displayed for each virtual
+          interface.  This table is implemented to support type-9 LSAs
+          that are defined in 'The OSPF Opaque LSA Option'."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements and The OSPF Opaque LSA Option"
+       ::= { wriOspfv2 18 }
+
+  wriOspfVirtLocalLsdbEntry OBJECT-TYPE
+       SYNTAX       WriOspfVirtLocalLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX { wriOspfProcessId,
+       	  wriOspfVirtLocalLsdbTransitArea,
+          wriOspfVirtLocalLsdbNeighbor,
+          wriOspfVirtLocalLsdbType,
+          wriOspfVirtLocalLsdbLsid,
+          wriOspfVirtLocalLsdbRouterId
+          }
+       ::= { wriOspfVirtLocalLsdbTable 1 }
+
+  WriOspfVirtLocalLsdbEntry ::=
+       SEQUENCE {
+          wriOspfVirtLocalLsdbTransitArea
+             AreaID,
+          wriOspfVirtLocalLsdbNeighbor
+             RouterID,
+          wriOspfVirtLocalLsdbType
+             INTEGER,
+          wriOspfVirtLocalLsdbLsid
+             IpAddress,
+          wriOspfVirtLocalLsdbRouterId
+             RouterID,
+          wriOspfVirtLocalLsdbSequence
+             Integer32,
+          wriOspfVirtLocalLsdbAge
+             Integer32,
+          wriOspfVirtLocalLsdbChecksum
+             Integer32,
+          wriOspfVirtLocalLsdbAdvertisement
+            OCTET STRING
+          }
+
+  wriOspfVirtLocalLsdbTransitArea OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The transit area that the virtual link
+          traverses.  By definition, this is not 0.0.0.0."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3 Interface parameters"
+       ::= { wriOspfVirtLocalLsdbEntry 1 }
+
+  wriOspfVirtLocalLsdbNeighbor OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the virtual neighbor."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3 Interface parameters"
+       ::= { wriOspfVirtLocalLsdbEntry 2 }
+
+  wriOspfVirtLocalLsdbType OBJECT-TYPE
+       SYNTAX       INTEGER  { localOpaqueLink (9) }
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate
+          advertisement format."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { wriOspfVirtLocalLsdbEntry 3 }
+
+  wriOspfVirtLocalLsdbLsid OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing a 32-bit identifier in IP address format;
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { wriOspfVirtLocalLsdbEntry 4 }
+
+  wriOspfVirtLocalLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { wriOspfVirtLocalLsdbEntry 5 }
+
+  wriOspfVirtLocalLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate link state
+          advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.6 LS sequence
+          number"
+       ::= { wriOspfVirtLocalLsdbEntry 6 }
+
+  wriOspfVirtLocalLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the age of the link state
+          advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { wriOspfVirtLocalLsdbEntry 7 }
+
+  wriOspfVirtLocalLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the checksum of the complete
+          contents of the advertisement, excepting the
+          age field.  The age field is excepted so that
+          an advertisement's age can be incremented
+          without updating the checksum.  The checksum
+          used is the same that is used for ISO
+          connectionless datagrams; it is commonly
+          referred to as the Fletcher checksum."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.7 LS checksum"
+       ::= { wriOspfVirtLocalLsdbEntry 8 }
+
+  wriOspfVirtLocalLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE (1..65535))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements.
+
+          Note that for variable length LSAs, SNMP agents
+          may not be able to return the largest string size."
+       ::= { wriOspfVirtLocalLsdbEntry 9 }
+
+--  OSPF Link State Database, AS-scope
+
+  wriOspfAsLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF WriOspfAsLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Process's AS-scope LSA link state database.
+           The database contains the AS-scope Link State
+           Advertisements from throughout the areas that
+           the device is attached to.
+
+           This table is identical to the OSPF LSDB Table
+           in format, but contains only AS-scope Link State
+           Advertisements.  The purpose is to allow AS-scope
+           LSAs to be displayed once for the router rather
+           than once in each non-stub area."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements"
+       ::= { wriOspfv2 19 }
+
+  wriOspfAsLsdbEntry OBJECT-TYPE
+       SYNTAX       WriOspfAsLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX { wriOspfProcessId,wriOspfAsLsdbType, wriOspfAsLsdbLsid, wriOspfAsLsdbRouterId }
+       ::= { wriOspfAsLsdbTable 1 }
+
+  WriOspfAsLsdbEntry ::=
+       SEQUENCE {
+          wriOspfAsLsdbType
+             INTEGER,
+          wriOspfAsLsdbLsid
+             IpAddress,
+          wriOspfAsLsdbRouterId
+             RouterID,
+          wriOspfAsLsdbSequence
+             Integer32,
+          wriOspfAsLsdbAge
+             Integer32,
+          wriOspfAsLsdbChecksum
+             Integer32,
+          wriOspfAsLsdbAdvertisement
+             OCTET STRING
+          }
+
+  wriOspfAsLsdbType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                      asExternalLink (5),
+                      asOpaqueLink   (11)
+                      }
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate
+          advertisement format."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { wriOspfAsLsdbEntry 1 }
+
+  wriOspfAsLsdbLsid OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing either a Router ID or an IP address;
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { wriOspfAsLsdbEntry 2 }
+
+  wriOspfAsLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { wriOspfAsLsdbEntry 3 }
+
+  wriOspfAsLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate link state
+          advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version  2,  Section  12.1.6  LS  sequence
+          number"
+       ::= { wriOspfAsLsdbEntry 4 }
+
+  wriOspfAsLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the age of the link state
+          advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { wriOspfAsLsdbEntry 5 }
+
+  wriOspfAsLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the checksum of the complete
+          contents of the advertisement, excepting the
+          age field.  The age field is excepted so that
+          an advertisement's age can be incremented
+          without updating the checksum.  The checksum
+          used is the same that is used for ISO
+          connectionless datagrams; it is commonly referred
+          to as the Fletcher checksum."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.7 LS checksum"
+       ::= { wriOspfAsLsdbEntry 6 }
+
+  wriOspfAsLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING (SIZE (1..65535))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements.
+
+          Note that for variable length LSAs, SNMP agents
+          may not be able to return the largest string size."
+       ::= { wriOspfAsLsdbEntry 7 }
+
+ --  OSPF Area LSA Counter Table
+
+      wriOspfAreaLsaCountTable OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WriOspfAreaLsaCountEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+             "This table maintains per-area, per-LSA-type counters"
+          ::= { wriOspfv2 20 }
+
+      wriOspfAreaLsaCountEntry OBJECT-TYPE
+          SYNTAX       WriOspfAreaLsaCountEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+             "An entry with a number of link advertisements
+              of a given type for a given area."
+          INDEX { wriOspfProcessId,wriOspfAreaLsaCountAreaId, wriOspfAreaLsaCountLsaType }
+          ::= { wriOspfAreaLsaCountTable 1 }
+
+      WriOspfAreaLsaCountEntry ::=
+           SEQUENCE {
+              wriOspfAreaLsaCountAreaId
+                 AreaID,
+              wriOspfAreaLsaCountLsaType
+                 INTEGER,
+              wriOspfAreaLsaCountNumber
+                 Gauge32
+           }
+
+      wriOspfAreaLsaCountAreaId OBJECT-TYPE
+          SYNTAX       AreaID
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+             "This entry Area ID."
+         ::= { wriOspfAreaLsaCountEntry 1 }
+
+      wriOspfAreaLsaCountLsaType OBJECT-TYPE
+          SYNTAX       INTEGER {
+                          routerLink (1),
+                          networkLink (2),
+                          summaryLink (3),
+                          asSummaryLink (4),
+                          multicastLink (6),
+                          nssaExternalLink (7),
+                          areaOpaqueLink (10)
+                       }
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+             "This entry LSA type."
+         ::= { wriOspfAreaLsaCountEntry 2 }
+
+      wriOspfAreaLsaCountNumber OBJECT-TYPE
+          SYNTAX       Gauge32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+             "Number of LSAs of a given type for a given area."
+         ::= { wriOspfAreaLsaCountEntry 3 } 
+         
+--  OSPF NetWork Table 
+	wriOspfNetWorkTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfNetWorkEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf network element"
+	          ::= { wriOspfv2 21 } 
+          
+	wriOspfNetWorkEntry OBJECT-TYPE
+	          SYNTAX       WriOspfNetWorkEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf network element"
+	          INDEX {wriOspfProcessId,wriOspfNetWorkAreaId, wriOspfNetWorkDest, wriOspfNetWorkMask}
+	          ::= { wriOspfNetWorkTable 1 }  
+          
+	WriOspfNetWorkEntry ::=
+	           SEQUENCE {
+	              wriOspfNetWorkAreaId
+	                 AreaID,
+	              wriOspfNetWorkDest
+	                 IpAddress,
+	              wriOspfNetWorkMask
+	                 IpAddress,
+	              wriOspfNetWorkStatus
+	                 RowStatus   
+	           }
+
+	wriOspfNetWorkAreaId OBJECT-TYPE
+	          SYNTAX       AreaID
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry Area ID."
+	         ::= { wriOspfNetWorkEntry 1 }
+     
+	 wriOspfNetWorkDest OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address."
+	         ::= { wriOspfNetWorkEntry 2 }
+	 
+	 wriOspfNetWorkMask OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address mask."
+	         ::= { wriOspfNetWorkEntry 3 }
+	 
+	 wriOspfNetWorkStatus OBJECT-TYPE
+	          SYNTAX       RowStatus
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry status."
+	         ::= { wriOspfNetWorkEntry 4 } 
+	          
+--  OSPF Distribute Table 
+	wriOspfDistributeTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfDistributeEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Distribute element"
+	          ::= { wriOspfv2 22 } 
+          
+	wriOspfDistributeEntry OBJECT-TYPE
+	          SYNTAX       WriOspfDistributeEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Distribute element"
+	          INDEX {wriOspfProcessId, wriOspfDistributeProtocol, wriOspfDistributeDest, wriOspfDistributeMask}
+	          ::= { wriOspfDistributeTable 1 }  
+          
+	WriOspfDistributeEntry ::=
+	           SEQUENCE {
+	              wriOspfDistributeProtocol
+	                 INTEGER,
+	              wriOspfDistributeDest
+	                 IpAddress,
+	              wriOspfDistributeMask
+	                 IpAddress,
+	              wriOspfDistributeStatus
+	                 RowStatus,
+	              wriOspfDistributeCostType
+	              	 INTEGER,
+	             wriOspfDistributeCost
+	              	 INTEGER,
+	             wriOspfDistributeAdvertise
+	             	 INTEGER,
+	             wriOspfDistributeTranslate	             	 
+	                 INTEGER	  	  	    
+	           }
+
+	wriOspfDistributeProtocol OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "protocol type."
+	         ::= { wriOspfDistributeEntry 1 }
+     
+	 wriOspfDistributeDest OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address."
+	         ::= { wriOspfDistributeEntry 2 }
+	 
+	 wriOspfDistributeMask OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address mask."
+	         ::= { wriOspfDistributeEntry 3 }
+	 
+	 wriOspfDistributeStatus OBJECT-TYPE
+	          SYNTAX       RowStatus
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry status."
+	         ::= { wriOspfDistributeEntry 4 }	 
+	         
+	wriOspfDistributeCostType OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "Distribute Cost Type."
+	         ::= { wriOspfDistributeEntry 5 } 
+	         
+	wriOspfDistributeCost OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "Distribute Cost."
+	         ::= { wriOspfDistributeEntry 6 }  
+	                                        
+	wriOspfDistributeAdvertise OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "Distribute Advertise."
+	         ::= { wriOspfDistributeEntry 7 }
+	         
+	wriOspfDistributeTranslate OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "Distribute Translate."
+	         ::= { wriOspfDistributeEntry 8 }   
+	         
+--  OSPF Filter Table 
+	 wriOspfRouteFilterTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfRouteFilterEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Route Filter element"
+	          ::= { wriOspfv2 23 } 
+          
+	wriOspfRouteFilterEntry OBJECT-TYPE
+	          SYNTAX       WriOspfRouteFilterEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Route  Filter element"
+	          INDEX { wriOspfProcessId,wriOspfRouteFilterDest, wriOspfRouteFilterMask}
+	          ::= { wriOspfRouteFilterTable 1 }  
+          
+	WriOspfRouteFilterEntry ::=
+	           SEQUENCE {
+	              wriOspfRouteFilterDest
+	                 IpAddress,
+	              wriOspfRouteFilterMask
+	                 IpAddress,
+	              wriOspfRouteFilterStatus
+	                 RowStatus,
+	              wriOspfRouteFilterMatchRule
+	              	 INTEGER    
+	           }
+     
+	 wriOspfRouteFilterDest OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address."
+	         ::= { wriOspfRouteFilterEntry 1 }
+	 
+	 wriOspfRouteFilterMask OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address mask."
+	         ::= { wriOspfRouteFilterEntry 2 }
+	 
+	 wriOspfRouteFilterStatus OBJECT-TYPE
+	          SYNTAX       RowStatus
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry status."
+	         ::= { wriOspfRouteFilterEntry 3 }  
+	 
+	 wriOspfRouteFilterMatchRule OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "match rule index."
+	         ::= { wriOspfRouteFilterEntry 4 }
+
+--  OSPF NSSA Range Table 
+	 wriOspfNssaRangeTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfNssaRangeEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Nssa Range element"
+	          ::= { wriOspfv2 24 } 
+          
+	wriOspfNssaRangeEntry OBJECT-TYPE
+	          SYNTAX       WriOspfNssaRangeEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Nssa Range element"
+	          INDEX { wriOspfProcessId,wriOspfNssaRangeAreaId,wriOspfNssaRangeDest, wriOspfNssaRangeMask}
+	          ::= { wriOspfNssaRangeTable 1 }  
+          
+	WriOspfNssaRangeEntry ::=
+	           SEQUENCE {
+	              wriOspfNssaRangeAreaId
+	                 AreaID,
+	              wriOspfNssaRangeDest
+	                 IpAddress,
+	              wriOspfNssaRangeMask
+	                 IpAddress,
+	              wriOspfNssaRangeStatus
+	                 RowStatus,
+	              wriOspfNssaRangeCost
+	              	 INTEGER,
+	              wriOspfNssaRangeEffect
+	              	 INTEGER 	     
+	           }
+      
+    wriOspfNssaRangeAreaId OBJECT-TYPE
+	          SYNTAX       AreaID
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry area id."
+	         ::= { wriOspfNssaRangeEntry 1 }
+
+	 wriOspfNssaRangeDest OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address."
+	         ::= { wriOspfNssaRangeEntry 2 }
+	 
+	 wriOspfNssaRangeMask OBJECT-TYPE
+	          SYNTAX       IpAddress
+	          MAX-ACCESS   read-only
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry destion  ip address mask."
+	         ::= { wriOspfNssaRangeEntry 3 }
+	 
+	 wriOspfNssaRangeStatus OBJECT-TYPE
+	          SYNTAX       RowStatus
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "This entry status."
+	         ::= { wriOspfNssaRangeEntry 4 }  
+	 
+	 wriOspfNssaRangeCost OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "Nssa Range Cost."
+	         ::= { wriOspfNssaRangeEntry 5} 
+	        
+	 wriOspfNssaRangeEffect OBJECT-TYPE
+	          SYNTAX       INTEGER
+	          MAX-ACCESS   read-write
+	          STATUS       current
+	          DESCRIPTION
+	             "Nssa Range Effect."
+	         ::= { wriOspfNssaRangeEntry 6}   
+	         
+--  OSPF NetWork Route Table 
+	 wriOspfNetWorkRouteTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfNetWorkRouteEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf NetWork Route element"
+	          ::= { wriOspfv2 25 } 
+          
+	wriOspfNetWorkRouteEntry OBJECT-TYPE
+	          SYNTAX       WriOspfNetWorkRouteEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf NetWork Route element"
+	          INDEX { wriOspfProcessId,wriOspfNetWorkRouteType,wriOspfNetWorkRouteMask, wriOspfNetWorkRouteDest}
+	          ::= { wriOspfNetWorkRouteTable 1 }  
+          
+	WriOspfNetWorkRouteEntry ::=
+	           SEQUENCE {
+	              wriOspfNetWorkRouteType
+	                 INTEGER,
+	              wriOspfNetWorkRouteMask
+	                 IpAddress,
+	              wriOspfNetWorkRouteDest
+	                 IpAddress,
+	              wriOspfNetWorkRouteNextHop
+	                 OCTET STRING,
+	              wriOspfNetWorkRoutePathType
+	              	 INTEGER,	                
+	              wriOspfNetWorkRouteBackupNextHop
+	                 IpAddress,
+	              wriOspfNetWorkRouteCost   
+	              	 INTEGER,
+	              wriOspfNetWorkRouteCost2
+	              	 INTEGER   	 
+	           }
+	 
+	 wriOspfNetWorkRouteType  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Type."
+	        ::= { wriOspfNetWorkRouteEntry 1} 
+	        
+	 wriOspfNetWorkRouteMask  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Mask."
+	        ::= { wriOspfNetWorkRouteEntry 2} 
+	 
+	 wriOspfNetWorkRouteDest  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Dest."
+	        ::= { wriOspfNetWorkRouteEntry 3} 
+	        
+	wriOspfNetWorkRouteNextHop  OBJECT-TYPE
+	 		SYNTAX       OCTET STRING
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Dest."
+	        ::= { wriOspfNetWorkRouteEntry 4}  
+	
+	wriOspfNetWorkRoutePathType  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Path Type."
+	        ::= { wriOspfNetWorkRouteEntry 5}     
+	 
+	  wriOspfNetWorkRouteBackupNextHop   OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route backup nexthop."
+	        ::= { wriOspfNetWorkRouteEntry 6}  
+	        
+	        
+	   wriOspfNetWorkRouteCost  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route cost."
+	        ::= { wriOspfNetWorkRouteEntry 7}  
+	        
+	   wriOspfNetWorkRouteCost2  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route cost2."
+	        ::= { wriOspfNetWorkRouteEntry 8}          
+
+--  OSPF Abr Route Table 
+	 wriOspfAbrRouteTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfAbrRouteEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Abr Route element"
+	          ::= { wriOspfv2 26 } 
+          
+	wriOspfAbrRouteEntry OBJECT-TYPE
+	          SYNTAX       WriOspfAbrRouteEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Abr Route element"
+	          INDEX { wriOspfProcessId,wriOspfAbrRouteType,wriOspfAbrRouteMask, wriOspfAbrRouteDest,wriOspfAbrRouteAreaId}
+	          ::= { wriOspfAbrRouteTable 1 }  
+          
+	WriOspfAbrRouteEntry ::=
+	           SEQUENCE {
+	              wriOspfAbrRouteType
+	                 INTEGER,
+	              wriOspfAbrRouteMask
+	                 IpAddress, 
+	              wriOspfAbrRouteAreaId   
+	             	 IpAddress, 
+	              wriOspfAbrRouteDest
+	                 IpAddress,
+	              wriOspfAbrRouteNextHop
+	                 OCTET STRING,
+	              wriOspfAbrRoutePathType
+	              	 INTEGER,	                
+	              wriOspfAbrRouteBackupNextHop
+	                 IpAddress,
+	              wriOspfAbrRouteCost   
+	              	 INTEGER,
+	              wriOspfAbrRouteCost2
+	              	 INTEGER	   	 
+	           }
+	 
+	 wriOspfAbrRouteType  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Type."
+	        ::= { wriOspfAbrRouteEntry 1} 
+	        
+	 wriOspfAbrRouteMask  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Mask."
+	        ::= { wriOspfAbrRouteEntry 2}   
+	 
+	 wriOspfAbrRouteAreaId  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route AreaId."
+	        ::= { wriOspfAbrRouteEntry 3} 
+       
+	 
+	 wriOspfAbrRouteDest  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Dest."
+	        ::= { wriOspfAbrRouteEntry 4} 
+	        
+	wriOspfAbrRouteNextHop  OBJECT-TYPE
+	 		SYNTAX       OCTET STRING
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Dest."
+	        ::= { wriOspfAbrRouteEntry 5}  
+	
+	wriOspfAbrRoutePathType  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Path Type."
+	        ::= { wriOspfAbrRouteEntry 6}        
+	        
+	 wriOspfAbrRouteBackupNextHop  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route backup nexthop."
+	        ::= { wriOspfAbrRouteEntry 7}    
+	        
+	  wriOspfAbrRouteCost  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route cost."
+	        ::= { wriOspfAbrRouteEntry 8}  
+	        
+	   wriOspfAbrRouteCost2  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route cost2."
+	        ::= { wriOspfAbrRouteEntry 9}           
+	        
+--  OSPF Asbr Route Table 
+	 wriOspfAsbrRouteTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfAsbrRouteEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Asbr Route element"
+	          ::= { wriOspfv2 27 } 
+          
+	wriOspfAsbrRouteEntry OBJECT-TYPE
+	          SYNTAX       WriOspfAsbrRouteEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Asbr Route element"
+	          INDEX { wriOspfProcessId,wriOspfAsbrRouteType,wriOspfAsbrRouteMask, wriOspfAsbrRouteDest,wriOspfAsbrRouteAreaId}
+	          ::= { wriOspfAsbrRouteTable 1 }  
+          
+	WriOspfAsbrRouteEntry ::=
+	           SEQUENCE {
+	              wriOspfAsbrRouteType
+	                 INTEGER,
+	              wriOspfAsbrRouteMask
+	                 IpAddress, 
+	              wriOspfAsbrRouteAreaId   
+	             	 IpAddress, 
+	              wriOspfAsbrRouteDest
+	                 IpAddress,
+	              wriOspfAsbrRouteNextHop
+	                 OCTET STRING,
+	              wriOspfAsbrRoutePathType
+	              	 INTEGER,
+	              wriOspfAsbrRoutebackupNextHop
+	                 IpAddress,
+	              wriOspfAsbrRouteCost
+                    INTEGER,
+            	  wriOspfAsbrRouteCost2
+                    INTEGER
+ 	 	                
+	           }
+	 
+	 wriOspfAsbrRouteType  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Type."
+	        ::= { wriOspfAsbrRouteEntry 1} 
+	        
+	 wriOspfAsbrRouteMask  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Mask."
+	        ::= { wriOspfAsbrRouteEntry 2}   
+	 
+	 wriOspfAsbrRouteAreaId  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route AreaId."
+	        ::= { wriOspfAsbrRouteEntry 3} 
+       
+	 
+	 wriOspfAsbrRouteDest  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Dest."
+	        ::= { wriOspfAsbrRouteEntry 4} 
+	        
+	wriOspfAsbrRouteNextHop  OBJECT-TYPE
+	 		SYNTAX       OCTET STRING
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Dest."
+	        ::= { wriOspfAsbrRouteEntry 5}  
+	
+	wriOspfAsbrRoutePathType  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route Path Type."
+	        ::= { wriOspfAsbrRouteEntry 6}   
+	             	                 
+     wriOspfAsbrRoutebackupNextHop  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route backup nexthop."
+	        ::= { wriOspfAsbrRouteEntry 7}   
+	 
+	  wriOspfAsbrRouteCost  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route cost."
+	        ::= { wriOspfAsbrRouteEntry 8}  
+	        
+	   wriOspfAsbrRouteCost2  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "NetWork Route cost2."
+	        ::= { wriOspfAsbrRouteEntry 9}           
+	        
+--  OSPF Redistribute  Policy Table 
+	 wriOspfRedisPolicyTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfRedisPolicyEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Redistribute Policy element"
+	          ::= { wriOspfv2 28 } 
+          
+	wriOspfRedisPolicyEntry OBJECT-TYPE
+	          SYNTAX       WriOspfRedisPolicyEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Redistribute  Policy element"
+	          INDEX { wriOspfProcessId,wriOspfRedisPolicyProtocol,wriOspfRedisPolicyIndex}
+	          ::= { wriOspfRedisPolicyTable 1 }  
+          
+	WriOspfRedisPolicyEntry ::=
+	           SEQUENCE {
+	              wriOspfRedisPolicyProtocol
+	                 INTEGER,
+	              wriOspfRedisPolicyIndex
+	                 INTEGER, 
+	              wriOspfRedisPolicyStatus
+	              	 RowStatus	                
+	           }
+    
+    wriOspfRedisPolicyProtocol  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute  route Policy protocol type."
+	        ::= { wriOspfRedisPolicyEntry 1}  
+	        
+	 wriOspfRedisPolicyIndex  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute route Policy index."
+	        ::= { wriOspfRedisPolicyEntry 2}    
+	        
+	  wriOspfRedisPolicyStatus  OBJECT-TYPE
+	 		SYNTAX       RowStatus
+	        MAX-ACCESS   read-write
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute route Policy RowStatus."
+	        ::= { wriOspfRedisPolicyEntry 3}            
+ 
+ 
+--  OSPF Filter Policy Table 
+	 wriOspfFilterPolicyTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfFilterPolicyEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Filter Policy element"
+	          ::= { wriOspfv2 29 } 
+          
+	wriOspfFilterPolicyEntry OBJECT-TYPE
+	          SYNTAX       WriOspfFilterPolicyEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Filter Policy element"
+	          INDEX { wriOspfProcessId,wriOspfFilterPolicyIndex}
+	          ::= { wriOspfFilterPolicyTable 1 }  
+          
+	WriOspfFilterPolicyEntry ::=
+	           SEQUENCE {
+	            wriOspfFilterPolicyIndex
+	                 INTEGER, 
+	            wriOspfFilterPolicyStatus
+	              	 RowStatus	                
+	           }
+    	        
+	 wriOspfFilterPolicyIndex  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "Filter route Policy index."
+	        ::= { wriOspfFilterPolicyEntry 1}    
+	        
+	  wriOspfFilterPolicyStatus  OBJECT-TYPE
+	 		SYNTAX       RowStatus
+	        MAX-ACCESS   read-write
+	        STATUS       current
+	        DESCRIPTION
+	             "Filter route Policy RowStatus."
+	        ::= { wriOspfFilterPolicyEntry 2}     
+	        
+--  OSPF Redistribute  range Table 
+	 wriOspfRedisRangeTable OBJECT-TYPE
+	          SYNTAX       SEQUENCE OF WriOspfRedisRangeEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Redistribute Range element"
+	          ::= { wriOspfv2 30 } 
+          
+	wriOspfRedisRangeEntry OBJECT-TYPE
+	          SYNTAX       WriOspfRedisRangeEntry
+	          MAX-ACCESS   not-accessible
+	          STATUS       current
+	          DESCRIPTION
+	             "The table maintains wriOspf Redistribute  Policy element"
+	          INDEX { wriOspfProcessId,wriOspfRedisRangeProtocol,wriOspfRedisRangeDest,wriOspfRedisRangeMask}
+	          ::= { wriOspfRedisRangeTable 1 }  
+          
+	WriOspfRedisRangeEntry ::=
+	           SEQUENCE {
+	              wriOspfRedisRangeProtocol
+	                 INTEGER,
+	              wriOspfRedisRangeDest
+	                 IpAddress, 
+	              wriOspfRedisRangeMask  
+	              	  IpAddress,
+	              wriOspfRedisRangeStatus	  
+	              	 RowStatus	                
+	           }
+    
+    wriOspfRedisRangeProtocol  OBJECT-TYPE
+	 		SYNTAX       INTEGER
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute  range Policy protocol type."
+	        ::= { wriOspfRedisRangeEntry 1}  
+	        
+	 wriOspfRedisRangeDest  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute route range dest address."
+	        ::= { wriOspfRedisRangeEntry 2} 
+	        
+	  wriOspfRedisRangeMask  OBJECT-TYPE
+	 		SYNTAX       IpAddress
+	        MAX-ACCESS   read-only
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute route range dest address mask."
+	        ::= { wriOspfRedisRangeEntry 3}          
+	        
+	  wriOspfRedisRangeStatus  OBJECT-TYPE
+	 		SYNTAX       RowStatus
+	        MAX-ACCESS   read-write
+	        STATUS       current
+	        DESCRIPTION
+	             "Redistribute route range RowStatus."
+	        ::= { wriOspfRedisRangeEntry 4}      
+	              	              	                                	                                                        
+-- conformance information
+wriOspfConformance OBJECT IDENTIFIER ::= { wriOspfv2 15 }
+
+wriOspfGroups      OBJECT IDENTIFIER ::= { wriOspfConformance 1 }
+wriOspfCompliances OBJECT IDENTIFIER ::= { wriOspfConformance 2 }
+
+-- compliance statements
+
+  wriOspfCompliance MODULE-COMPLIANCE
+       STATUS       deprecated
+       DESCRIPTION
+          "The compliance statement for OSPF systems
+          conforming to RFC 1850."
+       MODULE       -- this module
+       MANDATORY-GROUPS {
+           wriOspfBasicGroup,
+           wriOspfAreaGroup,
+           wriOspfStubAreaGroup,
+           wriOspfIfGroup,
+           wriOspfIfMetricGroup,
+           wriOspfVirtIfGroup,
+           wriOspfNbrGroup,
+           wriOspfVirtNbrGroup,
+           wriOspfAreaAggregateGroup
+           }
+       GROUP  wriOspfHostGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that support
+             attached hosts."
+       GROUP  wriOspfLsdbGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             their per-area link state database."
+       GROUP  wriOspfExtLsdbGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             their external link state database."
+       ::= { wriOspfCompliances 1 }
+
+  wriOspfCompliance2 MODULE-COMPLIANCE
+       STATUS       current
+       DESCRIPTION
+          "The compliance statement."
+       MODULE       -- this module
+       MANDATORY-GROUPS {
+          wriOspfBasicGroup2,
+          wriOspfAreaGroup2,
+          wriOspfStubAreaGroup,
+          wriOspfIfGroup2,
+          wriOspfIfMetricGroup,
+          wriOspfVirtIfGroup2,
+          wriOspfNbrGroup2,
+          wriOspfVirtNbrGroup2,
+          wriOspfAreaAggregateGroup2
+          }
+       GROUP  wriOspfHostGroup2
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that support
+             attached hosts."
+       GROUP  wriOspfLsdbGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             their per-area link state database."
+       GROUP  wriOspfAsLsdbGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             their AS-scope link state database."
+       GROUP  wriOspfLocalLsdbGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             their per-link link state database for non-virtual
+             links."
+       GROUP  wriOspfVirtLocalLsdbGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             their per-link link state database for virtual links."
+       GROUP wriOspfAreaLsaCountGroup
+          DESCRIPTION
+             "This group is mandatory for OSPF systems that display
+             per-area, per-LSA-type counters."
+       ::= { wriOspfCompliances 2 }
+
+  wriOspfComplianceObsolete MODULE-COMPLIANCE
+       STATUS       obsolete
+       DESCRIPTION
+          "Contains obsolete object groups."
+       MODULE       -- this module
+       GROUP  wriOspfAreaRangeGroup
+          DESCRIPTION
+             "This group is obsolete, and it is mandatory only
+             for non-Classless Inter-Domain Routing (CIDR) OSPF
+             systems that support multiple areas."
+       GROUP  wriOspfObsoleteGroup
+          DESCRIPTION
+             "This group contains obsolete objects,
+             which are no longer required for OSPF systems."
+       ::= { wriOspfCompliances 3 }
+--  units of conformance
+
+  wriOspfBasicGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfRouterId,
+          wriOspfAdminStat,
+          wriOspfVersionNumber,
+          wriOspfAreaBdrRtrStatus,
+          wriOspfASBdrRtrStatus,
+          wriOspfExternLsaCount,
+          wriOspfExternLsaCksumSum,
+          wriOspfTOSSupport,
+          wriOspfOriginateNewLsas,
+          wriOspfRxNewLsas,
+          wriOspfExtLsdbLimit,
+          wriOspfMulticastExtensions,
+          wriOspfExitOverflowInterval,
+          wriOspfDemandExtensions
+          }
+       STATUS      deprecated
+       DESCRIPTION
+          "These objects are used to monitor/manage
+          global OSPF parameters.  This object group
+          conforms to RFC 1850."
+       ::= { wriOspfGroups 1 }
+
+  wriOspfAreaGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAreaId,
+          wriOspfImportAsExtern,
+          wriOspfSpfRuns,
+          wriOspfAreaBdrRtrCount,
+          wriOspfAsBdrRtrCount,
+          wriOspfAreaLsaCount,
+          wriOspfAreaLsaCksumSum,
+          wriOspfAreaSummary,
+          wriOspfAreaStatus
+          }
+       STATUS      deprecated
+       DESCRIPTION
+          "These objects are used for OSPF systems
+          supporting areas per RFC 1850."
+       ::= { wriOspfGroups 2 }
+
+  wriOspfStubAreaGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfStubAreaId,
+          wriOspfStubTOS,
+          wriOspfStubMetric,
+          wriOspfStubStatus,
+          wriOspfStubMetricType
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used for OSPF systems
+          supporting stub areas."
+       ::= { wriOspfGroups 3 }
+
+   wriOspfLsdbGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfLsdbAreaId,
+          wriOspfLsdbType,
+          wriOspfLsdbLsid,
+          wriOspfLsdbRouterId,
+          wriOspfLsdbSequence,
+          wriOspfLsdbAge,
+          wriOspfLsdbChecksum,
+          wriOspfLsdbAdvertisement
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used for OSPF systems
+          that display their link state database."
+       ::= { wriOspfGroups 4 }
+
+   wriOspfAreaRangeGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAreaRangeAreaId,
+          wriOspfAreaRangeNet,
+          wriOspfAreaRangeMask,
+          wriOspfAreaRangeStatus,
+          wriOspfAreaRangeEffect
+          }
+       STATUS  obsolete
+       DESCRIPTION
+          "These objects are used for non-CIDR OSPF
+          systems that support multiple areas.  This
+          object group is obsolete."
+       ::= { wriOspfGroups 5 }
+
+  wriOspfHostGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfHostIpAddress,
+          wriOspfHostTOS,
+          wriOspfHostMetric,
+          wriOspfHostStatus,
+          wriOspfHostAreaID
+          }
+       STATUS       deprecated
+       DESCRIPTION
+          "These objects are used for OSPF systems
+          that support attached hosts."
+       ::= { wriOspfGroups 6 }
+
+  wriOspfIfGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfIfIpAddress,
+          wriOspfAddressLessIf,
+          wriOspfIfAreaId,
+          wriOspfIfType,
+          wriOspfIfAdminStat,
+          wriOspfIfRtrPriority,
+          wriOspfIfTransitDelay,
+          wriOspfIfRetransInterval,
+          wriOspfIfHelloInterval,
+          wriOspfIfRtrDeadInterval,
+          wriOspfIfPollInterval,
+          wriOspfIfState,
+          wriOspfIfDesignatedRouter,
+          wriOspfIfBackupDesignatedRouter,
+          wriOspfIfEvents,
+          wriOspfIfAuthType,
+          wriOspfIfAuthKey,
+          wriOspfIfStatus,
+          wriOspfIfMulticastForwarding,
+          wriOspfIfDemand
+          }
+       STATUS       deprecated
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF
+          interfaces.  This object group conforms to RFC 1850."
+       ::= { wriOspfGroups 7 }
+
+  wriOspfIfMetricGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfIfMetricIpAddress,
+          wriOspfIfMetricAddressLessIf,
+          wriOspfIfMetricTOS,
+          wriOspfIfMetricValue,
+          wriOspfIfMetricStatus
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used for OSPF systems for supporting
+          interface metrics."
+       ::= { wriOspfGroups 8 }
+
+  wriOspfVirtIfGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfVirtIfAreaId,
+          wriOspfVirtIfNeighbor,
+          wriOspfVirtIfTransitDelay,
+          wriOspfVirtIfRetransInterval,
+          wriOspfVirtIfHelloInterval,
+          wriOspfVirtIfRtrDeadInterval,
+          wriOspfVirtIfState,
+          wriOspfVirtIfEvents,
+          wriOspfVirtIfAuthType,
+          wriOspfVirtIfAuthKey,
+          wriOspfVirtIfStatus
+          }
+        STATUS       deprecated
+        DESCRIPTION
+          "These objects are used for OSPF systems for supporting
+          virtual interfaces.  This object group conforms
+          to RFC 1850."
+        ::= { wriOspfGroups 9 }
+
+  wriOspfNbrGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfNbrIpAddr,
+          wriOspfNbrAddressLessIndex,
+          wriOspfNbrRtrId,
+          wriOspfNbrOptions,
+          wriOspfNbrPriority,
+          wriOspfNbrState,
+          wriOspfNbrEvents,
+          wriOspfNbrLsRetransQLen,
+          wriOspfNbmaNbrStatus,
+          wriOspfNbmaNbrPermanence,
+          wriOspfNbrHelloSuppressed
+          }
+       STATUS       deprecated
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF neighbors.
+          This object group conforms to RFC 1850."
+       ::= { wriOspfGroups 10 }
+
+  wriOspfVirtNbrGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfVirtNbrArea,
+          wriOspfVirtNbrRtrId,
+          wriOspfVirtNbrIpAddr,
+          wriOspfVirtNbrOptions,
+          wriOspfVirtNbrState,
+          wriOspfVirtNbrEvents,
+          wriOspfVirtNbrLsRetransQLen,
+          wriOspfVirtNbrHelloSuppressed
+          }
+       STATUS       deprecated
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF virtual
+          neighbors.  This object group conforms to RFC 1850."
+
+       ::= { wriOspfGroups 11 }
+
+  wriOspfExtLsdbGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfExtLsdbType,
+          wriOspfExtLsdbLsid,
+          wriOspfExtLsdbRouterId,
+          wriOspfExtLsdbSequence,
+          wriOspfExtLsdbAge,
+          wriOspfExtLsdbChecksum,
+          wriOspfExtLsdbAdvertisement
+          }
+       STATUS       deprecated
+       DESCRIPTION
+          "These objects are used for OSPF systems that display
+          their link state database.  This object group
+          conforms to RFC 1850.
+
+          This object group is replaced by the wriOspfAsLsdbGroup
+          in order to support any AS-scope LSA type in a single
+          table."
+       ::= { wriOspfGroups 12 }
+
+  wriOspfAreaAggregateGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAreaAggregateAreaID,
+          wriOspfAreaAggregateLsdbType,
+          wriOspfAreaAggregateNet,
+          wriOspfAreaAggregateMask,
+          wriOspfAreaAggregateStatus,
+          wriOspfAreaAggregateEffect
+          }
+       STATUS       deprecated
+       DESCRIPTION
+          "These objects are used for OSPF systems to support
+          network prefix aggregation across areas."
+       ::= { wriOspfGroups 13 }
+
+  wriOspfLocalLsdbGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfLocalLsdbSequence,
+          wriOspfLocalLsdbAge,
+          wriOspfLocalLsdbChecksum,
+          wriOspfLocalLsdbAdvertisement
+          }
+       STATUS      current
+       DESCRIPTION
+          "These objects are used for OSPF systems
+          that display their link-local link state databases
+          for non-virtual links."
+        ::= { wriOspfGroups 14 }
+
+  wriOspfVirtLocalLsdbGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfVirtLocalLsdbSequence,
+          wriOspfVirtLocalLsdbAge,
+          wriOspfVirtLocalLsdbChecksum,
+          wriOspfVirtLocalLsdbAdvertisement
+          }
+        STATUS       current
+        DESCRIPTION
+           "These objects are used for OSPF systems
+           that display their link-local link state databases
+           for virtual links."
+         ::= { wriOspfGroups 15 }
+
+  wriOspfAsLsdbGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAsLsdbSequence,
+          wriOspfAsLsdbAge,
+          wriOspfAsLsdbChecksum,
+          wriOspfAsLsdbAdvertisement
+          }
+        STATUS       current
+        DESCRIPTION
+           "These objects are used for OSPF systems
+           that display their AS-scope link state database."
+         ::= { wriOspfGroups 16 }
+
+  wriOspfBasicGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfRouterId,
+          wriOspfAdminStat,
+          wriOspfVersionNumber,
+          wriOspfAreaBdrRtrStatus,
+          wriOspfASBdrRtrStatus,
+          wriOspfExternLsaCount,
+          wriOspfExternLsaCksumSum,
+          wriOspfTOSSupport,
+          wriOspfOriginateNewLsas,
+          wriOspfRxNewLsas,
+          wriOspfExtLsdbLimit,
+          wriOspfMulticastExtensions,
+          wriOspfExitOverflowInterval,
+          wriOspfDemandExtensions,
+          wriOspfRFC1583Compatibility,
+          wriOspfOpaqueLsaSupport,
+          wriOspfReferenceBandwidth,
+          wriOspfRestartSupport,
+          wriOspfRestartInterval,
+          wriOspfRestartStrictLsaChecking,
+          wriOspfRestartStatus,
+          wriOspfRestartAge,
+          wriOspfRestartExitReason,
+          wriOspfAsLsaCount,
+          wriOspfAsLsaCksumSum,
+          wriOspfStubRouterSupport,
+          wriOspfStubRouterAdvertisement,
+          wriOspfDiscontinuityTime
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF global
+          parameters."
+       ::= { wriOspfGroups 17 }
+
+  wriOspfAreaGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAreaId,
+          wriOspfImportAsExtern,
+          wriOspfSpfRuns,
+          wriOspfAreaBdrRtrCount,
+          wriOspfAsBdrRtrCount,
+          wriOspfAreaLsaCount,
+          wriOspfAreaLsaCksumSum,
+          wriOspfAreaSummary,
+          wriOspfAreaStatus,
+          wriOspfAreaNssaTranslatorRole,
+          wriOspfAreaNssaTranslatorState,
+          wriOspfAreaNssaTranslatorStabilityInterval,
+          wriOspfAreaNssaTranslatorEvents
+          }
+       STATUS       current
+       DESCRIPTION
+            "These objects are used by OSPF systems
+            to support areas."
+       ::= { wriOspfGroups 18 }
+
+  wriOspfIfGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfIfIpAddress,
+          wriOspfAddressLessIf,
+          wriOspfIfAreaId,
+          wriOspfIfType,
+          wriOspfIfAdminStat,
+          wriOspfIfRtrPriority,
+          wriOspfIfTransitDelay,
+          wriOspfIfRetransInterval,
+          wriOspfIfHelloInterval,
+          wriOspfIfRtrDeadInterval,
+          wriOspfIfPollInterval,
+          wriOspfIfState,
+          wriOspfIfDesignatedRouter,
+          wriOspfIfBackupDesignatedRouter,
+          wriOspfIfEvents,
+          wriOspfIfAuthType,
+          wriOspfIfAuthKey,
+          wriOspfIfStatus,
+          wriOspfIfMulticastForwarding,
+          wriOspfIfDemand,
+          wriOspfIfLsaCount,
+          wriOspfIfLsaCksumSum
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF interfaces."
+        ::= { wriOspfGroups 19 }
+
+  wriOspfVirtIfGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfVirtIfAreaId,
+          wriOspfVirtIfNeighbor,
+          wriOspfVirtIfTransitDelay,
+          wriOspfVirtIfRetransInterval,
+          wriOspfVirtIfHelloInterval,
+          wriOspfVirtIfRtrDeadInterval,
+          wriOspfVirtIfState,
+          wriOspfVirtIfEvents,
+          wriOspfVirtIfAuthType,
+          wriOspfVirtIfAuthKey,
+          wriOspfVirtIfStatus,
+          wriOspfVirtIfLsaCount,
+          wriOspfVirtIfLsaCksumSum,
+          wriOspfIfDesignatedRouterId,
+          wriOspfIfBackupDesignatedRouterId
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF
+          virtual interfaces."
+       ::= { wriOspfGroups 20 }
+
+  wriOspfNbrGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfNbrIpAddr,
+          wriOspfNbrAddressLessIndex,
+          wriOspfNbrRtrId,
+          wriOspfNbrOptions,
+          wriOspfNbrPriority,
+          wriOspfNbrState,
+          wriOspfNbrEvents,
+          wriOspfNbrLsRetransQLen,
+          wriOspfNbmaNbrStatus,
+          wriOspfNbmaNbrPermanence,
+          wriOspfNbrHelloSuppressed,
+          wriOspfNbrRestartHelperStatus,
+          wriOspfNbrRestartHelperAge,
+          wriOspfNbrRestartHelperExitReason
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF
+          neighbors."
+       ::= { wriOspfGroups 21 }
+
+  wriOspfVirtNbrGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfVirtNbrArea,
+          wriOspfVirtNbrRtrId,
+          wriOspfVirtNbrIpAddr,
+          wriOspfVirtNbrOptions,
+          wriOspfVirtNbrState,
+          wriOspfVirtNbrEvents,
+          wriOspfVirtNbrLsRetransQLen,
+          wriOspfVirtNbrHelloSuppressed,
+          wriOspfVirtNbrRestartHelperStatus,
+          wriOspfVirtNbrRestartHelperAge,
+          wriOspfVirtNbrRestartHelperExitReason
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used to monitor/manage OSPF
+          virtual neighbors."
+       ::= { wriOspfGroups 22 }
+
+  wriOspfAreaAggregateGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAreaAggregateAreaID,
+          wriOspfAreaAggregateLsdbType,
+          wriOspfAreaAggregateNet,
+          wriOspfAreaAggregateMask,
+          wriOspfAreaAggregateStatus,
+          wriOspfAreaAggregateEffect,
+          wriOspfAreaAggregateExtRouteTag
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used for OSPF systems to support
+          network prefix aggregation across areas."
+       ::= { wriOspfGroups 23 }
+
+  wriOspfAreaLsaCountGroup      OBJECT-GROUP
+       OBJECTS {
+          wriOspfAreaLsaCountNumber
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used for OSPF systems that display
+          per-area, per-LSA-type counters."
+       ::= { wriOspfGroups 24 }
+
+  wriOspfHostGroup2    OBJECT-GROUP
+       OBJECTS {
+          wriOspfHostIpAddress,
+          wriOspfHostTOS,
+          wriOspfHostMetric,
+          wriOspfHostStatus,
+          wriOspfHostCfgAreaID
+          }
+       STATUS       current
+       DESCRIPTION
+          "These objects are used for OSPF systems
+          that support attached hosts."
+       ::= { wriOspfGroups 25 }
+
+--     This object group is included for SMI conformance.  It is not a
+--     mandatory group for compliance with this MIB
+
+  wriOspfObsoleteGroup    OBJECT-GROUP
+       OBJECTS {
+          wriOspfAuthType
+          }
+       STATUS       obsolete
+       DESCRIPTION
+          "These objects are obsolete and are no longer required for
+          OSPF systems.  They are placed into this group for SMI
+          conformance."
+       ::= { wriOspfGroups 26 }
+
+END

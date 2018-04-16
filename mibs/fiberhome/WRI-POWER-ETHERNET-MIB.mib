@@ -1,0 +1,1023 @@
+
+WRI-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+           MODULE-IDENTITY, mib-2, OBJECT-TYPE, Integer32,
+           Gauge32, Counter32, Unsigned32,NOTIFICATION-TYPE
+                   FROM SNMPv2-SMI
+           TruthValue
+                   FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                   FROM SNMPv2-CONF
+            SnmpAdminString
+                    FROM SNMP-FRAMEWORK-MIB
+			wri,wriProducts		
+					FROM WRI-SMI;
+
+					
+    powerEthernetMIB MODULE-IDENTITY
+
+         LAST-UPDATED    "200311240000Z"  -- November 24, 2003
+         ORGANIZATION "IETF Ethernet Interfaces and Hub MIB
+                       Working Group"
+         CONTACT-INFO
+         "
+          WG Charter:
+          http://www.ietf.org/html.charters/hubmib-charter.html
+
+         Mailing lists:
+          General Discussion: hubmib@ietf.org
+          To Subscribe: hubmib-requests@ietf.org
+          In Body: subscribe your_email_address
+
+         Chair: Dan Romascanu
+          Avaya
+          Tel:  +972-3-645-8414
+          Email: dromasca@avaya.com
+
+         Editor: Avi Berger
+          PowerDsine Inc.
+          Tel:    972-9-7755100 Ext 307
+          Fax:    972-9-7755120
+          E-mail: avib@PowerDsine.com
+         "
+
+        DESCRIPTION
+              "The MIB module for managing Power Source Equipment
+               (PSE) working according to the IEEE 802.af Powered
+               Ethernet (DTE Power via MDI) standard.
+
+                The following terms are used throughout this
+                MIB module.  For complete formal definitions,
+                the IEEE 802.3 standards should be consulted
+                wherever possible:
+
+                Group - A recommended, but optional, entity
+                defined by the IEEE 802.3 management standard,
+                in order to support a modular numbering scheme.
+                The classical example allows an implementor to
+                represent field-replaceable units as groups of
+                ports, with the port numbering matching the
+                modular hardware implementation.
+
+              Port - This entity identifies the port within the group
+              for which this entry contains information.  The numbering
+              scheme for ports is implementation specific.
+
+             Copyright (c) The Internet Society (2003).  This version
+             of this MIB module is part of RFC 3621; See the RFC
+             itself for full legal notices."
+
+       REVISION    "200311240000Z"  -- November 24, 2003
+       DESCRIPTION "Initial version, published as RFC 3621."
+       ::= { wriProducts 1622 }
+
+poeNotifications OBJECT IDENTIFIER ::= { powerEthernetMIB 0 }
+poeObjects       OBJECT IDENTIFIER ::= { powerEthernetMIB 1 }
+poeConformance   OBJECT IDENTIFIER ::= { powerEthernetMIB 2 }
+
+-- PSE Objects
+
+  poePsePortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoePsePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control the power
+            characteristics of power Ethernet ports on a Power Source
+            Entity (PSE) device.  This group will be implemented in
+            managed power Ethernet switches and mid-span devices.
+            Values of all read-write objects in this table are
+            persistent at restart/reboot."
+       ::= { poeObjects 1 }
+
+   poePsePortEntry OBJECT-TYPE
+       SYNTAX      PoePsePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A set of objects that display and control the power
+               characteristics of a power Ethernet PSE port."
+       INDEX    {  poePsePortIndex  }
+       ::= { poePsePortTable 1 }
+
+   PoePsePortEntry ::= SEQUENCE {
+       poePsePortIndex
+          Integer32,
+       poePsePortAdminEnable
+          TruthValue,
+       poePsePortPowerPairsControlAbility
+          TruthValue,
+       poePsePortPowerPairs
+          INTEGER,
+       poePsePortDetectionStatus
+          INTEGER,
+       poePsePortPowerPriority
+          INTEGER,
+       poePsePortMPSAbsentCounter
+          Counter32,
+       poePsePortType
+          SnmpAdminString,
+       poePsePortPowerClassifications
+          INTEGER,
+       poePsePortInvalidSignatureCounter
+          Counter32,
+       poePsePortPowerDeniedCounter
+          Counter32,
+       poePsePortOverLoadCounter
+          Counter32,
+       poePsePortShortCounter
+          Counter32,
+       poePsePortPowerSupplyMode
+          INTEGER,
+       poePsePortSupportStandard
+          INTEGER,
+       poePsePortEnhanceCheck
+          TruthValue,
+       poePsePortLegacy
+          TruthValue,
+       poePsePortUsagePowerThreshold
+          Integer32,
+       poePsePortTimerRangeID
+          Integer32,
+       poePsePortPowerType 
+          Unsigned32,
+       poePsePortMirroredPowerType
+          Unsigned32,
+       poePsePortPowerSource
+          Unsigned32,
+       poePsePortMirroredPowerSource
+          Unsigned32,
+       poePsePortReceivedRequestdPower
+          Unsigned32,
+       poePsePortMirroredRequestdPower
+          Unsigned32,
+       poePsePortPSEAllocatedPower
+          Unsigned32,
+       poePsePortEchoedPSEAllocatedPower
+          Unsigned32,
+       poePsePortLostCommunication
+          Counter32,
+       poePsePortMirroredLostCommunication
+          Counter32,
+       poePsePortPSEResponseTime
+          Counter32,
+       poePsePortPeakPower
+          Unsigned32,
+       poePsePortRealTimePower
+          Unsigned32,
+       poePsePortRealTimeCurrent
+          Unsigned32,  
+       poePsePortVoltage
+          Unsigned32,
+       poePsePortDisconnectMethod
+          INTEGER,
+       poePsePortFixedDisconnectMethodEnable  
+		  INTEGER,
+	   poePsePortDescription
+          OCTET STRING,
+	   poePsePortPowerReserved
+          TruthValue,
+       poePsePortPeakPowerRemove
+          INTEGER,
+       poePsePortLastPowerOnTime	  
+	      INTEGER,
+	   poePsePortLastPowerOffTime 
+	      INTEGER,
+	   poePsePortFaultType
+	      INTEGER
+  }
+
+     poePsePortIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Port unit which unique identify the interface."
+       ::= { poePsePortEntry 1 }
+
+     poePsePortAdminEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "true (1) An interface which can provide the PSE functions.
+         false(2) The interface will act as it would if it had no PSE
+         function."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.2 aPSEAdminState"
+    ::= { poePsePortEntry 2 }
+
+     poePsePortPowerPairsControlAbility OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Describes the capability of controlling the power pairs
+         functionality to switch pins for sourcing power.
+         The value true indicate that the device has the capability
+         to control the power pairs.  When false the PSE Pinout
+         Alternative used cannot be controlled through the
+         PoePsePortAdminEnable attribute."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.3
+       aPSEPowerPairsControlAbility"
+    ::= { poePsePortEntry 3 }
+
+    poePsePortPowerPairs OBJECT-TYPE
+    SYNTAX INTEGER   {
+               signal(1),
+               spare(2)
+     }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Describes or controls the pairs in use.  If the value of
+         poePsePortPowerPairsControl is true, this object is
+         writable.
+         A value of signal(1) means that the signal pairs
+         only are in use.
+         A value of spare(2) means that the spare pairs
+         only are in use."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.4 aPSEPowerPairs"
+    ::= { poePsePortEntry 4 }
+
+     poePsePortDetectionStatus OBJECT-TYPE
+    SYNTAX INTEGER   {
+             disabled(1),
+             searching(2),
+               deliveringPower(3),
+               fault(4),
+               test(5),
+               otherFault(6)
+     }
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Describes the operational status of the port PD detection.
+         A value of disabled(1)- indicates that the PSE State diagram
+         is in the state DISABLED.
+         A value of deliveringPower(3) - indicates that the PSE State
+         diagram is in the state POWER_ON for a duration greater than
+         tlim max (see IEEE Std 802.3af Table 33-5 tlim).
+         A value of fault(4) - indicates that the PSE State diagram is
+         in the state TEST_ERROR.
+         A value of test(5) - indicates that the PSE State diagram is
+         in the state TEST_MODE.
+         A value of otherFault(6) - indicates that the PSE State
+         diagram is in the state IDLE due to the variable
+         error_conditions.
+         A value of searching(2)- indicates the PSE State diagram is
+         in a state other than those listed above."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.5
+       aPSEPowerDetectionStatus"
+    ::= { poePsePortEntry 5 }
+
+     poePsePortPowerPriority OBJECT-TYPE
+    SYNTAX INTEGER   {
+               critical(1),
+               high(2),
+               low(3)
+     }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object controls the priority of the port from the point
+         of view of a power management algorithm.  The priority that
+         is set by this variable could be used by a control mechanism
+         that prevents over current situations by disconnecting first
+         ports with lower power priority.  Ports that connect devices
+         critical to the operation of the network - like the E911
+         telephones ports - should be set to higher priority."
+    ::= { poePsePortEntry 6 }
+
+   poePsePortMPSAbsentCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "This counter is incremented when the PSE state diagram
+             transitions directly from the state POWER_ON to the
+             state IDLE due to tmpdo_timer_done being asserted."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.11
+       aPSEMPSAbsentCounter"
+    ::= { poePsePortEntry 7 }
+
+   poePsePortType OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A manager will set the value of this variable to indicate
+         the type of powered device that is connected to the port.
+         The default value supplied by the agent if no value has
+         ever been set should be a zero-length octet string."
+    ::= { poePsePortEntry 8 }
+
+    poePsePortPowerClassifications OBJECT-TYPE
+     SYNTAX INTEGER   {
+               class0(1),
+               class1(2),
+               class2(3),
+               class3(4),
+               class4(5)
+     }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Classification is a way to tag different terminals on the
+        Power over LAN network according to their power consumption.
+        Devices such as IP telephones, WLAN access points and others,
+        will be classified according to their power requirements.
+
+        The meaning of the classification labels is defined in the
+        IEEE specification.
+
+       This variable is valid only while a PD is being powered,
+        that is, while the attribute poePsePortDetectionStatus
+        is reporting the enumeration deliveringPower."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.6
+       aPSEPowerClassification"
+   ::= { poePsePortEntry 9 }
+
+   poePsePortInvalidSignatureCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "This counter is incremented when the PSE state diagram
+         enters the state SIGNATURE_INVALID."
+    REFERENCE
+          "IEEE Std 802.3af Section 30.9.1.1.7
+           aPSEInvalidSignatureCounter"
+    ::= { poePsePortEntry 10 }
+
+   poePsePortPowerDeniedCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "This counter is incremented when the PSE state diagram
+             enters the state POWER_DENIED."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.8
+       aPSEPowerDeniedCounter"
+    ::= { poePsePortEntry 11 }
+
+   poePsePortOverLoadCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "This counter is incremented when the PSE state diagram
+             enters the state ERROR_DELAY_OVER."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.9
+       aPSEOverLoadCounter"
+    ::= { poePsePortEntry 12 }
+
+   poePsePortShortCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "This counter is incremented when the PSE state diagram
+             enters the state ERROR_DELAY_SHORT."
+    REFERENCE
+      "IEEE Std 802.3af Section 30.9.1.1.10
+       aPSEShortCounter"
+    ::= { poePsePortEntry 13 }
+	
+	poePsePortPowerSupplyMode OBJECT-TYPE
+  	SYNTAX INTEGER
+            	{
+            	auto(0),
+            	semiauto(1),
+				      force(2),
+				      microsemi-auto(3),
+				      microsemi-force(4)
+            	}
+	MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "The mode of power supply."
+    ::= { poePsePortEntry 14 }
+	
+	poePsePortSupportStandard OBJECT-TYPE
+  	SYNTAX    INTEGER
+	          {
+			     af(1),
+			     at(2),
+				 both(3)
+			  }
+	MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "Supply standard of IEEE 802.3af or IEEE 802.3at."
+    ::= { poePsePortEntry 15 }
+	
+	poePsePortEnhanceCheck OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "Enhance check the device."
+    ::= { poePsePortEntry 16 }
+
+	poePsePortLegacy OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "Support the standard device or not."
+    ::= { poePsePortEntry 17 }
+	
+	poePsePortUsagePowerThreshold OBJECT-TYPE
+    SYNTAX Integer32  (0..30000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "Power threshold of port."
+    ::= { poePsePortEntry 18 }
+	
+	poePsePortTimerRangeID OBJECT-TYPE
+    SYNTAX Integer32  (0..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "Binding with timerange table."
+    ::= { poePsePortEntry 19 }
+		
+	poePsePortPowerType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The power type."
+    ::= { poePsePortEntry 20 }
+	
+	poePsePortMirroredPowerType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The mirrored power type."
+    ::= { poePsePortEntry 21 }
+	
+	poePsePortPowerSource OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The type of source power."
+    ::= { poePsePortEntry 22 }
+	
+	poePsePortMirroredPowerSource OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The mirrored power type."
+    ::= { poePsePortEntry 23 }
+	
+	poePsePortReceivedRequestdPower OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The received requested power from remote system."
+    ::= { poePsePortEntry 24 }
+	
+	poePsePortMirroredRequestdPower OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The received requested power from remote mirrored system."
+    ::= { poePsePortEntry 25 }
+	
+	poePsePortPSEAllocatedPower OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The power from PSE allocate with PD."
+    ::= { poePsePortEntry 26 }
+	
+	poePsePortEchoedPSEAllocatedPower OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The echoed power from PSE allocate with PD."
+    ::= { poePsePortEntry 27 }
+	
+	poePsePortLostCommunication OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The counter of interactive."
+    ::= { poePsePortEntry 28 }
+	
+	poePsePortMirroredLostCommunication OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The counter of mirrored interactive."
+    ::= { poePsePortEntry 29 }
+	
+	poePsePortPSEResponseTime OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The update time from receivedPDRequestedPower to pseAllocatedPower."
+    ::= { poePsePortEntry 30 }
+	
+	poePsePortPeakPower OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The largest power of history."
+    ::= { poePsePortEntry 31 }
+	
+	poePsePortRealTimePower OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The largest power of real time."
+    ::= { poePsePortEntry 32 }
+	
+	poePsePortRealTimeCurrent OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The current of real time."
+    ::= { poePsePortEntry 33 }
+	
+	poePsePortVoltage OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "The Voltage value."
+    ::= { poePsePortEntry 34 }
+	
+    poePsePortDisconnectMethod OBJECT-TYPE
+    SYNTAX INTEGER            	
+	           {
+            	dc(0),
+            	ac(1)
+            	}
+	
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "The disconnect check method."
+    ::= { poePsePortEntry 35 }
+	
+	poePsePortFixedDisconnectMethodEnable OBJECT-TYPE
+    SYNTAX INTEGER	          
+            	{
+            	fixed(1),
+            	unfixed(2)
+            	}
+	
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "The fixed disconnect check method."
+    ::= { poePsePortEntry 36 }
+	
+	poePsePortDescription OBJECT-TYPE
+  	SYNTAX    OCTET STRING
+	MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "Port description."
+    ::= { poePsePortEntry 37 }
+	
+    poePsePortPowerReserved OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Power reserved or not."
+    ::= { poePsePortEntry 38 }
+	
+	poePsePortPeakPowerRemove OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Remove peak power."
+    ::= { poePsePortEntry 39 }
+	
+	poePsePortLastPowerOnTime OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "Last power on time."
+    ::= { poePsePortEntry 40 }
+	
+	poePsePortLastPowerOffTime OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "Last power off time."
+    ::= { poePsePortEntry 41 }
+	
+	poePsePortFaultType OBJECT-TYPE
+    SYNTAX INTEGER   {
+               none(0),
+               portoverload(1),
+			   slotoverload(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+          "Port fault type."
+    ::= { poePsePortEntry 42 }
+	
+		
+-- Main PSE Objects
+
+poeMainPseObjects       OBJECT IDENTIFIER ::= { poeObjects 3 }
+
+poeMainPseTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoeMainPseEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control attributes
+            of the main power source in a PSE  device.  Ethernet
+            switches are one example of boxes that would support
+            these objects.
+            Values of all read-write objects in this table are
+            persistent at restart/reboot."
+       ::= { poeMainPseObjects 1 }
+
+   poeMainPseEntry OBJECT-TYPE
+       SYNTAX      PoeMainPseEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "A set of objects that display and control the Main
+             power of a PSE. "
+       INDEX    { poeMainPseSystemIndex,poeMainPseGroupIndex }
+       ::= { poeMainPseTable 1 }
+
+   PoeMainPseEntry ::= SEQUENCE {
+       poeMainPseSystemIndex
+           Integer32,
+	   poeMainPseGroupIndex
+           Integer32,
+	   poeMainPsePower
+           Gauge32 ,  
+	   poeMainPseOperStatus
+           INTEGER,
+       poeMainPseConsumptionPower
+           Gauge32,
+       poeMainPseUsageThreshold
+           Integer32,
+	   poeMainPseTimeTolerance
+	       INTEGER,
+	   poeMainPseLegacy
+	       TruthValue
+   }
+   
+     poeMainPseSystemIndex OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Slot system index which started from 1."
+       ::= { poeMainPseEntry 1 }
+   
+   
+     poeMainPseGroupIndex OBJECT-TYPE
+       SYNTAX       Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the group to which
+           power Ethernet PSE is connected.  Group means (box in
+           the stack, module in a rack) and the value 1 MUST be
+           used for non-modular devices.  Furthermore, the same
+           value MUST be used in this variable, poePsePortGroupIndex,
+           and poeNotificationControlGroupIndex to refer to a
+           given box in a stack or module in a rack."
+       ::= { poeMainPseEntry 2 }
+	   
+	  poeMainPsePower OBJECT-TYPE
+       SYNTAX      Gauge32  (1..65535)
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The nominal power of the PSE expressed in Watts."
+       ::= { poeMainPseEntry 3 }  
+	   
+	   poeMainPseOperStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+               on(1),
+               off(2),
+               faulty(3)
+          }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The operational status of the main PSE."
+       ::= { poeMainPseEntry 4 }
+		   
+     poeMainPseConsumptionPower OBJECT-TYPE
+       SYNTAX      Gauge32
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Measured usage power expressed in Watts."
+       ::= { poeMainPseEntry 5 }
+
+     poeMainPseUsageThreshold OBJECT-TYPE
+       SYNTAX      Integer32  (1..99)
+       UNITS      "%"
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The usage threshold expressed in percents for
+                comparing the measured power and initiating
+                an alarm if the threshold is exceeded."
+       ::= { poeMainPseEntry 6 }
+
+     poeMainPseTimeTolerance OBJECT-TYPE
+        SYNTAX INTEGER  
+		      {
+               one(0),
+               half(1),
+               two(2),
+               four(3)
+              }
+	   
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Time tolerance between 0 and 3."
+       ::= { poeMainPseEntry 7 }
+    
+    poeMainPseLegacy OBJECT-TYPE
+       SYNTAX TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Support the standard device or not."
+       ::= { poeMainPseEntry 8 }
+
+	   
+-- Notification  Control  Objects
+
+poeNotificationControl        OBJECT IDENTIFIER ::= { poeObjects 4 }
+
+poeNotificationControlTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoeNotificationControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control the
+            Notification on a PSE  device.
+            Values of all read-write objects in this table are
+            persistent at restart/reboot."
+       ::= { poeNotificationControl 1 }
+
+   poeNotificationControlEntry OBJECT-TYPE
+       SYNTAX      PoeNotificationControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "A set of objects that control the Notification events."
+       INDEX    { poeNotificationControlGroupIndex }
+       ::= { poeNotificationControlTable 1 }
+
+   PoeNotificationControlEntry ::= SEQUENCE {
+       poeNotificationControlGroupIndex
+           Integer32,
+       poeNotificationControlEnable
+           TruthValue
+   }
+     poeNotificationControlGroupIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the group.  Group
+            means box in the stack, module in a rack and the value
+            1 MUST be used for non-modular devices.  Furthermore,
+            the same value MUST be used in this variable,
+            poePsePortGroupIndex, and
+            poeMainPseGroupIndex to refer to a given box in a
+            stack or module in a rack. "
+       ::= { poeNotificationControlEntry 1 }
+
+      poeNotificationControlEnable  OBJECT-TYPE
+       SYNTAX             TruthValue
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+          "This object controls, on a per-group basis, whether
+             or not notifications from the agent are enabled.  The
+             value true(1) means that notifications are enabled; the
+             value false(2) means that they are not."
+       ::= { poeNotificationControlEntry 2 }
+	   
+
+-- General  Control  Objects
+
+poeGeneral        OBJECT IDENTIFIER ::= { poeObjects 5 }
+
+poeGeneralMaxSlotNum  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"The max amount of slot."
+			::= { poeGeneral 1 }
+			
+poeGeneralMaxPortNum  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"The max amount of port."
+			::= { poeGeneral 2 }
+	
+poeGeneralUsedSlotNum  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"The used amount of slot."
+			::= { poeGeneral 3 }
+	
+poeGeneralUsedPortNum  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"The used amount of port."
+			::= { poeGeneral 4 }
+	
+poeGeneralTrapCtrl  OBJECT-TYPE
+			SYNTAX     TruthValue
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"Enable the trap or not."
+			::= { poeGeneral 5 }
+
+poeGeneralPseMaxPower  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"The max power of the PSE expressed in Watts."
+			::= { poeGeneral 6 }     
+			
+poeGeneralPseCurrentPortNum  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"The enabled pse port number ."
+			::= { poeGeneral 7 }
+			
+--
+-- Notifications Section
+--
+--
+
+     poePsePortOnOffNotification NOTIFICATION-TYPE
+         OBJECTS     { poePsePortDetectionStatus }
+         STATUS      current
+         DESCRIPTION
+             " This Notification indicates if Pse Port is delivering or
+               not power to the PD.  This Notification SHOULD be sent on
+               every status change except in the searching mode.
+               At least 500 msec must elapse between notifications
+               being emitted by the same object instance."
+          ::= { poeNotifications 1 }
+
+     poeMainPowerUsageOnNotification NOTIFICATION-TYPE
+         OBJECTS     { poeMainPseConsumptionPower  }
+         STATUS      current
+         DESCRIPTION
+           " This Notification indicate PSE Threshold usage
+               indication is on, the usage power is above the
+               threshold.  At least 500 msec must elapse between
+               notifications being emitted by the same object
+               instance."
+         ::= { poeNotifications 2 }
+
+      poeMainPowerUsageOffNotification NOTIFICATION-TYPE
+         OBJECTS     { poeMainPseConsumptionPower }
+         STATUS      current
+         DESCRIPTION
+           " This Notification indicates PSE Threshold usage indication
+               off, the usage power is below the threshold.
+               At least 500 msec must elapse between notifications being
+               emitted by the same object instance."
+         ::= { poeNotifications 3 }
+
+--
+-- Conformance Section
+--
+poeCompliances OBJECT IDENTIFIER ::= { poeConformance 1 }
+poeGroups      OBJECT IDENTIFIER ::= { poeConformance 2 }
+
+poeCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "Describes the requirements for conformance to the
+               Power Ethernet MIB."
+       MODULE  -- this module
+           MANDATORY-GROUPS { poePsePortGroup,
+                              poePsePortNotificationGroup,
+                              poeNotificationControlGroup
+                            }
+           GROUP   poeMainPseGroup
+           DESCRIPTION
+               "The poeMainPseGroup is mandatory for PSE systems
+                that implement a main power supply."
+           GROUP   poeMainPowerNotificationGroup
+           DESCRIPTION
+               "The poeMainPowerNotificationGroup is mandatory for
+               PSE systems that implement a main power supply."
+       ::= { poeCompliances 1 }
+
+poePsePortGroup OBJECT-GROUP
+    OBJECTS {
+       poePsePortAdminEnable,
+       poePsePortPowerPairsControlAbility,
+       poePsePortPowerPairs,
+       poePsePortDetectionStatus,
+       poePsePortPowerPriority,
+       poePsePortMPSAbsentCounter,
+       poePsePortInvalidSignatureCounter,
+       poePsePortPowerDeniedCounter,
+       poePsePortOverLoadCounter,
+       poePsePortShortCounter,
+       poePsePortType,
+       poePsePortPowerClassifications
+    }
+    STATUS  current
+    DESCRIPTION
+          "PSE Port objects."
+    ::= { poeGroups 1 }
+
+poeMainPseGroup OBJECT-GROUP
+    OBJECTS {
+       poeMainPsePower,
+       poeMainPseOperStatus,
+       poeMainPseConsumptionPower,
+       poeMainPseUsageThreshold
+    }
+    STATUS  current
+    DESCRIPTION
+            "Main PSE Objects. "
+    ::= { poeGroups 2 }
+
+poeNotificationControlGroup OBJECT-GROUP
+    OBJECTS {
+       poeNotificationControlEnable
+    }
+    STATUS  current
+    DESCRIPTION
+            "Notification Control  Objects. "
+    ::= { poeGroups 3 }
+
+poePsePortNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { poePsePortOnOffNotification}
+    STATUS           current
+    DESCRIPTION  "Pse Port Notifications."
+    ::= { poeGroups 4 }
+
+  poeMainPowerNotificationGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { poeMainPowerUsageOnNotification,
+                      poeMainPowerUsageOffNotification}
+    STATUS           current
+    DESCRIPTION  "Main PSE Notifications."
+      ::= { poeGroups 5 }
+
+END
+

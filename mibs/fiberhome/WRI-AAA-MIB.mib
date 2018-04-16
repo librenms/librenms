@@ -1,0 +1,647 @@
+WRI-AAA-MIB DEFINITIONS ::= BEGIN
+     
+   IMPORTS
+      TimeTicks, Unsigned32, Integer32, OBJECT-TYPE,MODULE-IDENTITY    FROM SNMPv2-SMI            
+      MacAddress, RowStatus,TEXTUAL-CONVENTION            FROM SNMPv2-TC
+      enterprises	               FROM RFC1155-SMI
+      InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+      wri,wriProtocol,wriProducts				FROM WRI-SMI;
+      
+    -- 1.3.6.1.4.1.3807.2.104
+		wriaaa OBJECT IDENTIFIER ::= { wriProtocol 104 }
+		
+		EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+     
+		-- 1.3.6.1.4.1.3807.2.104.1
+		aaaCommonTable OBJECT IDENTIFIER ::= { wriaaa 1 }
+		
+		-- WRI AAA Common Information	
+		-- 1.3.6.1.4.1.3807.2.104.1.1
+		aaaAccRealtime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"aaa real account report interval time."
+			::= { aaaCommonTable 1 }
+                                                             
+		-- 1.3.6.1.4.1.3807.2.104.1.2
+		aaaRadiusSerRetrans OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"aaa radius server retansmit interval."
+			::= { aaaCommonTable 2 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.3
+		aaaRadiusSerMaxRetrans  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"aaa radius server max retransmit count."
+			::= { aaaCommonTable 3 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.4
+		aaaRadiusSerDeadtime  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"aaa radius server dead time."
+			::= { aaaCommonTable 4 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.5
+		aaaSerFreeIndex  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"aaa server free index."
+			::= { aaaCommonTable 5 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.6
+		aaaSerGroupFreeIndex  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"aaa server group free index."
+			::= { aaaCommonTable 6 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.7
+		aaaMethodListFreeIndex  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"aaa method list free index."
+			::= { aaaCommonTable 7 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.8
+		aaaTacacsSerTimeout  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"aaa tacacs server timeout."
+			::= { aaaCommonTable 8 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.9
+		aaaTacacsSerDeadtime  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current  
+			DESCRIPTION
+				"aaa tacacs server deadtime."
+			::= { aaaCommonTable 9 }					
+		
+		-- 1.3.6.1.4.1.3807.2.104.1.10
+		aaaServerNameToIndex  OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Get index from server name."
+			::= { aaaCommonTable 10 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.11
+		aaaServerGrpNameToIndex  OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Get index from server group."
+			::= { aaaCommonTable 11 }
+			
+		-- 1.3.6.1.4.1.3807.2.104.1.12
+		aaaMethodNameToIndex  OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current  
+			DESCRIPTION
+				"Get index from method name."
+			::= { aaaCommonTable 12 }
+			
+					
+		-- 1.3.6.1.4.1.3807.2.104.2                      
+    aaaServerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AaaServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "aaa server table. "
+        ::= { wriaaa 2 }
+                                                                                         
+    -- 1.3.6.1.4.1.3807.2.104.2.1                                                   
+    aaaServerEntry OBJECT-TYPE
+        SYNTAX AaaServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "aaa server table. "
+        INDEX { aaaServerIndex }
+        ::= { aaaServerTable 1 }
+
+    
+    AaaServerEntry ::=
+        SEQUENCE { 
+            aaaServerIndex            INTEGER,
+            aaaServerName             OCTET STRING,
+            aaaServerIpType           InetAddressType,
+            aaaServerIp               InetAddress,
+            aaaServerProType          INTEGER,
+            aaaServerKey              OCTET STRING,
+            aaaServerPriority         Unsigned32,
+            aaaServerDeadtime         Integer32,
+            aaaServerRadiusSerType    INTEGER,
+            aaaServerRadiusAuthPort   INTEGER,
+            aaaServerRadiusAccPort    INTEGER,
+            aaaServerRadiusRetrans    Integer32,
+            aaaServerRadiusMaxRetrans Integer32,
+            aaaServerRowStatus        RowStatus,
+            aaaServerTacacsPort       INTEGER,
+            aaaServerTacacsTimeout    Integer32,
+            aaaServerTacacsSingleConn    INTEGER,
+            aaaServerTacacsSerType    INTEGER,
+			aaaServerVrfId 			  Unsigned32,
+			--xf add 2014-8-8
+			aaaServerSrcIp			  OCTET STRING,
+			aaaServerSrcVrId 		  Unsigned32
+         }
+                                                                              
+    -- 1.3.6.1.4.1.3807.2.104.2.1.1
+    aaaServerIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "aaa server index. "
+        ::= { aaaServerEntry 1 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.2
+    aaaServerName OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server name. "
+        ::= { aaaServerEntry 2 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.3
+    aaaServerIpType OBJECT-TYPE
+        SYNTAX InetAddressType 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server ip address type(v4:1/v6:2). "
+        ::= { aaaServerEntry 3 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.4
+    aaaServerIp OBJECT-TYPE
+        SYNTAX InetAddress       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server ip address. "
+        ::= { aaaServerEntry 4 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.5
+    aaaServerProType OBJECT-TYPE
+        SYNTAX  INTEGER
+          {
+					radius(0),
+					tacacsplus(1)
+					}      
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server protocol type. "
+        ::= { aaaServerEntry 5 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.6
+    aaaServerKey OBJECT-TYPE
+        SYNTAX   OCTET STRING       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server share secret. "
+        ::= { aaaServerEntry 6 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.7
+    aaaServerPriority OBJECT-TYPE
+        SYNTAX Unsigned32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server priority. "
+        ::= { aaaServerEntry 7 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.8
+    aaaServerDeadtime OBJECT-TYPE
+        SYNTAX Integer32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server dead time. "
+        ::= { aaaServerEntry 8 }
+	
+		-- 1.3.6.1.4.1.3807.2.104.2.1.9
+    aaaServerRadiusSerType OBJECT-TYPE
+        SYNTAX INTEGER  
+           {
+					authentication(0),
+					account(1),
+					authorization(2),
+					both(3)
+					}     
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa radius server type. both means authentication and account."
+        ::= { aaaServerEntry 9 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.10
+    aaaServerRadiusAuthPort OBJECT-TYPE
+        SYNTAX INTEGER       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa radius server auth port. "
+        ::= { aaaServerEntry 10 }
+        
+   -- 1.3.6.1.4.1.3807.2.104.2.1.11
+    aaaServerRadiusAccPort OBJECT-TYPE
+        SYNTAX INTEGER       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa radius server account port. "
+        ::= { aaaServerEntry 11 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.12
+    aaaServerRadiusRetrans OBJECT-TYPE
+        SYNTAX Integer32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa radius server retansmit interval. "
+        ::= { aaaServerEntry 12 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.13
+    aaaServerRadiusMaxRetrans OBJECT-TYPE
+        SYNTAX Integer32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa radius server max retransmit count. "
+        ::= { aaaServerEntry 13 } 
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.14
+    aaaServerRowStatus OBJECT-TYPE
+        SYNTAX RowStatus       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server entry status. "
+        ::= { aaaServerEntry 14 }
+		
+	  -- 1.3.6.1.4.1.3807.2.104.2.1.15
+    aaaServerTacacsPort OBJECT-TYPE
+        SYNTAX INTEGER       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa tacacs server port. "
+        ::= { aaaServerEntry 15 } 	
+		
+		-- 1.3.6.1.4.1.3807.2.104.2.1.16
+    aaaServerTacacsTimeout OBJECT-TYPE
+        SYNTAX Integer32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa tacscs server timeout. "
+        ::= { aaaServerEntry 16 } 
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.17
+    aaaServerTacacsSingleConn OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            enable(1),
+            disable(0)      
+        }       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable or disable aaa tacacs single connect. "
+        ::= { aaaServerEntry 17 } 
+        
+    -- 1.3.6.1.4.1.3807.2.104.2.1.18
+    aaaServerTacacsSerType OBJECT-TYPE
+        SYNTAX INTEGER       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa tacacs server type. "
+        ::= { aaaServerEntry 18 }   
+
+	aaaServerVrfId OBJECT-TYPE
+        SYNTAX Unsigned32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa tacacs server type. "
+        ::= { aaaServerEntry 19 }   
+        
+	aaaServerSrcIp OBJECT-TYPE
+        SYNTAX   OCTET STRING       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server source ip address. "
+        ::= { aaaServerEntry 20 }
+		
+	aaaServerSrcVrId OBJECT-TYPE
+        SYNTAX   Unsigned32       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server source vpn. "
+        ::= { aaaServerEntry 21 }
+		
+        		
+		-- 1.3.6.1.4.1.3807.2.104.3                      
+    aaaServerGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AaaServerGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "aaa server group table. "
+        ::= { wriaaa 3 }
+                                                                                         
+    -- 1.3.6.1.4.1.3807.2.104.3.1                                                   
+    aaaServerGroupEntry OBJECT-TYPE
+        SYNTAX AaaServerGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "aaa server group table. "
+        INDEX { aaaServerGroupIndex }
+        ::= { aaaServerGroupTable 1 }
+    
+    AaaServerGroupEntry ::=
+        SEQUENCE { 
+            aaaServerGroupIndex            INTEGER,
+            aaaServerGroupName             OCTET STRING,     
+            aaaServerGroupProType          INTEGER,
+            aaaServerGroupAddServer        INTEGER,
+            aaaServerGroupDelServer        INTEGER,
+            aaaServerGroupSerList          OCTET STRING,
+            aaaServerGroupSerNum           INTEGER,
+            aaaServerGroupRowStatus      RowStatus 
+         }
+                                                                              
+    -- 1.3.6.1.4.1.3807.2.104.3.1.1
+    aaaServerGroupIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "aaa server group index. "
+        ::= { aaaServerGroupEntry 1 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.3.1.2
+    aaaServerGroupName OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server group name. "
+        ::= { aaaServerGroupEntry 2 }
+        
+   -- 1.3.6.1.4.1.3807.2.104.3.1.3
+    aaaServerGroupProType OBJECT-TYPE
+        SYNTAX  INTEGER
+        	{
+					radius(0),
+					tacacsplus(1)
+					}    
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server group protocol type. "
+        ::= { aaaServerGroupEntry 3 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.3.1.4
+    aaaServerGroupAddServer OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "add aaa server . "
+        ::= { aaaServerGroupEntry 4 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.3.1.5
+    aaaServerGroupDelServer OBJECT-TYPE
+        SYNTAX  INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "delete aaa server. "
+        ::= { aaaServerGroupEntry 5 }
+        
+   -- 1.3.6.1.4.1.3807.2.104.3.1.6
+    aaaServerGroupSerList OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "aaa server list. "
+        ::= { aaaServerGroupEntry 6 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.3.1.7
+    aaaServerGroupSerNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "aaa server group server number. "
+        ::= { aaaServerGroupEntry 7 } 
+        
+    -- 1.3.6.1.4.1.3807.2.104.3.1.8
+    aaaServerGroupRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa server group entry status. "
+        ::= { aaaServerGroupEntry 8 } 
+        
+		
+		-- 1.3.6.1.4.1.3807.2.104.4                      
+    aaaMethodListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AaaMethodListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "aaa method list table. "
+        ::= { wriaaa 4 }
+                                                                                         
+    -- 1.3.6.1.4.1.3807.2.104.4.1                                                   
+    aaaMethodListEntry OBJECT-TYPE
+        SYNTAX AaaMethodListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "aaa method list table. "
+        INDEX { aaaMethodListIndex }
+        ::= { aaaMethodListTable 1 }
+    
+    AaaMethodListEntry ::=
+        SEQUENCE { 
+            aaaMethodListIndex            INTEGER,
+            aaaMethodListName             OCTET STRING,
+            aaaMethodListAppType          INTEGER,     
+            aaaMethodListAppFun          INTEGER,
+            aaaMethodListAddSerGroup      INTEGER,
+            aaaMethodListDelSerGroup      INTEGER,
+            aaaMethodListSerGroupList     OCTET STRING,
+            aaaMethodListSerGroupNum      INTEGER,
+            aaaMethodListLocal            INTEGER,
+            aaaMethodListNone             INTEGER,
+            aaaMethodListRowStatus      RowStatus 
+         }
+                                                                              
+    -- 1.3.6.1.4.1.3807.2.104.4.1.1
+    aaaMethodListIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "aaa method list index. "
+        ::= { aaaMethodListEntry 1 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.2
+    aaaMethodListName OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa method list name. "
+        ::= { aaaMethodListEntry 2 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.3
+    aaaMethodListAppType OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+			dot1x(1),
+			ppp(2),
+			login(3),
+			mab(4),
+			webauth(5),
+			macauthen(6)
+		}   
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa method list application type. "
+        ::= { aaaMethodListEntry 3 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.4
+    aaaMethodListAppFun OBJECT-TYPE
+        SYNTAX INTEGER 
+        	{
+					authentication(0),
+					account(1),
+					author(2)
+					}  
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa method list application function. "
+        ::= { aaaMethodListEntry 4 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.5
+    aaaMethodListAddSerGroup OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "add server group of method list. "
+        ::= { aaaMethodListEntry 5 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.6
+    aaaMethodListDelSerGroup OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "delete server group of method list. "
+        ::= { aaaMethodListEntry 6 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.7
+    aaaMethodListSerGroupList OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "server group list. "
+        ::= { aaaMethodListEntry 7 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.8
+    aaaMethodListSerGroupNum OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "server group number. "
+        ::= { aaaMethodListEntry 8 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.9
+    aaaMethodListLocal OBJECT-TYPE
+        SYNTAX INTEGER 
+	        {
+					enable(1),
+					disable(0)
+					}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa method list local authentication status. "
+        ::= { aaaMethodListEntry 9 }
+        
+     -- 1.3.6.1.4.1.3807.2.104.4.1.10
+    aaaMethodListNone OBJECT-TYPE
+        SYNTAX INTEGER 
+	        {
+					enable(1),
+					disable(0)
+					}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa method list none authentication status. "
+        ::= { aaaMethodListEntry 10 }
+        
+    -- 1.3.6.1.4.1.3807.2.104.4.1.11
+    aaaMethodListRowStatus OBJECT-TYPE
+        SYNTAX RowStatus 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "aaa method list entry status. "
+        ::= { aaaMethodListEntry 11 }
+  
+  END      

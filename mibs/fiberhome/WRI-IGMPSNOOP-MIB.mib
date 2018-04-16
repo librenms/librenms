@@ -1,0 +1,941 @@
+WRI-IGMPSNOOP-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.911
+		wriIgmpSnoop OBJECT IDENTIFIER ::= { wriProtocol 911 }
+     
+   	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}  
+     
+     
+    -- 1.3.6.1.4.1.3807.2.911.1
+		igmpSnoopCommon OBJECT IDENTIFIER ::= { wriIgmpSnoop 1 }
+		
+		-- 1.3.6.1.4.1.3807.2.911.1.1
+		igmpSnoopEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				start(1),
+				stop(2)			
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the igmpsnoop protocol."
+			::= { igmpSnoopCommon 1 } 
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.2
+		igmpSnoopAging OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop aging time."
+			::= { igmpSnoopCommon 2 } 
+			
+	  -- 1.3.6.1.4.1.3807.2.911.1.3
+		igmpSnoopQueryInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop query interval."
+			::= { igmpSnoopCommon 3 } 
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.4
+		igmpSnoopQueryMaxResponse OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop query max response time."
+			::= { igmpSnoopCommon 4 }
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.5
+		igmpSnoopLastQueryInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop special group query interval."
+			::= { igmpSnoopCommon 5 } 
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.6
+		igmpSnoopLastQueryMaxResponse OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop special group max response time."
+			::= { igmpSnoopCommon 6 } 
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.7
+		igmpSnoopLastQueryCnt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop special group query count."
+			::= { igmpSnoopCommon 7 } 
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.8
+		igmpSnoopV2RouterAging OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop router aging time."
+			::= { igmpSnoopCommon 8 }
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.9
+		igmpSnoopRobustness OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop send special query packet count."
+			::= { igmpSnoopCommon 9 }
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.10
+		igmpSnoopParamSynToLinecard OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configuration parameter synchronous to linecard."
+			::= { igmpSnoopCommon 10 }
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.11
+		igmpSnoopGroupNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group number."
+			::= { igmpSnoopCommon 11 }
+
+		-- 1.3.6.1.4.1.3807.2.911.1.12
+		igmpSnoopGroupMemNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group member number."
+			::= { igmpSnoopCommon 12 }
+			
+		-- 1.3.6.1.4.1.3807.2.911.1.13
+		igmpSnoopClrDynamicTable OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Clear the dynamic table."
+			::= { igmpSnoopCommon 13 }	
+										
+						
+--WRI IGMPSNOOP INTERFACE Table	
+	igmpSnoopIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop interface table."
+			::= { wriIgmpSnoop 2 }
+		
+		igmpSnoopIfEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop interface table."
+			INDEX {igmpSnoopIfUnit}
+			::= { igmpSnoopIfTable 1 }
+		
+		IgmpSnoopIfEntry ::=
+			SEQUENCE { 
+				igmpSnoopIfUnit					        	Unsigned32,
+				igmpSnoopIfEnable				        		INTEGER,
+				igmpSnoopIfFastleaveEnable					INTEGER,
+				igmpSnoopIfMcastCtrlEnable      		INTEGER
+			 }	
+			 
+		igmpSnoopIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface unit."
+			::= { igmpSnoopIfEntry 1 }
+			
+		igmpSnoopIfEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the igmpsnoop protocol on interface."
+			::= { igmpSnoopIfEntry 2 }
+			
+		igmpSnoopIfFastleaveEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of fast leave."
+			::= { igmpSnoopIfEntry 3 }
+			
+		igmpSnoopIfMcastCtrlEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of control mode."
+			::= { igmpSnoopIfEntry 4 }
+			
+	--WRI IGMPSNOOP MVLAN Table	
+	igmpSnoopMvlanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopMvlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop mvlan table."
+			::= { wriIgmpSnoop 3 }
+		
+		igmpSnoopMvlanEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopMvlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop mvlan table."
+			INDEX {igmpSnoopMvlan}
+			::= { igmpSnoopMvlanTable 1 }
+		
+		IgmpSnoopMvlanEntry ::=
+			SEQUENCE { 
+				igmpSnoopMvlan					        	INTEGER,
+				igmpSnoopMvlanEntryStatus				      EntryStatus,
+				igmpSnoopMvlanDuplicateEnable			INTEGER,
+				igmpSnoopMvlanWorkModeEnable      INTEGER,
+				igmpSnoopMvlanVersion             INTEGER, 
+				igmpSnoopMvlanLogEnable           INTEGER, 
+				igmpSnoopMvlanUserVlanList        OCTET STRING,
+				igmpSnoopMvlanProxyIp             InetAddress,
+				igmpSnoopMvlanSingalVlan          INTEGER,
+				igmpSnoopMvlanReportProxyEnable   INTEGER,
+				igmpSnoopMvlanLeaveProxyEnable    INTEGER,
+				igmpSnoopMvlanForwardMode         INTEGER,
+				igmpSnoopMvlanQueryEnable         INTEGER,
+				igmpSnoopMvlanQueryMaxResponse    INTEGER,
+				igmpSnoopMvlanRouterAlertEnable   INTEGER,
+				igmpSnoopMvlanGrpPolicyAcl        Unsigned32,
+				igmpSnoopMvlanGrpPolicyVersion    OCTET STRING,
+				igmpSnoopMvlanSsmMapEnable        INTEGER				
+			 }	
+			 
+		igmpSnoopMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop mvlan index."
+			::= { igmpSnoopMvlanEntry 1 } 
+			 		
+		igmpSnoopMvlanEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Create or delete igmpsnoop mvlan."
+			::= { igmpSnoopMvlanEntry 2 }
+			
+		igmpSnoopMvlanDuplicateEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of multicast vlan."
+			::= { igmpSnoopMvlanEntry 3 } 
+						
+		igmpSnoopMvlanWorkModeEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   igmpproxy(2),
+			   igmpsnoop(1)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the wrok mode on mvlan."
+			::= { igmpSnoopMvlanEntry 4 } 
+				
+		igmpSnoopMvlanVersion OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   v1(1),
+			   v2(2),
+			   v3(3)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The version of igmpsnoop."
+			::= { igmpSnoopMvlanEntry 5 } 	
+		
+		igmpSnoopMvlanLogEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of log."
+			::= { igmpSnoopMvlanEntry 6 } 	
+				
+	  igmpSnoopMvlanUserVlanList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the multicast user vlan list."
+			::= { igmpSnoopMvlanEntry 7 } 
+					
+		igmpSnoopMvlanProxyIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the proxy ip."
+			::= { igmpSnoopMvlanEntry 8 } 			
+		
+		igmpSnoopMvlanSingalVlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the singal vlan."
+			::= { igmpSnoopMvlanEntry 9 } 
+			
+		igmpSnoopMvlanReportProxyEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of report proxy."
+			::= { igmpSnoopMvlanEntry 10 } 
+			
+		igmpSnoopMvlanLeaveProxyEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of leave proxy."
+			::= { igmpSnoopMvlanEntry 11 } 
+					
+		igmpSnoopMvlanForwardMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   mac(1),
+			   ip(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the data forwarding mode of igmpsnoop."
+			::= { igmpSnoopMvlanEntry 12 } 
+			
+		igmpSnoopMvlanQueryEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the function of general query."
+			::= { igmpSnoopMvlanEntry 13 } 		
+		
+		igmpSnoopMvlanQueryMaxResponse OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the query max response time."
+			::= { igmpSnoopMvlanEntry 14 } 		
+			
+		igmpSnoopMvlanRouterAlertEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the function of router alert."
+			::= { igmpSnoopMvlanEntry 15 } 	
+		
+		igmpSnoopMvlanGrpPolicyAcl OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Group policy acl index."
+			::= { igmpSnoopMvlanEntry 16 }
+		
+		igmpSnoopMvlanGrpPolicyVersion OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Group policy version list(version:1,2,3)."
+			::= { igmpSnoopMvlanEntry 17 }
+		
+		igmpSnoopMvlanSsmMapEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of ssm mapping."
+			::= { igmpSnoopMvlanEntry 18 } 
+			
+		
+	--WRI IGMPSNOOP UPLINK INTERFACE Table	
+	igmpSnoopUplinkIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopUplinkIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop uplink interface table."
+			::= { wriIgmpSnoop 4 }
+		
+		igmpSnoopUplinkIfEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopUplinkIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop uplink interface table."
+			INDEX {igmpSnoopUplinkIfUnit,igmpSnoopUplinkIfMvlan}
+			::= { igmpSnoopUplinkIfTable 1 }
+		
+		IgmpSnoopUplinkIfEntry ::=
+			SEQUENCE { 
+				igmpSnoopUplinkIfUnit					        	Unsigned32,
+				igmpSnoopUplinkIfMvlan					        INTEGER,
+				igmpSnoopUplinkIfEntryStatus				    EntryStatus,
+				igmpSnoopUplinkIfType			              INTEGER,
+				igmpSnoopUplinkIfRemainTime			          INTEGER
+			 }	
+			 
+		igmpSnoopUplinkIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Uplink interface unit."
+			::= { igmpSnoopUplinkIfEntry 1 }
+			
+		igmpSnoopUplinkIfMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The mvlan."
+			::= { igmpSnoopUplinkIfEntry 2 }
+			
+		igmpSnoopUplinkIfEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Create or delete uplink interface."
+			::= { igmpSnoopUplinkIfEntry 3 }
+			
+		igmpSnoopUplinkIfType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			  static(1),
+			  dynamic(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the uplink interface type to static."
+			::= { igmpSnoopUplinkIfEntry 4 }
+		
+		igmpSnoopUplinkIfRemainTime OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Uplink interface remain time."
+			::= { igmpSnoopUplinkIfEntry 5 }
+			
+	--WRI IGMPSNOOP GROUP Table	
+	igmpSnoopGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group table."
+			::= { wriIgmpSnoop 5 }
+		
+		igmpSnoopGroupEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group table."
+			INDEX {igmpSnoopGroupIp,igmpSnoopGroupMvlan}
+			::= { igmpSnoopGroupTable 1 }
+		
+		IgmpSnoopGroupEntry ::=
+			SEQUENCE { 
+				igmpSnoopGroupIp					        	InetAddress,
+				igmpSnoopGroupMvlan					        INTEGER,
+				igmpSnoopGroupEntryStatus				    EntryStatus,
+				igmpSnoopGroupPreJoinEnable         INTEGER,
+				igmpSnoopGroupMemberNum             INTEGER,
+				igmpSnoopGroupMemberPorts           OCTET STRING,
+				igmpSnoopGroupV3FilterMode          INTEGER 
+			 }	
+		
+		igmpSnoopGroupIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group ip address."
+			::= { igmpSnoopGroupEntry 1 }
+			
+		igmpSnoopGroupMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group mvlan."
+			::= { igmpSnoopGroupEntry 2 }
+			
+		igmpSnoopGroupEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Create or delete group"
+			::= { igmpSnoopGroupEntry 3 }
+	
+		igmpSnoopGroupPreJoinEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the prejoin funcion."
+			::= { igmpSnoopGroupEntry 4 }
+			
+		igmpSnoopGroupMemberNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopGroupEntry 5 }
+		
+		igmpSnoopGroupMemberPorts OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopGroupEntry 6 }
+			
+		igmpSnoopGroupV3FilterMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   invalid(0),
+			   include(1),
+			   exclude(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopGroupEntry 7 }
+			
+	
+--WRI IGMPSNOOP SOURCEIP Table	
+	igmpSnoopSourceIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopSourceIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop source ip table."
+			::= { wriIgmpSnoop 6 }
+		
+		igmpSnoopSourceIpEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopSourceIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop source ip table."
+			INDEX {igmpSnoopSourceIpGroupIp,igmpSnoopSourceIpMvlan,igmpSnoopSourceIpAddress}
+			::= { igmpSnoopSourceIpTable 1 }
+		
+		IgmpSnoopSourceIpEntry ::=
+			SEQUENCE { 
+				igmpSnoopSourceIpGroupIp				        InetAddress,
+				igmpSnoopSourceIpMvlan					        INTEGER,
+				igmpSnoopSourceIpAddress				        InetAddress,
+				igmpSnoopSourceIpMode                  INTEGER,
+				igmpSnoopSourceIpEntryStatus           EntryStatus
+			 }	
+		
+		igmpSnoopSourceIpGroupIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group ip address."
+			::= { igmpSnoopSourceIpEntry 1 }
+			
+		igmpSnoopSourceIpMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop mvlan."
+			::= { igmpSnoopSourceIpEntry 2 }
+			
+		igmpSnoopSourceIpAddress OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Ip address."
+			::= { igmpSnoopSourceIpEntry 3 }		
+			
+		igmpSnoopSourceIpMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    include(1),
+			    exclude(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The interface mode."
+			::= { igmpSnoopSourceIpEntry 4 }	
+					
+		igmpSnoopSourceIpEntryStatus	OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Create and delete the item."
+			::= { igmpSnoopSourceIpEntry 5 }	
+	
+--WRI IGMPSNOOP MEMBER Table	
+	igmpSnoopGroupMemberTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopGroupMemberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group member table."
+			::= { wriIgmpSnoop 7 }
+		
+		igmpSnoopGroupMemberEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopGroupMemberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group member table."
+			INDEX {igmpSnoopGroupMemberGroupIp,igmpSnoopGroupMemberMvlan,igmpSnoopGroupMemberSourceIp,igmpSnoopGroupMemberIfUnit}
+			::= { igmpSnoopGroupMemberTable 1 }
+		
+		IgmpSnoopGroupMemberEntry ::=
+			SEQUENCE { 
+				igmpSnoopGroupMemberGroupIp				        InetAddress,
+				igmpSnoopGroupMemberMvlan					        INTEGER,
+				igmpSnoopGroupMemberSourceIp              InetAddress,
+				igmpSnoopGroupMemberIfUnit					      INTEGER,
+				igmpSnoopGroupMemberType                  INTEGER,
+				igmpSnoopGroupMemberEntryStatus				    EntryStatus,
+				igmpSnoopGroupMemberRemainTime            INTEGER,
+				igmpSnoopGroupMemberOutVlanList           OCTET STRING,
+				igmpSnoopGroupMemberUserVlanAdd           OCTET STRING,
+				igmpSnoopGroupMemberUserVlanDel           OCTET STRING,
+				igmpSnoopGroupMemberV3Mode                INTEGER
+			 }	
+		
+		igmpSnoopGroupMemberGroupIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group member group ip address."
+			::= { igmpSnoopGroupMemberEntry 1 }
+			
+		igmpSnoopGroupMemberMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group member mvlan."
+			::= { igmpSnoopGroupMemberEntry 2 }
+		
+		igmpSnoopGroupMemberSourceIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group member group source ip address."
+			::= { igmpSnoopGroupMemberEntry 3 }	
+			
+		igmpSnoopGroupMemberIfUnit OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The interface unit."
+			::= { igmpSnoopGroupMemberEntry 4 }
+			
+		igmpSnoopGroupMemberType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    static(1),
+			    dynamic(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configrue the group member type."
+			::= { igmpSnoopGroupMemberEntry 5 }		
+					
+		igmpSnoopGroupMemberEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Create or delete the group member."
+			::= { igmpSnoopGroupMemberEntry 6 }
+			
+		igmpSnoopGroupMemberRemainTime OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The group member expire time."
+			::= { igmpSnoopGroupMemberEntry 7 }					
+		
+		igmpSnoopGroupMemberOutVlanList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The group out vlan list."
+			::= { igmpSnoopGroupMemberEntry 8 }
+		
+		igmpSnoopGroupMemberUserVlanAdd OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"."
+			::= { igmpSnoopGroupMemberEntry 9 }
+		
+		igmpSnoopGroupMemberUserVlanDel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopGroupMemberEntry 10 }
+			
+		igmpSnoopGroupMemberV3Mode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				invalid(0),
+				include(1),
+				exclude(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopGroupMemberEntry 11 }
+			
+			
+	--WRI IGMPSNOOP SSMMAP Table	
+	igmpSnoopSsmMapTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopSsmMapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop ssm mapping table."
+			::= { wriIgmpSnoop 8 }
+		
+		igmpSnoopSsmMapEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopSsmMapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop ssm mapping table."
+			INDEX {igmpSnoopSsmMapMvlan,igmpSnoopSsmMapAcl,igmpSnoopSsmMapSourceIp}
+			::= { igmpSnoopSsmMapTable 1 }
+		
+		IgmpSnoopSsmMapEntry ::=
+			SEQUENCE {
+				igmpSnoopSsmMapMvlan					        INTEGER,
+				igmpSnoopSsmMapAcl                      INTEGER,
+				igmpSnoopSsmMapSourceIp					      InetAddress,
+				igmpSnoopSsmMapEntryStatus				    EntryStatus
+			 }	
+		
+		igmpSnoopSsmMapMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopSsmMapEntry 1 }
+		
+		igmpSnoopSsmMapAcl OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopSsmMapEntry 2 }
+		
+		igmpSnoopSsmMapSourceIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopSsmMapEntry 3 }
+		
+		igmpSnoopSsmMapEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopSsmMapEntry 4 }
+		
+--WRI IGMPSNOOP TEMP GROUP Table/*MAC FOR INDEX*/	    
+	igmpSnoopMacGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpSnoopMacGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group table."
+			::= { wriIgmpSnoop 9 }
+		
+		igmpSnoopMacGroupEntry OBJECT-TYPE
+			SYNTAX IgmpSnoopMacGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group table."
+			INDEX {igmpSnoopMacGroupMac,igmpSnoopMacGroupMvlan}
+			::= { igmpSnoopMacGroupTable 1 }
+		
+		IgmpSnoopMacGroupEntry ::=
+			SEQUENCE { 
+				igmpSnoopMacGroupMac			    MacAddress,
+				igmpSnoopMacGroupMvlan				INTEGER,
+				igmpSnoopMacGroupEntryStatus		EntryStatus,
+				igmpSnoopMacGroupMemberAddIfIndex   OCTET STRING,
+				igmpSnoopMacGroupMemberDelIfIndex   OCTET STRING
+				}	
+		
+		igmpSnoopMacGroupMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group ip address."
+			::= { igmpSnoopMacGroupEntry 1 }
+			
+		igmpSnoopMacGroupMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Igmpsnoop group mvlan."
+			::= { igmpSnoopMacGroupEntry 2 }
+			
+		igmpSnoopMacGroupEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Create or delete group"
+			::= { igmpSnoopMacGroupEntry 3 }
+				
+				
+		igmpSnoopMacGroupMemberAddIfIndex OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""                                
+			::= { igmpSnoopMacGroupEntry 4 }      
+			
+		igmpSnoopMacGroupMemberDelIfIndex OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { igmpSnoopMacGroupEntry 5 }
+	
+			
+END

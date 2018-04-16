@@ -1,0 +1,152 @@
+WRI-BPDUTUNNEL-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32,enterprises,NOTIFICATION-TYPE    FROM SNMPv2-SMI      	 
+			TEXTUAL-CONVENTION,MacAddress			FROM SNMPv2-TC	
+    		wri,wriProtocol			FROM WRI-SMI;
+		
+		wriBpduTunnel			OBJECT IDENTIFIER ::= { wriProtocol 241 }
+
+		wriBpduTunnelMaxPort OBJECT-TYPE
+			SYNTAX  INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The max value of the interface that the protocol support."
+			::= { wriBpduTunnel 1 }
+		
+		wriBpduTunnelMaxProtoPerPort  OBJECT-TYPE
+			SYNTAX  INTEGER
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The max protocol num that every interface support."
+			::= { wriBpduTunnel 2 }
+
+       
+          -- The Bpdu Tunnel if Table
+		wriBpduTunnelIfTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF WriBpduTunnelIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"A table that contains port-specific information
+					of Bpdu Tunnel."
+			::= { wriBpduTunnel 3}
+
+		wriBpduTunnelIfEntry OBJECT-TYPE
+			SYNTAX  WriBpduTunnelIfEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"A list of information maintained by every port
+					about the Bpdu Tunnel state for that
+					port."
+			INDEX   { wriBpduTunnelIfIndex }
+			::= { wriBpduTunnelIfTable 1 }
+
+		WriBpduTunnelIfEntry ::=
+		SEQUENCE {
+                  wriBpduTunnelIfIndex		INTEGER,
+                  wriBpduTunnelIfState		INTEGER,
+                  wriBpduTunnelIfRole       INTEGER
+                 }
+
+		wriBpduTunnelIfIndex OBJECT-TYPE
+			SYNTAX      INTEGER 
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+					"The port index."
+			::= { wriBpduTunnelIfEntry 1 }
+
+		wriBpduTunnelIfState OBJECT-TYPE
+			SYNTAX  INTEGER{
+				    enable(1),
+				    disable(2)
+			} 
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+					"The state of interface."
+		 ::= { wriBpduTunnelIfEntry 2 }
+
+		wriBpduTunnelIfRole OBJECT-TYPE
+			SYNTAX  INTEGER {
+					uni(1),
+					nni(2)					
+				}
+			MAX-ACCESS  read-write			
+			STATUS  current
+			DESCRIPTION
+					"the role of interface."			
+		::= { wriBpduTunnelIfEntry 3 }
+
+
+         -- The Bpdu Tunnel MAC Mapping Table
+        wriBpduTunnelMacTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF WriBpduTunnelMacEntry
+			MAX-ACCESS  not-accessible
+			STATUS   current
+			DESCRIPTION
+					"A table that contains mac mapping information 
+					of Bpdu Tunnel."
+			::= { wriBpduTunnel 4}
+
+		wriBpduTunnelMacEntry OBJECT-TYPE
+			SYNTAX  WriBpduTunnelMacEntry
+			MAX-ACCESS  not-accessible
+			STATUS  current
+			DESCRIPTION
+					"A list of information of mac mapping iformation of Bpdu Tunnel.."
+			INDEX   { wriBpduTunnelIfIndex,wriBpduTunnelProtocolMac }
+			::= { wriBpduTunnelMacTable 1 }
+
+		WriBpduTunnelMacEntry ::=
+		SEQUENCE {
+				  wriBpduTunnelProtocolMac	   MacAddress,
+                  wriBpduTunnelProviderMac	   MacAddress,                  
+                  wriBpduTunnelMacRowStatus    INTEGER,
+				  wriBpduTunnelVid			   OCTET STRING
+                 }
+
+		wriBpduTunnelProtocolMac OBJECT-TYPE
+			SYNTAX  MacAddress
+			MAX-ACCESS  read-only
+			STATUS  current
+			DESCRIPTION
+				"The protocol mac address."
+		 ::= { wriBpduTunnelMacEntry 1 }
+
+
+		wriBpduTunnelProviderMac OBJECT-TYPE
+			SYNTAX      MacAddress 
+			MAX-ACCESS  read-write
+			STATUS  current
+			DESCRIPTION
+				"The provider mac address."
+			::= { wriBpduTunnelMacEntry 2 }   
+			
+
+		wriBpduTunnelMacRowStatus OBJECT-TYPE
+			SYNTAX  INTEGER{
+				valid (1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			} 
+			MAX-ACCESS  read-write			
+			STATUS  current
+			DESCRIPTION
+				"The row status of mac address mapping."			
+		::= { wriBpduTunnelMacEntry 3 }
+		
+		wriBpduTunnelVid OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(0..1024))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The vlan id."
+			::= { wriBpduTunnelMacEntry 4}
+
+		END

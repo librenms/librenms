@@ -1,0 +1,213 @@
+WRI-SCHEDULPROFILE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+	
+		
+	wriScheduleProfile			MODULE-IDENTITY 
+			LAST-UPDATED  "201101041500Z"		-- January 4, 2011 at 15:00 GMT
+			ORGANIZATION 
+				"FiberHome Networks Systems, Inc."
+			CONTACT-INFO 
+				"http://www.fhn.com.cn"
+			DESCRIPTION 
+				" The info of load balance profile."
+	::=   {wriProtocol 1920}
+		
+		DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		                        
+	    EntryStatus ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"entry status."
+			SYNTAX INTEGER
+				{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+				}
+
+		scheduleProfileGeneral OBJECT IDENTIFIER ::= { wriScheduleProfile 1 }
+
+
+		scheduleProfileFreeIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get the new index of scheduleProfileTable ."
+			::= { scheduleProfileGeneral 1 }
+		
+	  scheduleProfileMaxCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get the  max profile count of current device ."
+			::= { scheduleProfileGeneral 2 }
+			
+		scheduleProfileConfigCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get the configed profile count of current device ."
+			::= { scheduleProfileGeneral 3 }
+			
+			scheduleProfileTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF ScheduleProfileEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "load balance profile."
+			::= { wriScheduleProfile 2 }
+
+		scheduleProfileEntry OBJECT-TYPE
+			SYNTAX ScheduleProfileEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"NULL."
+			INDEX {scheduleProfileInstance }
+			::= { scheduleProfileTable 1 }
+		
+		ScheduleProfileEntry ::=
+		    SEQUENCE {
+		    scheduleProfileInstance         Integer32,
+		    scheduleProfileName        		  DisplayString,
+		    scheduleProfileL2field	       	BITS,
+		    scheduleProfileIpv4field        BITS,
+		    scheduleProfileIpv6field	      BITS,
+		    scheduleProfileMplsfield		    BITS,
+		    scheduleProfileRefCnt						Integer32,
+		    scheduleProfileRefTrunkList			OCTET STRING,
+		    scheduleProfileEntryStatus      EntryStatus
+			}
+		-- The following section describes the components of the
+		-- table.
+
+				scheduleProfileInstance OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"load balance profile instance index."
+				::= { scheduleProfileEntry 1 }
+
+
+				scheduleProfileName OBJECT-TYPE
+				SYNTAX  DisplayString (SIZE(0..255))
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the name of load balance profile."
+				::= { scheduleProfileEntry 2 }
+				
+				scheduleProfileL2field OBJECT-TYPE
+				SYNTAX  BITS{
+				smac(0),
+				dmac(1),
+				l2-protocol(2),
+				vlan(3),
+				sport(4),
+				dport(5)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the l2 field of load balance profile."
+				::= { scheduleProfileEntry 3 }
+				
+				scheduleProfileIpv4field OBJECT-TYPE
+				SYNTAX  BITS{
+				sip(0),
+				dip(1),
+				vlan(2),
+				l4-sport(3),
+				l4-dport(4),
+				protocol(5),
+				sport(6),
+				dport(7)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the ipv4 field of load balance profile."
+				::= { scheduleProfileEntry 4 }
+				
+				scheduleProfileIpv6field OBJECT-TYPE
+				SYNTAX  BITS{
+				sip(0),
+				dip(1),
+				vlan(2),
+				l4-sport(3),
+				l4-dport(4),
+				protocol(5),
+				sport(6),
+				dport(7)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the ipv6 field of load balance profile."
+				::= { scheduleProfileEntry 5 }
+				
+				scheduleProfileMplsfield OBJECT-TYPE
+				SYNTAX  BITS
+				{
+				top-label(0),
+				n2d-label(1),
+				sip(2),
+				dip(3),
+				vlan(4),
+				sport(5),
+				dport(6)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"the Mpls field of load balance profile."
+				::= { scheduleProfileEntry 6 }
+				
+				 
+				scheduleProfileRefCnt OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The ref count of profile on trunk port ."
+				::= { scheduleProfileEntry 7 }
+				
+				scheduleProfileRefTrunkList OBJECT-TYPE
+				SYNTAX  OCTET STRING (SIZE(0..1024))
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The binding trunk port info of current profile."
+				::= { scheduleProfileEntry 8 }
+				
+				scheduleProfileEntryStatus OBJECT-TYPE
+				SYNTAX  EntryStatus
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"entry status."
+				::= { scheduleProfileEntry 9 }
+				
+																
+END
+

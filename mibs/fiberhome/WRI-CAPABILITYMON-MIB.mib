@@ -1,0 +1,541 @@
+WRI-CAPABILITYMON-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol,wriMgmt				FROM WRI-SMI;
+	
+
+  wriCapabilityMon		MODULE-IDENTITY 
+			LAST-UPDATED "201102241500Z"		-- Feb 24, 2011 at 15:00 GMT
+			ORGANIZATION 
+				"FiberHome Networks Systems, Inc."
+			CONTACT-INFO 
+				"http://www.fhn.com.cn"
+			DESCRIPTION 
+				" The info of ip source trail   ." 
+  ::= { wriMgmt 303 }
+		
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+		
+
+	portStatisticsMonInfoTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PortStatisticsMonInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "ip source trail info  table."
+			::= { wriCapabilityMon 1 }
+
+	portStatisticsMonInfoEntry OBJECT-TYPE
+			SYNTAX PortStatisticsMonInfoEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The statistics info of monitor interface ."
+			INDEX { portStatisticsMonInfoIndex,portStatisticsMonInfoType}
+			::= { portStatisticsMonInfoTable 1 }
+		
+	PortStatisticsMonInfoEntry ::=
+		    SEQUENCE {
+		    portStatisticsMonInfoIndex  							Integer32,
+				portStatisticsMonInfoType   							INTEGER,
+				portStatisticsMonInfoRxpkt								Counter64,
+				portStatisticsMonInfoRxbyte								Counter64,
+				portStatisticsMonInfoTxpkt								Counter64,
+				portStatisticsMonInfoTxbyte								Counter64,
+				portStatisticsMonInfoFrag									Counter64,
+				portStatisticsMonInfoJumbo								Counter64,
+				portStatisticsMonInfoCrc									Counter64,
+				portStatisticsMonInfoColls								Counter64,
+				portStatisticsMonInfoUsize								Counter64,
+				portStatisticsMonInfoTX64OCtet						Counter64,
+				portStatisticsMonInfoTX65TO127OCtet				Counter64,
+				portStatisticsMonInfoTX128TO255OCtet			Counter64,
+				portStatisticsMonInfoTX256TO511OCtet			Counter64,
+				portStatisticsMonInfoTX512TO1023OCtet			Counter64,
+				portStatisticsMonInfoTX1024TO1518OCtet		Counter64,
+				portStatisticsMonInfoTX1519TOMaxCtet			Counter64,
+				portStatisticsMonInfoRX64OCtet						Counter64,
+				portStatisticsMonInfoRX65TO127OCtet				Counter64,
+				portStatisticsMonInfoRX128TO255OCtet			Counter64,
+				portStatisticsMonInfoRX256TO511OCtet			Counter64,
+				portStatisticsMonInfoRX512TO1023OCtet			Counter64,
+				portStatisticsMonInfoRX1024TO1518OCtet		Counter64,
+				portStatisticsMonInfoRX1519TOMaxOCtet			Counter64,
+				portStatisticsMonInfoStatus               INTEGER,
+				portStatisticsMonInfoReset                Integer32
+
+			}
+			
+		portStatisticsMonInfoIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Interface index."
+				::= { portStatisticsMonInfoEntry 1 }
+			
+		 portStatisticsMonInfoType OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The type of port monitor statistics ."
+				::= { portStatisticsMonInfoEntry 2 }
+								
+			portStatisticsMonInfoRxpkt OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx packet info of port monitor staistics ."
+				::= { portStatisticsMonInfoEntry 3 }
+								
+		 portStatisticsMonInfoRxbyte OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx byte info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 4 }
+						
+		 portStatisticsMonInfoTxpkt OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx packet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 5 }
+				
+		portStatisticsMonInfoTxbyte OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx byte info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 6 }
+				
+		portStatisticsMonInfoFrag OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The frag info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 7 }
+				
+		portStatisticsMonInfoJumbo OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The jumbo info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 8 }
+				
+		portStatisticsMonInfoCrc OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The crc info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 9 }
+				
+		portStatisticsMonInfoColls OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The colls info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 10 }
+				
+		portStatisticsMonInfoUsize OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The used size info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 11 }
+			
+		portStatisticsMonInfoTX64OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 64OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 12 }
+				
+		portStatisticsMonInfoTX65TO127OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 65TO127OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 13 }
+				
+		portStatisticsMonInfoTX128TO255OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 128TO255OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 14 }
+		
+		portStatisticsMonInfoTX256TO511OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 256TO511OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 15 }
+
+	 portStatisticsMonInfoTX512TO1023OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 512TO1023OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 16 }
+				
+		portStatisticsMonInfoTX1024TO1518OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 1024TO1518OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 17 }
+			
+		portStatisticsMonInfoTX1519TOMaxCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx 1519TOMaxCtete info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 18 }
+				
+		portStatisticsMonInfoRX64OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 64OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 19 }
+				
+		portStatisticsMonInfoRX65TO127OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 65TO127OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 20 }
+		
+		portStatisticsMonInfoRX128TO255OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 128TO255OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 21 }
+				
+	  portStatisticsMonInfoRX256TO511OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 256TO511OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 22 }
+	
+	portStatisticsMonInfoRX512TO1023OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 512TO1023OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 23}
+		
+		portStatisticsMonInfoRX1024TO1518OCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 1024TO1518OCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 24 }
+				
+	  portStatisticsMonInfoRX1519TOMaxOCtet OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx 1519TOMaxOCtet info of port monitor staistics."
+				::= { portStatisticsMonInfoEntry 25 }
+			
+		portStatisticsMonInfoStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Entry Status ."
+				::= { portStatisticsMonInfoEntry 26 }
+				
+	  portStatisticsMonInfoReset OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Reset port monitor staistics."
+				::= { portStatisticsMonInfoEntry 27 }
+				
+				
+	vlanIfMonStatisticsTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF VlanIfMonStatisticsEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The monitor statistic info table on vlan and interface ."
+			::= { wriCapabilityMon 2 }
+
+	vlanIfMonStatisticsEntry OBJECT-TYPE
+			SYNTAX VlanIfMonStatisticsEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The monitor statistic info  on vlan and interface ."
+			INDEX { vlanIfMonStatisticsVlanBegin,vlanIfMonStatisticsVlanEnd,vlanIfMonStatisticsIndex,vlanIfMonStatisticsType}
+			::= { vlanIfMonStatisticsTable 1 }
+		
+	VlanIfMonStatisticsEntry ::=
+		    SEQUENCE {
+						vlanIfMonStatisticsVlanBegin          Integer32,
+						vlanIfMonStatisticsVlanEnd            Integer32,
+						vlanIfMonStatisticsIndex              Integer32,
+						vlanIfMonStatisticsType								INTEGER,
+						vlanIfMonStatisticsRxpkt              Counter64,
+						vlanIfMonStatisticsRxbyte             Counter64,
+						vlanIfMonStatisticsTxpkt              Counter64,
+						vlanIfMonStatisticsTxbyte             Counter64,
+						vlanIfMonStatisticsStatus							INTEGER,
+						vlanIfMonStatisticsReset							Integer32
+	
+				}
+				
+		vlanIfMonStatisticsVlanBegin OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The begin vlan value."
+				::= { vlanIfMonStatisticsEntry 1 }
+			
+		 vlanIfMonStatisticsVlanEnd OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The end vlan value."
+				::= { vlanIfMonStatisticsEntry 2 }
+								
+			vlanIfMonStatisticsIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The interface index."
+				::= { vlanIfMonStatisticsEntry 3 }
+								
+		 vlanIfMonStatisticsType OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The monitor type ."
+				::= { vlanIfMonStatisticsEntry 4 }
+						
+		 vlanIfMonStatisticsRxpkt OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx packet info of vlan and port monitor staistics."
+				::= { vlanIfMonStatisticsEntry 5 }
+				
+		vlanIfMonStatisticsRxbyte OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx packet info of vlan and port monitor staistics."
+				::= { vlanIfMonStatisticsEntry 6 }
+				
+		vlanIfMonStatisticsTxpkt OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx packet info of vlan and port monitor staistics."
+				::= { vlanIfMonStatisticsEntry 7 }
+				
+		vlanIfMonStatisticsTxbyte OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx byte info of vlan and port monitor staistics."
+				::= { vlanIfMonStatisticsEntry 8 }
+				
+		vlanIfMonStatisticsStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Entry Status ."
+				::= { vlanIfMonStatisticsEntry 9 }
+				
+		vlanIfMonStatisticsReset OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Reset the  info of vlan and port monitor staistics."
+				::= { vlanIfMonStatisticsEntry 10 }
+				
+				
+	protoIfMonStatisticsTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF ProtoIfMonStatisticsEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "The monitor statistic info table on vlan and interface ."
+			::= { wriCapabilityMon 3 }
+
+	protoIfMonStatisticsEntry OBJECT-TYPE
+			SYNTAX ProtoIfMonStatisticsEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"The monitor statistic info on protocol and interface ."
+			INDEX { protoIfMonStatisticsProtocol,protoIfMonStatisticsIndex,protoIfMonStatisticsType}
+			::= { protoIfMonStatisticsTable 1 }
+		
+	ProtoIfMonStatisticsEntry ::=
+		    SEQUENCE {
+						protoIfMonStatisticsProtocol          Integer32,
+						protoIfMonStatisticsIndex             Integer32,
+						protoIfMonStatisticsType              INTEGER,
+						protoIfMonStatisticsRxpkt							Counter64,
+						protoIfMonStatisticsRxbyte            Counter64,
+						protoIfMonStatisticsTxpkt             Counter64,
+						protoIfMonStatisticsTxbyte            Counter64,
+						protoIfMonStatisticsStatus            INTEGER,
+						protoIfMonStatisticsReset							Integer32
+	
+				}
+				
+		protoIfMonStatisticsProtocol OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The protocol type."
+				::= { protoIfMonStatisticsEntry 1 }
+			
+		 protoIfMonStatisticsIndex OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The interface index."
+				::= { protoIfMonStatisticsEntry 2 }
+								
+			protoIfMonStatisticsType OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The mon statistics type ."
+				::= { protoIfMonStatisticsEntry 3 }
+								
+		 protoIfMonStatisticsRxpkt OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx packet info of protocol and port statistics  ."
+				::= { protoIfMonStatisticsEntry 4 }
+						
+		 protoIfMonStatisticsRxbyte OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx byte info of protocol and port statistics  ."
+				::= { protoIfMonStatisticsEntry 5 }
+				
+		protoIfMonStatisticsTxpkt OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The rx packet info of protocol and port monitor staistics."
+				::= { protoIfMonStatisticsEntry 6 }
+				
+		protoIfMonStatisticsTxbyte OBJECT-TYPE
+				SYNTAX  Counter64
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The tx byte info of protocol and port monitor staistics."
+				::= { protoIfMonStatisticsEntry 7 }
+				
+		protoIfMonStatisticsStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The entry status ."
+				::= { protoIfMonStatisticsEntry 8 }
+				
+		protoIfMonStatisticsReset OBJECT-TYPE
+				SYNTAX  Integer32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Reset the monitor statistics info of protocl and port ."
+				::= { protoIfMonStatisticsEntry 9 }
+				
+		
+END
+

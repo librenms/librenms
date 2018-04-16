@@ -1,0 +1,241 @@
+WRI-PACKETTEST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+      MODULE-IDENTITY, mib-2, OBJECT-TYPE, Counter32, Unsigned32, Counter64,
+        Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION, MacAddress        FROM SNMPv2-TC
+      wri,wriProtocol	
+        FROM WRI-SMI  
+      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;  
+          
+     wriPacketTest  OBJECT IDENTIFIER ::={ wriProtocol 1611}
+           
+      -- ***************************************************************
+      --
+      --  WRI Ethernet OAM Control group
+      --
+
+      wriPacketTestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WriPacketTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This table contains the character of test."
+        ::= { wriPacketTest 1 }
+
+      wriPacketTestEntry OBJECT-TYPE
+        SYNTAX     WriPacketTestEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "This table contains the character of test "
+        INDEX       { packetTestIndex }
+        ::= { wriPacketTestTable 1 }  
+        
+      WriPacketTestEntry ::=
+        SEQUENCE {
+          packetTestIndex                  INTEGER,
+          packetTesIfIndex                 INTEGER,
+          packetTestSendCount              Counter32,
+          packetTestReceiveCount           Counter32, 
+          packetTestLostCount              Counter32,
+          packetTestSendByteCount          Counter32,
+          packetTestReceiveByteCount       Counter32,
+          packetTestLostByteCount          Counter32,
+          packetTestUtilizationIn          INTEGER,
+          packetTestUtilizationOut         INTEGER,
+          packetTestDestMac                MacAddress, 
+          packetTestVlanId                 INTEGER,
+          packetTestVlanPri                INTEGER,
+          packetTestStpID                  INTEGER, 
+          packetTestStatus                 INTEGER,
+          packetTestSize                   INTEGER,
+          packetTestNum                    INTEGER,
+          packetTestStartTime              INTEGER,
+          packetTestEndTime                INTEGER,
+          packetTestResultStatus           INTEGER,
+          packetTestPktInterval            INTEGER
+       }
+      packetTestIndex  OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the send packet start time"
+         ::= { wriPacketTestEntry 1 } 
+  
+      packetTesIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the test interface"       
+        ::= { wriPacketTestEntry 2 }
+        
+      packetTestSendCount OBJECT-TYPE
+        SYNTAX      Counter32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Send packet count"
+        ::= { wriPacketTestEntry 3 }
+        
+      packetTestReceiveCount OBJECT-TYPE
+        SYNTAX      Counter32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Reveive packet count"
+        ::= { wriPacketTestEntry 4 }
+        
+      packetTestLostCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Lost packet num"
+        ::= { wriPacketTestEntry 5 }  
+        
+      packetTestSendByteCount OBJECT-TYPE
+        SYNTAX      Counter32  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        " Send bytes num  "
+         ::= { wriPacketTestEntry 6 }
+         
+       packetTestReceiveByteCount OBJECT-TYPE
+        SYNTAX      Counter32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Receive bytes num"
+         ::= { wriPacketTestEntry 7 }  
+         
+       packetTestLostByteCount OBJECT-TYPE
+        SYNTAX      Counter32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Receive bytes num"
+         ::= { wriPacketTestEntry 8 } 
+         
+      packetTestUtilizationIn OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the utilization of the interface"
+         ::= { wriPacketTestEntry 9 } 
+      
+      packetTestUtilizationOut OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the utilization of the interface"
+         ::= { wriPacketTestEntry 10 }
+       
+      packetTestDestMac OBJECT-TYPE
+        SYNTAX      MacAddress 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the destination mac address"
+         ::= { wriPacketTestEntry 11 }    
+      
+      packetTestVlanId OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the vlan tag of the packet"
+         ::= { wriPacketTestEntry 12 }
+      
+      packetTestVlanPri OBJECT-TYPE
+        SYNTAX      INTEGER(0..7) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the vlan priority of the vlan tag "
+         ::= { wriPacketTestEntry 13 }        
+
+     packetTestStpID OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the stp id of the packet"
+         ::= { wriPacketTestEntry 14 } 
+         
+     packetTestStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+         		start(1),
+         		stop(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the stp id of the packet"
+         ::= { wriPacketTestEntry 15 }
+         
+     packetTestSize OBJECT-TYPE
+        SYNTAX      INTEGER(64..1518) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the send packet size"
+         ::= { wriPacketTestEntry 16 }
+        
+     packetTestNum OBJECT-TYPE
+        SYNTAX      INTEGER(1..65535) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "the send packet num"
+         ::= { wriPacketTestEntry 17 }
+                    
+      packetTestStartTime OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the send packet start time"
+         ::= { wriPacketTestEntry 18 } 
+      
+      packetTestEndTime OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the send packet start time"
+         ::= { wriPacketTestEntry 19 }  
+              
+    packetTestResultStatus  OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the send packet start time"
+         ::= { wriPacketTestEntry 20 } 
+         
+    packetTestPktInterval  OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "the send packet start time"
+         ::= { wriPacketTestEntry 21 } 
+
+       packetTestFreeIndex   OBJECT-TYPE
+      	 SYNTAX      INTEGER
+      	 MAX-ACCESS  read-only 
+      	 STATUS      current
+      	 DESCRIPTION
+            "packetTest free index."
+		::= { wriPacketTest 2}
+         		
+
+        END     

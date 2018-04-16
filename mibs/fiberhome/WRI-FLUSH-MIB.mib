@@ -1,0 +1,133 @@
+WRI-FLUSH-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,Counter32
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.611
+		wriFlush OBJECT IDENTIFIER ::= { wriProtocol 611 }
+		
+		flushCommon OBJECT IDENTIFIER ::= { wriFlush 1 }
+		
+		-- 1.3.6.1.4.1.3807.2.611.1.1
+		flushMaxIfNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of interface."
+			::= { flushCommon 1 } 
+			
+		-- 1.3.6.1.4.1.3807.2.611.1.2
+		flushFreeIfNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of free interface."
+			::= { flushCommon 2 } 
+		
+		-- 1.3.6.1.4.1.3807.2.611.1.3
+		flushIfAutoInit OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					enable(1),
+					disable(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface auto init if the state is enable."
+			::= { flushCommon 3 } 
+		
+		
+		--WRI FLUSH Table	
+	  flushIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF FlushIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"flush interface table."
+			::= { wriFlush 2 }
+		
+		flushIfEntry OBJECT-TYPE
+			SYNTAX FlushIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"flush interface table."
+			INDEX {flushIfIndex}
+			::= { flushIfTable 1 }
+		
+		FlushIfEntry ::=
+			SEQUENCE { 
+				flushIfIndex					        	INTEGER,
+				flushIfEnable				        		INTEGER,
+				flushIfForwardEnable            INTEGER,
+				flushIfLastFlushTime					        INTEGER,
+				flushIfRecPkt       					  Counter32,
+				flushIfSendPkt       					  Counter32
+				
+			 }	
+		
+		flushIfIndex OBJECT-TYPE
+			 SYNTAX INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The flush interface."
+			 ::= { flushIfEntry 1 }
+			 
+		flushIfEnable OBJECT-TYPE
+			 SYNTAX  INTEGER
+			 {
+			 		enable(1),
+			 		disable(2) 
+			 }
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "Enable or disable flush function on interface."
+			 ::= { flushIfEntry 2 }
+		
+		flushIfForwardEnable OBJECT-TYPE
+			 SYNTAX  INTEGER
+			 {
+			 		enable(1),
+			 		disable(2) 
+			 }
+			 MAX-ACCESS read-write
+			 STATUS current
+			 DESCRIPTION
+				 "Enable or disable flush forward function on interface."
+			 ::= { flushIfEntry 3 }
+		
+		flushIfLastFlushTime OBJECT-TYPE
+			 SYNTAX  INTEGER
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "Last flush time."
+			 ::= { flushIfEntry 4 }
+			 
+		flushIfRecPkt OBJECT-TYPE
+			 SYNTAX  Counter32
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of flush packets received."
+			 ::= { flushIfEntry 5 }	
+			  
+		flushIfSendPkt OBJECT-TYPE
+			 SYNTAX  Counter32
+			 MAX-ACCESS read-only
+			 STATUS current
+			 DESCRIPTION
+				 "The number of flush packets send."
+			 ::= { flushIfEntry 6 }	  
+   END

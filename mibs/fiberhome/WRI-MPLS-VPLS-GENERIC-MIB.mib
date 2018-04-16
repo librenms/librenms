@@ -1,0 +1,1049 @@
+WRI-MPLS-VPLS-GENERIC-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+      NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE,
+      Unsigned32, Counter32, transmission
+         FROM SNMPv2-SMI                    -- [RFC2578]
+
+      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF                   -- [RFC2580]
+
+      TruthValue, RowStatus, StorageType,TEXTUAL-CONVENTION
+         FROM SNMPv2-TC                     -- [RFC2579]
+
+      SnmpAdminString
+         FROM SNMP-FRAMEWORK-MIB            -- [RFC3411]
+
+      VPNIdOrZero
+               FROM VPN-TC-STD-MIB           -- [RFC4265]
+           
+      InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB              -- [RFC4001]
+        
+      wri,wriProtocol,wriProducts				FROM WRI-SMI
+      ;
+
+
+ 		-- 1.3.6.1.4.1.3807.2.1326
+		wriMplsVplsGeneric OBJECT IDENTIFIER ::= { wriProtocol 1326 }
+		
+		
+     -- Vpls BGP Autodiscovery specific Textual Convention
+    VplsBgpRouteDistinguisher ::= TEXTUAL-CONVENTION
+      STATUS        current
+      DESCRIPTION
+          "Syntax for a route distinguisher. For a complete
+           definition of a route distinguisher, see [RFC4364].
+           For more details on use of a route distinguisher
+           for a VPLS service, see [RFC4761]"
+      REFERENCE
+          "[RFC4364]"
+      SYNTAX  OCTET STRING(SIZE (0..256))
+
+    VplsBgpRouteTarget ::= TEXTUAL-CONVENTION
+      STATUS        current
+      DESCRIPTION
+          "Syntax for a route target. For a complete
+           definition of a route target, see [RFC4364]."
+      REFERENCE
+          "[RFC4364]"
+      SYNTAX  OCTET STRING(SIZE (0..256))
+
+    VplsBgpRouteTargetType ::= TEXTUAL-CONVENTION
+      STATUS        current
+      DESCRIPTION
+       "Used to define the type of a route target usage.
+        Route targets can be specified to be imported,
+        exported, or both.  For a complete definition of a
+        route target, see [RFC4364]."
+      REFERENCE
+        "[RFC4364]"
+      SYNTAX INTEGER { import(1), export(2), both(3) }
+
+
+   wriMplsVplsNotifications OBJECT IDENTIFIER ::= { wriMplsVplsGeneric 0 }
+   wriMplsVplsObjects       OBJECT IDENTIFIER ::= { wriMplsVplsGeneric 1 }
+   wriMplsVplsConformance   OBJECT IDENTIFIER ::= { wriMplsVplsGeneric 2 }
+
+   -- PW Virtual Connection Table
+
+   wriMplsVplsConfigIndexNext OBJECT-TYPE
+      SYNTAX            Unsigned32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+          "This object contains an appropriate value to be used
+           for vplsConfigIndex when creating entries in the
+           vplsConfigTable. The value 0 indicates that no
+           unassigned entries are available.  To obtain the
+           value of vplsConfigIndex for a new entry in the
+           vplsConfigTable, the manager issues a management
+           protocol retrieval operation to obtain the current
+           value of vplsConfigIndex.  After each retrieval
+           operation, the agent should modify the value to
+           reflect the next unassigned index.  After a manager
+           retrieves a value the agent will determine through
+           its local policy when this index value will be made
+           available for reuse."
+      ::= { wriMplsVplsObjects 1 }
+
+      wriMplsVplsConfigTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF WriMplsVplsConfigEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "This table specifies information for configuring
+                and monitoring Virtual Private Lan Services(VPLS).
+                "
+          ::= { wriMplsVplsObjects 2 }
+
+      wriMplsVplsConfigEntry OBJECT-TYPE
+          SYNTAX          WriMplsVplsConfigEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+           "A row in this table represents a Virtual Private Lan
+            Service(VPLS) in a packet network. It is indexed by
+            vplsConfigIndex, which uniquely identifies a single VPLS.
+
+            A row is created by the operator or by the agent if a
+            VPLS service is created by non-SNMP application or
+            due to autodiscovery process.
+
+            None of the read-write objects values can be
+            changed when vplsConfigRowStatus is in the active(1)
+            state. Changes are allowed when the vplsConfigRowStatus
+            is in notInService(2) or notReady(3) states only.
+            If the operator need to change one of the values
+            for an active row the vplsConfigRowStatus should be
+            first changed to notInService(2), the objects may
+            be changed now, and later to active(1) in order to
+            re-initiate the signaling process with the new
+            values in effect.
+            "
+          INDEX           { wriMplsVplsConfigIndex }
+          ::= { wriMplsVplsConfigTable 1 }
+
+     WriMplsVplsConfigEntry ::=
+        SEQUENCE {
+         wriMplsVplsConfigIndex                                Unsigned32,
+         wriMplsVplsConfigName                                 SnmpAdminString,
+         wriMplsVplsConfigDescr                                SnmpAdminString,
+         wriMplsVplsConfigAdminStatus                          INTEGER,
+         wriMplsVplsConfigMacLearning                          TruthValue,
+         wriMplsVplsConfigDiscardUnknownDest                   TruthValue,
+         wriMplsVplsConfigMacAging                             TruthValue,
+         wriMplsVplsConfigFwdFullHighWatermark                 Unsigned32,
+         wriMplsVplsConfigFwdFullLowWatermark                  Unsigned32,
+         wriMplsVplsConfigRowStatus                            RowStatus,
+         wriMplsVplsConfigMtu                                  Unsigned32,
+         wriMplsVplsConfigVpnId                                VPNIdOrZero,
+         wriMplsVplsConfigServiceType                          INTEGER,
+         wriMplsVplsConfigStorageType                          StorageType,
+         wriMplsVplsConfigJoinPolicy                           INTEGER,
+         wriMplsVplsConfigVsiID                                Unsigned32,
+				 wriMplsVplsConfigPwSignal                             INTEGER
+          }
+
+      wriMplsVplsConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { wriMplsVplsConfigEntry 1 }
+
+      wriMplsVplsConfigName  OBJECT-TYPE
+          SYNTAX          SnmpAdminString
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "A textual name of the VPLS.
+                If there is no local name, or this object is
+                otherwise not applicable, then this object MUST
+                contain a zero-length octet string."
+          DEFVAL           { "" }
+          ::= { wriMplsVplsConfigEntry 2 }
+
+      wriMplsVplsConfigDescr  OBJECT-TYPE
+          SYNTAX          SnmpAdminString
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "A textual string containing information about the
+               VPLS service. If there is no information for this VPLS
+               service, then this object MUST contain a zero-length
+               octet string."
+          DEFVAL           { "" }
+          ::= { wriMplsVplsConfigEntry 3 }
+
+      wriMplsVplsConfigAdminStatus OBJECT-TYPE
+          SYNTAX          INTEGER {
+                              up(1),
+                              down(2),
+                              testing(3)   -- in some test mode
+
+                          }
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "The desired administrative state of the VPLS
+                service. If the administrative status of the
+                Vpls service is changed to enable then this
+                service is able to utilize the pseudo wire to
+                perform the tasks of a VPLS service.
+                The testing(3) state indicates that no operational
+                packets can be passed. "
+          DEFVAL           { down }
+          ::= { wriMplsVplsConfigEntry 4 }
+
+      wriMplsVplsConfigMacLearning OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "This object specifies if MAC Learning is enabled
+                in this service. If this object is true then Mac
+                Learning is enabled. If false, then Mac Learning is
+                disabled."
+          DEFVAL          { true }
+          ::= { wriMplsVplsConfigEntry 6 }
+
+      wriMplsVplsConfigDiscardUnknownDest OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "If the value of this object is 'true', then frames
+                received with an unknown destination MAC are discarded
+                in this VPLS. If 'false', then the packets are
+                processed."
+          DEFVAL          { false }
+          ::= { wriMplsVplsConfigEntry 7 }
+
+      wriMplsVplsConfigMacAging OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "If the value of this object is 'true'
+                then the MAC ageing process is enabled in
+                this VPLS. If 'false', then the MAC ageing process
+                is disabled"
+          DEFVAL          { true }
+          ::= { wriMplsVplsConfigEntry 8 }
+
+      wriMplsVplsConfigFwdFullHighWatermark OBJECT-TYPE
+          SYNTAX          Unsigned32 (0..100)
+          UNITS           "percentage"
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "This object specifies the utilization of the
+                forwarding database for this VPLS instance at
+                which the vplsFwdFullAlarmRaised notification
+                will be sent."
+          DEFVAL          { 95 }
+          ::= { wriMplsVplsConfigEntry 10 }
+
+      wriMplsVplsConfigFwdFullLowWatermark OBJECT-TYPE
+          SYNTAX          Unsigned32 (0..100)
+          UNITS           "percentage"
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "This object specifies the utilization of the
+                forwarding database for this VPLS instance
+                at which the vplsFwdFullAlarmCleared
+                notification will be sent."
+          DEFVAL          { 90 }
+          ::= { wriMplsVplsConfigEntry 11 }
+
+      wriMplsVplsConfigRowStatus OBJECT-TYPE
+          SYNTAX          RowStatus
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "For creating, modifying, and deleting this row.
+                None of the read-write objects in the
+                conceptual rows may be changed when this
+                object is in the active(1) state."
+          ::= { wriMplsVplsConfigEntry 12 }
+
+      wriMplsVplsConfigMtu OBJECT-TYPE
+          SYNTAX          Unsigned32 (64..1518)
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "The value of this object specifies the MTU of this
+                vpls instance."
+          DEFVAL          { 1518 }
+          ::= { wriMplsVplsConfigEntry 13 }
+
+      wriMplsVplsConfigVpnId OBJECT-TYPE
+          SYNTAX          VPNIdOrZero
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This objects indicates the IEEE 802-1990
+                VPN ID of the associated VPLS service."
+          ::= { wriMplsVplsConfigEntry 14 }
+
+      wriMplsVplsConfigServiceType OBJECT-TYPE
+          SYNTAX          INTEGER {
+                           vlan     (1),
+                           ethernet (2)
+                          }
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               "The value of this object specifies the type of
+                service emulated by this vpls instance."
+          DEFVAL          { vlan }
+          ::= { wriMplsVplsConfigEntry 15 }
+
+      wriMplsVplsConfigStorageType OBJECT-TYPE
+          SYNTAX        StorageType
+          MAX-ACCESS    read-write
+          STATUS        current
+          DESCRIPTION
+               "This variable indicates the storage type for this row."
+          DEFVAL { volatile }
+          ::= { wriMplsVplsConfigEntry 16 }
+
+			wriMplsVplsConfigJoinPolicy  OBJECT-TYPE
+          SYNTAX        INTEGER
+          {
+                 static(1),
+                 auto(2)
+          }
+          MAX-ACCESS    read-write
+          STATUS        current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsConfigEntry 17 }
+
+			wriMplsVplsConfigVsiID   OBJECT-TYPE
+          SYNTAX       Unsigned32
+          MAX-ACCESS    read-write
+          STATUS        current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsConfigEntry 18 }
+
+			wriMplsVplsConfigPwSignal  OBJECT-TYPE
+          SYNTAX       INTEGER
+          {
+                ldp(1),
+                 bgp(2)
+          }
+          MAX-ACCESS    read-write
+          STATUS        current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsConfigEntry 19 }
+
+
+-- VPLS Status table
+
+      wriMplsVplsStatusTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF WriMplsVplsStatusEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+                "This table provides information for monitoring
+                Virtual Private Lan Services(VPLS).
+                "
+          ::= { wriMplsVplsObjects 3 }
+
+      wriMplsVplsStatusEntry OBJECT-TYPE
+          SYNTAX          WriMplsVplsStatusEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+           "A row in this table represents a Virtual Private Lan
+            Service(VPLS) in a packet network. It is indexed by
+            vplsConfigIndex, which uniquely identifies a single VPLS.
+
+            A row in this table is automatically created by the agent
+            when a VPLS service is configured.
+            "
+          INDEX           { wriMplsVplsStatusConfigIndex }
+          ::= { wriMplsVplsStatusTable 1 }
+
+     WriMplsVplsStatusEntry ::=
+        SEQUENCE {
+         wriMplsVplsStatusConfigIndex                       Unsigned32,
+         wriMplsVplsStatusOperStatus                        INTEGER,
+         wriMplsVplsStatusPeerCount                         Counter32
+          }
+
+			wriMplsVplsStatusConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { wriMplsVplsStatusEntry 1 }
+
+      wriMplsVplsStatusOperStatus OBJECT-TYPE
+          SYNTAX          INTEGER {
+                              other(0),
+                              up(1),
+                              down(2)
+                          }
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "The current operational state of this VPLS Service."
+          ::= { wriMplsVplsStatusEntry 2 }
+
+      wriMplsVplsStatusPeerCount OBJECT-TYPE
+          SYNTAX          Counter32
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "This objects specifies the number of peers
+                present in this vpls instance."
+          ::= { wriMplsVplsStatusEntry 3 }
+
+
+      -- VPLS PW Binding Table
+
+      wriMplsVplsPwBindTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF WriMplsVplsPwBindEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "This table provides an association between a
+                VPLS service and the corresponding Pseudo
+                Wires. A service can have more than one Pseudo
+                Wire association. Pseudo Wires are defined in
+                the pwTable"
+          ::= { wriMplsVplsObjects 4 }
+
+      wriMplsVplsPwBindEntry OBJECT-TYPE
+          SYNTAX          WriMplsVplsPwBindEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Each row represents an association between a
+                VPLS instance and one or more Pseudo Wires
+                defined in the pwTable. Each index is unique
+                in describing an entry in this table. However
+                both indexes are required to define the one
+                to many association of service to
+                pseudowire."
+          INDEX  { wriMplsVplsPwBindConfigIndex, wriMplsVplsPwBindIndex }
+          ::= { wriMplsVplsPwBindTable 1 }
+
+      WriMplsVplsPwBindEntry ::=
+          SEQUENCE {
+          		wriMplsVplsPwBindConfigIndex          Unsigned32,
+          		wriMplsVplsPwBindIndex                Unsigned32, 
+              wriMplsVplsPwBindConfigType              INTEGER,
+              wriMplsVplsPwBindType                  INTEGER,
+              wriMplsVplsPwBindRowStatus             RowStatus,
+              wriMplsVplsPwBindStorageType             StorageType,
+              wriMplsVplsPwBindPwName               OCTET STRING
+          }
+          
+      wriMplsVplsPwBindConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { wriMplsVplsPwBindEntry 1 }
+
+			wriMplsVplsPwBindIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsPwBindEntry 2 }
+
+
+      wriMplsVplsPwBindConfigType   OBJECT-TYPE
+           SYNTAX          INTEGER {
+                                   manual        (1),
+                                   autodiscovery (2)
+                           }
+           MAX-ACCESS      read-write
+           STATUS          current
+           DESCRIPTION
+                "The value of this object indicates
+                 whether the Pseudo Wire binding was created
+                 manually or via autodiscovery.
+
+                 The value of this object must be
+                 specifed when the row is created and cannot
+                 be changed while the row status is active(1)"
+          ::= { wriMplsVplsPwBindEntry 3 }
+
+      wriMplsVplsPwBindType   OBJECT-TYPE
+           SYNTAX          INTEGER {
+                                   mesh  (1),
+                                   spoke (2)
+                           }
+           MAX-ACCESS      read-write
+           STATUS          current
+           DESCRIPTION
+                "The value of this object indicates
+                 whether the Pseudo Wire binding is of
+                 type mesh or spoke.
+
+                 The value of this object must be
+                 specifed when the row is created and cannot
+                 be changed while the row status is active(1)"
+          ::= { wriMplsVplsPwBindEntry 4 }
+
+      wriMplsVplsPwBindRowStatus  OBJECT-TYPE
+           SYNTAX          RowStatus
+           MAX-ACCESS      read-write
+           STATUS          current
+           DESCRIPTION
+                "For creating, modifying, and deleting this row.
+                 None of the read-write objects in the
+                 conceptual rows may be changed when this
+                 object is in the active(1) state"
+          ::= { wriMplsVplsPwBindEntry 5 }
+
+      wriMplsVplsPwBindStorageType OBJECT-TYPE
+           SYNTAX        StorageType
+           MAX-ACCESS    read-write
+           STATUS        current
+           DESCRIPTION
+               "This variable indicates the storage type for this row."
+           DEFVAL { volatile }
+           ::= { wriMplsVplsPwBindEntry 6 }
+           
+     wriMplsVplsPwBindPwName OBJECT-TYPE
+           SYNTAX        OCTET STRING
+           MAX-ACCESS    read-write
+           STATUS        current
+           DESCRIPTION
+               "This variable indicates the pw name for this row."
+           ::= { wriMplsVplsPwBindEntry 7 }  
+
+-- vplsBgpADConfigTable
+
+      wriMplsVplsBgpADConfigTable OBJECT-TYPE
+            SYNTAX          SEQUENCE OF WriMplsVplsBgpADConfigEntry
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+            "This table specifies information for configuring
+             BGP Auto-discovery parameters for a given Vpls service.
+            "
+            ::= { wriMplsVplsObjects 5 }
+
+      wriMplsVplsBgpADConfigEntry OBJECT-TYPE
+            SYNTAX          WriMplsVplsBgpADConfigEntry
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+            "A row in this table represents BGP based autodiscovery
+             is in use for this instance of Vpls.
+             A row in this table is indexed by vplsConfigIndex, which
+             uniquely identifies a single VPLS.
+             None of the read-write objects can be changed when
+             vplsBGPADConfigRowStatus is in active(1) state. Changes
+             are allowed when the vplsBGPADConfigRowStatus is in
+             notInService(2) or notReady(3) states only.
+             If the operator need to change one of the values
+             for an active row the vplsConfigRowStatus should be
+             first changed to notInService(2), the objects may
+             be changed now, and later to active(1) in order to
+             re-initiate the signaling process with the new
+             values in effect.
+            "
+            INDEX      { wriMplsVplsBgpADConfigIndex }
+            ::= { wriMplsVplsBgpADConfigTable 1 }
+
+      WriMplsVplsBgpADConfigEntry ::=
+         SEQUENCE {
+          wriMplsVplsBgpADConfigIndex                Unsigned32,
+          wriMplsVplsBgpADConfigRouteDistinguisher   VplsBgpRouteDistinguisher,
+          wriMplsVplsBgpADConfigPrefix               Unsigned32,
+          wriMplsVplsBgpADConfigVplsId               VplsBgpRouteDistinguisher,
+          wriMplsVplsBgpADConfigRowStatus            RowStatus
+         }
+
+			wriMplsVplsBgpADConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { wriMplsVplsBgpADConfigEntry 1 }
+
+      wriMplsVplsBgpADConfigRouteDistinguisher OBJECT-TYPE
+            SYNTAX          VplsBgpRouteDistinguisher
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            " The route distinguisher for this VPLS. See [RFC4364]
+            for a complete definition of a route distinguisher.
+            for more details on use of a route distinguisher
+            for a VPLS service, see [RFC4761]
+            "
+            ::= { wriMplsVplsBgpADConfigEntry 2 }
+
+      wriMplsVplsBgpADConfigPrefix      OBJECT-TYPE
+            SYNTAX          Unsigned32
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            " In case of auto-discovery the default prefix advertised
+            is the ip address of the loopback. In case the user wants
+            to override the loopback address, vplsBgpADConfigPrefix
+            should be set. When this value if non-zero it is used
+            as the advertised IP address in the NLRI.
+            "
+            DEFVAL { 0 }
+            ::= { wriMplsVplsBgpADConfigEntry 3 }
+
+      wriMplsVplsBgpADConfigVplsId          OBJECT-TYPE
+            SYNTAX          VplsBgpRouteDistinguisher
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            " VplsId is a unique identifier for all VSIs belonging to
+            the same VPLS. It is advertised as an extended community
+            "
+            ::= { wriMplsVplsBgpADConfigEntry 4 }
+
+      wriMplsVplsBgpADConfigRowStatus OBJECT-TYPE
+            SYNTAX          RowStatus
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            " For creating, modifying, and deleting this row.
+            None of the read-write objects in the
+            conceptual rows may be changed when this
+            object is in the active(1) state.
+            "
+            ::= { wriMplsVplsBgpADConfigEntry 5 }
+
+
+    -- vplsBgpRteTargetTable
+
+      wriMplsVplsBgpRteTargetTable   OBJECT-TYPE
+            SYNTAX          SEQUENCE OF WriMplsVplsBgpRteTargetEntry
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+            " This table specifies the list of Route Targets
+              imported or exported by BGP during auto-discovery of VPLS.
+            "
+            ::= { wriMplsVplsObjects 6 }
+
+      wriMplsVplsBgpRteTargetEntry   OBJECT-TYPE
+            SYNTAX          WriMplsVplsBgpRteTargetEntry
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+              "An entry in this table specifies the value of the
+               Route Target being used by BGP. Depending on the value
+               of vplsBgpRteTargetType an RT might be exported or
+               imported or both. Every VPLS which
+              uses auto-discovery for finding peer nodes can import and
+              export multiple Route Targets. This representation allows
+              support for hierarchical VPLS.
+            "
+            INDEX     { wriMplsVplsBgpRteTargetConfigIndex, wriMplsVplsBgpRteTargetIndex }
+            ::= { wriMplsVplsBgpRteTargetTable 1 }
+
+      WriMplsVplsBgpRteTargetEntry ::=
+         SEQUENCE {
+          wriMplsVplsBgpRteTargetConfigIndex     Unsigned32,
+          wriMplsVplsBgpRteTargetIndex          Unsigned32,
+          wriMplsVplsBgpRteTargetRTType         VplsBgpRouteTargetType,
+          wriMplsVplsBgpRteTargetRT             VplsBgpRouteTarget,
+          wriMplsVplsBgpRteTargetRTRowStatus    RowStatus
+         }
+
+		 wriMplsVplsBgpRteTargetConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { wriMplsVplsBgpRteTargetEntry 1 }
+
+      wriMplsVplsBgpRteTargetIndex   OBJECT-TYPE
+            SYNTAX          Unsigned32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+            "This index along with vplsConfigIndex,identifies one entry
+             in the vplsBgpRteTargetTable. By keeping vplsConfigIndex
+             constant and using new value of vplsBgpRteTargetIndex user
+              can configure multiple Route Targets for the same Vpls.
+            "
+            ::= { wriMplsVplsBgpRteTargetEntry 2 }
+
+      wriMplsVplsBgpRteTargetRTType  OBJECT-TYPE
+            SYNTAX          VplsBgpRouteTargetType
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            " Used to define the type of a route target usage.
+              Route targets can be specified to be imported,
+              exported, or both.  For a complete definition of a
+              route target, see [RFC4364]."
+            ::= { wriMplsVplsBgpRteTargetEntry 3 }
+
+      wriMplsVplsBgpRteTargetRT     OBJECT-TYPE
+            SYNTAX          VplsBgpRouteTarget
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            " The route target associated with the VPLS service.
+              For more details on use of route targets
+              for a VPLS service, see [RFC4761]
+            "
+            ::= { wriMplsVplsBgpRteTargetEntry 4 }
+
+      wriMplsVplsBgpRteTargetRTRowStatus     OBJECT-TYPE
+            SYNTAX          RowStatus
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+            "This variable is used to create, modify, and/or
+             delete a row in this table.  When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified
+            "
+            ::= { wriMplsVplsBgpRteTargetEntry 5 }
+
+
+
+      wriMplsVplsStatusNotifEnable  OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+            "If this object is set to true(1), then it enables
+             the emission of vplsStatusChanged
+             notification; otherwise this notification is not
+             emitted."
+            REFERENCE
+            "See also [RFC3413] for explanation that
+            notifications are under the ultimate control of the
+            MIB module in this document."
+            DEFVAL { false }
+            ::= { wriMplsVplsObjects 7 }
+
+       wriMplsVplsNotificationMaxRate OBJECT-TYPE
+          SYNTAX       Unsigned32
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+           "This object indicates the maximum number of
+            notifications issued per second. If events occur
+            more rapidly, the implementation may simply fail to
+            emit these notifications during that period, or may
+            queue them until an appropriate time. A value of 0
+            means no throttling is applied and events may be
+            notified at the rate at which they occur."
+          DEFVAL       { 0 }
+          ::= { wriMplsVplsObjects 8 }
+
+			wriMplsVplsEnable OBJECT-TYPE
+          SYNTAX       INTEGER
+          {
+          		 start(1),
+          		 stop(2)
+          }
+          MAX-ACCESS   read-write
+          STATUS       current
+          DESCRIPTION
+           "Start or stop the mpls vpls protocol."
+          ::= { wriMplsVplsObjects 9 }
+
+      wriMplsVplsIfBindVsiTable   OBJECT-TYPE
+            SYNTAX          SEQUENCE OF WriMplsVplsIfBindVsiEntry
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+            " 
+            "
+            ::= { wriMplsVplsObjects 10 }
+
+      wriMplsVplsIfBindVsiEntry   OBJECT-TYPE
+            SYNTAX          WriMplsVplsIfBindVsiEntry
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+              "
+            "
+            INDEX     { wriMplsVplsIfBindVsiConfigIndex, wriMplsVplsIfBindVsiIfIndex }
+            ::= { wriMplsVplsIfBindVsiTable 1 }
+
+      WriMplsVplsIfBindVsiEntry ::=
+         SEQUENCE {
+          wriMplsVplsIfBindVsiConfigIndex     Unsigned32,
+          wriMplsVplsIfBindVsiIfIndex          Unsigned32,
+          wriMplsVplsIfBindVsiRowStatus    RowStatus,
+          wriMplsVplsIfBindVsiName          OCTET STRING
+         }
+
+		 wriMplsVplsIfBindVsiConfigIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32 (1.. 2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               "Unique index for the conceptual row identifying
+                a VPLS service."
+          ::= { wriMplsVplsIfBindVsiEntry 1 }
+
+			wriMplsVplsIfBindVsiIfIndex  OBJECT-TYPE
+          SYNTAX          Unsigned32
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsIfBindVsiEntry 2 }
+          
+       wriMplsVplsIfBindVsiRowStatus  OBJECT-TYPE
+          SYNTAX          RowStatus
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsIfBindVsiEntry 3 }
+          
+        wriMplsVplsIfBindVsiName   OBJECT-TYPE
+          SYNTAX      OCTET STRING   
+       		MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION
+               ""
+          ::= { wriMplsVplsIfBindVsiEntry 4 }
+
+
+      -- VPLS Service Notifications
+      wriMplsVplsStatusChanged NOTIFICATION-TYPE
+          OBJECTS {
+              wriMplsVplsConfigVpnId,
+              wriMplsVplsConfigAdminStatus,
+              wriMplsVplsStatusOperStatus
+          }
+          STATUS          current
+          DESCRIPTION
+               "The vplsStatusChanged notification is generated
+                when there is a change in the administrative or
+                operating status of a VPLS service."
+          ::= { wriMplsVplsNotifications 1 }
+
+      wriMplsVplsFwdFullAlarmRaised NOTIFICATION-TYPE
+          OBJECTS {
+              wriMplsVplsConfigVpnId,
+              wriMplsVplsConfigFwdFullHighWatermark,
+              wriMplsVplsConfigFwdFullLowWatermark
+          }
+          STATUS          current
+          DESCRIPTION
+               "The vplsFwdFullAlarmRaised notification is
+                generated when the utilization of the Forwarding
+                database is above the value specified by
+                vplsConfigFwdFullHighWatermark."
+          ::= { wriMplsVplsNotifications 2 }
+
+      wriMplsVplsFwdFullAlarmCleared NOTIFICATION-TYPE
+          OBJECTS {
+              wriMplsVplsConfigVpnId,
+              wriMplsVplsConfigFwdFullHighWatermark,
+              wriMplsVplsConfigFwdFullLowWatermark
+          }
+          STATUS          current
+          DESCRIPTION
+               "The vplsFwdFullAlarmCleared notification is
+                generated when the utilization of the Forwarding
+                database is below the value specified by
+                vplsConfigFwdFullLowWatermark."
+          ::= { wriMplsVplsNotifications 3 }
+
+   -- Compliance requirement for read-only implementations.
+
+   wriMplsVplsCompliances
+     OBJECT IDENTIFIER ::= { wriMplsVplsConformance 1 }
+
+   wriMplsVplsModuleFullCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+           "Compliance requirement for implementations that
+            provide full support for VPLS-GENERIC-DRAFT-01-MIB.
+            Such devices can then be monitored and configured using
+            this MIB module."
+      MODULE -- this module
+
+          MANDATORY-GROUPS {
+               wriMplsVplsGroup,
+               wriMplsVplsPwBindGroup,
+               wriMplsVplsNotificationGroup
+           }
+
+      ::= { wriMplsVplsCompliances 1 }
+
+
+   wriMplsVplsModuleReadOnlyCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+           "Compliance requirement for implementations that only
+            provide read-only support for VPLS-GENERIC-DRAFT-01-MIB.
+            Such devices can then be monitored but cannot be
+            configured using this MIB modules."
+
+      MODULE -- this module
+
+          MANDATORY-GROUPS {
+               wriMplsVplsGroup,
+               wriMplsVplsPwBindGroup,
+               wriMplsVplsNotificationGroup
+           }
+
+           OBJECT          wriMplsVplsConfigName
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+
+           OBJECT          wriMplsVplsConfigDescr
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigAdminStatus
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigMacLearning
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigDiscardUnknownDest
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigMacAging
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigFwdFullHighWatermark
+           MIN-ACCESS      read-only
+           DESCRIPTION
+
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigFwdFullLowWatermark
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigRowStatus
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigMtu
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsConfigServiceType
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsPwBindConfigType
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsPwBindType
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+           OBJECT          wriMplsVplsPwBindRowStatus
+           MIN-ACCESS      read-only
+           DESCRIPTION
+               "Write access is not required."
+
+      ::= { wriMplsVplsCompliances 2 }
+
+-- Units of conformance.
+
+      wriMplsVplsGroups
+        OBJECT IDENTIFIER ::= { wriMplsVplsConformance 2 }
+
+
+      wriMplsVplsGroup OBJECT-GROUP
+          OBJECTS {
+              wriMplsVplsConfigName,
+              wriMplsVplsConfigDescr,
+              wriMplsVplsConfigAdminStatus,
+              wriMplsVplsConfigMacLearning,
+              wriMplsVplsConfigDiscardUnknownDest,
+              wriMplsVplsConfigMacAging,
+              wriMplsVplsConfigVpnId,
+              wriMplsVplsConfigFwdFullHighWatermark,
+              wriMplsVplsConfigFwdFullLowWatermark,
+              wriMplsVplsConfigRowStatus,
+              wriMplsVplsConfigIndexNext,
+              wriMplsVplsConfigMtu,
+              wriMplsVplsConfigServiceType,
+              wriMplsVplsConfigStorageType,
+
+              wriMplsVplsStatusOperStatus,
+              wriMplsVplsStatusPeerCount,
+
+              wriMplsVplsStatusNotifEnable,
+              wriMplsVplsNotificationMaxRate
+          }
+          STATUS          current
+          DESCRIPTION
+               "The group of objects supporting
+                management of L2VPN VPLS services"
+          ::= { wriMplsVplsGroups 1 }
+
+      wriMplsVplsPwBindGroup OBJECT-GROUP
+          OBJECTS {
+              wriMplsVplsPwBindConfigType,
+              wriMplsVplsPwBindType,
+              wriMplsVplsPwBindRowStatus,
+              wriMplsVplsPwBindStorageType
+          }
+          STATUS          current
+          DESCRIPTION
+               "The group of objects supporting
+                management of
+                Pseudo Wire (PW) Binding to VPLS."
+          ::= { wriMplsVplsGroups 2 }
+
+      wriMplsVplsNotificationGroup NOTIFICATION-GROUP
+          NOTIFICATIONS   {
+              wriMplsVplsStatusChanged,
+              wriMplsVplsFwdFullAlarmRaised,
+              wriMplsVplsFwdFullAlarmCleared
+          }
+          STATUS          current
+          DESCRIPTION
+               "The group of notifications supporting
+                the  Notifications generated for
+                VPLS Services"
+          ::= { wriMplsVplsGroups 3 }
+END

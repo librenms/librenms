@@ -1,0 +1,330 @@
+WRI-LOOPCHECK-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+	
+	-- Multiple Services Ring (MSPP)
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppLayer2		OBJECT IDENTIFIER ::=   {mspp 3}
+	
+
+
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+	VlanList ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"Each octet within this value specifies a set of eight
+		ports, with the first octet specifying ports 1 through
+		8, the second octet specifying ports 9 through 16, etc.
+		Within each octet, the most significant bit represents
+		the lowest numbered port, and the least significant bit
+		represents the highest numbered port.  Thus, each port
+		of the bridge is represented by a single bit within the
+		value of this object.  If that bit has a value of '1'
+		then that port is included in the set of ports; the port
+		is not included if its bit has a value of '0'."
+	SYNTAX      OCTET STRING
+			
+			
+	loopcheck			OBJECT IDENTIFIER ::=   {msppLayer2 13}
+	
+	loopcheckGeneral			OBJECT IDENTIFIER ::=   {loopcheck 1}
+	
+	loopcheckLoopAction	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	port-block(1),
+        	vlan-block(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckGeneral 1 }
+        
+	loopcheckCheckTime	OBJECT-TYPE
+        SYNTAX INTEGER(60..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"unit:second,it can be set 0"
+        ::= { loopcheckGeneral 2 }
+        
+	loopcheckTrapEnable	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	enable(1),
+        	disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckGeneral 3}
+        
+	loopcheckShutdownTime	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	enable(1),
+        	disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckGeneral 4} 
+        
+    loopcheckSendInterval   OBJECT-TYPE
+        SYNTAX INTEGER(3..60)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "loopcheck packet send interval"
+        ::= { loopcheckGeneral 5} 
+        
+    loopcheckRecoverTime   OBJECT-TYPE
+        SYNTAX INTEGER(3..20)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "loopcheck recover time's multiple,the real recover time is loopcheckRecoverTime
+         multiple the loopcheckSendInterval"
+        ::= { loopcheckGeneral 6}
+  
+    
+	
+
+	loopcheckIfTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF LoopcheckIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				"A table that contains all switch mac information."
+		::= { loopcheck 2 }
+
+	loopcheckIfEntry OBJECT-TYPE
+		SYNTAX  LoopcheckIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { loopcheckIfIndex}
+		::= { loopcheckIfTable 1 }
+
+	LoopcheckIfEntry ::=
+		SEQUENCE {
+			loopcheckIfIndex				Unsigned32,
+			loopcheckIfEnable			INTEGER,
+			loopcheckIfVlanListAdd		OCTET STRING,
+			loopcheckIfStatus			INTEGER,
+			loopcheckIfShutdownEnable	INTEGER,
+			loopcheckIfRxDistance		Unsigned32,
+			loopcheckIfTxDistance		Unsigned32,
+			loopcheckIfStateReset       INTEGER,
+			loopcheckIfActionMode       INTEGER,
+			loopcheckIfRecoverTime      INTEGER,            
+			loopcheckIfVlanListDel			OCTET STRING
+		}
+
+	loopcheckIfIndex	   OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "if index."
+        ::= { loopcheckIfEntry 1 }
+
+
+	loopcheckIfEnable	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	enable(1),
+        	disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { loopcheckIfEntry 2 }
+        
+	loopcheckIfVlanListAdd OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { loopcheckIfEntry 3 }
+        
+	loopcheckIfStatus	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	ok(1),
+        	linkdown(2),
+			local-loop(3),
+			remote-loop(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckIfEntry 4 }
+        
+	loopcheckIfShutdownEnable	OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	canshutdown(1),
+        	cannotshutdown(2)
+		}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckIfEntry 5 }
+
+	loopcheckIfRxDistance	OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckIfEntry 6 }
+        
+	loopcheckIfTxDistance	OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { loopcheckIfEntry 7 }
+        
+    loopcheckIfStateReset   OBJECT-TYPE 
+    	SYNTAX INTEGER       
+    	MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "set the loopcheck mode is normally or relieve after the port is shutdown"
+        ::= { loopcheckIfEntry 8}  
+        
+    loopcheckIfActionMode   OBJECT-TYPE 
+    	SYNTAX INTEGER{
+    					blocking(1),
+    					trap(2),
+    					nolearning(3),
+    					shutdown(4)
+    	               }
+    	MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "the port action when the loopcheck is happened in vlan-block mode"
+        ::= { loopcheckIfEntry 9}
+        
+          
+    loopcheckIfRecoverTime   OBJECT-TYPE 
+    	SYNTAX INTEGER
+     	MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "the port which is shutdown when the loopcheck is happened in vlan-block mode recover time"
+        ::= { loopcheckIfEntry 10}
+        
+	loopcheckIfVlanListDel OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { loopcheckIfEntry 11 }
+		
+		
+		
+	loopcheckTraps	 OBJECT IDENTIFIER ::= { loopcheck 3 }
+
+	loopcheckLoopTrap NOTIFICATION-TYPE
+		OBJECTS { loopcheckIfIndex,
+							loopcheckIfStatus,
+							loopcheckIfVlan
+						}
+		STATUS  current
+		DESCRIPTION
+		"."
+		::= { loopcheckTraps 1 }
+
+	loopcheckLoopRecoverTrap NOTIFICATION-TYPE
+		OBJECTS { loopcheckIfIndex,
+							loopcheckIfStatus,
+							loopcheckIfVlan
+						}
+		STATUS  current
+		DESCRIPTION
+		"."
+		::= { loopcheckTraps 2 }
+
+
+   loopcheckIfVlanTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF LoopcheckIfVlanEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				"A table that contains all switch mac information."
+		::= { loopcheck 4 }
+		  
+	loopcheckIfVlanEntry OBJECT-TYPE
+		SYNTAX  LoopcheckIfVlanEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { loopcheckIfIndex,loopcheckIfVlan}
+		::= { loopcheckIfVlanTable 1 }
+
+	LoopcheckIfVlanEntry ::=
+		SEQUENCE {
+			loopcheckIfVlan			       	INTEGER, 
+			loopcheckIfVlanRemainTime        INTEGER
+		} 
+		
+	loopcheckIfVlan  OBJECT-TYPE 
+    	SYNTAX INTEGER       
+    	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "the vlan list which have looped on the interface "
+        ::= { loopcheckIfVlanEntry 1}   
+        		
+     
+   loopcheckIfVlanRemainTime   OBJECT-TYPE 
+    	SYNTAX INTEGER       
+    	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "the remain time of the loopcheckCheckTime or loopcheckRecoverTime"
+        ::= { loopcheckIfVlanEntry 2}
+
+END

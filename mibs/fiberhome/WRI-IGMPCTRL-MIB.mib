@@ -1,0 +1,1548 @@
+WRI-IGMPCTRL-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			IpAddress, Integer32, OBJECT-TYPE			FROM SNMPv2-SMI			
+			TEXTUAL-CONVENTION			FROM SNMPv2-TC			
+			wriProducts, wriProtocol			FROM WRI-SMI
+			InetAddressType,InetAddress			FROM INET-ADDRESS-MIB;
+	
+
+-- Type definitions
+-- 
+		DisplayString ::= OCTET STRING
+
+--
+-- Textual conventions
+--
+
+		EntryStatus ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"entry status."
+			SYNTAX INTEGER
+				{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+				}
+	
+--  Node definitions
+-- 
+-- Node definitions
+-- 
+-- 1.3.6.1.4.1.3807.2.910
+		-- 1.3.6.1.4.1.3807.2.910
+		igmpctrl OBJECT IDENTIFIER ::= { wriProtocol 910 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1
+		-- 1.3.6.1.4.1.3807.2.910.1
+		igmpctrlGen OBJECT IDENTIFIER ::= { igmpctrl 1 }
+
+		
+		-- 1.3.6.1.4.1.3807.2.910.1.1
+		igmpctrlAutoReportNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 1 }
+		
+--  1.3.6.1.4.1.3807.2.910.1.2
+		igmpctrlIgnoreTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.3
+		igmpctrlLogInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.4
+		igmpctrlLogAutoUploadEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					enable(1),
+					disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.5
+		igmpctrlAutoReportInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.6
+		igmpctrlHostIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 6 }
+			
+--  1.3.6.1.4.1.3807.2.910.1.7
+		igmpctrlHostIpType OBJECT-TYPE
+			SYNTAX  InetAddressType
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 7 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.8
+		igmpctrlHostName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 8 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.9
+		igmpctrlHostPassword OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 9 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.10
+		igmpctrlPreviewResetHour OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 10 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.11
+		igmpctrlPreviewResetMinute OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 11 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.12
+		igmpctrlPreviewResetSec OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 12 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.13
+		igmpctrlPreviewSynToLinecard OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 13 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.1.14
+		igmpctrlUnknownMulticast OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 14 }
+
+		igmpctrlPreviewVidTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 15 }
+		
+		igmpctrlPreviewResetUserParas OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 16 }
+		
+		igmpctrlLogMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 17 }
+		
+		igmpctrlPreviewMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 18 }
+		
+		igmpctrlPreviewFreeIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 19 }
+		
+		igmpctrlChannelMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 20 }
+		
+		igmpctrlChannelFreeIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 21 }
+		
+		igmpctrlChannelPktMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 22 }
+		
+		igmpctrlChannelPktFreeIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 23 }
+		
+		igmpctrlClearConfig OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 24 }
+			
+		igmpctrlChannelNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 25 }
+			
+		igmpctrlPreviewNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 26 }
+			
+		igmpctrlPacketNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlGen 27 }
+				
+		
+--  1.3.6.1.4.1.3807.2.910.2
+		igmpctrlChannelTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlChannelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1
+		igmpctrlChannelEntry OBJECT-TYPE
+			SYNTAX IgmpctrlChannelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlChannelId }
+			::= { igmpctrlChannelTable 1 }
+
+		
+		IgmpctrlChannelEntry ::=
+			SEQUENCE { 
+				igmpctrlChannelId
+					Integer32,
+				igmpctrlChannelEntryStatus
+					EntryStatus,
+				igmpctrlChannelName
+					OCTET STRING,
+				igmpctrlChannelVlan
+					Integer32,
+				igmpctrlChannelGroupIp
+					OCTET STRING,
+				igmpctrlChannelSourceIp
+					OCTET STRING,
+				igmpctrlChannelIpType
+					Integer32,
+				igmpctrlChannelRefCnt
+					Integer32,
+				igmpctrlChannelOnlineUser
+					Integer32
+			 }
+
+--  1.3.6.1.4.1.3807.2.910.2.1.1
+		-- 1.3.6.1.4.1.3807.2.910.2.1.1
+		igmpctrlChannelId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 1 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.2
+		-- 1.3.6.1.4.1.3807.2.910.2.1.2
+		igmpctrlChannelEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.3
+		-- 1.3.6.1.4.1.3807.2.910.2.1.3
+		igmpctrlChannelName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.4
+		-- 1.3.6.1.4.1.3807.2.910.2.1.4
+		igmpctrlChannelVlan OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.5
+		-- 1.3.6.1.4.1.3807.2.910.2.1.5
+		igmpctrlChannelGroupIp OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.6
+		-- 1.3.6.1.4.1.3807.2.910.2.1.6
+		igmpctrlChannelSourceIp OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 6 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.7
+		-- 1.3.6.1.4.1.3807.2.910.2.1.7
+		igmpctrlChannelIpType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 7 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.2.1.8
+		-- 1.3.6.1.4.1.3807.2.910.2.1.8
+		igmpctrlChannelRefCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 8 }
+			
+		igmpctrlChannelOnlineUser OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlChannelEntry 9 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3
+		-- 1.3.6.1.4.1.3807.2.910.3
+		igmpctrlPreviewTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlPreviewEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1
+		-- 1.3.6.1.4.1.3807.2.910.3.1
+		igmpctrlPreviewEntry OBJECT-TYPE
+			SYNTAX IgmpctrlPreviewEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlPreviewId }
+			::= { igmpctrlPreviewTable 1 }
+
+		
+		IgmpctrlPreviewEntry ::=
+			SEQUENCE { 
+				igmpctrlPreviewId
+					Integer32,
+				igmpctrlPreviewEntryStatus
+					EntryStatus,
+				igmpctrlPreviewName
+					OCTET STRING,
+				igmpctrlPreviewType
+					Integer32,
+				igmpctrlPreviewInterval
+					Integer32,
+				igmpctrlPreviewDuration
+					Integer32,
+				igmpctrlPreviewTimes
+					Integer32,
+				igmpctrlPreviewTotalTime
+					Integer32,
+				igmpctrlPreviewRefCnt
+					Integer32
+			 }
+
+--  1.3.6.1.4.1.3807.2.910.3.1.1
+		-- 1.3.6.1.4.1.3807.2.910.3.1.1
+		igmpctrlPreviewId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 1 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.2
+		-- 1.3.6.1.4.1.3807.2.910.3.1.2
+		igmpctrlPreviewEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.3
+		-- 1.3.6.1.4.1.3807.2.910.3.1.3
+		igmpctrlPreviewName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.4
+		-- 1.3.6.1.4.1.3807.2.910.3.1.4
+		igmpctrlPreviewType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.5
+		-- 1.3.6.1.4.1.3807.2.910.3.1.5
+		igmpctrlPreviewInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.6
+		-- 1.3.6.1.4.1.3807.2.910.3.1.6
+		igmpctrlPreviewDuration OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 6 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.7
+		-- 1.3.6.1.4.1.3807.2.910.3.1.7
+		igmpctrlPreviewTimes OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 7 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.8
+		-- 1.3.6.1.4.1.3807.2.910.3.1.8
+		igmpctrlPreviewTotalTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 8 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.3.1.9
+		-- 1.3.6.1.4.1.3807.2.910.3.1.9
+		igmpctrlPreviewRefCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPreviewEntry 9 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4
+		-- 1.3.6.1.4.1.3807.2.910.4
+		igmpctrlPacketTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlPacketEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4.1
+		-- 1.3.6.1.4.1.3807.2.910.4.1
+		igmpctrlPacketEntry OBJECT-TYPE
+			SYNTAX IgmpctrlPacketEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlPacketId }
+			::= { igmpctrlPacketTable 1 }
+
+		
+		IgmpctrlPacketEntry ::=
+			SEQUENCE { 
+				igmpctrlPacketId
+					Integer32,
+				igmpctrlPacketEntryStatus
+					EntryStatus,
+				igmpctrlPacketName
+					OCTET STRING,
+				igmpctrlPacketPreviewNum
+					Integer32,
+				igmpctrlPacketChannelNum
+					Integer32,
+				igmpctrlPacketRefCnt
+					Integer32
+			 }
+
+--  1.3.6.1.4.1.3807.2.910.4.1.1
+		-- 1.3.6.1.4.1.3807.2.910.4.1.1
+		igmpctrlPacketId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPacketEntry 1 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4.1.2
+		-- 1.3.6.1.4.1.3807.2.910.4.1.2
+		igmpctrlPacketEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPacketEntry 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4.1.3
+		-- 1.3.6.1.4.1.3807.2.910.4.1.3
+		igmpctrlPacketName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPacketEntry 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4.1.4
+		-- 1.3.6.1.4.1.3807.2.910.4.1.4
+		igmpctrlPacketPreviewNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPacketEntry 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4.1.5
+		-- 1.3.6.1.4.1.3807.2.910.4.1.5
+		igmpctrlPacketChannelNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPacketEntry 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.4.1.6
+		-- 1.3.6.1.4.1.3807.2.910.4.1.6
+		igmpctrlPacketRefCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPacketEntry 6 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.5
+		-- 1.3.6.1.4.1.3807.2.910.5
+		channelRightTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF ChannelRightEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.5.1
+		-- 1.3.6.1.4.1.3807.2.910.5.1
+		channelRightEntry OBJECT-TYPE
+			SYNTAX ChannelRightEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { channelRightPacketId, channelRightChannelId }
+			::= { channelRightTable 1 }
+
+		
+		ChannelRightEntry ::=
+			SEQUENCE { 
+				channelRightPacketId
+					Integer32,
+				channelRightChannelId
+					Integer32,
+				channelRightEntryStatus
+					EntryStatus,
+				channelRightRight
+					Integer32,
+				channelRightRightProfile
+					Integer32
+			 }
+
+--  1.3.6.1.4.1.3807.2.910.5.1.1
+		-- 1.3.6.1.4.1.3807.2.910.5.1.1
+		channelRightPacketId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { channelRightEntry 1 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.5.1.2
+		-- 1.3.6.1.4.1.3807.2.910.5.1.2
+		channelRightChannelId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { channelRightEntry 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.5.1.3
+		-- 1.3.6.1.4.1.3807.2.910.5.1.3
+		channelRightEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { channelRightEntry 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.5.1.4
+		-- 1.3.6.1.4.1.3807.2.910.5.1.4
+		channelRightRight OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { channelRightEntry 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.5.1.5
+		-- 1.3.6.1.4.1.3807.2.910.5.1.5
+		channelRightRightProfile OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { channelRightEntry 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6
+		-- 1.3.6.1.4.1.3807.2.910.6
+		igmpctrlUserTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 6 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6.1
+		-- 1.3.6.1.4.1.3807.2.910.6.1
+		igmpctrlUserEntry OBJECT-TYPE
+			SYNTAX IgmpctrlUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlUserIfIndex, igmpctrlUserOnuId, igmpctrlUserUserPort }
+			::= { igmpctrlUserTable 1 }
+
+		
+		IgmpctrlUserEntry ::=
+			SEQUENCE { 
+				igmpctrlUserIfIndex
+					Integer32,
+				igmpctrlUserOnuId
+					Integer32,
+				igmpctrlUserUserPort
+					Integer32,
+				igmpctrlUserEntryStatus
+					EntryStatus,
+				igmpctrlUserAuthType
+					Integer32,
+				igmpctrlUserPacketId
+					Integer32,
+				igmpctrlUserMaxChannel   Integer32,
+				igmpctrlUserForceLeave   OCTET STRING,
+				igmpctrlUserOnlineChannel     Integer32
+					
+			 }
+
+--  1.3.6.1.4.1.3807.2.910.6.1.1
+		-- 1.3.6.1.4.1.3807.2.910.6.1.1
+		igmpctrlUserIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 1 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6.1.2
+		-- 1.3.6.1.4.1.3807.2.910.6.1.2
+		igmpctrlUserOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6.1.3
+		-- 1.3.6.1.4.1.3807.2.910.6.1.3
+		igmpctrlUserUserPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6.1.4
+		-- 1.3.6.1.4.1.3807.2.910.6.1.4
+		igmpctrlUserEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6.1.5
+		-- 1.3.6.1.4.1.3807.2.910.6.1.5
+		igmpctrlUserAuthType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.6.1.6
+		-- 1.3.6.1.4.1.3807.2.910.6.1.6
+		igmpctrlUserPacketId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 6 }
+		
+		igmpctrlUserMaxChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 7 }
+		
+		igmpctrlUserForceLeave OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 8 }
+			
+		igmpctrlUserOnlineChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlUserEntry 9 }
+		
+			
+		
+--  1.3.6.1.4.1.3807.2.910.7
+		-- 1.3.6.1.4.1.3807.2.910.7
+		igmpctrlLogTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlLogEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 7 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1
+		-- 1.3.6.1.4.1.3807.2.910.7.1
+		igmpctrlLogEntry OBJECT-TYPE
+			SYNTAX IgmpctrlLogEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlLogIndex }
+			::= { igmpctrlLogTable 1 }
+
+		
+		IgmpctrlLogEntry ::=
+			SEQUENCE { 
+				igmpctrlLogIndex
+					Integer32,
+				igmpctrlLogGenerateTime
+					Integer32,
+				igmpctrlLogOnlineTime
+					Integer32,
+				igmpctrlLogGroupIp
+					OCTET STRING,
+				igmpctrlLogIfUnit
+					Integer32,
+				igmpctrlLogOnuId
+					Integer32,
+				igmpctrlLogUserId
+					Integer32,
+				igmpctrlLogAction
+					Integer32,
+				igmpctrlLogType
+					Integer32,
+				igmpctrlLogReason
+					Integer32,
+				igmpctrlLogMvid
+					Integer32,
+				igmpctrlLogIpType
+					Integer32
+			 }
+
+--  1.3.6.1.4.1.3807.2.910.7.1.1
+		-- 1.3.6.1.4.1.3807.2.910.7.1.1
+		igmpctrlLogIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 1 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.2
+		-- 1.3.6.1.4.1.3807.2.910.7.1.2
+		igmpctrlLogGenerateTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 2 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.3
+		-- 1.3.6.1.4.1.3807.2.910.7.1.3
+		igmpctrlLogOnlineTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 3 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.4
+		-- 1.3.6.1.4.1.3807.2.910.7.1.4
+		igmpctrlLogGroupIp OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 4 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.5
+		-- 1.3.6.1.4.1.3807.2.910.7.1.5
+		igmpctrlLogIfUnit OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 5 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.6
+		-- 1.3.6.1.4.1.3807.2.910.7.1.6
+		igmpctrlLogOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 6 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.7
+		-- 1.3.6.1.4.1.3807.2.910.7.1.7
+		igmpctrlLogUserId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 7 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.8
+		-- 1.3.6.1.4.1.3807.2.910.7.1.8
+		igmpctrlLogAction OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 8 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.9
+		-- 1.3.6.1.4.1.3807.2.910.7.1.9
+		igmpctrlLogType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 9 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.10
+		-- 1.3.6.1.4.1.3807.2.910.7.1.10
+		igmpctrlLogReason OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 10 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.11
+		-- 1.3.6.1.4.1.3807.2.910.7.1.11
+		igmpctrlLogMvid OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 11 }
+
+		
+--  1.3.6.1.4.1.3807.2.910.7.1.12
+		-- 1.3.6.1.4.1.3807.2.910.7.1.12
+		igmpctrlLogIpType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlLogEntry 12 }
+
+
+
+		igmpctrlIfUserTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlIfUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 8 }
+
+		igmpctrlIfUserEntry OBJECT-TYPE
+			SYNTAX IgmpctrlIfUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlIfUserIfIndex }
+			::= { igmpctrlIfUserTable 1 }
+
+		
+		IgmpctrlIfUserEntry ::=
+			SEQUENCE { 
+				igmpctrlIfUserIfIndex
+					Integer32,
+				igmpctrlIfUserEntryStatus
+					EntryStatus,
+				igmpctrlIfUserAuthType
+					Integer32,
+				igmpctrlIfUserPacketId
+					Integer32,
+				igmpctrlIfUserMaxChannel   Integer32,
+				igmpctrlIfUserForceLeave   OCTET STRING,
+				igmpctrlIfUserOnlineChannel   Integer32  			
+			 }
+
+		igmpctrlIfUserIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 1 }
+		
+		igmpctrlIfUserEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 2 }
+
+		igmpctrlIfUserAuthType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 3 }
+
+		igmpctrlIfUserPacketId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 4 }
+		
+		igmpctrlIfUserMaxChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 5 }
+		
+		igmpctrlIfUserForceLeave OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 6 }
+			
+		igmpctrlIfUserOnlineChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfUserEntry 7 }
+		
+		
+		igmpctrlIfVlanUserTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlIfVlanUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 9 }
+
+		igmpctrlIfVlanUserEntry OBJECT-TYPE
+			SYNTAX IgmpctrlIfVlanUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlIfVlanUserIfIndex, igmpctrlIfVlanUserUserVlan}
+			::= { igmpctrlIfVlanUserTable 1 }
+
+		
+		IgmpctrlIfVlanUserEntry ::=
+			SEQUENCE { 
+				igmpctrlIfVlanUserIfIndex
+					Integer32,
+				igmpctrlIfVlanUserUserVlan  Integer32,
+				igmpctrlIfVlanUserEntryStatus
+					EntryStatus,
+				igmpctrlIfVlanUserAuthType
+					Integer32,
+				igmpctrlIfVlanUserPacketId
+					Integer32,
+				igmpctrlIfVlanUserMaxChannel   Integer32,
+				igmpctrlIfVlanUserForceLeave   OCTET STRING,
+				igmpctrlIfVlanUserOnlineChannel    Integer32  			
+			 }
+
+		igmpctrlIfVlanUserIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 1 }
+		
+		igmpctrlIfVlanUserUserVlan OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 2 }
+		
+		igmpctrlIfVlanUserEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 3 }
+
+		igmpctrlIfVlanUserAuthType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 4 }
+
+		igmpctrlIfVlanUserPacketId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 5 }
+		
+		igmpctrlIfVlanUserMaxChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 6 }
+		
+		igmpctrlIfVlanUserForceLeave OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 7 }
+		
+		igmpctrlIfVlanUserOnlineChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanUserEntry 8 }
+
+
+		igmpctrlPonOnlineTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlPonOnlineEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 10 }
+
+		igmpctrlPonOnlineEntry OBJECT-TYPE
+			SYNTAX IgmpctrlPonOnlineEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlPonOnlineIfIndex, igmpctrlPonOnlineOnuId,igmpctrlPonOnlineUserPort,igmpctrlPonOnlineChannelId}
+			::= { igmpctrlPonOnlineTable 1 }
+
+		IgmpctrlPonOnlineEntry ::=
+			SEQUENCE { 
+				igmpctrlPonOnlineIfIndex       Integer32,
+				igmpctrlPonOnlineOnuId         Integer32,
+				igmpctrlPonOnlineUserPort      Integer32,
+				igmpctrlPonOnlineChannelId     Integer32,
+				igmpctrlPonOnlineType          INTEGER,
+				igmpctrlPonOnlineTotalTime     Integer32,
+				igmpctrlPonOnlineRemainTime    Integer32,
+				igmpctrlPonOnlinePreviewCnt    Integer32			
+			 }
+
+		igmpctrlPonOnlineIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 1 }
+
+		igmpctrlPonOnlineOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 2 }
+			
+		igmpctrlPonOnlineUserPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 3 }
+			
+		igmpctrlPonOnlineChannelId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 4 }
+	
+		igmpctrlPonOnlineType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					watch(1),
+					preview(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 5 }
+		
+		igmpctrlPonOnlineTotalTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 6 }
+	
+		igmpctrlPonOnlineRemainTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 7 }
+	
+		igmpctrlPonOnlinePreviewCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlPonOnlineEntry 9 }
+	
+		
+		igmpctrlIfOnlineTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlIfOnlineEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 11 }
+
+		igmpctrlIfOnlineEntry OBJECT-TYPE
+			SYNTAX IgmpctrlIfOnlineEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlIfOnlineIfIndex,igmpctrlIfOnlineChannelId}
+			::= { igmpctrlIfOnlineTable 1 }
+
+		IgmpctrlIfOnlineEntry ::=
+			SEQUENCE { 
+				igmpctrlIfOnlineIfIndex       Integer32,
+				igmpctrlIfOnlineChannelId     Integer32,
+				igmpctrlIfOnlineType          INTEGER,
+				igmpctrlIfOnlineTotalTime     Integer32,
+				igmpctrlIfOnlineRemainTime    Integer32,
+				igmpctrlIfOnlinePreviewCnt    Integer32			
+			 }
+
+		igmpctrlIfOnlineIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfOnlineEntry 1 }
+			
+		igmpctrlIfOnlineChannelId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfOnlineEntry 2 }
+	
+		igmpctrlIfOnlineType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					watch(1),
+					preview(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfOnlineEntry 3 }
+		
+		igmpctrlIfOnlineTotalTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfOnlineEntry 4 }
+	
+		igmpctrlIfOnlineRemainTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfOnlineEntry 5 }
+	
+		igmpctrlIfOnlinePreviewCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfOnlineEntry 6 }
+		
+		
+		igmpctrlIfVlanOnlineTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpctrlIfVlanOnlineEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrl 12 }
+
+		igmpctrlIfVlanOnlineEntry OBJECT-TYPE
+			SYNTAX IgmpctrlIfVlanOnlineEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { igmpctrlIfVlanOnlineIfIndex,igmpctrlIfVlanOnlineIfVlan,igmpctrlIfVlanOnlineChannelId}
+			::= { igmpctrlIfVlanOnlineTable 1 }
+
+		IgmpctrlIfVlanOnlineEntry ::=
+			SEQUENCE { 
+				igmpctrlIfVlanOnlineIfIndex       Integer32,
+				igmpctrlIfVlanOnlineIfVlan        Integer32,
+				igmpctrlIfVlanOnlineChannelId     Integer32,
+				igmpctrlIfVlanOnlineType          INTEGER,
+				igmpctrlIfVlanOnlineTotalTime     Integer32,
+				igmpctrlIfVlanOnlineRemainTime    Integer32,
+				igmpctrlIfVlanOnlinePreviewCnt    Integer32			
+			 }
+
+		igmpctrlIfVlanOnlineIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 1 }
+		
+		igmpctrlIfVlanOnlineIfVlan OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 2 }
+		
+		igmpctrlIfVlanOnlineChannelId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 3 }
+	
+		igmpctrlIfVlanOnlineType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+					watch(1),
+					preview(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 4 }
+		
+		igmpctrlIfVlanOnlineTotalTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 5 }
+	
+		igmpctrlIfVlanOnlineRemainTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 6 }
+	
+		igmpctrlIfVlanOnlinePreviewCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpctrlIfVlanOnlineEntry 7 }
+		
+		
+	END
+
+--
+-- igmpctrl.mib
+--

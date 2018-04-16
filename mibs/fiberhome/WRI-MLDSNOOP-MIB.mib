@@ -1,0 +1,862 @@
+WRI-MLDSNOOP-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.1311
+		wriMldSnoop OBJECT IDENTIFIER ::= { wriProtocol 1313 }
+     
+   	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}  
+     
+     
+    -- 1.3.6.1.4.1.3807.2.1311.1
+		mldSnoopCommon OBJECT IDENTIFIER ::= { wriMldSnoop 1 }
+		
+		-- 1.3.6.1.4.1.3807.2.1311.1.1
+		mldSnoopEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				start(1),
+				stop(2)			
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the mldsnoop protocol."
+			::= { mldSnoopCommon 1 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.2
+		mldSnoopAging OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop aging time."
+			::= { mldSnoopCommon 2 } 
+			
+	  -- 1.3.6.1.4.1.3807.2.1311.1.3
+		mldSnoopQueryInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop query interval."
+			::= { mldSnoopCommon 3 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.4
+		mldSnoopQueryMaxResponse OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop query max response time."
+			::= { mldSnoopCommon 4 }
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.5
+		mldSnoopLastQueryInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop special group query interval."
+			::= { mldSnoopCommon 5 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.6
+		mldSnoopLastQueryMaxResponse OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop special group query max response time."
+			::= { mldSnoopCommon 6 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.7
+		mldSnoopLastQueryCnt OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop special group query count."
+			::= { mldSnoopCommon 7 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.8
+		mldSnoopV2RouterAging OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop router aging time."
+			::= { mldSnoopCommon 8 }
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.9
+		mldSnoopRobustness OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop robust count."
+			::= { mldSnoopCommon 9 }
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.10
+		mldSnoopParamSynToLinecard OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configuration parameter synchronous to linecard."
+			::= { mldSnoopCommon 10 }
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.11
+		mldSnoopGroupNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop group number."
+			::= { mldSnoopCommon 11 }
+
+		-- 1.3.6.1.4.1.3807.2.1311.1.12
+		mldSnoopGroupMemNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop group member number."
+			::= { mldSnoopCommon 12 }
+			
+		-- 1.3.6.1.4.1.3807.2.1311.1.13
+		mldSnoopClrDynamicTable OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Clear the dynamic table."
+			::= { mldSnoopCommon 13 }	
+			
+			
+--WRI MLDSNOOP INTERFACE Table	
+	mldSnoopIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP interface table."
+			::= { wriMldSnoop 2 }
+		
+		mldSnoopIfEntry OBJECT-TYPE
+			SYNTAX MldSnoopIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {mldSnoopIfUnit}
+			::= { mldSnoopIfTable 1 }
+		
+		MldSnoopIfEntry ::=
+			SEQUENCE { 
+				mldSnoopIfUnit					        	Unsigned32,
+				mldSnoopIfEnable				        		INTEGER,
+				mldSnoopIfFastleaveEnable					INTEGER,
+				mldSnoopIfMcastCtrlEnable      		INTEGER
+			 }	
+			 
+		mldSnoopIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface unit."
+			::= { mldSnoopIfEntry 1 }
+			
+		mldSnoopIfEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopIfEntry 2 }
+			
+		mldSnoopIfFastleaveEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopIfEntry 3 }
+			
+		mldSnoopIfMcastCtrlEnable OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopIfEntry 4 }
+			
+	--WRI MLDSNOOP MVLAN Table	
+	mldSnoopMvlanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopMvlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP interface table."
+			::= { wriMldSnoop 3 }
+		
+		mldSnoopMvlanEntry OBJECT-TYPE
+			SYNTAX MldSnoopMvlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {mldSnoopMvlan}
+			::= { mldSnoopMvlanTable 1 }
+		
+		MldSnoopMvlanEntry ::=
+			SEQUENCE { 
+				mldSnoopMvlan					        	INTEGER,
+				mldSnoopMvlanEntryStatus				      EntryStatus,
+				mldSnoopMvlanDuplicateEnable			INTEGER,
+				mldSnoopMvlanWorkModeEnable      INTEGER,
+				mldSnoopMvlanVersion             INTEGER, 
+				mldSnoopMvlanLogEnable           INTEGER, 
+				mldSnoopMvlanUserVlanList        OCTET STRING,
+				mldSnoopMvlanProxyIp             InetAddress,
+				mldSnoopMvlanSingalVlan          INTEGER,
+				mldSnoopMvlanReportProxyEnable   INTEGER,
+				mldSnoopMvlanLeaveProxyEnable    INTEGER,
+				mldSnoopMvlanForwardMode         INTEGER,
+				mldSnoopMvlanQueryEnable         INTEGER,
+				mldSnoopMvlanRouterAlertEnable   INTEGER,
+				mldSnoopMvlanGrpPolicyAcl        Unsigned32,
+				mldSnoopMvlanGrpPolicyVersion    OCTET STRING,
+				mldSnoopMvlanQueryMaxResponse    INTEGER,
+				mldSnoopMvlanSsmMapEnable        INTEGER		 
+				}	
+			 
+		mldSnoopMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 1 } 
+			 		
+		mldSnoopMvlanEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 2 }
+			
+		mldSnoopMvlanDuplicateEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 3 } 
+						
+		mldSnoopMvlanWorkModeEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   mldproxy(1),
+			   mldsnoop(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 4 } 
+				
+		mldSnoopMvlanVersion OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   v1(1),
+			   v2(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 5 } 	
+		
+		mldSnoopMvlanLogEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 6 } 	
+				
+	  mldSnoopMvlanUserVlanList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 7 } 
+					
+		mldSnoopMvlanProxyIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 8 } 			
+		
+		mldSnoopMvlanSingalVlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 9 } 
+			
+		mldSnoopMvlanReportProxyEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 10 } 
+			
+		mldSnoopMvlanLeaveProxyEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopMvlanEntry 11 } 
+		
+		mldSnoopMvlanForwardMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   ip(2),
+			   mac(1)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the data forwarding mode of mldsnoop."
+			::= { mldSnoopMvlanEntry 12 } 
+			
+		mldSnoopMvlanQueryEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the function of general query."
+			::= { mldSnoopMvlanEntry 13 } 			 	
+			
+		mldSnoopMvlanRouterAlertEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the function of require router alert."
+			::= { mldSnoopMvlanEntry 14 } 	
+		
+		mldSnoopMvlanGrpPolicyAcl OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"policy acl."
+			::= { mldSnoopMvlanEntry 15 } 	
+		
+		mldSnoopMvlanGrpPolicyVersion OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"policy version."
+			::= { mldSnoopMvlanEntry 16 } 	
+		
+	  mldSnoopMvlanQueryMaxResponse OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Query max response time."
+			::= { mldSnoopMvlanEntry 17 } 
+		
+		mldSnoopMvlanSsmMapEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the funcion of ssm mapping."
+			::= { mldSnoopMvlanEntry 18 } 
+		
+	--WRI MLDSNOOP UPLINK INTERFACE Table	
+	mldSnoopUplinkIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopUplinkIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wriMldSnoop 4 }
+		
+		mldSnoopUplinkIfEntry OBJECT-TYPE
+			SYNTAX MldSnoopUplinkIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {mldSnoopUplinkIfUnit,mldSnoopUplinkIfMvlan}
+			::= { mldSnoopUplinkIfTable 1 }
+		
+		MldSnoopUplinkIfEntry ::=
+			SEQUENCE { 
+				mldSnoopUplinkIfUnit					        	Unsigned32,
+				mldSnoopUplinkIfMvlan					        INTEGER,
+				mldSnoopUplinkIfEntryStatus				      EntryStatus,
+				mldSnoopUplinkIfType			              INTEGER,
+				mldSnoopUplinkIfRemainTime			          INTEGER
+			 }	
+			 
+		mldSnoopUplinkIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopUplinkIfEntry 1 }
+			
+		mldSnoopUplinkIfMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopUplinkIfEntry 2 }
+			
+		mldSnoopUplinkIfEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopUplinkIfEntry 3 }
+			
+		mldSnoopUplinkIfType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			  static(1),
+			  dynamic(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopUplinkIfEntry 4 }
+			
+		mldSnoopUplinkIfRemainTime OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Uplink interface remain time."
+			::= { mldSnoopUplinkIfEntry 5 }
+			
+	--WRI MLDSNOOP GROUP Table	
+	mldSnoopGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wriMldSnoop 5 }
+		
+		mldSnoopGroupEntry OBJECT-TYPE
+			SYNTAX MldSnoopGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {mldSnoopGroupIp,mldSnoopGroupMvlan}
+			::= { mldSnoopGroupTable 1 }
+		
+		MldSnoopGroupEntry ::=
+			SEQUENCE { 
+				mldSnoopGroupIp					        	InetAddress,
+				mldSnoopGroupMvlan					        INTEGER,
+				mldSnoopGroupEntryStatus				    EntryStatus,
+				mldSnoopGroupPreJoinEnable         INTEGER,
+				mldSnoopGroupMemberNum             INTEGER,
+				mldSnoopGroupV2FilterMode          INTEGER
+			 }	
+		
+		mldSnoopGroupIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupEntry 1 }
+			
+		mldSnoopGroupMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupEntry 2 }
+			
+		mldSnoopGroupEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupEntry 3 }
+			
+		mldSnoopGroupPreJoinEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the prejoin funcion."
+			::= { mldSnoopGroupEntry 4 }
+			
+		mldSnoopGroupMemberNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupEntry 5 }
+			
+		mldSnoopGroupV2FilterMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   invalid(0),
+			   include(1),
+			   exclude(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupEntry 6 }
+		
+--WRI MLDSNOOP SOURCEIP Table	
+	mldSnoopSourceIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopSourceIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wriMldSnoop 6 }
+		
+		mldSnoopSourceIpEntry OBJECT-TYPE
+			SYNTAX MldSnoopSourceIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {mldSnoopSourceIpGroupIp,mldSnoopSourceIpMvlan,mldSnoopSourceIpAddress}
+			::= { mldSnoopSourceIpTable 1 }
+		
+		MldSnoopSourceIpEntry ::=
+			SEQUENCE { 
+				mldSnoopSourceIpGroupIp				        InetAddress,
+				mldSnoopSourceIpMvlan					        INTEGER,
+				mldSnoopSourceIpAddress				      InetAddress,
+				mldSnoopSourceIpMode                  INTEGER,
+				mldSnoopSourceIpEntryStatus            EntryStatus   
+			 }	
+		
+		mldSnoopSourceIpGroupIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSourceIpEntry 1 }
+			
+		mldSnoopSourceIpMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSourceIpEntry 2 }
+			
+		mldSnoopSourceIpAddress OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSourceIpEntry 3 }		
+			
+		mldSnoopSourceIpMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    include(1),
+			    exclude(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The interface mode."
+			::= { mldSnoopSourceIpEntry 4 }	
+			
+			
+		mldSnoopSourceIpEntryStatus	OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Add or delete a source ip item."
+			::= { mldSnoopSourceIpEntry 5 }	
+			
+			
+			
+--WRI MLDSNOOP MEMBER Table	
+	mldSnoopGroupMemberTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopGroupMemberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wriMldSnoop 7 }
+		
+		mldSnoopGroupMemberEntry OBJECT-TYPE
+			SYNTAX MldSnoopGroupMemberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {mldSnoopGroupMemberGroupIp,mldSnoopGroupMemberMvlan,mldSnoopGroupMemberSourceIp,mldSnoopGroupMemberIfUnit}
+			::= { mldSnoopGroupMemberTable 1 }
+		
+		MldSnoopGroupMemberEntry ::=
+			SEQUENCE { 
+				mldSnoopGroupMemberGroupIp				        InetAddress,
+				mldSnoopGroupMemberMvlan					        INTEGER,
+				mldSnoopGroupMemberSourceIp				        InetAddress,
+				mldSnoopGroupMemberIfUnit					        Unsigned32,
+				mldSnoopGroupMemberType                   INTEGER,   
+				mldSnoopGroupMemberEntryStatus				    EntryStatus,
+				mldSnoopGroupMemberRemainTime             Unsigned32,
+				mldSnoopGroupMemberOutVlanList            OCTET STRING,
+				mldSnoopGroupMemberV2Mode                 INTEGER,
+				mldSnoopGroupMemberUserVlanAdd           OCTET STRING,
+				mldSnoopGroupMemberUserVlanDel           OCTET STRING  
+				}	
+		
+		mldSnoopGroupMemberGroupIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 1 }
+			
+		mldSnoopGroupMemberMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 2 }
+		
+		mldSnoopGroupMemberSourceIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 3 }
+				
+		mldSnoopGroupMemberIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 4 }		
+		
+		mldSnoopGroupMemberType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    static(1),
+			    dynamic(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configrue the group member type."
+			::= { mldSnoopGroupMemberEntry 5 }
+						
+	  mldSnoopGroupMemberEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 6 }	
+			
+		mldSnoopGroupMemberRemainTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 7 }
+			
+		mldSnoopGroupMemberOutVlanList  OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 8 }							
+		
+		mldSnoopGroupMemberV2Mode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				invalid(0),
+				include(1),
+				exclude(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 9 }
+		
+		mldSnoopGroupMemberUserVlanAdd OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 10 }
+		
+		mldSnoopGroupMemberUserVlanDel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopGroupMemberEntry 11 }
+			
+		
+	--WRI MLDSNOOP SSMMAP Table	
+	mldSnoopSsmMapTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MldSnoopSsmMapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop ssm mapping table."
+			::= { wriMldSnoop 8 }
+		
+		mldSnoopSsmMapEntry OBJECT-TYPE
+			SYNTAX MldSnoopSsmMapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Mldsnoop ssm mapping table."
+			INDEX {mldSnoopSsmMapMvlan,mldSnoopSsmMapAcl,mldSnoopSsmMapSourceIp}
+			::= { mldSnoopSsmMapTable 1 }
+		
+		MldSnoopSsmMapEntry ::=
+			SEQUENCE {
+				mldSnoopSsmMapMvlan					        INTEGER,
+				mldSnoopSsmMapAcl                      INTEGER,
+				mldSnoopSsmMapSourceIp					      InetAddress,
+				mldSnoopSsmMapEntryStatus				    EntryStatus
+			 }	
+		
+		mldSnoopSsmMapMvlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSsmMapEntry 1 }
+		
+		mldSnoopSsmMapAcl OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSsmMapEntry 2 }
+		
+		mldSnoopSsmMapSourceIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSsmMapEntry 3 }
+		
+		mldSnoopSsmMapEntryStatus OBJECT-TYPE
+			SYNTAX EntryStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { mldSnoopSsmMapEntry 4 }
+END

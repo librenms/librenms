@@ -1,0 +1,559 @@
+WRI-PPP-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+	    -- 1.3.6.1.4.1.3807.2.1607
+		wriPpp OBJECT IDENTIFIER ::= { wriProtocol 1607 }
+     
+		--WRI PPP INTERFACE Table	
+		pppPhyIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PppPhyIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Ppp phy interface table."
+			::= { wriPpp 1 }
+		
+		pppPhyIfEntry OBJECT-TYPE
+			SYNTAX PppPhyIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Ppp interface table."
+			INDEX {pppPhyIfUnit}
+			::= { pppPhyIfTable 1 }
+		
+		PppPhyIfEntry ::=
+			SEQUENCE { 
+				pppPhyIfUnit					        	Unsigned32,
+				pppPhyIfMru				        			INTEGER,
+				pppPhyIfAuthMode							INTEGER,				
+				pppPhyIfPapUserName							OCTET STRING,
+				pppPhyIfPapPassword							OCTET STRING,
+				pppPhyIfPapPwdEncryptionType				INTEGER,
+				pppPhyIfChapUserName						OCTET STRING,
+				pppPhyIfChapPassword						OCTET STRING,
+				pppPhyIfChapPwdEncryptionType				INTEGER,
+			    pppPhyIfCallbackRole						INTEGER,
+			    pppPhyIfCallbackNtString					OCTET STRING,
+			    pppPhyIfCompressionIphc                    	INTEGER,
+			    pppPhyIfNegotiateTimeout					Unsigned32,    
+			    pppPhyIfHoldTime							Unsigned32,    
+			    pppPhyIfIpcpPrimaryDnsAddr					IpAddress,
+			    pppPhyIfIpcpSecondaryDnsAddr				IpAddress,
+			    pppPhyIfIpcpDnsAddrReqEnable				INTEGER,
+			    pppPhyIfLqcClosePercentage                 	Unsigned32,     
+				pppPhyIfLqcResumePercentage                	Unsigned32,     	
+				pppPhyIfLqcEnable                 			INTEGER,		    
+			    pppPhyIfPeerHostRouterSuppress				INTEGER,			    
+			    pppPhyIfIpAddressNegotiate               	INTEGER,
+			    pppPhyIfRemoteAddr							IpAddress,
+			    pppPhyIfIpPoolIndex							Unsigned32				
+			 }
+			 
+		pppPhyIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Phy interface unit."
+			::= { pppPhyIfEntry 1 }
+			
+		pppPhyIfMru OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        ipv4(1),
+ 		        ipv6(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The ipv4 or ipv6 mru negotiation."
+			::= { pppPhyIfEntry 2 }
+			
+		pppPhyIfAuthMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   chap(1),
+			   pap(2),
+			   chappap(3)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The ppp authentication mode."
+			::= { pppPhyIfEntry 3 } 
+
+		pppPhyIfPapUserName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The pap local user."
+			::= { pppPhyIfEntry 4 } 
+			                               
+		pppPhyIfPapPassword OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The pap password."
+			::= { pppPhyIfEntry 5 } 
+			                  					                  
+		pppPhyIfPapPwdEncryptionType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   simple(1),
+			   md5(2)			   
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The encryption type of pap password."
+			::= { pppPhyIfEntry 6 } 
+		
+		pppPhyIfChapUserName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The chap user."
+			::= { pppPhyIfEntry 7 } 
+					                               
+		pppPhyIfChapPassword OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The chap password."
+			::= { pppPhyIfEntry 8 }                
+
+		pppPhyIfChapPwdEncryptionType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   simple(1),
+			   md5(2)			   
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The encryption type of chap password."
+			::= { pppPhyIfEntry 9 } 			
+						                               
+		pppPhyIfCallbackRole OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        client(1),
+ 		        server(2)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The callback role."
+			::= { pppPhyIfEntry 10 }
+			                         
+		pppPhyIfCallbackNtString OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The callback string for Windows NT Server."
+			::= { pppPhyIfEntry 11 } 
+
+		pppPhyIfCompressionIphc OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable PPP compression iphc."
+			::= { pppPhyIfEntry 12 } 
+		
+		pppPhyIfNegotiateTimeout OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The negotiation timeout."
+			::= { pppPhyIfEntry 13 }
+
+		pppPhyIfHoldTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The hold time."
+			::= { pppPhyIfEntry 14 }
+
+		pppPhyIfIpcpPrimaryDnsAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The primary dns address."
+			::= { pppPhyIfEntry 15 } 
+
+		pppPhyIfIpcpSecondaryDnsAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The secondary dns address."
+			::= { pppPhyIfEntry 16 } 
+
+		pppPhyIfIpcpDnsAddrReqEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable request for dns address."
+			::= { pppPhyIfEntry 17 } 
+
+		pppPhyIfLqcClosePercentage OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The quality percentage of closing link."
+			::= { pppPhyIfEntry 18 }
+
+		pppPhyIfLqcResumePercentage OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The quality percentage of resume link."
+			::= { pppPhyIfEntry 19 }
+			                               			                               
+		pppPhyIfLqcEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable PPP lqc."
+			::= { pppPhyIfEntry 20 } 
+			                               			                            
+		pppPhyIfPeerHostRouterSuppress OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable route of peer host to be suppressed."
+			::= { pppPhyIfEntry 21 } 
+				
+		pppPhyIfIpAddressNegotiate OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable ip address to be negotiated."
+			::= { pppPhyIfEntry 22 } 
+		
+		pppPhyIfRemoteAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The remote ip address."
+			::= { pppPhyIfEntry 23 } 
+	
+		pppPhyIfIpPoolIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The ip pool index."
+			::= { pppPhyIfEntry 24 } 
+
+	
+		--WRI PPP MP AG INTERFACE Table	
+		pppMpAgIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PppMpAgIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The ppp mp ag interface table."
+			::= { wriPpp 2 }
+		
+		pppMpAgIfEntry OBJECT-TYPE
+			SYNTAX PppMpAgIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The ppp mp ag interface table."
+			INDEX {pppMpAgIfUnit}
+			::= { pppMpAgIfTable 1 }
+		
+		PppMpAgIfEntry ::=
+			SEQUENCE { 
+				pppMpAgIfUnit					        Unsigned32,
+				pppMpAgIfDiscriminator					INTEGER,
+				pppMpAgIfMrru					        Unsigned32, 
+				pppMpAgIfDampingEnable					INTEGER,				
+				pppMpAgIfDampingDetectTime				Unsigned32,
+				pppMpAgIfDampingFlappingCount			Unsigned32,
+				pppMpAgIfDampingDampingTime				Unsigned32,   
+				pppMpAgIfThresholdLeast					Unsigned32,
+				pppMpAgIfMaxBind						Unsigned32,
+				pppMpAgIfFragmentThreshold				INTEGER,
+				pppMpAgIfFragmentThresholdEnable		INTEGER,								
+				pppMpAgIfShortSequence					INTEGER,
+			    pppMpAgIfIpAddressNegotiate             INTEGER,
+			    pppMpAgIfRemoteAddr						IpAddress,
+			    pppMpAgIfMemberPortList                 OCTET STRING,
+			    pppMpAgIfActiveMemberPortList           OCTET STRING,
+			 }	
+			 
+		pppMpAgIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Mp ag interface unit."
+			::= { pppMpAgIfEntry 1 }
+	
+		pppMpAgIfDiscriminator OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable discriminator."
+			::= { pppMpAgIfEntry 2 } 
+			                               			                            
+		pppMpAgIfMrru OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The interface mrru."
+			::= { pppMpAgIfEntry 3 } 
+			
+		pppMpAgIfDampingEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable damping."
+			::= { pppMpAgIfEntry 4 } 
+			
+		pppMpAgIfDampingDetectTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The detect time of damping."
+			::= { pppMpAgIfEntry 5 } 
+
+		pppMpAgIfDampingFlappingCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The flapping count of damping."
+			::= { pppMpAgIfEntry 6 } 
+
+		pppMpAgIfDampingDampingTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The time of damping."
+			::= { pppMpAgIfEntry 7 } 
+
+		pppMpAgIfThresholdLeast OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The least of threshold."
+			::= { pppMpAgIfEntry 8 } 
+
+		pppMpAgIfMaxBind OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The max bind number of link."
+			::= { pppMpAgIfEntry 9 } 
+			                          
+		pppMpAgIfFragmentThreshold OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   fragment128(0),
+			   fragment256(1),
+			   fragment512(2),
+			   nofragment(3)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The threshold of frament."
+			::= { pppMpAgIfEntry 10 } 
+
+		pppMpAgIfFragmentThresholdEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable threshold of frament."
+			::= { pppMpAgIfEntry 11 } 
+
+		pppMpAgIfShortSequence OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(0),
+			   disable(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable short sequence."
+			::= { pppMpAgIfEntry 12 } 
+
+		pppMpAgIfIpAddressNegotiate OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)	
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable negotiation of ip address."
+			::= { pppMpAgIfEntry 13 } 
+
+		pppMpAgIfRemoteAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The remote ip address."
+			::= { pppMpAgIfEntry 14 } 
+			                                                   
+		pppMpAgIfMemberPortList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The member ports."
+			::= { pppMpAgIfEntry 15 }
+
+		pppMpAgIfActiveMemberPortList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The active member posts."
+			::= { pppMpAgIfEntry 16 }
+
+
+		--WRI PPP IP POOL Table	
+		pppIpPoolTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PppIpPoolEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Ppp ip pool table."
+			::= { wriPpp 3 }
+		
+		pppIpPoolEntry OBJECT-TYPE
+			SYNTAX PppIpPoolEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Ppp ip pool table."
+			INDEX {pppIpPoolIndex}
+			::= { pppIpPoolTable 1 }
+		
+		PppIpPoolEntry ::=
+			SEQUENCE { 
+				pppIpPoolIndex					Unsigned32,
+				pppIpPoolStartAddr				IpAddress,
+				pppIpPoolEndAddr				IpAddress,
+				pppIpPoolEntryStatus            INTEGER,
+				pppIpPoolRefCnt             	Unsigned32
+			 }	
+			 
+		pppIpPoolIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Ip pool index."
+			::= { pppIpPoolEntry 1 }
+			
+		pppIpPoolStartAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The ip pool start address."
+			::= { pppIpPoolEntry 2 }
+			
+		pppIpPoolEndAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The ip pool end address."
+			::= { pppIpPoolEntry 3 } 
+                            
+		pppIpPoolRefCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The ip pool referent count."
+			::= { pppIpPoolEntry 4 }
+                            
+		pppIpPoolEntryStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The status of ip pool entry."
+			::= { pppIpPoolEntry 5 } 
+                                                                                                                                    
+END

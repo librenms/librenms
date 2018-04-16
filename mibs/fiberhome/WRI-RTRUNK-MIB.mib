@@ -1,0 +1,470 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--  WRI RTRUNK MIB
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+   WRI-RTRUNK-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,Counter32,
+        Integer32,Counter64, NOTIFICATION-TYPE       FROM SNMPv2-SMI
+        DisplayString, MacAddress,
+        RowStatus, TruthValue,TEXTUAL-CONVENTION                   FROM SNMPv2-TC
+        InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
+        wri,wriProtocol							FROM WRI-SMI;
+        
+   	wriRtrunk       OBJECT IDENTIFIER    ::= { wriProtocol 1813}    
+	
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+
+	wriRtrunkGenLacpSysId  OBJECT-TYPE
+ 	SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "the Resilient trunk lacp  system id."
+    ::= { wriRtrunk 1 } 
+    
+  	wriRtrunkGenSubSysId  OBJECT-TYPE
+ 	SYNTAX  INTEGER(0..15)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "the Resilient trunk lacp  system id."
+    ::= { wriRtrunk 2 } 
+
+     
+    wriRtrunkGenLacpPriority  OBJECT-TYPE
+ 	SYNTAX  INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "the Resilient trunk lacp Priority."
+    ::= { wriRtrunk 3 }      
+    
+    wriRtrunkGenCurNum  OBJECT-TYPE
+ 	SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "the Resilient trunk current number."
+    ::= { wriRtrunk 4 } 
+    
+   wriRtrunkGenMaxNum  OBJECT-TYPE
+ 	SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "the Resilient trunk max number."
+    ::= { wriRtrunk 5 } 
+        
+  -- Resilient trunk Table
+   wriRtrunkTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF WriRtrunkEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and configure Resilient trunk."
+       ::= { wriRtrunk 6 }
+
+   wriRtrunkEntry OBJECT-TYPE
+       SYNTAX      WriRtrunkEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A set of objects that display and configure Resilient trunk."
+       INDEX    {wriRtrunkIndex}
+       ::= { wriRtrunkTable 1 }
+
+   WriRtrunkEntry ::= SEQUENCE {
+       wriRtrunkIndex
+          INTEGER,
+       wriRtrunkPriority
+          INTEGER, 
+       wriRtrunkVrid
+       	  INTEGER,         
+       wriRtrunkAddressType
+       	  InetAddressType,	   
+       wriRtrunkLocalAddress
+          InetAddress,
+       wriRtrunkPeerAddress
+          InetAddress,
+       wriRtrunkProtoType
+       	  INTEGER,	   
+       wriRtrunkHelloInterval
+          INTEGER,
+       wriRtrunkHelloMultiplier
+          INTEGER,
+       wriRtrunkAuthType
+          INTEGER,
+       wriRtrunkAuthAuthKey
+          OCTET STRING,
+       wriRtrunkBfdTrackId
+          INTEGER,
+       wriRtrunkRecoverTime
+          INTEGER,
+       wriRtrunkPeerPriority
+          INTEGER,
+       wriRtrunkPeerHelloInterval
+          INTEGER,
+       wriRtrunkPeerHelloMultiplier
+          INTEGER,  
+       wriRtrunkInPkt
+       	  Counter64,
+       wriRtrunkOutPkt
+       	  Counter64,
+	   wriRtrunkInDropPkt
+       	  Counter64,
+       wriRtrunkOutFailPkt
+       	  Counter64,
+        wriRtrunkStatus
+       	  EntryStatus  
+      }  
+      
+      wriRtrunkIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..16)
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk index "
+		::= { wriRtrunkEntry 1 }
+
+     wriRtrunkPriority OBJECT-TYPE
+		SYNTAX INTEGER(1..255)
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk Priority"
+		::= { wriRtrunkEntry 2 }
+     
+     wriRtrunkVrid  OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk vpn instance id"
+		::= { wriRtrunkEntry 3 }
+		
+     wriRtrunkAddressType OBJECT-TYPE
+		SYNTAX InetAddressType
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk Address Type"
+		::= { wriRtrunkEntry 4 }
+       	   
+     wriRtrunkLocalAddress OBJECT-TYPE
+		SYNTAX InetAddress
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk Local Address"
+		::= { wriRtrunkEntry 5 }
+         
+       wriRtrunkPeerAddress OBJECT-TYPE
+		SYNTAX InetAddress
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk Peer Address"
+		::= { wriRtrunkEntry 6 }   
+		
+	  wriRtrunkProtoType OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk protocol type"
+		::= { wriRtrunkEntry 7 } 
+		
+       wriRtrunkHelloInterval  OBJECT-TYPE
+		SYNTAX INTEGER(5..100)
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk hello interval"
+		::= { wriRtrunkEntry 8 }
+		       
+       wriRtrunkHelloMultiplier  OBJECT-TYPE
+		SYNTAX INTEGER(3..200)
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk hello interval multiplier"
+		::= { wriRtrunkEntry 9 }
+		
+        wriRtrunkAuthType OBJECT-TYPE
+		SYNTAX INTEGER{simple(1),cipher(2)}
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk authentication type"
+		::= { wriRtrunkEntry 10 }
+		
+       wriRtrunkAuthAuthKey  OBJECT-TYPE
+		SYNTAX OCTET STRING(SIZE(1..32))
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk authentication key"
+		::= { wriRtrunkEntry 11 }
+
+       wriRtrunkBfdTrackId OBJECT-TYPE
+		SYNTAX INTEGER(0..2000)
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk bind BFD session id"
+		::= { wriRtrunkEntry 12 }   
+		
+       wriRtrunkRecoverTime OBJECT-TYPE
+		SYNTAX INTEGER(1..255)
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk recover delay time"
+		::= { wriRtrunkEntry 13 }
+          
+       wriRtrunkPeerPriority OBJECT-TYPE
+		SYNTAX INTEGER(1..255)
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk peer Priority"
+		::= { wriRtrunkEntry 14 }
+
+       wriRtrunkPeerHelloInterval  OBJECT-TYPE
+		SYNTAX INTEGER(5..100)
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk peer hello interval"
+		::= { wriRtrunkEntry 15 }
+
+       wriRtrunkPeerHelloMultiplier OBJECT-TYPE
+		SYNTAX INTEGER(3..200)
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk peer hello interval multiplier"
+		::= { wriRtrunkEntry 16 }    
+		
+	  wriRtrunkInPkt OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk receive packet"
+		::= { wriRtrunkEntry 17 }    
+		
+      wriRtrunkOutPkt  OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk send packet"
+		::= { wriRtrunkEntry 18 }  
+		
+	  wriRtrunkInDropPkt  OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk receive drop packet"
+		::= { wriRtrunkEntry 19 } 
+	
+	wriRtrunkOutFailPkt	 OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk receive drop packet"
+		::= { wriRtrunkEntry 20 }
+				
+	 	wriRtrunkStatus	OBJECT-TYPE
+		SYNTAX      EntryStatus
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk status"
+		::= { wriRtrunkEntry 21 }  
+		
+				
+--Resilient trunk member table			
+	wriRtrunkAgTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF WriRtrunkAgEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and configure Resilient trunk member."
+       ::= { wriRtrunk 7 }
+
+   wriRtrunkAgEntry OBJECT-TYPE
+       SYNTAX      WriRtrunkAgEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A set of objects that display and configure Resilient trunk member."
+       INDEX    {wriRtrunkAgIndex}
+       ::= { wriRtrunkAgTable 1 }
+       
+   WriRtrunkAgEntry ::= SEQUENCE {
+       wriRtrunkAgIndex
+          INTEGER, 
+       wriRtrunkAgRtrunkIndex
+          INTEGER,     
+       wriRtrunkAgMode
+          INTEGER,      
+       wriRtrunkAgWorkState
+          INTEGER,
+       wriRtrunkAgCause
+          INTEGER,
+       wriRtrunkAgRole
+       	   INTEGER 	    
+      }  
+      
+	wriRtrunkAgIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk member index "
+		::= { wriRtrunkAgEntry 1 } 
+		       
+	wriRtrunkAgRtrunkIndex  OBJECT-TYPE
+		SYNTAX INTEGER(0..16)
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk  index "
+		::= { wriRtrunkAgEntry 2 }
+		       
+	wriRtrunkAgMode OBJECT-TYPE
+		SYNTAX INTEGER{auto(1),force-master(2),force-backup(3)}
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk member configure work mode "
+		::= { wriRtrunkAgEntry 3 }  
+		
+   	wriRtrunkAgWorkState OBJECT-TYPE
+		SYNTAX INTEGER{master(1),backup(2)}
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk member work mode "
+		::= { wriRtrunkAgEntry 4 } 
+   
+     wriRtrunkAgCause OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			force-backup(1),
+			force-master(2),
+			auto-backup(4),
+			auto-master(8),	
+			peer-down(16),
+			peer-up(32)				
+		}
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk member work state cause "
+		::= { wriRtrunkAgEntry 5 }
+                                      
+                                    
+	wriRtrunkAgRole OBJECT-TYPE
+		SYNTAX INTEGER{master(1),backup(2)}
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk member peer link state "
+		::= { wriRtrunkAgEntry 6}
+
+
+--Resilient trunk interface table
+wriRtrunkIfTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF WriRtrunkIfEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and configure Resilient trunk interface."
+       ::= { wriRtrunk 8 }
+
+   wriRtrunkIfEntry OBJECT-TYPE
+       SYNTAX      WriRtrunkIfEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A set of objects that display and configure Resilient trunk ineterface."
+       INDEX    {wriRtrunkIndex,wriRtrunkIfIndex}
+       ::= { wriRtrunkIfTable 1 }
+       
+   WriRtrunkIfEntry ::= SEQUENCE {
+       wriRtrunkIfIndex
+          INTEGER,   
+       wriRtrunkIfState
+       	  INTEGER,  
+       wriRtrunkIfVid
+       	  INTEGER,	  
+       wriRtrunkIfStatus
+          EntryStatus
+       }        
+	
+	wriRtrunkIfIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk inteface index "
+		::= { wriRtrunkIfEntry 1 } 
+		  
+	wriRtrunkIfState  OBJECT-TYPE
+		SYNTAX   INTEGER{enable(1),disable(2)}
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk interface state "
+		::= { wriRtrunkIfEntry 2 }
+		
+    wriRtrunkIfVid   OBJECT-TYPE
+		SYNTAX   INTEGER
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk interface vlan"
+		::= { wriRtrunkIfEntry 3 }
+
+    
+	wriRtrunkIfStatus OBJECT-TYPE
+		SYNTAX   EntryStatus
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"Resilient trunk interface state "
+		::= { wriRtrunkIfEntry 4 }
+				                         
+---trap 
+	wriRtrunkTrap			OBJECT IDENTIFIER ::=   {wriRtrunk 9}
+		
+		
+		wriRtrunkModeError NOTIFICATION-TYPE
+       		OBJECTS {wriRtrunkAgIndex,wriRtrunkAgMode}
+       		STATUS  current
+       		DESCRIPTION
+               	"trunk work mode change trap"
+			::= { wriRtrunkTrap 1}
+				                         
+				                         
+END

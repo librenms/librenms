@@ -1,0 +1,4084 @@
+WRI-Y1731-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,Counter64,
+		Integer32, TimeTicks, enterprises,Unsigned32,
+		NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+			MacAddress,PhysAddress,RowStatus		FROM SNMPv2-TC
+			wriProtocol	FROM WRI-SMI;				
+	
+	y1731 OBJECT IDENTIFIER ::= { wriProtocol 2501 }
+
+
+	y1731MepPmNum	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mep pm number."
+      ::= { y1731 1 }
+     
+     y1731FpgaIfNum	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 fpga interface number."
+      ::= { y1731 2 }   
+     
+     y1731FpgaCcIfTxNum	   OBJECT-TYPE
+      SYNTAX Counter32 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 fpga CC interface send number."
+      ::= { y1731 3 }  
+
+     y1731FpgaCcIfRxNum	   OBJECT-TYPE
+      SYNTAX Counter32 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 fpga CC interface receive number."
+      ::= { y1731 4 } 
+      
+    y1731IfMaxNum	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 interface max number."
+      ::= { y1731 5 } 
+  
+    y1731IfUsedCnt	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 interface used count."
+      ::= { y1731 6 }  
+      
+    y1731MipDbMaxNum  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mip Db max number."
+      ::= { y1731 7 }  
+      
+    y1731MipDbUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mip db used count."
+      ::= { y1731 8 }  
+      
+    y1731MipMaxNum  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mip max number."
+      ::= { y1731 9 }
+        
+    y1731MipUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mip used count."
+      ::= { y1731 10 }     
+      
+    y1731LtrMaxNum  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 Ltr max number."
+      ::= { y1731 11 }  
+    
+    y1731LtrUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 Ltr used  count."
+      ::= { y1731 12 }
+    
+    y1731MepDbMaxNum  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mep Db max number."
+      ::= { y1731 13 }
+    
+    y1731MepDbUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mep Db used count."
+      ::= { y1731 14 }
+    
+    y1731MepErrDbMaxNum  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mep error Db max number."
+      ::= { y1731 15 }
+    
+    y1731MepErrDbUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mep error Db used count."
+      ::= { y1731 16 }
+      
+     y1731MipDbAge  OBJECT-TYPE
+      SYNTAX INTEGER(1..65535) 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 mip Db aging time."
+      ::= { y1731 17 } 
+    
+     y1731MepDbAge  OBJECT-TYPE
+      SYNTAX INTEGER(60..65535) 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 mep Db aging time."
+      ::= { y1731 18 }
+    
+     y1731MepLtrAge  OBJECT-TYPE
+      SYNTAX INTEGER(60..65535) 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 mep Ltr aging time."
+      ::= { y1731 19 }
+    
+     y1731CrossCheckTime  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 time cross check."
+      ::= { y1731 20 }
+    
+     y1731MegFreeIndex  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "get y1731 meg free index."
+      ::= { y1731 21 }
+      
+      
+     y1731MegNameValiDate  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731 22 }
+    
+     y1731ManAddrDomainUdp  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731 23 }
+    
+     y1731ManAddrDomainIeee802  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731 24 }
+    
+     y1731DeviceName  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "device name"
+      ::= { y1731 25 }
+    
+    
+     y1731SnmpTrap  OBJECT-TYPE
+      SYNTAX Unsigned32   
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "snmp trap,value 0xffffffff is enable,0 is disable"
+      ::= { y1731 26 }
+    
+     y1731RsvProtoVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 reserve protocol version"
+      ::= { y1731 27 }
+    
+    y1731ProtoVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 protocol version"
+      ::= { y1731 28 }
+    
+    y1731DeviceVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 device version"
+      ::= { y1731 29 }
+    
+     
+    y1731SoftPmVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 soft pm version"
+      ::= { y1731 30 }
+    
+    y1731SpeVersion  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 spe version"
+      ::= { y1731 31 }
+        
+    y1731DefaultMegDefLevel  OBJECT-TYPE
+      SYNTAX INTEGER(0..7) 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 default meg default level"
+      ::= { y1731 32 }
+    
+    y1731DefaultMegDefMhfCreation  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 default meg default MHF creation"
+      ::= { y1731 33 }  
+      
+    y1731DefaultMegDefIdPermission  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 Default Meg Default Id Permission"
+      ::= { y1731 34 }  
+      
+     y1731AutoCfgMipAddVlanlist  OBJECT-TYPE
+      SYNTAX OCTET STRING 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 automatic config mip level"
+      ::= { y1731 35 }  
+     
+     y1731AutoCfgMipDelVlanlist  OBJECT-TYPE
+      SYNTAX OCTET STRING 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 automatic config mip level"
+      ::= { y1731 36 }
+       
+     y1731OrgOui  OBJECT-TYPE
+      SYNTAX OCTET STRING 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 organization Oui"
+      ::= { y1731 37 } 
+      
+     y1731GlobalState  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 Global State"
+      ::= { y1731 38 } 
+      
+     y1731CpuTimeThreshold  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 cpu time threshold"
+      ::= { y1731 39 } 
+      
+     y1731CpuTimeBombState  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 cpu time bomb state"
+      ::= { y1731 40 }
+      
+     y1731CpuUtilizationThreshold  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 cpu Utilization Threshold"
+      ::= { y1731 41 } 
+      
+      y1731MepMaxCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 max mep number"
+      ::= { y1731 42 }
+      
+      
+      y1731MepUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 max mep number"
+      ::= { y1731 43 }  
+                      
+     
+      y1731MegMaxCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 max meg number"
+      ::= { y1731 44 } 
+      
+      y1731MegUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 max meg number"
+      ::= { y1731 45 }
+     
+     y1731RmepMaxCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 max meg number"
+      ::= { y1731 46 } 
+      
+      y1731RmepUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 max meg number"
+      ::= { y1731 47 }
+       
+     y1731SdkCcTxUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 sdk cc send hardwar table count"
+      ::= { y1731 48 }
+     
+      y1731SdkCcRxUsedCnt  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 sdk cc receive hardwar table count"
+      ::= { y1731 49 }
+     
+      
+      y1731MepLmFreeIndex  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 free index of mep lm table"
+      ::= { y1731 50 }   
+      
+     y1731MepDmFreeIndex  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 free index of mep dm table"
+      ::= { y1731 51 }
+      
+     y1731MepThroughtputFreeIndex  OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 free index of mep Throughtput table"
+      ::= { y1731 52 }
+ 
+ 
+ --y1731 interface table     
+    y1731IfTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731IfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 interface information."
+		::= { y1731 53 }
+	
+	y1731IfEntry OBJECT-TYPE
+		SYNTAX  Y1731IfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { y1731IfIndex}
+		::= { y1731IfTable 1 }
+  
+      Y1731IfEntry ::= SEQUENCE{   
+        y1731IfIndex              INTEGER,
+		y1731IfCcmTxCnt			  Counter32,
+		y1731IfCcmRxCnt		   	  Counter32,
+		y1731IfLbrTxCnt  	      Counter32,
+		y1731IfLbrRxCnt			  Counter32,
+		y1731IfLbmTxCnt           Counter32,
+		y1731IfLbmRxCnt           Counter32,
+		y1731IfLtrTxCnt           Counter32,
+		y1731IfLtrRxCnt           Counter32,
+		y1731IfLtmTxCnt           Counter32,
+		y1731IfLtmRxCnt           Counter32,
+		y1731IfAisTxCnt           Counter32,
+		y1731IfAisRxCnt           Counter32,
+		y1731IfLckTxCnt           Counter32,
+		y1731IfLckRxCnt           Counter32,
+		y1731IfTstTxCnt           Counter32, 
+		y1731IfTstRxCnt           Counter32,
+		y1731IfMccTxCnt           Counter32,
+		y1731IfMccRxCnt           Counter32,
+		y1731IfLmrTxCnt           Counter32, 
+		y1731IfLmrRxCnt           Counter32,
+		y1731IfLmmTxCnt           Counter32, 
+		y1731IfLmmRxCnt           Counter32,
+        y1731If1dmTxCnt           Counter32, 
+		y1731If1dmRxCnt           Counter32,
+		y1731IfDmrTxCnt           Counter32, 
+		y1731IfDmrRxCnt           Counter32,
+		y1731IfDmmTxCnt           Counter32, 
+		y1731IfDmmRxCnt           Counter32,
+		y1731IfExrTxCnt           Counter32, 
+		y1731IfExrRxCnt           Counter32,
+		y1731IfExmTxCnt           Counter32, 
+		y1731IfExmRxCnt           Counter32,
+        y1731IfVsrTxCnt           Counter32, 
+		y1731IfVsrRxCnt           Counter32,
+		y1731IfVsmTxCnt           Counter32, 
+		y1731IfVsmRxCnt           Counter32,
+		y1731IfFwdPduCnt          Counter32, 
+		y1731IfFailInPduCnt       Counter32, 
+		y1731IfFailOutPduCnt      Counter32,
+		y1731IfMacPingReqTxCnt    Counter32, 
+		y1731IfMacPingReqRxCnt    Counter32,
+        y1731IfMacPingReplyTxCnt    Counter32, 
+        y1731IfMacPingReplyRxCnt    Counter32, 
+        y1731IfMacTraceReqTxCnt    Counter32, 
+		y1731IfMacTraceReqRxCnt    Counter32,
+        y1731IfMacTraceReplyTxCnt    Counter32, 
+        y1731IfMacTraceReplyRxCnt    Counter32,
+        y1731IfMepCnt    INTEGER,
+        y1731IfMipCnt    INTEGER,
+        y1731IfEfpsdState    INTEGER,
+        y1731IfLbRcvMode    INTEGER, 
+        y1731IfLtRcvMode    INTEGER,
+        y1731IfResetCounter     INTEGER
+		} 
+		
+      y1731IfIndex	   OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              "y1731 interface index."
+      ::= { y1731IfEntry 1 }
+
+    y1731IfCcmTxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 2 }  
+      
+    y1731IfCcmRxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 3}    
+      
+    y1731IfLbrTxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 4}  
+  
+    y1731IfLbrRxCnt	   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 5}   
+                                                                     
+    y1731IfLbmTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 6}              
+      
+     y1731IfLbmRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 7}  
+      
+     y1731IfLtrTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 8} 
+      
+	y1731IfLtrRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 9} 
+             
+	y1731IfLtmTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 10} 
+       
+	y1731IfLtmRxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 11} 
+          
+	y1731IfAisTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 12} 
+             
+	y1731IfAisRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 13} 
+             
+       
+	y1731IfLckTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 14} 
+             
+       
+	y1731IfLckRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 15} 
+             
+      
+	y1731IfTstTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 16} 
+             
+       
+	y1731IfTstRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 17} 
+             
+        
+	y1731IfMccTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 18} 
+             
+     
+	y1731IfMccRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 19} 
+             
+    
+	y1731IfLmrTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 20} 
+             
+        
+	y1731IfLmrRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 21} 
+             
+       
+	y1731IfLmmTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 22} 
+             
+          
+	y1731IfLmmRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 23} 
+             
+
+	y1731If1dmTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 24} 
+             
+         
+	y1731If1dmRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 25} 
+             
+         
+	y1731IfDmrTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 26} 
+             
+          
+	y1731IfDmrRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 27} 
+             
+         
+	y1731IfDmmTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 28} 
+             
+           
+	y1731IfDmmRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 29} 
+             
+         
+	y1731IfExrTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 30} 
+             
+        
+	y1731IfExrRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 31} 
+             
+         
+	y1731IfExmTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 32} 
+             
+        
+	y1731IfExmRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 33} 
+             
+         
+	y1731IfVsrTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 34} 
+             
+          
+	y1731IfVsrRxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 35} 
+             
+        
+	y1731IfVsmTxCnt   OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 36} 
+             
+        
+	y1731IfVsmRxCnt    OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 37} 
+             
+       
+	y1731IfFwdPduCnt    OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 38} 
+             
+      
+	y1731IfFailInPduCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 39} 
+             
+      
+	y1731IfFailOutPduCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 40} 
+             
+     
+	y1731IfMacPingReqTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 41} 
+             
+  
+	y1731IfMacPingReqRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 42} 
+             
+  
+	y1731IfMacPingReplyTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 43} 
+             
+   
+	y1731IfMacPingReplyRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 44} 
+             
+  
+	y1731IfMacTraceReqTxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 45} 
+             
+  
+	y1731IfMacTraceReqRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 46} 
+             
+  
+	y1731IfMacTraceReplyTxCnt OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 47} 
+             
+   
+	y1731IfMacTraceReplyRxCnt  OBJECT-TYPE
+      SYNTAX         Counter32 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 48} 
+                          
+	y1731IfMepCnt   OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 49} 
+             
+ 
+	y1731IfMipCnt   OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 50} 
+             
+ 
+	y1731IfEfpsdState OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 51} 
+             
+   
+	y1731IfLbRcvMode  OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 52} 
+             
+  
+	y1731IfLtRcvMode OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 53} 
+      
+   y1731IfResetCounter OBJECT-TYPE
+      SYNTAX         INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731IfEntry 54}              
+ --y1731 meg table
+	y1731MegTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MegEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 meg information."
+		::= { y1731 54}
+	
+	y1731MegEntry OBJECT-TYPE
+		SYNTAX  Y1731MegEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { y1731MegIndex}
+		::= { y1731MegTable 1 }
+
+	Y1731MegEntry ::= SEQUENCE{ 
+		y1731MegIndex           INTEGER,
+		y1731MegNextIndex		INTEGER,
+		y1731MegFormat			INTEGER,
+		y1731MegIcc				OCTET STRING,
+		y1731MegUmc				OCTET STRING,
+		y1731MegOwner  	        INTEGER,
+		y1731MegLevel			INTEGER,
+		y1731MegCcmInterval     INTEGER,
+		y1731MegAisInterval     INTEGER,
+		y1731MegLckInterval     INTEGER,
+		y1731MegLmmInterval     INTEGER, 
+		y1731MegLossThresholdCcm     INTEGER,
+		y1731MegLossThresholdAis     INTEGER, 
+		y1731MegLossThresholdLck     INTEGER,
+        y1731MegCcDirection     INTEGER,
+        y1731MegPrimaryVlan     INTEGER,
+        y1731MegNumberOfVids     INTEGER,
+        y1731MegRowstatus     RowStatus,
+        y1731MegVlanRowstatus     INTEGER,
+        y1731MegMhfCreation     INTEGER,
+        y1731MegMhfIdPermission     INTEGER,
+        y1731MegUsed     INTEGER,
+        y1731MegAddVlanlist     OCTET STRING,
+        y1731MegDelVlanlist     OCTET STRING,
+        y1731MegCrossCheckState   INTEGER,
+      	y1731MegCrossCheckTime   INTEGER,
+	    y1731MegRmepAge           INTEGER,
+	    y1731MegMipDbAge          INTEGER,
+        y1731MegMepLtrAge         INTEGER,
+        y1731MegMipCnt            INTEGER, 
+        y1731MegMepCnt            INTEGER,
+        y1731MegRmepCnt           INTEGER,
+        y1731MegCcTxCnt           Unsigned32,
+        y1731MegCcRxCnt           Unsigned32,
+        y1731MegDmmInterval       INTEGER,
+        y1731MegMdFormat          INTEGER
+        }
+		
+	y1731MegIndex	   OBJECT-TYPE
+      SYNTAX INTEGER (1..256)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 meg index."
+      ::= { y1731MegEntry 1 }
+  
+	y1731MegNextIndex OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 2 }
+      		
+	y1731MegFormat	OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 3 }
+      		
+	y1731MegIcc	 OBJECT-TYPE
+      SYNTAX         OCTET STRING 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 4 } 
+      			
+	y1731MegUmc	 	 OBJECT-TYPE
+      SYNTAX         OCTET STRING 
+      MAX-ACCESS     read-write
+      STATUS         current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 5 } 
+      			
+			
+	y1731MegOwner OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 6 }
+       	        
+	y1731MegLevel	OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 7 }
+       	        
+		       	        
+	y1731MegCcmInterval OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 8 }
+       	        
+    
+	y1731MegAisInterval   OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 9 }
+       	        
+  
+	y1731MegLckInterval  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 10 }
+       	        
+   
+	y1731MegLmmInterval   OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 11 }
+       	        
+  
+	y1731MegLossThresholdCcm  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 12 }
+       	        
+   
+	y1731MegLossThresholdAis OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 13}
+       	        
+    
+	y1731MegLossThresholdLck  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 14 }
+       	        
+   
+	y1731MegCcDirection    OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 15 }
+       	        
+       	          
+	y1731MegPrimaryVlan  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 16 }
+       	        
+   
+	y1731MegNumberOfVids  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 17 }
+       	        
+   
+	y1731MegRowstatus  OBJECT-TYPE
+      SYNTAX        RowStatus 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 18 }
+       	        
+   
+	y1731MegVlanRowstatus OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 19 }
+       	        
+    
+	y1731MegMhfCreation  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 20 }
+       	        
+   
+	y1731MegMhfIdPermission OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 21 }
+       	              	        
+	y1731MegUsed  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 22}
+       	        
+   
+	y1731MegAddVlanlist  OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 23 }
+       	        
+   
+	y1731MegDelVlanlist  OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 24 }
+    
+    y1731MegCrossCheckState OBJECT-TYPE  
+   	  SYNTAX        INTEGER{enable(1),disable(2)}
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 25}  
+      
+   	y1731MegCrossCheckTime  OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 26}  
+      
+    y1731MegRmepAge   OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 27}   
+            
+    y1731MegMipDbAge   OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 28}  
+            
+    y1731MegMepLtrAge  OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 29}
+              
+    y1731MegMipCnt   OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 30}   
+              
+    y1731MegMepCnt  OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 31}
+                  
+    y1731MegRmepCnt OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 32}   
+      
+   y1731MegCcTxCnt    OBJECT-TYPE  
+   	  SYNTAX        Unsigned32
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 33}   
+      
+     y1731MegCcRxCnt    OBJECT-TYPE  
+   	  SYNTAX        Unsigned32
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 34}   
+      
+    y1731MegDmmInterval OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 35}     
+      
+     y1731MegMdFormat OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MegEntry 36}       
+        
+ -- y1731 mep table
+
+  y1731MepTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 mep information."
+		::= { y1731 55}
+	
+	y1731MepEntry OBJECT-TYPE
+		SYNTAX  Y1731MepEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { y1731MegIndex,y1731MepIndex}
+		::= { y1731MepTable 1 }
+
+	Y1731MepEntry ::= SEQUENCE{
+	    y1731MepMegIndex		INTEGER,
+		y1731MepIndex			INTEGER,
+		y1731MepIfIndex			INTEGER,
+		y1731MepCcmSendCnt		INTEGER,
+		y1731MepCcmSeqErrorCnt	INTEGER,
+		y1731MepLbrInCnt		INTEGER,
+		y1731MepLbrOutCnt		INTEGER, 
+		y1731MepLbrBadMsduCnt	INTEGER,
+		y1731MepLbrInOutOfOrder	INTEGER,
+		y1731MepNextLbmTransid	INTEGER,
+		y1731MepTransmitLbmSeqNum	INTEGER,
+		y1731MepLbmPktLen	INTEGER,
+		y1731MepLbmTimeEnd	INTEGER,
+		y1731MepLbmTimeStart	INTEGER,
+		y1731MepLbmTimeMin	INTEGER,
+		y1731MepLbmTimeMax	INTEGER,
+		y1731MepLbmTimeCur	INTEGER,
+		y1731MepLbmTimeAvg	INTEGER,
+        y1731MepLtmPktLen	INTEGER,
+		y1731MepLtmTimeEnd	INTEGER, 
+		y1731MepLtmTimeStart	INTEGER,
+		y1731MepUnexpLtrInCnt	INTEGER,
+		y1731MepLtmNextSeqNum	INTEGER, 
+		y1731MepTransLtmSeqNum	INTEGER,
+		y1731MepPrimaryVid	 INTEGER,
+		y1731MepFngResetTime	INTEGER,
+		y1731MepFngAlarmTime	INTEGER,
+		y1731MepTransLbmNum	 INTEGER,
+		y1731MepTransLbmDestMepId	 INTEGER,
+        y1731MepTransLtmTargetMepId	 INTEGER,
+        y1731MepTransMulticastLbmStatus	 INTEGER,
+        y1731MepCrossCheckState	 INTEGER,
+		y1731MepCrossCheckTime	 INTEGER,
+		y1731MepTstPriority	 INTEGER,
+		y1731MepTstRemoteMepId	 INTEGER,
+		y1731MepTstSendPktLen	 INTEGER,
+		y1731MepTstSendPktNum	 INTEGER,
+		y1731MepOwner	 INTEGER,
+		y1731MepTransLtmEgId	 OCTET STRING,
+		y1731MepMac	 OCTET STRING,
+        y1731MepTransLbmDestMac	 OCTET STRING,
+        y1731MepTransLtmTargetMac	 OCTET STRING,
+		y1731MepDefects	  INTEGER,
+        y1731MepTransLtmTtl	  INTEGER,
+		y1731MepErrorCcmLastFailure	 INTEGER,
+		y1731MepXconCcmLastFailure	 INTEGER,
+		y1731MepActive	 INTEGER,
+		y1731MepCcmLtmPri	 INTEGER,
+		y1731MepTransLbmVlanPri	 INTEGER,		
+		y1731MepDirection		INTEGER, 
+		y1731MepLowPrdefect		INTEGER, 
+		y1731MepHighestPrdefect		INTEGER, 
+		y1731MepStateLckDefectCondition		INTEGER, 
+		y1731MepTstEabled		INTEGER,
+		y1731MepTstVlanDropEnable		INTEGER,
+		y1731MepTstPatternType		INTEGER,
+		y1731MepTransLbmTimeOut		INTEGER,
+        y1731MepTransLtmTimeOut		INTEGER,
+		y1731MepCciEnabled		INTEGER,
+		y1731MepFngState		INTEGER,
+		y1731MepRowStatus           RowStatus,
+        y1731MepTransLbmState		INTEGER,
+		y1731MepTransLbmResultOk		INTEGER,
+        y1731MepTransLbmDestIsMepId		INTEGER,
+		y1731MepTransLbmVlanDropEnabled		INTEGER,
+		y1731MepTransLtmFlags		INTEGER,
+		y1731MepTransLtmResult		INTEGER,                                     
+		y1731MepTransLtmStatus		INTEGER,       
+		y1731MepTransLtmTargetIsMepId		INTEGER,                                     
+		y1731MepMode		INTEGER,                                     
+		y1731MepMulticastCcHwTXEnabled		INTEGER,                                     
+		y1731MepAisInterval		INTEGER,                                         
+		y1731MepLckInterval		INTEGER,                                     
+		y1731MepAisState		INTEGER,                                     
+		y1731MepAisPriority		INTEGER,
+		y1731MepLckState		INTEGER,                                     
+		y1731MepLckPriority		INTEGER,                                      
+		y1731MepServiceType		INTEGER,                                      
+		y1731MepAisEnabled		INTEGER,                                      
+		y1731MepLckEnabled		INTEGER,
+		y1731MepAisDefectConditionState		INTEGER,                                      
+		y1731MepAisSuppressAlarmOperState	INTEGER,
+		y1731MepAisSuppressAlarmAdminState	INTEGER,                                       
+		y1731MepAisDot3ahCausedEnabled		INTEGER,
+		y1731MepResetCounter                INTEGER,
+		y1731MepCcTxCnt           Unsigned32,
+        y1731MepCcRxCnt           Unsigned32,
+        y1731MepTstDstMac           MacAddress,  
+        y1731MepLbPathMtuTstStatus           INTEGER,  					     
+        y1731MepLbThroughoutputTstStatus     INTEGER,
+        y1731MepLbPathMtu                    INTEGER,
+        y1731MepLbFarIfThroughoutput         INTEGER,
+        y1731MepLbNearIfThroughoutput         INTEGER,
+        y1731MepPatternContent                OCTET STRING,
+        y1731MepThroughoutputType             INTEGER,
+        y1731MepThroughoutputStatus           INTEGER,
+        y1731MepThroughoutputBurstTime        INTEGER,  
+        y1731MepThroughoutputGranularity      INTEGER,
+        y1731MepThroughoutputBMMin            INTEGER,
+        y1731MepThroughoutputBMMax            INTEGER,
+        y1731MepThroughoutputTimeEnd          INTEGER,
+        y1731MepThroughoutputTimeStart        INTEGER       
+	}
+
+   y1731MepMegIndex	   OBJECT-TYPE
+      SYNTAX INTEGER (1..256)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 meg index."
+      ::= { y1731MepEntry 1 }
+   
+   y1731MepIndex	   OBJECT-TYPE
+      SYNTAX INTEGER (1..8192)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mep index."
+      ::= { y1731MepEntry 2 }
+
+   y1731MepIfIndex	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "If index."
+      ::= { y1731MepEntry 3 }
+   
+   y1731MepDirection	   OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        	down(1),
+        	up(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "y1731 mep diretion."
+      ::= { y1731MepEntry 4 }
+   
+	y1731MepCcmSendCnt 	 OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 5 }
+   
+		
+	y1731MepCcmSeqErrorCnt	 OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 6 } 
+      
+	y1731MepLbrInCnt OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 7 }
+   
+		
+	y1731MepLbrOutCnt	 OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 8 }
+      	
+	y1731MepLbrBadMsduCnt  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 9 }
+      	
+ 	
+	y1731MepLbrInOutOfOrder	  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 10 }
+      	
+ 
+	y1731MepNextLbmTransid	  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 11 }
+      	
+
+	y1731MepTransmitLbmSeqNum	 OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 12 }
+      	
+
+	y1731MepLbmPktLen  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 13 }
+      	
+	
+	y1731MepLbmTimeEnd OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 14 }
+      	
+	
+	y1731MepLbmTimeStart OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 15 }
+      	
+	
+	y1731MepLbmTimeMin OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 16 }
+      	
+	
+	y1731MepLbmTimeMax OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 17 }
+      	
+	
+	y1731MepLbmTimeCur OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 18 }
+      	
+	
+	y1731MepLbmTimeAvg OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 19 }
+      	
+	
+	y1731MepLtmPktLen OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 20 }
+      	
+	
+	y1731MepLtmTimeEnd OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 21 }
+      	
+	
+	y1731MepLtmTimeStart OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 22 }
+      	
+	
+	y1731MepUnexpLtrInCnt OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 23 }
+      	
+	
+	y1731MepLtmNextSeqNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 24 }
+      	
+	
+	y1731MepTransLtmSeqNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 25 }
+      	
+	
+	y1731MepPrimaryVid OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 26 }
+      	
+	 
+	y1731MepFngResetTime OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 27 }
+      	
+	
+	y1731MepFngAlarmTime OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 28 }
+      	
+	
+	y1731MepTransLbmNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 29 }
+      	
+	 
+	y1731MepTransLbmDestMepId OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 30 }
+      	
+	 
+	y1731MepTransLtmTargetMepId OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 31 }
+      	
+	 
+	y1731MepTransMulticastLbmStatus	  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 32 }
+    
+    y1731MepCrossCheckState OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 33 }
+  	
+
+	y1731MepCrossCheckTime OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 34 }
+      	
+	 
+	y1731MepTstPriority OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 35 }
+      	
+	 
+	y1731MepTstRemoteMepId OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 36 }
+      	
+	 
+	y1731MepTstSendPktLen OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 37 }
+      	
+	 
+	y1731MepTstSendPktNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 38 }
+      	
+	 
+	y1731MepOwner OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 39}
+      	
+	 
+	y1731MepTransLtmEgId OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 40 }
+      	
+	 
+	y1731MepMac OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 41 }
+      	
+	 
+	y1731MepTransLbmDestMac	 OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 42 }
+      	
+ 
+	y1731MepTransLtmTargetMac OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 43 }
+      	
+	 
+	y1731MepDefects	  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 44 }
+      	
+ 
+	y1731MepTransLtmTtl	 OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 45 }
+      	
+  
+	y1731MepErrorCcmLastFailure OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 46 }
+      	
+	 
+	y1731MepXconCcmLastFailure OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 47 }
+      	
+	 
+	y1731MepActive	 OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 48 }
+      	
+ 
+	y1731MepCcmLtmPri OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 49 }
+      	
+	 
+	y1731MepTransLbmVlanPri OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 50 }      	
+		
+	y1731MepLowPrdefect OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 51 }
+      		
+	y1731MepHighestPrdefect OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 52 }		
+	y1731MepStateLckDefectCondition OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 53 }
+      		
+	y1731MepTstEabled OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 54 }
+      		
+	y1731MepTstVlanDropEnable OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 55 }
+      		
+		
+	y1731MepTstPatternType OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 56 }
+      		
+		
+	y1731MepTransLbmTimeOut OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 57 }
+      		
+		
+	y1731MepTransLtmTimeOut OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 58 }
+      		
+		
+	y1731MepCciEnabled OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 59 }
+      		
+		
+	y1731MepFngState OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 60 }
+      		                           
+		
+	y1731MepRowStatus OBJECT-TYPE
+      SYNTAX     RowStatus
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 61}
+      		
+   
+	y1731MepTransLbmState OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 62 }
+      		
+		
+	y1731MepTransLbmResultOk OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 63}
+      		
+		
+	y1731MepTransLbmDestIsMepId OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 64 }
+      		
+		
+	y1731MepTransLbmVlanDropEnabled OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 65 }
+      		
+		
+	y1731MepTransLtmFlags OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 66 }
+      		
+		
+	y1731MepTransLtmResult OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 67 }
+      		
+		
+	y1731MepTransLtmStatus OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 68 }
+      		
+		
+	y1731MepTransLtmTargetIsMepId OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 69 }
+      		
+		
+	y1731MepMode OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 70 }
+      		
+		
+	y1731MepMulticastCcHwTXEnabled	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 71 }	
+      
+	y1731MepAisInterval 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 72 }
+      		
+	y1731MepLckInterval OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 73 }	
+      
+		
+	y1731MepAisState	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 74 }	
+      
+	
+	y1731MepAisPriority OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 75 }	
+      
+		
+	y1731MepLckState OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 76}	
+      
+		
+	y1731MepLckPriority		OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 77 }	
+      
+
+	y1731MepServiceType	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 78 }	
+      
+	
+	y1731MepAisEnabled OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 79 }	
+      
+		
+	y1731MepLckEnabled OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 80 }	
+      
+		
+	y1731MepAisDefectConditionState  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 81 }	
+      
+		
+	y1731MepAisSuppressAlarmOperState OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 82}	
+      
+		
+	y1731MepAisSuppressAlarmAdminState OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 83 }	
+      
+		
+	y1731MepAisDot3ahCausedEnabled OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 84 }    
+      
+    y1731MepResetCounter  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepEntry 85 }
+	 
+    y1731MepCcTxCnt    OBJECT-TYPE  
+   	  SYNTAX        Unsigned32
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 86}   
+      
+     y1731MepCcRxCnt    OBJECT-TYPE  
+   	  SYNTAX        Unsigned32
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 87}      
+     
+      y1731MepTstDstMac        OBJECT-TYPE  
+   	  SYNTAX        MacAddress
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 88} 
+            
+    y1731MepLbPathMtuTstStatus    OBJECT-TYPE  
+   	  SYNTAX        INTEGER{start(1),stop(2)}
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 89}   
+             					     
+    y1731MepLbThroughoutputTstStatus   OBJECT-TYPE  
+   	  SYNTAX        INTEGER{start(1),stop(2)}
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 90}
+       
+     y1731MepLbPathMtu     OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 91}
+      
+    y1731MepLbFarIfThroughoutput    OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 92}  
+       
+    y1731MepLbNearIfThroughoutput  OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 93}
+          
+    y1731MepPatternContent       OBJECT-TYPE  
+   	  SYNTAX        OCTET STRING
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 94}
+
+    y1731MepThroughoutputType            OBJECT-TYPE  
+   	  SYNTAX        INTEGER{initiaor(1),responder(2)}
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 95}
+
+    y1731MepThroughoutputStatus          OBJECT-TYPE  
+   	  SYNTAX        INTEGER{true(1),false(2)}
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 96}
+
+    y1731MepThroughoutputBurstTime        OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 97}
+
+    y1731MepThroughoutputGranularity      OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 98}
+
+    y1731MepThroughoutputBMMin          OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 99}
+
+    y1731MepThroughoutputBMMax            OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 100}
+
+    y1731MepThroughoutputTimeEnd       OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 101}
+
+    y1731MepThroughoutputTimeStart      OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MepEntry 102}
+
+          
+-- y1731 ltr table
+    y1731LtrTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731LtrEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 Ltr information."
+		::= { y1731 56}
+	
+	y1731LtrEntry OBJECT-TYPE
+		SYNTAX  Y1731LtrEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { y1731MegIndex,y1731MepIndex,y1731LtrSeqNum,y1731LtrRcvOrder}
+		::= { y1731LtrTable 1 }  
+		
+	Y1731LtrEntry::=SEQUENCE{
+	    y1731LtrSeqNum		INTEGER,
+		y1731LtrRcvOrder	INTEGER,
+		y1731LtrTtl		    INTEGER,       
+		y1731LtrForwarded   INTEGER,
+		y1731LtrTerminalMep   INTEGER,
+		y1731LtrLastEgressIdentifier OCTET STRING,
+        y1731LtrNextEgressIdentifier OCTET STRING,
+		y1731LtrRelay                INTEGER,
+		y1731LtrChassisIdSubtype     INTEGER,
+		y1731LtrChassisId            OCTET STRING,
+		y1731LtrManAddressDomain     INTEGER,
+		y1731LtrManAddress           OCTET STRING,
+		y1731LtrIngress              INTEGER,
+		y1731LtrIngressMac           MacAddress,
+		y1731LtrIngressPortIdSubtype INTEGER,
+		y1731LtrIngressPortId        OCTET STRING,
+		y1731LtrEgress               INTEGER,
+		y1731LtrEgressMac            MacAddress,
+		y1731LtrEgressPortIdSubtype  INTEGER,
+		y1731LtrEgressPortId         OCTET STRING, 
+		y1731LtrOrganizationSpecificOui OCTET STRING, 
+		y1731LtrOrganizationSpecificType INTEGER 
+		} 
+		
+      y1731LtrSeqNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 1 } 
+      
+     y1731LtrRcvOrder OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 2 }     
+      
+	y1731LtrTtl	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 3 }
+      	     
+	y1731LtrForwarded  	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 4 }
+      	     
+ 
+	y1731LtrTerminalMep  	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 5 }
+      	     
+ 
+	y1731LtrLastEgressIdentifier 	OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 6 }
+      	     
+
+	y1731LtrNextEgressIdentifier 	OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 7 }
+      	     
+
+	y1731LtrRelay  	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 8 }
+      	     
+              
+	y1731LtrChassisIdSubtype 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 9 }
+      	     
+    
+	y1731LtrChassisId  	OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 10 }
+      	     
+          
+	y1731LtrManAddressDomain 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 11 }
+      	     
+    
+	y1731LtrManAddress  	OBJECT-TYPE
+      SYNTAX  OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 12 }
+      	     
+         
+	y1731LtrIngress 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 13 }
+      	     
+            
+	y1731LtrIngressMac 	OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 14 }
+      	     
+           
+	y1731LtrIngressPortIdSubtype 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 15 }
+      	     
+
+	y1731LtrIngressPortId  	OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 16 }
+      	     
+      
+	y1731LtrEgress   	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 17 }
+      	     
+            
+	y1731LtrEgressMac  	OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 18 }
+      	     
+          
+	y1731LtrEgressPortIdSubtype 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 19 }
+      	     
+ 
+	y1731LtrEgressPortId 	OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 20 }
+      	     
+        
+	y1731LtrOrganizationSpecificOui 	OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 21 }
+      	     
+
+	y1731LtrOrganizationSpecificType 	OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731LtrEntry 22 }    
+      
+ -- y1731 mep Db table
+  y1731MepDbTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 mip information."
+		::= { y1731 57 }
+	
+	y1731MepDbEntry OBJECT-TYPE
+		SYNTAX  Y1731MepDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { y1731MegIndex,y1731MepIndex,y1731MepDbRMepIdentifier}
+		::= { y1731MepDbTable 1 }
+
+	Y1731MepDbEntry ::= SEQUENCE{
+	  y1731MepDbRMepIdentifier         INTEGER,
+      y1731MepDbRMepState              INTEGER,
+      y1731MepDbRMepFailedOkTime       TimeTicks,
+      y1731MepDbMacAddress             MacAddress,
+      y1731MepDbRdi                    INTEGER,
+      y1731MepDbPortStatusTlv          INTEGER,
+      y1731MepDbInterfaceStatusTlv     INTEGER,
+      y1731MepDbChassisIdSubtype       INTEGER,
+      y1731MepDbChassisId              OCTET STRING,
+      y1731MepDbManAddressDomain       INTEGER,
+      y1731MepDbManAddress             OCTET STRING,
+      y1731MepDbOrgSpfValue            OCTET STRING,
+      y1731MepDbOrgSpfOui              OCTET STRING,
+      y1731MepDbOrgSpfSubType          INTEGER,
+      y1731MepDbOwner                  INTEGER,
+      y1731MepDbStorageType            INTEGER, 
+      y1731MepDbCcHwRxEnabled          INTEGER,
+      y1731MepDbUnicastCcHwTxEnabled   INTEGER
+		}
+     	     
+	y1731MepDbRMepIdentifier	   OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 Mep Db Remote Mep Identifier."
+      ::= { y1731MepDbEntry 1 }  
+      
+      y1731MepDbRMepState  	   OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 2 }  
+                 
+      y1731MepDbRMepFailedOkTime  OBJECT-TYPE
+      SYNTAX        TimeTicks 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 3 }
+            
+      y1731MepDbMacAddress  OBJECT-TYPE
+      SYNTAX        MacAddress 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 4 }
+            
+            
+      y1731MepDbRdi  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 5 }
+            
+                   
+      y1731MepDbPortStatusTlv    OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 6 }
+            
+       
+      y1731MepDbInterfaceStatusTlv OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 7  }
+          
+      y1731MepDbChassisIdSubtype  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 8  }
+          
+      
+      y1731MepDbChassisId   OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 9  }
+          
+            
+      y1731MepDbManAddressDomain  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 10  }
+          
+      
+      y1731MepDbManAddress   OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 11  }
+          
+           
+      y1731MepDbOrgSpfValue  OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 12  }
+          
+           
+      y1731MepDbOrgSpfOui   OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 13  }
+          
+            
+      y1731MepDbOrgSpfSubType   OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 14  }
+          
+        
+      y1731MepDbOwner   OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 15  }
+          
+                
+      y1731MepDbStorageType  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 16  }
+          
+        
+                  
+      y1731MepDbCcHwRxEnabled  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 17  }
+          
+         
+      y1731MepDbUnicastCcHwTxEnabled  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDbEntry 18  }
+          
+ -- y1731 mep error Db table
+  y1731MepErrorDbTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepErrorDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 mip information."
+		::= { y1731 58 }
+	
+	y1731MepErrorDbEntry OBJECT-TYPE
+		SYNTAX  Y1731MepErrorDbEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   { y1731MegIndex,y1731MepIndex,y1731MepDbRMepIdentifier}
+		::= { y1731MepErrorDbTable 1 }
+
+	Y1731MepErrorDbEntry ::= SEQUENCE{
+      y1731MepErrorDbMac  MacAddress,
+      y1731MepErrorDbRmepId  INTEGER,   
+      y1731MepErrorDbIcc     OCTET STRING,
+      y1731MepErrorDbUmc     OCTET STRING,
+      y1731MepErrorDbErrType INTEGER,
+      y1731MepErrorDbLevel   INTEGER,
+      y1731MepErrorDbInterval   INTEGER	 
+      }
+	 y1731MepErrorDbMac  OBJECT-TYPE
+      SYNTAX        MacAddress 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 1  } 
+      
+      y1731MepErrorDbRmepId  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 2  } 
+      
+     y1731MepErrorDbIcc  OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 3  }
+      
+      y1731MepErrorDbUmc OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 4 }
+      
+    y1731MepErrorDbErrType  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 5 }
+      
+      y1731MepErrorDbLevel	OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 6 }   
+      
+      y1731MepErrorDbInterval  OBJECT-TYPE
+      SYNTAX        INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepErrorDbEntry 7 }    
+	
+-- y1731 mip table
+  y1731MipTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MipEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 mip information."
+		::= { y1731 59}
+	
+	y1731MipEntry OBJECT-TYPE
+		SYNTAX  Y1731MipEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {y1731MipIfIndex,y1731MipLevel,y1731MipFid}
+		::= { y1731MipTable 1 }
+
+	Y1731MipEntry ::= SEQUENCE{
+	  	y1731MipIfIndex		INTEGER,
+		y1731MipLevel		INTEGER,
+		y1731MipFid			INTEGER,
+		y1731MipMac         MacAddress,
+		y1731MipOwner       INTEGER,
+		y1731MipRowstatus	RowStatus,
+		y1731MipCcTxCnt     Unsigned32,
+		y1731MipCcRxCnt     Unsigned32,
+		y1731MipMegIndex    INTEGER                                
+		}
+
+   y1731MipIfIndex	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mip  interface index."
+      ::= { y1731MipEntry 1 }
+   
+   y1731MipLevel	   OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "y1731 mip level."
+      ::= { y1731MipEntry 2 }
+
+   y1731MipFid	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "mip vlan id."
+      ::= { y1731MipEntry 3 }  
+      
+    y1731MipMac	   OBJECT-TYPE
+      SYNTAX      MacAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "mip vlan id."
+      ::= { y1731MipEntry 4 }
+
+     y1731MipOwner	   OBJECT-TYPE
+      SYNTAX      INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "mip vlan id."
+      ::= { y1731MipEntry 5 }
+      
+   y1731MipRowstatus	   OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "This object indicates the status of this entry."
+      ::= { y1731MipEntry 6 }
+    
+    y1731MipCcTxCnt    OBJECT-TYPE  
+   	  SYNTAX        Unsigned32
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MipEntry 7}   
+      
+     y1731MipCcRxCnt    OBJECT-TYPE  
+   	  SYNTAX        Unsigned32
+   	  MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MipEntry 8}      
+      
+      y1731MipMegIndex OBJECT-TYPE  
+   	  SYNTAX        INTEGER
+   	  MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+              ""
+      ::= { y1731MipEntry 9}
+--y1731 test table
+	
+	y1731MepTestTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepTestEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 test information."
+		::= { y1731 60}
+	
+	y1731MepTestEntry OBJECT-TYPE
+		SYNTAX  Y1731MepTestEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {y1731MepTestIndex}
+		::= { y1731MepTestTable 1 }
+
+	Y1731MepTestEntry ::= SEQUENCE{  
+		y1731MepTestIndex                         INTEGER,
+	    y1731MepTestResultPatternType             INTEGER,
+	    y1731MepTestResultIfSpeed				  INTEGER,
+		y1731MepTestResultIfThroughput			  INTEGER,
+		y1731MepTestResultIfUtilizationIn		  INTEGER,
+		y1731MepTestResultIfUtilizationOut  	  INTEGER,
+		y1731MepTestResultIfBitErrorsMin          INTEGER,
+	    y1731MepTestResultIfBitErrorsMax		  INTEGER,
+	    y1731MepTestResultIfBitErrorsCur		  INTEGER, 
+	    y1731MepTestResultIfBitErrorsAvg		  INTEGER, 
+	    y1731MepTestResultIfMtuFar		          INTEGER, 
+	    y1731MepTestResultIfMtuNear		          INTEGER
+		}
+  
+   y1731MepTestIndex	   OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepTestEntry 1 }
+   
+  y1731MepTestResultPatternType	   OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepTestEntry 2 }
+		
+	y1731MepTestResultIfSpeed	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepTestEntry 3 }
+
+	y1731MepTestResultIfThroughput	   OBJECT-TYPE
+      SYNTAX      INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 4 }
+  
+    y1731MepTestResultIfUtilizationIn	   OBJECT-TYPE
+      SYNTAX         INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 5 }
+  
+   y1731MepTestResultIfUtilizationOut	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepTestEntry 6 }
+
+  y1731MepTestResultIfBitErrorsMin	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepTestEntry 7 }
+		
+	y1731MepTestResultIfBitErrorsMax	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 8 }
+      
+      y1731MepTestResultIfBitErrorsCur	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 9 } 
+      
+      y1731MepTestResultIfBitErrorsAvg	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 10 }   
+      
+      y1731MepTestResultIfMtuFar	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 11 } 
+      
+       y1731MepTestResultIfMtuNear	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepTestEntry 12 }
+
+ --y1731 mep lm table
+	
+	y1731MepLmTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepLmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 test information."
+		::= { y1731 61 }
+	
+	y1731MepLmEntry OBJECT-TYPE
+		SYNTAX  Y1731MepLmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {y1731MepLmIndex}
+		::= { y1731MepLmTable 1 }
+
+	Y1731MepLmEntry ::= SEQUENCE{   
+	    y1731MepLmIndex             INTEGER,
+	    y1731MepLmResultLmrCnt             INTEGER,
+	    y1731MepLmResultFarMin				  INTEGER,
+		y1731MepLmResultFarMax			  INTEGER,
+		y1731MepLmResultFarCur		  INTEGER,
+		y1731MepLmResultFarAvg  	  INTEGER,
+		y1731MepLmResultNearMin          INTEGER,
+	    y1731MepLmResultNearMax		  INTEGER,
+	    y1731MepLmResultNearCur		  INTEGER, 
+	    y1731MepLmResultNearAvg		  INTEGER, 
+	    y1731MepLmSendPrd		          INTEGER, 
+	    y1731MepLmPriority		          INTEGER,
+	    y1731MepLmRmepId		          INTEGER, 
+	    y1731MepLmHoldTime		          INTEGER, 
+	    y1731MepLmStatus		          INTEGER,
+	    y1731MepLmDstMac		          MacAddress,
+	    y1731MepLmMegIndex		          INTEGER,
+	    y1731MepLmMepIndex		          INTEGER,
+	    y1731MepLmResultLmsCnt         INTEGER,
+	    y1731MepLmStartTime         INTEGER,
+	    y1731MepLmEndTime         INTEGER
+		}
+   
+  y1731MepLmIndex    OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepLmEntry 1 }
+
+  
+  y1731MepLmResultLmrCnt	   OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepLmEntry 2 }
+		
+	y1731MepLmResultFarMin	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepLmEntry 3 }
+
+	y1731MepLmResultFarMax	   OBJECT-TYPE
+      SYNTAX      INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 4 }
+                     
+    y1731MepLmResultFarCur	   OBJECT-TYPE
+      SYNTAX         INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 5 }
+  
+   y1731MepLmResultFarAvg	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepLmEntry 6 }
+
+  y1731MepLmResultNearMin	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepLmEntry 7 }
+		
+	y1731MepLmResultNearMax	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 8 }
+      
+      y1731MepLmResultNearCur	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 9 } 
+      
+      y1731MepLmResultNearAvg	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 10 }   
+      
+      y1731MepLmSendPrd	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 11 } 
+      
+      y1731MepLmPriority	   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 12}
+
+      y1731MepLmRmepId    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 13}
+      
+     y1731MepLmHoldTime    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepLmEntry 14}   
+      
+     y1731MepLmStatus    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 15}
+      
+     y1731MepLmDstMac	OBJECT-TYPE
+      SYNTAX     MacAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 16}	          
+      
+    y1731MepLmMegIndex	 OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 17}	         
+      
+    y1731MepLmMepIndex		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 18}
+      
+    y1731MepLmResultLmsCnt		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 19}
+      
+    y1731MepLmStartTime		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 20}
+      
+    y1731MepLmEndTime		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepLmEntry 21}         
+ 
+ 
+      
+ --y1731 mep Dm table
+	
+	y1731MepDmTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepDmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 test information."
+		::= { y1731 62}
+	
+	y1731MepDmEntry OBJECT-TYPE
+		SYNTAX  Y1731MepDmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {y1731MepDmIndex}
+		::= { y1731MepDmTable 1 }
+
+	Y1731MepDmEntry ::= SEQUENCE{
+		y1731MepDmIndex           INTEGER,
+	    y1731MepDmResultDmrCnt    INTEGER,
+	    y1731MepDmResultMin	      INTEGER,
+		y1731MepDmResultMax	      INTEGER,
+		y1731MepDmResultCur		  INTEGER,
+		y1731MepDmResultAvg  	  INTEGER,
+		y1731MepDvmResultMin      INTEGER,
+	    y1731MepDvmResultMax	  INTEGER,
+	  	y1731MepDvmResultCur	  INTEGER,
+		y1731MepDvmResultAvg  	  INTEGER,
+		y1731MepDmSendPrd         INTEGER,
+	    y1731MepDmPriority        INTEGER,
+	    y1731MepDmRmepId          INTEGER, 
+	    y1731MepDmHoldTime        INTEGER,
+	    y1731MepDmStatus          INTEGER,
+	    y1731MepDmDstMac		          MacAddress,
+	    y1731MepDmMegIndex		          INTEGER,
+	    y1731MepDmMepIndex		          INTEGER,
+	    y1731MepDmResultDmsCnt		          INTEGER,
+	    y1731MepDmStartTime		          INTEGER,
+	    y1731MepDmEndTime		          INTEGER
+
+		}    
+		
+	y1731MepDmIndex    OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDmEntry 1 }
+		
+
+  y1731MepDmResultDmrCnt	   OBJECT-TYPE
+      SYNTAX      INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDmEntry 2 }
+		
+	y1731MepDmResultMin	   OBJECT-TYPE
+      SYNTAX INTEGER 
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDmEntry 3 }
+
+	y1731MepDmResultMax	   OBJECT-TYPE
+      SYNTAX      INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 4 }
+                     
+    y1731MepDmResultCur	   OBJECT-TYPE
+      SYNTAX         INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 5 }
+  
+   y1731MepDmResultAvg	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDmEntry 6 }
+
+  y1731MepDvmResultMin	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "."
+      ::= { y1731MepDmEntry 7 }
+		
+	y1731MepDvmResultMax	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 8 }
+      
+      y1731MepDvmResultCur	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 9 } 
+      
+      y1731MepDvmResultAvg	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 10 }   
+      
+      y1731MepDmSendPrd	   OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 11 } 
+      
+      y1731MepDmPriority	   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 12}
+
+      y1731MepDmRmepId    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 13}
+      
+     y1731MepDmHoldTime    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 14}   
+      
+     y1731MepDmStatus    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepDmEntry 15}   
+   
+    y1731MepDmDstMac	OBJECT-TYPE
+      SYNTAX     MacAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepDmEntry 16}	          
+      
+    y1731MepDmMegIndex	 OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepDmEntry 17}	         
+      
+    y1731MepDmMepIndex		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepDmEntry 18}  
+    
+    y1731MepDmResultDmsCnt		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepDmEntry 19} 
+   
+    y1731MepDmStartTime		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepDmEntry 20} 
+      
+    y1731MepDmEndTime		OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""                     
+      ::= { y1731MepDmEntry 21} 
+  
+  
+     
+ --y1731 mep throughtput table
+	
+	y1731MepThroughtputTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731MepThroughtputEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 test information."
+		::= { y1731 63}
+	
+	y1731MepThroughtputEntry OBJECT-TYPE
+		SYNTAX  Y1731MepThroughtputEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {y1731MegIndex,y1731MepIndex}
+		::= { y1731MepThroughtputTable 1 }
+
+	Y1731MepThroughtputEntry ::= SEQUENCE{
+	    y1731MepThroughtputStatus    INTEGER,
+	    y1731MepThroughtputPri	      INTEGER,
+		y1731MepThroughtputRmepId	      INTEGER,
+		y1731MepThroughtputResult		  INTEGER,
+		y1731MepThroughtputHoldTime  	  INTEGER,
+		y1731MepThroughtputSendPktLen      INTEGER,
+	    y1731MepThroughtputServiceType	  INTEGER
+	    }
+    y1731MepThroughtputStatus    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 1}  
+      
+    y1731MepThroughtputPri    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 2}  
+      
+     y1731MepThroughtputRmepId   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 4}    
+      
+      
+     y1731MepThroughtputResult  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 5}  
+      
+      y1731MepThroughtputHoldTime  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 6}  
+      
+      y1731MepThroughtputSendPktLen  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 7}    
+      
+      y1731MepThroughtputServiceType OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731MepThroughtputEntry 8}       
+
+--y1731 config remote mep table
+	
+	y1731RmepCfgTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF Y1731RmepCfgEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The table used to describe the switch y1731 test information."
+		::= { y1731 64}
+	
+	y1731RmepCfgEntry OBJECT-TYPE
+		SYNTAX  Y1731RmepCfgEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"The entry of the table."
+		INDEX   {y1731MegIndex,y1731RmepCfgId}
+		::= { y1731RmepCfgTable 1 }
+
+	Y1731RmepCfgEntry ::= SEQUENCE{
+	    y1731RmepCfgId                     INTEGER,
+	    y1731RmepCfgMac	                   MacAddress,
+	    y1731RmepCfgState	               INTEGER,
+		y1731RmepCfgOwner	               INTEGER,
+		y1731RmepCfgStorageType	           INTEGER,
+		y1731RmepCfgRowStatus  	           RowStatus,
+		y1731RmepCfgCcHwRxEnabled          INTEGER,
+	    y1731RmepCfgUnicastCcHwTxEnabled   INTEGER,
+	    y1731RmepCfgMode                   INTEGER,
+	    y1731RmepCfgManAddrDomain          INTEGER,
+	    y1731RmepCfgFailedOkTime           TimeTicks,
+        y1731RmepCfgOrgSpeValue            OCTET STRING,
+        y1731RmepCfgOrgSpeOui              OCTET STRING, 
+        y1731RmepCfgOrgSpeSubType          INTEGER,
+        y1731RmepCfgChassisId              OCTET STRING,
+        y1731RmepCfgChassisIdSubType       INTEGER, 
+        y1731RmepCfgManAddress             MacAddress,
+        y1731RmepCfgPortStatusTlv          INTEGER,
+        y1731RmepCfgInterfaceStatusTlv     INTEGER, 
+        y1731RmepRdi                       INTEGER
+		}
+    y1731RmepCfgId    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 1}  
+      
+    y1731RmepCfgMac    OBJECT-TYPE
+      SYNTAX     MacAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 2} 
+     
+     y1731RmepCfgState   OBJECT-TYPE
+      SYNTAX     INTEGER{idle(1),start(2),failed(3),ok(4)}
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 3}  
+      
+     y1731RmepCfgOwner   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 4}    
+      
+      
+     y1731RmepCfgStorageType  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 5}  
+      
+      y1731RmepCfgRowStatus  OBJECT-TYPE
+      SYNTAX     RowStatus
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 6}  
+      
+      y1731RmepCfgCcHwRxEnabled  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 7}    
+      
+      y1731RmepCfgUnicastCcHwTxEnabled OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 8} 
+      
+      y1731RmepCfgMode           OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 9} 
+
+	  y1731RmepCfgManAddrDomain   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 10}     
+      	   
+      y1731RmepCfgFailedOkTime  OBJECT-TYPE
+      SYNTAX     TimeTicks
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 11}  
+       
+      y1731RmepCfgOrgSpeValue    OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 12}    
+          
+      y1731RmepCfgOrgSpeOui     OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 13}   
+      
+      y1731RmepCfgOrgSpeSubType    OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 14}  
+         
+      y1731RmepCfgChassisId     OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 15} 
+          
+      y1731RmepCfgChassisIdSubType  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 16}  
+         
+      y1731RmepCfgManAddress     OBJECT-TYPE
+      SYNTAX     MacAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 17}  
+            
+      y1731RmepCfgPortStatusTlv  OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION                                 
+             ""
+      ::= { y1731RmepCfgEntry 18} 
+             
+     y1731RmepCfgInterfaceStatusTlv   OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             ""
+      ::= { y1731RmepCfgEntry 19 } 
+      
+      y1731RmepRdi              OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              ""
+      ::= { y1731RmepCfgEntry 20}         
+   
+   y1731Notifications      OBJECT IDENTIFIER ::= { y1731 65 }   
+     
+   y1731CcLoop NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepDbRMepIdentifier,
+    				y1731MepErrorDbMac
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc remote mep loop trap"
+    ::= { y1731Notifications 1 }
+    
+    y1731CcUnexpectedLevel NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepDbRMepIdentifier,
+    				y1731MepErrorDbLevel
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc unexpected remote mep level mep trap"
+    ::= { y1731Notifications 2} 		
+   
+    y1731CcCrossConnect NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepDbRMepIdentifier,
+    				y1731MepErrorDbIcc,
+    				y1731MepErrorDbUmc
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc remote mep  cross connect trap"
+    ::= { y1731Notifications 3}
+    
+    y1731CcRmepUnknown  NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepDbRMepIdentifier,
+    				y1731MepErrorDbRmepId
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc remote mep unknow"
+    ::= { y1731Notifications 4}
+
+    y1731CcUnexpectedPrd   NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepDbRMepIdentifier,
+    				y1731MepErrorDbInterval
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc remote mep unexpected period"
+    ::= { y1731Notifications 5}
+
+    y1731CcRdi    NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731RmepCfgId,
+    				y1731RmepCfgMac,
+    				y1731RmepCfgState,
+    				y1731RmepCfgOwner,
+    				y1731RmepCfgStorageType,
+    				y1731RmepCfgRowStatus,
+    				y1731RmepCfgCcHwRxEnabled,
+    				y1731RmepCfgUnicastCcHwTxEnabled
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc rdi trap"
+    ::= { y1731Notifications 6}
+
+    y1731CcLinkUpTrap    NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731RmepCfgId,
+    				y1731RmepCfgMac,
+    				y1731RmepCfgState,
+    				y1731RmepCfgOwner,
+    				y1731RmepCfgStorageType,
+    				y1731RmepCfgRowStatus,
+    				y1731RmepCfgCcHwRxEnabled,
+    				y1731RmepCfgUnicastCcHwTxEnabled
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc link up trap"
+    ::= { y1731Notifications 7}
+
+
+    
+    y1731CcLinkDown NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731RmepCfgId,
+    				y1731RmepCfgMac,
+    				y1731RmepCfgState,
+    				y1731RmepCfgOwner,
+    				y1731RmepCfgStorageType,
+    				y1731RmepCfgRowStatus,
+    				y1731RmepCfgCcHwRxEnabled,
+    				y1731RmepCfgUnicastCcHwTxEnabled
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc link down trap"
+    ::= { y1731Notifications 8}
+
+    y1731CcRmepMissing   NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731RmepCfgId,
+    				y1731RmepCfgMac,
+    				y1731RmepCfgState,
+    				y1731RmepCfgOwner,
+    				y1731RmepCfgStorageType,
+    				y1731RmepCfgRowStatus,
+    				y1731RmepCfgCcHwRxEnabled,
+    				y1731RmepCfgUnicastCcHwTxEnabled
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc remote mep missing trap"
+    ::= { y1731Notifications 9}
+
+    y1731CcMacStatusDefect  NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731RmepCfgId,
+    				y1731RmepCfgMac,
+    				y1731RmepCfgState,
+    				y1731RmepCfgOwner,
+    				y1731RmepCfgStorageType,
+    				y1731RmepCfgRowStatus,
+    				y1731RmepCfgCcHwRxEnabled,
+    				y1731RmepCfgUnicastCcHwTxEnabled
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc mac status error trap"
+    ::= { y1731Notifications 10}
+
+    y1731CcServiceStatusDefect   NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731RmepCfgId,
+    				y1731RmepCfgMac,
+    				y1731RmepCfgState,
+    				y1731RmepCfgOwner,
+    				y1731RmepCfgStorageType,
+    				y1731RmepCfgRowStatus,
+    				y1731RmepCfgCcHwRxEnabled,
+    				y1731RmepCfgUnicastCcHwTxEnabled
+                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 cc service status error trap"
+    ::= { y1731Notifications 11}
+
+    y1731LoopBackSuccess    NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex                }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 loopback success trap"
+    ::= { y1731Notifications 12}
+
+    y1731LoopBackTimeout NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731RmepCfgId
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 loopback timeout trap"
+    ::= { y1731Notifications 13}
+
+    y1731LinkTraceSuccess   NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 linktrace success trap"
+    ::= { y1731Notifications 14}
+
+    
+    y1731LinkTraceFailed NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 linktrace failed trap"
+    ::= { y1731Notifications 15}
+
+    y1731AisTrap    NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepAisDefectConditionState
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 ais trap"
+    ::= { y1731Notifications 16}
+
+    y1731LckTrap NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepStateLckDefectCondition
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 lock trap"
+    ::= { y1731Notifications 17}   
+    
+    y1731FaultAlarm   NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731MepHighestPrdefect
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 fault alarm  trap"
+    ::= { y1731Notifications 18}
+    
+    y1731MpingSuccess  NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731RmepCfgId
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 ping success  trap"
+    ::= { y1731Notifications 19}
+
+    y1731MpingFailed  NOTIFICATION-TYPE
+    OBJECTS     { 
+    				y1731MegIndex,
+    				y1731MepIndex,
+    				y1731RmepCfgId
+	             }
+    STATUS      current
+    DESCRIPTION 
+    		"y1731 ping failed  trap"
+    ::= { y1731Notifications 20}
+ END
+
+

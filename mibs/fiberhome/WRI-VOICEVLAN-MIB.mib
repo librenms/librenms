@@ -1,0 +1,274 @@
+WRI-VOICEVLAN-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+	
+	
+
+
+	-- Multiple Services Ring (MSPP)
+
+	wri MODULE-IDENTITY
+		LAST-UPDATED 	"200712050000Z"
+		ORGANIZATION 	"FiberHome Networks Systems, Inc."
+		CONTACT-INFO	"http://www.fhn.com.cn"
+		DESCRIPTION		"reference to 802.17."
+		::= { enterprises 3807 }	-- assigned by IANA	
+
+
+	wriProtocol	 	OBJECT IDENTIFIER ::= { wri 2 }
+	               
+	               
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+
+	voiceVlan      OBJECT IDENTIFIER ::= { wriProtocol 2205 }
+	
+	
+	voiceVlanGeneral OBJECT IDENTIFIER ::= { voiceVlan 1 } 
+	
+	voiceVlanOUICount	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { voiceVlanGeneral 1 }
+        
+    voiceVlanAgingtime	OBJECT-TYPE
+        SYNTAX INTEGER  (5..43200)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { voiceVlanGeneral 2 } 
+         
+     voiceVlanMaxIfCount	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { voiceVlanGeneral 3 }      
+          
+     voiceVlanMaxOuiCount	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { voiceVlanGeneral 4 }    
+        
+     voiceVlanIfCount	OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { voiceVlanGeneral 5 }     
+	--voice vlan OUI table
+	voiceVlanOUITable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF VoiceVlanOUIEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { voiceVlan 2 }
+
+	voiceVlanOUIEntry OBJECT-TYPE
+		SYNTAX  VoiceVlanOUIEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { voiceVlanOUIMacAddr, voiceVlanOUIMacMask}
+		::= { voiceVlanOUITable 1 }
+
+	VoiceVlanOUIEntry ::=
+		SEQUENCE {
+			voiceVlanOUIMacAddr		MacAddress,
+			voiceVlanOUIMacMask		INTEGER,
+			voiceVlanOUIDescr		DisplayString,
+			voiceVlanOUItype		INTEGER,
+			voiceVlanOUIStatus		EntryStatus
+		}
+
+	voiceVlanOUIMacAddr	   OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "group index."
+        ::= { voiceVlanOUIEntry 1 }
+        
+    voiceVlanOUIMacMask	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "group index."
+        ::= { voiceVlanOUIEntry 2 }
+
+
+	voiceVlanOUIDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { voiceVlanOUIEntry 3 }
+
+	voiceVlanOUItype	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { voiceVlanOUIEntry 4 }        
+                
+	voiceVlanOUIStatus	OBJECT-TYPE
+        SYNTAX EntryStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { voiceVlanOUIEntry 5 }
+        
+        
+        
+	--voice vlan interface table
+	voiceVlanIfTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF VoiceVlanIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { voiceVlan 3 }
+
+	voiceVlanIfEntry OBJECT-TYPE
+		SYNTAX  VoiceVlanIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { voiceVlanIfIndex}
+		::= { voiceVlanIfTable 1 }
+
+	VoiceVlanIfEntry ::=
+		SEQUENCE {
+			voiceVlanIfIndex		INTEGER,
+			voiceVlanIfVID          INTEGER, 
+			voiceVlanIfStatus       INTEGER,
+			voiceVlanIfMode			INTEGER,
+			voiceVlanIfSecurity     INTEGER,
+			voiceVlanIfRemainTime     INTEGER
+	}
+		
+	voiceVlanIfIndex	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "group index."
+        ::= { voiceVlanIfEntry 1 }  
+        
+    voiceVlanIfVID			OBJECT-TYPE
+        SYNTAX INTEGER 	(2..4096)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { voiceVlanIfEntry 2 }
+    
+      voiceVlanIfStatus	OBJECT-TYPE
+        SYNTAX INTEGER
+        	{
+				enable(1),
+				disable(2)
+			}
+
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { voiceVlanIfEntry 3 }
+
+
+	voiceVlanIfMode	OBJECT-TYPE
+        SYNTAX INTEGER   
+        {
+        	manual(1),
+        	auto(2)	
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { voiceVlanIfEntry 4 }
+
+      
+   voiceVlanIfSecurity OBJECT-TYPE
+        SYNTAX INTEGER  
+        {      
+        	enable(1),
+        	disable(2)
+				
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { voiceVlanIfEntry 5}
+     
+   voiceVlanIfRemainTime   OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "The remain time of the voicevlan interface that is in auto mode"
+        ::= { voiceVlanIfEntry 6}   
+ 	--voice vlan interface trap       
+    voiceVlanIfTrap 	OBJECT IDENTIFIER ::= { voiceVlan 4 }
+      
+    voiceVlanIfIn NOTIFICATION-TYPE
+       		OBJECTS {voiceVlanIfIndex,voiceVlanIfStatus}
+       		STATUS  current
+       		DESCRIPTION
+               	"intface enable voice vlan trap."
+			::= { voiceVlanIfTrap 1}
+			  
+	voiceVlanIfOut NOTIFICATION-TYPE
+       		OBJECTS {voiceVlanIfIndex,voiceVlanIfStatus}
+       		STATUS  current
+       		DESCRIPTION
+               	"intface disable voice vlan trap."
+			::= { voiceVlanIfTrap 2}
+
+      
+        
+END

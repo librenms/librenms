@@ -1,0 +1,1073 @@
+WRI-ELMI-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,
+			NOTIFICATION-TYPE, enterprises          FROM SNMPv2-SMI
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,RowStatus,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+				wriProtocol			FROM WRI-SMI;
+
+	elmi       OBJECT IDENTIFIER ::= { wriProtocol 502 }   
+	
+	-- the Elmi group
+    elmiGlobal   	OBJECT IDENTIFIER ::= { elmi 1 }   
+    
+	elmiState OBJECT-TYPE
+		SYNTAX  INTEGER {
+				start(1),
+				stop(2)				
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiGlobal 1 }
+
+	elmiType OBJECT-TYPE
+		SYNTAX  INTEGER {
+				provideredge(1),
+				customeredge(2)				
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiGlobal 2 }
+		
+	elmiTraps OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE(0..4))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The traps bitmap."		
+		::= { elmiGlobal 3 }
+	
+	elmiVlanAutoCfg OBJECT-TYPE
+		SYNTAX  INTEGER {
+				enable(1),
+				disable(2)				
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Whether or not enable the vlan auto config function."
+		::= { elmiGlobal 4 }
+	
+	elmiEvcFreeIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"get free evc index."
+		::= { elmiGlobal 5 }
+  
+  elmiEvcMaxNum OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"The max evc number."
+		::= { elmiGlobal 6 }
+  
+  elmiEvcUsed OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Evc used."
+		::= { elmiGlobal 7 }
+  
+  elmiUniMaxNum OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Max uni number."
+		::= { elmiGlobal 8 }
+  
+  elmiUniUsed OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Uni used."
+		::= { elmiGlobal 9 }
+  
+  elmiServiceMaxNum OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Sevice max number."
+		::= { elmiGlobal 10 }
+  
+  elmiServiceUsed OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Service used."
+		::= { elmiGlobal 11 }
+  
+  elmiCeVlanMaxNum OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Client-edge vlan max number."
+		::= { elmiGlobal 12 }
+  
+  elmiCeVlanUsed OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Client-edge vlan used."
+		::= { elmiGlobal 13 }
+
+		
+	-- The Elmi EVC Table
+
+	elmiEvcTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ElmiEvcEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmi 2 }
+
+	elmiEvcEntry OBJECT-TYPE
+		SYNTAX  ElmiEvcEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { elmiEvcIndex}
+		::= { elmiEvcTable 1 }
+
+	ElmiEvcEntry ::=
+		SEQUENCE {
+        elmiEvcIndex         INTEGER,
+        elmiEvcId            OCTET STRING,
+        elmiEvcType          INTEGER,
+        elmiEvcState         INTEGER,
+				elmiEvcUniNum        INTEGER,
+				elmiEvcProtocolType     INTEGER,
+				elmiEvcProtocolVid			 INTEGER,
+				elmiEvcProtocolLevel		 INTEGER,
+				elmiEvcCir				   Unsigned32,
+				elmiEvcCbs				   Unsigned32,
+				elmiEvcEir				   Unsigned32,
+				elmiEvcEbs 				   Unsigned32,
+     		elmiEvcCM 				   INTEGER,
+     		elmiEvcCF 				   INTEGER,
+     		elmiEvcBWPState      INTEGER,
+     		elmiEvcServiceCnt    Counter32,
+     		elmiEvcLocalUniCnt   Counter32,
+     		elmiEvcActiveUniCnt  Counter32,
+     		elmiEvcRowStatus	   RowStatus
+		}
+
+
+	elmiEvcIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"The evc index."
+		::= { elmiEvcEntry 1 }
+
+	elmiEvcId OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE(0..100))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The evc name string."
+		::= { elmiEvcEntry 2 }
+
+	elmiEvcType OBJECT-TYPE
+		SYNTAX  INTEGER {
+				pointToPoint(1),
+				multiToMulti(2)
+								}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiEvcEntry 3 }
+
+	elmiEvcState OBJECT-TYPE
+		SYNTAX  INTEGER { 
+				unknown(1),
+				active(2), 
+				partlyActive(3),				 
+				notactive(4)
+				}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Evc operation status."		
+		::= { elmiEvcEntry 4 }
+
+	elmiEvcUniNum OBJECT-TYPE
+		SYNTAX  INTEGER (2..1024)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The number of uni which bind to evc."
+		::= { elmiEvcEntry 5 }
+		
+	elmiEvcProtocolType OBJECT-TYPE
+		SYNTAX  INTEGER { 
+				none(0),
+				dot1ag(1), 
+				y1731(2),				 
+				ldp(3)
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The protocol type bind to evc."
+		::= { elmiEvcEntry 6 }
+	
+	elmiEvcProtocolVid OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"vlan id"
+		::= { elmiEvcEntry 7 }
+		
+	elmiEvcProtocolLevel OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiEvcEntry 8 }
+
+	elmiEvcCir OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Cir bind to evc in unit 64kbps."		
+		::= { elmiEvcEntry 9 }
+		
+	elmiEvcCbs OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Cbs bind to evc in unit kbytes."		
+		::= { elmiEvcEntry 10 }
+		
+	elmiEvcEir OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Eir bind to evc in unit 64kbps."		
+		::= { elmiEvcEntry 11 }
+		
+	elmiEvcEbs OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Ebs bind to evc in unit kbytes."		
+		::= { elmiEvcEntry 12 }		
+
+	elmiEvcCM OBJECT-TYPE
+		SYNTAX  INTEGER{
+				aware(1),
+				blind(2)
+				}
+
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Evc color mode."	
+		::= { elmiEvcEntry 13 }
+
+	elmiEvcCF OBJECT-TYPE
+		SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Whether or not enable color algorithm."		
+		::= { elmiEvcEntry 14 }
+
+	elmiEvcBWPState OBJECT-TYPE
+		SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Whether or not enable bandwidth templet."		
+		::= { elmiEvcEntry 15 }
+	
+	elmiEvcServiceCnt OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Evc service count."
+		::= { elmiEvcEntry 16 }
+	
+	elmiEvcLocalUniCnt OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Evc local uni count."
+		::= { elmiEvcEntry 17 }
+	
+	elmiEvcActiveUniCnt OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Evc active uni count."
+		::= { elmiEvcEntry 18 }
+	
+	elmiEvcRowStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiEvcEntry 19 }
+		
+	
+	-- The Elmi EVC cos Table
+
+	elmiEvcCosTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ElmiEvcCosEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmi 3 }
+
+	elmiEvcCosEntry OBJECT-TYPE
+		SYNTAX  ElmiEvcCosEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { elmiEvcCosEvcIndex,elmiEvcCosIndex}
+		::= { elmiEvcCosTable 1 }
+
+	ElmiEvcCosEntry ::=
+		SEQUENCE {
+				elmiEvcCosEvcIndex		INTEGER,
+				elmiEvcCosIndex			INTEGER,
+				elmiEvcCosCir			Unsigned32,
+				elmiEvcCosCbs			Unsigned32,
+				elmiEvcCosEir			Unsigned32,
+				elmiEvcCosEbs 			Unsigned32,
+     			elmiEvcCosCM 			INTEGER,
+     			elmiEvcCosCF 			INTEGER,
+     			elmiEvcCosBWPState	INTEGER
+		}
+
+
+	elmiEvcCosEvcIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiEvcCosEntry 1 }
+		
+	elmiEvcCosIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiEvcCosEntry 2 }
+
+	elmiEvcCosCir OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiEvcCosEntry 3 }
+		
+	elmiEvcCosCbs OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiEvcCosEntry 4 }
+		
+	elmiEvcCosEir OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiEvcCosEntry 5 }
+		
+	elmiEvcCosEbs OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiEvcCosEntry 6 }		
+
+	elmiEvcCosCM OBJECT-TYPE
+		SYNTAX  INTEGER{
+				aware(1),
+				blind(2)
+				}
+
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""	
+		::= { elmiEvcCosEntry 7 }
+
+	elmiEvcCosCF OBJECT-TYPE
+		SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiEvcCosEntry 8 }
+	
+	elmiEvcCosBWPState OBJECT-TYPE
+		SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+				}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiEvcCosEntry 9 }
+	
+		
+	-- The Elmi Uni Table
+
+	elmiUniTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ElmiUniEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmi 4 }
+
+	elmiUniEntry OBJECT-TYPE
+		SYNTAX  ElmiUniEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { elmiUniIndex }
+		::= { elmiUniTable 1 }
+
+	ElmiUniEntry ::=
+			SEQUENCE {
+				elmiUniIndex				Unsigned32,
+				elmiUniId				OCTET STRING,
+				elmiUniType				INTEGER,
+				elmiUniCir				Unsigned32,
+				elmiUniCbs				Unsigned32,
+				elmiUniEir				Unsigned32,
+				elmiUniEbs 				Unsigned32,
+     			elmiUniCM 				INTEGER,
+     			elmiUniCF 				INTEGER,
+     			elmiUniN391				INTEGER,
+     			elmiUniN393				INTEGER,
+          elmiUniTimerType				INTEGER,
+          elmiUniTimerVal				INTEGER,
+          elmiUniState				  INTEGER,
+          elmiUniBWPState				  INTEGER,
+          elmiUniVlanList				OCTET STRING,
+     			elmiUniAdminStatus		INTEGER
+		}
+
+
+	elmiUniIndex OBJECT-TYPE
+		SYNTAX  Unsigned32 
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniEntry 1 }
+
+	elmiUniId OBJECT-TYPE
+		SYNTAX  OCTET STRING(SIZE(0..64))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  
+				"Interface name string."
+		::= { elmiUniEntry 2 }
+
+	elmiUniType OBJECT-TYPE
+		SYNTAX  INTEGER{
+						allToOne(1),
+						multiplexing(2),
+						bundling(3)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The interface type bitmap."
+		::= { elmiUniEntry 3 }
+
+	elmiUniCir OBJECT-TYPE
+		SYNTAX  Unsigned32 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Interface cir in unit 64kbps."
+		::= { elmiUniEntry 4 }
+
+	elmiUniCbs OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Interface cbs in unit kbytes."
+		::= { elmiUniEntry 5 }
+
+	elmiUniEir OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Interface eir in unit 64kbps."		
+		::= { elmiUniEntry 6 }    
+		
+	elmiUniEbs OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Interface ebs in unit kbytes."		
+		::= { elmiUniEntry 7 }
+		
+	elmiUniCM OBJECT-TYPE
+		SYNTAX  INTEGER{
+						aware(1),
+						blind(2)
+						}	
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Interface color mode."		
+		::= { elmiUniEntry 8 }
+		
+	elmiUniCF OBJECT-TYPE
+		SYNTAX  INTEGER{
+						enable(1),
+						disable(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiUniEntry 9 }		
+
+
+	elmiUniN391 OBJECT-TYPE
+		SYNTAX  INTEGER (1..65000)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The N391 counter value."		
+		::= { elmiUniEntry 10 }
+
+	elmiUniN393 OBJECT-TYPE
+		SYNTAX  INTEGER (2..10)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The N393 counter value."
+		::= { elmiUniEntry 11 }
+
+	elmiUniTimerType OBJECT-TYPE
+		SYNTAX  INTEGER {
+						t391(1),
+						t392(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The timer type."
+		::= { elmiUniEntry 12 }
+		
+	elmiUniTimerVal OBJECT-TYPE
+		SYNTAX  INTEGER (5..30)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"The timer value."
+		::= { elmiUniEntry 13 }
+		
+	elmiUniState OBJECT-TYPE
+		SYNTAX  INTEGER  {
+                        unknown(1),
+                        notReachable(2),
+                        up(3),
+                        down(4),
+                        adminDown(5),
+                        localExcessiveError(6),
+                        remoteExcessiveError(7),
+                        localInLoopback(8),
+                        remoteInLoopback(9),
+                        localOutLoopback(10),
+                        remoteOutLoopback(11)
+                    }
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"The operation status."
+		::= { elmiUniEntry 14 } 
+	
+	elmiUniBWPState OBJECT-TYPE
+		SYNTAX  INTEGER {
+						enable(1),
+						disable(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"BW templet state."
+		::= { elmiUniEntry 15 }
+	
+	elmiUniVlanList OBJECT-TYPE
+		SYNTAX  OCTET STRING(SIZE(0..512))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  
+				"Interface vlan bitmap."
+		::= { elmiUniEntry 16 }
+	
+	elmiUniAdminStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+						enable(1),
+						disable(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniEntry 17 }
+		
+		
+	-- The Elmi Uni stats Table
+
+	elmiUniStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ElmiUniStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmi 5 }
+
+	elmiUniStatsEntry OBJECT-TYPE
+		SYNTAX  ElmiUniStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { elmiUniStatsIndex }
+		::= { elmiUniStatsTable 1 }
+
+	ElmiUniStatsEntry ::=
+			SEQUENCE {
+				elmiUniStatsIndex				Unsigned32,
+     			elmiUniStatsCheckQuery	Counter32,  
+     			elmiUniStatsFsQuery	Counter32,      			 
+     			elmiUniStatsFscQuery	Counter32,  
+     			elmiUniStatsCheck			Counter32,
+     			elmiUniStatsFs			Counter32,
+     			elmiUniStatsFsc		Counter32,
+     			elmiUniStatsAsyn		Counter32,
+     			elmiUniStatsEvc			Counter32,
+     			elmiUniStatsService			Counter32,
+     			elmiUniStatsCheckErr			Counter32,
+     			elmiUniStatsFsErr			Counter32,
+     			elmiUniStatsFscErr		Counter32,
+     			elmiUniStatsAsynErr		Counter32,
+     			elmiUniStatsCheckQueryErr	Counter32,  
+     			elmiUniStatsFsQueryErr	Counter32,      			 
+     			elmiUniStatsFscQueryErr	Counter32,
+     			elmiUniStatsTxClear		INTEGER,
+     			elmiUniStatsRxClear			INTEGER
+		}
+
+
+	elmiUniStatsIndex OBJECT-TYPE
+		SYNTAX  Unsigned32 
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 1 }
+
+	elmiUniStatsCheckQuery OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 2 }
+		
+	elmiUniStatsFsQuery OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 3 }
+		
+	elmiUniStatsFscQuery OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 4 }
+		
+	elmiUniStatsCheck OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 5 }
+		
+	elmiUniStatsFs OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 6 }
+		
+	elmiUniStatsFsc OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 7 }
+		
+	elmiUniStatsAsyn OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 8 }
+	
+	elmiUniStatsEvc OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 9 }
+		
+	elmiUniStatsService OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 10 }
+	
+	elmiUniStatsCheckErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 11 }
+		
+	elmiUniStatsFsErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 12 }
+		
+	elmiUniStatsFscErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 13 }
+		
+	elmiUniStatsAsynErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 14 }
+	
+	elmiUniStatsCheckQueryErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 15 }
+		
+	elmiUniStatsFsQueryErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 16 }
+		
+	elmiUniStatsFscQueryErr OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 17 }
+	
+	elmiUniStatsTxClear OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 18 }
+	
+	elmiUniStatsRxClear OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniStatsEntry 19 }
+		
+	
+	-- The Elmi Uni Service Table
+
+	elmiUniServiceTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ElmiUniServiceEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmi 6 }
+
+	elmiUniServiceEntry OBJECT-TYPE
+		SYNTAX  ElmiUniServiceEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { elmiUniServiceIfIndex,elmiUniServiceIndex }
+		::= { elmiUniServiceTable 1 }
+
+	ElmiUniServiceEntry ::=
+			SEQUENCE {
+				elmiUniServiceIfIndex	    Unsigned32,
+				elmiUniServiceIndex		    INTEGER,
+				elmiUniServiceEvc  		    Integer32,
+        elmiUniServiceAddVlan		  OCTET STRING,
+        elmiUniServiceDelVlan		  OCTET STRING,
+        elmiUniServiceCeVlanCnt		Unsigned32,
+				elmiUniServiceState		    INTEGER,
+				elmiUniServiceCeVlanType  INTEGER,
+				elmiUniServiceRowStatus	  RowStatus
+		}
+
+	elmiUniServiceIfIndex OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiUniServiceEntry 1 }
+
+    elmiUniServiceIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiUniServiceEntry 2 }
+
+
+	elmiUniServiceEvc OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmiUniServiceEntry 3 }
+
+	elmiUniServiceAddVlan OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (0..512))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  
+				""
+		::= { elmiUniServiceEntry 4 }
+	
+	elmiUniServiceDelVlan OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (0..512))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  
+				""
+		::= { elmiUniServiceEntry 5 }
+	
+	elmiUniServiceCeVlanCnt OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  
+				""
+		::= { elmiUniServiceEntry 6 }
+		
+	elmiUniServiceState OBJECT-TYPE
+		SYNTAX  INTEGER
+		{
+		    up(1),
+		    down(2),
+		    adminDown(3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  
+				""
+		::= { elmiUniServiceEntry 7 }
+	
+	elmiUniServiceCeVlanType OBJECT-TYPE
+		SYNTAX  INTEGER
+		{
+		    unknown(1),
+		    dot1q(2),
+		    dot1ad(3),
+		    untagged(4),
+		    untaggeddot1q(5),
+		    untaggeddot1ad(6),
+		    priority-tagged(7),
+		    default-tagged(8)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  
+				""
+		::= { elmiUniServiceEntry 8 }
+	
+	elmiUniServiceRowStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  
+				""
+		::= { elmiUniServiceEntry 9 }
+		
+		
+	-- The Elmi ceVlan Table
+
+	elmiCeVlanTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ElmiCeVlanEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { elmi 7 }
+
+	elmiCeVlanEntry OBJECT-TYPE
+		SYNTAX  ElmiCeVlanEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { elmiCeVlanIfIndex,elmiCeVlanServiceIndex,elmiCeVlanBeginVlan}
+		::= { elmiCeVlanTable 1 }
+
+	ElmiCeVlanEntry ::=
+			SEQUENCE {
+				elmiCeVlanIfIndex			Unsigned32,
+				elmiCeVlanServiceIndex			Unsigned32,
+				elmiCeVlanBeginVlan			Unsigned32,
+				elmiCeVlanEndVlan			Unsigned32
+		}
+
+	elmiCeVlanIfIndex OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiCeVlanEntry 1 }
+	
+	elmiCeVlanServiceIndex OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiCeVlanEntry 2 }
+	
+	elmiCeVlanBeginVlan OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiCeVlanEntry 3 }
+	
+	elmiCeVlanEndVlan OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				""		
+		::= { elmiCeVlanEntry 4 }
+		
+	elmiTrap			OBJECT IDENTIFIER ::=   {elmi 8}
+	
+	elmiEvcStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS {elmiEvcIndex,elmiEvcState,elmiEvcLocalUniCnt,elmiEvcActiveUniCnt}
+    STATUS  current
+    DESCRIPTION
+        "elmi operation status change trap."
+		::= { elmiTrap 1}
+			
+  elmiEvcCreationTrap NOTIFICATION-TYPE
+    OBJECTS {elmiEvcIndex,elmiEvcState}
+    STATUS  current
+    DESCRIPTION
+        "elmi evc creation trap."
+		::= { elmiTrap 2}
+	
+	elmiEvcDeletionTrap NOTIFICATION-TYPE
+    OBJECTS {elmiEvcIndex,elmiEvcState}
+    STATUS  current
+    DESCRIPTION
+        "elmi evc deletion trap."
+		::= { elmiTrap 3}
+END

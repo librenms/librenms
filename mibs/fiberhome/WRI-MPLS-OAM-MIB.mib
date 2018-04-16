@@ -1,0 +1,748 @@
+WRI-MPLS-OAM-MIB DEFINITIONS ::= BEGIN
+     
+   IMPORTS
+      TimeTicks, Unsigned32, OBJECT-TYPE,MODULE-IDENTITY    FROM SNMPv2-SMI            
+      MacAddress, RowStatus,TEXTUAL-CONVENTION            FROM SNMPv2-TC
+      enterprises	               FROM RFC1155-SMI
+      InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+      wri,wriProtocol,wriProducts				FROM WRI-SMI;
+     
+   	-- 1.3.6.1.4.1.3807.2.1312
+		wriMplsoam OBJECT IDENTIFIER ::= { wriProtocol 1312 }
+		
+		EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+		-- 1.3.6.1.4.1.3807.2.1312.1
+		mplsoamCommon OBJECT IDENTIFIER ::= { wriMplsoam 1 }
+		
+		
+		-- 1.3.6.1.4.1.3807.2.1312.1.1
+		mplsoamStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(1),
+				stop(2)	
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the mplsoam protocol"
+			::= { mplsoamCommon 1 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1312.1.2
+		mplsoamIngressAllEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the ingress mplsoam"
+			::= { mplsoamCommon 2 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1312.1.3
+		mplsoamEgressAllEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the egress mplsoam"
+			::= { mplsoamCommon 3 } 
+					
+			
+	 -- 1.3.6.1.4.1.3807.2.1213.2                      
+     mplsoamIngressTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MplsoamIngressEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Mplsoam ingress table"
+        ::= { wriMplsoam 2 }
+                                       
+                                                   
+     -- 1.3.6.1.4.1.3807.2.1213.2.1                                                   
+     mplsoamIngressEntry OBJECT-TYPE
+         SYNTAX MplsoamIngressEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+            "Mplsoam ingress table"
+         INDEX { mplsoamIngressTunnelUnit }
+         ::= { mplsoamIngressTable 1 }
+
+        
+     MplsoamIngressEntry ::=
+         SEQUENCE { 
+				mplsoamIngressTunnelUnit		Unsigned32,
+				mplsoamIngressDetType				INTEGER,
+				mplsoamIngressFfdFreq				INTEGER,
+				mplsoamIngressLspName 			OCTET STRING,
+				mplsoamIngressLsrIdType			InetAddressType,
+				mplsoamIngressLsrId 				InetAddress,
+				mplsoamIngressRecvType      INTEGER ,
+				mplsoamIngressTunnelId			Unsigned32,
+				mplsoamIngressDetPriority		Unsigned32,
+				mplsoamIngressEnable				INTEGER ,
+				mplsoamIngressDefectType    INTEGER ,
+				mplsoamIngressTtsiLsrType   InetAddressType,
+				mplsoamIngressTtsiLsrId		  InetAddress,
+				mplsoamIngressTtsiTunnelId  Unsigned32,
+				mplsoamIngressEntryStatus		EntryStatus,
+				mplsoamIngressLspAvailable  INTEGER,
+				mplsoamIngressCfgMethod		INTEGER
+             }
+                                                                                              
+        -- 1.3.6.1.4.1.3807.2.1213.2.1.1
+		    mplsoamIngressTunnelUnit OBJECT-TYPE
+		        SYNTAX  Unsigned32 
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Tunnel unit of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 1 }     
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.2.1.2
+		    mplsoamIngressDetType OBJECT-TYPE
+		        SYNTAX  INTEGER
+		          {
+					cv(1),
+					ffd(2)
+				  }      
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Detect type of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 2 }
+		      
+		    -- 1.3.6.1.4.1.3807.2.1213.2.1.3
+		    mplsoamIngressFfdFreq OBJECT-TYPE
+		        SYNTAX  INTEGER    
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Ffd freq of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 3 }  
+		          
+		    -- 1.3.6.1.4.1.3807.2.1213.2.1.4
+		    mplsoamIngressLspName OBJECT-TYPE
+		        SYNTAX  OCTET STRING  
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Lsp name of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 4 }
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.2.1.5
+		    mplsoamIngressLsrIdType OBJECT-TYPE
+		        SYNTAX  InetAddressType	           
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Lsr id type of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 5 } 
+		        
+		      -- 1.3.6.1.4.1.3807.2.1213.2.1.6
+		    mplsoamIngressLsrId OBJECT-TYPE
+		        SYNTAX  InetAddress	           
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Lsr id of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 6 }
+		        
+		     -- 1.3.6.1.4.1.3807.2.1213.2.1.7
+		    mplsoamIngressRecvType OBJECT-TYPE
+		        SYNTAX  INTEGER	 
+					{
+						private(1),
+						share(2)
+					}
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Reverse type of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 7 }
+		       
+		     -- 1.3.6.1.4.1.3807.2.1213.2.1.8
+		    mplsoamIngressTunnelId OBJECT-TYPE
+		        SYNTAX  Unsigned32	           
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Tunnel id of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 8 }   
+				
+			-- 1.3.6.1.4.1.3807.2.1213.2.1.9
+		    mplsoamIngressDetPriority OBJECT-TYPE
+		        SYNTAX  Unsigned32	           
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Detect priority of ingress mplsoam."
+		        ::= { mplsoamIngressEntry 9 } 
+
+			-- 1.3.6.1.4.1.3807.2.1213.2.1.10
+		    mplsoamIngressEnable OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					enable(1),
+					disable(2)
+				}				
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Enable or disable the ingress mplsoam."
+		        ::= { mplsoamIngressEntry 10 }
+		    
+			-- 1.3.6.1.4.1.3807.2.1213.2.1.11
+		    mplsoamIngressDefectType OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					nodefect(0),
+					server(1),
+					peerme(2),
+					locv(3),
+					ttsi-mismatch(4),
+					ttsi-mismerge(5),
+					excess(6),
+					unknown(7),
+					disable(8)
+				}				
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Defect type of the ingress mplsoam."
+		        ::= { mplsoamIngressEntry 11 }
+		        
+		  -- 1.3.6.1.4.1.3807.2.1213.2.1.12
+		  mplsoamIngressTtsiLsrType OBJECT-TYPE
+		        SYNTAX  InetAddressType
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Ttsi lsrid of the ingress mplsoam."
+		        ::= { mplsoamIngressEntry 12 }
+				
+			-- 1.3.6.1.4.1.3807.2.1213.2.1.13
+			mplsoamIngressTtsiLsrId OBJECT-TYPE
+		        SYNTAX  InetAddress
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Ttsi lsrid of the ingress mplsoam."
+		        ::= { mplsoamIngressEntry 13 }
+				
+			-- 1.3.6.1.4.1.3807.2.1213.2.1.14
+			mplsoamIngressTtsiTunnelId OBJECT-TYPE
+		        SYNTAX  Unsigned32
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Ttsi tunnel id of the ingress mplsoam."
+		        ::= { mplsoamIngressEntry 14 }
+				
+			-- 1.3.6.1.4.1.3807.2.1213.2.1.15
+		    mplsoamIngressEntryStatus OBJECT-TYPE
+		        SYNTAX  EntryStatus
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Entry status of the ingress mplsoam."
+		        ::= { mplsoamIngressEntry 15 }
+		        
+		  -- 1.3.6.1.4.1.3807.2.1213.2.1.16
+		    mplsoamIngressLspAvailable OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        {
+		        	unavailable(0),
+		        	available(1)
+		        }
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Lsp available status."
+		        ::= { mplsoamIngressEntry 16 }
+				
+		  -- 1.3.6.1.4.1.3807.2.1213.2.1.17
+		    mplsoamIngressCfgMethod OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        {
+		        	tunnel(1),
+		        	name(2)
+		        }
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Backlsp type config method."
+		        ::= { mplsoamIngressEntry 17 }
+		    
+        
+      -- 1.3.6.1.4.1.3807.2.1213.3                      
+     mplsoamEgressTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MplsoamEgressEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Mplsoam egress table"
+        ::= { wriMplsoam 3 }
+                                       
+                                                   
+     -- 1.3.6.1.4.1.3807.2.1213.3.1                                                   
+     mplsoamEgressEntry OBJECT-TYPE
+         SYNTAX MplsoamEgressEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+            "Mplsoam egress table"
+         INDEX { mplsoamEgressLsrIdType,mplsoamEgressLsrId,mplsoamEgressTunnelId,mplsoamEgressLspName}
+         ::= { mplsoamEgressTable 1 }
+
+        
+     MplsoamEgressEntry ::=
+         SEQUENCE { 
+         			mplsoamEgressLsrIdType          InetAddressType,
+					mplsoamEgressLsrId            	InetAddress,
+					mplsoamEgressTunnelId           Unsigned32,
+					mplsoamEgressLspName			OCTET STRING,
+					mplsoamEgressAutoProtocol       INTEGER,
+					mplsoamEgressAutoOvertime       Unsigned32 ,
+					mplsoamEgressDetType          	INTEGER,
+					mplsoamEgressFfdFreq       		INTEGER ,
+					mplsoamEgressTunnelUnit       	Unsigned32,
+					mplsoamEgressRecvType           INTEGER,
+					mplsoamEgressBdiFreqType        INTEGER,
+					mplsoamEgressEnable				INTEGER,
+					mplsoamEgressIsStart			INTEGER,
+					mplsoamEgressDefectType			INTEGER,
+					mplsoamEgressEntryStatus        EntryStatus,
+					mplsoamEgressLspAvailable		INTEGER,
+					mplsoamEgressShowLsrIdType      InetAddressType,
+					mplsoamEgressShowLsrId          InetAddress,
+					mplsoamEgressShowTunnelId       Unsigned32,
+					mplsoamEgressShowLspName		OCTET STRING
+                  }
+    
+        -- 1.3.6.1.4.1.3807.2.1213.3.1.1
+		    mplsoamEgressLsrIdType OBJECT-TYPE
+		        SYNTAX  InetAddressType 
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Lsr id type of egress mplsoam"
+		        ::= { mplsoamEgressEntry 1 }  
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.2
+		    mplsoamEgressLsrId OBJECT-TYPE
+		        SYNTAX  InetAddress 
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Lsr id of egress mplsoam"
+		        ::= { mplsoamEgressEntry 2 }  
+		        
+		     -- 1.3.6.1.4.1.3807.2.1213.3.1.3
+		    mplsoamEgressTunnelId OBJECT-TYPE
+		        SYNTAX  Unsigned32 
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Tunnel id of egress mplsoam"
+		        ::= { mplsoamEgressEntry 3 }  
+				
+			-- 1.3.6.1.4.1.3807.2.1213.3.1.4
+			mplsoamEgressLspName OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Lsp name of egress mplsoam"
+				::= { mplsoamEgressEntry 4}
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.5
+		    mplsoamEgressAutoProtocol OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					enable(1),
+					disable(2)
+				}
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Auto protocol of egress mplsoam"
+		        ::= { mplsoamEgressEntry 5 } 
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.6
+		    mplsoamEgressAutoOvertime OBJECT-TYPE
+		        SYNTAX  Unsigned32 (0..6000)
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Auto over time of egress mplsoam"
+		        ::= { mplsoamEgressEntry 6 }   
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.7
+		    mplsoamEgressDetType OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					cv(1),
+					ffd(2)
+				}
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Detect type of egress mplsoam"
+		        ::= { mplsoamEgressEntry 7 }   
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.8
+		    mplsoamEgressFfdFreq OBJECT-TYPE
+		        SYNTAX  INTEGER 	
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Ffd freq of egress mplsoam"
+		        ::= { mplsoamEgressEntry 8 }   
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.9
+		    mplsoamEgressTunnelUnit OBJECT-TYPE
+		        SYNTAX  Unsigned32  
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Tunnel unit of egress mplsoam"
+		        ::= { mplsoamEgressEntry 9 } 
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.10
+		    mplsoamEgressRecvType OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					private(1),
+					share(2)
+				}
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Reverse type of egress mplsoam"
+		        ::= { mplsoamEgressEntry 10 } 
+		        
+		      -- 1.3.6.1.4.1.3807.2.1213.3.1.11
+		    mplsoamEgressBdiFreqType OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					per-second(1),
+					detect-freq(2)
+				}
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Bdi freq type of egress mplsoam"
+		        ::= { mplsoamEgressEntry 11 } 
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.12
+		    mplsoamEgressEnable OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					enable(1),
+					disable(2)
+				}
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Enable or disable of egress mplsoam"
+		        ::= { mplsoamEgressEntry 12 } 
+				
+			-- 1.3.6.1.4.1.3807.2.1213.3.1.13
+		    mplsoamEgressIsStart OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					stop(0),
+					start(1)
+				}
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Enable or disable of egress mplsoam"
+		        ::= { mplsoamEgressEntry 13 } 
+				
+			-- 1.3.6.1.4.1.3807.2.1213.3.1.14
+		    mplsoamEgressDefectType OBJECT-TYPE
+		        SYNTAX  INTEGER 
+				{
+					nodefect(0),
+					server(1),
+					peerme(2),
+					locv(3),
+					ttsi-mismatch(4),
+					ttsi-mismerge(5),
+					excess(6),
+					unknown(7),
+					disable(8)
+				}
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Enable or disable of egress mplsoam"
+		        ::= { mplsoamEgressEntry 14 } 
+				
+			-- 1.3.6.1.4.1.3807.2.1213.3.1.15
+		    mplsoamEgressEntryStatus OBJECT-TYPE
+		        SYNTAX  EntryStatus
+		        MAX-ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		            "Entry status of egress mplsoam"
+		        ::= { mplsoamEgressEntry 15 }
+		        
+		   -- 1.3.6.1.4.1.3807.2.1213.3.1.16
+		    mplsoamEgressLspAvailable OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        {
+		        	unavailable(0),
+		        	available(1)
+		        }
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Lsp available status"
+		        ::= { mplsoamEgressEntry 16 }
+				
+			-- 1.3.6.1.4.1.3807.2.1213.3.1.17
+		    mplsoamEgressShowLsrIdType OBJECT-TYPE
+		        SYNTAX  InetAddressType 
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Lsr id type of egress mplsoam"
+		        ::= { mplsoamEgressEntry 17 }  
+		        
+		    -- 1.3.6.1.4.1.3807.2.1213.3.1.18
+		    mplsoamEgressShowLsrId OBJECT-TYPE
+		        SYNTAX  InetAddress 
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Lsr id of egress mplsoam"
+		        ::= { mplsoamEgressEntry 18 }  
+		        
+		     -- 1.3.6.1.4.1.3807.2.1213.6.1.19
+		    mplsoamEgressShowTunnelId OBJECT-TYPE
+		        SYNTAX  Unsigned32 
+		        MAX-ACCESS read-only
+		        STATUS current
+		        DESCRIPTION
+		            "Tunnel id of egress mplsoam"
+		        ::= { mplsoamEgressEntry 19 }  
+				
+			-- 1.3.6.1.4.1.3807.2.1213.3.1.20
+			mplsoamEgressShowLspName OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Lsp name of egress mplsoam"
+				::= { mplsoamEgressEntry 20}
+		        
+	 -- 1.3.6.1.4.1.3807.2.1213.4                      
+     mplsoamProtectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MplsoamProtectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Mplsoam protect table "
+        ::= { wriMplsoam 4 }
+                                       
+                                                   
+     -- 1.3.6.1.4.1.3807.2.1213.4.1                                                   
+     mplsoamProtectEntry OBJECT-TYPE
+         SYNTAX MplsoamProtectEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+            "Mplsoam protect table "
+         INDEX { mplsoamProtectTunnelIndex}
+         ::= { mplsoamProtectTable 1 }
+
+        
+     MplsoamProtectEntry ::=
+         SEQUENCE { 
+         			mplsoamProtectTunnelIndex 		   Unsigned32,   
+					mplsoamProtectTunnelID             Unsigned32,
+					mplsoamProtectHoldOffTime          Unsigned32,
+					mplsoamProtectReverTiveMode        INTEGER,
+					mplsoamProtectReverTime			   Unsigned32 ,
+					mplsoamProtectSwitch			   INTEGER,  
+					mplsoamProtectTunnelUnit		   Unsigned32,
+					mplsoamProtectCurSwitch			   INTEGER,
+					mplsoamProtectSwResult			   INTEGER,
+					mplsoamProtectWTunnelState 		   INTEGER,
+					mplsoamProtectPTunnelState         INTEGER,
+					mplsoamProtectEntryStatus          EntryStatus,
+					mplsoamProtectWorkTunnelID         Unsigned32
+                  }
+                                                                                    
+        -- 1.3.6.1.4.1.3807.2.1213.4.1.1
+        mplsoamProtectTunnelIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Tunnel index of protect mplsoam"
+            ::= { mplsoamProtectEntry 1 }  
+            
+        -- 1.3.6.1.4.1.3807.2.1213.4.1.2
+        mplsoamProtectTunnelID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Tunnel id of protect mplsoam"
+            ::= { mplsoamProtectEntry 2 } 
+            
+        -- 1.3.6.1.4.1.3807.2.1213.4.1.3
+        mplsoamProtectHoldOffTime OBJECT-TYPE
+            SYNTAX Unsigned32(0..10000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "HoldOff time of protect mplsoam"
+            ::= { mplsoamProtectEntry 3 } 
+            
+        -- 1.3.6.1.4.1.3807.2.1213.4.1.4
+        mplsoamProtectReverTiveMode OBJECT-TYPE
+            SYNTAX INTEGER
+			{
+				revertive(1),
+				non-revertive(2)				
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Rever tive mode of protect mplsoam"
+            ::= { mplsoamProtectEntry 4 }  
+            
+         -- 1.3.6.1.4.1.3807.2.1213.4.1.5
+        mplsoamProtectReverTime OBJECT-TYPE
+            SYNTAX Unsigned32(0..1800)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Rever time of protect mplsoam"
+            ::= { mplsoamProtectEntry 5 }    
+            
+         -- 1.3.6.1.4.1.3807.2.1213.4.1.6
+        mplsoamProtectSwitch OBJECT-TYPE
+            SYNTAX INTEGER
+			{
+				clear(0),				
+				lock(1),
+				force(2),
+				work-lsp(3),
+				protect-lsp(4)
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Switch state of protect mplsoam"
+            ::= { mplsoamProtectEntry 6 }    
+            
+         -- 1.3.6.1.4.1.3807.2.1213.4.1.7
+        mplsoamProtectTunnelUnit OBJECT-TYPE
+            SYNTAX Unsigned32 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Tunnel unit of protect mplsoam"
+            ::= { mplsoamProtectEntry 7 }  
+            
+        -- 1.3.6.1.4.1.3807.2.1213.4.1.8
+        mplsoamProtectCurSwitch OBJECT-TYPE
+            SYNTAX INTEGER 
+			{
+				clear(1),
+				lockout(2),
+				force(3),
+				sf(4),
+				manual(5),
+				wtrtimer(6),
+				norequest(7)
+			}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current switch state of protect mplsoam"
+            ::= { mplsoamProtectEntry 8 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1213.4.1.9
+        mplsoamProtectSwResult OBJECT-TYPE
+            SYNTAX INTEGER  
+			{
+				working(1),
+				protect(2)
+			}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Swresult of protect mplsoam"
+            ::= { mplsoamProtectEntry 9 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1213.4.1.10
+        mplsoamProtectWTunnelState OBJECT-TYPE
+            SYNTAX INTEGER  
+			{
+				nodefect(0),
+				indefect(1)
+			}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Main tunnel state of protect mplsoam"
+            ::= { mplsoamProtectEntry 10 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1213.4.1.11
+        mplsoamProtectPTunnelState OBJECT-TYPE
+            SYNTAX INTEGER  
+			{
+				nodefect(0),
+				indefect(1)
+			}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protect tunnel state of protect mplsoam"
+            ::= { mplsoamProtectEntry 11 } 
+			
+		-- 1.3.6.1.4.1.3807.2.1213.4.1.12
+        mplsoamProtectEntryStatus OBJECT-TYPE
+            SYNTAX EntryStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Entry Status of protect mplsoam"
+            ::= { mplsoamProtectEntry 12} 
+            
+    -- 1.3.6.1.4.1.3807.2.1213.4.1.13
+        mplsoamProtectWorkTunnelID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Work tunnel ID"
+            ::= { mplsoamProtectEntry 13} 
+            
+            
+ END       

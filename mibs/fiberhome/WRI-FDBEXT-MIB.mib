@@ -1,0 +1,67 @@
+WRI-FDBEXT-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,Unsigned32,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts,wriProtocol			FROM WRI-SMI;
+
+	wriFdbExt MODULE-IDENTITY 
+			LAST-UPDATED "201101041500Z"		-- January 4, 2011 at 15:00 GMT
+			ORGANIZATION 
+				"FiberHome Networks Systems, Inc."
+			CONTACT-INFO 
+				"http://www.fhn.com.cn"
+			DESCRIPTION 
+				" The extend table of fdb table ."
+	 ::= { wriProtocol 610 }
+
+	
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+			
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING                                                 
+			
+		extFdbGeneral	 	OBJECT IDENTIFIER ::= { wriFdbExt 1 }
+		
+		extFdbMacLearnPriority  OBJECT-TYPE
+			SYNTAX     OCTET STRING (SIZE(0..1024))
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"the priority of mac learning."
+			::= { extFdbGeneral 1 }
+			
+		extFdbMacLearnMode  OBJECT-TYPE
+			SYNTAX     INTEGER
+			{
+				independence(2),
+				share(1)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"the mode of mac learning."
+			::= { extFdbGeneral 2 }
+			
+			
+END

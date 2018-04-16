@@ -1,0 +1,1942 @@
+WRI-DHCP6-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,Counter32,NOTIFICATION-TYPE
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.405
+		wriDhcp6 OBJECT IDENTIFIER ::= { wriProtocol 405 }
+     
+    -- 1.3.6.1.4.1.3807.2.405.1
+		dhcp6Common OBJECT IDENTIFIER ::= { wriDhcp6 1 }
+		
+		-- 1.3.6.1.4.1.3807.2.405.1.1
+		dhcp6Enable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				start(1),
+				stop(2)			
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the protocol of ipv6 dhcp."
+			::= { dhcp6Common 1 }
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.2
+		dhcp6Duid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"DUID of ipv6 dhcp."
+			::= { dhcp6Common 2 }
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.3
+		dhcp6RemoteidFormat OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The format of remote id."
+			::= { dhcp6Common 3 }
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.4
+		dhcp6IfMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of interface structure."
+			::= { dhcp6Common 4 } 
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.5
+		dhcp6PoolMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of pool structure."
+			::= { dhcp6Common 5 } 
+			
+	  -- 1.3.6.1.4.1.3807.2.405.1.6
+		dhcp6PrefixPoolMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of prefix pool structure."
+			::= { dhcp6Common 6 } 
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.7
+		dhcp6ClientMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of client structure."
+			::= { dhcp6Common 7 } 
+		
+		-- 1.3.6.1.4.1.3807.2.405.1.8
+		dhcp6BindMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of bind structure."
+			::= { dhcp6Common 8 } 
+		
+		-- 1.3.6.1.4.1.3807.2.405.1.9
+		dhcp6DeclineMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of decline structure."
+			::= { dhcp6Common 9 }
+			
+			
+	  -- 1.3.6.1.4.1.3807.2.405.1.10
+		dhcp6ServerMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of server structure."
+			::= { dhcp6Common 10 }
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.11
+		dhcp6PrefixMaxNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximal number of prefix structure."
+			::= { dhcp6Common 11 }		
+			
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.12
+		dhcp6BindNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of bind entry."
+			::= { dhcp6Common 12 }		
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.13
+		dhcp6PoolFreeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The free index of dhcpv6 pool."
+			::= { dhcp6Common 13 }	
+			
+		-- 1.3.6.1.4.1.3807.2.405.1.14
+		dhcp6PrefixPoolFreeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The free index of dhcpv6 prefix pool."
+			::= { dhcp6Common 14 }			
+					 	
+
+--WRI DHCP6 SERVER INTERFACE Table	
+	  dhcp6ServerIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ServerIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 server interface table."
+			::= { wriDhcp6 2 }
+		
+		dhcp6ServerIfEntry OBJECT-TYPE
+			SYNTAX Dhcp6ServerIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The server dhcp6 interface table."
+			INDEX {dhcp6ServerIfUnit}
+			::= { dhcp6ServerIfTable 1 }
+		
+		Dhcp6ServerIfEntry ::=
+			SEQUENCE { 
+				dhcp6ServerIfUnit					        	Unsigned32,
+				dhcp6ServerIfRowStatus              RowStatus,
+				dhcp6ServerIfPreference					    INTEGER,
+				dhcp6ServerIfAllowHint					    INTEGER,
+			  dhcp6ServerIfRapidCommit					  INTEGER,
+			  dhcp6ServerIfPoolName					      OCTET STRING		  				  
+			 }
+
+		dhcp6ServerIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface vlan unit."
+			::= { dhcp6ServerIfEntry 1 }
+			
+		dhcp6ServerIfRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 interface."
+			::= { dhcp6ServerIfEntry 2 }
+
+			
+		dhcp6ServerIfPreference OBJECT-TYPE
+			SYNTAX		INTEGER			   
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The priorty of server interface."
+			::= { dhcp6ServerIfEntry 3 }	
+			
+		dhcp6ServerIfAllowHint OBJECT-TYPE
+			SYNTAX		INTEGER	
+			   {
+			       enable(1),
+			       disable(2)
+			   }		   
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The allow hint function of server interface."
+			::= { dhcp6ServerIfEntry 4 }
+			
+		dhcp6ServerIfRapidCommit OBJECT-TYPE
+			SYNTAX		INTEGER	
+			   {
+			       enable(1),
+			       disable(2)
+			   }		   
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The rapid commit function of server interface."
+			::= { dhcp6ServerIfEntry 5 }
+			
+		dhcp6ServerIfPoolName OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The pool of server interface binding."
+			::= { dhcp6ServerIfEntry 6 }
+
+	--WRI DHCP6 RELAY INTERFACE Table	
+	  dhcp6RelayIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6RelayIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 Relay interface table."
+			::= { wriDhcp6 3 }
+		
+		dhcp6RelayIfEntry OBJECT-TYPE
+			SYNTAX Dhcp6RelayIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 Relay interface table."
+			INDEX {dhcp6RelayIfUnit}
+			::= { dhcp6RelayIfTable 1 }
+		
+		Dhcp6RelayIfEntry ::=
+			SEQUENCE { 
+				dhcp6RelayIfUnit					        	Unsigned32,
+				dhcp6RelayIfRowStatus              RowStatus,		
+			  dhcp6RelayIfRemoteIdState					INTEGER	  				  
+			 }	
+		
+		dhcp6RelayIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface vlan unit."
+			::= { dhcp6RelayIfEntry 1 }
+			
+		dhcp6RelayIfRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 interface."
+			::= { dhcp6RelayIfEntry 2 }
+
+		dhcp6RelayIfRemoteIdState OBJECT-TYPE
+			SYNTAX		INTEGER	
+			   {
+			       enable(1),
+			       disable(2)
+			   }				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The relay interface remote-id state."
+			::= { dhcp6RelayIfEntry 3 }	
+		
+--WRI DHCP6 CLIENTPDUP INTERFACE Table	
+	  dhcp6ClientPdUpIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ClientPdUpIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ClientPdUp interface table."
+			::= { wriDhcp6 4 }
+		
+		dhcp6ClientPdUpIfEntry OBJECT-TYPE
+			SYNTAX Dhcp6ClientPdUpIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 interface table."
+			INDEX {dhcp6ClientPdUpIfUnit}
+			::= { dhcp6ClientPdUpIfTable 1 }
+		
+		Dhcp6ClientPdUpIfEntry ::=
+			SEQUENCE { 
+				dhcp6ClientPdUpIfUnit					        	Unsigned32,
+				dhcp6ClientPdUpIfRowStatus              RowStatus,
+				dhcp6ClientPdUpIfAllowHint					    INTEGER,
+			  dhcp6ClientPdUpIfRapidCommit					  INTEGER,
+				dhcp6ClientPdUpIfRelease              INTEGER,
+			  dhcp6ClientPdUpIfRenew                INTEGER,	  
+			  dhcp6ClientPdUpIfPrefixName           OCTET STRING,
+			  dhcp6ClientPdUpIfClientState          INTEGER,
+			 	dhcp6ClientPdUpIfCurrServerAddr       InetAddress,
+			 	dhcp6ClientPdUpIfCurrServerDuid       OCTET STRING,
+			 	dhcp6ClientPdUpIfCurrServerPref       INTEGER,
+			 	dhcp6ClientPdUpIfDnsList              OCTET STRING,
+			 	dhcp6ClientPdUpIfDomainList           OCTET STRING,
+			 	dhcp6ClientPdUpIfSntpList             OCTET STRING				  
+			 }
+			 
+		dhcp6ClientPdUpIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface vlan unit."
+			::= { dhcp6ClientPdUpIfEntry 1 }
+			
+		dhcp6ClientPdUpIfRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 interface."
+			::= { dhcp6ClientPdUpIfEntry 2 }
+			
+		dhcp6ClientPdUpIfAllowHint OBJECT-TYPE
+			SYNTAX		INTEGER	
+			   {
+			       enable(1),
+			       disable(2)
+			   }		   
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The allow hint function of server interface."
+			::= { dhcp6ClientPdUpIfEntry 3 }
+			
+		dhcp6ClientPdUpIfRapidCommit OBJECT-TYPE
+			SYNTAX		INTEGER	
+			   {
+			       enable(1),
+			       disable(2)
+			   }		   
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The rapid commit function of server interface."
+			::= { dhcp6ClientPdUpIfEntry 4 }
+			
+		dhcp6ClientPdUpIfRelease OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The clinet up interface release function."
+			::= { dhcp6ClientPdUpIfEntry 5 }
+			
+		dhcp6ClientPdUpIfRenew OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The clinet up interface renew function."
+			::= { dhcp6ClientPdUpIfEntry 6 }
+		
+		dhcp6ClientPdUpIfPrefixName OBJECT-TYPE
+			SYNTAX		OCTET STRING			  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The clinet up interface prefix name."
+			::= { dhcp6ClientPdUpIfEntry 7 }
+		
+		dhcp6ClientPdUpIfClientState OBJECT-TYPE
+			SYNTAX  INTEGER 
+			        {        
+			          init(1),
+			          inforeqinit(2),
+			          confirminit(3),
+			          solicit(4),
+			          inforeq(5),
+			          request(6),
+			          renew(7),
+			          rebind(8),
+			          release(9),
+			          confirm(10),
+			          up(11),
+			          down(12)
+			        }
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The clinet state."
+			::= { dhcp6ClientPdUpIfEntry 8 }
+		
+		dhcp6ClientPdUpIfCurrServerAddr OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current server address."
+			::= { dhcp6ClientPdUpIfEntry 9 }
+			
+		dhcp6ClientPdUpIfCurrServerDuid OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current server address."
+			::= { dhcp6ClientPdUpIfEntry 10 }
+			
+		dhcp6ClientPdUpIfCurrServerPref OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current server preference."
+			::= { dhcp6ClientPdUpIfEntry 11 }
+		
+		dhcp6ClientPdUpIfDnsList OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current dns."
+			::= { dhcp6ClientPdUpIfEntry 12 }
+		
+		dhcp6ClientPdUpIfDomainList OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current domain name."
+			::= { dhcp6ClientPdUpIfEntry 13 }		
+			
+		dhcp6ClientPdUpIfSntpList OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client sntp server."
+			::= { dhcp6ClientPdUpIfEntry 14 }	
+		
+--WRI DHCP6 CLIENTPDDOWN INTERFACE Table	
+	  dhcp6ClientPdDownIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ClientPdDownIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ClientPdDown interface table."
+			::= { wriDhcp6 5 }
+		
+		dhcp6ClientPdDownIfEntry OBJECT-TYPE
+			SYNTAX Dhcp6ClientPdDownIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 ClientPdDown interface table."
+			INDEX {dhcp6ClientPdDownIfUnit}
+			::= { dhcp6ClientPdDownIfTable 1 }
+		
+		Dhcp6ClientPdDownIfEntry ::=
+			SEQUENCE { 
+				dhcp6ClientPdDownIfUnit					        	Unsigned32,
+				dhcp6ClientPdDownIfRowStatus              RowStatus,
+			  dhcp6ClientPdDownIfPrefixName           OCTET STRING,
+				dhcp6ClientPdDownIfAddress              InetAddress,
+				dhcp6ClientPdDownIfPrefixLen            INTEGER
+			 }
+			 
+		dhcp6ClientPdDownIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface vlan unit."
+			::= { dhcp6ClientPdDownIfEntry 1 }
+			
+		dhcp6ClientPdDownIfRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 interface."
+			::= { dhcp6ClientPdDownIfEntry 2 }	
+			
+		dhcp6ClientPdDownIfPrefixName OBJECT-TYPE
+			SYNTAX		OCTET STRING			  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The clinet up interface prefix name."
+			::= { dhcp6ClientPdDownIfEntry 3 }
+			
+		dhcp6ClientPdDownIfAddress OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The clinet down interface prefix address."
+			::= { dhcp6ClientPdDownIfEntry 4 }
+			
+		dhcp6ClientPdDownIfPrefixLen OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The clinet down interface prefix length."
+			::= { dhcp6ClientPdDownIfEntry 5 }	
+			
+		
+--WRI DHCP6 CLIENTSTATELESS INTERFACE Table	
+	  dhcp6ClientStatelessIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ClientStatelessIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ClientStateless interface table."
+			::= { wriDhcp6 6 }
+		
+		dhcp6ClientStatelessIfEntry OBJECT-TYPE
+			SYNTAX Dhcp6ClientStatelessIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 interface table."
+			INDEX {dhcp6ClientStatelessIfUnit}
+			::= { dhcp6ClientStatelessIfTable 1 }
+		
+		Dhcp6ClientStatelessIfEntry ::=
+			SEQUENCE { 
+				dhcp6ClientStatelessIfUnit					        	Unsigned32,
+				dhcp6ClientStatelessIfRowStatus              RowStatus,
+			  dhcp6ClientStatelessIfClientState          INTEGER,
+			 	dhcp6ClientStatelessIfCurrServerAddr       InetAddress,
+			 	dhcp6ClientStatelessIfCurrServerDuid       OCTET STRING,
+			 	dhcp6ClientStatelessIfCurrServerPref       INTEGER,
+			 	dhcp6ClientStatelessIfDnsList              OCTET STRING,
+			 	dhcp6ClientStatelessIfDomainList           OCTET STRING,
+			 	dhcp6ClientStatelessIfInfoRefreshTime       Unsigned32,
+			 	dhcp6ClientStatelessIfSntpList             OCTET STRING   				  
+			 }
+			 
+		dhcp6ClientStatelessIfUnit OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface vlan unit."
+			::= { dhcp6ClientStatelessIfEntry 1 }
+			
+		dhcp6ClientStatelessIfRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 interface."
+			::= { dhcp6ClientStatelessIfEntry 2 }
+		
+		dhcp6ClientStatelessIfClientState OBJECT-TYPE
+			SYNTAX  INTEGER 
+			        {        
+			          init(1),
+			          inforeqinit(2),
+			          confirminit(3),
+			          solicit(4),
+			          inforeq(5),
+			          request(6),
+			          renew(7),
+			          rebind(8),
+			          release(9),
+			          confirm(10),
+			          up(11),
+			          down(12)
+			        }
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The clinet state."
+			::= { dhcp6ClientStatelessIfEntry 3 }
+		
+		dhcp6ClientStatelessIfCurrServerAddr OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current server address."
+			::= { dhcp6ClientStatelessIfEntry 4 }
+			
+		dhcp6ClientStatelessIfCurrServerDuid OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current server address."
+			::= { dhcp6ClientStatelessIfEntry 5 }
+			
+		dhcp6ClientStatelessIfCurrServerPref OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current server preference."
+			::= { dhcp6ClientStatelessIfEntry 6 }
+		
+		dhcp6ClientStatelessIfDnsList OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current dns."
+			::= { dhcp6ClientStatelessIfEntry 7 }
+		
+		dhcp6ClientStatelessIfDomainList OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client current domain name."
+			::= { dhcp6ClientStatelessIfEntry 8 }
+			
+		dhcp6ClientStatelessIfInfoRefreshTime OBJECT-TYPE
+			SYNTAX		Unsigned32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The information refresh time of client stateless interface."
+			::= { dhcp6ClientStatelessIfEntry 9 }
+		
+		dhcp6ClientStatelessIfSntpList OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The client sntp server."
+			::= { dhcp6ClientStatelessIfEntry 10 }	
+			
+					
+--WRI DHCP6 POOL Table	
+	  dhcp6PoolTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6PoolEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 pool table."
+			::= { wriDhcp6 7 }
+		
+		dhcp6PoolEntry OBJECT-TYPE
+			SYNTAX Dhcp6PoolEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 pool table."
+			INDEX {dhcp6PoolIndex}
+			::= { dhcp6PoolTable 1 }
+		
+		Dhcp6PoolEntry ::=
+			SEQUENCE { 
+				dhcp6PoolIndex					        INTEGER,
+				dhcp6PoolName                   OCTET STRING,
+				dhcp6PoolRowStatus              RowStatus,
+				dhcp6PoolPrefixPool               OCTET STRING,
+				dhcp6PoolPreferTime             INTEGER,
+				dhcp6PoolValidTime              INTEGER,
+				dhcp6PoolAddDns               InetAddress,
+				dhcp6PoolDelDns               InetAddress,
+				dhcp6PoolAddDomainName            OCTET STRING,
+				dhcp6PoolDelDomainName           OCTET STRING,
+				dhcp6PoolAddressPrefix        InetAddress,
+				dhcp6PoolPrefixLen            INTEGER,
+				dhcp6PoolAddLinkAddress        InetAddress,
+				dhcp6PoolDelLinkAddress        InetAddress,
+				dhcp6PoolAddSntpServer         InetAddress,
+				dhcp6PoolDelSntpServer         InetAddress,
+				dhcp6PoolInforRefreshTime      INTEGER
+				}
+				
+		dhcp6PoolIndex OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 pool index."
+			::= { dhcp6PoolEntry 1 }
+			
+		dhcp6PoolName OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 pool name."
+			::= { dhcp6PoolEntry 2 }	
+			
+		dhcp6PoolRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 pool."
+			::= { dhcp6PoolEntry 3 }
+			
+		dhcp6PoolPrefixPool OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 prefix pool name."
+			::= { dhcp6PoolEntry 4 }
+			
+		dhcp6PoolPreferTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 prefer time."
+			::= { dhcp6PoolEntry 5 }	
+			
+		dhcp6PoolValidTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 valid time."
+			::= { dhcp6PoolEntry 6 }	
+			
+		dhcp6PoolAddDns OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Add the dhcpv6 dns address."
+			::= { dhcp6PoolEntry 7 }	
+			
+		dhcp6PoolDelDns OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Delete the dhcpv6 dns address."
+			::= { dhcp6PoolEntry 8 }	
+			
+		dhcp6PoolAddDomainName OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 dns addresses."
+			::= { dhcp6PoolEntry 9 }
+			
+		dhcp6PoolDelDomainName OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 dns addresses."
+			::= { dhcp6PoolEntry 10 }
+			
+		dhcp6PoolAddressPrefix OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 dns addresses."
+			::= { dhcp6PoolEntry 11 }
+			
+		dhcp6PoolPrefixLen OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 dns addresses."
+			::= { dhcp6PoolEntry 12 }
+			
+		dhcp6PoolAddLinkAddress OBJECT-TYPE
+			SYNTAX		InetAddress			  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 dns addresses."
+			::= { dhcp6PoolEntry 13 }
+			
+		dhcp6PoolDelLinkAddress OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 dns addresses."
+			::= { dhcp6PoolEntry 14 }
+		
+		dhcp6PoolAddSntpServer OBJECT-TYPE
+			SYNTAX		InetAddress			  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 sntp server addresses."
+			::= { dhcp6PoolEntry 15 }
+			
+		dhcp6PoolDelSntpServer OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 sntp server addresses."
+			::= { dhcp6PoolEntry 16 }
+		
+		dhcp6PoolInforRefreshTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 pool information refresh time."
+			::= { dhcp6PoolEntry 17 }
+				
+						  	
+	 --WRI DHCP6 PREFIX POOL Table	
+	  dhcp6PrefixPoolTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6PrefixPoolEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 prefix pool table."
+			::= { wriDhcp6 8 }
+		
+		dhcp6PrefixPoolEntry OBJECT-TYPE
+			SYNTAX Dhcp6PrefixPoolEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 prefix pool table."
+			INDEX {dhcp6PrefixPoolIndex}
+			::= { dhcp6PrefixPoolTable 1 }
+		
+		Dhcp6PrefixPoolEntry ::=
+			SEQUENCE { 
+				dhcp6PrefixPoolIndex					        INTEGER,
+				dhcp6PrefixPoolName                   OCTET STRING,
+				dhcp6PrefixPoolRowStatus              RowStatus,
+				dhcp6PrefixPoolPrefix                 InetAddress,
+				dhcp6PrefixPoolPrefixLen              INTEGER,
+				dhcp6PrefixPoolAssignLen              INTEGER	
+				}
+				
+		dhcp6PrefixPoolIndex OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 prefix pool index."
+			::= { dhcp6PrefixPoolEntry 1 }	
+			
+		dhcp6PrefixPoolName OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 prefix pool name."
+			::= { dhcp6PrefixPoolEntry 2 }	
+						
+	  dhcp6PrefixPoolRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete the dhcpv6 prefix pool."
+			::= { dhcp6PrefixPoolEntry 3 }	
+			
+	  dhcp6PrefixPoolPrefix OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The prefix of dhcpv6 prefix pool."
+			::= { dhcp6PrefixPoolEntry 4 }
+			
+		dhcp6PrefixPoolPrefixLen OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The prefix length of dhcpv6 prefix pool."
+			::= { dhcp6PrefixPoolEntry 5 }	 
+			
+		dhcp6PrefixPoolAssignLen OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The assign length of dhcpv6 prefix pool."
+			::= { dhcp6PrefixPoolEntry 6 }
+			
+	--WRI DHCP6 RELAY DESTINATION Table	
+	  dhcp6RelayDstTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6RelayDstEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 relay destination table."
+			::= { wriDhcp6 9 }
+		
+		dhcp6RelayDstEntry OBJECT-TYPE
+			SYNTAX Dhcp6RelayDstEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 relay destination table."
+			INDEX {dhcp6RelayDstIfIndex,dhcp6RelayDstAddress}
+			::= { dhcp6RelayDstTable 1 }
+		
+		Dhcp6RelayDstEntry ::=
+			SEQUENCE { 
+				dhcp6RelayDstIfIndex					        INTEGER,
+				dhcp6RelayDstAddress                InetAddress,
+				dhcp6RelayDstRowStatus              RowStatus,
+				dhcp6RelayDstOutIf              INTEGER
+				}
+				
+		dhcp6RelayDstIfIndex OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 relay destination interface index."
+			::= { dhcp6RelayDstEntry 1 }
+			
+		dhcp6RelayDstAddress OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 relay destination address."
+			::= { dhcp6RelayDstEntry 2 }	
+			
+		dhcp6RelayDstRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete the dhcpv6 relay destination address."
+			::= { dhcp6RelayDstEntry 3 }	
+			
+		dhcp6RelayDstOutIf OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 relay destination out interface."
+			::= { dhcp6RelayDstEntry 4 }
+		
+			
+	--WRI DHCP6 CLIENT Table	
+		dhcp6ClientTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 client table."
+			::= { wriDhcp6 10 }
+		
+		dhcp6ClientEntry OBJECT-TYPE
+			SYNTAX Dhcp6ClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 client table."
+			INDEX {dhcp6ClientDuid}
+			::= { dhcp6ClientTable 1 }
+		
+		Dhcp6ClientEntry ::=
+			SEQUENCE { 
+				dhcp6ClientDuid					        OCTET STRING,
+				dhcp6ClientRowStatus            RowStatus,	
+				dhcp6ClientPoolId                 INTEGER,
+				dhcp6ClientIp                     InetAddress
+				}
+	  
+		dhcp6ClientDuid OBJECT-TYPE
+			SYNTAX		OCTET STRING (SIZE(1..33))			  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client duid."
+			::= { dhcp6ClientEntry 1 }
+
+		dhcp6ClientRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client row status."
+			::= { dhcp6ClientEntry 2 }
+			
+		dhcp6ClientPoolId OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client pool id."
+			::= { dhcp6ClientEntry 3 }
+
+		dhcp6ClientIp OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ip address."
+			::= { dhcp6ClientEntry 4 }
+		
+
+	--WRI DHCP6 BIND Table	
+		dhcp6BindTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6BindEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 Bind table."
+			::= { wriDhcp6 11 }
+		
+		dhcp6BindEntry OBJECT-TYPE
+			SYNTAX Dhcp6BindEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 Bind table."
+			INDEX {dhcp6BindIp}
+			::= { dhcp6BindTable 1 }
+		
+		Dhcp6BindEntry ::=
+			SEQUENCE { 
+				dhcp6BindIp                     InetAddress,
+				dhcp6BindRowStatus              RowStatus,
+				dhcp6BindPrefixLen              INTEGER,
+				dhcp6BindDuid                   OCTET STRING,
+				dhcp6BindIAType                 INTEGER,
+				dhcp6BindIAID                   INTEGER,
+				dhcp6BindCurrentIAID           INTEGER,
+				dhcp6BindConfigFlag            INTEGER,
+				dhcp6BindValidTime             INTEGER,
+				dhcp6BindPreferTime            INTEGER,
+				dhcp6BindIAT1                  INTEGER,
+				dhcp6BindIAT2                  INTEGER,
+				dhcp6BindExpireTime            INTEGER,
+				dhcp6BindStaticFlag            INTEGER,
+				dhcp6BindState                  INTEGER                          
+				}	
+
+		dhcp6BindIp OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind ip address."
+			::= { dhcp6BindEntry 1 }
+
+		dhcp6BindRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 bind entry."
+			::= { dhcp6BindEntry 2 }
+			
+		dhcp6BindPrefixLen OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind prefix length."
+			::= { dhcp6BindEntry 3 }
+		
+		dhcp6BindDuid OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind duid."
+			::= { dhcp6BindEntry 4 }
+			
+		dhcp6BindIAType OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind iaid type."
+			::= { dhcp6BindEntry 5 }
+			
+		dhcp6BindIAID OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind iaid."
+			::= { dhcp6BindEntry 6 }
+			
+		dhcp6BindCurrentIAID OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind current IAID."
+			::= { dhcp6BindEntry 7 }
+					
+		dhcp6BindConfigFlag OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind config flag."
+			::= { dhcp6BindEntry 8 }
+			
+		dhcp6BindValidTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind valid time."
+			::= { dhcp6BindEntry 9 }
+			
+		dhcp6BindPreferTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind prefer time."
+			::= { dhcp6BindEntry 10 }
+			
+		dhcp6BindIAT1 OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind IAT1."
+			::= { dhcp6BindEntry 11 }
+			
+		dhcp6BindIAT2 OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind IAT2."
+			::= { dhcp6BindEntry 12 }	
+			
+		dhcp6BindExpireTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind expire time."
+			::= { dhcp6BindEntry 13 }
+			
+		dhcp6BindStaticFlag OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind static flag.1 means static"
+			::= { dhcp6BindEntry 14 }
+			
+		dhcp6BindState OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 bind state.1 means committed"
+			::= { dhcp6BindEntry 15 }	
+		
+		
+	--WRI DHCP6 CONFLICT IP Table	
+		dhcp6ConflictIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ConflictIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ConflictIp table."
+			::= { wriDhcp6 12 }
+		
+		dhcp6ConflictIpEntry OBJECT-TYPE
+			SYNTAX Dhcp6ConflictIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 ConflictIp table."
+			INDEX {dhcp6ConflictIp}
+			::= { dhcp6ConflictIpTable 1 }
+		
+		Dhcp6ConflictIpEntry ::=
+			SEQUENCE { 
+				dhcp6ConflictIp                     InetAddress,
+				dhcp6ConflictIpRowStatus            RowStatus,
+				dhcp6ConflictIpExpiredTime          INTEGER,
+				dhcp6ConflictIpPoolId               INTEGER            
+				}	
+	
+		dhcp6ConflictIp OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 conflict ip address."
+			::= { dhcp6ConflictIpEntry 1 }
+
+		dhcp6ConflictIpRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete dhcpv6 conflict ip entry."
+			::= { dhcp6ConflictIpEntry 2 }
+		
+		dhcp6ConflictIpExpiredTime OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 conflict ip expired time."
+			::= { dhcp6ConflictIpEntry 3 }
+			
+		dhcp6ConflictIpPoolId OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 conflict ip pool id."
+			::= { dhcp6ConflictIpEntry 4 }
+		
+	
+	--WRI DHCP6 EXCLUDE IP Table	
+		dhcp6ExcludeIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ExcludeIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ExcludeIp table."
+			::= { wriDhcp6 13 }
+		
+		dhcp6ExcludeIpEntry OBJECT-TYPE
+			SYNTAX Dhcp6ExcludeIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 ExcludeIp table."
+			INDEX {dhcp6ExcludeIp}
+			::= { dhcp6ExcludeIpTable 1 }
+		
+		Dhcp6ExcludeIpEntry ::=
+			SEQUENCE { 
+				dhcp6ExcludeIp                      InetAddress,
+				dhcp6ExcludeIpRowStatus            RowStatus           
+				}	
+			
+		dhcp6ExcludeIp OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 exclude ip pool id."
+			::= { dhcp6ExcludeIpEntry 1 }
+			
+		dhcp6ExcludeIpRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete the dhcpv6 exclude ip pool."
+			::= { dhcp6ExcludeIpEntry 2 }
+			
+	--WRI DHCP6 EXPIRED BIND Table	
+		dhcp6ExpiredBindTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ExpiredBindEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ExcludeIp table."
+			::= { wriDhcp6 14 }
+		
+		dhcp6ExpiredBindEntry OBJECT-TYPE
+			SYNTAX Dhcp6ExpiredBindEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 ExpiredBind table."
+			INDEX {dhcp6ExpiredBindIp}
+			::= { dhcp6ExpiredBindTable 1 }
+		
+		Dhcp6ExpiredBindEntry ::=
+			SEQUENCE { 
+				dhcp6ExpiredBindIp                   InetAddress,
+				dhcp6ExpiredBindRowStatus            RowStatus,
+				dhcp6ExpiredBindPrefixLen            INTEGER,
+				dhcp6ExpiredBindDuid                 OCTET STRING,
+				dhcp6ExpiredBindIAType               INTEGER,
+				dhcp6ExpiredBindIAID                 INTEGER          
+				}	
+		
+		dhcp6ExpiredBindIp OBJECT-TYPE
+			SYNTAX		InetAddress				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 expired bind ip."
+			::= { dhcp6ExpiredBindEntry 1 }
+			
+		dhcp6ExpiredBindRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Create or delete the dhcpv6 expired bind ip."
+			::= { dhcp6ExpiredBindEntry 2 }
+			
+		dhcp6ExpiredBindPrefixLen OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 expired bind prefix length."
+			::= { dhcp6ExpiredBindEntry 3 }
+		
+		dhcp6ExpiredBindDuid OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 expired bind duid."
+			::= { dhcp6ExpiredBindEntry 4 }
+			
+		dhcp6ExpiredBindIAType OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 expired bind IA type."
+			::= { dhcp6ExpiredBindEntry 5 }
+			
+		dhcp6ExpiredBindIAID OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 expired bind IAID."
+			::= { dhcp6ExpiredBindEntry 6 }	
+		
+	--WRI DHCP6 CLIENT IA Table	
+		dhcp6ClientIATable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6ClientIAEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 ClientIA table."
+			::= { wriDhcp6 15 }
+		
+		dhcp6ClientIAEntry OBJECT-TYPE
+			SYNTAX Dhcp6ClientIAEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 ClientIA table."
+			INDEX {dhcp6ClientIAIfIndex,dhcp6ClientIAID,dhcp6ClientIAIDType}
+			::= { dhcp6ClientIATable 1 }
+		
+		Dhcp6ClientIAEntry ::=
+			SEQUENCE { 
+				dhcp6ClientIAIfIndex              Unsigned32,
+				dhcp6ClientIAID                   INTEGER,
+				dhcp6ClientIAIDType               INTEGER,
+				dhcp6ClientIAT1                   INTEGER,
+				dhcp6ClientIAT2                   INTEGER,
+				dhcp6ClientIAPrefix               OCTET STRING          
+				}	
+	
+		dhcp6ClientIAIfIndex OBJECT-TYPE
+			SYNTAX		Unsigned32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ia interface."
+			::= { dhcp6ClientIAEntry 1 }
+			
+		dhcp6ClientIAID OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ia id."
+			::= { dhcp6ClientIAEntry 2 }
+			
+		dhcp6ClientIAIDType OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ia id type."
+			::= { dhcp6ClientIAEntry 3 }
+			
+		dhcp6ClientIAT1 OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ia t1."
+			::= { dhcp6ClientIAEntry 4 }
+			
+		dhcp6ClientIAT2 OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ia t2."
+			::= { dhcp6ClientIAEntry 5 }
+			
+		dhcp6ClientIAPrefix OBJECT-TYPE
+			SYNTAX		OCTET STRING				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dhcpv6 client ia id type."
+			::= { dhcp6ClientIAEntry 6 }
+		
+	--WRI DHCP6 STATISTICS Table	
+		dhcp6IfStatisticsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dhcp6IfStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP6 interface Statistics table."
+			::= { wriDhcp6 16 }
+		
+		dhcp6IfStatisticsEntry OBJECT-TYPE
+			SYNTAX Dhcp6IfStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp6 interface statistics table."
+			INDEX {dhcp6IfStatisticsIfIndex}
+			::= { dhcp6IfStatisticsTable 1 }
+		
+		Dhcp6IfStatisticsEntry ::=
+			SEQUENCE { 
+				dhcp6IfStatisticsIfIndex        Unsigned32,
+        dhcp6IfResetStat                INTEGER,
+			  dhcp6IfUnknownRcv               Counter32,
+			  dhcp6IfUnknownSend              Counter32,
+			  dhcp6IfUnknownError             Counter32,
+			  dhcp6IfSolicitRcv               Counter32,
+			  dhcp6IfSolicitSend              Counter32,
+			  dhcp6IfSolicitError             Counter32,
+			  dhcp6IfAdvertiseRcv             Counter32,
+			  dhcp6IfAdvertiseSend            Counter32,
+			  dhcp6IfAdvertiseError           Counter32,
+			  dhcp6IfRequestRcv               Counter32,
+			  dhcp6IfRequestSend              Counter32,
+			  dhcp6IfRequestError             Counter32,
+			  dhcp6IfConfirmRcv               Counter32,
+			  dhcp6IfConfirmSend              Counter32,
+			  dhcp6IfConfirmError             Counter32,
+			  dhcp6IfRenewRcv                 Counter32,
+			  dhcp6IfRenewSend                Counter32,
+			  dhcp6IfRenewError               Counter32,
+			  dhcp6IfRebindRcv                Counter32,
+			  dhcp6IfRebindSend               Counter32,
+			  dhcp6IfRebindError              Counter32,
+			  dhcp6IfReplyRcv                 Counter32,
+			  dhcp6IfReplySend                Counter32,
+			  dhcp6IfReplyError               Counter32,
+			  dhcp6IfReleaseRcv               Counter32,
+			  dhcp6IfReleaseSend              Counter32,
+			  dhcp6IfReleaseError             Counter32,
+			  dhcp6IfDeclineRcv               Counter32,
+			  dhcp6IfDeclineSend              Counter32,
+			  dhcp6IfDeclineError             Counter32,
+			  dhcp6IfReconfigRcv              Counter32,
+			  dhcp6IfReconfigSend             Counter32,
+			  dhcp6IfReconfigError            Counter32,
+			  dhcp6IfInforReqRcv              Counter32,
+			  dhcp6IfInforReqSend             Counter32,
+			  dhcp6IfInforReqError            Counter32,
+			  dhcp6IfRelayForwRcv             Counter32,
+			  dhcp6IfRelayForwSend            Counter32,
+			  dhcp6IfRelayForwError           Counter32,
+			  dhcp6IfRelayReplyRcv            Counter32,
+			  dhcp6IfRelayReplySend           Counter32,
+			  dhcp6IfRelayReplyError          Counter32
+				}		
+	
+		dhcp6IfStatisticsIfIndex OBJECT-TYPE
+			SYNTAX		Unsigned32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The interface index."
+			::= { dhcp6IfStatisticsEntry 1 }	
+			
+		dhcp6IfResetStat OBJECT-TYPE
+			SYNTAX		INTEGER				  
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Reset the statistics of interface."
+			::= { dhcp6IfStatisticsEntry 2 }		
+			
+		dhcp6IfUnknownRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The unkonw receive packet."
+			::= { dhcp6IfStatisticsEntry 3 }
+			
+		dhcp6IfUnknownSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The unkonw send packet."
+			::= { dhcp6IfStatisticsEntry 4 }
+			
+		dhcp6IfUnknownError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The unkonw error packet."
+			::= { dhcp6IfStatisticsEntry 5 }
+			
+	  dhcp6IfSolicitRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The solicit receive packet."
+			::= { dhcp6IfStatisticsEntry 6 }
+			
+		dhcp6IfSolicitSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The solicit send packet."
+			::= { dhcp6IfStatisticsEntry 7 }
+			
+		dhcp6IfSolicitError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The solicit error packet."
+			::= { dhcp6IfStatisticsEntry 8 }	
+			
+		dhcp6IfAdvertiseRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The advertise receive packet."
+			::= { dhcp6IfStatisticsEntry 9 }
+			
+		dhcp6IfAdvertiseSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The advertise send packet."
+			::= { dhcp6IfStatisticsEntry 10 }
+			
+		dhcp6IfAdvertiseError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The advertise error packet."
+			::= { dhcp6IfStatisticsEntry 11 }	
+			
+		dhcp6IfRequestRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The request receive packet."
+			::= { dhcp6IfStatisticsEntry 12 }
+			
+		dhcp6IfRequestSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The request send packet."
+			::= { dhcp6IfStatisticsEntry 13 }
+			
+		dhcp6IfRequestError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The request error packet."
+			::= { dhcp6IfStatisticsEntry 14 }	
+			
+		dhcp6IfConfirmRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The confirm receive packet."
+			::= { dhcp6IfStatisticsEntry 15 }
+			
+		dhcp6IfConfirmSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The confirm send packet."
+			::= { dhcp6IfStatisticsEntry 16 }
+			
+		dhcp6IfConfirmError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The confirm error packet."
+			::= { dhcp6IfStatisticsEntry 17 }
+			
+		dhcp6IfRenewRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The renew receive packet."
+			::= { dhcp6IfStatisticsEntry 18 }
+			
+		dhcp6IfRenewSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The renew send packet."
+			::= { dhcp6IfStatisticsEntry 19 }
+			
+		dhcp6IfRenewError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The renew error packet."
+			::= { dhcp6IfStatisticsEntry 20 }	
+			
+		dhcp6IfRebindRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The rebind receive packet."
+			::= { dhcp6IfStatisticsEntry 21 }
+			
+		dhcp6IfRebindSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The rebind send packet."
+			::= { dhcp6IfStatisticsEntry 22 }
+			
+		dhcp6IfRebindError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The rebind error packet."
+			::= { dhcp6IfStatisticsEntry 23 }
+			
+		dhcp6IfReplyRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The reply receive packet."
+			::= { dhcp6IfStatisticsEntry 24 }
+			
+		dhcp6IfReplySend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The reply send packet."
+			::= { dhcp6IfStatisticsEntry 25 }
+			
+		dhcp6IfReplyError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The reply error packet."
+			::= { dhcp6IfStatisticsEntry 26 }
+			
+		dhcp6IfReleaseRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The release receive packet."
+			::= { dhcp6IfStatisticsEntry 27 }
+			
+		dhcp6IfReleaseSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The release send packet."
+			::= { dhcp6IfStatisticsEntry 28 }
+			
+		dhcp6IfReleaseError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The release error packet."
+			::= { dhcp6IfStatisticsEntry 29 }
+			
+		dhcp6IfDeclineRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The decline receive packet."
+			::= { dhcp6IfStatisticsEntry 30 }
+			
+		dhcp6IfDeclineSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The decline send packet."
+			::= { dhcp6IfStatisticsEntry 31 }
+			
+		dhcp6IfDeclineError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The decline error packet."
+			::= { dhcp6IfStatisticsEntry 32 }
+			
+		dhcp6IfReconfigRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The reconfig receive packet."
+			::= { dhcp6IfStatisticsEntry 33 }
+			
+		dhcp6IfReconfigSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The reconfig send packet."
+			::= { dhcp6IfStatisticsEntry 34 }
+			
+		dhcp6IfReconfigError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The reconfig error packet."
+			::= { dhcp6IfStatisticsEntry 35 }
+			
+		dhcp6IfInforReqRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The information request receive packet."
+			::= { dhcp6IfStatisticsEntry 36 }
+			
+		dhcp6IfInforReqSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The information request send packet."
+			::= { dhcp6IfStatisticsEntry 37 }
+			
+		dhcp6IfInforReqError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The information request error packet."
+			::= { dhcp6IfStatisticsEntry 38 }
+			
+		dhcp6IfRelayForwRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The relay forward receive packet."
+			::= { dhcp6IfStatisticsEntry 39 }
+			
+		dhcp6IfRelayForwSend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The relay forward send packet."
+			::= { dhcp6IfStatisticsEntry 40 }
+			
+		dhcp6IfRelayForwError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The relay forward error packet."
+			::= { dhcp6IfStatisticsEntry 41 }
+			
+		dhcp6IfRelayReplyRcv OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The relay reply receive packet."
+			::= { dhcp6IfStatisticsEntry 42 }
+			
+		dhcp6IfRelayReplySend OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The relay reply send packet."
+			::= { dhcp6IfStatisticsEntry 43 }
+			
+		dhcp6IfRelayReplyError OBJECT-TYPE
+			SYNTAX		Counter32				  
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The relay reply error packet."
+			::= { dhcp6IfStatisticsEntry 44 }
+	
+	dhcp6Trap		OBJECT IDENTIFIER ::=   {wriDhcp6 17}
+	
+		dhcp6AddressAssignedSuccess NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned success."
+			::= { dhcp6Trap 1} 	
+			
+		dhcp6AddressAssignedUnSpecified NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned failed,
+               	 reason unspecified; this status 
+               	 code is sent by either a client
+                 or a server to indicate a failure
+                 not explicitly specified in this
+                 document."
+			::= { dhcp6Trap 2} 		
+			
+		dhcp6AddressAssignedNoAddress NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned failed,
+               	Server has no addresses available 
+               	to assign to the IA(s)"
+			::= { dhcp6Trap 3} 	 	
+			
+		dhcp6AddressAssignedNoBind NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned failed,
+               	Client record (binding) unavailable."
+			::= { dhcp6Trap 4} 	
+				
+		dhcp6AddressAssignedNoOnLink NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned failed,
+               	The prefix for the address is not
+               	appropriate for the link to which 
+               	the client is attached"
+			::= { dhcp6Trap 5} 	
+			
+		dhcp6AddressAssignedUseMulticast NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned failed,
+               	Sent by a server to a client to force the
+                client to send messages to the server.
+                using the All_DHCP_Relay_Agents_and_Servers
+                address"
+			::= { dhcp6Trap 6} 	
+			
+		dhcp6AddressAssignedNoPrefix NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client address assigned failed."
+			::= { dhcp6Trap 7} 	
+		
+		dhcp6ClientPdUpIfStateChange NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid,
+       						 dhcp6ClientPdUpIfUnit,
+       		         dhcp6ClientPdUpIfClientState}
+       		STATUS  current
+       		DESCRIPTION
+               	"client pd up interface state change."
+			::= { dhcp6Trap 8} 	
+			
+		dhcp6ClientStatelessIfStateChange NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid,
+       						 dhcp6ClientStatelessIfUnit,
+       		         dhcp6ClientStatelessIfClientState}
+       		STATUS  current
+       		DESCRIPTION
+               	"client stateless interface state change."
+			::= { dhcp6Trap 9} 	
+			
+		dhcp6ClientIAState NOTIFICATION-TYPE
+       		OBJECTS {dhcp6ClientDuid}
+       		STATUS  current
+       		DESCRIPTION
+               	"client state change."
+			::= { dhcp6Trap 10} 		
+								
+  END

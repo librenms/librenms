@@ -1,0 +1,1780 @@
+WRI-MPLS-L3VPN-STD-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Integer32, Counter32, Unsigned32, Gauge32
+      FROM SNMPv2-SMI                                     -- [RFC2578]
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF                                    -- [RFC2580]
+   TEXTUAL-CONVENTION, TruthValue, RowStatus,
+   TimeStamp, StorageType
+      FROM SNMPv2-TC                                      -- [RFC2579]
+   InterfaceIndex, InterfaceIndexOrZero
+      FROM IF-MIB                                         -- [RFC2863]
+   VPNIdOrZero
+     FROM VPN-TC-STD-MIB                                  -- [RFC4265]
+   SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB                             -- [RFC3411]
+   IANAipRouteProtocol
+      FROM IANA-RTPROTO-MIB                               -- [RTPROTO]
+   InetAddress, InetAddressType,
+   InetAddressPrefixLength,
+   InetAutonomousSystemNumber
+      FROM INET-ADDRESS-MIB                               -- [RFC4001]
+
+   MplsIndexType
+      FROM MPLS-LSR-STD-MIB                               -- [RFC3813]
+   wri,wriProtocol,wriProducts				FROM WRI-SMI; 
+
+
+wriMpls OBJECT IDENTIFIER ::= { wriProtocol 1325 }
+
+wriMplsL3VpnMIB OBJECT IDENTIFIER ::= { wriMpls 11 }
+        
+-- Textual Conventions.
+MplsL3VpnName ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "An identifier that is assigned to each MPLS/BGP VPN and
+        is used to uniquely identify it.  This is assigned by the
+        system operator or NMS and SHOULD be unique throughout
+        the MPLS domain.  If this is the case, then this identifier
+        can then be used at any LSR within a specific MPLS domain
+        to identify this MPLS/BGP VPN.  It may also be possible to
+        preserve the uniqueness of this identifier across MPLS
+        domain boundaries, in which case this identifier can then
+        be used to uniquely identify MPLS/BGP VPNs on a more global
+        basis.  This object MAY be set to the VPN ID as defined in
+        RFC 2685."
+   REFERENCE
+        "RFC 2685 Fox B., et al, 'Virtual Private
+         Networks Identifier', September 1999."
+   SYNTAX OCTET STRING (SIZE (0..31))
+
+MplsL3VpnRouteDistinguisher ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "Syntax for a route distinguisher and route target
+        as defined in [RFC4364]."
+   REFERENCE
+        "[RFC4364]"
+   SYNTAX  OCTET STRING(SIZE (0..256))
+
+MplsL3VpnRtType ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "Used to define the type of a route target usage.
+        Route targets can be specified to be imported,
+        exported, or both.  For a complete definition of a
+        route target, see [RFC4364]."
+   REFERENCE
+        "[RFC4364]"
+   SYNTAX INTEGER { import(1), export(2), both(3) }
+
+-- Top level components of this MIB.
+wriMplsL3VpnNotifications OBJECT IDENTIFIER ::= { wriMplsL3VpnMIB 0 }
+wriMplsL3VpnObjects       OBJECT IDENTIFIER ::= { wriMplsL3VpnMIB 1 }
+wriMplsL3VpnScalars       OBJECT IDENTIFIER ::= { wriMplsL3VpnObjects 1 }
+wriMplsL3VpnConf          OBJECT IDENTIFIER ::= { wriMplsL3VpnObjects 2 }
+wriMplsL3VpnPerf          OBJECT IDENTIFIER ::= { wriMplsL3VpnObjects 3 }
+wriMplsL3VpnRoute         OBJECT IDENTIFIER ::= { wriMplsL3VpnObjects 4 }
+wriMplsL3VpnConformance   OBJECT IDENTIFIER ::= { wriMplsL3VpnMIB 2 }
+
+--
+-- Scalar Objects
+--
+
+wriMplsL3VpnConfiguredVrfs OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of VRFs that are configured on this node."
+   ::= { wriMplsL3VpnScalars 1 }
+
+wriMplsL3VpnActiveVrfs OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of VRFs that are active on this node.
+        That is, those VRFs whose corresponding mplsL3VpnVrfOperStatus
+        object value is equal to operational (1)."
+   ::= { wriMplsL3VpnScalars 2 }
+
+wriMplsL3VpnConnectedInterfaces OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Total number of interfaces connected to a VRF."
+   ::= { wriMplsL3VpnScalars 3 }
+
+wriMplsL3VpnNotificationEnable OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+        "If this object is true, then it enables the
+         generation of all notifications defined in
+         this MIB.  This object's value should be
+         preserved across agent reboots."
+   REFERENCE
+       "See also [RFC3413] for explanation that
+        notifications are under the ultimate control of the
+        MIB modules in this document."
+   DEFVAL { false }
+   ::= { wriMplsL3VpnScalars 4 }
+
+wriMplsL3VpnVrfConfMaxPossRts  OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "Denotes maximum number of routes that the device
+      will allow all VRFs jointly to hold.  If this value is
+      set to 0, this indicates that the device is
+      unable to determine the absolute maximum.  In this
+      case, the configured maximum MAY not actually
+      be allowed by the device."
+   ::= { wriMplsL3VpnScalars 5 }
+
+wriMplsL3VpnVrfConfRteMxThrshTime  OBJECT-TYPE
+   SYNTAX        Unsigned32
+   UNITS         "seconds"
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "Denotes the interval in seconds, at which the route max threshold
+      notification may be reissued after the maximum value has been
+      exceeded (or has been reached if mplsL3VpnVrfConfMaxRoutes and
+      mplsL3VpnVrfConfHighRteThresh are equal) and the initial
+      notification has been issued.  This value is intended to prevent
+      continuous generation of notifications by an agent in the event
+      that routes are continually added to a VRF after it has reached
+      its maximum value.  If this value is set to 0, the agent should
+      only issue a single notification at the time that the maximum
+      threshold has been reached, and should not issue any more
+      notifications until the value of routes has fallen below the
+      configured threshold value.  This is the recommended default
+      behavior."
+   DEFVAL { 0 }
+   ::= { wriMplsL3VpnScalars 6 }
+
+wriMplsL3VpnIllLblRcvThrsh OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+       "The number of illegally received labels above which
+        the mplsNumVrfSecIllglLblThrshExcd notification
+        is issued.  The persistence of this value mimics
+        that of the device's configuration."
+   ::= { wriMplsL3VpnScalars 7 }
+
+wriMplsL3VpnEnable OBJECT-TYPE
+   SYNTAX        INTEGER
+   {
+   			enable(1),
+   			disable(2)
+   }
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+       "Enable or disable the protocol of mplsl3vpn."
+   ::= { wriMplsL3VpnScalars 8 }
+
+
+
+-- VPN Interface Configuration Table
+
+wriMplsL3VpnIfConfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnIfConfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per-interface MPLS capability
+        and associated information."
+   ::= { wriMplsL3VpnConf 1 }
+
+wriMplsL3VpnIfConfEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnIfConfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for
+        every interface capable of supporting MPLS L3VPN.
+        Each entry in this table is meant to correspond to
+        an entry in the Interfaces Table."
+   INDEX       { wriMplsL3VpnVrfName, wriMplsL3VpnIfConfIndex }
+   ::= { wriMplsL3VpnIfConfTable 1 }
+
+WriMplsL3VpnIfConfEntry ::= SEQUENCE {
+  wriMplsL3VpnIfConfIndex             InterfaceIndex,
+  wriMplsL3VpnIfVpnClassification     INTEGER,
+  wriMplsL3VpnIfVpnRouteDistProtocol  BITS,
+  wriMplsL3VpnIfConfStorageType       StorageType,
+  wriMplsL3VpnIfConfRowStatus         RowStatus
+}
+   
+wriMplsL3VpnIfConfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        mplsL3VpnIfConfTable.  A non-zero index for an
+        entry indicates the ifIndex for the corresponding
+        interface entry in the MPLS-VPN-layer in the ifTable.
+        Note that this table does not necessarily correspond
+        one-to-one with all entries in the Interface MIB
+        having an ifType of MPLS-layer; rather, only those
+        that are enabled for MPLS L3VPN functionality."
+   REFERENCE
+       "RFC2863"
+   ::= { wriMplsL3VpnIfConfEntry 1 }
+
+wriMplsL3VpnIfVpnClassification OBJECT-TYPE
+   SYNTAX        INTEGER { carrierOfCarrier (1),
+                           enterprise (2),
+                           interProvider (3)
+   }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes whether this link participates in a
+        carrier's carrier, enterprise, or inter-provider
+        scenario."
+   DEFVAL { enterprise }
+   ::= { wriMplsL3VpnIfConfEntry 2 }
+
+wriMplsL3VpnIfVpnRouteDistProtocol OBJECT-TYPE
+   SYNTAX        BITS { none (0),
+                        bgp (1),
+                        ospf (2),
+                        rip(3),
+                        isis(4),
+                        static(5),
+                        other (6)
+   }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the route distribution protocol across the
+        PE-CE link.  Note that more than one routing protocol
+        may be enabled at the same time; thus, this object is
+        specified as a bitmask.  For example, static(5) and
+        ospf(2) are a typical configuration."
+   ::= { wriMplsL3VpnIfConfEntry 3 }
+
+wriMplsL3VpnIfConfStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this VPN If entry.
+        Conceptual rows having the value 'permanent'
+        need not allow write access to any columnar
+        objects in the row."
+   REFERENCE
+        "See RFC2579."
+   DEFVAL { volatile }
+   ::= { wriMplsL3VpnIfConfEntry 4 }
+
+wriMplsL3VpnIfConfRowStatus  OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table.  Rows in this
+        table signify that the specified interface is
+        associated with this VRF.  If the row creation
+        operation succeeds, the interface will have been
+        associated with the specified VRF, otherwise the
+        agent MUST not allow the association.  If the agent
+        only allows read-only operations on this table, it
+        MUST create entries in this table as they are created
+        on the device.  When a row in this table is in
+        active(1) state, no objects in that row can be
+        modified except mplsL3VpnIfConfStorageType and
+        mplsL3VpnIfConfRowStatus."
+   ::= { wriMplsL3VpnIfConfEntry 5 }
+
+-- VRF Configuration Table
+wriMplsL3VpnVrfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnVrfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per-interface MPLS L3VPN
+        VRF Table capability and associated information.
+        Entries in this table define VRF routing instances
+        associated with MPLS/VPN interfaces.  Note that
+        multiple interfaces can belong to the same VRF
+        instance.  The collection of all VRF instances
+        comprises an actual VPN."
+   ::= { wriMplsL3VpnConf 2 }
+
+wriMplsL3VpnVrfEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnVrfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for
+        every VRF capable of supporting MPLS L3VPN.  The
+        indexing provides an ordering of VRFs per-VPN
+        interface."
+   INDEX       { wriMplsL3VpnVrfName }
+   ::= { wriMplsL3VpnVrfTable 1 }
+WriMplsL3VpnVrfEntry ::= SEQUENCE {
+  wriMplsL3VpnVrfName                      MplsL3VpnName,
+  wriMplsL3VpnVrfVpnId                     VPNIdOrZero,
+  wriMplsL3VpnVrfDescription               SnmpAdminString,
+  wriMplsL3VpnVrfRD                        MplsL3VpnRouteDistinguisher,
+  wriMplsL3VpnVrfCreationTime              TimeStamp,
+  wriMplsL3VpnVrfOperStatus                INTEGER,
+  wriMplsL3VpnVrfActiveInterfaces          Gauge32,
+  wriMplsL3VpnVrfAssociatedInterfaces      Unsigned32,
+  wriMplsL3VpnVrfConfMidRteThresh          Unsigned32,
+  wriMplsL3VpnVrfConfHighRteThresh         Unsigned32,
+  wriMplsL3VpnVrfConfMaxRoutes             Unsigned32,
+  wriMplsL3VpnVrfConfLastChanged           TimeStamp,
+  wriMplsL3VpnVrfConfRowStatus             RowStatus,
+  wriMplsL3VpnVrfConfAdminStatus           INTEGER,
+  wriMplsL3VpnVrfConfStorageType           StorageType,
+  wriMplsL3VpnVrfApplyLabelPerInstance     Unsigned32,
+  --xf add 2014-5-16		
+  wriMplsL3VpnVrfId						   Unsigned32
+}
+
+wriMplsL3VpnVrfName OBJECT-TYPE
+   SYNTAX        MplsL3VpnName
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The human-readable name of this VPN.  This MAY
+        be equivalent to the [RFC2685] VPN-ID, but may
+        also vary.  If it is set to the VPN ID, it MUST
+        be equivalent to the value of mplsL3VpnVrfVpnId.
+        It is strongly recommended that all sites supporting
+        VRFs that are part of the same VPN use the same
+        naming convention for VRFs as well as the same VPN
+        ID."
+   REFERENCE
+       "[RFC2685]"
+   ::= { wriMplsL3VpnVrfEntry 1 }
+
+wriMplsL3VpnVrfVpnId OBJECT-TYPE
+   SYNTAX        VPNIdOrZero
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The VPN ID as specified in [RFC2685].  If a VPN ID
+        has not been specified for this VRF, then this
+        variable SHOULD be set to a zero-length OCTET
+        STRING."
+   ::= { wriMplsL3VpnVrfEntry 2 }
+
+wriMplsL3VpnVrfDescription OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The human-readable description of this VRF."
+   DEFVAL { "" }
+   ::= { wriMplsL3VpnVrfEntry 3 }
+
+wriMplsL3VpnVrfRD OBJECT-TYPE
+   SYNTAX        MplsL3VpnRouteDistinguisher
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The route distinguisher for this VRF."
+   DEFVAL { "" }
+   ::= { wriMplsL3VpnVrfEntry 4 }
+
+wriMplsL3VpnVrfCreationTime OBJECT-TYPE
+   SYNTAX        TimeStamp
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The time at which this VRF entry was created."
+   ::= { wriMplsL3VpnVrfEntry 5 }
+
+wriMplsL3VpnVrfOperStatus OBJECT-TYPE
+   SYNTAX        INTEGER { up (1),
+                           down (2)
+                         }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Denotes whether or not a VRF is operational.  A VRF is
+        up(1) when there is at least one interface associated
+        with the VRF whose ifOperStatus is up(1).  A VRF is
+        down(2) when:
+        a. There does not exist at least one interface whose
+           ifOperStatus is up(1).
+        b. There are no interfaces associated with the VRF."
+   ::= { wriMplsL3VpnVrfEntry 6 }
+
+wriMplsL3VpnVrfActiveInterfaces OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Total number of interfaces connected to this VRF with
+        ifOperStatus = up(1).
+
+        This value should increase when an interface is associated
+        with the corresponding VRF and its corresponding ifOperStatus
+        is equal to up(1).  If an interface is associated whose
+        ifOperStatus is not up(1), then the value is not incremented
+        until such time as it transitions to this state.
+
+        This value should be decremented when an interface is
+        disassociated with a VRF or the corresponding ifOperStatus
+        transitions out of the up(1) state to any other state.
+       "
+   ::= { wriMplsL3VpnVrfEntry 7 }
+
+wriMplsL3VpnVrfAssociatedInterfaces OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Total number of interfaces connected to this VRF
+        (independent of ifOperStatus type)."
+   ::= { wriMplsL3VpnVrfEntry 8 }
+
+wriMplsL3VpnVrfConfMidRteThresh    OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "Denotes mid-level water marker for the number
+      of routes that this VRF may hold."
+  DEFVAL { 0 }
+  ::= { wriMplsL3VpnVrfEntry 9 }
+
+wriMplsL3VpnVrfConfHighRteThresh  OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "Denotes high-level water marker for the number of
+      routes that this VRF may hold."
+   DEFVAL { 0 }
+  ::= { wriMplsL3VpnVrfEntry 10 }
+
+wriMplsL3VpnVrfConfMaxRoutes  OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "Denotes maximum number of routes that this VRF is
+      configured to hold.  This value MUST be less than or
+      equal to mplsL3VpnVrfConfMaxPossRts unless it is set
+      to 0."
+   DEFVAL { 0 }
+  ::= { wriMplsL3VpnVrfEntry 11 }
+
+wriMplsL3VpnVrfConfLastChanged  OBJECT-TYPE
+   SYNTAX        TimeStamp
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "The value of sysUpTime at the time of the last
+      change of this table entry, which includes changes of
+      VRF parameters defined in this table or addition or
+      deletion of interfaces associated with this VRF."
+  ::= { wriMplsL3VpnVrfEntry 12 }
+
+wriMplsL3VpnVrfConfRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table.
+        When a row in this table is in active(1) state, no
+        objects in that row can be modified except
+        mplsL3VpnVrfConfAdminStatus, mplsL3VpnVrfConfRowStatus,
+        and mplsL3VpnVrfConfStorageType."
+  ::= { wriMplsL3VpnVrfEntry 13 }
+
+wriMplsL3VpnVrfConfAdminStatus OBJECT-TYPE
+   SYNTAX     INTEGER {
+                      up(1),     -- ready to pass packets
+                      down(2),   -- can't pass packets
+                      testing(3) -- in some test mode
+                }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Indicates the desired operational status of this
+         VRF."
+  ::= { wriMplsL3VpnVrfEntry 14 }
+
+wriMplsL3VpnVrfConfStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+        "The storage type for this VPN VRF entry.
+         Conceptual rows having the value 'permanent'
+         need not allow write access to any columnar
+         objects in the row."
+   REFERENCE
+        "See RFC2579."
+   DEFVAL { volatile }
+   ::= { wriMplsL3VpnVrfEntry 15 }
+
+wriMplsL3VpnVrfApplyLabelPerInstance  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The lable of instance."
+   ::= { wriMplsL3VpnVrfEntry 16 } 
+    
+--xf add 2014-5-16
+wriMplsL3VpnVrfId  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The vrf id."
+   ::= { wriMplsL3VpnVrfEntry 17 } 
+
+-- MplsL3VpnVrfRTTable
+wriMplsL3VpnVrfRTTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF WriMplsL3VpnVrfRTEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies per-VRF route target association.
+         Each entry identifies a connectivity policy supported
+         as part of a VPN."
+    ::= { wriMplsL3VpnConf 3 }
+
+wriMplsL3VpnVrfRTEntry OBJECT-TYPE
+    SYNTAX        WriMplsL3VpnVrfRTEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+       "An entry in this table is created by an LSR for
+        each route target configured for a VRF supporting
+        a MPLS L3VPN instance.  The indexing provides an
+        ordering per-VRF instance.  See [RFC4364] for a
+        complete definition of a route target."
+    INDEX  { wriMplsL3VpnVrfName, wriMplsL3VpnVrfRTIndex,
+             wriMplsL3VpnVrfRTType }
+    ::= { wriMplsL3VpnVrfRTTable 1 }
+
+WriMplsL3VpnVrfRTEntry ::= SEQUENCE {
+     wriMplsL3VpnVrfRTIndex       Unsigned32,
+     wriMplsL3VpnVrfRTType        MplsL3VpnRtType,
+     wriMplsL3VpnVrfRT            MplsL3VpnRouteDistinguisher,
+     wriMplsL3VpnVrfRTDescr       SnmpAdminString,
+     wriMplsL3VpnVrfRTRowStatus   RowStatus,
+     wriMplsL3VpnVrfRTStorageType StorageType
+   }
+
+wriMplsL3VpnVrfRTIndex OBJECT-TYPE
+   SYNTAX        Unsigned32 (1..4294967295)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Auxiliary index for route targets configured for a
+        particular VRF."
+   ::= { wriMplsL3VpnVrfRTEntry 2 }
+
+wriMplsL3VpnVrfRTType OBJECT-TYPE
+   SYNTAX        MplsL3VpnRtType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The route target distribution type."
+   ::= { wriMplsL3VpnVrfRTEntry 3 }
+
+wriMplsL3VpnVrfRT OBJECT-TYPE
+   SYNTAX        MplsL3VpnRouteDistinguisher
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The route target distribution policy."
+   DEFVAL { "" }
+   ::= { wriMplsL3VpnVrfRTEntry 4 }
+
+wriMplsL3VpnVrfRTDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Description of the route target."
+   DEFVAL { "" }
+   ::= { wriMplsL3VpnVrfRTEntry 5 }
+
+wriMplsL3VpnVrfRTRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table.  When a row in this
+        table is in active(1) state, no objects in that row
+        can be modified except mplsL3VpnVrfRTRowStatus."
+   ::= { wriMplsL3VpnVrfRTEntry 6 }
+
+wriMplsL3VpnVrfRTStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The storage type for this VPN route target (RT) entry.
+         Conceptual rows having the value 'permanent'
+         need not allow write access to any columnar
+         objects in the row."
+   REFERENCE
+        "See RFC2579."
+   DEFVAL { volatile }
+   ::= { wriMplsL3VpnVrfRTEntry 7 }
+
+-- VRF Security Table
+
+wriMplsL3VpnVrfSecTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnVrfSecEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per MPLS L3VPN VRF Table
+        security-related counters."
+   ::= { wriMplsL3VpnConf 6 }
+
+wriMplsL3VpnVrfSecEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnVrfSecEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for
+        every VRF capable of supporting MPLS L3VPN.  Each
+        entry in this table is used to indicate security-related
+        information for each VRF entry."
+   AUGMENTS      { wriMplsL3VpnVrfEntry }
+      ::= { wriMplsL3VpnVrfSecTable 1 }
+
+WriMplsL3VpnVrfSecEntry ::= SEQUENCE {
+       wriMplsL3VpnVrfSecIllegalLblVltns     Counter32,
+       wriMplsL3VpnVrfSecDiscontinuityTime   TimeStamp
+}
+
+wriMplsL3VpnVrfSecIllegalLblVltns OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the number of illegally received
+        labels on this VPN/VRF.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        mplsL3VpnVrfSecDiscontinuityTime."
+   ::= { wriMplsL3VpnVrfSecEntry 1 }
+
+wriMplsL3VpnVrfSecDiscontinuityTime  OBJECT-TYPE
+   SYNTAX              TimeStamp
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "The value of sysUpTime on the most recent occasion at
+        which any one or more of this entry's counters suffered
+        a discontinuity.  If no such discontinuities have
+        occurred since the last re-initialization of the local
+        management subsystem, then this object contains a zero
+        value."
+   ::= { wriMplsL3VpnVrfSecEntry 2 }
+
+
+-- VRF Performance Table
+
+wriMplsL3VpnVrfPerfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnVrfPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per MPLS L3VPN VRF Table performance
+        information."
+   ::= { wriMplsL3VpnPerf 1 }
+
+wriMplsL3VpnVrfPerfEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnVrfPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for
+        every VRF capable of supporting MPLS L3VPN."
+   AUGMENTS      { wriMplsL3VpnVrfEntry }
+      ::= { wriMplsL3VpnVrfPerfTable 1 }
+
+WriMplsL3VpnVrfPerfEntry ::= SEQUENCE {
+   wriMplsL3VpnVrfPerfRoutesAdded       Counter32,
+   wriMplsL3VpnVrfPerfRoutesDeleted     Counter32,
+   wriMplsL3VpnVrfPerfCurrNumRoutes     Gauge32,
+   wriMplsL3VpnVrfPerfRoutesDropped     Counter32,
+   wriMplsL3VpnVrfPerfDiscTime          TimeStamp
+}
+
+wriMplsL3VpnVrfPerfRoutesAdded OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the number of routes added to this VPN/VRF
+        since the last discontinuity.  Discontinuities in
+        the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        mplsL3VpnVrfPerfDiscTime."
+   ::= { wriMplsL3VpnVrfPerfEntry 1 }
+
+wriMplsL3VpnVrfPerfRoutesDeleted OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the number of routes removed from this VPN/VRF.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        mplsL3VpnVrfPerfDiscTime."
+   ::= { wriMplsL3VpnVrfPerfEntry 2 }
+
+wriMplsL3VpnVrfPerfCurrNumRoutes     OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the number of routes currently used by this
+        VRF."
+   ::= { wriMplsL3VpnVrfPerfEntry 3 }
+
+
+wriMplsL3VpnVrfPerfRoutesDropped OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This counter should be incremented when the number of routes
+        contained by the specified VRF exceeds or attempts to exceed
+        the maximum allowed value as indicated by
+        mplsL3VpnVrfMaxRouteThreshold.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        mplsL3VpnVrfPerfDiscTime."
+  ::= { wriMplsL3VpnVrfPerfEntry 4 }
+
+wriMplsL3VpnVrfPerfDiscTime  OBJECT-TYPE
+   SYNTAX              TimeStamp
+   MAX-ACCESS          read-only
+   STATUS              current
+   DESCRIPTION
+       "The value of sysUpTime on the most recent occasion at
+        which any one or more of this entry's counters suffered
+        a discontinuity.  If no such discontinuities have
+        occurred since the last re-initialization of the local
+        management subsystem, then this object contains a zero
+        value."
+  ::= { wriMplsL3VpnVrfPerfEntry 5 }
+
+-- VRF Routing Table
+
+wriMplsL3VpnVrfRteTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnVrfRteEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per-interface MPLS L3VPN VRF Table
+        routing information.  Entries in this table define VRF routing
+        entries associated with the specified MPLS/VPN interfaces.  Note
+        that this table contains both BGP and Interior Gateway Protocol
+        IGP routes, as both may appear in the same VRF."
+    REFERENCE
+       "[RFC2096]"
+   ::= { wriMplsL3VpnRoute 1 }
+
+wriMplsL3VpnVrfRteEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnVrfRteEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for every route
+        present configured (either dynamically or statically) within
+        the context of a specific VRF capable of supporting MPLS/BGP
+        VPN.  The indexing provides an ordering of VRFs per-VPN
+        interface.
+
+        Implementers need to be aware that there are quite a few
+        index objects that together can exceed the size allowed
+        for an Object Identifier (OID).  So implementers must make
+        sure that OIDs of column instances in this table will have
+        no more than 128 sub-identifiers, otherwise they cannot be
+        accessed using SNMPv1, SNMPv2c, or SNMPv3."
+
+      INDEX  { wriMplsL3VpnVrfName,
+               wriMplsL3VpnVrfRteInetCidrDestType,
+               wriMplsL3VpnVrfRteInetCidrDest,
+               wriMplsL3VpnVrfRteInetCidrPfxLen,
+               wriMplsL3VpnVrfRteInetCidrPolicy,
+               wriMplsL3VpnVrfRteInetCidrNHopType,
+               wriMplsL3VpnVrfRteInetCidrNextHop
+      }
+      ::= { wriMplsL3VpnVrfRteTable 1 }
+
+WriMplsL3VpnVrfRteEntry ::= SEQUENCE {
+         wriMplsL3VpnVrfRteInetCidrDestType     InetAddressType,
+         wriMplsL3VpnVrfRteInetCidrDest         InetAddress,
+         wriMplsL3VpnVrfRteInetCidrPfxLen       InetAddressPrefixLength,
+         wriMplsL3VpnVrfRteInetCidrPolicy       OBJECT IDENTIFIER,
+         wriMplsL3VpnVrfRteInetCidrNHopType     InetAddressType,
+         wriMplsL3VpnVrfRteInetCidrNextHop      InetAddress,
+         wriMplsL3VpnVrfRteInetCidrIfIndex      InterfaceIndexOrZero,
+         wriMplsL3VpnVrfRteInetCidrType         INTEGER,
+         wriMplsL3VpnVrfRteInetCidrProto        IANAipRouteProtocol,
+         wriMplsL3VpnVrfRteInetCidrAge          Gauge32,
+         wriMplsL3VpnVrfRteInetCidrNextHopAS    InetAutonomousSystemNumber,
+         wriMplsL3VpnVrfRteInetCidrMetric1      Integer32,
+         wriMplsL3VpnVrfRteInetCidrMetric2      Integer32,
+         wriMplsL3VpnVrfRteInetCidrMetric3      Integer32,
+         wriMplsL3VpnVrfRteInetCidrMetric4      Integer32,
+         wriMplsL3VpnVrfRteInetCidrMetric5      Integer32,
+         wriMplsL3VpnVrfRteXCPointer            MplsIndexType,
+         wriMplsL3VpnVrfRteInetCidrStatus       RowStatus
+       }
+
+    wriMplsL3VpnVrfRteInetCidrDestType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "The type of the mplsL3VpnVrfRteInetCidrDest address, as
+                defined in the InetAddress MIB.
+
+                Only those address types that may appear in an actual
+                routing table are allowed as values of this object."
+        REFERENCE "RFC4001"
+        ::= { wriMplsL3VpnVrfRteEntry 1 }
+
+    wriMplsL3VpnVrfRteInetCidrDest OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "The destination IP address of this route.
+
+                The type of this address is determined by the value of
+                the mplsL3VpnVrfRteInetCidrDestType object.
+
+                The values for the index objects
+                mplsL3VpnVrfRteInetCidrDest and
+                mplsL3VpnVrfRteInetCidrPfxLen must be consistent.  When
+                the value of mplsL3VpnVrfRteInetCidrDest is x, then
+                the bitwise logical-AND of x with the value of the mask
+                formed from the corresponding index object
+                mplsL3VpnVrfRteInetCidrPfxLen MUST be
+                equal to x.  If not, then the index pair is not
+                consistent and an inconsistentName error must be
+                returned on SET or CREATE requests."
+        ::= { wriMplsL3VpnVrfRteEntry 2 }
+
+    wriMplsL3VpnVrfRteInetCidrPfxLen OBJECT-TYPE
+        SYNTAX     InetAddressPrefixLength (0..128)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Indicates the number of leading one bits that form the
+                mask to be logical-ANDed with the destination address
+                before being compared to the value in the
+                mplsL3VpnVrfRteInetCidrDest field.
+
+                The values for the index objects
+                mplsL3VpnVrfRteInetCidrDest and
+                mplsL3VpnVrfRteInetCidrPfxLen must be consistent.  When
+                the value of mplsL3VpnVrfRteInetCidrDest is x, then the
+                bitwise logical-AND of x with the value of the mask
+                formed from the corresponding index object
+                mplsL3VpnVrfRteInetCidrPfxLen MUST be
+                equal to x.  If not, then the index pair is not
+                consistent and an inconsistentName error must be
+                returned on SET or CREATE requests."
+        ::= { wriMplsL3VpnVrfRteEntry 3 }
+
+    wriMplsL3VpnVrfRteInetCidrPolicy OBJECT-TYPE
+        SYNTAX     OBJECT IDENTIFIER
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "This object is an opaque object without any defined
+                semantics.  Its purpose is to serve as an additional
+                index that may delineate between multiple entries to
+                the same destination.  The value { 0 0 } shall be used
+                as the default value for this object."
+        ::= { wriMplsL3VpnVrfRteEntry 4 }
+
+    wriMplsL3VpnVrfRteInetCidrNHopType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "The type of the mplsL3VpnVrfRteInetCidrNextHop address,
+                as defined in the InetAddress MIB.
+
+                Value should be set to unknown(0) for non-remote
+                routes.
+
+                Only those address types that may appear in an actual
+                routing table are allowed as values of this object."
+        REFERENCE "RFC4001"
+        ::= { wriMplsL3VpnVrfRteEntry 5 }
+
+    wriMplsL3VpnVrfRteInetCidrNextHop OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "On remote routes, the address of the next system en
+                route.  For non-remote routes, a zero-length string.
+                The type of this address is determined by the value of
+                the mplsL3VpnVrfRteInetCidrNHopType object."
+        ::= { wriMplsL3VpnVrfRteEntry 6 }
+
+    wriMplsL3VpnVrfRteInetCidrIfIndex OBJECT-TYPE
+        SYNTAX     InterfaceIndexOrZero
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "The ifIndex value that identifies the local interface
+                through which the next hop of this route should be
+                reached.  A value of 0 is valid and represents the
+                scenario where no interface is specified."
+        DEFVAL { 0 }
+        ::= { wriMplsL3VpnVrfRteEntry 7 }
+
+    wriMplsL3VpnVrfRteInetCidrType OBJECT-TYPE
+        SYNTAX     INTEGER {
+                    other    (1), -- not specified by this MIB
+                    reject   (2), -- route which discards traffic and
+                                  --   returns ICMP notification
+                    local    (3), -- local interface
+                    remote   (4), -- remote destination
+                    blackhole(5)  -- route which discards traffic
+                                  --   silently
+                 }
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "The type of route.  Note that local(3) refers to a
+                route for which the next hop is the final destination;
+                remote(4) refers to a route for which the next hop is
+                not the final destination.
+
+                Routes that do not result in traffic forwarding or
+                rejection should not be displayed even if the
+                implementation keeps them stored internally.
+
+                reject(2) refers to a route that, if matched, discards
+                the message as unreachable and returns a notification
+                (e.g., ICMP error) to the message sender.  This is used
+                in some protocols as a means of correctly aggregating
+                routes.
+
+                blackhole(5) refers to a route that, if matched,
+                discards the message silently."
+        DEFVAL { other }
+        ::= { wriMplsL3VpnVrfRteEntry 8 }
+
+    wriMplsL3VpnVrfRteInetCidrProto OBJECT-TYPE
+        SYNTAX     IANAipRouteProtocol
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "The routing mechanism via which this route was learned.
+                Inclusion of values for gateway routing protocols is
+                not intended to imply that hosts should support those
+                protocols."
+        ::= { wriMplsL3VpnVrfRteEntry 9 }
+
+    wriMplsL3VpnVrfRteInetCidrAge OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "The number of seconds since this route was last updated
+                or otherwise determined to be correct.  Note that no
+                semantics of 'too old' can be implied except through
+                knowledge of the routing protocol by which the route
+                was learned."
+        ::= { wriMplsL3VpnVrfRteEntry 10 }
+
+    wriMplsL3VpnVrfRteInetCidrNextHopAS OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "The Autonomous System Number of the next hop.  The
+                semantics of this object are determined by the
+                routing protocol specified in the route's
+                mplsL3VpnVrfRteInetCidrProto value.  When this
+                object is unknown or not relevant, its value should
+                be set to zero."
+        DEFVAL { 0 }
+        ::= { wriMplsL3VpnVrfRteEntry 11 }
+
+    wriMplsL3VpnVrfRteInetCidrMetric1 OBJECT-TYPE
+        SYNTAX     Integer32 (-1 | 0..2147483647)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "The primary routing metric for this route.  The
+                semantics of this metric are determined by the
+                routing protocol specified in the route's
+                mplsL3VpnVrfRteInetCidrProto value.  If this
+                metric is not used, its value should be set to
+                -1."
+        DEFVAL { -1 }
+        ::= { wriMplsL3VpnVrfRteEntry 12 }
+
+    wriMplsL3VpnVrfRteInetCidrMetric2 OBJECT-TYPE
+        SYNTAX     Integer32 (-1 | 0..2147483647)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "An alternate routing metric for this route.  The
+                semantics of this metric are determined by the routing
+                protocol specified in the route's
+                mplsL3VpnVrfRteInetCidrProto
+                value.  If this metric is not used, its value should be
+                set to -1."
+        DEFVAL { -1 }
+        ::= { wriMplsL3VpnVrfRteEntry 13 }
+
+    wriMplsL3VpnVrfRteInetCidrMetric3 OBJECT-TYPE
+        SYNTAX     Integer32 (-1 | 0..2147483647)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "An alternate routing metric for this route.  The
+                semantics of this metric are determined by the routing
+                protocol specified in the route's
+                mplsL3VpnVrfRteInetCidrProto
+                value.  If this metric is not used, its value should be
+                set to -1."
+        DEFVAL { -1 }
+        ::= { wriMplsL3VpnVrfRteEntry 14 }
+
+    wriMplsL3VpnVrfRteInetCidrMetric4 OBJECT-TYPE
+        SYNTAX     Integer32 (-1 | 0..2147483647)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "An alternate routing metric for this route.  The
+                semantics of this metric are determined by the routing
+                protocol specified in the route's
+                mplsL3VpnVrfRteInetCidrProto value.  If this metric
+                is not used, its value should be set to -1."
+        DEFVAL { -1 }
+        ::= { wriMplsL3VpnVrfRteEntry 15 }
+
+
+    wriMplsL3VpnVrfRteInetCidrMetric5 OBJECT-TYPE
+        SYNTAX     Integer32 (-1 | 0..2147483647)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "An alternate routing metric for this route.  The
+                semantics of this metric are determined by the routing
+                protocol specified in the route's
+                mplsL3VpnVrfRteInetCidrProto value.  If this metric is
+                not used, its value should be set to -1."
+        DEFVAL { -1 }
+        ::= { wriMplsL3VpnVrfRteEntry 16 }
+
+   wriMplsL3VpnVrfRteXCPointer  OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+        "Index into mplsXCTable that identifies which cross-
+        connect entry is associated with this VRF route entry
+        by containing the mplsXCIndex of that cross-connect entry.
+        The string containing the single-octet 0x00 indicates that
+        a label stack is not associated with this route entry.  This
+        can be the case because the label bindings have not yet
+        been established, or because some change in the agent has
+        removed them.
+
+        When the label stack associated with this VRF route is created,
+        it MUST establish the associated cross-connect
+        entry in the mplsXCTable and then set that index to the value
+        of this object.  Changes to the cross-connect object in the
+        mplsXCTable MUST automatically be reflected in the value of
+        this object.  If this object represents a static routing entry,
+        then the manager must ensure that this entry is maintained
+        consistently in the corresponding mplsXCTable as well."
+      REFERENCE
+       "RFC 3813 - Multiprotocol Label Switching (MPLS) Label Switching
+        Router (LSR) Management Information base (MIB), C. Srinivasan,
+        A. Vishwanathan, and T. Nadeau, June 2004"
+       ::= { wriMplsL3VpnVrfRteEntry 17 }
+
+    wriMplsL3VpnVrfRteInetCidrStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+               "The row status variable, used according to row
+                installation and removal conventions.
+                A row entry cannot be modified when the status is
+                marked as active(1)."
+        ::= { wriMplsL3VpnVrfRteEntry 18 }
+
+
+wriMplsL3VpnIdToNameTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnIdToNameEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       ""
+   ::= { wriMplsL3VpnObjects 5 }
+
+wriMplsL3VpnIdToNameEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnIdToNameEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       ""
+      INDEX  { wriMplsL3VpnIdToNameVrid }
+      ::= { wriMplsL3VpnIdToNameTable 1 }
+
+WriMplsL3VpnIdToNameEntry ::= SEQUENCE {
+         wriMplsL3VpnIdToNameVrid     Unsigned32,
+         wriMplsL3VpnIdToNameString   OCTET STRING
+       }
+
+    wriMplsL3VpnIdToNameVrid OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "."
+        ::= { wriMplsL3VpnIdToNameEntry 1 }
+
+		wriMplsL3VpnIdToNameString OBJECT-TYPE
+        SYNTAX     OCTET STRING
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "."
+        ::= { wriMplsL3VpnIdToNameEntry 2 }
+
+
+wriMplsL3VpnImportRTTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF WriMplsL3VpnImportRTEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       ""
+   ::= { wriMplsL3VpnObjects 6 }
+
+wriMplsL3VpnImportRTEntry OBJECT-TYPE
+   SYNTAX        WriMplsL3VpnImportRTEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       ""
+      INDEX  { wriMplsL3VpnImportRTVrfName, wriMplsL3VpnImportRT}
+      ::= { wriMplsL3VpnImportRTTable 1 }
+
+WriMplsL3VpnImportRTEntry ::= SEQUENCE {
+         wriMplsL3VpnImportRTVrfName     OCTET STRING,
+         wriMplsL3VpnImportRT      OCTET STRING,
+         wriMplsL3VpnImportRTVrfID       INTEGER
+         
+       }
+
+    wriMplsL3VpnImportRTVrfName OBJECT-TYPE
+        SYNTAX     OCTET STRING(SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "."
+        ::= { wriMplsL3VpnImportRTEntry 1 }
+
+		wriMplsL3VpnImportRT OBJECT-TYPE
+        SYNTAX     OCTET STRING(SIZE (0..21))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "."
+        ::= { wriMplsL3VpnImportRTEntry 2 }
+        
+    wriMplsL3VpnImportRTVrfID OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "."
+        ::= { wriMplsL3VpnImportRTEntry 3 } 
+
+-- MplsL3VpnVrfRT2Table
+wriMplsL3VpnVrfRT2Table OBJECT-TYPE
+    SYNTAX        SEQUENCE OF WriMplsL3VpnVrfRT2Entry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies per-VRF route target association.
+         Each entry identifies a connectivity policy supported
+         as part of a VPN."
+    ::= { wriMplsL3VpnObjects 7  }
+
+wriMplsL3VpnVrfRT2Entry OBJECT-TYPE
+    SYNTAX        WriMplsL3VpnVrfRT2Entry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+       "An entry in this table is created by an LSR for
+        each route target configured for a VRF supporting
+        a MPLS L3VPN instance.  The indexing provides an
+        ordering per-VRF instance.  See [RFC4364] for a
+        complete definition of a route target."
+    INDEX  { wriMplsL3VpnVrfRT2Name,
+             wriMplsL3VpnVrfRT2Type ,
+             wriMplsL3VpnVrfRT2}
+    ::= { wriMplsL3VpnVrfRT2Table 1 }
+
+WriMplsL3VpnVrfRT2Entry ::= SEQUENCE {
+     wriMplsL3VpnVrfRT2Name        MplsL3VpnName,
+     wriMplsL3VpnVrfRT2Type        MplsL3VpnRtType,
+     wriMplsL3VpnVrfRT2            MplsL3VpnRouteDistinguisher,
+     wriMplsL3VpnVrfRT2Descr       SnmpAdminString,
+     wriMplsL3VpnVrfRT2RowStatus   RowStatus,
+     wriMplsL3VpnVrfRT2StorageType StorageType
+   }
+
+wriMplsL3VpnVrfRT2Name OBJECT-TYPE
+   SYNTAX       MplsL3VpnName
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Auxiliary index for route targets configured for a
+        particular VRF."
+   ::= { wriMplsL3VpnVrfRT2Entry 1 }
+
+wriMplsL3VpnVrfRT2Type OBJECT-TYPE
+   SYNTAX        MplsL3VpnRtType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The route target distribution type."
+   ::= { wriMplsL3VpnVrfRT2Entry 2 }
+
+wriMplsL3VpnVrfRT2 OBJECT-TYPE
+   SYNTAX        MplsL3VpnRouteDistinguisher
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The route target distribution policy."
+   DEFVAL { "" }
+   ::= { wriMplsL3VpnVrfRT2Entry 3 }
+
+wriMplsL3VpnVrfRT2Descr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Description of the route target."
+   DEFVAL { "" }
+   ::= { wriMplsL3VpnVrfRT2Entry 4 }
+
+wriMplsL3VpnVrfRT2RowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table.  When a row in this
+        table is in active(1) state, no objects in that row
+        can be modified except mplsL3VpnVrfRTRowStatus."
+   ::= { wriMplsL3VpnVrfRT2Entry 5 }
+
+wriMplsL3VpnVrfRT2StorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The storage type for this VPN route target (RT) entry.
+         Conceptual rows having the value 'permanent'
+         need not allow write access to any columnar
+         objects in the row."
+   REFERENCE
+        "See RFC2579."
+   DEFVAL { volatile }
+   ::= { wriMplsL3VpnVrfRT2Entry 6 }
+
+
+-- MPLS L3VPN Notifications
+wriMplsL3VpnVrfUp NOTIFICATION-TYPE
+   OBJECTS     { wriMplsL3VpnIfConfRowStatus,
+                 wriMplsL3VpnVrfOperStatus
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when:
+        a. No interface is associated with this VRF, and the first
+           (and only first) interface associated with it has its
+           ifOperStatus change to up(1).
+
+        b. One interface is associated with this VRF, and
+           the ifOperStatus of this interface changes to up(1).
+
+        c. Multiple interfaces are associated with this VRF, and the
+           ifOperStatus of all interfaces is down(2), and the first
+           of those interfaces has its ifOperStatus change to up(1)."
+   ::= { wriMplsL3VpnNotifications 1 }
+
+wriMplsL3VpnVrfDown NOTIFICATION-TYPE
+   OBJECTS     { wriMplsL3VpnIfConfRowStatus,
+                 wriMplsL3VpnVrfOperStatus
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when:
+        a. One interface is associated with this VRF, and
+           the ifOperStatus of this interface changes from up(1)
+           to down(2).
+
+        b. Multiple interfaces are associated with this VRF, and
+           the ifOperStatus of all except one of these interfaces is
+           equal to up(1), and the ifOperStatus of that interface
+           changes from up(1) to down(2).
+
+        c. The last interface with ifOperStatus equal to up(1)
+           is disassociated from a VRF."
+   ::= { wriMplsL3VpnNotifications 2 }
+
+wriMplsL3VpnVrfRouteMidThreshExceeded NOTIFICATION-TYPE
+   OBJECTS     { wriMplsL3VpnVrfPerfCurrNumRoutes,
+                 wriMplsL3VpnVrfConfMidRteThresh
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when the number of routes
+        contained by the specified VRF exceeds the value indicated by
+        mplsL3VpnVrfMidRouteThreshold.  A single notification MUST be
+        generated when this threshold is exceeded, and no other
+        notifications of this type should be issued until the value
+        of mplsL3VpnVrfPerfCurrNumRoutes has fallen below that of
+        mplsL3VpnVrfConfMidRteThresh."
+   ::= { wriMplsL3VpnNotifications 3 }
+
+wriMplsL3VpnVrfNumVrfRouteMaxThreshExceeded NOTIFICATION-TYPE
+   OBJECTS     { wriMplsL3VpnVrfPerfCurrNumRoutes,
+                 wriMplsL3VpnVrfConfHighRteThresh
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when the number of routes
+        contained by the specified VRF exceeds or attempts to exceed
+        the maximum allowed value as indicated by
+        mplsL3VpnVrfMaxRouteThreshold.  In cases where
+        mplsL3VpnVrfConfHighRteThresh is set to the same value
+        as mplsL3VpnVrfConfMaxRoutes, mplsL3VpnVrfConfHighRteThresh
+        need not be exceeded; rather, just reached for this notification
+        to be issued.
+
+        Note that mplsL3VpnVrfConfRteMxThrshTime denotes the interval
+        at which the this notification will be reissued after the
+        maximum value has been exceeded (or reached if
+        mplsL3VpnVrfConfMaxRoutes and mplsL3VpnVrfConfHighRteThresh are
+        equal) and the initial notification has been issued.  This value
+        is intended to prevent continuous generation of notifications by
+        an agent in the event that routes are continually added to a VRF
+        after it has reached its maximum value.  The default value is 0
+        minutes.  If this value is set to 0, the agent should only issue
+        a single notification at the time that the maximum threshold has
+        been reached, and should not issue any more notifications until
+        the value of routes has fallen below the configured threshold
+        value."
+   ::= { wriMplsL3VpnNotifications 4 }
+
+wriMplsL3VpnNumVrfSecIllglLblThrshExcd NOTIFICATION-TYPE
+   OBJECTS     { wriMplsL3VpnVrfSecIllegalLblVltns }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when the number of illegal
+        label violations on a VRF as indicated by
+        mplsL3VpnVrfSecIllegalLblVltns has exceeded
+        mplsL3VpnIllLblRcvThrsh.  The threshold is not
+        included in the varbind here because the value of
+        mplsL3VpnVrfSecIllegalLblVltns should be one greater than
+        the threshold at the time this notification is issued."
+   ::= { wriMplsL3VpnNotifications 5 }
+
+
+wriMplsL3VpnNumVrfRouteMaxThreshCleared NOTIFICATION-TYPE
+   OBJECTS     { wriMplsL3VpnVrfPerfCurrNumRoutes,
+                 wriMplsL3VpnVrfConfHighRteThresh
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated only after the number of routes
+        contained by the specified VRF exceeds or attempts to exceed
+        the maximum allowed value as indicated by
+        mplsVrfMaxRouteThreshold, and then falls below this value.  The
+        emission of this notification informs the operator that the
+        error condition has been cleared without the operator having to
+        query the device.
+
+        Note that mplsL3VpnVrfConfRteMxThrshTime denotes the interval at
+        which the mplsNumVrfRouteMaxThreshExceeded notification will
+        be reissued after the maximum value has been exceeded (or
+        reached if mplsL3VpnVrfConfMaxRoutes and
+        mplsL3VpnVrfConfHighRteThresh are equal) and the initial
+        notification has been issued.  Therefore,
+        the generation of this notification should also be emitted with
+        this same frequency (assuming that the error condition is
+        cleared).  Specifically, if the error condition is reached and
+        cleared several times during the period of time specified in
+        mplsL3VpnVrfConfRteMxThrshTime, only a single notification will
+        be issued to indicate the first instance of the error condition
+        as well as the first time the error condition is cleared.
+        This behavior is intended to prevent continuous generation of
+        notifications by an agent in the event that routes are
+        continually added and removed to/from a VRF after it has
+        reached its maximum value.  The default value is 0.  If this
+        value is set to 0, the agent should issue a notification
+        whenever the maximum threshold has been cleared."
+   ::= { wriMplsL3VpnNotifications 6 }
+
+-- Conformance Statement
+wriMplsL3VpnGroups
+      OBJECT IDENTIFIER ::= { wriMplsL3VpnConformance 1 }
+
+wriMplsL3VpnCompliances
+      OBJECT IDENTIFIER ::= { wriMplsL3VpnConformance 2 }
+
+-- Module Compliance
+
+wriMplsL3VpnModuleFullCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+          "Compliance statement for agents that provide full support
+           for the MPLS-L3VPN-STD-MIB"
+      MODULE -- this module
+         MANDATORY-GROUPS    { wriMplsL3VpnScalarGroup,
+                               wriMplsL3VpnVrfGroup,
+                               wriMplsL3VpnIfGroup,
+                               wriMplsL3VpnPerfGroup,
+                               wriMplsL3VpnVrfRteGroup,
+                               wriMplsL3VpnVrfRTGroup,
+                               wriMplsL3VpnSecGroup,
+                               wriMplsL3VpnNotificationGroup
+                             }
+
+   GROUP       wriMplsL3VpnPerfRouteGroup
+   DESCRIPTION "This group is only mandatory for LSRs that
+                support tracking the number of routes attempted
+                to be added to VRFs."
+
+   OBJECT       wriMplsL3VpnIfConfRowStatus
+   SYNTAX       RowStatus { active(1), notInService(2) }
+   WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                            createAndGo(4), destroy(6)
+                          }
+   DESCRIPTION "Support for createAndWait and notReady is
+                not required."
+
+
+   OBJECT       wriMplsL3VpnVrfConfRowStatus
+   SYNTAX       RowStatus { active(1), notInService(2) }
+   WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                            createAndGo(4), destroy(6)
+                          }
+   DESCRIPTION "Support for createAndWait and notReady is
+                not required."
+   OBJECT       wriMplsL3VpnVrfRTRowStatus
+   SYNTAX       RowStatus { active(1), notInService(2) }
+   WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                            createAndGo(4), destroy(6)
+                          }
+   DESCRIPTION "Support for createAndWait and notReady is
+                not required."
+   ::= { wriMplsL3VpnCompliances 1 }
+
+
+--
+-- ReadOnly Compliance
+--
+
+mplsL3VpnModuleReadOnlyCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION "Compliance requirement for implementations that only
+                   provide read-only support for MPLS-L3VPN-STD-MIB.
+                   Such devices can then be monitored but cannot be
+                   configured using this MIB module."
+
+      MODULE -- this module
+         MANDATORY-GROUPS    { wriMplsL3VpnScalarGroup,
+                               wriMplsL3VpnVrfGroup,
+                               wriMplsL3VpnIfGroup,
+                               wriMplsL3VpnPerfGroup,
+                               wriMplsL3VpnVrfRteGroup,
+                               wriMplsL3VpnVrfRTGroup,
+                               wriMplsL3VpnSecGroup,
+                               wriMplsL3VpnNotificationGroup
+                             }
+
+   GROUP       wriMplsL3VpnPerfRouteGroup
+   DESCRIPTION "This group is only mandatory for LSRs that
+                support tracking the number of routes attempted to
+                be added to VRFs."
+
+   OBJECT       wriMplsL3VpnIfConfRowStatus
+   SYNTAX       RowStatus { active(1) }
+   MIN-ACCESS   read-only
+   DESCRIPTION  "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfConfRowStatus
+   SYNTAX       RowStatus { active(1) }
+   MIN-ACCESS   read-only
+   DESCRIPTION  "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRTRowStatus
+   SYNTAX       RowStatus { active(1) }
+   MIN-ACCESS   read-only
+   DESCRIPTION  "Write access is not required."
+
+   OBJECT       wriMplsL3VpnIfVpnClassification
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnIfVpnRouteDistProtocol
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnIfConfStorageType
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfVpnId
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfDescription
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRD
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfConfMidRteThresh
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfConfHighRteThresh
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfConfMaxRoutes
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfConfStorageType
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRT
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRTDescr
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRTStorageType
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrIfIndex
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrType
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrNextHopAS
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrMetric1
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrMetric2
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrMetric3
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrMetric4
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrMetric5
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteXCPointer
+   MIN-ACCESS   read-only
+   DESCRIPTION "Write access is not required."
+
+   OBJECT       wriMplsL3VpnVrfRteInetCidrStatus
+   SYNTAX       RowStatus { active(1) }
+   MIN-ACCESS   read-only
+   DESCRIPTION  "Write access is not required."
+   ::= { wriMplsL3VpnCompliances 2 }
+
+
+   -- Units of conformance.
+   wriMplsL3VpnScalarGroup OBJECT-GROUP
+      OBJECTS { wriMplsL3VpnConfiguredVrfs,
+                wriMplsL3VpnActiveVrfs,
+                wriMplsL3VpnConnectedInterfaces,
+                wriMplsL3VpnNotificationEnable,
+                wriMplsL3VpnVrfConfMaxPossRts,
+                wriMplsL3VpnVrfConfRteMxThrshTime,
+                wriMplsL3VpnIllLblRcvThrsh
+             }
+      STATUS  current
+      DESCRIPTION
+             "Collection of scalar objects required for MPLS VPN
+              management."
+      ::= { wriMplsL3VpnGroups 1 }
+
+   wriMplsL3VpnVrfGroup OBJECT-GROUP
+      OBJECTS { wriMplsL3VpnVrfVpnId,
+                wriMplsL3VpnVrfDescription,
+                wriMplsL3VpnVrfRD,
+                wriMplsL3VpnVrfCreationTime,
+                wriMplsL3VpnVrfOperStatus,
+                wriMplsL3VpnVrfActiveInterfaces,
+                wriMplsL3VpnVrfAssociatedInterfaces,
+                wriMplsL3VpnVrfConfMidRteThresh,
+                wriMplsL3VpnVrfConfHighRteThresh,
+                wriMplsL3VpnVrfConfMaxRoutes,
+                wriMplsL3VpnVrfConfLastChanged,
+                wriMplsL3VpnVrfConfRowStatus,
+                wriMplsL3VpnVrfConfAdminStatus,
+                wriMplsL3VpnVrfConfStorageType
+       }
+      STATUS  current
+      DESCRIPTION
+             "Collection of objects needed for MPLS VPN VRF
+              management."
+      ::= { wriMplsL3VpnGroups 2 }
+
+   wriMplsL3VpnIfGroup OBJECT-GROUP
+        OBJECTS { wriMplsL3VpnIfVpnClassification,
+                  wriMplsL3VpnIfVpnRouteDistProtocol,
+                  wriMplsL3VpnIfConfStorageType,
+                  wriMplsL3VpnIfConfRowStatus
+           }
+      STATUS  current
+      DESCRIPTION
+             "Collection of objects needed for MPLS VPN interface
+              management."
+      ::= { wriMplsL3VpnGroups 3 }
+
+   wriMplsL3VpnPerfGroup OBJECT-GROUP
+      OBJECTS { wriMplsL3VpnVrfPerfRoutesAdded,
+                wriMplsL3VpnVrfPerfRoutesDeleted,
+                wriMplsL3VpnVrfPerfCurrNumRoutes
+             }
+      STATUS  current
+      DESCRIPTION
+             "Collection of objects needed for MPLS VPN
+              performance information."
+      ::= { wriMplsL3VpnGroups 4 }
+
+   wriMplsL3VpnPerfRouteGroup OBJECT-GROUP
+      OBJECTS { wriMplsL3VpnVrfPerfRoutesDropped,
+                wriMplsL3VpnVrfPerfDiscTime
+             }
+      STATUS  current
+      DESCRIPTION
+             "Collection of objects needed to track MPLS VPN
+              routing table dropped routes."
+      ::= { wriMplsL3VpnGroups 5 }
+
+   wriMplsL3VpnSecGroup OBJECT-GROUP
+      OBJECTS { wriMplsL3VpnVrfSecIllegalLblVltns,
+                wriMplsL3VpnVrfSecDiscontinuityTime }
+      STATUS  current
+      DESCRIPTION
+             "Collection of objects needed for MPLS VPN
+              security-related information."
+      ::= { wriMplsL3VpnGroups 7 }
+
+   wriMplsL3VpnVrfRteGroup OBJECT-GROUP
+      OBJECTS {
+            wriMplsL3VpnVrfRteInetCidrIfIndex,
+            wriMplsL3VpnVrfRteInetCidrType,
+            wriMplsL3VpnVrfRteInetCidrProto,
+            wriMplsL3VpnVrfRteInetCidrAge,
+            wriMplsL3VpnVrfRteInetCidrNextHopAS,
+            wriMplsL3VpnVrfRteInetCidrMetric1,
+            wriMplsL3VpnVrfRteInetCidrMetric2,
+            wriMplsL3VpnVrfRteInetCidrMetric3,
+            wriMplsL3VpnVrfRteInetCidrMetric4,
+            wriMplsL3VpnVrfRteInetCidrMetric5,
+            wriMplsL3VpnVrfRteXCPointer,
+            wriMplsL3VpnVrfRteInetCidrStatus
+       }
+      STATUS  current
+      DESCRIPTION
+             "Objects required for VRF route table management."
+   ::= { wriMplsL3VpnGroups 8 }
+
+   wriMplsL3VpnVrfRTGroup OBJECT-GROUP
+      OBJECTS { wriMplsL3VpnVrfRTDescr,
+                wriMplsL3VpnVrfRT,
+                wriMplsL3VpnVrfRTRowStatus,
+                wriMplsL3VpnVrfRTStorageType
+              }
+      STATUS  current
+      DESCRIPTION
+             "Objects required for VRF route target management."
+   ::= { wriMplsL3VpnGroups 9 }
+
+   wriMplsL3VpnNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS { wriMplsL3VpnVrfUp,
+                       wriMplsL3VpnVrfDown,
+                       wriMplsL3VpnVrfRouteMidThreshExceeded,
+                       wriMplsL3VpnVrfNumVrfRouteMaxThreshExceeded,
+                       wriMplsL3VpnNumVrfSecIllglLblThrshExcd,
+                       wriMplsL3VpnNumVrfRouteMaxThreshCleared
+                     }
+      STATUS  current
+      DESCRIPTION
+             "Objects required for MPLS VPN notifications."
+   ::= { wriMplsL3VpnGroups 10 }
+END
+
+-- End of MPLS-VPN-MIB

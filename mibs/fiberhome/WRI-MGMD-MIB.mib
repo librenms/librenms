@@ -1,0 +1,2419 @@
+WRI-MGMD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2, Counter32, Gauge32,
+    Unsigned32, TimeTicks            FROM SNMPv2-SMI
+    InetAddress, InetAddressType     FROM INET-ADDRESS-MIB
+    RowStatus,TruthValue,TEXTUAL-CONVENTION             FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    InterfaceIndexOrZero,
+    InterfaceIndex                   FROM IF-MIB
+	wri,wriProtocol	        		 FROM WRI-SMI ; 
+
+wriMgmdMIB MODULE-IDENTITY
+    LAST-UPDATED "201106302000Z"
+    ORGANIZATION "FiberHome Networks Systems, Inc"
+    CONTACT-INFO "http://www.fhn.com.cn"
+    DESCRIPTION  "reference to rfc5643."
+        ::= { wriProtocol 1334 }
+
+EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+
+wriMgmdMIBObjects     OBJECT IDENTIFIER ::= { wriMgmdMIB 1 }
+
+--
+--  The WriMgmd Host Interface Table
+--
+
+wriMgmdHostInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdHostInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces on which
+             IGMP or MLD is enabled."
+
+    ::= { wriMgmdMIBObjects 1 }
+
+wriMgmdHostInterfaceEntry OBJECT-TYPE
+    SYNTAX     WriMgmdHostInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) representing an interface on
+            which IGMP or MLD is enabled."
+    INDEX      { wriMgmdHostInterfaceIfIndex,
+                 wriMgmdHostInterfaceQuerierType }
+
+    ::= { wriMgmdHostInterfaceTable 1 }
+
+WriMgmdHostInterfaceEntry ::= SEQUENCE {
+    wriMgmdHostInterfaceIfIndex               InterfaceIndex,
+    wriMgmdHostInterfaceQuerierType           InetAddressType,
+    wriMgmdHostInterfaceQuerier               InetAddress,
+    wriMgmdHostInterfaceStatus                RowStatus,
+    wriMgmdHostInterfaceVersion               Unsigned32,
+    wriMgmdHostInterfaceVersion1QuerierTimer  TimeTicks,
+    wriMgmdHostInterfaceVersion2QuerierTimer  TimeTicks,
+    wriMgmdHostInterfaceVersion3Robustness    Unsigned32
+}
+
+wriMgmdHostInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which IGMP or MLD is
+             enabled.  The table is indexed by the ifIndex value and the
+             InetAddressType to allow for interfaces that may be
+             configured in both IPv4 and IPv6 modes."  
+             
+    ::= { wriMgmdHostInterfaceEntry 1 }
+
+wriMgmdHostInterfaceQuerierType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of this interface.  This entry along with
+             the ifIndex value acts as an index to the wriMgmdHostInterface
+             table.  A physical interface may be configured in multiple
+             modes concurrently, e.g., in IPv4 and IPv6 modes connected
+             to the same interface; however, the traffic is considered
+             to be logically separate."
+
+    ::= { wriMgmdHostInterfaceEntry 2 }
+
+wriMgmdHostInterfaceQuerier OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the IGMP or MLD Querier on the IP subnet to
+             which this interface is attached.  The InetAddressType,
+             e.g., IPv4 or IPv6, is identified by the
+             wriMgmdHostInterfaceQuerierType variable in the
+             wriMgmdHostInterface table."
+
+    ::= { wriMgmdHostInterfaceEntry 3 }
+
+wriMgmdHostInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The activation of a row enables the host side of IGMP or
+            MLD on the interface.  The destruction of a row disables
+            the host side of IGMP or MLD on the interface."
+
+    ::= { wriMgmdHostInterfaceEntry 4 }
+
+wriMgmdHostInterfaceVersion OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..3)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum version of WriMgmd that the host can run on
+            this interface.  A value of 1 is only applicable for IPv4,
+            and indicates that the host only supports IGMPv1 on the
+            interface.  A value of 2 indicates that the host also
+            supports IGMPv2 (for IPv4) or MLDv1 (for IPv6).  A value of
+            3 indicates that the host also supports WriMgmd (for IPv4)
+            or MLDv2 (for IPv6)."
+    DEFVAL     { 3 }
+
+    ::= { wriMgmdHostInterfaceEntry 5 }
+
+wriMgmdHostInterfaceVersion1QuerierTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the host assumes that there are
+            no IGMPv1 routers present on the interface.  While this is
+            non-zero, the host will reply to all queries with version 1
+            membership reports.  This variable applies to IGMPv2 or 3
+            hosts that are forced to run in v1 for compatibility with
+            v1 routers present on the interface.  This object may only
+            be present when the corresponding value of
+            wriMgmdHostInterfaceQuerierType is ipv4."
+    REFERENCE "RFC 2236, Section 4 and RFC 3376, Section 7.2.1"
+    DEFVAL     { 0 }
+
+    ::= { wriMgmdHostInterfaceEntry 6 }
+
+wriMgmdHostInterfaceVersion2QuerierTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the host assumes that there are
+            no MGMDv2 routers present on the interface.  While this is
+            non-zero, the host will reply to all queries with version 1
+            or 2 membership reports.  This variable applies to MGMDv3
+            hosts that are forced to run in v2 for compatibility with
+            v2 hosts or routers present on the interface."
+    REFERENCE "RFC 3376, Section 7.2.1 and RFC 3810, Section 8.2.1"
+    DEFVAL     { 0 }
+
+    ::= { wriMgmdHostInterfaceEntry 7 }
+
+wriMgmdHostInterfaceVersion3Robustness OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The robustness variable utilised by an MGMDv3 host in
+            sending state-change reports for multicast routers.  To
+            ensure the state-change report is not missed, the host
+            retransmits the state-change report
+            [wriMgmdHostInterfaceVersion3Robustness - 1] times.  The
+            variable must be a non-zero value."
+    REFERENCE "RFC 3376, Section 8.1 and RFC 3810, Section 9.14.1"
+    DEFVAL     { 2 }
+
+    ::= { wriMgmdHostInterfaceEntry 8 }
+
+--
+--  The WriMgmd Router Interface Table
+--
+
+wriMgmdRouterInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces on which
+            IGMP or MLD is enabled."
+
+    ::= { wriMgmdMIBObjects 2 }
+
+wriMgmdRouterInterfaceEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) representing an interface on
+            which IGMP or MLD is enabled."
+    INDEX      { wriMgmdRouterInterfaceIfIndex,
+                 wriMgmdRouterInterfaceQuerierType }
+
+    ::= { wriMgmdRouterInterfaceTable 1 }
+
+WriMgmdRouterInterfaceEntry ::= SEQUENCE {
+    wriMgmdRouterInterfaceIfIndex                 InterfaceIndex,
+    wriMgmdRouterInterfaceQuerierType             InetAddressType,
+    wriMgmdRouterInterfaceQuerier                 InetAddress,
+    wriMgmdRouterInterfaceQueryInterval           Unsigned32,
+    wriMgmdRouterInterfaceStatus                  RowStatus,
+    wriMgmdRouterInterfaceVersion                 Unsigned32,
+    wriMgmdRouterInterfaceQueryMaxResponseTime    Unsigned32,
+    wriMgmdRouterInterfaceQuerierUpTime           TimeTicks,
+    wriMgmdRouterInterfaceQuerierExpiryTime       Unsigned32,
+    wriMgmdRouterInterfaceWrongVersionQueries     Counter32,
+    wriMgmdRouterInterfaceJoins                   Counter32,
+    wriMgmdRouterInterfaceProxyIfIndex            InterfaceIndexOrZero,
+    wriMgmdRouterInterfaceGroups                  Gauge32,
+    wriMgmdRouterInterfaceRobustness              Unsigned32,
+    wriMgmdRouterInterfaceLastMemberQueryInterval Unsigned32,
+    wriMgmdRouterInterfaceLastMemberQueryCount    Unsigned32,
+    wriMgmdRouterInterfaceStartupQueryCount       Unsigned32,
+    wriMgmdRouterInterfaceStartupQueryInterval    Unsigned32,
+	wriMgmdRouterInterfaceAccessList              Unsigned32,
+	wriMgmdRouterInterfaceFastLeave               TruthValue,
+	wriMgmdRouterInterfaceQuerierRemain           Unsigned32,
+    wriMgmdRouterInterfaceCheckAlert              TruthValue,
+    wriMgmdRouterInterfaceSndWithAlert            TruthValue,
+	wriMgmdRouterInterfaceGrpMax                  Counter32,
+	wriMgmdRouterInterfaceGeneralQuery            TruthValue,
+	wriMgmdRouterInterfaceSsmMapEnable            TruthValue,
+	wriMgmdRouterInterfaceGrpPolicyAcl            Unsigned32,
+	wriMgmdRouterInterfaceGrpPolicyVersion        OCTET STRING
+	
+}
+
+wriMgmdRouterInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which IGMP or MLD
+            is enabled.  The table is indexed by the ifIndex value and
+            the InetAddressType to allow for interfaces that may be
+            configured in both IPv4 and IPv6 modes."
+
+    ::= { wriMgmdRouterInterfaceEntry 1 }
+
+wriMgmdRouterInterfaceQuerierType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of this interface.  This entry along with
+            the ifIndex value acts as the index to the
+            wriMgmdRouterInterface table.  A physical interface may be
+            configured in multiple modes concurrently, e.g., in IPv4
+            and IPv6 modes connected to the same interface; however,
+            the traffic is considered to be logically separate."
+
+    ::= { wriMgmdRouterInterfaceEntry 2 }
+
+wriMgmdRouterInterfaceQuerier OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the IGMP or MLD Querier on the IP subnet to
+            which this interface is attached.  The InetAddressType,
+            e.g., IPv4 or IPv6, is identified by the
+            wriMgmdRouterInterfaceQuerierType variable in the
+            wriMgmdRouterInterface table."
+
+    ::= { wriMgmdRouterInterfaceEntry 3 }
+
+wriMgmdRouterInterfaceQueryInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The frequency at which IGMP or MLD Host-Query packets are
+            transmitted on this interface."
+    DEFVAL     { 125 }
+
+    ::= { wriMgmdRouterInterfaceEntry 4 }
+
+wriMgmdRouterInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The activation of a row enables the router side of IGMP or
+            MLD on the interface.  The destruction of a row disables
+            the router side of IGMP or MLD on the interface."
+
+    ::= { wriMgmdRouterInterfaceEntry 5 }
+
+wriMgmdRouterInterfaceVersion OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..3)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The version of WriMgmd that is running on this interface.
+            Value 1 applies to IGMPv1 routers only.  Value 2 applies
+            to IGMPv2 and MLDv1 routers, and value 3 applies to WriMgmd
+            and MLDv2 routers.
+
+            This object can be used to configure a router capable of
+            running either version.  For IGMP and MLD to function
+            correctly, all routers on a LAN must be configured to run
+            the same version on that LAN."
+    DEFVAL     { 3 }
+
+    ::= { wriMgmdRouterInterfaceEntry 6 }
+
+wriMgmdRouterInterfaceQueryMaxResponseTime OBJECT-TYPE
+    SYNTAX     Unsigned32  (0..65535)
+    UNITS      "tenths of seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum query response interval advertised in MGMDv2
+            or WriMgmd queries on this interface."
+    REFERENCE "RFC 3810, Section 9.3"
+    DEFVAL     { 100 }
+
+    ::= { wriMgmdRouterInterfaceEntry 7 }
+
+wriMgmdRouterInterfaceQuerierUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since wriMgmdRouterInterfaceQuerier was last
+            changed."
+
+    ::= { wriMgmdRouterInterfaceEntry 8 }
+
+wriMgmdRouterInterfaceQuerierExpiryTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The amount of time remaining before the Other Querier
+            Present Timer expires.  If the local system is the querier,
+            the value of this object is zero."
+
+    ::= { wriMgmdRouterInterfaceEntry 9 }
+
+wriMgmdRouterInterfaceWrongVersionQueries OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of general queries received whose IGMP or MLD
+            version does not match the equivalent
+            wriMgmdRouterInterfaceVersion, over the lifetime of the row
+            entry.  Both IGMP and MLD require that all routers on a LAN
+            be configured to run the same version.  Thus, if any general
+            queries are received with the wrong version, this indicates
+            a configuration error."
+
+    ::= { wriMgmdRouterInterfaceEntry 10 }
+
+wriMgmdRouterInterfaceJoins OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of times a group membership has been added on
+            this interface, that is, the number of times an entry for
+            this interface has been added to the Cache Table.  This
+            object can give an indication of the amount of activity
+            between samples over time."
+
+    ::= { wriMgmdRouterInterfaceEntry 11 }
+
+wriMgmdRouterInterfaceProxyIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Some devices implement a form of IGMP or MLD proxying
+            whereby memberships learned on the interface represented by
+            this row cause Host Membership Reports to be sent on the
+            interface whose ifIndex value is given by this object.
+            Such a device would implement the wriMgmdV2RouterBaseMIBGroup
+            only on its router interfaces (those interfaces with
+            non-zero wriMgmdRouterInterfaceProxyIfIndex).  Typically, the
+            value of this object is 0, indicating that no proxying is
+            being done."
+    DEFVAL     { 0 }
+
+    ::= { wriMgmdRouterInterfaceEntry 12 }
+
+wriMgmdRouterInterfaceGroups OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current number of entries for this interface in the
+            wriMgmdRouterCacheTable."
+
+    ::= { wriMgmdRouterInterfaceEntry 13 }
+
+wriMgmdRouterInterfaceRobustness OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The Robustness Variable allows tuning for the expected
+            packet loss on a subnet.  If a subnet is expected to be
+            lossy, the Robustness Variable may be increased.  IGMP and
+            MLD are robust to (Robustness Variable-1) packet losses."
+    DEFVAL     { 2 }
+    ::= { wriMgmdRouterInterfaceEntry 14 }
+
+wriMgmdRouterInterfaceLastMemberQueryInterval OBJECT-TYPE
+    SYNTAX     Unsigned32  (0..31744)
+    UNITS      "tenths of seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The Last Member Query Interval is the Max Query Response
+            Interval inserted into group-specific queries sent in
+            response to leave group messages, and is also the amount
+            of time between group-specific query messages.  This value
+            may be tuned to modify the leave latency of the network.  A
+            reduced value results in reduced time to detect the loss of
+            the last member of a group.  The value of this object is
+            irrelevant if wriMgmdRouterInterfaceVersion is 1."
+    DEFVAL     { 10 }
+
+    ::= { wriMgmdRouterInterfaceEntry 15 }
+
+wriMgmdRouterInterfaceLastMemberQueryCount OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Represents the number of group-specific and group-and-
+            source-specific queries sent by the router before it assumes
+            there are no local members."
+
+    ::= { wriMgmdRouterInterfaceEntry 16 }
+
+wriMgmdRouterInterfaceStartupQueryCount OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Represents the number of Queries sent out on startup,
+            separated by the Startup Query Interval."
+
+    ::= { wriMgmdRouterInterfaceEntry 17 }
+
+wriMgmdRouterInterfaceStartupQueryInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..31744)
+    UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This variable represents the interval between General
+            Queries sent by a Querier on startup."
+
+    ::= { wriMgmdRouterInterfaceEntry 18 }
+
+wriMgmdRouterInterfaceAccessList OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Reserved."
+
+    ::= { wriMgmdRouterInterfaceEntry 19 }	
+	
+wriMgmdRouterInterfaceFastLeave OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 20} 		
+
+wriMgmdRouterInterfaceQuerierRemain OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS   read-only
+   STATUS    current
+   DESCRIPTION
+      "  "
+   ::= { wriMgmdRouterInterfaceEntry 21} 
+   
+wriMgmdRouterInterfaceCheckAlert OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 22} 
+
+wriMgmdRouterInterfaceSndWithAlert OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 23} 
+
+wriMgmdRouterInterfaceGrpMax OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 24} 
+
+wriMgmdRouterInterfaceGeneralQuery OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 25} 
+ 
+wriMgmdRouterInterfaceSsmMapEnable  OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 26}
+
+wriMgmdRouterInterfaceGrpPolicyAcl OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterInterfaceEntry 27}
+   
+wriMgmdRouterInterfaceGrpPolicyVersion OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS   current
+   DESCRIPTION
+       "bitmap,version1 0,version2 1 version3 2" 
+   ::= { wriMgmdRouterInterfaceEntry 28}
+
+--
+--  The WriMgmd Host Cache Table
+--
+
+wriMgmdHostCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups for
+             which the host is a member on a particular interface."
+
+    ::= { wriMgmdMIBObjects 3 }
+
+wriMgmdHostCacheEntry OBJECT-TYPE
+    SYNTAX     WriMgmdHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wriMgmdHostCacheTable."
+    INDEX      { wriMgmdHostCacheAddressType, wriMgmdHostCacheAddress,
+                 wriMgmdHostCacheIfIndex }
+
+    ::= { wriMgmdHostCacheTable 1 }
+
+WriMgmdHostCacheEntry ::= SEQUENCE {
+    wriMgmdHostCacheAddressType        InetAddressType,
+    wriMgmdHostCacheAddress            InetAddress ,
+    wriMgmdHostCacheIfIndex            InterfaceIndex,
+    wriMgmdHostCacheUpTime             TimeTicks,
+    wriMgmdHostCacheLastReporter       InetAddress,
+    wriMgmdHostCacheSourceFilterMode   INTEGER
+}
+
+wriMgmdHostCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the wriMgmdHostCacheTable entry.  This
+            value applies to both the wriMgmdHostCacheAddress and the
+            wriMgmdHostCacheLastReporter entries."
+             
+    ::= { wriMgmdHostCacheEntry 1 }
+
+wriMgmdHostCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the wriMgmdHostCacheAddressType variable
+            in the wriMgmdHostCache table."
+
+    ::= { wriMgmdHostCacheEntry 2 }
+
+wriMgmdHostCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { wriMgmdHostCacheEntry 3 }
+
+wriMgmdHostCacheUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time elapsed since this entry was created."
+
+    ::= { wriMgmdHostCacheEntry 4 }
+
+wriMgmdHostCacheLastReporter OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the source of the last membership report
+            received for this IP multicast group address on this
+            interface.  If no membership report has been received, this
+            object has a value of 0.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the wriMgmdHostCacheAddressType variable
+            in the wriMgmdHostCache table."
+
+    ::= { wriMgmdHostCacheEntry 5 }
+
+wriMgmdHostCacheSourceFilterMode OBJECT-TYPE
+    SYNTAX     INTEGER {include (1),
+                        exclude (2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state in which the interface is currently set.  The
+            value indicates the relevance of the corresponding source
+            list entries in the wriMgmdHostSecListTable for MGMDv3
+            interfaces."
+
+    ::= { wriMgmdHostCacheEntry 6 }
+
+--
+--  The WriMgmd Router Cache Table
+--
+
+wriMgmdRouterCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups for
+            which there are members on a particular router interface."
+
+    ::= { wriMgmdMIBObjects 4 }
+
+wriMgmdRouterCacheEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wriMgmdRouterCacheTable."
+
+    INDEX      { wriMgmdRouterCacheAddressType, wriMgmdRouterCacheAddress,
+                 wriMgmdRouterCacheIfIndex }
+
+    ::= { wriMgmdRouterCacheTable 1 }
+
+WriMgmdRouterCacheEntry ::= SEQUENCE {
+    wriMgmdRouterCacheAddressType        InetAddressType,
+    wriMgmdRouterCacheAddress            InetAddress,
+    wriMgmdRouterCacheIfIndex            InterfaceIndex,
+    wriMgmdRouterCacheLastReporter       InetAddress,
+    wriMgmdRouterCacheUpTime             TimeTicks,
+    wriMgmdRouterCacheExpiryTime         TimeTicks,
+    wriMgmdRouterCacheExcludeModeExpiryTimer
+                                      TimeTicks,
+    wriMgmdRouterCacheVersion1HostTimer  TimeTicks,
+    wriMgmdRouterCacheVersion2HostTimer  TimeTicks,
+    wriMgmdRouterCacheSourceFilterMode   INTEGER,
+	wriMgmdRouterCacheStaticStatus       INTEGER,
+	wriMgmdRouterCacheStatus             RowStatus,
+	wriMgmdRouterCacheFlush              TruthValue	
+}
+
+wriMgmdRouterCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the wriMgmdRouterCacheTable entry.  This
+            value applies to both the wriMgmdRouterCacheAddress and the
+            wriMgmdRouterCacheLastReporter entries."
+
+    ::= { wriMgmdRouterCacheEntry 1 }
+
+wriMgmdRouterCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the wriMgmdRouterCacheAddressType
+            variable in the wriMgmdRouterCache table."
+
+    ::= { wriMgmdRouterCacheEntry 2 }
+
+wriMgmdRouterCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { wriMgmdRouterCacheEntry 3 }
+
+wriMgmdRouterCacheLastReporter OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the source of the last membership report
+            received for this IP multicast group address on this
+            interface.  If no membership report has been received, this
+            object has the value 0.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the wriMgmdRouterCacheAddressType
+            variable in the wriMgmdRouterCache table."
+
+    ::= { wriMgmdRouterCacheEntry 4 }
+
+wriMgmdRouterCacheUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time elapsed since this entry was created."
+
+    ::= { wriMgmdRouterCacheEntry 5 }
+
+wriMgmdRouterCacheExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This value represents the time remaining before the Group
+            Membership Interval state expires.  The value must always be
+            greater than or equal to 1."
+
+    ::= { wriMgmdRouterCacheEntry 6 }
+
+wriMgmdRouterCacheExcludeModeExpiryTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This value is applicable only to MGMDv3-compatible nodes
+            and represents the time remaining before the interface
+            EXCLUDE state expires and the interface state transitions
+            to INCLUDE mode.  This value can never be greater than
+            wriMgmdRouterCacheExpiryTime."
+
+    ::= { wriMgmdRouterCacheEntry 7 }
+
+wriMgmdRouterCacheVersion1HostTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the local router will assume that
+            there are no longer any WriMgmd version 1 members on the IP
+            subnet attached to this interface.  This entry only applies
+            to IGMPv1 hosts, and is not implemented for MLD.  Upon
+            hearing any MGMDv1 Membership Report (IGMPv1 only), this
+            value is reset to the group membership timer.  While this
+            time remaining is non-zero, the local router ignores any
+            MGMDv2 Leave messages (IGMPv2 only) for this group that it
+            receives on this interface."
+
+    ::= { wriMgmdRouterCacheEntry 8 }
+
+wriMgmdRouterCacheVersion2HostTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the local router will assume that
+            there are no longer any WriMgmd version 2 members on the IP
+            subnet attached to this interface.  This entry applies to
+            both IGMP and MLD hosts.  Upon hearing any MGMDv2 Membership
+            Report, this value is reset to the group membership timer.
+            Assuming no MGMDv1 hosts have been detected, the local
+            router does not ignore any MGMDv2 Leave messages for this
+            group that it receives on this interface."
+
+    ::= { wriMgmdRouterCacheEntry 9 }
+
+wriMgmdRouterCacheSourceFilterMode OBJECT-TYPE
+    SYNTAX     INTEGER {include (1),
+                        exclude (2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current cache state, applicable to MGMDv3-compatible
+            nodes.  The value indicates whether the state is INCLUDE or
+            EXCLUDE."
+
+    ::= { wriMgmdRouterCacheEntry 10 }
+
+wriMgmdRouterCacheStaticStatus OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "    "
+
+    ::= { wriMgmdRouterCacheEntry 11 }
+	
+wriMgmdRouterCacheStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "    "
+
+    ::= { wriMgmdRouterCacheEntry 12 }
+	
+wriMgmdRouterCacheFlush OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "    "
+
+    ::= { wriMgmdRouterCacheEntry 13 }
+		
+--
+--  The WriMgmd Inverse Host interface/cache lookup Table
+--
+
+wriMgmdInverseHostCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdInverseHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces that are
+            members of a particular group.  This is an inverse lookup
+            table for entries in the wriMgmdHostCacheTable."
+
+    ::= { wriMgmdMIBObjects 5 }
+
+wriMgmdInverseHostCacheEntry OBJECT-TYPE
+    SYNTAX     WriMgmdInverseHostCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the
+            wriMgmdInverseHostCacheTable."
+    INDEX      { wriMgmdInverseHostCacheIfIndex,
+                 wriMgmdInverseHostCacheAddressType,
+                 wriMgmdInverseHostCacheAddress}
+
+    ::= { wriMgmdInverseHostCacheTable 1 }
+
+WriMgmdInverseHostCacheEntry ::= SEQUENCE {
+    wriMgmdInverseHostCacheIfIndex            InterfaceIndex,
+    wriMgmdInverseHostCacheAddressType        InetAddressType,
+    wriMgmdInverseHostCacheAddress            InetAddress
+}
+
+wriMgmdInverseHostCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information."
+
+    ::= { wriMgmdInverseHostCacheEntry 1 }
+
+wriMgmdInverseHostCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the wriMgmdInverseHostCacheTable entry."
+
+    ::= { wriMgmdInverseHostCacheEntry 2 }
+
+wriMgmdInverseHostCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information about an interface.  The
+            InetAddressType, e.g., IPv4 or IPv6, is identified by the
+            wriMgmdInverseHostCacheAddressType variable in the
+            wriMgmdInverseHostCache table."
+
+    ::= { wriMgmdInverseHostCacheEntry 3 }
+
+--
+--  The WriMgmd Inverse Router interface/cache lookup Table
+--
+
+wriMgmdInverseRouterCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdInverseRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces that
+            are members of a particular group.  This is an inverse
+            lookup table for entries in the wriMgmdRouterCacheTable."
+
+    ::= { wriMgmdMIBObjects 6 }
+
+wriMgmdInverseRouterCacheEntry OBJECT-TYPE
+    SYNTAX     WriMgmdInverseRouterCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the
+            wriMgmdInverseRouterCacheTable."
+    INDEX      { wriMgmdInverseRouterCacheIfIndex,
+                 wriMgmdInverseRouterCacheAddressType,
+                 wriMgmdInverseRouterCacheAddress }
+
+    ::= { wriMgmdInverseRouterCacheTable 1 }
+
+WriMgmdInverseRouterCacheEntry ::= SEQUENCE {
+    wriMgmdInverseRouterCacheIfIndex            InterfaceIndex,
+    wriMgmdInverseRouterCacheAddressType        InetAddressType,
+    wriMgmdInverseRouterCacheAddress            InetAddress
+}
+
+wriMgmdInverseRouterCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { wriMgmdInverseRouterCacheEntry 1 }
+
+wriMgmdInverseRouterCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the wriMgmdInverseRouterCacheTable entry."
+
+    ::= { wriMgmdInverseRouterCacheEntry 2 }
+
+wriMgmdInverseRouterCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the wriMgmdInverseRouterCacheAddressType
+            variable in the wriMgmdInverseRouterCache table."
+
+    ::= { wriMgmdInverseRouterCacheEntry 3 }
+
+--
+--  The WriMgmd Host Source list Table
+--
+
+wriMgmdHostSrcListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdHostSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the Source List entries
+             corresponding to each interface and multicast group pair
+             on a host."
+
+    ::= { wriMgmdMIBObjects 7 }
+
+wriMgmdHostSrcListEntry OBJECT-TYPE
+    SYNTAX     WriMgmdHostSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wriMgmdHostSrcListTable."
+    INDEX      { wriMgmdHostSrcListAddressType, wriMgmdHostSrcListAddress,
+                 wriMgmdHostSrcListIfIndex, wriMgmdHostSrcListHostAddress }
+
+    ::= { wriMgmdHostSrcListTable 1 }
+
+WriMgmdHostSrcListEntry ::= SEQUENCE {
+    wriMgmdHostSrcListAddressType      InetAddressType,
+    wriMgmdHostSrcListAddress          InetAddress,
+    wriMgmdHostSrcListIfIndex          InterfaceIndex,
+    wriMgmdHostSrcListHostAddress      InetAddress,
+    wriMgmdHostSrcListExpire           TimeTicks
+}
+
+wriMgmdHostSrcListAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the InetAddress variables in this
+            table.  This value applies to the wriMgmdHostSrcListHostAddress
+            and wriMgmdHostSrcListAddress entries."
+
+    ::= { wriMgmdHostSrcListEntry 1 }
+
+wriMgmdHostSrcListAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information."
+
+    ::= { wriMgmdHostSrcListEntry 2 }
+
+wriMgmdHostSrcListIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { wriMgmdHostSrcListEntry 3 }
+
+wriMgmdHostSrcListHostAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS   read-only
+    STATUS     current
+    DESCRIPTION
+            "The host address to which this entry corresponds.  The
+            wriMgmdHostCacheSourceFilterMode value for this group address
+            and interface indicates whether this host address is
+            included or excluded."
+
+    ::= { wriMgmdHostSrcListEntry 4 }    
+    
+wriMgmdHostSrcListExpire OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This value indicates the relevance of the SrcList entry,
+            whereby a non-zero value indicates this is an INCLUDE state
+            value, and a zero value indicates this to be an EXCLUDE
+            state value."
+
+    ::= { wriMgmdHostSrcListEntry 5 }
+
+--
+--  The WriMgmd Router Source list Table
+--
+
+wriMgmdRouterSrcListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the Source List entries
+            corresponding to each interface and multicast group pair on
+            a Router."
+
+    ::= { wriMgmdMIBObjects 8 }
+
+wriMgmdRouterSrcListEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterSrcListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wriMgmdRouterSrcListTable."
+    INDEX      { wriMgmdRouterSrcListAddressType,
+                 wriMgmdRouterSrcListAddress,
+                 wriMgmdRouterSrcListIfIndex,
+                 wriMgmdRouterSrcListHostAddress }
+
+    ::= { wriMgmdRouterSrcListTable 1 }
+
+WriMgmdRouterSrcListEntry ::= SEQUENCE {
+    wriMgmdRouterSrcListAddressType    InetAddressType,
+    wriMgmdRouterSrcListAddress        InetAddress,
+    wriMgmdRouterSrcListIfIndex        InterfaceIndex,
+    wriMgmdRouterSrcListHostAddress    InetAddress,
+    wriMgmdRouterSrcListExpire         TimeTicks,
+	wriMgmdRouterSrcListIngressPort    INTEGER,
+	wriMgmdRouterSrcListStaticStatus   INTEGER,
+	wriMgmdRouterSrcListStatus         RowStatus,
+	wriMgmdRouterSrcListFlush          TruthValue,
+	wriMgmdRouterSrcListMode           INTEGER     
+}
+
+wriMgmdRouterSrcListAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the InetAddress variables in this
+            table.  This value applies to the
+            wriMgmdRouterSrcListHostAddress and wriMgmdRouterSrcListAddress
+            entries."
+
+    ::= { wriMgmdRouterSrcListEntry 1 }
+
+wriMgmdRouterSrcListAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information."
+
+    ::= { wriMgmdRouterSrcListEntry 2 }
+
+wriMgmdRouterSrcListIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { wriMgmdRouterSrcListEntry 3 }
+
+wriMgmdRouterSrcListHostAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "The host address to which this entry corresponds.  The
+            wriMgmdRouterCacheSourceFilterMode value for this group address
+            and interface indicates whether this host address is
+            included or excluded."
+
+    ::= { wriMgmdRouterSrcListEntry 4 }
+
+wriMgmdRouterSrcListExpire OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This value indicates the relevance of the SrcList entry,
+            whereby a non-zero value indicates this is an INCLUDE state
+            value, and a zero value indicates this to be an EXCLUDE
+            state value."
+
+    ::= { wriMgmdRouterSrcListEntry 5 }
+	
+wriMgmdRouterSrcListIngressPort OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           " "	
+	::= { wriMgmdRouterSrcListEntry 6 }	   
+
+wriMgmdRouterSrcListStaticStatus OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "  ."
+
+    ::= { wriMgmdRouterSrcListEntry 7 } 
+	
+wriMgmdRouterSrcListStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "    "
+
+    ::= { wriMgmdRouterSrcListEntry 8 }	
+	
+wriMgmdRouterSrcListFlush OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "    "
+
+    ::= { wriMgmdRouterSrcListEntry 9 }
+	
+wriMgmdRouterSrcListMode OBJECT-TYPE
+    SYNTAX    INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+	  "   "
+    ::= { wriMgmdRouterSrcListEntry 10 }	
+
+	
+
+	
+--  The WriMgmd Router Source Output Table
+--
+
+wriMgmdRouterSrcOutputTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterSrcOutputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " ."
+
+    ::= { wriMgmdMIBObjects 9 }
+
+wriMgmdRouterSrcOutputEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterSrcOutputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "  ."
+    INDEX      { wriMgmdRouterSrcOutputAddressType,
+	             wriMgmdRouterSrcOutputAddress,
+                 wriMgmdRouterSrcOutputIfIndex,
+				 wriMgmdRouterSrcOutputHostAddress, 
+                 wriMgmdRouterSrcOutputPort }
+
+    ::= { wriMgmdRouterSrcOutputTable 1 }
+
+WriMgmdRouterSrcOutputEntry ::= SEQUENCE {
+    wriMgmdRouterSrcOutputAddressType    InetAddressType,
+	wriMgmdRouterSrcOutputAddress        InetAddress,
+    wriMgmdRouterSrcOutputIfIndex        InterfaceIndex,
+	wriMgmdRouterSrcOutputHostAddress    InetAddress, 
+    wriMgmdRouterSrcOutputPort           INTEGER,
+	wriMgmdRouterSrcOutputStaticStatus   INTEGER,
+	wriMgmdRouterSrcOutputStatus         RowStatus,
+	wriMgmdRouterSrcOutputFlush          TruthValue
+  }
+  
+wriMgmdRouterSrcOutputAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1), ipv6(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type of the InetAddress variables in this
+            table.  This value applies to the
+            wriMgmdRouterSrcListHostAddress and wriMgmdRouterSrcListAddress
+            entries."
+
+    ::= { wriMgmdRouterSrcOutputEntry 1 }
+  
+wriMgmdRouterSrcOutputAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            " ."
+
+    ::= { wriMgmdRouterSrcOutputEntry 2 }
+
+wriMgmdRouterSrcOutputIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "  ."
+
+    ::= { wriMgmdRouterSrcOutputEntry 3 }
+
+wriMgmdRouterSrcOutputHostAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+            "   ."
+
+    ::= { wriMgmdRouterSrcOutputEntry 4 }
+
+wriMgmdRouterSrcOutputPort OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "  ."
+
+    ::= { wriMgmdRouterSrcOutputEntry 5 }  
+	
+wriMgmdRouterSrcOutputStaticStatus OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "  ."
+
+    ::= { wriMgmdRouterSrcOutputEntry 6 } 
+
+wriMgmdRouterSrcOutputStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "  ."
+
+    ::= { wriMgmdRouterSrcOutputEntry 7 } 	
+	
+wriMgmdRouterSrcOutputFlush OBJECT-TYPE
+    SYNTAX    TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "   " 
+    ::= { wriMgmdRouterSrcOutputEntry 8}		  
+  
+
+--  The WriMgmd Router IgmpInstance Table
+--  The IgmpInstance Parameters for WriMgmd.
+
+wriMgmdRouterIgmpInstanceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterIgmpInstanceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " ."
+
+    ::= { wriMgmdMIBObjects 10}
+
+wriMgmdRouterIgmpInstanceEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterIgmpInstanceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "  ."
+    INDEX      { wriMgmdRouterIgmpInstanceVrid }
+
+    ::= { wriMgmdRouterIgmpInstanceTable 1 }
+
+WriMgmdRouterIgmpInstanceEntry ::= SEQUENCE {
+    wriMgmdRouterIgmpInstanceVrid    Unsigned32,    
+    wriMgmdRouterIgmpInstanceIfNum     Counter32,
+    wriMgmdRouterIgmpInstanceGrpNum   Counter32,
+    wriMgmdRouterIgmpInstanceSrcNum    Counter32,
+    wriMgmdRouterIgmpInstanceEgressNum   Counter32,
+    wriMgmdRouterIgmpInstanceRowStatus   RowStatus,
+    wriMgmdRouterIgmpInstanceCheckAlert  TruthValue,
+    wriMgmdRouterIgmpInstanceSndWithAlert  TruthValue,
+    wriMgmdRouterIgmpInstanceQI       Unsigned32,
+    wriMgmdRouterIgmpInstanceRBV   Unsigned32,
+    wriMgmdRouterIgmpInstanceQRI   Unsigned32,
+    wriMgmdRouterIgmpInstanceOQI   Unsigned32,
+    wriMgmdRouterIgmpInstanceLLQI   Unsigned32,
+	  wriMgmdRouterIgmpInstanceInVlan   TruthValue,
+	  wriMgmdRouterIgmpInstanceGrpMax   Counter32,
+	  wriMgmdRouterIgmpInstanceGrpFlush   INTEGER
+}
+
+wriMgmdRouterIgmpInstanceVrid  OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterIgmpInstanceEntry 1}		
+
+wriMgmdRouterIgmpInstanceIfNum OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "     "
+   ::= { wriMgmdRouterIgmpInstanceEntry 2}
+
+wriMgmdRouterIgmpInstanceGrpNum  OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION   
+         "    "
+   ::= { wriMgmdRouterIgmpInstanceEntry 3}
+
+
+wriMgmdRouterIgmpInstanceSrcNum  OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+       "   "
+   ::= { wriMgmdRouterIgmpInstanceEntry 4}
+
+wriMgmdRouterIgmpInstanceEgressNum  OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+       "    " 
+   ::= { wriMgmdRouterIgmpInstanceEntry 5}
+
+wriMgmdRouterIgmpInstanceRowStatus  OBJECT-TYPE
+   SYNTAX   RowStatus
+   MAX-ACCESS  read-write
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterIgmpInstanceEntry 6} 	   
+	
+wriMgmdRouterIgmpInstanceCheckAlert   OBJECT-TYPE
+   SYNTAX  TruthValue
+   MAX-ACCESS  read-write
+   STATUS   current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterIgmpInstanceEntry 7}
+
+wriMgmdRouterIgmpInstanceSndWithAlert      OBJECT-TYPE
+   SYNTAX  TruthValue
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+       "     "
+   ::= { wriMgmdRouterIgmpInstanceEntry 8}
+
+wriMgmdRouterIgmpInstanceQI  OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+	   "   " 
+	::= { wriMgmdRouterIgmpInstanceEntry 9}
+
+wriMgmdRouterIgmpInstanceRBV   OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "    ."
+    DEFVAL   { 2 }
+    ::= { wriMgmdRouterIgmpInstanceEntry 10}
+
+wriMgmdRouterIgmpInstanceQRI  OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "        "
+    DEFVAL     { 125 }
+    ::= { wriMgmdRouterIgmpInstanceEntry 11}
+
+wriMgmdRouterIgmpInstanceOQI    OBJECT-TYPE
+    SYNTAX   Unsigned32  
+    UNITS    "seconds"
+    MAX-ACCESS  read-write
+    STATUS   current
+    DESCRIPTION
+       "      "	
+	::= { wriMgmdRouterIgmpInstanceEntry 12}
+
+wriMgmdRouterIgmpInstanceLLQI   OBJECT-TYPE
+    SYNTAX     Unsigned32  (0..31744)
+    UNITS      "tenths of seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+	DESCRIPTION
+	   "   "
+    ::= { wriMgmdRouterIgmpInstanceEntry 13}	
+	
+wriMgmdRouterIgmpInstanceInVlan   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "   "	
+	::= { wriMgmdRouterIgmpInstanceEntry 14}   
+	
+wriMgmdRouterIgmpInstanceGrpMax OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+         "    "
+   ::= { wriMgmdRouterIgmpInstanceEntry 15}
+
+wriMgmdRouterIgmpInstanceGrpFlush   OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "   "	
+	::= { wriMgmdRouterIgmpInstanceEntry 16}
+		
+	
+--  The WriMgmd Router MldInstanceTable
+--  The MldInstanceParameters for WriMgmd.
+
+wriMgmdRouterMldInstanceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterMldInstanceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " ."
+
+    ::= { wriMgmdMIBObjects 11 }
+
+wriMgmdRouterMldInstanceEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterMldInstanceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "  ."
+    INDEX      { wriMgmdRouterMldInstanceVrid }
+
+    ::= { wriMgmdRouterMldInstanceTable 1 }
+
+WriMgmdRouterMldInstanceEntry ::= SEQUENCE {
+    wriMgmdRouterMldInstanceVrid    Unsigned32,
+    wriMgmdRouterMldInstanceIfNum     Counter32,
+    wriMgmdRouterMldInstanceGrpNum   Counter32,
+    wriMgmdRouterMldInstanceSrcNum    Counter32,
+    wriMgmdRouterMldInstanceEgressNum   Counter32,
+    wriMgmdRouterMldInstanceRowStatus   RowStatus,
+    wriMgmdRouterMldInstanceCheckAlert  TruthValue,
+    wriMgmdRouterMldInstanceSndWithAlert  TruthValue,
+    wriMgmdRouterMldInstanceQI       Unsigned32,
+    wriMgmdRouterMldInstanceRBV   Unsigned32,
+    wriMgmdRouterMldInstanceQRI   Unsigned32,
+    wriMgmdRouterMldInstanceOQI   Unsigned32,
+    wriMgmdRouterMldInstanceLLQI   Unsigned32,
+	  wriMgmdRouterMldInstanceInVlan   TruthValue,
+	  wriMgmdRouterMldInstanceGrpMax   Counter32,
+	  wriMgmdRouterMldInstanceGrpFlush   INTEGER
+  }
+  
+wriMgmdRouterMldInstanceVrid OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterMldInstanceEntry 1}	
+
+wriMgmdRouterMldInstanceIfNum OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "     "
+   ::= { wriMgmdRouterMldInstanceEntry 2}
+
+wriMgmdRouterMldInstanceGrpNum  OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION   
+         "    "
+   ::= { wriMgmdRouterMldInstanceEntry 3}
+
+
+wriMgmdRouterMldInstanceSrcNum  OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+       "   "
+   ::= { wriMgmdRouterMldInstanceEntry 4}
+
+wriMgmdRouterMldInstanceEgressNum  OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+       "    " 
+   ::= { wriMgmdRouterMldInstanceEntry 5}
+
+wriMgmdRouterMldInstanceRowStatus  OBJECT-TYPE
+   SYNTAX   RowStatus
+   MAX-ACCESS  read-write
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterMldInstanceEntry 6} 	   
+	
+wriMgmdRouterMldInstanceCheckAlert   OBJECT-TYPE
+   SYNTAX  TruthValue
+   MAX-ACCESS  read-write
+   STATUS   current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterMldInstanceEntry 7}
+
+wriMgmdRouterMldInstanceSndWithAlert      OBJECT-TYPE
+   SYNTAX  TruthValue
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+       "     "
+   ::= { wriMgmdRouterMldInstanceEntry 8}
+
+wriMgmdRouterMldInstanceQI  OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+	   "   " 
+	::= { wriMgmdRouterMldInstanceEntry 9}
+
+wriMgmdRouterMldInstanceRBV   OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "    ."
+    DEFVAL   { 2 }
+    ::= { wriMgmdRouterMldInstanceEntry 10}
+
+wriMgmdRouterMldInstanceQRI  OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "        "
+    DEFVAL     { 125 }
+    ::= { wriMgmdRouterMldInstanceEntry 11}
+
+wriMgmdRouterMldInstanceOQI    OBJECT-TYPE
+    SYNTAX   Unsigned32  
+    UNITS    "seconds"
+    MAX-ACCESS  read-write
+    STATUS   current
+    DESCRIPTION
+       "      "	
+	::= { wriMgmdRouterMldInstanceEntry 12}
+
+wriMgmdRouterMldInstanceLLQI   OBJECT-TYPE
+    SYNTAX     Unsigned32  (0..31744)
+    UNITS      "tenths of seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+	DESCRIPTION
+	   "   "
+    ::= { wriMgmdRouterMldInstanceEntry 13}	
+	
+wriMgmdRouterMldInstanceInVlan   OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "   "	
+	::= { wriMgmdRouterMldInstanceEntry 14}   
+	
+wriMgmdRouterMldInstanceGrpMax  OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+         "    "
+   ::= { wriMgmdRouterMldInstanceEntry 15}
+
+wriMgmdRouterMldInstanceGrpFlush  OBJECT-TYPE
+   SYNTAX   INTEGER
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+         "    "
+   ::= { wriMgmdRouterMldInstanceEntry 16}
+   
+  
+--  The WriMgmd Router Globalv4 Table
+--  The Globalv4 Parameters for WriMgmd.
+
+wriMgmdRouterGlobalv4Entry OBJECT IDENTIFIER    
+    ::= { wriMgmdMIBObjects 12 }
+
+wriMgmdRouterGlobalv4IfMaxNum OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterGlobalv4Entry 1}		
+
+wriMgmdRouterGlobalv4GrpMaxNum  OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+         "    "
+   ::= { wriMgmdRouterGlobalv4Entry 2}
+
+wriMgmdRouterGlobalv4SrcMaxNum   OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+       "     " 
+   ::= { wriMgmdRouterGlobalv4Entry 3}
+
+wriMgmdRouterGlobalv4EgressMaxNum  OBJECT-TYPE     
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS   current
+   DESCRIPTION
+       "    "
+   ::= { wriMgmdRouterGlobalv4Entry 4}	
+
+wriMgmdRouterGlobalv4Enable  OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-write
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterGlobalv4Entry 5} 	   
+	
+	
+--  The WriMgmd Router Globalv6Table
+--  The Globalv6Parameters for WriMgmd.
+
+wriMgmdRouterGlobalv6Entry OBJECT IDENTIFIER    
+    ::= { wriMgmdMIBObjects 13 }
+
+wriMgmdRouterGlobalv6IfMaxNum OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterGlobalv6Entry 1}		
+
+wriMgmdRouterGlobalv6GrpMaxNum  OBJECT-TYPE
+   SYNTAX   Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+         "    "
+   ::= { wriMgmdRouterGlobalv6Entry 2}
+
+wriMgmdRouterGlobalv6SrcMaxNum   OBJECT-TYPE
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+       "     " 
+   ::= { wriMgmdRouterGlobalv6Entry 3}
+
+wriMgmdRouterGlobalv6EgressMaxNum  OBJECT-TYPE     
+   SYNTAX  Counter32
+   MAX-ACCESS  read-only
+   STATUS   current
+   DESCRIPTION
+       "    "
+   ::= { wriMgmdRouterGlobalv6Entry 4}	
+
+wriMgmdRouterGlobalv6Enable  OBJECT-TYPE
+   SYNTAX   TruthValue
+   MAX-ACCESS  read-write
+   STATUS   current
+   DESCRIPTION
+       "   " 
+   ::= { wriMgmdRouterGlobalv6Entry 5} 	   
+
+
+wriMgmdRouterIgmpSsmMapTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterIgmpSsmMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " ."
+    ::= { wriMgmdMIBObjects 14 }
+
+wriMgmdRouterIgmpSsmMapEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterIgmpSsmMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "  ."
+    INDEX      { wriMgmdRouterIgmpSsmMapVrid, wriMgmdRouterIgmpSsmMapAcl, wriMgmdRouterIgmpSsmMapSrcIp}
+
+    ::= { wriMgmdRouterIgmpSsmMapTable 1 }
+
+WriMgmdRouterIgmpSsmMapEntry ::= SEQUENCE {
+    wriMgmdRouterIgmpSsmMapVrid    Unsigned32,
+    wriMgmdRouterIgmpSsmMapAcl     Unsigned32,
+    wriMgmdRouterIgmpSsmMapSrcIp   InetAddress,
+    wriMgmdRouterIgmpSsmMapEntryStatus   EntryStatus   
+  }
+  
+wriMgmdRouterIgmpSsmMapVrid OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterIgmpSsmMapEntry 1}	
+
+wriMgmdRouterIgmpSsmMapAcl OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterIgmpSsmMapEntry 2}	
+
+wriMgmdRouterIgmpSsmMapSrcIp OBJECT-TYPE
+   SYNTAX   InetAddress
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterIgmpSsmMapEntry 3}	
+   
+wriMgmdRouterIgmpSsmMapEntryStatus OBJECT-TYPE
+   SYNTAX   EntryStatus
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterIgmpSsmMapEntry 4}	
+
+
+wriMgmdRouterMldSsmMapTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF WriMgmdRouterMldSsmMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            " ."
+    ::= { wriMgmdMIBObjects 15 }
+
+wriMgmdRouterMldSsmMapEntry OBJECT-TYPE
+    SYNTAX     WriMgmdRouterMldSsmMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "  ."
+    INDEX      { wriMgmdRouterMldSsmMapVrid, wriMgmdRouterMldSsmMapAcl, wriMgmdRouterMldSsmMapSrcIp}
+
+    ::= { wriMgmdRouterMldSsmMapTable 1 }
+
+WriMgmdRouterMldSsmMapEntry ::= SEQUENCE {
+    wriMgmdRouterMldSsmMapVrid    Unsigned32,
+    wriMgmdRouterMldSsmMapAcl     Unsigned32,
+    wriMgmdRouterMldSsmMapSrcIp   InetAddress,
+    wriMgmdRouterMldSsmMapEntryStatus   EntryStatus   
+  }
+  
+wriMgmdRouterMldSsmMapVrid OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterMldSsmMapEntry 1}	
+
+wriMgmdRouterMldSsmMapAcl OBJECT-TYPE
+   SYNTAX   Unsigned32
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterMldSsmMapEntry 2}	
+
+wriMgmdRouterMldSsmMapSrcIp OBJECT-TYPE
+   SYNTAX   InetAddress
+   MAX-ACCESS  read-only
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterMldSsmMapEntry 3}	
+   
+wriMgmdRouterMldSsmMapEntryStatus OBJECT-TYPE
+   SYNTAX   EntryStatus
+   MAX-ACCESS  read-write
+   STATUS    current
+   DESCRIPTION
+        "     " 
+   ::= { wriMgmdRouterMldSsmMapEntry 4}	
+
+	
+	
+-- conformance information
+
+wriMgmdMIBConformance OBJECT IDENTIFIER ::= { wriMgmdMIB 2 }
+wriMgmdMIBCompliance  OBJECT IDENTIFIER ::= { wriMgmdMIBConformance 1 }
+wriMgmdMIBGroups      OBJECT IDENTIFIER ::= { wriMgmdMIBConformance 2 }
+
+-- Protocol Version Conformance
+
+-- Read Compliance statement for IGMPv1 Hosts
+-- IGMPv1 only supports the IPv4 Address Family
+
+wriMgmdIgmpV1HostReadMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-only compliance statement for hosts running IGMPv1
+            [RFC1112] and implementing the WriMgmd MIB.  IGMPv1 hosts must
+            support the IPv4 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdHostBaseMIBGroup }
+
+    OBJECT wriMgmdHostInterfaceStatus
+    SYNTAX RowStatus {active(1)}
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Read-write or read-create access is not required and only
+             the value 'active(1)' needs to be supported."
+
+    OBJECT wriMgmdHostInterfaceVersion
+    SYNTAX Unsigned32 (1)
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required.  Only version 1 needs to be
+             supported."
+
+    GROUP wriMgmdHostExtendedMIBGroup
+    DESCRIPTION
+            "Supporting this group can be especially useful in
+             an environment with a router that does not support the
+             WriMgmd MIB."
+    ::= { wriMgmdMIBCompliance 1 }
+
+-- Read Compliance statement for IGMPv1 Routers
+-- IGMPv1 only supports the IPv4 Address Family
+
+wriMgmdIgmpV1RouterReadMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-only compliance statement for routers running
+            IGMPv1 [RFC1112] and implementing the WriMgmd MIB.  IGMPv1
+            routers only support the IPv4 address type.
+
+            Non-accessible index objects that only need IPv4
+            support are:
+
+            OBJECT wriMgmdRouterCacheAddressType
+            SYNTAX InetAddressType { ipv4(1) }
+
+            OBJECT wriMgmdRouterCacheAddress
+            SYNTAX InetAddress (SIZE(4))
+
+            OBJECT wriMgmdRouterInterfaceQuerierType
+            SYNTAX InetAddressType { ipv4(1) }
+
+            OBJECT wriMgmdInverseRouterCacheAddressType
+            SYNTAX InetAddressType { ipv4(1) }
+            "
+
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdRouterBaseMIBGroup }
+
+    OBJECT wriMgmdRouterCacheLastReporter
+    SYNTAX InetAddress (SIZE(4))
+    DESCRIPTION
+            "IGMPv1 routers only support IPv4 addresses."
+
+    OBJECT wriMgmdRouterInterfaceQuerier
+    SYNTAX InetAddress (SIZE(4))
+    DESCRIPTION
+            "IGMPv1 routers only support IPv4 addresses."
+
+    OBJECT wriMgmdInverseRouterCacheAddress
+    SYNTAX InetAddress (SIZE(4))
+    DESCRIPTION
+            "IGMPv1 routers only support IPv4 addresses."
+
+    OBJECT wriMgmdRouterInterfaceVersion
+    SYNTAX Unsigned32 (1)
+	MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required.  Only version 1 needs to
+             be supported."
+
+    OBJECT wriMgmdRouterInterfaceStatus
+    SYNTAX RowStatus {active(1)}
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Read-write or read-create access is not required and only
+             the value 'active(1)' needs to be supported."
+
+    OBJECT wriMgmdRouterInterfaceQueryInterval
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    ::= { wriMgmdMIBCompliance 2 }
+
+-- Write Compliance statement for IGMPv1 Routers
+-- IGMPv1 only supports the IPv4 Address Family
+
+wriMgmdIgmpV1RouterWriteMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-create compliance statement for routers running
+            IGMPv1 [RFC1112] and implementing the WriMgmd MIB.  IGMPv1
+            routers only support the IPv4 address type.
+
+            Non-accessible index objects that only need IPv4
+            support are:
+
+            OBJECT wriMgmdRouterCacheAddressType
+            SYNTAX InetAddressType { ipv4(1) }
+
+            OBJECT wriMgmdRouterCacheAddress
+            SYNTAX InetAddress (SIZE(4))
+
+            OBJECT wriMgmdRouterInterfaceQuerierType
+            SYNTAX InetAddressType { ipv4(1) }
+
+            OBJECT wriMgmdInverseRouterCacheAddressType
+            SYNTAX InetAddressType { ipv4(1) }
+            "
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdRouterBaseMIBGroup }
+
+    OBJECT wriMgmdRouterCacheLastReporter
+    SYNTAX InetAddress (SIZE(4))
+    DESCRIPTION
+            "Only IPv4 addresses needed for IGMPv1 router support."
+
+    OBJECT wriMgmdRouterInterfaceQuerier
+    SYNTAX InetAddress (SIZE(4))
+    DESCRIPTION
+            "Only IPv4 addresses needed for IGMPv1 router support."
+
+    OBJECT wriMgmdInverseRouterCacheAddress
+    SYNTAX InetAddress (SIZE(4))
+    DESCRIPTION
+            "Only IPv4 addresses needed for IGMPv1 router support."
+
+    OBJECT wriMgmdRouterInterfaceVersion
+    SYNTAX Unsigned32 (1)
+    DESCRIPTION
+            "Write access is not required.  Only version 1 needs to
+             be supported."
+
+    ::= { wriMgmdMIBCompliance 3 }
+
+-- Read Compliance statement for IGMPv2 and MLDv1 Hosts
+-- IGMPv2 only supports the IPv4 Address Family
+-- MLDv1 only supports the IPv6 Address Family
+
+wriMgmdIgmpV2MldV1HostReadMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-only compliance statement for hosts running IGMPv2
+            [RFC2236] or MLDv1 [RFC2710] and implementing the WriMgmd
+            MIB.  IGMPv2 hosts only support the IPv4 address type and
+            MLDv1 hosts only support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdHostBaseMIBGroup,
+                       wriMgmdV2HostMIBGroup
+                     }
+
+    OBJECT wriMgmdHostInterfaceStatus
+    SYNTAX RowStatus {active(1)}
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Read-write or read-create access is not required and only
+             the value 'active(1)' needs to be supported."
+
+    OBJECT wriMgmdHostInterfaceVersion
+    SYNTAX Unsigned32 (1..2)
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required.  Only versions 1 and 2 need
+             to be supported."
+
+    GROUP   wriMgmdHostExtendedMIBGroup
+    DESCRIPTION
+            "Supporting this group can be especially useful in an
+             environment with a router that does not support the
+             WriMgmd MIB."
+
+    ::= { wriMgmdMIBCompliance 4 }
+
+-- Write Compliance statement for IGMPv2 and MLDv1 Hosts
+-- IGMPv2 only supports the IPv4 Address Family
+-- MLDv1 only supports the IPv6 Address Family
+
+wriMgmdIgmpV2MldV1HostWriteMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-create compliance statement for hosts running
+            IGMPv2 [RFC2236] or MLDv1 [RFC2710] and implementing
+            the WriMgmd MIB.  IGMPv2 hosts only support the IPv4 address
+            type and MLDv1 hosts only support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdHostBaseMIBGroup,
+                       wriMgmdV2HostMIBGroup }
+    OBJECT wriMgmdHostInterfaceVersion
+    SYNTAX Unsigned32 (1..2)
+    DESCRIPTION
+            "Only versions 1 and 2 need to be supported."
+
+    ::= { wriMgmdMIBCompliance 5 }
+
+-- Read Compliance statement for IGMPv2 and MLDv1 Routers
+-- IGMPv2 only supports the IPv4 Address Family
+-- MLDv1 only supports the IPv6 Address Family
+
+wriMgmdIgmpV2MldV1RouterReadMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-only compliance statement for routers running
+            IGMPv2 [RFC2236] or MLDv1 [RFC2710] and implementing
+            the WriMgmd MIB.  IGMPv2 routers only support the IPv4
+            address type and MLDv1 routers only support the IPv6
+            address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdRouterBaseMIBGroup,
+                       wriMgmdV2RouterBaseMIBGroup
+                     }
+
+    OBJECT wriMgmdRouterInterfaceLastMemberQueryInterval
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceRobustness
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceQueryMaxResponseTime
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceVersion
+    SYNTAX Unsigned32 (1..2)
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required.  Only versions 1 and 2
+             need to be supported."
+
+    OBJECT wriMgmdRouterInterfaceStatus
+    SYNTAX RowStatus {active(1)}
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Read-write or read-create access is not required and only
+             the value 'active(1)' needs to be supported."
+
+    OBJECT wriMgmdRouterInterfaceQueryInterval
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    GROUP   wriMgmdV2ProxyMIBGroup
+    DESCRIPTION
+            "Write access is not required."
+
+    ::= { wriMgmdMIBCompliance 6 }
+
+-- Write Compliance statement for IGMPv2, WriMgmd, MLDv1, and MLDv2
+--   Routers
+-- IGMPv2 and WriMgmd only support the IPv4 Address Family
+-- MLDv1 and MLDv2 only support the IPv6 Address Family
+
+wriMgmdIgmpV2V3MldV1V2RouterWriteMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-create compliance statement for routers running
+            IGMPv2 [RFC2236], WriMgmd [RFC3376], MLDv1 [RFC2710], or
+            MLDv2 [RFC3810] and implementing the WriMgmd MIB.  IGMPv2 and
+            WriMgmd routers only support the IPv4 address type, while
+            MLDv1 and MLDv2 routers only support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdRouterBaseMIBGroup,
+                       wriMgmdV2RouterBaseMIBGroup
+                     }
+
+    GROUP   wriMgmdV2ProxyMIBGroup
+    DESCRIPTION
+            "Read-create access is required."
+
+    ::= { wriMgmdMIBCompliance 7 }
+
+-- Read Compliance statement for IGMPv2, WriMgmd, MLDv1, and MLDv2 Hosts
+-- IGMPv2 and WriMgmd only support the IPv4 Address Family
+-- MLDv1 and MLDv2 only support the IPv6 Address Family
+
+wriMgmdIgmpV3MldV2HostReadMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for hosts running WriMgmd
+            [RFC3376] or MLDv2 [RFC3810] and implementing the
+            WriMgmd MIB.  WriMgmd hosts only support the IPv4 address
+            type and MLDv2 hosts only support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdHostBaseMIBGroup,
+                       wriMgmdV2HostMIBGroup,
+                       wriMgmdV3HostMIBGroup
+                     }
+
+    OBJECT wriMgmdHostInterfaceVersion
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdHostInterfaceStatus
+    SYNTAX RowStatus {active(1)}
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Read-write or read-create access is not required and only
+             the value 'active(1)' needs to be supported."
+
+    OBJECT  wriMgmdHostInterfaceVersion3Robustness
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    GROUP   wriMgmdHostExtendedMIBGroup
+    DESCRIPTION
+            "Supporting this group can be especially useful in
+             an environment with a router that does not support the
+             WriMgmd MIB."
+
+    ::= { wriMgmdMIBCompliance 8 }
+
+-- Write Compliance statement for IGMPv2, WriMgmd, MLDv1, and MLDv2 Hosts
+-- IGMPv2 and WriMgmd only support the IPv4 Address Family
+-- MLDv1 and MLDv2 only support the IPv6 Address Family
+
+wriMgmdIgmpV3MldV2HostWriteMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for hosts running WriMgmd
+            [RFC3376] or MLDv2 [RFC3810] and implementing the
+            WriMgmd MIB.  WriMgmd hosts only support the IPv4 address
+            type and MLDv2 hosts only support the IPv6 address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdHostBaseMIBGroup,
+                       wriMgmdV2HostMIBGroup,
+                       wriMgmdV3HostMIBGroup
+                     }
+
+    GROUP   wriMgmdHostExtendedMIBGroup
+    DESCRIPTION
+            "Supporting this group can be especially useful in
+             an environment with a router that does not support the
+             WriMgmd MIB."
+
+    ::= { wriMgmdMIBCompliance 9 }
+
+-- Read Compliance statement for IGMPv2, WriMgmd, MLDv1, and MLDv2
+--   Routers
+-- IGMPv2 and WriMgmd only support the IPv4 Address Family
+-- MLDv1 and MLDv2 only support the IPv6 Address Family
+
+wriMgmdIgmpV3MldV2RouterReadMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "A read-only compliance statement for routers running
+            WriMgmd [RFC3376] or MLDv2 [RFC3810] and implementing
+            the WriMgmd MIB.  WriMgmd routers only support the IPv4
+            address type and MLDv2 routers only support the IPv6
+            address type."
+    MODULE  -- this module
+    MANDATORY-GROUPS { wriMgmdRouterBaseMIBGroup,
+                       wriMgmdV2RouterBaseMIBGroup,
+                       wriMgmdV3RouterMIBGroup
+                     }
+
+    OBJECT wriMgmdRouterInterfaceLastMemberQueryInterval
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceRobustness
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceQueryMaxResponseTime
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceVersion
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    OBJECT wriMgmdRouterInterfaceStatus
+    SYNTAX RowStatus {active(1)}
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Read-write or read-create access is not required and only
+             the value 'active(1)' needs to be supported."
+
+    OBJECT wriMgmdRouterInterfaceQueryInterval
+    MIN-ACCESS read-only
+    DESCRIPTION
+            "Write access is not required."
+
+    GROUP   wriMgmdV2ProxyMIBGroup
+    DESCRIPTION
+            "Write access is not required."
+
+    ::= { wriMgmdMIBCompliance 10 }
+
+-- units of conformance
+
+wriMgmdHostBaseMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdHostInterfaceStatus,
+              wriMgmdHostInterfaceVersion
+            }
+    STATUS  current
+    DESCRIPTION
+            "The basic collection of objects providing management of
+            WriMgmd version 1, 2, or 3 for hosts."
+
+    ::= { wriMgmdMIBGroups 1 }
+
+wriMgmdRouterBaseMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdRouterInterfaceStatus,
+              wriMgmdRouterInterfaceQueryInterval,
+              wriMgmdRouterCacheUpTime, wriMgmdRouterCacheExpiryTime,
+              wriMgmdRouterInterfaceVersion,
+              wriMgmdRouterInterfaceJoins, wriMgmdRouterInterfaceGroups,
+              wriMgmdRouterCacheLastReporter,
+              wriMgmdRouterInterfaceQuerierUpTime,
+              wriMgmdRouterInterfaceQuerierExpiryTime,
+              wriMgmdRouterInterfaceQuerier,
+              wriMgmdInverseRouterCacheAddress
+            }
+    STATUS  current
+    DESCRIPTION
+            "The basic collection of objects providing management of
+            WriMgmd version 1, 2, or 3 for routers."
+
+    ::= { wriMgmdMIBGroups 2 }
+
+wriMgmdV2HostMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdHostInterfaceVersion1QuerierTimer
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional read-only objects for management
+            of IGMP version 2 in hosts for WriMgmd version 2 compliance."
+
+    ::= { wriMgmdMIBGroups 3 }
+
+wriMgmdHostExtendedMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdHostCacheLastReporter, wriMgmdHostCacheUpTime,
+              wriMgmdHostInterfaceQuerier, wriMgmdInverseHostCacheAddress }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects for WriMgmd hosts."
+
+    ::= { wriMgmdMIBGroups 4 }
+
+wriMgmdV2RouterBaseMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdRouterInterfaceWrongVersionQueries,
+              wriMgmdRouterInterfaceLastMemberQueryCount,
+              wriMgmdRouterInterfaceStartupQueryCount,
+              wriMgmdRouterInterfaceStartupQueryInterval,
+              wriMgmdRouterCacheVersion1HostTimer,
+              wriMgmdRouterInterfaceQueryMaxResponseTime,
+              wriMgmdRouterInterfaceRobustness,
+              wriMgmdRouterInterfaceLastMemberQueryInterval
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional read-only objects for
+            management of WriMgmd version 2 in routers."
+
+    ::= { wriMgmdMIBGroups 5 }
+
+wriMgmdV2ProxyMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdRouterInterfaceProxyIfIndex }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional read-create objects for
+            management of WriMgmd proxy devices."
+
+    ::= { wriMgmdMIBGroups 6 }
+
+wriMgmdV3HostMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdHostInterfaceVersion2QuerierTimer,
+              wriMgmdHostCacheSourceFilterMode,
+              wriMgmdHostInterfaceVersion3Robustness,
+              wriMgmdHostSrcListExpire
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for
+            management of WriMgmd version 3 in hosts."
+
+    ::= { wriMgmdMIBGroups 7 }
+
+wriMgmdV3RouterMIBGroup OBJECT-GROUP
+    OBJECTS { wriMgmdRouterCacheSourceFilterMode,
+              wriMgmdRouterCacheVersion2HostTimer,
+              wriMgmdRouterCacheExcludeModeExpiryTimer,
+              wriMgmdRouterSrcListExpire
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional read-only objects for
+            management of WriMgmd version 3 in routers."
+
+    ::= { wriMgmdMIBGroups 8 }
+
+END

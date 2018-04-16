@@ -1,0 +1,1378 @@
+WRI-DHCP-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        TimeTicks, IpAddress,Unsigned32, OBJECT-TYPE,MODULE-IDENTITY,Counter32
+            FROM SNMPv2-SMI            
+        MacAddress, RowStatus, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        enterprises	FROM RFC1155-SMI
+        InetAddressType,InetAddress			FROM INET-ADDRESS-MIB
+        wri,wriProtocol,wriProducts				FROM WRI-SMI;
+            	
+    -- 1.3.6.1.4.1.3807.2.400
+		wriDhcp OBJECT IDENTIFIER ::= { wriProtocol 419 }
+     
+    -- 1.3.6.1.4.1.3807.2.400.1
+		dhcpCommon OBJECT IDENTIFIER ::= { wriDhcp 1 }
+		
+		-- 1.3.6.1.4.1.3807.2.400.1.1
+		dhcpEnable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				start(1),
+				stop(0)			
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the protocol of dhcp."
+			::= { dhcpCommon 1 } 
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.2
+		dhcpCheckInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp check interval."
+			::= { dhcpCommon 2 } 
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.3
+		dhcpIfNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp interface number."
+			::= { dhcpCommon 3 } 
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.4
+		dhcpPoolNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp pool number."
+			::= { dhcpCommon 4 } 
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.5
+		dhcpResNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp resource number."
+			::= { dhcpCommon 5 } 
+	
+	-- 1.3.6.1.4.1.3807.2.400.1.6
+		dhcpUserNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp user number."
+			::= { dhcpCommon 6 } 
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.7
+		dhcpIcmpNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp icmp number."
+			::= { dhcpCommon 7 } 		
+		
+	-- 1.3.6.1.4.1.3807.2.400.1.8
+		dhcpHandenable OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp hand status."
+			::= { dhcpCommon 8 } 
+				
+	-- 1.3.6.1.4.1.3807.2.400.1.9
+		dhcpTrackerInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The flush interval of relay user table."
+			::= { dhcpCommon 9 } 		
+				
+	-- 1.3.6.1.4.1.3807.2.400.1.10
+			dhcpLeaseNum OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The number of lease entry."
+			::= { dhcpCommon 10 }
+	
+	-- 1.3.6.1.4.1.3807.2.400.1.11
+			dhcpBindNum OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The number of bind entry."
+			::= { dhcpCommon 11 }	
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.12
+			dhcpForbiddenNum OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The number of forbidden entry."
+			::= { dhcpCommon 12 }		
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.13
+		  dhcpServerDetect OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The dhcp server detect."
+			::= { dhcpCommon 13 }
+			
+	-- 1.3.6.1.4.1.3807.2.400.1.14
+		  dhcpServerOption82 OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			   enable(1),
+			   disable(0)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the dhcp server option82 function."
+			::= { dhcpCommon 14 } 	
+		
+	-- 1.3.6.1.4.1.3807.2.400.1.15
+		  dhcpRelayRcvBadPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dhcp Relay received Bad Packets."
+			::= { dhcpCommon 15 } 
+	
+	-- 1.3.6.1.4.1.3807.2.400.1.16
+		  dhcpRelayRcvClinetPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP packets received from clients."
+			::= { dhcpCommon 16 }
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.17
+		  dhcpRelayRcvDiscoverPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP DISCOVER packets received."
+			::= { dhcpCommon 17 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.18
+		  dhcpRelayRcvRequestPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP REQUEST packets received."
+			::= { dhcpCommon 18 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.19
+		  dhcpRelayRcvInformPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP INFORM packets received."
+			::= { dhcpCommon 19 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.20
+		  dhcpRelayRcvDeclinePkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP DECLINE packets received."
+			::= { dhcpCommon 20 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.21
+		  dhcpRelayRcvServerPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP packets received from servers."
+			::= { dhcpCommon 21 }
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.22
+		  dhcpRelayRcvOfferPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP OFFER packets received."
+			::= { dhcpCommon 22 }
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.23
+		  dhcpRelayRcvAckPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP ACK packets received."
+			::= { dhcpCommon 23 }	
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.24
+		  dhcpRelayRcvNakPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP NAK packets received."
+			::= { dhcpCommon 24 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.25
+		  dhcpRelayRcvReleasePkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP RELEASE packets received."
+			::= { dhcpCommon 25 }	
+			
+					
+		-- 1.3.6.1.4.1.3807.2.400.1.26
+		  dhcpRelayPktSendToServer OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP packets send to servers."
+			::= { dhcpCommon 26 }	
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.27
+		  dhcpRelayPktSendToClinet OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP packets send to clinets."
+			::= { dhcpCommon 27 }	
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.28
+		  dhcpRelayUnicastPktSendToClinet OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Unicast packets send to clients."
+			::= { dhcpCommon 28 }			
+					
+		-- 1.3.6.1.4.1.3807.2.400.1.29
+		  dhcpRelayBroadcastPktSendToClinet OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Broadcast packets send to clients."
+			::= { dhcpCommon 29 }		
+				
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.30
+		  dhcpRelayStatReset OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reset dhcp relay statistics."
+			::= { dhcpCommon 30 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.31
+		  dhcpServerPoolNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dhcp server pool number."
+			::= { dhcpCommon 31 }
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.32
+		  dhcpServerAutoBindIpNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dhcp server auto bind ip number."
+			::= { dhcpCommon 32 }					
+				
+		-- 1.3.6.1.4.1.3807.2.400.1.33
+		  dhcpServerManualBindIpNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dhcp server manual bind ip number."
+			::= { dhcpCommon 33 }		
+				
+		-- 1.3.6.1.4.1.3807.2.400.1.34
+		  dhcpServerBootRequestPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of packets which dhcp client sent to the dhcp server."
+			::= { dhcpCommon 34 }	
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.35
+		  dhcpServerDiscoverPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP DISCOVER packets received."
+			::= { dhcpCommon 35 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.36
+		  dhcpServerRequestPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP Request packets received."
+			::= { dhcpCommon 36 }			
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.37
+		  dhcpServerDeclinePkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP Decline packets received."
+			::= { dhcpCommon 37 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.38
+		  dhcpServerReleasePkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP Release packets received."
+			::= { dhcpCommon 38 }		
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.39
+		  dhcpServerBootReplyPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of packets which dhcp server sent to the dhcp client."
+			::= { dhcpCommon 39 }			
+					
+		-- 1.3.6.1.4.1.3807.2.400.1.40
+		  dhcpServerOfferPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP Offer packets received."
+			::= { dhcpCommon 40 }
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.41
+		  dhcpServerAckPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP ACK packets received."
+			::= { dhcpCommon 41 }	
+			
+		-- 1.3.6.1.4.1.3807.2.400.1.42
+		  dhcpServerNakPkt OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP NAK packets received."
+			::= { dhcpCommon 42 }
+			
+				
+	-- 1.3.6.1.4.1.3807.2.400.1.43
+		  dhcpServerStatReset OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reset dhcp server statistics."
+			::= { dhcpCommon 43 }								
+	
+	-- 1.3.6.1.4.1.3807.2.400.1.44		  
+	dhcpRelayUserNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Relay user number."
+			::= { dhcpCommon 44 }
+		
+--WRI DHCP INTERFACE Table	
+	  dhcpIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP interface table."
+			::= { wriDhcp 2 }
+		
+		dhcpIfEntry OBJECT-TYPE
+			SYNTAX DhcpIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The dhcp interface table."
+			INDEX {dhcpIfUnit}
+			::= { dhcpIfTable 1 }
+		
+		DhcpIfEntry ::=
+			SEQUENCE { 
+				dhcpIfUnit					        	Unsigned32,
+				dhcpIfMode				        		INTEGER,
+				dhcpIfOption82Status					INTEGER,
+				dhcpIfOption82Action      			INTEGER,
+				dhcpIfCircuitID									OCTET STRING,
+				dhcpIfRemoteID									OCTET STRING,
+				dhcpIfAddressCheck              INTEGER,
+				dhcpIfArpLearning               INTEGER,
+				dhcpIfMaxUser                   INTEGER 
+			 }
+
+		dhcpIfUnit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Interface unit."
+			::= { dhcpIfEntry 1 }
+		
+		dhcpIfMode OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        none (0),
+ 		        server (1),
+ 		        relay (2)
+ 		    } 		
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Dhcp mode on the corresponding interface."
+			::= { dhcpIfEntry 2 }
+
+		dhcpIfOption82Status OBJECT-TYPE
+			SYNTAX INTEGER {
+ 		        enable(1),
+ 		        disable(0)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Dhcp option82 status."
+			::= { dhcpIfEntry 3 }
+
+		dhcpIfOption82Action OBJECT-TYPE
+			SYNTAX INTEGER 
+				{
+ 		        drop(1),
+ 		        keep(2),
+ 		        replace(3)
+ 		    }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Dhcp option82 action(drop,keep,replace)."
+			::= { dhcpIfEntry 4 }
+
+		dhcpIfCircuitID  OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Dhcp option circuit content."
+			::= { dhcpIfEntry 5 }
+			
+		dhcpIfRemoteID  OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Dhcp option remote content."
+			::= { dhcpIfEntry 6 }
+					
+		dhcpIfAddressCheck  OBJECT-TYPE
+			SYNTAX INTEGER
+			 {
+ 		        enable(1),
+ 		        disable(0)
+ 		   }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable dhcp address check."
+			::= { dhcpIfEntry 7 }
+					
+		dhcpIfArpLearning  OBJECT-TYPE
+			SYNTAX INTEGER
+			 {
+ 		        enable(1),
+ 		        disable(0)
+ 		   }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable or disable the fuction of arp learning actived by dhcp."
+			::= { dhcpIfEntry 8 }
+			
+		dhcpIfMaxUser  OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Configure the max user on interface vlan."
+			::= { dhcpIfEntry 9 }
+
+---WRI DHCP Address Pool Table
+		dhcpPoolTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF DhcpPoolEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"DHCP Address Pool table."
+			::= { wriDhcp 3 }
+	       
+		dhcpPoolEntry OBJECT-TYPE
+			SYNTAX        DhcpPoolEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The dhcp pool entry of the dhcp address pool table."
+			INDEX { dhcpPoolIndex }
+			::= { dhcpPoolTable 1 }
+	
+		DhcpPoolEntry ::= SEQUENCE 
+		{
+			dhcpPoolIndex				Unsigned32,
+			dhcpPoolLIp					IpAddress,
+			dhcpPoolHIp		      IpAddress,
+			dhcpPoolMask				IpAddress,
+			dhcpPoolGateway			IpAddress,
+			dhcpPoolDns					IpAddress,
+			dhcpPoolDnsBackup		IpAddress,
+			dhcpPoolLeaseTime		Unsigned32,
+			dhcpPoolIfUnit      Unsigned32,
+			dhcpPoolOption60    OCTET STRING,
+			dhcpPoolOption43    OCTET STRING,
+			dhcpPoolRowStatus		RowStatus,
+			dhcpPoolEntryNum   		INTEGER,
+			dhcpPoolEntryUsed   	INTEGER,
+			dhcpPoolOption57    OCTET STRING,
+			dhcpPoolVrid        Unsigned32  
+		}
+	
+		dhcpPoolIndex OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The index of the dhcp pool table."
+			::= { dhcpPoolEntry 1 }
+			
+		dhcpPoolLIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The low ip address of a dhcp pool entry."
+			::= { dhcpPoolEntry 2 }
+			
+		dhcpPoolHIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The high ip address of a dhcp pool entry."
+			::= { dhcpPoolEntry 3 }
+			
+		dhcpPoolMask OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The mask of ip address."
+			::= { dhcpPoolEntry 4 }
+			
+		dhcpPoolGateway OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The gateway of a dhcp pool entry."
+			::= { dhcpPoolEntry 5 }
+
+		dhcpPoolDns OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The dns of a dhcp pool entry."
+			::= { dhcpPoolEntry 6 }
+			
+		dhcpPoolDnsBackup OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The backup dns of a dhcp pool entry."
+			::= { dhcpPoolEntry 7 }
+			
+		dhcpPoolLeaseTime OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The lease time of a dhcp pool entry."
+			::= { dhcpPoolEntry 8 }					
+			
+		dhcpPoolIfUnit   OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The interface unit of a dhcp pool entry."
+			::= { dhcpPoolEntry 9 }
+			
+	  dhcpPoolOption60  OBJECT-TYPE
+			SYNTAX		OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The value of option60 of a dhcp pool. 
+			type+length+value,the first byte is type(ascii:1,hex:2,ip:3),the second byte is the length of value."
+			::= { dhcpPoolEntry 10 }
+			
+		dhcpPoolOption43  OBJECT-TYPE
+			SYNTAX		OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The value of option43 of a dhcp pool.
+			type+length+value,the first byte is type(ascii:1,hex:2,ip:3),the second byte is the length of value."
+			::= { dhcpPoolEntry 11 }
+			
+		dhcpPoolRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The status of a dhcp pool entry."
+			::= { dhcpPoolEntry 12 }
+			
+		dhcpPoolEntryNum OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The entry number of a dhcp pool entry."
+			::= { dhcpPoolEntry 13 }
+			
+		dhcpPoolEntryUsed OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The entry used of a dhcp pool entry."
+			::= { dhcpPoolEntry 14 }
+		
+		dhcpPoolOption57  OBJECT-TYPE
+			SYNTAX		OCTET STRING
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The value of option57 of a dhcp pool.
+			type+length+value,the first byte is type(ascii:1,hex:2,ip:3),the second byte is the length of value."
+			::= { dhcpPoolEntry 15 }
+			
+		dhcpPoolVrid  OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"vpn instance id."
+			::= { dhcpPoolEntry 16 }
+			
+---WRI DHCP LEASE Table
+		dhcpLeaseTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF DhcpLeaseEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"DHCP lease table."
+			::= { wriDhcp 4 }
+	       
+		dhcpLeaseEntry OBJECT-TYPE
+			SYNTAX        DhcpLeaseEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The dhcp lease table."
+			INDEX { dhcpLeaseVrid,dhcpLeaseIp }
+			::= { dhcpLeaseTable 1 }
+	
+		DhcpLeaseEntry ::= SEQUENCE 
+		{
+				dhcpLeaseVrid     Unsigned32,
+				dhcpLeaseIp     IpAddress,
+				dhcpLeaseSubnet  IpAddress,
+				dhcpLeaseMac       MacAddress,
+				dhcpLeaseGateway  IpAddress,
+				dhcpLeaseDNS       IpAddress,
+				dhcpLeaseDNSBackup  IpAddress,
+				dhcpLeaseLeaseTime   INTEGER,
+				dhcpLeaseExpireTime  INTEGER
+		}
+		
+	  dhcpLeaseVrid OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Vpn instance id."
+			::= { dhcpLeaseEntry 1 }
+	
+		dhcpLeaseIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The ip address of a dhcp lease entry."
+			::= { dhcpLeaseEntry 2 }
+	
+		dhcpLeaseSubnet OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The subnet of a dhcp lease entry."
+			::= { dhcpLeaseEntry 3 }
+	
+		dhcpLeaseMac OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The mac address of a dhcp lease entry."
+			::= { dhcpLeaseEntry 4 }
+		
+		dhcpLeaseGateway OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The gateway of a dhcp lease entry."
+			::= { dhcpLeaseEntry 5 }
+	
+		dhcpLeaseDNS OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dns of a dhcp lease entry."
+			::= { dhcpLeaseEntry 6 }
+		
+		dhcpLeaseDNSBackup OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The dns backup of a dhcp lease entry."
+			::= { dhcpLeaseEntry 7 }
+
+		dhcpLeaseLeaseTime OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The lease time of a dhcp lease entry."
+			::= { dhcpLeaseEntry 8 }
+		
+		dhcpLeaseExpireTime OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The expire time of a dhcp lease entry."
+			::= { dhcpLeaseEntry 9 }
+			
+---WRI DHCP BIND Table
+		dhcpBindTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF DhcpBindEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"DHCP bind table."
+			::= { wriDhcp 5 }
+	       
+		dhcpBindEntry OBJECT-TYPE
+			SYNTAX        DhcpBindEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The dhcp bind table."
+			INDEX { dhcpBindVrid,dhcpBindIp }
+			::= { dhcpBindTable 1 }
+	
+		DhcpBindEntry ::= SEQUENCE 
+		{
+				dhcpBindVrid         Unsigned32,
+				dhcpBindIp           IpAddress,
+				dhcpBindMac          MacAddress,
+				dhcpBindExpireTime   INTEGER,
+				dhcpBindType         INTEGER,
+				dhcpBindFlag       INTEGER,
+				dhcpBindRowStatus    RowStatus,
+				dhcpBindDynamicState  INTEGER
+		}
+		
+		dhcpBindVrid  OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"vpn instance id."
+			::= { dhcpBindEntry 1 }
+	
+		dhcpBindIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The ip address of a dhcp bind entry."
+			::= { dhcpBindEntry 2 }
+	
+		dhcpBindMac OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The mac address of a dhcp bind entry."
+			::= { dhcpBindEntry 3 }			
+			
+		dhcpBindExpireTime OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The expire time of a dhcp bind entry."
+			::= { dhcpBindEntry 4 }		
+									
+		dhcpBindType OBJECT-TYPE
+			SYNTAX	INTEGER
+				{
+				    static(1),
+				    dynamic(0)		
+				}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The mac address of a dhcp bind entry."
+			::= { dhcpBindEntry 5 }		
+			
+		dhcpBindFlag OBJECT-TYPE
+			SYNTAX	INTEGER
+				{
+				    no(0),
+				    yes(1)		
+				}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"If arp added successful or unsuccessful."
+			::= { dhcpBindEntry 6 }	
+			
+		dhcpBindRowStatus OBJECT-TYPE
+			SYNTAX	RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Add or delete a dhcp bind entry."
+			::= { dhcpBindEntry 7 }	
+			
+		dhcpBindDynamicState OBJECT-TYPE
+			SYNTAX	INTEGER
+				{
+				    temporary(0),
+				    committed(1)		
+				}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The state of dynamic binding."
+			::= { dhcpBindEntry 8 }
+			
+				
+---WRI DHCP CONFLICT IP Table
+		dhcpConflictIpTable OBJECT-TYPE
+			SYNTAX   SEQUENCE OF DhcpConflictIpEntry
+			MAX-ACCESS   not-accessible
+			STATUS   current
+			DESCRIPTION
+			"DHCP Conflict Ip table."
+			::= { wriDhcp 6 }
+	       
+		dhcpConflictIpEntry OBJECT-TYPE
+			SYNTAX        DhcpConflictIpEntry
+			MAX-ACCESS    not-accessible
+			STATUS        current
+			DESCRIPTION
+			"The dhcp ConflictIp table."
+			INDEX { dhcpConflictIpVrid,dhcpConflictIpIp }
+			::= { dhcpConflictIpTable 1 }
+	
+		DhcpConflictIpEntry ::= SEQUENCE 
+		{
+				dhcpConflictIpVrid   Unsigned32,
+				dhcpConflictIpIp     IpAddress,
+				dhcpConflictIpTime   Unsigned32
+		}
+		
+		dhcpConflictIpVrid  OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"vpn instance id."
+			::= { dhcpConflictIpEntry 1 }	
+
+		dhcpConflictIpIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The ip address of a dhcp Conflict Ip entry."
+			::= { dhcpConflictIpEntry 2 }	
+			
+		dhcpConflictIpTime OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The times of conflict running time.(in seconds)"
+			::= { dhcpConflictIpEntry 3 }
+			
+--WRI DHCP FORBIDEN IP Table	
+	dhcpPoolForbiddenIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpPoolForbiddenIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Forbidden ip table."
+			::= { wriDhcp 7 }
+		
+		dhcpPoolForbiddenIpEntry OBJECT-TYPE
+			SYNTAX DhcpPoolForbiddenIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Forbidden ip table."
+			INDEX {dhcpPoolForbiddenIpPoolIndex,dhcpPoolForbiddenIp}
+			::= { dhcpPoolForbiddenIpTable 1 }
+		
+		DhcpPoolForbiddenIpEntry ::=
+			SEQUENCE { 
+				dhcpPoolForbiddenIpPoolIndex			  INTEGER,
+				dhcpPoolForbiddenIp								  IpAddress,
+				dhcpPoolForbiddenIpRowStatus        RowStatus
+			 }
+
+		dhcpPoolForbiddenIpPoolIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dhcp pool index."
+			::= { dhcpPoolForbiddenIpEntry 1 }
+
+		dhcpPoolForbiddenIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The Ip address Forbidden of a dhcp pool entry."
+			::= { dhcpPoolForbiddenIpEntry 2 }
+			
+		dhcpPoolForbiddenIpRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The row status of dhcp forbidden ip table."
+		  ::= { dhcpPoolForbiddenIpEntry 3 }
+
+		  
+--WRI DHCP RELAY SERVER IP Table	
+	dhcpRelayServerIpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpRelayServerIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Server ip table."
+			::= { wriDhcp 8 }
+		
+		dhcpRelayServerIpEntry OBJECT-TYPE
+			SYNTAX DhcpRelayServerIpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Server ip table."
+			INDEX {dhcpRelayServerIpIfIndex,dhcpRelayServerIp}
+			::= { dhcpRelayServerIpTable 1 }
+		
+		DhcpRelayServerIpEntry ::=
+			SEQUENCE { 
+				dhcpRelayServerIpIfIndex			    INTEGER,
+				dhcpRelayServerIp								  IpAddress,
+				dhcpRelayServerIpRowStatus        RowStatus
+			 }
+
+		dhcpRelayServerIpIfIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The interface unit."
+			::= { dhcpRelayServerIpEntry 1 }
+
+		dhcpRelayServerIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The Ip address Server of a dhcp pool entry."
+			::= { dhcpRelayServerIpEntry 2 }
+			
+		dhcpRelayServerIpRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"The row status of dhcp Server ip table."
+		  ::= { dhcpRelayServerIpEntry 3 }	
+	
+--WRI DHCP RELAY USER Table	
+	dhcpRelayUserTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpRelayUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP User table."
+			::= { wriDhcp 9 }
+		
+		dhcpRelayUserEntry OBJECT-TYPE
+			SYNTAX DhcpRelayUserEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP User table."
+			INDEX {dhcpRelayUserVrid,dhcpRelayUserIp}
+			::= { dhcpRelayUserTable 1 }
+		
+		DhcpRelayUserEntry ::=
+			SEQUENCE { 
+				dhcpRelayUserVrid         Unsigned32, 
+				dhcpRelayUserIp					  IpAddress,
+				dhcpRelayUserMac			    MacAddress,
+				dhcpRelayUserVid          INTEGER,
+				dhcpRelayUserIfUnit       INTEGER,
+				dhcpRelayUserLeaseTime    INTEGER,
+				dhcpRelayUserType         INTEGER,
+				dhcpRelayUserRowStatus    RowStatus,
+				dhcpRelayUserDynamicState INTEGER,
+				dhcpRelayUserFlag         INTEGER 
+			 }
+		
+		dhcpRelayUserVrid  OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"vpn instance id."
+			::= { dhcpRelayUserEntry 1 }
+
+		dhcpRelayUserIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Dhcp relay user ip address ."
+			::= { dhcpRelayUserEntry 2 }
+			
+		dhcpRelayUserMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Dhcp relay user mac."
+			::= { dhcpRelayUserEntry 3 }
+			
+		dhcpRelayUserVid OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Dhcp relay user vlan id."
+			::= { dhcpRelayUserEntry 4 }
+			
+		dhcpRelayUserIfUnit OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Dhcp relay user ip address ."
+			::= { dhcpRelayUserEntry 5 }
+			
+		dhcpRelayUserLeaseTime OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Dhcp relay user interface."
+			::= { dhcpRelayUserEntry 6 }
+		
+		dhcpRelayUserType OBJECT-TYPE
+			SYNTAX		INTEGER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Dhcp relay user type."
+			::= { dhcpRelayUserEntry 7 }			
+			
+		dhcpRelayUserRowStatus OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Add or delete one relay user."
+		  ::= { dhcpRelayUserEntry 8 }	
+			  
+    dhcpRelayUserDynamicState OBJECT-TYPE
+			SYNTAX	INTEGER
+				{
+				    temporary(0),
+				    committed(1)		    		
+				}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The state of dynamic binding."
+			::= { dhcpRelayUserEntry 9 }
+
+    dhcpRelayUserFlag OBJECT-TYPE
+			SYNTAX	INTEGER
+				{
+				    no(0),
+				    yes(1)		    		
+				}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"If arp added successful or unsuccessful."
+			::= { dhcpRelayUserEntry 10 }
+
+--WRI DHCP USER EXPIRE Table	
+	dhcpUserExpiredTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpUserExpiredEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP User expired table."
+			::= { wriDhcp 10 }
+		
+		dhcpUserExpiredEntry OBJECT-TYPE
+			SYNTAX DhcpUserExpiredEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP User expired table."
+			INDEX {dhcpUserExpiredVrid,dhcpUserExpiredIp}
+			::= { dhcpUserExpiredTable 1 }
+		
+		DhcpUserExpiredEntry ::=
+			SEQUENCE { 
+				dhcpUserExpiredVrid         Unsigned32, 
+				dhcpUserExpiredIp					  IpAddress,
+				dhcpUserExpiredMac			    MacAddress
+			 }
+		
+		dhcpUserExpiredVrid  OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"vpn instance id."
+			::= { dhcpUserExpiredEntry 1 }
+		
+	  dhcpUserExpiredIp OBJECT-TYPE
+			SYNTAX		IpAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Dhcp expired user ip address ."
+			::= { dhcpUserExpiredEntry 2 }
+			
+		dhcpUserExpiredMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dhcp expired user mac."
+			::= { dhcpUserExpiredEntry 3 }
+
+
+--WRI DHCP POOL OPTION Table	
+	dhcpPoolOptionTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpPoolOptionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Pool Option table."
+			::= { wriDhcp 11 }
+		
+		dhcpPoolOptionEntry OBJECT-TYPE
+			SYNTAX DhcpPoolOptionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Pool Option table."
+			INDEX {dhcpPoolOptionPoolId,dhcpPoolOptionCode}
+			::= { dhcpPoolOptionTable 1 }
+		
+		DhcpPoolOptionEntry ::=
+			SEQUENCE { 
+				dhcpPoolOptionPoolId					  Unsigned32,
+				dhcpPoolOptionCode			    Unsigned32,
+				dhcpPoolOptionValue         OCTET STRING,
+				dhcpPoolOptionRowStatus      RowStatus          
+			 }
+		
+		dhcpPoolOptionPoolId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolOptionEntry 1 }   
+		
+		dhcpPoolOptionCode OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolOptionEntry 2 }   
+		
+		dhcpPoolOptionValue OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolOptionEntry 3 }   
+		
+		dhcpPoolOptionRowStatus	OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolOptionEntry 4 }  
+			
+--WRI DHCP POOL OPTION Table	
+	dhcpPoolSubOptionTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DhcpPoolSubOptionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Pool Sub Option table."
+			::= { wriDhcp 12 }
+		
+		dhcpPoolSubOptionEntry OBJECT-TYPE
+			SYNTAX DhcpPoolSubOptionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"DHCP Pool Sub Option table."
+			INDEX {dhcpPoolSubOptionPoolId,dhcpPoolSubOptionCode,dhcpPoolSubOptionSubCode}
+			::= { dhcpPoolSubOptionTable 1 }
+		
+		DhcpPoolSubOptionEntry ::=
+			SEQUENCE { 
+				dhcpPoolSubOptionPoolId					  Unsigned32,
+				dhcpPoolSubOptionCode			    Unsigned32,
+				dhcpPoolSubOptionSubCode			    Unsigned32,
+				dhcpPoolSubOptionValue         OCTET STRING,
+				dhcpPoolSubOptionRowStatus       RowStatus    
+			 }
+		
+		dhcpPoolSubOptionPoolId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolSubOptionEntry 1 }   
+		
+		dhcpPoolSubOptionCode OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolSubOptionEntry 2 }   
+		
+		dhcpPoolSubOptionSubCode OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolSubOptionEntry 3 }   		
+		
+		dhcpPoolSubOptionValue OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolSubOptionEntry 4 }  			                                              
+    
+    dhcpPoolSubOptionRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { dhcpPoolSubOptionEntry 5 }                                                   
+END
+								

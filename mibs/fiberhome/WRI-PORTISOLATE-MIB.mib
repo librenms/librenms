@@ -1,0 +1,410 @@
+WRI-PORTISOLATE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    			InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+	
+
+	-- Multiple Services Ring (MSPP)
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppLayer2		OBJECT IDENTIFIER ::=   {mspp 3}
+	               
+	               
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING
+	
+
+	 EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+			{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+			}
+
+	portIsolate      OBJECT IDENTIFIER ::= { msppLayer2 7 }
+	
+	
+	portIsolateGroupGeneral OBJECT IDENTIFIER ::= { portIsolate 1 }
+	portIsolateGroupMaxNum	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"support max group number"
+        ::= { portIsolateGroupGeneral 1 }
+        
+	portIsolateGroupCurrNum	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"Current Used Interface-Group Node Count"
+        ::= { portIsolateGroupGeneral 2 }  
+        
+    portIsolateGroupFreeNum	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"Current Free Interface-Group Node Count"
+        ::= { portIsolateGroupGeneral 3 }
+      
+      portIsolateUniIsolateIfMaxNum	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"Support Max Unidirectional Ioslate target Interface Count"
+        ::= { portIsolateGroupGeneral 4 }    
+  
+      portIsolateUniIfPairCurrentNum	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"the current unidirectional ioslate interface pair used number"
+        ::= { portIsolateGroupGeneral 5 }  
+            
+     portIsolateIfMaxNum	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"support max interface number"
+        ::= { portIsolateGroupGeneral 6 } 
+           
+      portIsolateMode	OBJECT-TYPE
+        SYNTAX INTEGER{l2Ioslate(1),allIoslate(2)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"the ioslate mode"
+        ::= { portIsolateGroupGeneral 7 }              
+      
+      portIsolateMaxPortPerGroup    OBJECT-TYPE
+	   	SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"support max interface number each group "
+        ::= { portIsolateGroupGeneral 8 } 
+        
+      portIsolateIfPairFreeNum    OBJECT-TYPE
+	   	SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"Current Free Ioslate Node Count"
+        ::= { portIsolateGroupGeneral 9 }    
+       
+      portIsolateBiIfPairCurrentNum    OBJECT-TYPE
+	   	SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+		"Current Used Bidirectional-Ioslate Node Count"
+        ::= { portIsolateGroupGeneral 10 }
+ 
+                        
+	--port isolate group table
+	portIsolateGroupTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF PortIsolateGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { portIsolate 2 }
+
+	portIsolateGroupEntry OBJECT-TYPE
+		SYNTAX  PortIsolateGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { portIsolateGroupIndex}
+		::= { portIsolateGroupTable 1 }
+
+	PortIsolateGroupEntry ::=
+		SEQUENCE {
+			portIsolateGroupIndex		INTEGER,
+			portIsolateGroupDescr		DisplayString,
+			portIsolateGroupPortNum		Counter32,
+			portIsolateGroupPorts		DisplayString,
+			portIsolateGroupAddPorts	DisplayString,
+			portIsolateGroupRemPorts	DisplayString,
+			portIsolateGroupUplinkPort	Unsigned32,
+			portIsolateGroupStatus		EntryStatus,
+			portIsolateGroupIfString	OCTET STRING
+		}
+
+	portIsolateGroupIndex	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "group index."
+        ::= { portIsolateGroupEntry 1 }
+
+	portIsolateGroupDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateGroupEntry 2 }
+
+	portIsolateGroupPortNum	OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateGroupEntry 3 }
+
+	portIsolateGroupPorts OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateGroupEntry 4 }
+
+	portIsolateGroupAddPorts OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateGroupEntry 5 }
+
+	portIsolateGroupRemPorts OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateGroupEntry 6 }
+
+	portIsolateGroupUplinkPort	OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"PVlan up link port"
+        ::= { portIsolateGroupEntry 7 }
+                        
+	portIsolateGroupStatus	OBJECT-TYPE
+        SYNTAX EntryStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		""
+        ::= { portIsolateGroupEntry 8 }
+                                             
+	portIsolateGroupIfString	OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "interface string"
+        ::= { portIsolateGroupEntry 9 }
+                                             
+                                   
+	--port isolate interface table
+	portIsolateIfTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF PortIsolateIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { portIsolate 3 }
+
+	portIsolateIfEntry OBJECT-TYPE
+		SYNTAX  PortIsolateIfEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { portIsolateIfIndex}
+		::= { portIsolateIfTable 1 }
+
+	PortIsolateIfEntry ::=
+		SEQUENCE {
+			portIsolateIfIndex		INTEGER,
+			portIsolateIfGroupNum	Counter32,
+			portIsolateIfGroups		DisplayString,
+			portIsolateIfAddGroups	DisplayString,
+			portIsolateIfRemGroups	DisplayString,
+			portIsolateIfString	    OCTET STRING
+		}
+
+	portIsolateIfIndex	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "group index."
+        ::= { portIsolateIfEntry 1 }
+
+
+	portIsolateIfGroupNum	OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateIfEntry 2 }
+
+	portIsolateIfGroups OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateIfEntry 3 }
+
+	portIsolateIfAddGroups OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateIfEntry 4 }
+        
+	portIsolateIfRemGroups OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..1024))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { portIsolateIfEntry 5 }
+                                         
+	portIsolateIfString	OBJECT-TYPE
+	    SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "interface string"
+        ::= { portIsolateIfEntry 6 }
+                                                
+                                                
+	--port isolate interface group table
+	portIsolateIfGroupTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF PortIsolateIfGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				"the interface and the ioslate group mapping information"
+		::= { portIsolate 4 }
+
+	portIsolateIfGroupEntry OBJECT-TYPE
+		SYNTAX  PortIsolateIfGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { portIsolateIfGroupIfIndex,portIsolateIfGroupGroupIndex}
+		::= { portIsolateIfGroupTable 1 }
+
+	PortIsolateIfGroupEntry ::=
+		SEQUENCE {
+			portIsolateIfGroupIfIndex	    INTEGER,
+			portIsolateIfGroupGroupIndex	INTEGER,
+			portIsolateIfGroupAction	    EntryStatus
+		}
+
+	portIsolateIfGroupIfIndex	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "interface index."
+        ::= { portIsolateIfGroupEntry 1 }
+
+
+	portIsolateIfGroupGroupIndex	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "group index"
+        ::= { portIsolateIfGroupEntry 2 }
+
+	portIsolateIfGroupAction OBJECT-TYPE  
+        SYNTAX EntryStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "the action "
+        ::= { portIsolateIfGroupEntry 3 }
+                                                          
+                                                          
+    --port isolate interface pair table
+	portIsolateIfPairTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF PortIsolateIfPairEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		::= { portIsolate 5 }
+
+	portIsolateIfPairEntry OBJECT-TYPE
+		SYNTAX  PortIsolateIfPairEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+				""
+		INDEX   { portIsolateIfPairSrcIfIndex,portIsolateIfPairDestIfIndex}
+		::= { portIsolateIfPairTable 1 }
+
+	PortIsolateIfPairEntry ::=
+		SEQUENCE {
+			portIsolateIfPairSrcIfIndex	    INTEGER,
+			portIsolateIfPairDestIfIndex	INTEGER,
+			portIsolateIfPairAction	        EntryStatus
+		}
+
+	portIsolateIfPairSrcIfIndex	   OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "the unidirectional ioslate source index."
+        ::= { portIsolateIfPairEntry 1 }
+
+
+	portIsolateIfPairDestIfIndex	OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "the unidirectional ioslate destination index."
+        ::= { portIsolateIfPairEntry 2 }
+
+	portIsolateIfPairAction OBJECT-TYPE  
+        SYNTAX EntryStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "the action"
+        ::= { portIsolateIfPairEntry 3 }
+  
+                                                                                            
+END

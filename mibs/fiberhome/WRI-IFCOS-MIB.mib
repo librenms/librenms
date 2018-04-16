@@ -1,0 +1,164 @@
+WRI-IFCOS-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,Unsigned32,enterprises,
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+       
+			TEXTUAL-CONVENTION, TruthValue, TimeInterval,
+				MacAddress,PhysAddress		FROM SNMPv2-TC
+			InetAddressPrefixLength,InetAddressType,
+				InetPortNumber,InetAddress			FROM INET-ADDRESS-MIB
+			SnmpAdminString							FROM SNMP-FRAMEWORK-MIB
+    		InterfaceIndex							FROM IF-MIB
+			wri,wriProducts			FROM WRI-SMI;
+
+
+	-- Multiple Services Ring (MSPP)
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	msppDev			OBJECT IDENTIFIER ::=   {mspp 2}
+	
+
+	--cos queue
+		msppCos			OBJECT IDENTIFIER ::=   {msppDev 9}
+		
+		cosIfTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF CosIfEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { msppCos 1 }
+
+		cosIfEntry  OBJECT-TYPE
+			SYNTAX 	CosIfEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			INDEX {cosIfIndex}
+			::= { cosIfTable 1 }
+
+		CosIfEntry ::= SEQUENCE {
+				cosIfIndex				INTEGER,
+				cosIfSchedulingAlg			INTEGER,
+				cosIfQueueBitmap			Unsigned32
+			}
+
+
+		cosIfIndex  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"cos queue index."
+			::= { cosIfEntry 1 }
+
+		cosIfSchedulingAlg  OBJECT-TYPE
+			SYNTAX     INTEGER{
+				unknown(0),
+				sp(1),
+				rr(2),
+				wrr(3),
+				wfq(4),
+				drr(5),
+				doundeddelay(6),
+				sprr(7),
+				spwrr(8),
+				spwfq(9),
+				spdrr(10)
+			}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"cos scheduling."
+			::= { cosIfEntry 2 }
+			
+		cosIfQueueBitmap  OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"sp+drr|wrr|rr."
+			::= { cosIfEntry 3 }
+
+	
+		--cos queue table
+
+		cosIfQueueTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF CosIfQueueEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			::= { msppCos 2 }
+
+		cosIfQueueEntry  OBJECT-TYPE
+			SYNTAX 	CosIfQueueEntry
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION
+					"NULL."
+			INDEX {cosIfIndex, cosIfQueueIndex}
+			::= { cosIfQueueTable 1 }
+
+		CosIfQueueEntry ::= SEQUENCE {
+				cosIfQueueIndex					INTEGER,
+				cosIfQueueBWGranularity				INTEGER,
+				cosIfQueueMinBW					INTEGER,
+				cosIfQueueMaxBW					INTEGER,
+				cosIfQueueWeight					INTEGER,
+				cosIfQueueMapPri					INTEGER
+			}
+
+
+		cosIfQueueIndex  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"cos queue index."
+			::= { cosIfQueueEntry 1 }
+
+		cosIfQueueBWGranularity  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION
+					"bandwidth granularity."
+			::= { cosIfQueueEntry 2 }
+			
+		cosIfQueueMinBW  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosIfQueueEntry 3 }
+
+		cosIfQueueMaxBW  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosIfQueueEntry 4 }
+			
+		cosIfQueueWeight  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosIfQueueEntry 5 }
+			
+		cosIfQueueMapPri  OBJECT-TYPE
+			SYNTAX     INTEGER
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION
+					"times of bandwidth granularity."
+			::= { cosIfQueueEntry 6 }
+			
+END
