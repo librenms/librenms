@@ -8,7 +8,7 @@ $app_id = $app['app_id'];
 echo $name;
 
 $zfs=json_app_get($device, '3.122.102.115');
-if ( $zfs{'error'} != '0' ){
+if ($zfs{'error'} != '0') {
     print "\nJSON returned with error '".$zfs{'error'}."'\nerrorString: ".$zfs{'errorString'}."\n";
     return;
 }
