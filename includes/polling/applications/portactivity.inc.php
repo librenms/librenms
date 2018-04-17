@@ -2,16 +2,17 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo ' portactivity ';
-
 $name = 'portactivity';
 $app_id = $app['app_id'];
-$options = '-O qv';
-$mib = 'NET-SNMP-EXTEND-MIB';
-$oid = 'nsExtendOutputFull.12.112.111.114.116.97.99.116.105.118.105.116.121';
-$json = snmp_get($device, $oid, $options, $mib);
 
-$ports=json_decode(stripslashes($json), true);
+echo $name;
+
+$ports=json_app_get($device, '12.112.111.114.116.97.99.116.105.118.105.116.121');
+if ( $ports{'error'} != '0' ){
+    print "\nJSON returned with error '".$ports{'error'}."'\nerrorString: ".$ports{'errorString'}."\n";
+    return;
+}
+
 
 //
 // each port
