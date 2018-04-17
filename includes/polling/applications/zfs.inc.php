@@ -2,16 +2,17 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo ' zfs ';
-
 $name = 'zfs';
 $app_id = $app['app_id'];
-$options = '-O qv';
-$mib = 'NET-SNMP-EXTEND-MIB';
-$oid = 'nsExtendOutputFull.3.122.102.115';
-$json = snmp_get($device, $oid, $options, $mib);
 
-$zfs=json_decode(stripslashes($json), true);
+echo $name;
+
+$zfs=json_app_get($device, '3.122.102.115');
+if ( $zfs{'error'} != '0' ){
+    print "\nJSON returned with error '".$zfs{'error'}."'\nerrorString: ".$zfs{'errorString'}."\n";
+    return;
+}
+
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
