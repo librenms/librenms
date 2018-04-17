@@ -1,0 +1,12 @@
+os: sixnet
+text: 'Red Lion Sixnet'
+type: network
+icon: sixnet
+group: Red
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_uptime, text: 'Uptime' }
+    - { graph: device_ping_perf, text: 'Ping Response' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.20540.2.
