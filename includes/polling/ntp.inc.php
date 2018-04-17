@@ -22,6 +22,10 @@ if ($device['os_group'] == 'cisco') {
     include 'includes/polling/ntp/cisco.inc.php';
 }
 
+if ($device['os'] == 'awplus') {
+    include 'includes/polling/ntp/awplus.inc.php';
+}
+
 unset(
     $cntpPeersVarEntry
 );

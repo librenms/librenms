@@ -28,3 +28,7 @@
 if ($device['os_group'] == 'cisco') {
     include 'includes/discovery/ntp/cisco.inc.php';
 }
+
+if ($device['os'] == 'awplus') {
+    include 'includes/discovery/ntp/awplus.inc.php';
+}
