@@ -709,6 +709,7 @@ function convert_to_celsius($value)
  * -2 : Could not decode the JSON.
  * -3 : Empty JSON parsed, meaning blank JSON was returned.
  * -4 : Empty return from snmp_get().
+ * -5 : Non-numeric version number.
  *
  * Other error codes are possible, but those are extend related and should be handled
  * by the poller calling this function.
@@ -717,7 +718,7 @@ function json_app_get( $device, $poid )
 {
     $returned_json = snmp_get($device, 'nsExtendOutputFull.'.$poid, '-O qv', 'NET-SNMP-EXTEND-MIB');
 
-    #make sure we actually get something back
+    // make sure we actually get something back
     if ( empty($returned_json) ){
         $parsed_json=json_decode('{"error":"-4","errorString":"Empty return from snmp_get()"}', true);
         return $parsed_json;
@@ -727,20 +728,32 @@ function json_app_get( $device, $poid )
 
     if (json_last_error() === JSON_ERROR_NONE) {
         if ( empty($parsed_json) ){
-            # If we get here it means there are no keys in the array, meaining '{}' was was returned
+            // If we get here it means there are no keys in the array, meaining '{}' was was returned
             $parsed_json{'error'}='-3';
             $parsed_json{'errorString'}='Blank JSON returned.';
         } else {
-            # If the following is true, it is a legacy JSON app extend, meaning these are not set
+            // If the following is true, it is a legacy JSON app extend, meaning these are not set
             if (!isset($parsed_json{'error'})){
                 $parsed_json{'error'}='0';
             }
             if (!isset($parsed_json{'errorString'})){
                 $parsed_json{'errorString'}='';
             }
+            if (!isset($parsed_json{'version'})){
+                $parsed_json{'version'}='-1';
+            }
+
+            // If the version is not numeric and there is not an error already set, do so now.
+            if(
+                (!is_numeric($parsed_json{'version'})) &&
+                ($parsed_json{'error'} != '0')
+            ){
+                $parsed_json{'error'}='-5';
+                $parsed_json{'errorString'}='is_numeric returns false for the value "'.$parsed_json{'version'}.'"';
+            }
         }
     } else {
-        # If we get here, it means shit JSON was returned. Create some proper JSON and error.
+        // If we get here, it means shit JSON was returned. Create some proper JSON and error.
         $parsed_json=json_decode('{"error":"-2","errorString":"Invalid JSON"}', true);
     } 
     
