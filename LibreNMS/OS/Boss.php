@@ -29,7 +29,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class AvayaErs extends OS implements ProcessorDiscovery
+class Boss extends OS implements ProcessorDiscovery
 {
     /**
      * Discover processors.
