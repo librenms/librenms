@@ -9,7 +9,7 @@ echo $name;
 
 $f2b=json_app_get($device, '8.102.97.105.108.50.98.97.110');
 
-if ( $f2b{'error'} != '0' ){
+if ($f2b{'error'} != '0') {
     print "\nJSON returned with error '".$f2b{'error'}."'\nerrorString: ".$f2b{'errorString'}."\n";
     return;
 }
