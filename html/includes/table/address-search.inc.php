@@ -1,17 +1,18 @@
 <?php
 
 use LibreNMS\Util\IP;
+use LibreNMS\Authentication\Auth;
 
 $param = array();
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $perms_sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where     .= ' AND `DP`.`user_id`=?';
-    $param[]    = array($_SESSION['user_id']);
+    $param[]    = array(Auth::id());
 }
 
-list($address,$prefix) = explode('/', $_POST['address']);
-if ($_POST['search_type'] == 'ipv4') {
+list($address,$prefix) = explode('/', $vars['address']);
+if ($vars['search_type'] == 'ipv4') {
     $sql  = ' FROM `ipv4_addresses` AS A, `ports` AS I, `ipv4_networks` AS N, `devices` AS D';
     $sql .= $perms_sql;
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ";
@@ -23,7 +24,7 @@ if ($_POST['search_type'] == 'ipv4') {
         $sql    .= " AND ipv4_prefixlen='?'";
         $param[] = array($prefix);
     }
-} elseif ($_POST['search_type'] == 'ipv6') {
+} elseif ($vars['search_type'] == 'ipv6') {
     $sql  = ' FROM `ipv6_addresses` AS A, `ports` AS I, `ipv6_networks` AS N, `devices` AS D';
     $sql .= $perms_sql;
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id $where ";
@@ -34,26 +35,26 @@ if ($_POST['search_type'] == 'ipv4') {
     if (!empty($prefix)) {
         $sql .= " AND ipv6_prefixlen = '$prefix'";
     }
-} elseif ($_POST['search_type'] == 'mac') {
+} elseif ($vars['search_type'] == 'mac') {
     $sql  = ' FROM `ports` AS I, `devices` AS D';
     $sql .= $perms_sql;
-    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%".str_replace(array(':', ' ', '-', '.', '0x'), '', mres($_POST['address']))."%' $where ";
+    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%".str_replace(array(':', ' ', '-', '.', '0x'), '', mres($vars['address']))."%' $where ";
 }//end if
-if (is_numeric($_POST['device_id'])) {
+if (is_numeric($vars['device_id'])) {
     $sql    .= ' AND I.device_id = ?';
-    $param[] = array($_POST['device_id']);
+    $param[] = array($vars['device_id']);
 }
 
-if ($_POST['interface']) {
+if ($vars['interface']) {
     $sql    .= " AND I.ifDescr LIKE '?'";
-    $param[] = array($_POST['interface']);
+    $param[] = array($vars['interface']);
 }
 
-if ($_POST['search_type'] == 'ipv4') {
+if ($vars['search_type'] == 'ipv4') {
     $count_sql = "SELECT COUNT(`ipv4_address_id`) $sql";
-} elseif ($_POST['search_type'] == 'ipv6') {
+} elseif ($vars['search_type'] == 'ipv6') {
     $count_sql = "SELECT COUNT(`ipv6_address_id`) $sql";
-} elseif ($_POST['search_type'] == 'mac') {
+} elseif ($vars['search_type'] == 'mac') {
     $count_sql = "SELECT COUNT(`port_id`) $sql";
 }
 
@@ -83,9 +84,9 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     $speed = humanspeed($interface['ifSpeed']);
     $type  = humanmedia($interface['ifType']);
 
-    if ($_POST['search_type'] == 'ipv6') {
+    if ($vars['search_type'] == 'ipv6') {
         $address = (string)IP::parse($interface['ipv6_network'], true);
-    } elseif ($_POST['search_type'] == 'mac') {
+    } elseif ($vars['search_type'] == 'mac') {
         $address = formatMac($interface['ifPhysAddress']);
     } else {
         $address = (string)IP::parse($interface['ipv4_network'], true);

@@ -1,7 +1,9 @@
 <?php
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
-if (is_admin()) {
+use LibreNMS\Authentication\Auth;
+
+if (Auth::user()->hasGlobalAdmin()) {
     if (!is_array($config['rancid_configs'])) {
         $config['rancid_configs'] = array($config['rancid_configs']);
     }

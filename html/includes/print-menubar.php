@@ -9,10 +9,10 @@ $service_status   = get_service_status();
 $typeahead_limit  = $config['webui']['global_search_result_limit'];
 $if_alerts        = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
-if ($_SESSION['userlevel'] >= 5) {
+if (Auth::user()->hasGlobalRead()) {
     $links['count']        = dbFetchCell("SELECT COUNT(*) FROM `links`");
 } else {
-    $links['count']       = dbFetchCell("SELECT COUNT(*) FROM `links` AS `L`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `L`.`local_device_id` = `D`.`device_id`", array($_SESSION['user_id']));
+    $links['count']       = dbFetchCell("SELECT COUNT(*) FROM `links` AS `L`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `L`.`local_device_id` = `D`.`device_id`", array(Auth::id()));
 }
 
 if (isset($config['enable_bgp']) && $config['enable_bgp']) {
@@ -79,7 +79,7 @@ if ($config['title_image']) {
                 <?php
                 \LibreNMS\Plugins::call('menu');
 
-                if ($_SESSION['userlevel'] >= '10') {
+                if (Auth::user()->hasGlobalAdmin()) {
                     if (dbFetchCell("SELECT COUNT(*) from `plugins` WHERE plugin_active = '1'") > 0) {
                         echo('<li role="presentation" class="divider"></li>');
                     }
@@ -145,11 +145,11 @@ if (is_module_enabled('poller', 'mib')) {
 <?php
 
 $param = array();
-if (is_admin() === true || is_read() === true) {
+if (Auth::user()->hasGlobalRead()) {
     $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
 } else {
     $sql = "SELECT `type`,COUNT(`type`) AS total_type FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $device_types = dbFetchRows($sql, $param);
@@ -179,7 +179,7 @@ if (count($devices_groups) > 0) {
     unset($group);
     echo '</ul></li>';
 }
-if ($_SESSION['userlevel'] >= '10') {
+if (Auth::user()->hasGlobalAdmin()) {
     if ($config['show_locations']) {
         if ($config['show_locations_dropdown']) {
             $locations = getlocations();
@@ -246,7 +246,7 @@ if (($service_status[1] > 0) || ($service_status[2] > 0)) {
     }
 }
 
-if ($_SESSION['userlevel'] >= '10') {
+if (Auth::user()->hasGlobalAdmin()) {
     echo('
             <li role="presentation" class="divider"></li>
             <li><a href="addsrv/"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Service</a></li>');
@@ -289,7 +289,7 @@ if ($config['enable_pseudowires']) {
 ?>
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     echo('            <li role="presentation" class="divider"></li>');
     if ($config['int_customers']) {
         echo('            <li><a href="customers/"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i> Customers</a></li>');
@@ -471,7 +471,7 @@ if (!empty($valid_wireless_types)) {
 
 $app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applications` ORDER BY `app_type`");
 
-if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
+if (Auth::user()->hasGlobalRead() && count($app_list) > "0") {
 ?>
         <li class="dropdown">
           <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
@@ -511,7 +511,7 @@ $options['type'] = 'Cisco-OTV';
 $otv = $component->getComponents(null, $options);
 $routing_count['cisco-otv'] = count($otv);
 
-if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['cisco-otv']) > "0") {
+if (Auth::user()->hasGlobalRead() && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['cisco-otv']) > "0") {
 ?>
         <li class="dropdown">
           <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Routing</span></a>
@@ -519,12 +519,12 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 <?php
     $separator = 0;
 
-if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) {
+if (Auth::user()->hasGlobalRead() && $routing_count['vrf']) {
     echo('            <li><a href="routing/protocol=vrf/"><i class="fa fa-arrows fa-fw fa-lg" aria-hidden="true"></i> VRFs</a></li>');
     $separator++;
 }
 
-if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf']) {
+if (Auth::user()->hasGlobalRead() && $routing_count['ospf']) {
     if ($separator) {
         echo('            <li role="presentation" class="divider"></li>');
         $separator = 0;
@@ -534,7 +534,7 @@ if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf']) {
 }
 
     // Cisco OTV Links
-if ($_SESSION['userlevel'] >= '5' && $routing_count['cisco-otv']) {
+if (Auth::user()->hasGlobalRead() && $routing_count['cisco-otv']) {
     if ($separator) {
         echo('            <li role="presentation" class="divider"></li>');
         $separator = 0;
@@ -544,7 +544,7 @@ if ($_SESSION['userlevel'] >= '5' && $routing_count['cisco-otv']) {
 }
 
     // BGP Sessions
-if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp']) {
+if (Auth::user()->hasGlobalRead() && $routing_count['bgp']) {
     if ($separator) {
         echo('            <li role="presentation" class="divider"></li>');
         $separator = 0;
@@ -555,7 +555,7 @@ if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp']) {
 }
 
     // CEF info
-if ($_SESSION['userlevel'] >= '5' && $routing_count['cef']) {
+if (Auth::user()->hasGlobalRead() && $routing_count['cef']) {
     if ($separator) {
         echo('            <li role="presentation" class="divider"></li>');
         $separator = 0;
@@ -571,7 +571,7 @@ if ($bgp_alerts) {
             <li><a href="routing/protocol=bgp/adminstatus=start/state=down/"><i class="fa fa-exclamation-circle fa-fw fa-lg" aria-hidden="true"></i> Alerted BGP (' . $bgp_alerts . ')</a></li>');
 }
 
-if (is_admin() === true && $routing_count['bgp'] && $config['peeringdb']['enabled'] === true) {
+if (Auth::user()->hasGlobalAdmin() && $routing_count['bgp'] && $config['peeringdb']['enabled'] === true) {
     echo '
             <li role="presentation" class="divider"></li>
             <li><a href="peering/"><i class="fa fa-hand-o-right fa-fw fa-lg" aria-hidden="true"></i> PeeringDB</a></li>';
@@ -601,15 +601,12 @@ if ($alerts['active_count'] > 0) {
               <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg" aria-hidden="true"></i> Notifications</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Alert History</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i> Statistics</a></li>
-                <?php
-                if ($_SESSION['userlevel'] >= '10') {
-                    ?>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
-                  <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
-                    <?php
-                }
-                ?>
+                <?php if (Auth::user()->hasGlobalAdmin()) { ?>
+                    <li role="presentation" class="divider"></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                <?php } ?>
           </ul>
       </li>
 
@@ -648,7 +645,7 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
           <li role="presentation" class="divider"></li>
 <?php
 
-if ($_SESSION['authenticated']) {
+if (Auth::check()) {
     echo('
            <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>');
 }
@@ -659,7 +656,7 @@ if ($_SESSION['authenticated']) {
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">Settings</span></a>
         <ul class="dropdown-menu">
 <?php
-if ($_SESSION['userlevel'] >= '10') {
+if (Auth::user()->hasGlobalAdmin()) {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>');
     echo('<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>');
 }
@@ -667,7 +664,7 @@ if ($_SESSION['userlevel'] >= '10') {
 ?>
           <li role="presentation" class="divider"></li>
 
-<?php if ($_SESSION['userlevel'] >= '10') {
+<?php if (Auth::user()->hasGlobalAdmin()) {
     if (Auth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
@@ -704,7 +701,7 @@ if ($_SESSION['userlevel'] >= '10') {
            <li role="presentation" class="divider"></li>');
 }
 
-if ($_SESSION['authenticated']) {
+if (Auth::check()) {
     echo('
            <li class="dropdown-submenu">
                <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>

@@ -1,8 +1,8 @@
 <?php
 /**
- * sentry4.inc.php
+ * hiveos-wireless.inc.php
  *
- * LibreNMS power discovery module for Sentry4
+ * AeroHive Hiveos-Wireless Discovery Module
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,14 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @copyright  2018 Ryan Finney
+ * @author     https://github.com/theherodied/
  */
-
-foreach ($pre_cache['sentry4_input'] as $index => $data) {
-    $descr   = $data['st4InputCordName'];
-    $oid     = ".1.3.6.1.4.1.1718.4.1.3.3.1.3.$index";
-    $current = $data['st4InputCordActivePower'];
-    if ($current >= 0) {
-        discover_sensor($valid['sensor'], 'power', $device, $oid, "st4InputCord.$index", 'sentry4', $descr, 1, 1, null, null, null, null, $current);
+if ($device['os'] == 'hiveos-wireless') {
+    echo 'Hiveos-Wireless : ';
+    $memory_oid = '1.3.6.1.4.1.26928.1.2.4.0';
+    $usage = snmp_get($device, $memory_oid, '-Ovq');
+    if (is_numeric($usage)) {
+        discover_mempool($valid_mempool, $device, '0', 'hiveos-wireless', 'Memory');
     }
 }

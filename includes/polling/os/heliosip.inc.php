@@ -1,8 +1,6 @@
 <?php
 /**
- * sentry4.inc.php
- *
- * LibreNMS frequency discovery module for Sentry4
+ * heliosip.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +17,13 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @copyright  2018 Ryan Finney
+ * @author     https://github.com/theherodied/
  */
-
-foreach ($pre_cache['sentry4_input'] as $index => $data) {
-    $descr   = $data['st4InputCordName'];
-    $oid     = ".1.3.6.1.4.1.1718.4.1.3.3.1.11.$index";
-    $current = $data['st4InputCordFrequency'];
-    $divisor = 10;
-    if ($current >= 0) {
-        discover_sensor($valid['sensor'], 'frequency', $device, $oid, "st4InputCord.$index", 'sentry4', $descr, $divisor, 1, null, null, null, null, $current);
-    }
-}
+// SNMPv2-SMI::enterprises.6530.11.1.0 = STRING: "2N IP Force"
+// SNMPv2-SMI::enterprises.6530.11.4.0 = STRING: "2.22.0.31.8"
+// SNMPv2-SMI::enterprises.6530.11.3.0 = STRING: "54-0880-2424"
+$data = snmp_get_multi_oid($device, '.1.3.6.1.4.1.6530.11.1.0 .1.3.6.1.4.1.6530.11.3.0 .1.3.6.1.4.1.6530.11.4.0', '-OUQn');
+$hardware = isset($data['.1.3.6.1.4.1.6530.11.1.0']) ? $data['.1.3.6.1.4.1.6530.11.1.0'] : '';
+$version = isset($data['.1.3.6.1.4.1.6530.11.4.0']) ? $data['.1.3.6.1.4.1.6530.11.4.0'] : '';
+$serial = isset($data['.1.3.6.1.4.1.6530.11.3.0']) ? $data['.1.3.6.1.4.1.6530.11.3.0'] : '';

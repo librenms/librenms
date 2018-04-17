@@ -3,6 +3,7 @@ text: 'D-Link Switch'
 type: network
 icon: dlink
 ifname: 1
+empty_ifdescr: 1
 discovery:
     -
         sysObjectID_except:

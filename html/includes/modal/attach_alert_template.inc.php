@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -93,7 +95,7 @@ $('#alert-template-attach').click('', function(event) {
         dataType: "html",
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
-                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                toastr.success(msg);
                 $("#attach-alert-template").modal('hide');
             } else {
                 $('#template_error').html('<div class="alert alert-danger">'+msg+'</div>');

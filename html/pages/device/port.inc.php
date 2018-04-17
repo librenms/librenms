@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 if (!isset($vars['view'])) {
     $vars['view'] = 'graphs';
 }
@@ -231,7 +233,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
     }
 }//end if
 
-if ($_SESSION['userlevel'] >= '10' && $config['enable_billing'] == 1) {
+if (Auth::user()->hasGlobalAdmin() && $config['enable_billing'] == 1) {
     $bills = dbFetchRows("SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?", array($port['port_id']));
     if (count($bills) === 1) {
         echo "<span style='float: right;'><a href='" . generate_url(array('page' => 'bill','bill_id' => $bills[0]['bill_id'])) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";

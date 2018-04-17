@@ -24,6 +24,8 @@
  * @author     f0o <f0o@devilcode.org>
  */
 
+use LibreNMS\Authentication\Auth;
+
 ?>
 
 <div class="container-fluid">
@@ -40,7 +42,7 @@
 <?php
 
 
-if (is_admin() === true) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<ul class="nav nav-tabs">';
     $pages = dbFetchRows("SELECT DISTINCT `config_group` FROM `config` WHERE `config_group` IS NOT NULL AND `config_group` != ''");
     array_unshift($pages, array('config_group' => 'Global')); // Add Global tab
@@ -103,7 +105,7 @@ if (is_admin() === true) {
 
         echo '<div class="table-responsive">' . a2t($config) . '</div>';
 
-        if ($debug && $_SESSION['userlevel'] >= '10') {
+        if ($debug && Auth::user()->hasGlobalAdmin()) {
             echo("<pre>");
             print_r($config);
             echo("</pre>");

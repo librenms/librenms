@@ -1044,11 +1044,16 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null');
-                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : dynamic_discovery_get_value('low_warn_limit', $index, $data, $pre_cache, 'null');
-                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null');
-                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null');
+                    
+                    $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
+                    foreach ($limits as $limit) {
+                        $$limit = is_numeric($data[$limit]) ? $data[$limit] : dynamic_discovery_get_value($limit, $index, $data, $pre_cache, 'null');
+                        if (is_numeric($$limit)) {
+                            $$limit = ($$limit / $divisor) * $multiplier;
+                        }
+                    }
 
+                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit".PHP_EOL;
                     $entPhysicalIndex = str_replace('{{ $index }}', $index, $data['entPhysicalIndex']) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
@@ -1062,12 +1067,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
-                        if (is_numeric($divisor)) {
-                            $value = $value / $divisor;
-                        }
-                        if (is_numeric($multiplier)) {
-                            $value = $value * $multiplier;
-                        }
+                        // We default to 1 for both divisors / multipler so it should be safe to do the calculation using both.
+                        $value = ($value / $divisor) * $multiplier;
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, $data['index'] ?: $index);

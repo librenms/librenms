@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 $pagetitle[] = "Devices";
 
 if (!isset($vars['format'])) {
@@ -125,9 +127,9 @@ if ($format == "graph") {
         }
     }
 
-    if (!empty($vars['hostname'])) {
-        $where .= " AND hostname LIKE ?";
-        $sql_param[] = "%" . $vars['hostname'] . "%";
+    if (!empty($vars['searchquery'])) {
+        $where .= ' AND (sysName LIKE ? OR hostname LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
+        $sql_param += array_fill(count($param), 5, '%' . $vars['searchquery'] . '%');
     }
     if (!empty($vars['os'])) {
         $where .= " AND os = ?";
@@ -243,7 +245,7 @@ if ($format == "graph") {
     }
     echo '</div>';
 } else {
-    if (is_admin() === true || is_read() === true) {
+    if (Auth::user()->hasGlobalRead()) {
         $os = "SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`";
         $ver = "SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`";
         $platform = "SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`";
@@ -255,7 +257,7 @@ if ($format == "graph") {
         $platform = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
         $features = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
         $types = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-        $param[] = $_SESSION['user_id'];
+        $param[] = Auth::id();
     }
 
 
@@ -431,7 +433,7 @@ if ($format == "graph") {
                 return {
                     id: "devices",
                     format: ' <?php echo mres($vars['format']); ?>',
-                    hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
+                    searchquery: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
                     os: '<?php echo mres($vars['os']); ?>',
                     version: '<?php echo mres($vars['version']); ?>',
                     hardware: '<?php echo mres($vars['hardware']); ?>',
@@ -454,7 +456,7 @@ if ($format == "graph") {
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<div class='form-group'>" +
-            "<input type='text' name='hostname' id='hostname' value=''<?php echo $vars['hostname']; ?>'' class='form-control input-sm' placeholder='Hostname'>" +
+            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control input-sm' placeholder='Search'>" +
             "</div>" +
             "<div class='form-group'><?php echo $os_options; ?></div>" +
             "<div class='form-group'><?php echo $ver_options; ?></div>" +

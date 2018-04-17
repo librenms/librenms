@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
     if ($_POST['device_id']) {

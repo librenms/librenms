@@ -3,10 +3,11 @@
 
 use LibreNMS\Authentication\Auth;
 
-$options = getopt('u:rdvh');
-if (isset($options['h']) || !isset($options['u'])) {
+$options = getopt('u:rldvh');
+if (isset($options['h']) || (!isset($options['l']) && !isset($options['u']))) {
     echo ' -u <username>  (Required) username to test
  -r             Reauthenticate user, (requires previous web login with "Remember me" enabled)
+ -l             List all users (checks that auth can enumerate all allowed users)
  -d             Enable debug output
  -v             Enable verbose debug output
  -h             Display this help message
@@ -14,19 +15,18 @@ if (isset($options['h']) || !isset($options['u'])) {
     exit;
 }
 
-$test_username = $options['u'];
-
 if (isset($options['d'])) {
     $debug = true;
 }
 
-if (isset($options['v'])) {
-    // might need more options for other auth methods
-    $config['auth_ad_debug'] = 1; // active_directory
-}
-
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (isset($options['v'])) {
+    // Enable debug mode for auth methods that have it
+    $config['auth_ad_debug'] = 1;
+    $config['auth_ldap_debug'] = 1;
+}
 
 echo "Authentication Method: {$config['auth_mechanism']}\n";
 
@@ -81,6 +81,14 @@ try {
         }
     }
 
+    if (isset($options['l'])) {
+        $users = $authorizer->getUserlist();
+        echo "Users: " . implode(', ', array_column($users, 'username')) . PHP_EOL;
+        echo "Total users: " . count($users) . PHP_EOL;
+        exit;
+    }
+
+    $test_username = $options['u'];
     $auth = false;
     if (isset($options['r'])) {
         echo "Reauthenticate Test\n";

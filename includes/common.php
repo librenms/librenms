@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -365,7 +366,7 @@ function device_by_id_cache($device_id, $refresh = false)
     if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
         $device = $cache['devices']['id'][$device_id];
     } else {
-        $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device = dbFetchRow("SELECT `devices`.*, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.`location`=`locations`.`location` WHERE `device_id` = ?", array($device_id));
         $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
@@ -1465,29 +1466,6 @@ if (!function_exists('starts_with')) {
     }
 }
 
-function get_auth_ad_user_filter($username)
-{
-    global $config;
-
-    // don't return disabled users
-    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
-    if ($config['auth_ad_user_filter']) {
-        $user_filter .= $config['auth_ad_user_filter'];
-    }
-    $user_filter .= ')';
-    return $user_filter;
-}
-
-function get_auth_ad_group_filter($groupname)
-{
-    global $config;
-    $group_filter = "(samaccountname=$groupname)";
-    if ($config['auth_ad_group_filter']) {
-        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
-    }
-    return $group_filter;
-}
-
 /**
  * Print a list of items up to a max amount
  * If over that number, a line will print the total items
@@ -1766,7 +1744,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = Auth::id();
     }
 
     $pref = dbFetchCell(
@@ -1795,7 +1773,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = Auth::id();
     }
 
     $pref = array(

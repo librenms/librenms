@@ -15,6 +15,10 @@ $graphs['drbd']      = array(
     'unsynced',
 );
 
+$graphs['entropy']   = array(
+    'entropy',
+);
+
 $graphs['mysql']     = array(
     'network_traffic',
     'connections',

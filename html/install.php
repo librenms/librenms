@@ -37,19 +37,12 @@ $dbuser = @$_POST['dbuser'] ?: 'librenms';
 $dbpass = @$_POST['dbpass'] ?: '';
 $dbname = @$_POST['dbname'] ?: 'librenms';
 $dbport = @$_POST['dbport'] ?: 3306;
-$dbsocket = @$_POST['dbsocket'] ?: '';
-$config['db_host']=$dbhost;
-$config['db_user']=$dbuser;
-$config['db_pass']=$dbpass;
-$config['db_name']=$dbname;
-$config['db_port']=$dbport;
-$config['db_socket']=$dbsocket;
-
-if (!empty($config['db_socket'])) {
-    $config['db_host'] = 'localhost';
-    $config['db_port'] = null;
+if (empty($_POST['dbsocket'])) {
+    $dbsocket = null;
 } else {
-    $config['db_socket'] = null;
+    $dbhost = 'localhost';
+    $dbsocket = $_POST['dbsocket'];
+    $dbport = null;
 }
 
 $add_user = @$_POST['add_user'] ?: '';
@@ -61,7 +54,7 @@ $add_email = @$_POST['add_email'] ?: '';
 if ($stage > 1) {
     try {
         if ($stage != 6) {
-            dbConnect();
+            dbConnect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
         }
         if ($stage == 2 && $_SESSION['build-ok'] == true) {
             $stage = 3;

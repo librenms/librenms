@@ -11,6 +11,7 @@
  *
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -34,7 +35,7 @@ function set_debug($debug)
     }
 }//end set_debug()
 
-function array_sort($array, $on, $order = SORT_ASC)
+function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
     $new_array = array();
     $sortable_array = array();
@@ -423,8 +424,10 @@ function delete_device($id)
         dbDelete('sensors_to_state_indexes', "`sensor_id` = ?", array($sensor_id));
     }
     $fields = array('device_id','host');
+
+    $db_name = dbFetchCell('SELECT DATABASE()');
     foreach ($fields as $field) {
-        foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", array($config['db_name'],$field)) as $table) {
+        foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
             $table = $table['table_name'];
             $entries = (int) dbDelete($table, "`$field` =  ?", array($id));
             if ($entries > 0 && $debug === true) {
@@ -501,7 +504,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
 
     // if $snmpver isn't set, try each version of snmp
     if (empty($snmp_version)) {
-        $snmpvers = array('v2c', 'v3', 'v1');
+        $snmpvers = Config::get('snmp.version');
     } else {
         $snmpvers = array($snmp_version);
     }
@@ -894,7 +897,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => $_SESSION['username'] ?: '',
+        'username'  => Auth::user()->username ?: '',
      );
 
     dbInsert($insert, 'eventlog');
@@ -931,6 +934,9 @@ function send_mail($emails, $subject, $message, $html = false)
         $mail->Hostname = php_uname('n');
 
         foreach (parse_email($config['email_from']) as $from => $from_name) {
+            if (empty($from_name)) {
+                $from_name = Config::get('email_user');
+            }
             $mail->setFrom($from, $from_name);
         }
         foreach ($emails as $email => $email_name) {
@@ -2293,10 +2299,11 @@ function dump_db_schema()
     global $config;
 
     $output = array();
+    $db_name = dbFetchCell('SELECT DATABASE()');
 
-    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$config['db_name']}' ORDER BY TABLE_NAME;") as $table) {
+    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;") as $table) {
         $table = $table['TABLE_NAME'];
-        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table'") as $data) {
+        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'") as $data) {
             $def = array(
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
