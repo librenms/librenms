@@ -702,8 +702,9 @@ function convert_to_celsius($value)
  *
  * The returned value is JSON parsed into a array.
  *
- * The keys error contains the any errorcode and 0 if non is present. A textual
- * description of said error is found in errorString .
+ * The key error contains the any errorcode and 0 if non is present. A textual
+ * description of said error is found in errorString . The version of the return
+ * can be found in version.
  *
  * Possible parsing related errors.
  * -2 : Could not decode the JSON.
@@ -713,7 +714,10 @@ function convert_to_celsius($value)
  *
  * Other error codes are possible, but those are extend related and should be handled
  * by the poller calling this function.
- */  
+ *
+ * If version, error, and errorString are not set, it is assumed it is a old JSON backend and
+ * sets them manually with a version of 0 and assumes a error of 0(no error).
+ */
 function json_app_get( $device, $poid )
 {
     $returned_json = snmp_get($device, 'nsExtendOutputFull.'.$poid, '-O qv', 'NET-SNMP-EXTEND-MIB');
