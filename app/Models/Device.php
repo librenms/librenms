@@ -150,11 +150,11 @@ class Device extends BaseModel
 
         foreach ($options as $file) {
             if (is_file(public_path()."/$file")) {
-                return asset($file);
+                return $file;
             }
         }
 
-        return asset('images/os/generic.svg');
+        return 'images/os/generic.svg';
     }
 
     /**

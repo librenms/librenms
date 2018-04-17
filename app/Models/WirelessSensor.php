@@ -25,15 +25,18 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
+use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\Util\DiscoveryModelObserver;
 
-class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem //, PollerModule,
+class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem, PollerModule
 {
     protected $primaryKey = 'wireless_sensor_id';
     protected $fillable = ['type', 'device_id', 'oids', 'subtype', 'index', 'description', 'value', 'multiplier', 'divisor', 'aggregator', 'access_point_id', 'alert_high', 'alert_low', 'warn_high', 'warn_low'];
+    protected $casts = ['oids' => 'array'];
 
     private $valid = true;
 
@@ -55,11 +58,19 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
         $warn_low = null
     )
     {
+        // ensure leading dots
+        $oids = array_map(function($oid) {
+            return '.' . ltrim($oid, '.');
+        }, (array)$oids);
+
+        // capture all input variables
         $sensor_array = get_defined_vars();
+
 
         $sensor = WirelessSensor::where('device_id', $device_id)
             ->firstOrNew(compact(['type', 'subtype', 'index']), $sensor_array);
 
+        // if existing, update selected data
         if ($sensor->wireless_sensor_id) {
             $ignored = ['value'];
             if ($sensor->custom_thresholds) {
@@ -73,12 +84,15 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
         }
 
         if (is_null($value)) {
-            // fetch data
+            $sensors = collect([$sensor]);
+
+            $prefetch = self::fetchSnmpData(Device::find($device_id), $sensors);
+            $data = static::processSensorData($sensors, $prefetch);
+
+            $sensor->value = $data->first();
         }
 
-        if (!is_numeric($sensor->value)) {
-            $sensor->valid = false;
-        }
+        $sensor->valid = is_numeric($sensor->value);
 
         return $sensor;
     }
@@ -348,5 +362,87 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
     public static function fromYaml(OS $os, $index, array $data)
     {
         // TODO: Implement fromYaml() method.
+    }
+
+    public static function poll(OS $os)
+    {
+        // TODO: Implement poll() method.
+    }
+
+    /**
+     * Fetch snmp data from the device
+     * Return an array keyed by oid
+     *
+     * @param Device $device
+     * @param Collection $sensors
+     * @return Collection
+     */
+    private static function fetchSnmpData($device, $sensors)
+    {
+        $device_array = $device->toArray();
+
+        return self::getOidsFromSensors($sensors, get_device_oid_limit($device_array))
+            // fetch data in chunks
+            ->reduce(function ($carry, $oid_chunk) use ($device_array) {
+                $multi_data = snmp_get_multi_oid($device_array, $oid_chunk->toArray(), '-OUQnt');
+                return $carry->merge(collect($multi_data));
+            }, collect())
+            // deal with string values that may be surrounded by quotes
+            ->filter()
+            ->map(function ($oid) {
+                return trim($oid, '"') + 0;
+            });
+    }
+
+    /**
+     * Get a list of unique oids from an array of sensors and break it into chunks.
+     *
+     * @param Collection $sensors
+     * @param int $chunk How many oids per chunk.  Default 10.
+     * @return Collection OIDs
+     */
+    private static function getOidsFromSensors($sensors, $chunk = 10)
+    {
+        // collect all oids and chunk them
+        return $sensors->pluck('oids')->flatten()->unique()->chunk($chunk);
+    }
+
+    /**
+     * Process the snmp data for the specified sensors
+     * Returns an array sensor_id => value
+     *
+     * @param Collection $sensors
+     * @param Collection $prefetch
+     * @return Collection
+     */
+    protected static function processSensorData($sensors, $prefetch)
+    {
+        return $sensors->reduce(function ($all_data, $sensor) use ($prefetch) {
+            // pull out the data for this sensor
+            $data = $prefetch->intersectKey(array_flip($sensor->oids));
+
+            // if no data set null and continue to the next sensor
+            if ($data->count() == 0) {
+                return $all_data->put($sensor->wireless_sensor_id, null);
+            }
+
+            // distill data down to a single value
+            if ($data->count() > 1) {
+                // aggregate data
+                if ($sensor['sensor_aggregator'] == 'avg') {
+                    $sensor_value = $data->average();
+                } else {
+                    // sum
+                    $sensor_value = $data->sum();
+                }
+            } else {
+                $sensor_value = $data->first();
+            }
+
+            // apply multiplier and divisor
+            $sensor_value = $sensor_value * $sensor->multiplier / $sensor->divisor;
+
+            return $all_data->put($sensor->wireless_sensor_id, $sensor_value);
+        }, collect());
     }
 }

@@ -2533,17 +2533,13 @@ function db_schema_is_current()
  */
 function get_device_oid_limit($device)
 {
-    global $config;
+    $max_oid = get_dev_attrib($device, 'snmp_max_oid', 0);
 
-    $max_oid = $device['snmp_max_oid'];
-
-    if (isset($max_oid) && $max_oid > 0) {
+    if ($max_oid > 0) {
         return $max_oid;
-    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
-        return $config['snmp']['max_oid'];
-    } else {
-        return 10;
     }
+
+    return Config::get('snmp.max_oid', 10);
 }
 
 /**
