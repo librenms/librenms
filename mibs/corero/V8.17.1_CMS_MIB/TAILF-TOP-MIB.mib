@@ -1,0 +1,36 @@
+TAILF-TOP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+tailf MODULE-IDENTITY
+    LAST-UPDATED
+        "201103010000Z"
+    ORGANIZATION
+        "Tail-f Systems AB"
+    CONTACT-INFO
+        "support@tail-f.com"
+    DESCRIPTION
+        "The root MIB for Tail-f System AB"
+    REVISION  "201103010000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { enterprises 24961 }
+
+tfProducts OBJECT-IDENTITY
+    STATUS       current
+    DESCRIPTION
+        "The root OBJECT IDENTIFIER from
+         which sysObjectID values are assigned."
+    ::= { tailf 1 }
+
+tfModules OBJECT-IDENTITY
+    STATUS       current
+    DESCRIPTION
+        "The root OBJECT IDENTIFIER to be used
+         for MIB module registration."
+    ::= { tailf 2 }
+
+END
+

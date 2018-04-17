@@ -1,0 +1,507 @@
+TAILF-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32 
+        FROM SNMPv2-SMI
+    DateAndTime, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ItuPerceivedSeverity
+        FROM ITU-ALARM-TC-MIB
+    IANAItuEventType
+        FROM IANA-ITU-ALARM-TC-MIB
+    tfModules
+        FROM TAILF-TOP-MIB
+    TfAlarmOperatorState, TfAlarmIndex, TfYANGResource,
+    TfProbableCause, TfUtf8String	
+        FROM TAILF-ALARM-TC-MIB
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF;
+
+
+tfAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED "201208300000Z"
+    ORGANIZATION "Tail-f Systems AB"
+    CONTACT-INFO
+        "support@tail-f.com"
+    DESCRIPTION
+        "Alarm MIB for Tail-f Systems. This MIB represents alarms as 
+         states, where a row in the alarm table corresponds to a 
+         device, an object within the device and an unique alarm type. 
+         If the severity of an alarm or a the clear state is changed
+         this is an update to an existing alarm entry and not a new.
+         When the resource reports a clear on the alarm the alarm
+         entry still exists until administrative processes purges
+         the alarm list. These procedures are out of the scope for 
+         this module."
+     REVISION "201208300000Z"
+     DESCRIPTION
+         "Released as part of NCS-2.0.
+
+          Changed tfAlarmType to be a string.
+          Added tfAlarmObjectStr.
+          Added tfAlarmSpecificProblem."
+
+     REVISION "201103010000Z"
+     DESCRIPTION
+         "Initial version of this MIB module." 
+     ::= { tfModules 103 }
+
+--==========
+--==Groups==
+--==========
+
+tfAlarmObjects		OBJECT IDENTIFIER ::= { tfAlarmMIB 1 }
+tfAlarmNotifications	OBJECT IDENTIFIER ::= { tfAlarmMIB 2 }
+tfAlarmNotifsPrefix	OBJECT IDENTIFIER ::= { tfAlarmNotifications 0 }
+tfAlarmConformance	OBJECT IDENTIFIER ::= { tfAlarmMIB 10 }
+
+--======================
+--== Alarm table==
+--======================
+tfAlarms OBJECT IDENTIFIER ::= { tfAlarmObjects 1 }
+
+tfAlarmNumber OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS	 read-only
+    STATUS       current
+    DESCRIPTION
+        "This object shows the total number of of entries in the
+         tfAlarmTable."
+    ::= { tfAlarms 1 }
+
+tfAlarmLastChanged OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS	 read-only
+    STATUS       current
+    DESCRIPTION
+        "A timestamp when the active alarm table was last changed. The
+         value can be used by a manager to initiate an alarm
+         resynchronization procedure.  NOTE: All fields of the
+         DateAndTime MUST be filled out, including the hours and
+         minutes from UTC. As such, the value should be 11 octets
+         long."
+    ::= { tfAlarms 2 }
+
+tfAlarmTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TfAlarmEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table list all alarms in the system.  Entries are
+         created when a resource has a new alarm state. If the same
+         resource has several active alarms, with different Alarm
+         Types, this will be represented as separate rows. Rows
+         disappear based on administrative procedures outside the
+         scope of this module. Note that this means that cleared
+         alarms exist in the table.
+
+         Rows can be changed when an alarm changes
+         severity, additional text or clearance state."
+    ::= { tfAlarms 5 }
+
+tfAlarmEntry OBJECT-TYPE
+    SYNTAX       TfAlarmEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "One entry in the table holds one alarm for a given
+         resource. Entries are created by the system when a resource
+         has a new alarm state.  Entries are deleted by alarm pruning
+         actions.  An alarm that is cleared by a resource is still
+         kept in the alarm list until pruned by a user.
+
+         Alarm severity and additional text can later be
+         changed in a row."
+    INDEX {
+        tfAlarmIndex
+        }
+    ::= { tfAlarmTable 1 }
+
+TfAlarmEntry ::= SEQUENCE {
+    tfAlarmIndex            TfAlarmIndex,
+    tfAlarmType             SnmpAdminString,
+    tfAlarmDevice           SnmpAdminString,
+    tfAlarmObject           TfYANGResource,       -- Alarming Object based on
+                                                  -- NETCONF instance identifier
+    tfAlarmObjectOID        OBJECT IDENTIFIER,    -- Alarming Object based on
+                                                  -- SNMP object identifier
+    tfAlarmObjectStr        TfUtf8String,
+    tfAlarmSpecificProblem  TfUtf8String,
+    tfAlarmEventType        IANAItuEventType,     -- X.733
+    tfAlarmProbableCause    TfProbableCause,      -- X.733
+    tfAlarmOrigTime         DateAndTime,          -- Time for alarm raise
+    tfAlarmTime             DateAndTime,          -- Time for last state change
+    tfAlarmSeverity         ItuPerceivedSeverity, -- Last state change
+    tfAlarmCleared          TruthValue, 
+    tfAlarmText             TfUtf8String,
+    tfAlarmOperatorState    TfAlarmOperatorState,
+    tfAlarmOperatorNote     TfUtf8String
+    }
+
+tfAlarmIndex OBJECT-TYPE
+    SYNTAX       TfAlarmIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A unique value, greater than zero, for each alarm.  The value
+        for each alarm must remain constant at least from one
+        re-initialization of the entity to the next
+        re-initialization."
+    ::= { tfAlarmEntry 1 }
+
+tfAlarmType OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This provides an identification of the alarm type. Together
+         with tfAlarmSpecificProblem, this is a unique identification
+         of the alarm. Different managed object types and instances
+         can share alarm types, but if the same managed object reports
+         the same alarm type, it is to be considered as the same alarm
+         state. The alarm type is a simplification of the different
+         X.733 and 3GPP alarm IRP alarm correlation mechanisms based
+         on EventType, ProbableCause, SpecificProblem and
+         NotificationId."
+    ::= { tfAlarmEntry 2 }
+
+tfAlarmDevice OBJECT-TYPE               
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The name of the managed device.  May also be the system
+         itself for self-management alarms.  Note that this object is
+         not fine-grained enough to pinpoint the alarming
+         resource. The alarm object within the device is the exact
+         alarming resource."
+    ::= { tfAlarmEntry 3 }
+
+tfAlarmObject OBJECT-TYPE
+    SYNTAX       TfYANGResource
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Name of alarm object within a device based on YANG
+         naming. Note that the granularity must be good enough to
+         guarantee unique alarm states and relevant resource
+         identification to the operator."
+    ::= { tfAlarmEntry 4 }
+
+tfAlarmObjectOID OBJECT-TYPE
+    SYNTAX       OBJECT IDENTIFIER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Name of alarm object based on SNMP naming. Note that the
+        granularity must be good enough to guarantee unique alarm
+        states and relevant resource identification to the operator."
+    ::= { tfAlarmEntry 5 }
+
+tfAlarmObjectStr OBJECT-TYPE
+    SYNTAX       TfUtf8String
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Name of alarm object based on any other naming. Note that the
+         granularity must be good enough to guarantee unique alarm
+         states and relevant resource identification to the operator."
+    ::= { tfAlarmEntry 6 }
+
+tfAlarmSpecificProblem OBJECT-TYPE
+    SYNTAX       TfUtf8String
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object is used when the 'tfAlarmType' object cannot
+         uniquely identify the alarm type.  Normally, this is not the
+         case, and this leaf is the empty string."
+    ::= { tfAlarmEntry 7 }
+
+tfAlarmEventType OBJECT-TYPE
+    SYNTAX       IANAItuEventType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The event type as defined in X.733/X.736."
+    REFERENCE
+        "ITU Recommendation X.733, 'Information Technology - Open Systems
+         Interconnection - System Management: Alarm Reporting Function',
+         1992"
+    ::= { tfAlarmEntry 8 }
+
+tfAlarmProbableCause OBJECT-TYPE
+    SYNTAX       TfProbableCause
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The probable cause as defined in X.733/X.736."
+    REFERENCE
+        "ITU Recommendation X.733, 'Information Technology - Open Systems
+         Interconnection - System Management: Alarm Reporting Function',
+         1992"
+    ::= { tfAlarmEntry 9 }
+
+tfAlarmOrigTime OBJECT-TYPE
+    SYNTAX       DateAndTime -- Time for alarm raise
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Time for alarm raise"
+    ::= { tfAlarmEntry 10 }
+
+tfAlarmTime OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A time stamp of the alarm state change event.  Note that this
+         variable represents the last change of the alarm state, like
+         changed severity or additional text. If the alarm has not
+         changed state this variable represents the alarm raise time
+         and will be the same as tfAlarmOrigTime.
+
+         NOTE: All fields of the DateAndTime MUST be filled out,
+         including the hours and minutes from UTC. As such, the value
+         should be 11 octets long."
+    REFERENCE
+        "ITU Recommendation X.733, 'Information Technology - Open Systems
+         Interconnection - System Management: Alarm Reporting Function',
+         1992"
+    ::= { tfAlarmEntry 11 }
+
+tfAlarmSeverity OBJECT-TYPE
+    SYNTAX       ItuPerceivedSeverity
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The severity of the alarm as defined by X.733.  Note that
+         this may not be the original severity since the alarm may
+         have changed severity. For cleared alarms, this is the last
+         severity that is not equal to cleared."
+    REFERENCE
+        "ITU Recommendation X.733, 'Information Technology - Open Systems
+         Interconnection - System Management: Alarm Reporting Function',
+         1992"
+    ::= { tfAlarmEntry 12 }
+
+tfAlarmCleared OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Indicates if the alarm is cleared or not."
+    ::= { tfAlarmEntry 13 }
+
+tfAlarmText OBJECT-TYPE
+    SYNTAX       TfUtf8String
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A user friendly text describing the alarm.
+        Intended for human consumption."
+    REFERENCE
+        "ITU Recommendation X.733, 'Information Technology - Open Systems
+         Interconnection - System Management: Alarm Reporting Function',
+         1992"
+    ::= { tfAlarmEntry 14 }
+
+tfAlarmOperatorState OBJECT-TYPE
+    SYNTAX       TfAlarmOperatorState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operator state of the alarm."
+    ::= { tfAlarmEntry 15 }
+
+tfAlarmOperatorNote OBJECT-TYPE
+    SYNTAX       TfUtf8String
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Operator note for the alarm."
+    ::= { tfAlarmEntry 16 }
+
+--====================================================
+--==Notifications and notification specific objects ==
+--====================================================
+
+-- In order to support some SNMP Managers that can only map severity to
+-- indivudal SNMP notifications we split the notifications per severity. 
+
+tfAlarmIndeterminate NOTIFICATION-TYPE
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmSpecificProblem,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmTime,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "Indeterminate alarms are sent when errors occur for
+         which the severity level cannot be determined."
+    ::= { tfAlarmNotifsPrefix 1 }
+
+tfAlarmWarning NOTIFICATION-TYPE
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmSpecificProblem,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmTime,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "Warning alarms are sent for potential problems that
+         haven't yet caused any significant effects."
+    ::= { tfAlarmNotifsPrefix 2 }
+
+tfAlarmMinor NOTIFICATION-TYPE
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmSpecificProblem,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmTime,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "Minor alarms are sent for non-service affecting
+         problems, and indicate that corrective action should
+         be taken to prevent a more serious fault."
+    ::= { tfAlarmNotifsPrefix 3 }
+
+tfAlarmMajor NOTIFICATION-TYPE
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmSpecificProblem,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmTime,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "Major alarms are sent for service affecting problems
+         that require urgent corrective action."
+    ::= { tfAlarmNotifsPrefix 4 }
+
+tfAlarmCritical NOTIFICATION-TYPE
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmSpecificProblem,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmTime,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "Critical alarms are sent for service affecting
+         problems that require immediate corrective action."
+    ::= { tfAlarmNotifsPrefix 5 }
+
+tfAlarmClear NOTIFICATION-TYPE
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmSpecificProblem,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmTime,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "A clear alarm indicates that a previously reported
+         alarm is now cleared by the underlying resource."
+    ::= { tfAlarmNotifsPrefix 6 }
+
+--======================================================================
+-- CONFORMANCE INFORMATION
+--======================================================================
+
+tfAlarmCompliances      OBJECT IDENTIFIER ::= { tfAlarmConformance 1 }
+tfAlarmCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "Compliance information for this MIB module"
+    MODULE -- this module
+    MANDATORY-GROUPS {
+       tfAlarmNotifs,
+       tfAlarmObjs
+       }
+    ::= { tfAlarmCompliances 1 }
+
+tfAlarmGroups   OBJECT IDENTIFIER ::= { tfAlarmConformance 2 }
+
+tfAlarmNotifs NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tfAlarmIndeterminate,
+        tfAlarmWarning,
+        tfAlarmMinor,
+        tfAlarmMajor,
+        tfAlarmCritical,
+        tfAlarmClear
+        }
+    STATUS       current
+    DESCRIPTION
+        "The alarm notifications that can be sent from the system."
+    ::= { tfAlarmGroups 1 }
+
+tfAlarmObjs OBJECT-GROUP
+    OBJECTS {
+        tfAlarmType,
+        tfAlarmNumber,
+        tfAlarmLastChanged,
+        tfAlarmEventType,
+        tfAlarmProbableCause,
+        tfAlarmSpecificProblem,
+        tfAlarmCleared,
+        tfAlarmOperatorState,
+        tfAlarmOperatorNote,
+        tfAlarmDevice,
+        tfAlarmObject,
+        tfAlarmObjectOID,
+        tfAlarmObjectStr,
+        tfAlarmOrigTime,
+        tfAlarmTime,
+        tfAlarmSeverity,
+        tfAlarmText
+        }
+    STATUS       current
+    DESCRIPTION
+        "The alarm objects."
+    ::= { tfAlarmGroups 2 }
+
+END
+

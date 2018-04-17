@@ -1,0 +1,91 @@
+TAILF-ALARM-TC-MIB DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+    MODULE-IDENTITY, Unsigned32 
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tfModules
+        FROM TAILF-TOP-MIB;
+ 
+tfAlarmTCModule MODULE-IDENTITY
+    LAST-UPDATED "201208300000Z"
+    ORGANIZATION "Tail-f Systems AB"
+    CONTACT-INFO
+        "support@tail-f.com"
+    DESCRIPTION
+        "Textual conventions for alarms from Tail-f."
+    REVISION "201208300000Z"
+    DESCRIPTION
+        "Released as part of NCS-2.0.
+
+         Removed TfAlarmType.
+         Fixed DISPLAY-HINT in TfYANGResource and TfUtf8String.
+         Allow TfYANGResource to be an empty string."
+
+    REVISION "201103010000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tfModules 101 }
+
+--=======================
+--==Textual conventions==
+--=======================
+
+TfAlarmIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Index used in the alarm table.  A row shall never change its
+         index during the lifetime of the entry; for example
+         renumbering entries is not allowed when entries are
+         deleted. This integer is imaginary and has no meaning. The
+         logical index in the alarm list is managed device, resource
+         and alarm type."
+     SYNTAX Unsigned32
+
+TfYANGResource ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255t"
+    STATUS current
+    DESCRIPTION
+        "Identifies a resource using YANG instance identifers.
+
+        A zero-length octet string means that the reference
+        does not exist."
+    SYNTAX OCTET STRING(SIZE(0..255))
+
+TfAlarmOperatorState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "States for operator actions on alarms"
+    SYNTAX INTEGER {
+        none(1),
+        ack(2),
+        investigation(3), 
+        observation(4),
+        closed(5),
+        other(6)
+        }
+
+TfUtf8String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255t"
+    STATUS  current
+    DESCRIPTION
+        "To facilitate internationalization, this TC represents
+         information taken from the ISO/IEC IS 10646-1 character set,
+         encoded as an octet string using the UTF-8 character encoding
+         scheme described in RFC 2044 [10].  For strings in 7-bit
+         US-ASCII, there is no impact since the UTF-8 representation
+         is identical to the US-ASCII encoding."
+    SYNTAX  OCTET STRING (SIZE (0..255))
+
+TfProbableCause ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "An integer value used for X.733 probable cause mapping.
+         Since there are numerous conflicting probable cause
+         enumeration mappings we leave this as a configurable
+         integer."
+     SYNTAX Unsigned32
+END
