@@ -2,20 +2,28 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo "fail2ban";
-
 $name = 'fail2ban';
 $app_id = $app['app_id'];
 
-$options      = '-O qv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.102.97.105.108.50.98.97.110';
-$f2b = snmp_walk($device, $oid, $options);
-$f2b = trim($f2b, '"');
+echo $name;
+
+//$options      = '-O qv';
+//$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.102.97.105.108.50.98.97.110';
+//$f2b = snmp_walk($device, $oid, $options);
+//$f2b = trim($f2b, '"');
+
+$f2b=json_app_get($device, '8.102.97.105.108.50.98.97.110');
+
+if ( $f2b{'error'} != '0' ){
+    print "\nJSON returned with error '".$f2b{'error'}."'\nerrorString: ".$f2b{'errorString'}."\n";
+    return;
+}
+
 
 $metrics = array();
 $bannedStuff = explode("\n", $f2b);
 
-$total_banned=$bannedStuff[0];
+$total_banned=$f2b{'total'};
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -32,15 +40,14 @@ $metrics['total'] = $fields;
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
 
-$int=1;
-$jails=array();
+$int=0;
+$jails=array_keys($f2b{'jails'});
 
-while (isset($bannedStuff[$int])) {
-    list($jail, $banned) = explode(" ", $bannedStuff[$int]);
+while (isset($jails[$int])) {
+    $jail=$jails{$int};
+    $banned=$f2b{'jails'}{$jail};
 
     if (isset($jail) && isset($banned)) {
-        $jails[] = $jail;
-
         $rrd_name = array('app', $name, $app_id, $jail);
         $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
         $fields = array('banned' => $banned);
