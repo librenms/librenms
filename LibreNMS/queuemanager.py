@@ -119,24 +119,25 @@ class QueueManager:
         return getattr(self.config, self.type)
 
     def get_queue(self, group=0):
-        try:
-            return self._queues[group]
-        except KeyError:
-            with self._queue_create_lock:
-                if group not in self._queues:
-                    self._queues[group] = self._create_queue(self.type, group)
-                return self._queues[group]
+        name = self.queue_name(self.type, group)
 
-    def _create_queue(self, name, group=0):
+        if name not in self._queues.keys():
+            with self._queue_create_lock:
+                if name not in self._queues.keys():
+                    self._queues[name] = self._create_queue(self.type, group)
+
+        return self._queues[name]
+
+    def _create_queue(self, type, group=0):
         """
         Create a queue (not thread safe)
         :param name:
         :param group:
         :return:
         """
-        debug("Creating queue {}:{}".format(name, group))
+        debug("Creating queue {}".format(self.queue_name(type, group)))
         try:
-            return LibreNMS.RedisQueue(name,
+            return LibreNMS.RedisQueue(self.queue_name(type, group),
                                        namespace='librenms.queue',
                                        host=self.config.redis_host,
                                        port=self.config.redis_port,
@@ -156,6 +157,10 @@ class QueueManager:
                 exit(2)
 
         return Queue()
+
+    @staticmethod
+    def queue_name(type, group):
+        return "{}:{}".format(type, group)
 
 
 class TimedQueueManager(QueueManager):
