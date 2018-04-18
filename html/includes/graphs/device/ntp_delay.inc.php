@@ -19,11 +19,20 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
+//Specify whether value is ms or seconds.
+if ($device['os_group'] == 'cisco') {
+    $time=' (s)';
+    $virtlabel=' Seconds';
+} else {
+    $time = ' (ms)';
+    $virtlabel = ' Milliseconds';
+}
+
 include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
-$rrd_options .= " COMMENT:'Delay                Now       Min      Max\\n'";
+$rrd_options .= " --vertical-label='$virtlabel'";
+$rrd_options .= " COMMENT:'Delay".$time."             Now       Min      Max\\n'";
 $rrd_additions = "";
-
 
 $count = 0;
 foreach ($components as $id => $array) {
@@ -37,31 +46,15 @@ foreach ($components as $id => $array) {
             $color = $config['graph_colours']['oranges'][$count-7];
         }
 
-//        $rrd_additions .= " GPRINT:DS" . $count . "=" . $rrd_filename . ":delay:AVERAGE ";
         $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":delay:AVERAGE ";
-        $rrd_additions .= " LINE1.25:DS" . $count . "#" . $color . ":'" . str_pad(substr($array['peer'].' (s)', 0, 15), 15) . "'" . $stack;
-        $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%7.0lf ";
-        $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%7.0lf ";
-        $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%7.0lf\\l ";
-//        $rrd_options .= " GPRINT:ping:MAX:%6.2lf  'GPRINT:ping:AVERAGE:%6.2lf\\n'";
+        $rrd_additions .= " LINE1.25:DS" . $count . "#" . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;
+        $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%7.2lf ";
+        $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%7.2lf ";
+        $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%7.2lf\\l ";
 
         $count++;
     }
 }
-
-/*
-$scale_min = '0';
-
-require 'includes/graphs/common.inc.php';
-
-$rrd_filename = rrd_name($device['hostname'], 'ping-perf');
-
-$rrd_options .= ' DEF:ping='.$rrd_filename.':ping:AVERAGE';
-$rrd_options .= " 'COMMENT:Milliseconds      Cur    Min    Max    Avg\\n'";
-$rrd_options .= ' LINE1.25:ping#36393D:Ping';
-$rrd_options .= ' GPRINT:ping:LAST:%6.2lf  GPRINT:ping:AVERAGE:%6.2lf';
-$rrd_options .= " GPRINT:ping:MAX:%6.2lf  'GPRINT:ping:AVERAGE:%6.2lf\\n'";
-*/
 
 if ($rrd_additions == "") {
     // We didn't add any data points.
