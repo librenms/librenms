@@ -13,6 +13,10 @@ if ($ports['error'] != '0') {
     return;
 }
 
+// remove these at this point as we don't want them
+unset($ports['error']);
+unset($ports['errorString']);
+unset($ports['version']);
 
 //
 // each port
