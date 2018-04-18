@@ -49,12 +49,13 @@ class QueueManager:
     def _service_worker(self, work_func, queue_id):
         while not self._stop_event.is_set():
             try:
-                for id in random.sample(queue_id, len(queue_id)):
+                for queue in random.sample(queue_id, len(queue_id)):
                     # cannot break blocking request with redis-py, so timeout :(
-                    device_id = self.get_queue(id).get(True, 3)
+                    device_id = self.get_queue(queue).get(True, 3)
 
                     if device_id:  # None returned by redis after timeout when empty
-                        work_func(device_id, id)
+                        info("Worker attached to queues: {} removed job from queue {}".format(queue_id, queue))
+                        work_func(device_id, queue)
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
