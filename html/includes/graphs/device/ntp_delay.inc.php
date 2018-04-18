@@ -22,7 +22,7 @@ $components = $components[$device['device_id']];
 include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " --vertical-label='Seconds'";
-$rrd_options .= " COMMENT:'Delay (s)             Now       Min      Max\\n'";
+$rrd_options .= " COMMENT:'Delay (s)               Now      Min       Max\\n'";
 $rrd_additions = "";
 
 $count = 0;
