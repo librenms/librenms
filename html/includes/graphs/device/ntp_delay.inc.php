@@ -19,19 +19,10 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-//Specify whether value is ms or seconds.
-if ($device['os_group'] == 'cisco') {
-    $time=' (s)';
-    $virtlabel=' Seconds';
-} else {
-    $time = ' (ms)';
-    $virtlabel = ' Milliseconds';
-}
-
 include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
-$rrd_options .= " --vertical-label='$virtlabel'";
-$rrd_options .= " COMMENT:'Delay".$time."             Now       Min      Max\\n'";
+$rrd_options .= " --vertical-label='Seconds'";
+$rrd_options .= " COMMENT:'Delay (s)             Now       Min      Max\\n'";
 $rrd_additions = "";
 
 $count = 0;
@@ -48,10 +39,9 @@ foreach ($components as $id => $array) {
 
         $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":delay:AVERAGE ";
         $rrd_additions .= " LINE1.25:DS" . $count . "#" . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;
-        $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%7.2lf ";
-        $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%7.2lf ";
-        $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%7.2lf\\l ";
-
+        $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%7.0lf ";
+        $rrd_additions .= " GPRINT:DS" . $count .    ":MIN:%7.0lf ";
+        $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%7.0lf\\l ";
         $count++;
     }
 }
