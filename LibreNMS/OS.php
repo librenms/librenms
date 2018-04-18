@@ -25,7 +25,7 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Util\Wireless;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
@@ -214,7 +214,7 @@ class OS implements ProcessorDiscovery
                 $channel = $snmp_data[$oid];
             }
 
-            $data[$id] = WirelessSensor::channelToFrequency($channel);
+            $data[$id] = Wireless::channelToFrequency($channel);
         }
 
         return $data;

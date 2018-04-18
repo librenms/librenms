@@ -25,15 +25,16 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\WirelessSensor;
 use LibreNMS\Device\Processor;
-use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Wireless;
 
 class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
@@ -99,7 +100,7 @@ class HiveosWireless extends OS implements
                 'hiveos-wireless',
                 $index,
                 $ahRadioName[$index],
-                WirelessSensor::channelToFrequency($frequency['ahRadioChannel'])
+                Wireless::channelToFrequency($frequency['ahRadioChannel'])
             );
         }
         return $sensors;

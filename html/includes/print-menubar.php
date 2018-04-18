@@ -1,8 +1,8 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
+use App\Models\WirelessSensor;
 use LibreNMS\Authentication\Auth;
-use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
 $service_status   = get_service_status();

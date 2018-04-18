@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Device\WirelessSensor;
+use App\Models\WirelessSensor;
 
 // this determines the order of the tabs
 $types = WirelessSensor::getTypes();

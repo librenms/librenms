@@ -25,11 +25,13 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\DiscoveryModelObserver;
 
 class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem, PollerModule
@@ -38,6 +40,7 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
     protected $fillable = ['type', 'device_id', 'oids', 'subtype', 'index', 'description', 'value', 'multiplier', 'divisor', 'aggregator', 'access_point_id', 'alert_high', 'alert_low', 'warn_high', 'warn_low'];
     protected $casts = ['oids' => 'array'];
 
+    protected static $rrd_name = 'wireless-sensor';
     private $valid = true;
 
     public static function discover(
@@ -101,14 +104,14 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
 
     public function classDescr()
     {
-        return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
+        return collect(collect(\LibreNMS\Device\Wireless::getTypes())
             ->get($this->sensor_class, []))
             ->get('short', ucwords(str_replace('_', ' ', $this->sensor_class)));
     }
 
     public function icon()
     {
-        return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
+        return collect(collect(\LibreNMS\Device\Wireless::getTypes())
             ->get($this->sensor_class, []))
             ->get('icon', 'signal');
     }
@@ -187,7 +190,7 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
      * )
      * @param bool $valid filter this list by valid types in the database
      * @param int $device_id when filtering, only return types valid for this device_id
-     * @return array
+     * @return Collection
      */
     public static function getTypes($valid = false, $device_id = null)
     {
@@ -366,7 +369,60 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
 
     public static function poll(OS $os)
     {
-        // TODO: Implement poll() method.
+
+        // fetch and group sensors, decode oids
+        $sensors = WirelessSensor::where('device_id', $os->getDeviceId())->get()->groupBy('type');
+
+        foreach ($sensors as $type => $type_sensors) {
+            // check for custom polling
+            $typeInterface = static::getPollingInterface($type);
+            if (!interface_exists($typeInterface)) {
+                echo "ERROR: Polling Interface doesn't exist! $typeInterface\n";
+            }
+
+            // fetch custom data
+            if ($os instanceof $typeInterface) {
+                static::pollSensorType($os, $type, $type_sensors, collect());
+                $sensors->forget($type); // remove from sensors array to prevent double polling
+            }
+        }
+
+        // pre-fetch all standard sensors
+        $standard_sensors = $sensors->flatten();
+        $pre_fetch = self::fetchSnmpData(Device::find($os->getDeviceId()), $standard_sensors);
+
+        // poll standard sensors
+        foreach ($sensors as $type => $type_sensors) {
+            static::pollSensorType($os, $type, $type_sensors, $pre_fetch);
+        }
+    }
+
+    /**
+     * Poll all sensors of a specific class
+     *
+     * @param OS $os
+     * @param string $type
+     * @param Collection $sensors
+     * @param Collection|array $prefetch
+     */
+    protected static function pollSensorType($os, $type, $sensors, $prefetch = [])
+    {
+        echo "$type:\n";
+        $prefetch = is_array($prefetch) ? collect($prefetch) : $prefetch;
+
+        // process data or run custom polling
+        $typeInterface = static::getPollingInterface($type);
+        if ($os instanceof $typeInterface) {
+            d_echo("Using OS polling for $type\n");
+            $function = static::getPollingMethod($type);
+            $data = $os->$function($sensors);
+        } else {
+            $data = static::processSensorData($sensors, $prefetch);
+        }
+
+        d_echo($data);
+
+        self::recordSensorData($os, $sensors, $data);
     }
 
     /**
@@ -444,5 +500,58 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
 
             return $all_data->put($sensor->wireless_sensor_id, $sensor_value);
         }, collect());
+    }
+
+    /**
+     * Record sensor data in the database and data stores
+     *
+     * @param $os
+     * @param Collection $sensors
+     * @param Collection $data
+     */
+    protected static function recordSensorData(OS $os, $sensors, $data)
+    {
+        $types = static::getTypes();
+
+        /** @var WirelessSensor $sensor */
+        foreach ($sensors as $sensor) {
+            $sensor_value = $data[$sensor->wireless_sensor_id];
+
+            $type = $types->get($sensor->type);
+            echo "  $sensor->description: $sensor_value {$type['unit']}\n";
+
+            // update rrd and database
+            $rrd_name = [
+                static::$rrd_name,
+                $sensor->type,
+                $sensor->subtype,
+                $sensor->index
+            ];
+            $rrd_type = isset($type['type']) ? strtoupper($type['type']) : 'GAUGE';
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
+
+            $fields = [
+                'sensor' => isset($sensor_value) ? $sensor_value : 'U',
+            ];
+
+            $tags = [
+                'type' => $sensor->type,
+                'subtype' => $sensor->subtype,
+                'index' => $sensor->index,
+                'description' => $sensor->description,
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def
+            ];
+            data_update($os->getDevice(), static::$rrd_name, $tags, $fields);
+
+            if ($sensor_value != $sensor->value) {
+                $sensor->fill([
+                    'previous_value' => $sensor->value,
+                    'value' => $sensor_value,
+                    //                'updated_at' => Carbon::now(),
+                ]);
+                $sensor->save();
+            }
+        }
     }
 }

@@ -128,7 +128,7 @@ class MenuComposer
         $vars['sensor_menu'] = $sensor_menu;
 
         // Wireless menu
-        $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
+        $wireless_menu_order = array_keys(\LibreNMS\Device\Wireless::getTypes());
         $vars['wireless_menu'] = WirelessSensor::hasAccess($user)->select('sensor_class')
             ->groupBy('sensor_class')
             ->get()

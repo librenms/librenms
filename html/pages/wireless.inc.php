@@ -25,10 +25,10 @@
 
 $pagetitle[] = "Wireless";
 
-use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Util\Wireless;
 
 $sensors = dbFetchColumn('SELECT `sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`');
-$valid_wireless_types = array_intersect_key(WirelessSensor::getTypes(), array_flip($sensors));
+$valid_wireless_types = array_intersect_key(Wireless::getTypes(), array_flip($sensors));
 
 $class = $vars['metric'];
 if (!$class) {

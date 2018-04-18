@@ -25,7 +25,7 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
+use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;

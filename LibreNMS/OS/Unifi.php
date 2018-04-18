@@ -25,7 +25,8 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
+use App\Models\WirelessSensor;
+use LibreNMS\Util\Wireless;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -210,7 +211,7 @@ class Unifi extends OS implements
                 'unifi',
                 $radio,
                 "Frequency ($radio)",
-                WirelessSensor::channelToFrequency($entry['unifiVapChannel'])
+                Wireless::channelToFrequency($entry['unifiVapChannel'])
             );
         }
 

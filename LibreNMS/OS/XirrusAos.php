@@ -25,7 +25,7 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
+use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Wireless;
 
 class XirrusAos extends OS implements
     WirelessClientsDiscovery,
@@ -152,7 +153,7 @@ class XirrusAos extends OS implements
                 'xirrus',
                 $index,
                 $names[$index],
-                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) :$entry[$oid]
+                $type == 'frequency' ? Wireless::channelToFrequency($entry[$oid]) :$entry[$oid]
             );
         }
 

@@ -25,7 +25,7 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\WirelessSensor;
+use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Wireless;
 
 class Arubaos extends OS implements
     WirelessClientsDiscovery,
@@ -108,7 +109,7 @@ class Arubaos extends OS implements
             $tmp_index = "$oid.$index";
 
             if ($type == 'frequency') {
-                $current = WirelessSensor::channelToFrequency($this->decodeChannel($entry[$oid]));
+                $current = Wireless::channelToFrequency($this->decodeChannel($entry[$oid]));
             } else {
                 $current = $entry[$oid];
             }
