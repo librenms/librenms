@@ -324,7 +324,10 @@ class Service:
         for device in devices:
             self.discovery_manager.post_work(device[0], device[1])
 
-    def discover_device(self, device_id):
+    def discover_device(self, device_id, group):
+        if not self.verify_queue(device_id, group):
+            return False
+
         if self.lock_discovery(device_id):
             try:
                 with TimeitContext.start() as t:
@@ -359,7 +362,10 @@ class Service:
         for device in devices:
             self.services_manager.post_work(device[0], device[1])
 
-    def poll_services(self, device_id):
+    def poll_services(self, device_id, group):
+        if not self.verify_queue(device_id, group):
+            return False
+
         with TimeitContext.start() as t:
             info("Checking services on device {}".format(device_id))
             self.call_script('check-services.php', ('-h', device_id))
@@ -394,7 +400,10 @@ class Service:
                     debug("Dispatching polling for device {}, time since last poll {:.2f}s"
                           .format(device_id, elapsed))
 
-    def poll_device(self, device_id):
+    def poll_device(self, device_id, group):
+        if not self.verify_queue(device_id, group):
+            return False
+
         if self.lock_polling(device_id):
             info('Polling device {}'.format(device_id))
 
@@ -419,6 +428,9 @@ class Service:
     def fetch_services_device_list(self):
         return self._services_db.fetch("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
                                        " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
+
+    def fetch_device(self, device_id):
+        return self._discovery_db.fetch("SELECT `device_id`, `poller_group` FROM `devices` WHERE `device_id`=%s", device_id)
 
     def fetch_device_list(self):
         return self._discovery_db.fetch("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
@@ -640,3 +652,13 @@ class Service:
                        'ON DUPLICATE KEY UPDATE '
                        'last_polled=values(last_polled), devices=values(devices), time_taken=values(time_taken);'
                        .format(self.config.name, jobs, time))
+
+    def verify_queue(self, device_id, group):
+        devices = self.fetch_device(device_id)
+
+        for device in devices:
+            if device[1] != group:
+                error("Device {} has been entered into queue {} instead of queue {}".format(device[0], group, device[1]))
+                return False
+
+        return True

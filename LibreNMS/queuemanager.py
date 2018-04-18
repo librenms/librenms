@@ -54,7 +54,7 @@ class QueueManager:
                     device_id = self.get_queue(id).get(True, 3)
 
                     if device_id:  # None returned by redis after timeout when empty
-                        work_func(device_id)
+                        work_func(device_id, id)
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
