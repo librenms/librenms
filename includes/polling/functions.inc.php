@@ -695,10 +695,12 @@ function convert_to_celsius($value)
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
  * @param $device
- * @param string $poin partial OID
+ * @param string $extend the extend name
+ * @param integer $min_version the minimum version to accept for the returned JSON
  *
- * In regards to the POID, if the OID is 'nsExtendOutputFull.3.122.102.115', then
- * it would become '3.122.102.115'.
+ * If the min version is not set, it defaults to 0.
+ *
+ * In regards extend name, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
  *
  * The returned value is JSON parsed into a array.
  *
@@ -711,6 +713,7 @@ function convert_to_celsius($value)
  * -3 : Empty JSON parsed, meaning blank JSON was returned.
  * -4 : Empty return from snmp_get().
  * -5 : Non-numeric version number.
+ * -6 : Returned version is less than the min version.
  *
  * Other error codes are possible, but those are extend related and should be handled
  * by the poller calling this function.
@@ -718,9 +721,14 @@ function convert_to_celsius($value)
  * If version, error, and errorString are not set, it is assumed it is a old JSON backend and
  * sets them manually with a version of 0 and assumes a error of 0(no error).
  */
-function json_app_get($device, $poid)
+function json_app_get($device, $extend, $min_version)
 {
-    $returned_json = snmp_get($device, 'nsExtendOutputFull.'.$poid, '-O qv', 'NET-SNMP-EXTEND-MIB');
+    // If no $min_version is set, set it to 0
+    if (!isset($min_version)) {
+        $min_version=0;
+    }
+    
+    $returned_json = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-O qv', 'NET-SNMP-EXTEND-MIB');
 
     // make sure we actually get something back
     if (empty($returned_json)) {
@@ -733,26 +741,31 @@ function json_app_get($device, $poid)
     if (json_last_error() === JSON_ERROR_NONE) {
         if (empty($parsed_json)) {
             // If we get here it means there are no keys in the array, meaining '{}' was was returned
-            $parsed_json{'error'}='-3';
-            $parsed_json{'errorString'}='Blank JSON returned.';
+            $parsed_json['error']='-3';
+            $parsed_json['errorString']='Blank JSON returned.';
         } else {
             // If the following is true, it is a legacy JSON app extend, meaning these are not set
-            if (!isset($parsed_json{'error'})) {
-                $parsed_json{'error'}='0';
+            if (!isset($parsed_json['error'])) {
+                $parsed_json['error']='0';
             }
-            if (!isset($parsed_json{'errorString'})) {
-                $parsed_json{'errorString'}='';
+            if (!isset($parsed_json['errorString'])) {
+                $parsed_json['errorString']='';
             }
-            if (!isset($parsed_json{'version'})) {
-                $parsed_json{'version'}='-1';
+            if (!isset($parsed_json['version'])) {
+                $parsed_json['version']='-1';
             }
 
             // If the version is not numeric and there is not an error already set, do so now.
-            if ((!is_numeric($parsed_json{'version'})) &&
-                ($parsed_json{'error'} != '0')
+            if ((!is_numeric($parsed_json['version'])) &&
+                ($parsed_json['error'] != '0')
             ) {
-                $parsed_json{'error'}='-5';
-                $parsed_json{'errorString'}='is_numeric returns false for the value "'.$parsed_json{'version'}.'"';
+                $parsed_json['error']='-5';
+                $parsed_json['errorString']='is_numeric returns false for the value "'.$parsed_json{'version'}.'"';
+            } else {
+                if ($parsed_json['version'] < $min_version){
+                    $parsed_json['error']='-6';
+                    $parsed_json['errorString']='"'.$parsed_json['version'].'" is less than the required version of "'.$min_version.'"';
+                }
             }
         }
     } else {
