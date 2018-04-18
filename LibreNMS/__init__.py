@@ -1,4 +1,5 @@
 import threading
+
 from logging import critical, info, debug
 from time import time
 
@@ -17,7 +18,7 @@ class DB:
         :param config: The poller config object
         """
         self.config = config
-        self._db = None
+        self._db = {}
 
         if auto_connect:
             self.connect()
@@ -51,10 +52,22 @@ class DB:
             conn = MySQLdb.connect(**args)
             conn.autocommit(True)
             conn.ping(True)
-            self._db = conn
+            self._db[threading.get_ident()] = conn
         except Exception as e:
             critical("ERROR: Could not connect to MySQL database! {}".format(e))
             raise
+
+    def db_conn(self):
+        """
+        Refers to a database connection via thread identifier
+        :return: database connection handle
+        """
+
+        # Does a connection exist for this thread
+        if threading.get_ident() not in self._db.keys():
+            self.connect()
+
+        return self._db[threading.get_ident()]
 
     def fetch(self, query, args=None):
         """
@@ -64,7 +77,7 @@ class DB:
         :param args:
         :return: the cursor with results
         """
-        cursor = self._db.cursor()
+        cursor = self.db_conn().cursor()
         cursor.execute(query, args)
         cursor.close()
         return cursor
