@@ -11,6 +11,8 @@
  *
  */
 
+use LibreNMS\Authentication\Auth;
+
 if (empty($_SERVER['PATH_INFO'])) {
     if (strstr($_SERVER['SERVER_SOFTWARE'], "nginx") && isset($_SERVER['PATH_TRANSLATED']) && isset($_SERVER['ORIG_SCRIPT_FILENAME'])) {
             $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'] . $_SERVER['PHP_SELF'], "", $_SERVER['ORIG_SCRIPT_FILENAME']);
@@ -51,7 +53,7 @@ $msg_box = array();
 // Check for install.inc.php
 if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
     // no config.php does so let's redirect to the install
-    header("Location: {$config['base_url']}/install.php");
+    header("Location: /install.php");
     exit;
 }
 
@@ -128,6 +130,7 @@ if (empty($config['favicon'])) {
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>?ver=291727421" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417642" rel="stylesheet" type="text/css" />
 <?php
@@ -186,7 +189,7 @@ if (empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
 }
 
 if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
-    if ($_SESSION['authenticated']) {
+    if (Auth::check()) {
         require 'includes/print-menubar.php';
     }
 } else {
@@ -209,7 +212,7 @@ if (isset($devel) || isset($vars['devel'])) {
     echo("</pre>");
 }
 
-if ($_SESSION['authenticated']) {
+if (Auth::check()) {
     // Authenticated. Print a page.
     if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
         require "pages/" . $vars['page'] . ".inc.php";
@@ -302,7 +305,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(
     $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 
-foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array($_SESSION['user_id'])) as $notification) {
+foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array(Auth::id())) as $notification) {
     $msg_box[] = array(
         'type' => 'error',
         'message' => "<a href='notifications/'>${notification['body']}</a>",
@@ -324,7 +327,7 @@ if (is_array($msg_box)) {
     echo("</script>");
 }
 
-if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === true) {
+if (is_array($sql_debug) && is_array($php_debug) && Auth::check()) {
     require_once "includes/print-debug.php";
 }
 

@@ -23,7 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\Auth;
+
+if (!Auth::user()->hasGlobalAdmin()) {
     $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to delete poller entries');
 } else {
     $id = $vars['id'];

@@ -1,6 +1,9 @@
 <?php
+
+use LibreNMS\Authentication\Auth;
+
 if ($_POST['editing']) {
-    if ($_SESSION['userlevel'] > '7') {
+    if (Auth::user()->hasGlobalAdmin()) {
         $override_sysContact_bool = mres($_POST['override_sysContact']);
         if (isset($_POST['sysContact'])) {
             $override_sysContact_string = mres($_POST['sysContact']);

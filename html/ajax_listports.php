@@ -10,12 +10,14 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Authentication\Auth;
+
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
-if (!$_SESSION['authenticated']) {
+if (!Auth::check()) {
     echo 'unauthenticated';
     exit;
 }

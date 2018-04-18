@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $device_id = $widget_settings['device'];
 $column = $widget_settings['columnsize'];
 
@@ -23,12 +25,12 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
             <div class="col-sm-6">
                 <select id="device" name="device" class="form-control">';
-    if (is_admin() || is_read()) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` WHERE disabled = 0 AND `type` = 'server' ORDER BY `hostname` ASC";
         $param = array();
     } else {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id` WHERE disabled = 0 AND `type` = 'server' AND `DP`.`user_id`=? ORDER BY `hostname` ASC";
-        $param = array($_SESSION['user_id']);
+        $param = array(Auth::id());
     }
     foreach (dbFetchRows($sql, $param) as $dev) {
         if ($dev['device_id'] == $cur_dev) {

@@ -23,64 +23,61 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$tables = array(
-    // One could add more entrys from deviceGroup, but this will do as a start
-    array('cpqDaPhyDrvStatus','.1.3.6.1.4.1.232.3.2.5.1.1.6.','cpqDaPhyDrvStatus','DriveStatus','CPQSINFO-MIB'),
-    array('cpqDaPhyDrvSmartStatus','.1.3.6.1.4.1.232.3.2.5.1.1.57.','cpqDaPhyDrvSmartStatus','SmartStatus','CPQSINFO-MIB'),
-);
+// One could add more entries from deviceGroup, but this will do as a start
+$tables = [
+    ['cpqDaPhyDrvStatus','.1.3.6.1.4.1.232.3.2.5.1.1.6.','Status','CPQIDA-MIB', [
+        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
+        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+        ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'predictiveFailure'],
+        ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'erasing'],
+        ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'eraseDone'],
+        ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'eraseQueued'],
+        ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'ssdWearOut'],
+        ['value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'notAuthenticated'],
+    ]],
+    ['cpqDaPhyDrvSmartStatus','.1.3.6.1.4.1.232.3.2.5.1.1.57.','S.M.A.R.T.','CPQIDA-MIB', [
+        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
+        ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'replaceDrive'],
+        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'replaceDriveSSDWearOut'],
+    ]],
+];
 
-$x=0;
 foreach ($tables as $tablevalue) {
-    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], array(), $tablevalue[4], 'hp');
-    $cur_oid = $tablevalue[1];
+    list($oid, $num_oid, $descr, $mib, $states) = $tablevalue;
+    $temp = snmpwalk_cache_multi_oid($device, $oid, [], $mib, 'hp', '-OQUse');
 
-    if (is_array($temp)) {
+    if (!empty($temp)) {
         //Create State Index
-        $state_name = $tablevalue[2];
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            if ($state_name == 'cpqDaPhyDrvStatus') {
-                $states = array(
-                    array($state_index_id,'other',1,1,3),
-                    array($state_index_id,'ok',1,2,0),
-                    array($state_index_id,'failed',1,3,2),
-                    array($state_index_id,'predictiveFailure',1,4,2),
-                    array($state_index_id,'erasing',1,5,1),
-                    array($state_index_id,'eraseDone',1,6,1),
-                    array($state_index_id,'eraseQueued',1,7,1),
-                    array($state_index_id,'ssdWearOut',1,8,2),
-                    array($state_index_id,'notAuthenticated',1,9,3),
-                );
-            } elseif ($state_name == 'cpqDaPhyDrvSmartStatus') {
-                $states = array(
-                    array($state_index_id,'other',1,1,3),
-                    array($state_index_id,'ok',1,2,0),
-                    array($state_index_id,'replaceDrive',1,3,1),
-                    array($state_index_id,'replaceDriveSSDWearOut',1,4,1),
-                );
-            }
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $state_name = $oid;
+        $state_index_id = create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            $descr = 'Disk #'.trim(snmp_get($device, ".1.3.6.1.4.1.232.3.2.5.1.1.5.1.$index", "-Ovqn"), '"');
+            $drive_bay = snmp_get($device, "cpqDaPhyDrvBay.$index", '-Ovqn', 'CPQIDA-MIB');
+
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $x . $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
+            discover_sensor(
+                $valid['sensor'],
+                'state',
+                $device,
+                $num_oid . $index,
+                $index,
+                $state_name,
+                "Drive  $drive_bay $descr",
+                1,
+                1,
+                null,
+                null,
+                null,
+                null,
+                $entry[$oid],
+                'snmp',
+                $index
+            );
+
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
         }
     }
-    $x++;
 }

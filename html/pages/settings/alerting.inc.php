@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 ?>
@@ -240,7 +242,7 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
-if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin() === true) {
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && Auth::user()->hasGlobalAdmin()) {
     set_config_name('alert.transports.pagerduty', '');
     set_config_name('alert.pagerduty.account', '');
     set_config_name('alert.pagerduty.service', '');
@@ -1384,7 +1386,101 @@ echo '
                     </div>
                 </div>
             </div>
+	</div>';
+// Gitlab Transport Section
+
+$gitlab_host = get_config_by_name('alert.transports.gitlab.host');
+$gitlab_project = get_config_by_name('alert.transports.gitlab.project_id');
+$gitlab_key = get_config_by_name('alert.transports.gitlab.key');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#gitlab_transport_expand"><i class="fa fa-caret-down"></i> Gitlab transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="gitlab" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="gitlab_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_host" class="col-sm-4 control-label">Gitlab Host</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_host" class="form-control validation" type="url" name="global-config-input" value="'.$gitlab_host['config_value'].'" data-config_id="'.$gitlab_host['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_project" class="col-sm-4 control-label">Gitlab Project ID</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_project" class="form-control" type="text" name="global-config-input" value="'.$gitlab_project['config_value'].'" data-config_id="'.$gitlab_project['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_key" class="col-sm-4 control-label">Gitlab API Key</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_key" class="form-control" type="text" name="global-config-input" value="'.$gitlab_key['config_value'].'" data-config_id="'.$gitlab_key['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>';
+
+        // Philips Hue Transport Section
+
+$hue_bridge = get_config_by_name('alert.transports.hue.bridge');
+$hue_user = get_config_by_name('alert.transports.hue.user');
+$hue_duration = get_config_by_name('alert.transports.hue.duration');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#hue_transport_expand"><i class="fa fa-caret-down"></i> Philips Hue transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hue" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="hue_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="hue_host" class="col-sm-4 control-label">Hue Host</label>
+                        <div class="col-sm-4">
+                            <input id="hue_host" class="form-control validation" type="url" name="global-config-input" value="'.$hue_bridge['config_value'].'" data-config_id="'.$hue_bridge['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="hue_user" class="col-sm-4 control-label">Philips Hue User</label>
+                        <div class="col-sm-4">
+                            <input id="hue_user" class="form-control" type="text" name="global-config-input" value="'.$hue_user['config_value'].'" data-config_id="'.$hue_user['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="hue_duration" class="col-sm-4 control-label">Philips Hue Duration</label>
+                        <div class="col-sm-4">
+                            <select id="hue_duration" class="form-control" name="global-config-select" data-config_id="'.$hue_duration['config_id'].'">
+                                <option '.( $hue_duration['config_value'] == "select" ? "selected" : ""). ' value="select">1 Second</option>
+                                <option '.( $hue_duration['config_value'] == "lselect" ? "selected" : ""). ' value="lselect">15 Seconds</option>
+                            </select>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+
 // Jira Transport Section
 $jira_prj     = get_config_by_name('alert.transports.jira.prjkey');
 $jira_url    = get_config_by_name('alert.transports.jira.url');

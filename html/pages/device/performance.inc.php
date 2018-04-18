@@ -18,6 +18,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Authentication\Auth;
+
 if (!isset($vars['section'])) {
     $vars['section'] = "performance";
 }
@@ -90,12 +92,12 @@ if (empty($vars['dtpickerto'])) {
 
 
     <?php
-    if (is_admin() === true || is_read() === true) {
+    if (Auth::user()->hasGlobalRead()) {
         $query = "SELECT DATE_FORMAT(timestamp, '" . $config['alert_graph_date_format'] . "') Date, xmt,rcv,loss,min,max,avg FROM `device_perf` WHERE `device_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?";
         $param = array($device['device_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
     } else {
         $query = "SELECT DATE_FORMAT(timestamp, '" . $config['alert_graph_date_format'] . "') Date, xmt,rcv,loss,min,max,avg FROM `device_perf`,`devices_perms` WHERE `device_perf`.`device_id` = ? AND `device_perf`.`device_id` = devices_perms.device_id AND devices_perms.user_id = ? AND `timestamp` >= ? AND `timestamp` <= ?";
-        $param = array($device['device_id'], $_SESSION['user_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
+        $param = array($device['device_id'], Auth::id(), $vars['dtpickerfrom'], $vars['dtpickerto']);
     }
     ?>
 

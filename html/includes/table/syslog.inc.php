@@ -9,50 +9,52 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
+
+use LibreNMS\Authentication\Auth;
 
 $where = '1';
 $param = array();
 
-if (!empty($_POST['searchPhrase'])) {
-    $where .= ' AND S.msg LIKE "%'.mres($_POST['searchPhrase']).'%"';
+if (!empty($vars['searchPhrase'])) {
+    $where .= ' AND S.msg LIKE "%'.mres($vars['searchPhrase']).'%"';
 }
 
-if ($_POST['program']) {
+if ($vars['program']) {
     $where  .= ' AND S.program = ?';
-    $param[] = $_POST['program'];
+    $param[] = $vars['program'];
 }
 
-if (is_numeric($_POST['device'])) {
+if (is_numeric($vars['device'])) {
     $where  .= ' AND S.device_id = ?';
-    $param[] = $_POST['device'];
+    $param[] = $vars['device'];
 }
 
-if ($_POST['priority']) {
+if ($vars['priority']) {
     $where  .= ' AND S.priority = ?';
-    $param[] = $_POST['priority'];
+    $param[] = $vars['priority'];
 }
 
-if (!empty($_POST['from'])) {
+if (!empty($vars['from'])) {
     $where  .= ' AND timestamp >= ?';
-    $param[] = $_POST['from'];
+    $param[] = $vars['from'];
 }
 
-if (!empty($_POST['to'])) {
+if (!empty($vars['to'])) {
     $where  .= ' AND timestamp <= ?';
-    $param[] = $_POST['to'];
+    $param[] = $vars['to'];
 }
 
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     $sql  = 'FROM syslog AS S';
     $sql .= ' WHERE '.$where;
 } else {
     $sql   = 'FROM syslog AS S, devices_perms AS P ';
     $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ? AND ';
     $sql  .= $where;
-    $param = array_merge(array($_SESSION['user_id']), $param);
+    $param = array_merge(array(Auth::id()), $param);
 }
 
 $count_sql = "SELECT COUNT(*) $sql";

@@ -5,7 +5,7 @@
     <table id="fdb-search" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="device" data-order="asc">Device</th>
+                <th data-column-id="device">Device</th>
                 <th data-column-id="mac_address">MAC Address</th>
                 <th data-column-id="ipv4_address">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
@@ -29,14 +29,16 @@ var grid = $("#fdb-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
 $param = array();
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
@@ -61,6 +63,14 @@ if ($_POST['searchby'] == 'mac') {
 ?>
 
                 ">MAC Address</option>"+
+                "<option value=\"ip\" "+
+<?php
+if ($_POST['searchby'] == 'ip') {
+    echo '" selected "+';
+}
+?>
+
+                ">IP Address</option>"+
                 "<option value=\"vlan\" "+
 <?php
 if ($_POST['searchby'] == 'vlan') {

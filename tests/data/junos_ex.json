@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "bgp-peers": {
         "discovery": {
             "devices": [
@@ -117,9 +116,7 @@
             ],
             "bgpPeers_cbgp": []
         }
-    }
-}
-=======
+    },
     "processors": {
         "discovery": {
             "processors": [
@@ -150,4 +147,3 @@
         "poller": "matches discovery"
     }
 }
->>>>>>> Extract DiscoveryItem and move some things to better places.

@@ -2,7 +2,7 @@
 
 $row = 1;
 
-$device_id = $_POST['device_id'];
+$device_id = $vars['device_id'];
 
 $sql = 'FROM `ports` WHERE `device_id` = ?';
 $param = array($device_id);

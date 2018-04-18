@@ -66,10 +66,6 @@ function poll_sensor($device, $class)
                 require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
             }
 
-            if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
-                $sensor_value = $sensor['user_func']($sensor_value);
-            }
-
             if ($class == 'temperature') {
                 preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
                 if (!empty($temp_response[0])) {
@@ -163,6 +159,10 @@ function record_sensor_data($device, $all_sensors)
 
         if ($sensor['sensor_multiplier']) {
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
+        }
+
+        if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
+            $sensor_value = $sensor['user_func']($sensor_value);
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);

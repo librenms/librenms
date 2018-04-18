@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -78,6 +79,12 @@ function external_exec($command)
 
     if ($debug && !$vdebug) {
         $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
+        $debug_command = preg_replace('/-u [\S]+/', '-u USER', $debug_command);
+        $debug_command = preg_replace('/-U [\S]+/', '-u USER', $debug_command);
+        $debug_command = preg_replace('/-A [\S]+/', '-A PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-X [\S]+/', '-X PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-P [\S]+/', '-P PASSWORD', $debug_command);
+        $debug_command = preg_replace('/-H [\S]+/', '-H HOSTNAME', $debug_command);
         $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
@@ -359,7 +366,7 @@ function device_by_id_cache($device_id, $refresh = false)
     if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
         $device = $cache['devices']['id'][$device_id];
     } else {
-        $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device = dbFetchRow("SELECT `devices`.*, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.`location`=`locations`.`location` WHERE `device_id` = ?", array($device_id));
         $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
@@ -1459,29 +1466,6 @@ if (!function_exists('starts_with')) {
     }
 }
 
-function get_auth_ad_user_filter($username)
-{
-    global $config;
-
-    // don't return disabled users
-    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
-    if ($config['auth_ad_user_filter']) {
-        $user_filter .= $config['auth_ad_user_filter'];
-    }
-    $user_filter .= ')';
-    return $user_filter;
-}
-
-function get_auth_ad_group_filter($groupname)
-{
-    global $config;
-    $group_filter = "(samaccountname=$groupname)";
-    if ($config['auth_ad_group_filter']) {
-        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
-    }
-    return $group_filter;
-}
-
 /**
  * Print a list of items up to a max amount
  * If over that number, a line will print the total items
@@ -1760,7 +1744,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = Auth::id();
     }
 
     $pref = dbFetchCell(
@@ -1789,7 +1773,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = Auth::id();
     }
 
     $pref = array(
@@ -1856,4 +1840,22 @@ function check_file_permissions($file, $mask)
 function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
+}
+
+/**
+ * Get all consecutive pairs of values in an array.
+ * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
+ *
+ * @param array $array
+ * @return array
+ */
+function array_pairs($array)
+{
+    $pairs = [];
+
+    for ($i = 1; $i < count($array); $i++) {
+        $pairs[] = [$array[$i -1], $array[$i]];
+    }
+
+    return $pairs;
 }

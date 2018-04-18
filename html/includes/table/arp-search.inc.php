@@ -1,35 +1,37 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $param = array();
 
 $sql .= ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
 
-if (is_admin() === false && is_read() === false) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ";
 
-if (is_numeric($_POST['device_id'])) {
+if (is_numeric($vars['device_id'])) {
     $sql    .= ' AND P.device_id = ?';
-    $param[] = $_POST['device_id'];
+    $param[] = $vars['device_id'];
 }
 
-if (is_numeric($_POST['port_id'])) {
+if (is_numeric($vars['port_id'])) {
     $sql    .= ' AND P.port_id = ?';
-    $param[] = $_POST['port_id'];
+    $param[] = $vars['port_id'];
 }
 
-if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
-    $ip_search = '%'.mres(trim($_POST['searchPhrase'])).'%';
-    $mac_search = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', mres($_POST['searchPhrase'])).'%';
+if (isset($vars['searchPhrase']) && !empty($vars['searchPhrase'])) {
+    $ip_search = '%'.mres(trim($vars['searchPhrase'])).'%';
+    $mac_search = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', mres($vars['searchPhrase'])).'%';
 
-    if (isset($_POST['searchby']) && $_POST['searchby'] == 'ip') {
+    if (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
         $sql    .= ' AND `ipv4_address` LIKE ?';
         $param[] = $ip_search;
-    } elseif (isset($_POST['searchby']) && $_POST['searchby'] == 'mac') {
+    } elseif (isset($vars['searchby']) && $vars['searchby'] == 'mac') {
         $sql    .= ' AND `mac_address` LIKE ?';
         $param[] = $mac_search;
     } else {

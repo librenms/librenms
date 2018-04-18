@@ -7,6 +7,9 @@
 // <table width=100% border=0><tr><td><div style="margin-bottom: 5px; font-size: 18px; font-weight: bold;">Devices with Alerts</div></td><td width=35 align=center><div class=tablehead>Host</div></td><td align=center width=35><div class=tablehead>Int</div></td><td align=center width=35><div class=tablehead>Srv</div></tr>
 ?>
 <?php
+
+use LibreNMS\Authentication\Auth;
+
 $nodes = array();
 
 $sql = "SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'";
@@ -102,7 +105,7 @@ echo '</div>
     <td bgcolor=#e5e5e5 width=275 valign=top>';
 
 // this stuff can be customised to show whatever you want....
-if ($_SESSION['userlevel'] >= '5') {
+if (Auth::user()->hasGlobalRead()) {
     $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
     $sql .= $config['mydomain']."' ORDER BY I.ifAlias";
     unset($seperator);

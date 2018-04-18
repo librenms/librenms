@@ -26,11 +26,10 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
-class Php implements ValidationGroup
+class Php extends BaseValidation
 {
     /**
      * Validate this module.
@@ -80,7 +79,7 @@ class Php implements ValidationGroup
 
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = array('mysqli','pcre','curl','session','snmp', 'xml', 'gd');
+        $required_modules = array('mysqli','pcre','curl','session', 'xml', 'gd');
 
         if (Config::get('distributed_poller')) {
             $required_modules[] = 'memcached';
@@ -160,15 +159,5 @@ class Php implements ValidationGroup
                 );
             }
         }
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }

@@ -3,6 +3,22 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
+    $etherlike_oids = array(
+        'dot3StatsAlignmentErrors',
+        'dot3StatsFCSErrors',
+        'dot3StatsSingleCollisionFrames',
+        'dot3StatsMultipleCollisionFrames',
+        'dot3StatsSQETestErrors',
+        'dot3StatsDeferredTransmissions',
+        'dot3StatsLateCollisions',
+        'dot3StatsExcessiveCollisions',
+        'dot3StatsInternalMacTransmitErrors',
+        'dot3StatsCarrierSenseErrors',
+        'dot3StatsFrameTooLongs',
+        'dot3StatsInternalMacReceiveErrors',
+        'dot3StatsSymbolErrors',
+    );
+
     $rrd_oldname= 'etherlike-'.$port['ifIndex']; // TODO: remove oldname check?
     $rrd_name = getPortRrdName($port_id, 'dot3');
 

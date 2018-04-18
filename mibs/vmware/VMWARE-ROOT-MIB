@@ -1,0 +1,155 @@
+-- **********************************************************
+-- Copyright 2007-2016 VMware, Inc.  All rights reserved. 
+-- **********************************************************
+
+VMWARE-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+     MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+vmware MODULE-IDENTITY
+       LAST-UPDATED "201611030000Z"
+       ORGANIZATION "VMware, Inc"
+       CONTACT-INFO
+               "VMware, Inc
+                3401 Hillview Ave
+                Palo Alto, CA 94304
+                Tel: 1-877-486-9273 or 650-427-5000
+                Fax: 650-427-5001
+                Web: http://communities.vmware.com/community/developer/forums/managementapi
+                "
+       DESCRIPTION
+               "VMware managed object root assignements
+                This module defines the VMware SNMP MIB root
+                and its primary subtrees.
+               "
+       REVISION      "201611030000Z"
+       DESCRIPTION
+               "Arc vmwNetworkInsight defined."
+
+       REVISION      "201601022000Z"
+       DESCRIPTION
+               "Arc vmwNsxManager defined."
+
+       REVISION      "201004020000Z"
+       DESCRIPTION
+               "Arc vmwDocumentation defined."
+
+       REVISION      "200707300000Z"
+       DESCRIPTION
+               "The initial revision. Prior version was released in 
+                SMIv1 format as VMWARE-ROOT-MIB."
+       ::= { enterprises 6876 }
+  
+
+-- The parent oid of snmpv1 traps when sent in snmpv2/v3
+-- vmwNotifications OBJECT IDENTIFIER ::= { vmware 0 }
+vmwNotifications OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Parent of all notifications (traps, informs)."
+ ::= { vmware 0 }
+
+vmwSystem OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Parent of all managed objects relating to system software identification."
+::= { vmware 1 }
+
+vmwVirtMachines OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Parent of all managed objects relating to virtual machine inventory."
+::= { vmware 2 }
+
+vmwResources OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Parent of all managed objects relating to resource utilization."
+::= { vmware 3 }
+
+vmwProductSpecific OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "parent of objects specific to a given hardware/software product."
+::= { vmware 4 }
+
+vmwLdap OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "VMware specific LDAP schema definitions."
+::= { vmware 40 }
+
+vmwTraps OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are only visible in
+     notifications varbind lists and can not be polled."
+::= { vmware 50 }
+
+vmwSRM OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are only visible in
+     notifications from Site Recovery Manager and can not be polled."
+::= { vmware 51 }
+
+vmwVCHA OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are only visible in
+     notifications from VMware Virtual Center High Availability and can not be polled."
+::= { vmware 53 }
+
+vmwVmon OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Managed objects defined under this node are for VMware Service Lifecycle
+    Manager."
+::= { vmware 55 }
+
+vmwOID OBJECT-IDENTITY
+STATUS  deprecated
+DESCRIPTION
+    "Assignments under this are no longer made."
+::= { vmware 60 }
+
+vmwareAgentCapabilities OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "All agent capabilities defnitions occur under this."
+::= { vmware 70 }
+
+vmwNsxManager OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware NSX Manager and related components."
+::= { vmware 90 }
+
+vmwNetworkInsight OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware vRealize Network Insight and related components."
+::= { vmware 100 }
+
+vmwExperimental OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Used for product testing and development."
+::= { vmware 700 }
+
+vmwDocumentation OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Used in product documentation, examples." 
+::= { vmware 750 }
+
+vmwObsolete OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Conformance, meta SMI oids for Obsolete smi assignements done under this arc."
+::= { vmware 800 }
+
+END
+

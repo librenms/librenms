@@ -66,6 +66,7 @@ if (!$where) {
     echo "Debugging and testing options:\n";
     echo "-r                                           Do not create or update RRDs\n";
     echo "-f                                           Do not insert data into InfluxDB\n";
+    echo "-p                                           Do not insert data into Prometheus\n";
     echo "-d                                           Enable debugging output\n";
     echo "-v                                           Enable verbose debugging output\n";
     echo "-m                                           Specify module(s) to be run\n";
@@ -113,6 +114,10 @@ if (isset($options['r'])) {
 
 if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
+}
+
+if (isset($options['p'])) {
+    $prometheus = false;
 }
 
 if (isset($options['g'])) {

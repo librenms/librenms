@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 if (!is_numeric($vars['device'])) {
     $vars['device'] = getidbyname($vars['device']);
 }
@@ -352,7 +354,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </a>
             </li>';
 
-        if (is_admin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             if (!is_array($config['rancid_configs'])) {
                 $config['rancid_configs'] = array($config['rancid_configs']);
             }
@@ -455,7 +457,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                     <li><a href="https://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
         if (isset($config['gateone']['server'])) {
             if ($config['gateone']['use_librenms_user'] == true) {
-                    echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $_SESSION['username'] . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
+                    echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             } else {
                     echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             }
@@ -464,8 +466,8 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             ';
         }
             echo '<li><a href="telnet://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-terminal fa-lg icon-theme"  aria-hidden="true"></i> Telnet</a></li>';
-    
-        if (is_admin()) {
+
+        if (Auth::user()->hasGlobalAdmin()) {
             echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
                 <i class="fa fa-pencil fa-lg icon-theme"  aria-hidden="true"></i> Edit </a>

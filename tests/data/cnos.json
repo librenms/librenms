@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.19046.1.7.34",
+                    "sysDescr": "Lenovo ThinkSystem NE1072T RackSwitch",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "cnos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "lenovo.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

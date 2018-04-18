@@ -1,9 +1,10 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 
-if ($_SESSION['userlevel'] < '5') {
+if (!Auth::user()->hasGlobalRead()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     $link_array = array(

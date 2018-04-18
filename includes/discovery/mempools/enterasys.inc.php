@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'enterasys') {
+if ($device['os'] == 'enterasys' || $device['os'] == 'ewc') {
     $enterasys_mem = snmpwalk_cache_threepart_oid($device, 'etsysResourceStorageTable', array(), 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
     foreach ($enterasys_mem as $index => $mem_data) {
         foreach ($mem_data['ram'] as $mem_id => $ram) {

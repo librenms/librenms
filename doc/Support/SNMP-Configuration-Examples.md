@@ -19,6 +19,8 @@ Table of Content:
         - [RouterOS 6.x](#routeros-6x)
     - [Palo Alto](#palo-alto)
         - [PANOS 6.x/7.x](#panos-6x7x)
+    - [VMware](#vmware)
+        - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
 - [Operating systems](#operating-systems)
     - [Linux (snmpd v2)](#linux-snmpd)
     - [Linux (snmpd v3)](#linux-snmpd-v3)
@@ -128,12 +130,23 @@ setsnmppw <community>
 
 ### Juniper
 #### Junos OS
+for SNMPv1/v2c
 ```
 set snmp description description
 set snmp location location
 set snmp contact contact
 set snmp community YOUR-COMMUNITY authorization read-only
 ```
+for SNMPv3 (authPriv):
+```
+set snmp v3 usm local-engine user authpriv authentication-sha authentication-password YOUR_AUTH_SECRET
+set snmp v3 usm local-engine user authpriv privacy-aes128 privacy-password YOUR_PRIV_SECRET
+set snmp v3 vacm security-to-group security-model usm security-name authpriv group mysnmpv3
+set snmp v3 vacm access group mysnmpv3 default-context-prefix security-model any security-level authentication read-view mysnmpv3view
+set snmp v3 vacm access group mysnmpv3 default-context-prefix security-model any security-level privacy read-view mysnmpv3view
+set snmp view mysnmpv3view oid iso include
+```
+
 
 ### Mikrotik
 #### RouterOS 6.x
@@ -157,6 +170,46 @@ set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
 
 Note that you need to allow SNMP on the needed interfaces. To do that you need to create a network "Interface Mgmt" profile for standard interface and allow SNMP under "Device > Management > Management Interface Settings" for out of band management interface.
 
+One may also configure SNMP from the command line, which is useful when you need to configure more than one firewall for SNMP monitoring. Log into the firewall(s) via ssh, and perform these commands for basic SNMPv3 configuration:
+```
+username@devicename> configure
+username@devicename# set deviceconfig system service disable-snmp no
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso oid 1.3.6.1
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso option include
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso mask 0xf0
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv authpwd YOUR_AUTH_SECRET
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv privpwd YOUR_PRIV_SECRET
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv view pa
+username@devicename# set deviceconfig system snmp-setting snmp-system location "Yourcity, Yourcountry [60.4,5.31]"
+username@devicename# set deviceconfig system snmp-setting snmp-system contact noc@your.org
+username@devicename# commit
+username@devicename# exit
+```
+
+
+
+### VMware
+#### ESX/ESXi 5.x/6.x
+
+Log on to your ESX server by means of ssh. You may have to enable the ssh service in the GUI first.
+From the CLI, execute the following commands:
+```
+esxcli system snmp set --authentication SHA1
+esxcli system snmp set --privacy AES128
+esxcli system snmp hash --auth-hash YOUR_AUTH_SECRET --priv-hash YOUR_PRIV_SECRET --raw-secret
+```
+This command produces output like this
+```
+   Authhash: f3d8982fc28e8d1346c26eee49eb2c4a5950c934
+   Privhash: 0596ab30b315576a4e9f7d7bde65bf49b749e335
+```
+Now define a SNMPv3 user:
+```
+esxcli system snmp set --users authpriv/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
+esxcli system snmp set -L "Yourcity, Yourcountry [60.4,5.3]"
+esxcli system snmp set -C noc@your.org
+esxcli system snmp set --enable true
+```
 
 ## Operating systems
 ### Linux (snmpd v2)
