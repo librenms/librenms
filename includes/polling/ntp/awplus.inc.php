@@ -31,7 +31,7 @@ if (count($components > 0)) {
     $atNtpAssociationEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.207.8.4.4.4.502.10.1', 2);
 
     // Loop through the components and extract the data.
-    foreach ($components as $key => &$array ) {
+    foreach ($components as $key => &$array) {
         $peer = $array['peer'];
 
         // Let's make sure the rrd is setup for this class.
