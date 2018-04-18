@@ -23,16 +23,15 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Models\WirelessSensor;
+
 $pagetitle[] = "Wireless";
 
-use LibreNMS\Util\Wireless;
+$valid_wireless_types = WirelessSensor::getTypes(true);
 
-$sensors = dbFetchColumn('SELECT `sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`');
-$valid_wireless_types = array_intersect_key(Wireless::getTypes(), array_flip($sensors));
-
-$class = $vars['metric'];
-if (!$class) {
-    $class = key($valid_wireless_types);  // get current type in array (should be the first)
+$active_type = $vars['metric'];
+if (!$active_type) {
+    $active_type = $valid_wireless_types->keys()->first();  // get current type in array (should be the first)
 }
 if (!$vars['view']) {
     $vars['view'] = "nographs";
@@ -45,13 +44,13 @@ $linkoptions = '<span style="font-weight: bold;">Wireless</span> &#187; ';
 $sep = '';
 foreach ($valid_wireless_types as $type => $details) {
     $linkoptions .= $sep;
-    if ($class == $type) {
+    if ($active_type == $type) {
         $linkoptions .= '<span class="pagemenu-selected">';
     }
 
     $linkoptions .= generate_link($details['short'], $link_array, array('metric'=> $type, 'view' => $vars['view']));
 
-    if ($class == $type) {
+    if ($active_type == $type) {
         $linkoptions .= '</span>';
     }
 
@@ -63,7 +62,7 @@ $displayoptions = '';
 if ($vars['view'] == "graphs") {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
-$displayoptions .= generate_link("Graphs", $link_array, array("metric"=> $class, "view" => "graphs"));
+$displayoptions .= generate_link("Graphs", $link_array, array("metric"=> $active_type, "view" => "graphs"));
 if ($vars['view'] == "graphs") {
     $displayoptions .= '</span>';
 }
@@ -74,17 +73,17 @@ if ($vars['view'] != "graphs") {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
 
-$displayoptions .= generate_link("No Graphs", $link_array, array("metric"=> $class, "view" => "nographs"));
+$displayoptions .= generate_link("No Graphs", $link_array, array("metric"=> $active_type, "view" => "nographs"));
 
 if ($vars['view'] != "graphs") {
     $displayoptions .= '</span>';
 }
 
-if (isset($valid_wireless_types[$class])) {
-    $graph_type = 'wireless_' . $class;
-    $unit = $valid_wireless_types[$class]['unit'];
-    $pagetitle[] = "Wireless :: ".$class;
+if (isset($valid_wireless_types[$active_type])) {
+    $graph_type = 'wireless_' . $active_type;
+    $unit = $valid_wireless_types[$active_type]['unit'];
+    $pagetitle[] = "Wireless :: ".$active_type;
     include $config['install_dir'] . '/html/pages/wireless/sensors.inc.php';
 } else {
-    echo("No sensors of type " . $class . " found.");
+    echo("No sensors of type " . $active_type . " found.");
 }

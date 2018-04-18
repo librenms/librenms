@@ -25,12 +25,14 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Models\User;
+
 /**
  * @property int level
  * @property string username
  * @property int user_id
  */
-class UserProxy
+class UserProxy extends User
 {
     public function hasGlobalAdmin()
     {
@@ -67,6 +69,6 @@ class UserProxy
             return $_SESSION['user_id'];
         }
 
-        return null;
+        return parent::__get($name);
     }
 }

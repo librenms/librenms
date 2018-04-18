@@ -46,7 +46,7 @@ if ($if_list) {
     foreach ($ports as $port) {
         $port = cleanPort($port);
         $done = 'yes';
-        unset($class);
+        unset($active_type);
         $port['ifAlias'] = str_ireplace($type.': ', '', $port['ifAlias']);
         $port['ifAlias'] = str_ireplace('[PNI]', 'Private', $port['ifAlias']);
         $ifclass         = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);

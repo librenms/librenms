@@ -65,7 +65,7 @@ echo '<table class="table table-striped">
 
 foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
     if (bill_permitted($history['bill_id'])) {
-        unset($class);
+        unset($active_type);
         $datefrom   = $history['bill_datefrom'];
         $dateto     = $history['bill_dateto'];
         $type       = $history['bill_type'];

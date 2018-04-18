@@ -26,7 +26,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
 
     $i = 0;
     while ($i <= 24) {
-        unset($class);
+        unset($active_type);
         unset($rate_data);
         $day_data = getDates($bill['bill_day'], $i);
 

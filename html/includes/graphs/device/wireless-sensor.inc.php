@@ -41,7 +41,7 @@ if ($unit === '') {
 
 $sensors = dbFetchRows(
     'SELECT * FROM `wireless_sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`',
-    array($class, $device['device_id'])
+    array($active_type, $device['device_id'])
 );
 
 

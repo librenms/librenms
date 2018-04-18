@@ -102,17 +102,23 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
 
     // ---- Helper Functions ----
 
+    public function inAlarm()
+    {
+        return (is_null($this->alert_high) ? false : $this->value >= $this->alert_high)
+            || (is_null($this->alert_low) ? false : $this->value <= $this->alert_low);
+    }
+
     public function classDescr()
     {
-        return collect(collect(\LibreNMS\Device\Wireless::getTypes())
-            ->get($this->sensor_class, []))
-            ->get('short', ucwords(str_replace('_', ' ', $this->sensor_class)));
+        return collect(self::getTypes()
+            ->get($this->type, []))
+            ->get('short', ucwords(str_replace('_', ' ', $this->type)));
     }
 
     public function icon()
     {
-        return collect(collect(\LibreNMS\Device\Wireless::getTypes())
-            ->get($this->sensor_class, []))
+        return collect(self::getTypes()
+            ->get($this->type, []))
             ->get('icon', 'signal');
     }
 
@@ -309,15 +315,15 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
         ];
 
         if ($valid) {
-            $query = WirelessSensor::select('sensor_class');
+            $query = WirelessSensor::select('type');
 
             if (isset($device_id)) {
                 $query->where('device_id', $device_id);
             }
 
             return collect($types)
-                ->intersectKey($query->groupBy('sensor_class')
-                    ->pluck('sensor_class')->flip());
+                ->intersectKey($query->groupBy('type')
+                    ->pluck('type')->flip());
         }
 
         return collect($types);

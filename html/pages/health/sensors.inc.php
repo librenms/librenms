@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-switch ($class) {
+switch ($active_type) {
     case 'charge':
         $pagetitle[] = "Health :: Charge";
         break;
@@ -105,7 +105,7 @@ switch ($class) {
                 view: '<?php echo $vars['view']; ?>',
                 graph_type: '<?php echo $graph_type; ?>',
                 unit: '<?php echo $unit; ?>',
-                class: '<?php echo $class; ?>'
+                class: '<?php echo $active_type; ?>'
             };
         },
         url: "ajax_table.php"

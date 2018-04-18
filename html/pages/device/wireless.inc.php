@@ -3,14 +3,7 @@
 use App\Models\WirelessSensor;
 
 // this determines the order of the tabs
-$types = WirelessSensor::getTypes();
-
-$sensors = dbFetchColumn(
-    "SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? GROUP BY `sensor_class`",
-    array($device['device_id'])
-);
-$datas = array_intersect(array_keys($types), $sensors);
-
+$types = WirelessSensor::getTypes(true, $device['device_id']);
 
 $wireless_link_array = array(
     'page'   => 'device',
@@ -31,14 +24,14 @@ echo '<span' . ($vars['metric'] == 'overview' ? ' class="pagemenu-selected"' : '
 echo generate_link('Overview', $wireless_link_array, array('metric' => 'overview'));
 echo '</span>';
 
-foreach ($datas as $type) {
+foreach ($types as $type_name => $type) {
     echo ' | <span';
     if ($vars['metric'] == $type) {
         echo ' class="pagemenu-selected"';
     }
     echo '>';
 
-    echo generate_link($types[$type]['short'], $wireless_link_array, array('metric' => $type));
+    echo generate_link($type['short'], $wireless_link_array, array('metric' => $type_name));
 
     echo '</span>';
 }
@@ -46,16 +39,16 @@ foreach ($datas as $type) {
 print_optionbar_end();
 
 if ($vars['metric'] == 'overview') {
-    foreach ($datas as $type) {
-        $text = $types[$type]['long'];
-        if (!empty($types[$type]['unit'])) {
-            $text .=  ' (' . $types[$type]['unit'] . ')';
+    foreach ($types as $type_name => $type) {
+        $text = $type['long'];
+        if (!empty($type['unit'])) {
+            $text .=  ' (' . $type['unit'] . ')';
         }
 
-        $graph_title = generate_link($text, $wireless_link_array, array('metric' => $type));
-        $graph_array['type'] = 'device_wireless_'.$type;
+        $graph_title = generate_link($text, $wireless_link_array, array('metric' => $type_name));
+        $graph_array['type'] = 'device_wireless_'.$type_name;
 
-        include $config['install_dir'] . '/html/includes/print-device-graph.php';
+        include Config::get('install_dir') . '/html/includes/print-device-graph.php';
     }
 } elseif (isset($types[$vars['metric']])) {
     $unit = $types[$vars['metric']]['unit'];
@@ -66,42 +59,37 @@ if ($vars['metric'] == 'overview') {
     }
     $row = 0;
 
-    $sensors = dbFetchRows(
-        'SELECT * FROM `wireless_sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_descr`',
-        array($vars['metric'], $device['device_id'])
-    );
+    $sensors = WirelessSensor::where(['type' => $vars['metric'], 'device_id' => $device['device_id']])->get();
     foreach ($sensors as $sensor) {
         if (!is_integer($row++ / 2)) {
-            $row_colour = $config['list_colour']['even'];
+            $row_colour = Config::get('list_colour.even');
         } else {
-            $row_colour = $config['list_colour']['odd'];
+            $row_colour = Config::get('list_colour.odd');
         }
 
-        $sensor_descr = $sensor['sensor_descr'];
-
         if (empty($unit)) {
-            $sensor_current = ((int)$sensor['sensor_current']) . $unit;
-            $sensor_limit = ((int)$sensor['sensor_limit']) . $unit;
-            $sensor_limit_low = ((int)$sensor['sensor_limit_low']) . $unit;
+            $sensor_value = $sensor->value . $unit;
+            $alert_high = $sensor->alert_high . $unit;
+            $alert_low = $sensor->alert_low . $unit;
         } else {
-            $sensor_current = format_si($sensor['sensor_current'] * $factor, 3) . $unit;
-            $sensor_limit = format_si($sensor['sensor_limit'] * $factor, 3) . $unit;
-            $sensor_limit_low = format_si($sensor['sensor_limit_low'] * $factor, 3) . $unit;
+            $sensor_value = format_si($sensor->value * $factor, 3) . $unit;
+            $alert_high = format_si($sensor->alert_high * $factor, 3) . $unit;
+            $alert_low = format_si($sensor->alert_low * $factor, 3) . $unit;
         }
 
         echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>
-                    $sensor_descr 
-                    <div class='pull-right'>$sensor_current | $sensor_limit_low <> $sensor_limit</div>
+                    $sensor->description 
+                    <div class='pull-right'>$sensor_value | $alert_low <> $alert_high</div>
                 </h3>
             </div>";
         echo "<div class='panel-body'>";
 
-        $graph_array['id']   = $sensor['sensor_id'];
+        $graph_array['id']   = $sensor->wireless_sensor_id;
         $graph_array['type'] = 'wireless_' . $vars['metric'];
 
-        include $config['install_dir'] . '/html/includes/print-graphrow.inc.php';
+        include Config::get('install_dir') . '/html/includes/print-graphrow.inc.php';
 
         echo '</div></div>';
     }
