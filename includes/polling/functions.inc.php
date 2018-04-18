@@ -698,8 +698,6 @@ function convert_to_celsius($value)
  * @param string $extend the extend name
  * @param integer $min_version the minimum version to accept for the returned JSON
  *
- * If the min version is not set, it defaults to 0.
- *
  * In regards extend name, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
  *
  * The returned value is JSON parsed into a array.
@@ -723,11 +721,6 @@ function convert_to_celsius($value)
  */
 function json_app_get($device, $extend, $min_version)
 {
-    // If no $min_version is set, set it to 0
-    if (!isset($min_version)) {
-        $min_version=0;
-    }
-    
     $returned_json = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-O qv', 'NET-SNMP-EXTEND-MIB');
 
     // make sure we actually get something back
