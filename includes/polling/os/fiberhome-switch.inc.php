@@ -1,46 +1,32 @@
 <?php
-/**
- * LibreNMS - FiberHome Switch device support - OS module
- *
- * @category   Network_Monitoring
- * @package    LibreNMS
- * @subpackage Fiber Home Switch device support
- * @author     Christoph Zilian <czilian@hotmail.com>
- * @license    http://gnu.org/copyleft/gpl.html GNU GPL
- * @link       https://github.com/librenms/librenms/
-
+/*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- **/
 
-function hexbin($hex_string) // convert the hex OID content to character
-{
-    $chr_string = '';
-    foreach (explode(' ', $hex_string) as $a) {
-        $chr_string .= chr(hexdec($a));
-    }
-    return $chr_string;
+ * @package    LibreNMS
+ * @subpackage FiberHome Switch Device Support - os module
+ * @link       http://librenms.org
+ * @copyright  2018 Christoph Zilian <czilian@hotmail.com>
+ * @author     Christoph Zilian <czilian@hotmail.com>
+*/
+
+echo $device['sysDescr']."\n";
+$sysDescrPieces = explode(" ", $device['sysDescr']); //extract model from sysDescr
+
+$versions = snmp_get_multi_oid($device, 'msppDevHwVersion.0 msppDevSwVersion.0', '-OQs', 'WRI-DEVICE-MIB');
+foreach ($versions as $key => $field) {
+  if (preg_match("/\b 00 00 00 00 00 00\b/i", $field)) {  //convert potential hex reading to character
+     $versions[$key] = str_replace(array("\r","\n"), '', $field);
+     $versions[$key] = str_replace(" 00", "", $field);
+     $versions[$key] = rtrim(hexbin($field));
+  }
 }
 
-$sysDescrPieces = explode(" ", snmp_get($device, 'sysDescr.0', '-Oqv', 'SNMPv2-MIB'));   //extract model from sysDescr
-
-$hwversion = str_replace(array("\r","\n"), '', snmp_get($device, 'msppDevHwVersion.0', '-Oqv', 'WRI-DEVICE-MIB'));
-if (preg_match("/\b 00 00 00 00 00 00\b/i", $hwversion)) {  //convert potential hex reading to character
-    str_replace(" 00", "", $hwversion);
-     $hwversion = rtrim(hexbin($hwversion));
-}
-
-$swversion = str_replace(array("\r","\n"), '', snmp_get($device, 'msppDevSwVersion.0', '-Oqv', 'WRI-DEVICE-MIB'));
-if (preg_match("/\b 00 00 00 00 00 00\b/i", $swversion)) {  //convert potential hex reading to character
-    str_replace(" 00", "", $swversion);
-     $swversion = rtrim(hexbin($swversion));
-}
-
-$hardware = 'FHN '.$sysDescrPieces[0].' V '.$hwversion;
-$version  = $swversion;
+$hardware = 'FHN '.$sysDescrPieces[0].' V '.$versions['msppDevHwVersion.0'];
+$version  = $versions['msppDevSwVersion.0'];
 $features = '';    // currently no features available
 $serial   = 'NA';  // currently no HW serial number through MIB
 

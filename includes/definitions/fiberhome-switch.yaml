@@ -4,16 +4,8 @@ type: network
 icon: fiberhome
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.3807.1.582815
-        - .1.3.6.1.4.1.3807.1.281802
-        - .1.3.6.1.4.1.3807.1.481005
+        - .1.3.6.1.4.1.3807.1.
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 mib_dir:
     - fiberhome
-discovery_modules:
-    sensors: 1
-    mempools: 1
-poller_modules:
-    sensors: 1
-    mempools: 1

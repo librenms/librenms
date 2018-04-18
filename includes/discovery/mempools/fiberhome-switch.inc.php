@@ -1,28 +1,21 @@
 <?php
-/**
- * LibreNMS - FiberHome Switch device support - mempools module
- *
- * @category   Network_Monitoring
- * @package    LibreNMS
- * @subpackage Fiber Home Switch device support
- * @author     Christoph Zilian <czilian@hotmail.com>
- * @license    http://gnu.org/copyleft/gpl.html GNU GPL
- * @link       https://github.com/librenms/librenms/
-
+/*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- **/
+
+ * @package    LibreNMS
+ * @subpackage FiberHome Switch Device Support - mempools module
+ * @link       http://librenms.org
+ * @copyright  2018 Christoph Zilian <czilian@hotmail.com>
+ * @author     Christoph Zilian <czilian@hotmail.com>
+*/
 
 if ($device['os'] === 'fiberhome-switch') {
     echo "\nFiberHome-MEMORY-POOL:\n";
-    $mempools_array = snmpwalk_cache_multi_oid($device, 'memoryPoolCurrUsage', $mempools_array, 'WRI-MEMORY-MIB', 'fiberhome-switch');
-    $mempools_array = snmpwalk_cache_multi_oid($device, 'memoryPoolIndexDescr', $mempools_array, 'WRI-MEMORY-MIB', 'fiberhome-switch');
-    $mempools_array = snmpwalk_cache_multi_oid($device, 'memoryPoolTotalBytes', $mempools_array, 'WRI-MEMORY-MIB', 'fiberhome-switch');
-    $mempools_array = snmpwalk_cache_multi_oid($device, 'memoryPoolAllocBytesNum', $mempools_array, 'WRI-MEMORY-MIB', 'fiberhome-switch');
-
+    $mempools_array = snmpwalk_group($device, 'memoryPoolTable', 'WRI-MEMORY-MIB');
     d_echo($mempools_array);
 
     if (is_array($mempools_array)) {
