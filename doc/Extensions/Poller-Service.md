@@ -9,9 +9,7 @@ Make sure you uninstall the old poller service before deploying the new one.
 
 ## External Requirements
 #### A recent version of Python
-The poller service will work under Python 2.7+, but some features require behaviour only found in Python3.4+.
-
-If you can't use Python 3.4 or higher, you'll need to manually restart the service whenever LibreNMS is updated.
+The poller service won't work under Python 2.7+; some features require behaviour only found in Python3.4+.
 
 #### A python mysql driver
 PyMySQL is recommended as it requires no C compiler to install. MySQLclient can also be used, but does require compilation.
@@ -27,7 +25,7 @@ If you want to use distributed polling, you'll need a redis instance to coordina
 It's strongly recommended that you deploy a resilient cluster of redis systems, and use redis-sentinel.
 
 #### MySQL
-You should already have this, but the pollers do need access to the SQL database.
+You should already have this, but the pollers do need access to the SQL database. The poller service runs much faster and more aggressively than the standard poller, so keep an eye on the number of open connections and other important health metrics.
 
 ## Configuration
 
