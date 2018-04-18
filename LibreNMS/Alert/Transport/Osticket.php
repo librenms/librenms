@@ -23,7 +23,7 @@ class Osticket implements Transport
         $token = $opts['token'];
 
         foreach (parse_email($config['email_from']) as $from => $from_name) {
-            $email = $from_name . ' <' . $from . '>';
+            $email = $from ;
             break;
         }
 
