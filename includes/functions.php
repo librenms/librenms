@@ -2485,4 +2485,3 @@ function hexbin($hex_string)
     }
     return $chr_string;
 }
-
