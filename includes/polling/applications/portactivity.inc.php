@@ -8,7 +8,7 @@ $app_id = $app['app_id'];
 echo $name;
 
 $ports=json_app_get($device, 'portactivity', 1);
-if ($ports['error'] != '0'){
+if ($ports['error'] != '0') {
     print "\nJSON returned with error '".$ports['error']."'\nerrorString: ".$ports['errorString']."\n";
     return;
 }
