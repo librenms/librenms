@@ -1,8 +1,8 @@
 <?php
 /*
- * LibreNMS module to capture statistics from the CISCO-NTP-MIB
+ * LibreNMS module to capture statistics from the AT-NTP-MIB
  *
- * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
+ * Copyright (c) 2018 Matt Read <matt.read@alliedtelesis.co.nz>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
