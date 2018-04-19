@@ -1,81 +1,53 @@
 <?php
+$oids = snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', null, '-OQUsne');
 
-$nokia_device_state_name  = 'tmnxDeviceState';
-$nokia_device_state_index = create_state_index($nokia_device_state_name);
-if ($nokia_device_state_index !== null) {
-    $nokia_device_states      = array(
-        array($nokia_device_state_index, 'Unknown', 1,1,3),
-        array($nokia_device_state_index, 'Not Equippped', 1,2,3),
-        array($nokia_device_state_index, 'Ok', 1,3,0),
-        array($nokia_device_state_index, 'Failed', 1,4,2),
-        array($nokia_device_state_index, 'Out Of Service', 1,5,1),
-        array($nokia_device_state_index, 'Not Provisioned', 1,6,3),
+if (!empty($oids)) {
+    // Create State Index
+    $dev_state_name = 'tmnxDeviceState';
+    $dev_states = array(
+        array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
+        array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Not Equipped'),
+        array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'),
+        array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'),
+        array('value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Out of Service')
     );
-    foreach ($nokia_device_states as $state) {
-        $insert = array(
-            'state_index_id'        => $state[0],
-            'state_descr'           => $state[1],
-            'state_draw_graph'      => $state[2],
-            'state_value'           => $state[3],
-            'state_generic_value'   => $state[4],
-        );
-        dbInsert($insert, 'state_translations');
+
+    create_state_index($dev_state_name, $dev_states);
+
+    $ps_state_name = 'tmnxChassisPowerSupplyAssignedTypes';
+    $ps_states = array(
+        array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'None'),
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'DC'),
+        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Single AC'),
+        array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Multiple AC')
+    );
+
+    create_state_index($ps_state_name, $ps_states);
+    
+    $ps_table = array(
+        array('tbl_index' => 2, 'desc' => 'AC Status PS ', 'type' => $dev_state_name),
+        array('tbl_index' => 3, 'desc' => 'DC Status PS ', 'type' => $dev_state_name),
+        array('tbl_index' => 4, 'desc' => 'Temperature Status PS ', 'type' => $dev_state_name),
+        array('tbl_index' => 6, 'desc' => 'Power Supply 1 Status PS ', 'type' => $dev_state_name),
+        array('tbl_index' => 7, 'desc' => 'Power Supply 2 Status PS ', 'type' => $dev_state_name),
+        array('tbl_index' => 8, 'desc' => 'Assigned Type PS ', 'type' => $ps_state_name),
+        array('tbl_index' => 9, 'desc' => 'Input Status PS ', 'type' => $dev_state_name),
+        array('tbl_index' => 10, 'desc' => 'Output Status PS ', 'type' => $dev_state_name),
+    );
+
+    $base_oid = '.1.3.6.1.4.1.6527.3.1.2.2.1.5.1.';
+    
+    foreach ($ps_table as $entry) {
+        foreach ($oids as $index => $value) {
+            $num_oid = $base_oid.$entry['tbl_index'].".1.".$index;
+            $sensor_index = 'tmnxPowerSupplyTable.'.$entry['tbl_index'].".1.".$index;
+            $desc = $entry['desc'].$index;
+
+            //Discover sensors
+            discover_sensor($valid['sensor'], 'state', $device, $num_oid, $sensor_index, $entry['type'], $desc, 1, 1, null, null, null, null, $value[$num_oid]);
+
+            // Create sensor to state index
+            create_sensor_to_state_index($device, $entry['type'], $sensor_index);
+        }
     }
 }
-
-$nokia_device_ps_assigned_types_name  = 'tmnxChassisPowerSupplyAssignedTypes';
-$nokia_device_ps_assigned_types_index = create_state_index($nokia_device_ps_assigned_types_name);
-if ($nokia_device_ps_assigned_types_index !== null) {
-    $nokia_device_ps_assigned_types      = array(
-        array($nokia_device_ps_assigned_types_index, 'None', 0,0,0),
-        array($nokia_device_ps_assigned_types_index, 'DC', 0,1,0),
-        array($nokia_device_ps_assigned_types_index, 'Single AC', 0,2,0),
-        array($nokia_device_ps_assigned_types_index, 'Multiple AC', 0,3,0),
-        array($nokia_device_ps_assigned_types_index, 'default', 0,4,3),
-    );
-    foreach ($nokia_device_ps_assigned_types as $state) {
-        $insert = array(
-          'state_index_id'        => $state[0],
-          'state_descr'           => $state[1],
-          'state_draw_graph'      => $state[2],
-          'state_value'           => $state[3],
-          'state_generic_value'   => $state[4],
-        );
-        dbInsert($insert, 'state_translations');
-    }
-}
-
-$base_oid          = '.1.3.6.1.4.1.6527.3.1.2.2.1.5.1.';
-$power_supply_oids = array(
-    array('sub_oid' => '2.1.1', 'desc' => 'AC Status', 'type' => $nokia_device_state_name),
-    array('sub_oid' => '3.1.1', 'desc' => 'DC Status', 'type' => $nokia_device_state_name),
-    array('sub_oid' => '6.1.1', 'desc' => 'Power Supply 1', 'type' => $nokia_device_state_name),
-    array('sub_oid' => '7.1.1', 'desc' => 'Power Supply 2', 'type' => $nokia_device_state_name),
-    array('sub_oid' => '8.1.1', 'desc' => 'Power Supply Type', 'type' => $nokia_device_ps_assigned_types_name),
-    array('sub_oid' => '9.1.1', 'desc' => 'Power In', 'type' => $nokia_device_state_name),
-    array('sub_oid' => '10.1.1', 'desc' => 'Power Out', 'type' => $nokia_device_state_name),
-);
-
-
-$pst = snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', null, '-OQUsn');
-$power_supply_table = end($pst);
-
-foreach ($power_supply_oids as $data) {
-    $full_oid = $base_oid . $data['sub_oid'];
-    $index = "tmnxChassisPowerSupplyTable." . $data['sub_oid'];
-    discover_sensor($valid['sensor'], 'state', $device, $full_oid, $index, $data['type'], $data['desc'], 1, 1, null, null, null, null, $power_supply_table[$full_oid], 'snmp', $index);
-    create_sensor_to_state_index($device, $data['type'], $index);
-    unset($full_oid);
-}
-
-unset(
-    $power_supply_state_table,
-    $nokia_device_state_name,
-    $nokia_device_state_index,
-    $nokia_device_states,
-    $nokia_device_ps_assigned_types_name,
-    $nokia_device_ps_assigned_types_index,
-    $nokia_device_ps_assigned_types,
-    $base_oid,
-    $power_supply_oids
-);
