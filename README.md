@@ -1,4 +1,4 @@
-[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+[![Travis Status](https://travis-ci.org/gs-kamnas/librenms.svg?branch=master)](https://travis-ci.org/gs-kamnas/librenms)
 
 Introduction
 ------------

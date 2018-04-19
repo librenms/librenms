@@ -42,4 +42,16 @@ script:
   - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
-  - bash scripts/deploy-docs.sh
+
+before_deploy:
+  - cd ..
+  - tar -zcf ${TRAVIS_BUILD_DIR}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}-alldeps.tar.gz librenms
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "ONxjg1LoARVxMcx13zz8xFMhKDHahbFtHABXa4Nl0R+dXN7CykTnS7M3+EfPXEPDUA8C62AUSJJPM5f+mH4NdUVE7pW0vWy6BPWNArMriVwpAT3Q37TOpGmg4N4IxoV/9TH2nA+wG6I9N1aEbYyu6mTIRM65dMa7blzz5QVvaV1oMEbOIvZfl5J9ZA6HXAm/KOGsP+x9oDJntLJQfNzhFz4lrppKkCYq19kdEOQVYgrj1cHeardfGXTe4aZwkMuL7mHsGj7QfZoUlT8V9IdO/EkocxrFhkQNxSzuci9qTpcOhrzCa6oeSYt7bOa/h1XKHgOZVLRQ5tYLJooLxBkAhrx+AWul1gPl0RmMMugniWxGtxEBT83jPWQvS6qkPJSOv8eliLCNQVVgAO6IjCKv8TPdrdV/JO548wXwzEc8qqa4w4qJxluZbcivjlJ6rw0Uannb7YL+z0rLi3V7otwu94CSL2TbiNj9foaeHYxcEyJJ6J7IhVMyAvNMSivXlmZDzODKVMjbHrEA62HaY8qZ7+acUmkNwnII+6z/0LiciWRP6351vHM3PInQ5+ZyoL23M+hKfFDtyIkAOrGRGhQr17JARMNaGrXIgu5/Rpp/Qg96OsxMnj7ulTyEc1fUY9WS4fOwEiLP0PpbZfOmUSxv8NIJwMIoe++mQwvK0rEbMt0="
+  file: ${TRAVIS_BUILD_DIR}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}-alldeps.tar.gz
+  skip_cleanup: true
+  on:
+    tags: true
