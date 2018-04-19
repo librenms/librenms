@@ -9,7 +9,6 @@ import sys
 import time
 import timeit
 
-from contextlib import AbstractContextManager
 from datetime import timedelta
 from logging import debug, info, warning, error, critical
 from platform import python_version
@@ -62,7 +61,7 @@ class PerformanceCounter(object):
             return (c if precise else int(c)), j
 
 
-class TimeitContext(AbstractContextManager):
+class TimeitContext(object):
     """
     Wrapper around timeit to allow the timing of larger blocks of code by wrapping them in "with"
     """
@@ -346,7 +345,7 @@ class Service:
                 self.unlock_discovery(device_id)
 
     # ------------ Alerting ------------
-    def poll_alerting(self, _=None):
+    def poll_alerting(self, _=None, group=None):
         try:
             info("Checking alerts")
             self.call_script('alerts.php')
@@ -378,7 +377,7 @@ class Service:
     def dispatch_poll_billing(self):
         self.billing_manager.post_work('poll')
 
-    def poll_billing(self, run_type):
+    def poll_billing(self, run_type, group=None):
         if run_type == 'poll':
             info("Polling billing")
             self.call_script('poll-billing.php')
