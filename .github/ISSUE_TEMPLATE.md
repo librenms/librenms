@@ -2,9 +2,9 @@
 
 > **Please read this information carefully.**
 
-**GitHub issues is for known/validated bugs, please do not post issues asking for help or how to do X, Y or Z.** 
+**GitHub issues is for new device requests only. Please do not post bugs or ask questions** 
 
-**You can use our [Discord server](https://t.libren.ms/discord) to ask questions or our [community site](https://community.librenms.org).**
+**For help and support you can use our [Discord server](https://t.libren.ms/discord) or our [community site](https://community.librenms.org).**
 
 **If you have a feature request/changes please post this on our [community site](https://community.librenms.org/c/feature-requests).**
 
