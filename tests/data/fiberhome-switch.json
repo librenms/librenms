@@ -14,7 +14,7 @@
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg"
+                    "icon": "fiberhome.png"
                 }
             ]
         },
@@ -32,7 +32,7 @@
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": "NA",
-                    "icon": "fiberhome.svg"
+                    "icon": "fiberhome.png"
                 }
             ]
         }
