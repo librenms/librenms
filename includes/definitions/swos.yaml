@@ -1,5 +1,6 @@
 os: swos
 text: 'Mikrotik SwOS'
+icon: mikrotik
 type: network
 nobulk: 1
 mib_dir:
