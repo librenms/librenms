@@ -136,6 +136,8 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
         return $this->belongsTo('App\Models\Device', 'device_id');
     }
 
+    // ---- Discovery / Poller Module Functions ----
+
     public static function runDiscovery(OS $os)
     {
         // check yaml first
@@ -559,5 +561,15 @@ class WirelessSensor extends BaseModel implements DiscoveryModule, DiscoveryItem
                 $sensor->save();
             }
         }
+    }
+
+    public function rrdName($hostname)
+    {
+        return rrd_name($hostname, [
+            self::$rrd_name,
+            $this->type,
+            $this->subtype,
+            $this->index
+        ]);
     }
 }

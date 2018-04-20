@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use App\Models\WirelessSensor;
 use LibreNMS\Authentication\Auth;
 
 function authToken(\Slim\Route $route)
@@ -862,31 +863,37 @@ function list_available_wireless_graphs()
     $router   = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    var_dump($router);
     check_device_permission($device_id);
     if (isset($router['type'])) {
         list(, , $type) = explode('_', $router['type']);
     }
     $sensor_id = $router['sensor_id'] ?: null;
-    $graphs    = array();
-
+//    $graphs    = array();
+    var_dump($router);
     if (isset($type)) {
         if (isset($sensor_id)) {
-            $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+            $graphs = WirelessSensor::find($sensor_id);
         } else {
-            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
-                $graphs[] = array(
-                    'sensor_id' => $graph['sensor_id'],
-                    'desc'      => $graph['sensor_descr'],
-                );
-            }
+            $graphs = WirelessSensor::select(['wireless_sensor_id', 'description'])
+                ->where('device_id', $device_id)
+                ->where('type', $type)
+                ->get()
+                ->map(function ($sensor) {
+                    return [
+                        'sensor_id' => $sensor->wireless_sensor_id,
+                        'desc' => $sensor->description,
+                    ];
+                });
         }
     } else {
-        foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
-            $graphs[] = array(
-                'desc' => ucfirst($graph['sensor_class']),
-                'name' => 'device_wireless_'.$graph['sensor_class'],
-            );
-        }
+        $graphs = WirelessSensor::getTypes(true, $device_id)
+            ->map(function ($type, $name) {
+                return [
+                    'desc' => $type['short'],
+                    'name' => "device_wireless_$name",
+                ];
+            })->values();
     }
 
     return api_success($graphs, 'graphs');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\WirelessSensor;
+use LibreNMS\Config;
 
 // this determines the order of the tabs
 $types = WirelessSensor::getTypes(true, $device['device_id']);
@@ -47,7 +48,6 @@ if ($vars['metric'] == 'overview') {
 
         $graph_title = generate_link($text, $wireless_link_array, array('metric' => $type_name));
         $graph_array['type'] = 'device_wireless_'.$type_name;
-
         include Config::get('install_dir') . '/html/includes/print-device-graph.php';
     }
 } elseif (isset($types[$vars['metric']])) {
