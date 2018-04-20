@@ -31,24 +31,24 @@ if (is_null($temp_board) || is_null($temp_mem) || is_null($temp_cpu)) {
         $description = $regexp_result[1];
 
         // Ambient Temperature
-        $oid = '.1.3.6.1.4.1.9.9.719.1.9.44.1.4'.$index;
+        $oid = '.1.3.6.1.4.1.9.9.719.1.9.44.1.4.'.$index;
         d_echo($oid." - ".$description." - Ambient: ".$temp_board[$oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'ambient-'.$index, 'cimc', $description." - Ambient", '1', '1', null, null, null, null, $temp_board[$oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'ambient-'.$index, 'cimc', $description." - Ambient", '1', '1', null, null, null, null);
 
         // Front Temperature
-        $oid = '.1.3.6.1.4.1.9.9.719.1.9.44.1.8'.$index;
+        $oid = '.1.3.6.1.4.1.9.9.719.1.9.44.1.8.'.$index;
         d_echo($oid." - ".$description." - Front: ".$temp_board[$oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'front-'.$index, 'cimc', $description." - Front", '1', '1', null, null, null, null, $temp_board[$oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'front-'.$index, 'cimc', $description." - Front", '1', '1', null, null, null, null);
 
         // Rear Temperature
         $oid = '.1.3.6.1.4.1.9.9.719.1.9.44.1.21.'.$index;
         d_echo($oid." - ".$description." - Rear: ".$temp_board[$oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'rear-'.$index, 'cimc', $description." - Rear", '1', '1', null, null, null, null, $temp_board[$oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'rear-'.$index, 'cimc', $description." - Rear", '1', '1', null, null, null, null);
 
         // IO Hub Temperature
         $oid = '.1.3.6.1.4.1.9.9.719.1.9.44.1.13.'.$index;
         d_echo($oid." - ".$description." - IO Hub: ".$temp_board[$oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'ioh-'.$index, 'cimc', $description." - IO Hub", '1', '1', null, null, null, null, $temp_board[$oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'ioh-'.$index, 'cimc', $description." - IO Hub", '1', '1', null, null, null, null);
     }
 
     // Memory Temperatures
@@ -59,7 +59,7 @@ if (is_null($temp_board) || is_null($temp_mem) || is_null($temp_cpu)) {
         // DIMM Temperature
         $oid = '.1.3.6.1.4.1.9.9.719.1.30.12.1.6.'.$index;
         d_echo($oid." - ".$description." - ".$temp_mem[$oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'mem-'.$index, 'cimc', $description, '1', '1', null, null, 40, null, $temp_mem[$oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'mem-'.$index, 'cimc', $description, '1', '1', null, null, 40, null);
     }
 
     // CPU Temperatures
@@ -70,6 +70,6 @@ if (is_null($temp_board) || is_null($temp_mem) || is_null($temp_cpu)) {
         // CPU Temperature
         $oid = '.1.3.6.1.4.1.9.9.719.1.41.2.1.10.'.$index;
         d_echo($oid." - ".$description." - ".$temp_cpu[$oid][$index]."\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'cpu-'.$index, 'cimc', $description, '1', '1', null, null, 40, null, $temp_cpu[$oid][$index]);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'cpu-'.$index, 'cimc', $description, '1', '1', null, null, 40, null);
     }
 }
