@@ -13,7 +13,6 @@
  * @author     Christoph Zilian <czilian@hotmail.com>
 */
 
-echo $device['sysDescr']."\n";
 $sysDescrPieces = explode(" ", $device['sysDescr']); //extract model from sysDescr
 
 $versions = snmp_get_multi_oid($device, 'msppDevHwVersion.0 msppDevSwVersion.0', '-OQs', 'WRI-DEVICE-MIB');
