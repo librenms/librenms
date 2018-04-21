@@ -27,6 +27,6 @@ foreach ($versions as $key => $field) {
 $hardware = 'FHN '.$sysDescrPieces[0].' V '.$versions['msppDevHwVersion.0'];
 $version  = $versions['msppDevSwVersion.0'];
 $features = '';    // currently no features available
-$serial   = 'NA';  // currently no HW serial number through MIB
+$serial   = '';  // currently no HW serial number through MIB
 
 // End of File
