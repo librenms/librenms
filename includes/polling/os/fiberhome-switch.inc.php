@@ -28,5 +28,3 @@ $hardware = 'FHN '.$sysDescrPieces[0].' V '.$versions['msppDevHwVersion.0'];
 $version  = $versions['msppDevSwVersion.0'];
 $features = '';    // currently no features available
 $serial   = '';  // currently no HW serial number through MIB
-
-// End of File
