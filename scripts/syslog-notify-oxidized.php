@@ -4,20 +4,17 @@
 $init_modules = [];
 require __DIR__ . '/../includes/init.php';
 
+use LibreNMS\Config;
+
 function oxidized_node_update($hostname, $msg, $username = 'not_provided')
 {
-    global $config;
-
     // Work around https://github.com/rack/rack/issues/337
     $msg = str_replace("%", "", $msg);
     $postdata = ["user" => $username, "msg" => $msg];
-
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($postdata));
-    curl_setopt($curl, CURLOPT_USERAGENT, 'librenms');
-    curl_setopt($curl, CURLOPT_URL, $config['oxidized']['url'].'/node/next/'.$hostname);
-    curl_exec($curl);
+    $oxidized_url = Config::get('oxidized.url');
+    if (!empty($oxidized_url)) {
+        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
+    }
 }//end oxidized_node_update()
 
 $hostname = $argv[1];
