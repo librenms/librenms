@@ -73,3 +73,4 @@ $tags = array(
 );
 data_update($device, 'app', $tags, $fields);
 update_application($app, $powerwall, $fields);
+
