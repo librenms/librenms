@@ -1,7 +1,7 @@
-os: avaya-ers
-text: 'ERS Firmware'
+os: boss
+text: 'Extreme BOSS'
 type: network
-icon: avaya
+icon: extremeboss
 ifname: 1
 mib_dir:
     - nortel
@@ -13,3 +13,5 @@ discovery:
       sysDescr:
           - 'Ethernet Routing Switch'
           - 'ERS'
+          - 'Virtual Services Platform 7024XLS'
+          - 'Virtual Services Platform 7024XT'
