@@ -253,7 +253,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $(this).find(".incident-toggle").fadeIn(200);
       }).on("mouseleave", function() {
         $(this).find(".incident-toggle").fadeOut(200);
-      }).on("click", "td:not(.incident-toggle-td)", function() {
+      }).on("click", "td(.incident-toggle-td)", function() {
         var target = $(this).parent().find(".incident-toggle").data("target");
         if( $(this).parent().find(".incident-toggle").hasClass(\'fa-plus\') ) {
           $(this).parent().find(".incident-toggle").toggleClass(\'fa-plus fa-minus\');

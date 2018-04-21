@@ -22,6 +22,9 @@
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+
+use LibreNMS\Config;
+
 header('Content-type: application/json');
 
 $alert_id = $vars['alert_id'];
@@ -45,7 +48,7 @@ if (!is_numeric($alert_id)) {
 
     $data = ['state' => $state, 'open' => $open];
     if (!empty($ack_msg)) {
-        $data['note'] = $ack_msg;
+        $data['note'] = date(Config::get('dateformat.long')) . " - Ack ({$_SESSION['username']}) $ack_msg";
     }
 
     if (dbUpdate($data, 'alerts', 'id=?', array($alert_id)) >= 0) {
