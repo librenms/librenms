@@ -1,11 +1,11 @@
 <?php
 /**
- * avaya-ers.inc.php
+ * boss.inc.php
  *
- * LibreNMS Fan and Power Supply state Discovery module for Avaya ERS
+ * LibreNMS Fan and Power Supply state Discovery module for Extreme/Avaya ERS
  */
 
-if ($device['os'] === 'avaya-ers') {
+if ($device['os'] === 'boss') {
     $oid = snmpwalk_cache_oid($device, 's5ChasComTable', array(), 'S5-CHASSIS-MIB');
     $cur_oid = '.1.3.6.1.4.1.45.1.6.3.3.1.1.10.';
 

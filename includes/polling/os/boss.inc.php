@@ -1,6 +1,6 @@
 <?php
 
-echo 'Doing Nortel/Avaya ERS ';
+echo 'Doing Extreme/Avaya/Nortel ERS ';
 
 // Try multiple ways of getting firmware version
 $version = snmp_get($device, 'SNMPv2-SMI::enterprises.2272.1.1.7.0', '-Oqvn');
