@@ -31,7 +31,7 @@
                     "location": "<private>",
                     "os": "fiberhome-switch",
                     "type": "network",
-                    "serial": "NA",
+                    "serial": null,
                     "icon": "fiberhome.png"
                 }
             ]
