@@ -162,7 +162,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     }
 
     if ((int)$alert['state'] === 2) {
-        $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
+        $severity_ico = '<span class="alert-status label-primary">&nbsp;</span>';
     }
 
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert['id']));
