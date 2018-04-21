@@ -2,7 +2,7 @@
 
 echo 'RC-VLAN-MIB VLANs: ';
 
-if ($device['os'] == 'avaya-ers') {
+if ($device['os'] == 'boss') {
     $vtpdomain_id = '1';
     $vlans        = snmpwalk_cache_oid($device, 'rcVlanName', array(), 'RC-VLAN-MIB');
     $tagoruntag   = snmpwalk_cache_oid($device, 'rcVlanPortMembers', array(), 'RC-VLAN-MIB', null, '-OQUs --hexOutputLength=0');

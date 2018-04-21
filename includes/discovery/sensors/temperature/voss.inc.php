@@ -1,8 +1,8 @@
 <?php
 /**
- * avaya-vsp.inc.php
+ * voss.inc.php
  *
- * LibreNMS Temperature Sensor Discovery module for Avaya VOSS(VSP Operating System Software)
+ * LibreNMS Temperature Sensor Discovery module for Extreme/Avaya VOSS(VSP Operating System Software)
  *
  * Copyright (c) 2017 Daniel Cox <danielcoxman@gmail.com>
  *

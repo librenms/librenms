@@ -1,6 +1,6 @@
 <?php
 /**
- * AvayaErs.php
+ * Boss.php
  *
  * -Description-
  *
@@ -29,7 +29,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class AvayaErs extends OS implements ProcessorDiscovery
+class Boss extends OS implements ProcessorDiscovery
 {
     /**
      * Discover processors.
@@ -45,7 +45,7 @@ class AvayaErs extends OS implements ProcessorDiscovery
         $count = 1;
         foreach ($data as $index => $entry) {
             $processors[] = Processor::discover(
-                $this->getName(),
+                "avaya-ers",
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.45.1.6.3.8.1.1.6.$index",
                 zeropad($count),
