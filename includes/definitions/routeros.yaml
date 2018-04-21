@@ -1,5 +1,6 @@
 os: routeros
 text: 'Mikrotik RouterOS'
+icon: mikrotik
 type: network
 nobulk: 1
 mib_dir:
