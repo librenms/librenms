@@ -88,7 +88,7 @@ if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
 }
 
 $config['project_home']   = 'http://www.librenms.org/';
-$config['project_issues'] = 'https://github.com/librenms/librenms/issues';
+$config['project_issues'] = 'https://community.librenms.org/c/help';
 $config['github_api']   = 'https://api.github.com/repos/librenms/librenms/';
 $config['site_style']     = 'light';
 // Options are dark or light
