@@ -2469,3 +2469,19 @@ function lock_and_purge($table, $sql)
         return -1;
     }
 }
+
+/**
+ * Convert space separated hex OID content to character
+ *
+ * @param string $hex_string
+ * @return string $chr_string
+ */
+
+function hexbin($hex_string)
+{
+    $chr_string = '';
+    foreach (explode(' ', $hex_string) as $a) {
+        $chr_string .= chr(hexdec($a));
+    }
+    return $chr_string;
+}
