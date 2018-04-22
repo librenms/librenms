@@ -21,6 +21,10 @@ $details = explode('  ', $sysDescr);
 $details = str_replace('ERS-', 'Ethernet Routing Switch ', $details);
 
 $hardware = explode(' (', $details[0]);
+
+// Make boss devices hardware string compact
+$hardware[0] = str_replace('Ethernet Routing Switch ', 'ERS-', $hardware[0]);
+$hardware[0] = str_replace('Virtual Services Platform ', 'VSP-', $hardware[0]);
 $hardware = $hardware[0];
 
 // Is this a 5500 series or 5600 series stack?
