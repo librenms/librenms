@@ -18,12 +18,6 @@ any other means), you assert that:
   Subversion revision 3250 and any patches or other code covered by that
   license after Tue May 29 13:08:01 2012 +0000 (the date of Observium r3250).
 
-- You are not running a copy of non-GPLed Observium, whether as part of your
-  work duties, or personally, or in any other capacity, and you have removed
-  any copies of non-GPLed Observium source code from your personal and work
-  systems.
-
-
 To agree with these assertions, when you submit your first pull request you 
 will be asked after submitting to sign the CLA, you do this by following the 
 link provided in the PR and agreeing to the CLA using your GitHub account. 
