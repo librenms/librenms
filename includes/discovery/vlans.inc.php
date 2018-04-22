@@ -25,8 +25,8 @@ $index_to_base = array_flip($base_to_index);
 
 if ($device['os'] === 'junos') {
     require 'includes/discovery/vlans/junos.inc.php';
-} elseif ($device['os'] === 'avaya-ers') {
-    require 'includes/discovery/vlans/avaya-ers.inc.php';
+} elseif ($device['os'] === 'boss') {
+    require 'includes/discovery/vlans/boss.inc.php';
 }
 
 if (empty($device['vlans']) === true) {
