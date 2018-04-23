@@ -755,7 +755,7 @@ function json_app_get($device, $extend, $min_version)
                 $parsed_json['error']='-5';
                 $parsed_json['errorString']='is_numeric returns false for the value "'.$parsed_json{'version'}.'"';
             } else {
-                if ($parsed_json['version'] < $min_version){
+                if ($parsed_json['version'] < $min_version) {
                     $parsed_json['error']='-6';
                     $parsed_json['errorString']='"'.$parsed_json['version'].'" is less than the required version of "'.$min_version.'"';
                 }
@@ -772,6 +772,6 @@ function json_app_get($device, $extend, $min_version)
     if ($parsed_json[error] != 0) {
         throw new JsonAppPollingFailedException("\n".$extend.":".$parsed_json[error].": ".$parsed_json[errorString]."\n");
     }
-    
+
     return $parsed_json;
 }
