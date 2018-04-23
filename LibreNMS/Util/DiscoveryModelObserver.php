@@ -38,7 +38,8 @@ class DiscoveryModelObserver
 
     public function updated(Eloquent $model)
     {
-        echo 'U';
+        d_echo("Updated data:", 'U');
+        d_echo($model->getDirty());
     }
 
     public function created(Eloquent $model)

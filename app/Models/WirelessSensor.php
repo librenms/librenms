@@ -68,10 +68,20 @@ class WirelessSensor extends BaseModel implements DiscoveryItem
         $sensor = WirelessSensor::where('device_id', $device_id)
             ->firstOrNew(compact(['type', 'subtype', 'index']), $sensor_array);
 
+        // fetch data if there is none
+        if (is_null($value)) {
+            $sensors = collect([$sensor]);
+
+            $prefetch = Wireless::fetchSnmpData(Device::find($device_id), $sensors);
+            $data = Wireless::processSensorData($sensors, $prefetch);
+
+            $sensor_array['value'] = $data->first();
+        }
+
         // if existing, update selected data
         if ($sensor->wireless_sensor_id) {
             $ignored = ['value'];
-            if ($sensor->custom_thresholds) {
+            if ($sensor->custom_thresholds == 'Yes') {
                 $ignored[] = 'alert_high';
                 $ignored[] = 'alert_low';
                 $ignored[] = 'warn_high';
@@ -81,16 +91,7 @@ class WirelessSensor extends BaseModel implements DiscoveryItem
             $sensor->fill(array_diff_key($sensor_array, array_flip($ignored)));
         }
 
-        if (is_null($value)) {
-            $sensors = collect([$sensor]);
-
-            $prefetch = Wireless::fetchSnmpData(Device::find($device_id), $sensors);
-            $data = Wireless::processSensorData($sensors, $prefetch);
-
-            $sensor->value = $data->first();
-        }
-
-        $sensor->valid = is_numeric($sensor->value);
+        $sensor->valid = is_numeric($sensor_array['value']);
 
         return $sensor;
     }
