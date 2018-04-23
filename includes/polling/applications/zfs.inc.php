@@ -7,11 +7,13 @@ $app_id = $app['app_id'];
 
 echo $name;
 
-$zfs=json_app_get($device, 'zfs', 0);
-if ($zfs['error'] != '0') {
-    print "\nJSON returned with error '".$zfs['error']."'\nerrorString: ".$zfs['errorString']."\n";
+try{
+    $zfs=json_app_get($device, $name, 0);
+}catch (JsonAppPollingFailedException $e) {
+    echo $e->getMessage();
     return;
 }
+
 
 
 $rrd_name = array('app', $name, $app_id);
