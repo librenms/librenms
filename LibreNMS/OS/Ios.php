@@ -29,6 +29,7 @@ use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 use LibreNMS\OS\Shared\Cisco;
 
@@ -68,7 +69,7 @@ class Ios extends Cisco implements
 
         $sensors = array();
         foreach ($data as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'clients',
                 $device['device_id'],
                 ".1.3.6.1.4.1.9.9.273.1.1.2.1.1.$index",
@@ -102,7 +103,7 @@ class Ios extends Cisco implements
 
         $data = snmpwalk_cache_oid($this->getDevice(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.' . $index,

@@ -29,6 +29,7 @@ use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDiscovery, WirelessRssiDiscovery
@@ -73,7 +74,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
 
         $sensors = array();
         foreach ($oids as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid_prefix . $index,

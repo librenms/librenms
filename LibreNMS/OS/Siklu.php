@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Siklu extends OS implements
@@ -49,7 +50,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.4.1'; // RADIO-BRIDGE-MIB::rfOperationalFrequency.1
         return array(
-            WirelessSensor::discover('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),
+            Wireless::discover('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),
         );
     }
 
@@ -63,7 +64,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.42.1'; // RADIO-BRIDGE-MIB::rfTxPower.1
         return array(
-            WirelessSensor::discover('power', $this->getDeviceId(), $oid, 'siklu', 1, 'Tx Power'),
+            Wireless::discover('power', $this->getDeviceId(), $oid, 'siklu', 1, 'Tx Power'),
         );
     }
 
@@ -77,7 +78,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.19.1'; // RADIO-BRIDGE-MIB::rfAverageRssi.1
         return array(
-            WirelessSensor::discover('rssi', $this->getDeviceId(), $oid, 'siklu', 1, 'RSSI'),
+            Wireless::discover('rssi', $this->getDeviceId(), $oid, 'siklu', 1, 'RSSI'),
         );
     }
 
@@ -91,7 +92,7 @@ class Siklu extends OS implements
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.18.1'; // RADIO-BRIDGE-MIB::rfAverageCinr.1
         return array(
-            WirelessSensor::discover('snr', $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
+            Wireless::discover('snr', $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
         );
     }
 }

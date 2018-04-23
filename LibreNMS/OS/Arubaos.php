@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
+use LibreNMS\Modules\Wireless as Wireless1;
 use LibreNMS\OS;
 use LibreNMS\Util\Wireless;
 
@@ -53,7 +54,7 @@ class Arubaos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated
         return array(
-            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
+            Wireless1::discover('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
         );
     }
 
@@ -114,7 +115,7 @@ class Arubaos extends OS implements
                 $current = $entry[$oid];
             }
 
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid,

@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Airos extends OS implements
@@ -60,7 +61,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.1.1.4.1'; //UBNT-AirMAX-MIB::ubntRadioFreq.1
         return array(
-            WirelessSensor::discover('frequency', $this->getDeviceId(), $oid, 'airos', 1, 'Radio Frequency'),
+            Wireless::discover('frequency', $this->getDeviceId(), $oid, 'airos', 1, 'Radio Frequency'),
         );
     }
 
@@ -74,7 +75,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.6.1.4.1'; //UBNT-AirMAX-MIB::ubntAirMaxCapacity.1
         return array(
-            WirelessSensor::discover('capacity', $this->getDeviceId(), $oid, 'airos', 1, 'airMAX Capacity'),
+            Wireless::discover('capacity', $this->getDeviceId(), $oid, 'airos', 1, 'airMAX Capacity'),
         );
     }
 
@@ -88,7 +89,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.7.1'; //UBNT-AirMAX-MIB::ubntWlStatCcq.1
         return array(
-            WirelessSensor::discover('ccq', $this->getDeviceId(), $oid, 'airos', 1, 'CCQ'),
+            Wireless::discover('ccq', $this->getDeviceId(), $oid, 'airos', 1, 'CCQ'),
         );
     }
 
@@ -102,7 +103,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.15.1'; //UBNT-AirMAX-MIB::ubntWlStatStaCount.1
         return array(
-            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'airos', 1, 'Clients'),
+            Wireless::discover('clients', $this->getDeviceId(), $oid, 'airos', 1, 'Clients'),
         );
     }
 
@@ -116,7 +117,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.1.1.7.1'; //UBNT-AirMAX-MIB::ubntRadioDistance.1
         return array(
-            WirelessSensor::discover('distance', $this->getDeviceId(), $oid, 'airos', 1, 'Distance', null, 1, 1000),
+            Wireless::discover('distance', $this->getDeviceId(), $oid, 'airos', 1, 'Distance', null, 1, 1000),
         );
     }
 
@@ -130,7 +131,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.8.1'; //UBNT-AirMAX-MIB::ubntWlStatNoiseFloor.1
         return array(
-            WirelessSensor::discover('noise-floor', $this->getDeviceId(), $oid, 'airos', 1, 'Noise Floor'),
+            Wireless::discover('noise-floor', $this->getDeviceId(), $oid, 'airos', 1, 'Noise Floor'),
         );
     }
 
@@ -145,8 +146,8 @@ class Airos extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.4.1.1.6.1'; //UBNT-AirMAX-MIB::ubntRadioTxPower.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.5.1'; //UBNT-AirMAX-MIB::ubntWlStatSignal.1
         return array(
-            WirelessSensor::discover('power', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Power'),
-            WirelessSensor::discover('power', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Signal Level'),
+            Wireless::discover('power', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Power'),
+            Wireless::discover('power', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Signal Level'),
         );
     }
 
@@ -160,7 +161,7 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.6.1.3.1'; //UBNT-AirMAX-MIB::ubntAirMaxQuality.1
         return array(
-            WirelessSensor::discover('quality', $this->getDeviceId(), $oid, 'airos', 1, 'airMAX Quality'),
+            Wireless::discover('quality', $this->getDeviceId(), $oid, 'airos', 1, 'airMAX Quality'),
         );
     }
 
@@ -175,8 +176,8 @@ class Airos extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.9.1'; //UBNT-AirMAX-MIB::ubntWlStatTxRate.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.4.5.1.10.1'; //UBNT-AirMAX-MIB::ubntWlStatRxRate.1
         return array(
-            WirelessSensor::discover('rate', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Rate'),
-            WirelessSensor::discover('rate', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Rx Rate'),
+            Wireless::discover('rate', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Rate'),
+            Wireless::discover('rate', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Rx Rate'),
         );
     }
 
@@ -190,12 +191,12 @@ class Airos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.6.1'; //UBNT-AirMAX-MIB::ubntWlStatRssi.1
         $sensors = array(
-            WirelessSensor::discover('rssi', $this->getDeviceId(), $oid, 'airos', 0, 'Overall RSSI')
+            Wireless::discover('rssi', $this->getDeviceId(), $oid, 'airos', 0, 'Overall RSSI')
         );
 
         $data = snmpwalk_cache_oid($this->getDevice(), 'ubntRadioRssi', array(), 'UBNT-AirMAX-MIB');
         foreach ($data as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.4.2.1.2.' . $index,

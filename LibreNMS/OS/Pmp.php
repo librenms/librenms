@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -33,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Pmp extends OS implements
@@ -55,7 +55,7 @@ class Pmp extends OS implements
     {
         $rssi_oid = '.1.3.6.1.4.1.161.19.3.2.2.2.0';
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rssi',
                 $this->getDeviceId(),
                 $rssi_oid,
@@ -85,7 +85,7 @@ class Pmp extends OS implements
         }
 
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'snr',
                 $this->getDeviceId(),
                 $snr_horizontal,
@@ -94,7 +94,7 @@ class Pmp extends OS implements
                 'Cambium SNR Horizontal',
                 null
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'snr',
                 $this->getDeviceId(),
                 $snr_vertical,
@@ -116,7 +116,7 @@ class Pmp extends OS implements
     {
         $frequency = '.1.3.6.1.4.1.161.19.3.1.7.37.0'; //WHISP-APS-MIB::currentRadioFreqCarrier
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $frequency,
@@ -148,7 +148,7 @@ class Pmp extends OS implements
         $suDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.31.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSumimoUtilization
 
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'utilization',
                 $this->getDeviceId(),
                 $downlink,
@@ -157,7 +157,7 @@ class Pmp extends OS implements
                 'Downlink Utilization',
                 null
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'utilization',
                 $this->getDeviceId(),
                 $uplink,
@@ -166,7 +166,7 @@ class Pmp extends OS implements
                 'Uplink Utilization',
                 null
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'utilization',
                 $this->getDeviceId(),
                 $muSectorDownlink,
@@ -175,7 +175,7 @@ class Pmp extends OS implements
                 'MU-MIMO Downlink Sector utilization',
                 null
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'utilization',
                 $this->getDeviceId(),
                 $muDownlink,
@@ -184,7 +184,7 @@ class Pmp extends OS implements
                 'MU-MIMO Downlink Utilization',
                 null
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'utilization',
                 $this->getDeviceId(),
                 $suDownlink,
@@ -210,7 +210,7 @@ class Pmp extends OS implements
             $ssr = '.1.3.6.1.4.1.161.19.3.2.2.108.0'; //WHISP-SMSSM-MIB::signalStrengthRatio.0
         }
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'ssr',
                 $this->getDeviceId(),
                 $ssr,
@@ -274,7 +274,7 @@ class Pmp extends OS implements
     {
         $registeredSM = '.1.3.6.1.4.1.161.19.3.1.7.1.0'; //WHISP-APS-MIB::regCount.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 $registeredSM,
@@ -298,7 +298,7 @@ class Pmp extends OS implements
         $fecOutErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.97.0';
         $fecCRCError = '.1.3.6.1.4.1.161.19.3.3.1.223.0';
         return array(
-            new WirelessSensor(
+            Wireless::discover(
                 'errors',
                 $this->getDeviceId(),
                 $fecCRCError,
@@ -307,7 +307,7 @@ class Pmp extends OS implements
                 'CRC Errors',
                 null
             ),
-            new WirelessSensor(
+            Wireless::discover(
                 'errors',
                 $this->getDeviceId(),
                 $fecOutErrorsCount,
@@ -316,7 +316,7 @@ class Pmp extends OS implements
                 'Out Error Count',
                 null
             ),
-            new WirelessSensor(
+            Wireless::discover(
                 'errors',
                 $this->getDeviceId(),
                 $fecInErrorsCount,

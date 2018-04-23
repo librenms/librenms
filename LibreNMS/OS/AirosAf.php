@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class AirosAf extends OS implements
@@ -49,7 +50,7 @@ class AirosAf extends OS implements
     {
         $oid = '.1.3.6.1.4.1.41112.1.3.2.1.4.1'; // UBNT-AirFIBER-MIB::radioLinkDistM.1
         return array(
-            WirelessSensor::discover('distance', $this->getDeviceId(), $oid, 'airos-af', 1, 'Distance', null, 1, 1000)
+            Wireless::discover('distance', $this->getDeviceId(), $oid, 'airos-af', 1, 'Distance', null, 1, 1000)
         );
     }
 
@@ -64,7 +65,7 @@ class AirosAf extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.1.1.5.1'; // UBNT-AirFIBER-MIB::txFrequency.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.3.1.1.6.1'; // UBNT-AirFIBER-MIB::rxFrequency.1
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $tx_oid,
@@ -72,7 +73,7 @@ class AirosAf extends OS implements
                 1,
                 'Tx Frequency'
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $rx_oid,
@@ -96,9 +97,9 @@ class AirosAf extends OS implements
         $rx1_oid = '.1.3.6.1.4.1.41112.1.3.2.1.14.1'; // UBNT-AirFIBER-MIB::rxPower1.1
 
         return array(
-            WirelessSensor::discover('power', $this->getDeviceId(), $tx_oid, 'airos-af-tx', 1, 'Tx Power'),
-            WirelessSensor::discover('power', $this->getDeviceId(), $rx0_oid, 'airos-af-rx', 0, 'Rx Chain 0 Power'),
-            WirelessSensor::discover('power', $this->getDeviceId(), $rx1_oid, 'airos-af-rx', 1, 'Rx Chain 1 Power'),
+            Wireless::discover('power', $this->getDeviceId(), $tx_oid, 'airos-af-tx', 1, 'Tx Power'),
+            Wireless::discover('power', $this->getDeviceId(), $rx0_oid, 'airos-af-rx', 0, 'Rx Chain 0 Power'),
+            Wireless::discover('power', $this->getDeviceId(), $rx1_oid, 'airos-af-rx', 1, 'Rx Chain 1 Power'),
         );
     }
 
@@ -113,8 +114,8 @@ class AirosAf extends OS implements
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.6.1'; // UBNT-AirFIBER-MIB::txCapacity.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.5.1'; // UBNT-AirFIBER-MIB::rxCapacity.1
         return array(
-            WirelessSensor::discover('rate', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Capacity'),
-            WirelessSensor::discover('rate', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Rx Capacity'),
+            Wireless::discover('rate', $this->getDeviceId(), $tx_oid, 'airos-tx', 1, 'Tx Capacity'),
+            Wireless::discover('rate', $this->getDeviceId(), $rx_oid, 'airos-rx', 1, 'Rx Capacity'),
         );
     }
 }

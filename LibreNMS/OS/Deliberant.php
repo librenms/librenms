@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Deliberant extends OS implements WirelessClientsDiscovery
@@ -44,7 +45,7 @@ class Deliberant extends OS implements WirelessClientsDiscovery
 
         $sensors = array();
         foreach ($clients_data as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'clients',
                 $device['device_id'],
                 '.1.3.6.1.4.1.32761.3.5.1.2.1.1.16.' . $index,

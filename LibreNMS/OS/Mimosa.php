@@ -25,13 +25,13 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Mimosa extends OS implements
@@ -53,7 +53,7 @@ class Mimosa extends OS implements
         $tx_oid = '.1.3.6.1.4.1.43356.2.1.2.7.3.0'; // MIMOSA-NETWORKS-BFIVE-MIB::mimosaPerTxRate
         $rx_oid = '.1.3.6.1.4.1.43356.2.1.2.7.4.0'; // MIMOSA-NETWORKS-BFIVE-MIB::mimosaPerRxRate
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'error-ratio',
                 $this->getDeviceId(),
                 $tx_oid,
@@ -64,7 +64,7 @@ class Mimosa extends OS implements
                 1,
                 100
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'error-ratio',
                 $this->getDeviceId(),
                 $rx_oid,
@@ -100,7 +100,7 @@ class Mimosa extends OS implements
         }
 
         foreach ($bfiveFreq as $index => $frequency) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.6.' . $index,
@@ -116,7 +116,7 @@ class Mimosa extends OS implements
         $ptmpFreq = snmpwalk_group($this->getDevice(), 'mimosaPtmpChPwrCntrFreqCur', 'MIMOSA-NETWORKS-PTMP-MIB');
 
         foreach ($ptmpFreq as $index => $frequency) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.9.3.3.1.7.' . $index,
@@ -149,7 +149,7 @@ class Mimosa extends OS implements
 
         $sensors = array();
         foreach ($oids as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'noise-floor',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.4.' . $index,
@@ -178,7 +178,7 @@ class Mimosa extends OS implements
         $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxPower', $oids, 'MIMOSA-NETWORKS-BFIVE-MIB');
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.2.' . $index,
@@ -189,7 +189,7 @@ class Mimosa extends OS implements
                 1,
                 10
             );
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.3.' . $index,
@@ -207,7 +207,7 @@ class Mimosa extends OS implements
         $ptmpTxPow = snmpwalk_group($this->getDevice(), 'mimosaPtmpChPwrTxPowerCur', 'MIMOSA-NETWORKS-PTMP-MIB');
 
         foreach ($ptmpTxPow as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.9.3.3.1.10.' . $index,
@@ -221,7 +221,7 @@ class Mimosa extends OS implements
         $ptmpRxPow = snmpwalk_group($this->getDevice(), 'mimosaPtmpChPwrMinRxPower', 'MIMOSA-NETWORKS-PTMP-MIB');
 
         foreach ($ptmpRxPow as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.9.3.3.1.12.' . $index,
@@ -248,7 +248,7 @@ class Mimosa extends OS implements
 
         $sensors = array();
         foreach ($oids as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.2.1.2.' . $index,
@@ -258,7 +258,7 @@ class Mimosa extends OS implements
                 $entry['mimosaTxPhy'],
                 1000000
             );
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.2.1.5.' . $index,
@@ -286,7 +286,7 @@ class Mimosa extends OS implements
 
         $sensors = array();
         foreach ($oids as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'snr',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.43356.2.1.2.6.1.1.5.' . $index,

@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Hpmsm extends OS implements WirelessClientsDiscovery
@@ -39,7 +40,7 @@ class Hpmsm extends OS implements WirelessClientsDiscovery
     public function discoverWirelessClients()
     {
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.8744.5.25.1.7.2.0',

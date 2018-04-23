@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery, WirelessPowerDiscovery, WirelessRateDiscovery
@@ -48,7 +49,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
 
         $tx = snmpwalk_group($this->getDevice(), 'genEquipRadioMRMCCurrTxBitrate', 'MWRM-RADIO-MIB');
         foreach ($tx as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.7.4.1.1.7.' . $index,
@@ -62,7 +63,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
 
         $rx = snmpwalk_group($this->getDevice(), 'genEquipRadioMRMCCurrRxBitrate', 'MWRM-RADIO-MIB');
         foreach ($rx as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.7.4.1.1.11.' . $index,
@@ -91,7 +92,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
 
         $mse = snmpwalk_group($this->getDevice(), 'genEquipRadioStatusDefectedBlocks', 'MWRM-RADIO-MIB');
         foreach ($mse as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'errors',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.7.1.1.3.' . $index,
@@ -120,7 +121,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
 
         $mse = snmpwalk_group($this->getDevice(), 'genEquipRadioStatusMSE', 'MWRM-RADIO-MIB');
         foreach ($mse as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'mse',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.7.1.1.2.' . $index,
@@ -150,7 +151,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
 
         $tx = snmpwalk_group($this->getDevice(), 'genEquipRfuStatusTxLevel', 'MWRM-RADIO-MIB');
         foreach ($tx as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.5.1.1.3.' . $index,
@@ -163,7 +164,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
 
         $rx = snmpwalk_group($this->getDevice(), 'genEquipRfuStatusRxLevel', 'MWRM-RADIO-MIB');
         foreach ($rx as $index => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.5.1.1.2.' . $index,

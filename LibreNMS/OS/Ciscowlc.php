@@ -29,6 +29,7 @@ use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 use LibreNMS\OS\Shared\Cisco;
 
@@ -55,7 +56,7 @@ class Ciscowlc extends Cisco implements
             $total_oids[] = $oid;
             $total += $count;
 
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 $oid,
@@ -67,7 +68,7 @@ class Ciscowlc extends Cisco implements
         }
 
         if (!empty($counts)) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 $total_oids,
@@ -97,7 +98,7 @@ class Ciscowlc extends Cisco implements
 
         if (isset($data[0]['clsSysApConnectCount'])) {
             return array(
-                WirelessSensor::discover(
+                Wireless::discover(
                     'ap-count',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.9.9.618.1.8.4.0',

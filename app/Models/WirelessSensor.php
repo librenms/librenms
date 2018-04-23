@@ -38,64 +38,6 @@ class WirelessSensor extends BaseModel implements DiscoveryItem
     protected static $rrd_name = 'wireless-sensor';
     private $valid = true;
 
-    public static function discover(
-        $type,
-        $device_id,
-        $oids,
-        $subtype,
-        $index,
-        $description,
-        $value = null,
-        $multiplier = 1,
-        $divisor = 1,
-        $aggregator = 'sum',
-        $access_point_id = null,
-        $alert_high = null,
-        $warn_high = null,
-        $alert_low = null,
-        $warn_low = null
-    )
-    {
-        // ensure leading dots
-        $oids = array_map(function($oid) {
-            return '.' . ltrim($oid, '.');
-        }, (array)$oids);
-
-        // capture all input variables
-        $sensor_array = get_defined_vars();
-
-
-        $sensor = WirelessSensor::where('device_id', $device_id)
-            ->firstOrNew(compact(['type', 'subtype', 'index']), $sensor_array);
-
-        // fetch data if there is none
-        if (is_null($value)) {
-            $sensors = collect([$sensor]);
-
-            $prefetch = Wireless::fetchSnmpData(Device::find($device_id), $sensors);
-            $data = Wireless::processSensorData($sensors, $prefetch);
-
-            $sensor_array['value'] = $data->first();
-        }
-
-        // if existing, update selected data
-        if ($sensor->wireless_sensor_id) {
-            $ignored = ['value'];
-            if ($sensor->custom_thresholds == 'Yes') {
-                $ignored[] = 'alert_high';
-                $ignored[] = 'alert_low';
-                $ignored[] = 'warn_high';
-                $ignored[] = 'warn_low';
-            }
-
-            $sensor->fill(array_diff_key($sensor_array, array_flip($ignored)));
-        }
-
-        $sensor->valid = is_numeric($sensor_array['value']);
-
-        return $sensor;
-    }
-
     // ---- Helper Functions ----
 
     public function inAlarm()

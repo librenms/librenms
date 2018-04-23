@@ -29,6 +29,7 @@ use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Ptp600 extends OS implements
@@ -47,7 +48,7 @@ class Ptp600 extends OS implements
         $transmit = '.1.3.6.1.4.1.17713.6.12.3.0'; //"CAMBIUM-PTP600-MIB::transmitPower.0"
         $receive = '.1.3.6.1.4.1.17713.6.12.1.0'; //"CAMBIUM-PTP600-MIB::receivePower.0";
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 $transmit,
@@ -58,7 +59,7 @@ class Ptp600 extends OS implements
                 1,
                 10
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 $receive,
@@ -85,7 +86,7 @@ class Ptp600 extends OS implements
         $transmit = '.1.3.6.1.4.1.17713.6.20.2.0'; //"CAMBIUM-PTP600-MIB::transmitDataRate.0"
         $aggregate = '.1.3.6.1.4.1.17713.6.20.3.0'; //"CAMBIUM-PTP600-MIB::aggregateDataRate.0"
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $receive,
@@ -96,7 +97,7 @@ class Ptp600 extends OS implements
                 1000,
                 1
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $transmit,
@@ -107,7 +108,7 @@ class Ptp600 extends OS implements
                 1000,
                 1
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $aggregate,
@@ -131,7 +132,7 @@ class Ptp600 extends OS implements
     {
         $ssr = '.1.3.6.1.4.1.17713.6.12.13.0'; // CAMBIUM-PTP600-MIB::signalStrengthRatio.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'ssr',
                 $this->getDeviceId(),
                 $ssr,

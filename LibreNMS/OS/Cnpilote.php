@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Cnpilote extends OS implements
@@ -49,7 +50,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.1.1.14.0'; //CAMBIUM-MIB::cambiumAPTotalClients.0
         return array(
-            WirelessSensor::discover('clients', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Clients')
+            Wireless::discover('clients', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Clients')
         );
     }
 
@@ -64,7 +65,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.3.1.11.0'; //CAMBIUM-MIB::cambiumClientSNR.0
         return array(
-            WirelessSensor::discover('snr', $this->getDeviceId(), $oid, 'cnpilot', 1, 'SNR')
+            Wireless::discover('snr', $this->getDeviceId(), $oid, 'cnpilot', 1, 'SNR')
         );
     }
 
@@ -78,7 +79,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.2.1.8.0'; //CAMBIUM-MIB::cambiumRadioTransmitPower.0
         return array(
-            WirelessSensor::discover('power', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Transmit Power')
+            Wireless::discover('power', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Transmit Power')
         );
     }
 
@@ -92,7 +93,7 @@ class Cnpilote extends OS implements
     {
         $oid = '.1.3.6.1.4.1.17713.22.1.2.1.16.0'; //CAMBIUM-MIB::cambiumRadioNoiseFloor.0
         return array(
-            WirelessSensor::discover('noise-floor', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Radio Noise Floor')
+            Wireless::discover('noise-floor', $this->getDeviceId(), $oid, 'cnpilot', 1, 'Radio Noise Floor')
         );
     }
 }

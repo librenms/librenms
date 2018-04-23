@@ -31,6 +31,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Routeros extends OS implements
@@ -58,7 +59,7 @@ class Routeros extends OS implements
                 continue;
             }
 
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'ccq',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.10.' . $index,
@@ -127,7 +128,7 @@ class Routeros extends OS implements
 
         $sensors = array();
         foreach ($data as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.2.' . $index,
@@ -136,7 +137,7 @@ class Routeros extends OS implements
                 'SSID: ' . $entry['mtxrWlApSsid'] . ' Tx',
                 $entry['mtxrWlApTxRate']
             );
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.3.' . $index,
@@ -165,7 +166,7 @@ class Routeros extends OS implements
 
         $sensors = array();
         foreach ($data as $index => $entry) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 $type,
                 $this->getDeviceId(),
                 $num_oid_base . $index,

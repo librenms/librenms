@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Ewc extends OS implements
@@ -62,7 +63,7 @@ class Ewc extends OS implements
         $data = snmp_get_multi($this->getDevice(), $oids);
         $licCount = $data[0]['licenseLocalAP'] + $data[0]['licenseForeignAP'];
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'ap-count',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.1.0',
@@ -70,7 +71,7 @@ class Ewc extends OS implements
                 0,
                 'Connected APs'
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'ap-count',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.1.1.0',
@@ -95,7 +96,7 @@ class Ewc extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.6.1.0',
@@ -111,7 +112,7 @@ class Ewc extends OS implements
         foreach ($apstats as $index => $entry) {
             $apStatsMuCounts = $entry['apStatsMuCounts'];
             $name = $apnames[$index];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 '1.3.6.1.4.1.4329.15.3.5.2.2.1.14.' . $index,
@@ -127,7 +128,7 @@ class Ewc extends OS implements
 
         foreach ($wlanstats as $index => $entry) {
             $name = $wlannames[$index];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 '1.3.6.1.4.1.4329.15.3.3.4.5.1.2.' . $index,
@@ -153,13 +154,13 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'errors',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.18.' . $index,
                 'ewc',
                 $index . 'Retx',
-                "Retransmits ($name radio " . explode('.', $index)[1]. ")"
+                "Retransmits ($name radio " . explode('.', $index)[1] . ")"
             );
         }
         return $sensors;
@@ -179,7 +180,7 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.4.1.1.' . $index,
@@ -206,7 +207,7 @@ class Ewc extends OS implements
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[$index];
             $noisefloor = $entry['dot11ExtRadioMaxNfCount'];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'noise-floor',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.1.4.3.1.32.' . $index,
@@ -238,13 +239,13 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.9.' . $index,
                 'ewc',
                 $index,
-                "RSS ($name radio " . explode('.', $index)[1]. ")"
+                "RSS ($name radio " . explode('.', $index)[1] . ")"
             );
         }
         return $sensors;
@@ -264,13 +265,13 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'snr',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.13.' . $index,
                 'ewc',
                 $index,
-                "SNR ($name radio " . explode('.', $index)[1]. ")"
+                "SNR ($name radio " . explode('.', $index)[1] . ")"
             );
         }
         return $sensors;
@@ -290,13 +291,13 @@ class Ewc extends OS implements
         $sensors = array();
         foreach ($oids as $index => $entry) {
             $name = $ap_interfaces[explode('.', $index)[0]];
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless::discover(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.4329.15.3.5.2.5.1.5.' . $index,
                 'ewc',
                 $index,
-                "Utilization ($name radio " . explode('.', $index)[1]. ")"
+                "Utilization ($name radio " . explode('.', $index)[1] . ")"
             );
         }
         return $sensors;

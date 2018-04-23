@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Epmp extends OS implements
@@ -48,7 +49,7 @@ class Epmp extends OS implements
     {
         $rssi_oid = '.1.3.6.1.4.1.17713.21.1.2.3.0'; //CAMBIUM-PMP80211-MIB::cambiumSTADLRSSI.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rssi',
                 $this->getDeviceId(),
                 $rssi_oid,
@@ -71,7 +72,7 @@ class Epmp extends OS implements
     {
         $snr = '.1.3.6.1.4.1.17713.21.1.2.18.0'; //CAMBIUM-PMP80211-MIB::cambiumSTADLSNR.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'snr',
                 $this->getDeviceId(),
                 $snr,
@@ -93,7 +94,7 @@ class Epmp extends OS implements
     {
         $frequency = '.1.3.6.1.4.1.17713.21.1.2.1.0'; //CAMBIUM-PMP80211-MIB::cambiumSTAConnectedRFFrequency"
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'frequency',
                 $this->getDeviceId(),
                 $frequency,
@@ -117,7 +118,7 @@ class Epmp extends OS implements
     {
         $registeredSM = '.1.3.6.1.4.1.17713.21.1.2.10.0'; //CAMBIUM-PMP80211-MIB::cambiumAPNumberOfConnectedSTA.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'clients',
                 $this->getDeviceId(),
                 $registeredSM,

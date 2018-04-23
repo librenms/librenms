@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\WirelessSensor;
+use LibreNMS\Modules\Wireless as Wireless1;
 use LibreNMS\Util\Wireless;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
@@ -80,7 +81,7 @@ class Unifi extends OS implements
 
         // discover client counts by radio
         foreach ($radios as $name => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 'clients',
                 $this->getDeviceId(),
                 $data['oids'],
@@ -116,7 +117,7 @@ class Unifi extends OS implements
         }
 
         foreach ($ssids as $ssid => $data) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 'clients',
                 $this->getDeviceId(),
                 $data['oids'],
@@ -147,7 +148,7 @@ class Unifi extends OS implements
         $sensors = array();
         foreach ($ccq_oids as $index => $entry) {
             if ($ssids[$index]) { // don't discover ssids with empty names
-                $sensors[] = WirelessSensor::discover(
+                $sensors[] = Wireless1::discover(
                     'ccq',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.3.' . $index,
@@ -204,7 +205,7 @@ class Unifi extends OS implements
             if (isset($sensors[$radio])) {
                 continue;
             }
-            $sensors[$radio] = WirelessSensor::discover(
+            $sensors[$radio] = Wireless1::discover(
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.2.1.4.' . $index,
@@ -249,7 +250,7 @@ class Unifi extends OS implements
         foreach ($power_oids as $index => $entry) {
             $radio_name = $vap_radios[$index];
             if (!isset($sensors[$radio_name])) {
-                $sensors[$radio_name] = WirelessSensor::discover(
+                $sensors[$radio_name] = Wireless1::discover(
                     'power',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
@@ -283,7 +284,7 @@ class Unifi extends OS implements
 
         $sensors = array();
         foreach ($radio_names as $index => $name) {
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.6.' . $index,
@@ -292,7 +293,7 @@ class Unifi extends OS implements
                 "Total Util ($name)",
                 $util_oids[$index]['unifiRadioCuTotal']
             );
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.7.' . $index,
@@ -301,7 +302,7 @@ class Unifi extends OS implements
                 "Self Rx Util ($name)",
                 $util_oids[$index]['unifiRadioCuSelfRx']
             );
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.8.' . $index,
@@ -310,7 +311,7 @@ class Unifi extends OS implements
                 "Self Tx Util ($name)",
                 $util_oids[$index]['unifiRadioCuSelfTx']
             );
-            $sensors[] = WirelessSensor::discover(
+            $sensors[] = Wireless1::discover(
                 'utilization',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.9.' . $index,

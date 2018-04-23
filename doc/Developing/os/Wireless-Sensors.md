@@ -43,7 +43,7 @@ class Airos extends OS implements WirelessClientsDiscovery
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.15.1'; //UBNT-AirMAX-MIB::ubntWlStatStaCount.1
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'airos', 1, 'Clients')
+            Wireless::discover('clients', $this->getDeviceId(), $oid, 'airos', 1, 'Clients')
         );
     }
 }
@@ -51,7 +51,7 @@ class Airos extends OS implements WirelessClientsDiscovery
 
 All discovery interfaces will require you to return an array of WirelessSensor objects.
 
-`new WirelessSensor()` Accepts the following arguments:
+`Wireless::discover()` Accepts the following arguments:
 
   - $type = Required. This is the sensor class from the table above (i.e humidity).
   - $device_id = Required. You can get this value with $this->getDeviceId()

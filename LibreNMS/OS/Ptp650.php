@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
 
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Ptp650 extends OS implements
@@ -48,7 +49,7 @@ class Ptp650 extends OS implements
         $transmit = '.1.3.6.1.4.1.17713.7.12.4.0'; //CAMBIUM-PTP650-MIB::transmitPower.0
         $receive = '.1.3.6.1.4.1.17713.7.12.12.0'; //CAMBIUM-PTP650ptp650-MIB::rawReceivePower.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 $transmit,
@@ -59,7 +60,7 @@ class Ptp650 extends OS implements
                 1,
                 10
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'power',
                 $this->getDeviceId(),
                 $receive,
@@ -87,7 +88,7 @@ class Ptp650 extends OS implements
         $txModulation = ".1.3.6.1.4.1.17713.7.12.15.0";
         $rxModulation = ".1.3.6.1.4.1.17713.7.12.14.0";
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $receive,
@@ -98,7 +99,7 @@ class Ptp650 extends OS implements
                 1000,
                 1
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $transmit,
@@ -109,7 +110,7 @@ class Ptp650 extends OS implements
                 1000,
                 1
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $aggregate,
@@ -120,7 +121,7 @@ class Ptp650 extends OS implements
                 1000,
                 1
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $txModulation,
@@ -129,7 +130,7 @@ class Ptp650 extends OS implements
                 'PTP650 Transmit Modulation Rate',
                 null
             ),
-            WirelessSensor::discover(
+            Wireless::discover(
                 'rate',
                 $this->getDeviceId(),
                 $rxModulation,
@@ -151,7 +152,7 @@ class Ptp650 extends OS implements
     {
         $ssr = '.1.3.6.1.4.1.17713.7.12.9.0'; // CAMBIUM-PTP650-MIB::signalStrengthRatio.0
         return array(
-            WirelessSensor::discover(
+            Wireless::discover(
                 'ssr',
                 $this->getDeviceId(),
                 $ssr,

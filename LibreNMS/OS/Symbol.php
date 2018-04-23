@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
 class Symbol extends OS implements WirelessClientsDiscovery
@@ -44,7 +45,7 @@ class Symbol extends OS implements WirelessClientsDiscovery
         if (str_i_contains($device['hardware'], 'AP')) {
             $oid = '.1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1';
             return array(
-                WirelessSensor::discover('clients', $device['device_id'], $oid, 'symbol', 1, 'Clients')
+                Wireless::discover('clients', $device['device_id'], $oid, 'symbol', 1, 'Clients')
             );
         }
 
