@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -34,9 +33,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
-use LibreNMS\Modules\Wireless as Wireless1;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
-use LibreNMS\Util\Wireless;
 
 class XirrusAos extends OS implements
     WirelessClientsDiscovery,
@@ -58,7 +56,7 @@ class XirrusAos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
         return array(
-            Wireless1::discover('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
+            Wireless::discover('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
         );
     }
 
@@ -147,14 +145,14 @@ class XirrusAos extends OS implements
 
         $sensors = array();
         foreach ($nf as $index => $entry) {
-            $sensors[] = Wireless1::discover(
+            $sensors[] = Wireless::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid_num_prefix . $index,
                 'xirrus',
                 $index,
                 $names[$index],
-                $type == 'frequency' ? Wireless::channelToFrequency($entry[$oid]) : $entry[$oid]
+                $type == 'frequency' ? \LibreNMS\Util\Wireless::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }
 

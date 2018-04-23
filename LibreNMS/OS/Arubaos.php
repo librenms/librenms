@@ -25,16 +25,14 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
-use LibreNMS\Modules\Wireless as Wireless1;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
-use LibreNMS\Util\Wireless;
 
 class Arubaos extends OS implements
     WirelessClientsDiscovery,
@@ -54,7 +52,7 @@ class Arubaos extends OS implements
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated
         return array(
-            Wireless1::discover('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
+            Wireless::discover('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
         );
     }
 
@@ -110,12 +108,12 @@ class Arubaos extends OS implements
             $tmp_index = "$oid.$index";
 
             if ($type == 'frequency') {
-                $current = Wireless::channelToFrequency($this->decodeChannel($entry[$oid]));
+                $current = \LibreNMS\Util\Wireless::channelToFrequency($this->decodeChannel($entry[$oid]));
             } else {
                 $current = $entry[$oid];
             }
 
-            $sensors[] = Wireless1::discover(
+            $sensors[] = Wireless::discover(
                 $type,
                 $this->getDeviceId(),
                 $oid,
