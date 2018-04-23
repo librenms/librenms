@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Exceptions\JsonAppPollingFailedException;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -725,8 +726,7 @@ function json_app_get($device, $extend, $min_version)
 
     // make sure we actually get something back
     if (empty($returned_json)) {
-        $parsed_json=json_decode('{"error":"-4","errorString":"Empty return from snmp_get()"}', true);
-        return $parsed_json;
+        throw new JsonAppPollingFailedException("\n".$extend.":-4: Empty return from snmp_get.\n");
     }
 
     $parsed_json=json_decode(stripslashes($returned_json), true);
@@ -745,7 +745,7 @@ function json_app_get($device, $extend, $min_version)
                 $parsed_json['errorString']='';
             }
             if (!isset($parsed_json['version'])) {
-                $parsed_json['version']='-1';
+                $parsed_json['version']='0';
             }
 
             // If the version is not numeric and there is not an error already set, do so now.
@@ -762,9 +762,16 @@ function json_app_get($device, $extend, $min_version)
             }
         }
     } else {
-        // If we get here, it means shit JSON was returned. Create some proper JSON and error.
-        $parsed_json=json_decode('{"error":"-2","errorString":"Invalid JSON"}', true);
+        // If we get here, it means improper JSON or something else was returned. Populate the variable with an errorr.
+        $parsed_json=[
+            "error"=>"-2",
+            "errorString"=>"Invalid JSON",
+        ];
     }
 
+    if ($parsed_json[error] != 0) {
+        throw new JsonAppPollingFailedException("\n".$extend.":".$parsed_json[error].": ".$parsed_json[errorString]."\n");
+    }
+    
     return $parsed_json;
 }

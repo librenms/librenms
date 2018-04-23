@@ -7,13 +7,12 @@ $app_id = $app['app_id'];
 
 echo $name;
 
-$f2b=json_app_get($device, $name, 1);
-
-if ($f2b{'error'} != '0') {
-    print "\nJSON returned with error '".$f2b{'error'}."'\nerrorString: ".$f2b{'errorString'}."\n";
+try{
+    $f2b=json_app_get($device, 'fail2ban', 0);
+} catch (JsonAppPollingFailedException $e ){
+    echo $e->getMessage();
     return;
 }
-
 
 $metrics = array();
 $bannedStuff = explode("\n", $f2b);
