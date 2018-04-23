@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS\Traits;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Util\Wireless;
 
 trait PollWirelessChannelAsFrequency
@@ -33,10 +34,10 @@ trait PollWirelessChannelAsFrequency
      * Poll wireless frequency as MHz
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @param Collection $sensors Array of sensors needed to be polled
+     * @return Collection of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(Collection $sensors)
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
     }
@@ -44,26 +45,21 @@ trait PollWirelessChannelAsFrequency
     /**
      * Poll a channel based OID, but return data in MHz
      *
-     * @param array $sensors
+     * @param Collection $sensors
      * @param callable $callback Function to modify the value before converting it to a frequency
-     * @return array
+     * @return Collection
      */
     public function pollWirelessChannelAsFrequency($sensors, $callback = null)
     {
         if (empty($sensors)) {
-            return [];
+            return collect();
         }
 
-        $oids = [];
-        foreach ($sensors as $sensor) {
-            $oids[$sensor->wireless_sensor_id] = current($sensor->oids);
-        }
-
-        $oids = collect($sensors)->pluck('oids', 'wireless_sensor_id');
+        $oids = $sensors->pluck('oids', 'wireless_sensor_id');
 
         $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids->flatten()->toArray());
 
-        return $oids->map(function ($oid) use ($snmp_data) {
+        return $oids->map(function ($oid) use ($snmp_data, $callback) {
             $oid = current($oid);  // probably only one oid
             if (isset($callback)) {
                 $channel = call_user_func($callback, $snmp_data[$oid]);
@@ -72,6 +68,6 @@ trait PollWirelessChannelAsFrequency
             }
 
             return Wireless::channelToFrequency($channel);
-        })->toArray();
+        });
     }
 }

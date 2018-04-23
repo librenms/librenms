@@ -123,7 +123,7 @@
                     "processor_index": "7.1.0.0",
                     "processor_type": "junos",
                     "processor_usage": "94",
-                    "processor_descr": "FPC: EX4200-48PX,48 POE+ @ 0/*/*",
+                    "processor_descr": "FPC: EX4200-48PX,48 POE+ @ 0\/*\/*",
                     "processor_precision": "1",
                     "processor_perc_warn": "75"
                 },

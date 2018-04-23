@@ -25,14 +25,16 @@
 
 namespace LibreNMS\Interfaces\Polling\Sensors;
 
+use Illuminate\Support\Collection;
+
 interface WirelessSnrPolling
 {
     /**
      * Poll wireless SNR in dB
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @param Collection $sensors Array of sensors needed to be polled
+     * @return Collection of polled data
      */
-    public function pollWirelessSnr(array $sensors);
+    public function pollWirelessSnr(Collection $sensors);
 }

@@ -360,7 +360,7 @@ class Wireless implements DiscoveryModule, PollerModule
         if ($os instanceof $typeInterface) {
             d_echo("Using OS polling for $type\n");
             $function = self::getPollingMethod($type);
-            $data = $os->$function($sensors->toArray());
+            $data = $os->$function($sensors);
         } else {
             $data = self::processSensorData($sensors, $prefetch);
         }
@@ -461,7 +461,7 @@ class Wireless implements DiscoveryModule, PollerModule
 
         /** @var WirelessSensor $sensor */
         foreach ($sensors as $sensor) {
-            $sensor_value = $data[$sensor->wireless_sensor_id];
+            $sensor_value = $data->get($sensor->wireless_sensor_id)+0;
 
             $type = $types->get($sensor->type);
             echo "  $sensor->description: $sensor_value {$type['unit']}\n";

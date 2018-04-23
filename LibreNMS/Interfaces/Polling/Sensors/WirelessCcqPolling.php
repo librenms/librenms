@@ -25,14 +25,16 @@
 
 namespace LibreNMS\Interfaces\Polling\Sensors;
 
+use Illuminate\Support\Collection;
+
 interface WirelessCcqPolling
 {
     /**
      * Poll wireless client connection quality as a percent
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @param Collection $sensors Array of sensors needed to be polled
+     * @return Collection of polled data
      */
-    public function pollWirelessCcq(array $sensors);
+    public function pollWirelessCcq(Collection $sensors);
 }

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -167,24 +168,20 @@ class Unifi extends OS implements
      * Poll wireless client connection quality
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
+     * @param Collection $sensors Array of sensors needed to be polled
+     * @return Collection of polled data
      */
-    public function pollWirelessCcq(array $sensors)
+    public function pollWirelessCcq(Collection $sensors)
     {
         if (empty($sensors)) {
-            return array();
+            return collect();
         }
 
         $ccq_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiVapCcq', array(), 'UBNT-UniFi-MIB');
 
-        $data = array();
-        foreach ($sensors as $sensor) {
-            $index = $sensor['sensor_index'];
-            $data[$sensor['sensor_id']] = min($ccq_oids[$index]['unifiVapCcq'] / $this->ccqDivisor, 100);
-        }
-
-        return $data;
+        return $sensors->keyBy('wireless_sensor_id')->map(function ($sensor) use ($ccq_oids) {
+            return min($ccq_oids[$sensor->index]['unifiVapCcq'] / $this->ccqDivisor, 100);
+        });
     }
 
     /**
