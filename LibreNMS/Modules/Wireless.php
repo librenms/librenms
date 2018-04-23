@@ -51,8 +51,8 @@ class Wireless implements DiscoveryModule, PollerModule
         $aggregator = 'sum',
         $access_point_id = null,
         $alert_high = null,
-        $warn_high = null,
         $alert_low = null,
+        $warn_high = null,
         $warn_low = null
     )
     {

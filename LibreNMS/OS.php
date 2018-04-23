@@ -187,40 +187,6 @@ class OS implements ProcessorDiscovery
     }
 
     /**
-     * Poll a channel based OID, but return data in MHz
-     *
-     * @param array $sensors
-     * @param callable $callback Function to modify the value before converting it to a frequency
-     * @return array
-     */
-    protected function pollWirelessChannelAsFrequency($sensors, $callback = null)
-    {
-        if (empty($sensors)) {
-            return array();
-        }
-
-        $oids = array();
-        foreach ($sensors as $sensor) {
-            $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
-        }
-
-        $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
-
-        $data = array();
-        foreach ($oids as $id => $oid) {
-            if (isset($callback)) {
-                $channel = call_user_func($callback, $snmp_data[$oid]);
-            } else {
-                $channel = $snmp_data[$oid];
-            }
-
-            $data[$id] = Wireless::channelToFrequency($channel);
-        }
-
-        return $data;
-    }
-
-    /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *

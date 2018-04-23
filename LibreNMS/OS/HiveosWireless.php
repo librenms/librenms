@@ -43,6 +43,8 @@ class HiveosWireless extends OS implements
     WirelessPowerDiscovery,
     ProcessorDiscovery
 {
+    use OS\Traits\PollWirelessChannelAsFrequency;
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -74,17 +76,6 @@ class HiveosWireless extends OS implements
         return array(
             Wireless::discover('clients', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Clients')
         );
-    }
-
-    /**
-     * Discover wireless frequency.  This is in GHz. Type is frequency.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
-     */
-    public function pollWirelessFrequency(array $sensors)
-    {
-        return $this->pollWirelessChannelAsFrequency($sensors);
     }
 
     public function discoverWirelessFrequency()

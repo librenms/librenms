@@ -47,6 +47,7 @@ class Unifi extends OS implements
     WirelessUtilizationDiscovery
 {
     use OS\Traits\FrogfootResources;
+    use OS\Traits\PollWirelessChannelAsFrequency;
 
     private $ccqDivisor = 10;
 
@@ -215,18 +216,6 @@ class Unifi extends OS implements
         }
 
         return $sensors;
-    }
-
-    /**
-     * Poll wireless frequency as MHz
-     * The returned array should be sensor_id => value pairs
-     *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
-     */
-    public function pollWirelessFrequency(array $sensors)
-    {
-        return $this->pollWirelessChannelAsFrequency($sensors);
     }
 
     /**

@@ -46,6 +46,7 @@ class XirrusAos extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
+    use OS\Traits\PollWirelessChannelAsFrequency;
 
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -69,18 +70,6 @@ class XirrusAos extends OS implements
     public function discoverWirelessFrequency()
     {
         return $this->discoverSensor('frequency', 'realtimeMonitorChannel', '.1.3.6.1.4.1.21013.1.2.24.7.1.3.');
-    }
-
-    /**
-     * Poll wireless frequency as MHz
-     * The returned array should be sensor_id => value pairs
-     *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
-     */
-    public function pollWirelessFrequency(array $sensors)
-    {
-        return $this->pollWirelessChannelAsFrequency($sensors);
     }
 
     /**
