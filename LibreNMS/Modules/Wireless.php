@@ -356,13 +356,13 @@ class Wireless implements DiscoveryModule, PollerModule
         $prefetch = is_array($prefetch) ? collect($prefetch) : $prefetch;
 
         // process data or run custom polling
-        $typeInterface = Wireless::getPollingInterface($type);
+        $typeInterface = self::getPollingInterface($type);
         if ($os instanceof $typeInterface) {
             d_echo("Using OS polling for $type\n");
-            $function = Wireless::getPollingMethod($type);
+            $function = self::getPollingMethod($type);
             $data = $os->$function($sensors->toArray());
         } else {
-            $data = Wireless::processSensorData($sensors, $prefetch);
+            $data = self::processSensorData($sensors, $prefetch);
         }
 
         d_echo($data);
@@ -488,9 +488,9 @@ class Wireless implements DiscoveryModule, PollerModule
             if ($sensor_value != $sensor->value) {
                 $sensor->fill([
                     'previous_value' => $sensor->value,
-                    'value' => $sensor_value,
-                    //                'updated_at' => Carbon::now(),
+                    'value' => $sensor_value
                 ]);
+
                 $sensor->save();
             }
         }

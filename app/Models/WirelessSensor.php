@@ -32,7 +32,7 @@ use LibreNMS\OS;
 class WirelessSensor extends BaseModel implements DiscoveryItem
 {
     protected $primaryKey = 'wireless_sensor_id';
-    protected $fillable = ['type', 'device_id', 'oids', 'subtype', 'index', 'description', 'value', 'multiplier', 'divisor', 'aggregator', 'access_point_id', 'alert_high', 'alert_low', 'warn_high', 'warn_low'];
+    protected $fillable = ['type', 'device_id', 'oids', 'subtype', 'index', 'description', 'value', 'previous_value', 'multiplier', 'aggregator', 'access_point_id', 'alert_high', 'alert_low', 'warn_high', 'warn_low'];
     protected $casts = ['oids' => 'array'];
 
     protected static $rrd_name = 'wireless-sensor';
