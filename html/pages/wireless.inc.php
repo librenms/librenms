@@ -23,11 +23,11 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\WirelessSensor;
+use LibreNMS\Modules\Wireless;
 
 $pagetitle[] = "Wireless";
 
-$valid_wireless_types = WirelessSensor::getTypes(true);
+$valid_wireless_types = Wireless::getTypes(true);
 
 $active_type = $vars['metric'];
 if (!$active_type) {

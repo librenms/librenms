@@ -23,6 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\WirelessSensor;
+use LibreNMS\Modules\Wireless;
 
-WirelessSensor::runDiscovery($os);
+Wireless::runDiscovery($os);

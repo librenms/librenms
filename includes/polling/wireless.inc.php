@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\WirelessSensor;
+use LibreNMS\Modules\Wireless;
 use LibreNMS\OS;
 
-WirelessSensor::poll(OS::make($device));
+Wireless::poll(OS::make($device));

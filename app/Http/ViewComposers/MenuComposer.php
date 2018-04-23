@@ -46,6 +46,7 @@ use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Modules\Wireless;
 
 class MenuComposer
 {
@@ -128,7 +129,7 @@ class MenuComposer
         $vars['sensor_menu'] = $sensor_menu;
 
         // Wireless menu
-        $vars['wireless_menu'] = WirelessSensor::getTypes(true);
+        $vars['wireless_menu'] = Wireless::getTypes(true);
 
         // Application menu
         $vars['app_menu'] = Application::hasAccess($user)

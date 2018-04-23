@@ -2,9 +2,10 @@
 
 use App\Models\WirelessSensor;
 use LibreNMS\Config;
+use LibreNMS\Modules\Wireless;
 
 // this determines the order of the tabs
-$types = WirelessSensor::getTypes(true, $device['device_id']);
+$types = Wireless::getTypes(true, $device['device_id']);
 
 $wireless_link_array = array(
     'page'   => 'device',

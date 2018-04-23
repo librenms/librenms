@@ -14,6 +14,7 @@
 
 use App\Models\WirelessSensor;
 use LibreNMS\Authentication\Auth;
+use LibreNMS\Modules\Wireless;
 
 function authToken(\Slim\Route $route)
 {
@@ -887,7 +888,7 @@ function list_available_wireless_graphs()
                 });
         }
     } else {
-        $graphs = WirelessSensor::getTypes(true, $device_id)
+        $graphs = Wireless::getTypes(true, $device_id)
             ->map(function ($type, $name) {
                 return [
                     'desc' => $type['short'],
