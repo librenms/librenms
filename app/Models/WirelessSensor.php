@@ -78,13 +78,23 @@ class WirelessSensor extends BaseModel implements DiscoveryItem
 
 
     /**
-     * Does this item represent an actual item or did it fail validation
+     * Does this discovery item represent an actual item or did it fail validation
      *
      * @return bool
      */
     public function isValid()
     {
         return $this->valid;
+    }
+
+    /**
+     * Set the validation status of this discovery item
+     *
+     * @return bool
+     */
+    public function setValid($valid)
+    {
+        return $this->valid = $valid;
     }
 
     /**

@@ -95,7 +95,7 @@ class Wireless implements DiscoveryModule, PollerModule
             $sensor->fill(array_diff_key($sensor_array, array_flip($ignored)));
         }
 
-        $sensor->valid = is_numeric($sensor_array['value']);
+        $sensor->setValid(is_numeric($sensor_array['value']));
 
         return $sensor;
     }
@@ -360,7 +360,7 @@ class Wireless implements DiscoveryModule, PollerModule
         if ($os instanceof $typeInterface) {
             d_echo("Using OS polling for $type\n");
             $function = Wireless::getPollingMethod($type);
-            $data = $os->$function($sensors);
+            $data = $os->$function($sensors->toArray());
         } else {
             $data = Wireless::processSensorData($sensors, $prefetch);
         }
@@ -441,7 +441,7 @@ class Wireless implements DiscoveryModule, PollerModule
             }
 
             // apply multiplier and divisor
-            $sensor_value = $sensor_value * $sensor->multiplier / $sensor->divisor;
+            $sensor_value = $sensor_value * $sensor->multiplier;
 
             return $all_data->put($sensor->wireless_sensor_id, $sensor_value);
         }, collect());
