@@ -96,6 +96,7 @@ class ComposerHelper
             @include 'config.php';
 
             self::setEnv([
+                'NODE_ID'        => uniqid(),
                 'DB_HOST'        => $config['db_host'],
                 'DB_PORT'        => $config['db_port'],
                 'DB_USERNAME'    => $config['db_user'],
