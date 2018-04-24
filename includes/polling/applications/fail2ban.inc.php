@@ -9,7 +9,7 @@ echo $name;
 
 try {
     $f2b=json_app_get($device, 'fail2ban', 0);
-}catch (JsonAppPollingFailedException $e) {
+} catch (JsonAppPollingFailedException $e) {
     echo $e->getMessage();
     return;
 }
