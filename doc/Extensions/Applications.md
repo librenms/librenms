@@ -41,7 +41,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-1. [Unbound](#unbound) - Agent
+1. [Unbound](#unbound) - SNMP extend
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [ZFS](#zfs) - SNMP extend
@@ -927,10 +927,10 @@ remote-control:
 
 Restart your unbound after changing the configuration, verify it is working by running 'unbound-control stats'.
 
-##### Agent
+##### Option 1: Agent
 [Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
 
-##### SNMP Extend
+##### Option 2: SNMP Extend (Preferred and easiest method)
 
 1: Copy the shell script, unbound, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound)
 
