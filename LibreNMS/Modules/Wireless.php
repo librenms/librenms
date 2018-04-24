@@ -95,6 +95,11 @@ class Wireless implements DiscoveryModule, PollerModule
             $sensor->fill(array_diff_key($sensor_array, array_flip($ignored)));
         }
 
+        // if updating, update value too
+        if ($sensor->isDirty()) {
+            $sensor->value = $sensor_array['value'];
+        }
+
         $sensor->setValid(is_numeric($sensor_array['value']));
 
         return $sensor;
@@ -334,7 +339,7 @@ class Wireless implements DiscoveryModule, PollerModule
 
         // pre-fetch all standard sensors
         $standard_sensors = $sensors->flatten();
-        $pre_fetch = self::fetchSnmpData(Device::find($os->getDeviceId()), $standard_sensors);
+        $pre_fetch = self::fetchSnmpData($os->getDevice(), $standard_sensors);
 
         // poll standard sensors
         foreach ($sensors as $type => $type_sensors) {
@@ -374,22 +379,23 @@ class Wireless implements DiscoveryModule, PollerModule
      * Fetch snmp data from the device
      * Return an array keyed by oid
      *
-     * @param Device $device
+     * @param array $device
      * @param Collection $sensors
      * @return Collection
      */
     public static function fetchSnmpData($device, $sensors)
     {
-        $device_array = $device->toArray();
-
-        return self::getOidsFromSensors($sensors, get_device_oid_limit($device_array))
+        return self::getOidsFromSensors($sensors, get_device_oid_limit($device))
             // fetch data in chunks
-            ->reduce(function ($carry, $oid_chunk) use ($device_array) {
-                $multi_data = snmp_get_multi_oid($device_array, $oid_chunk->toArray(), '-OUQnt');
+            ->reduce(function ($carry, $oid_chunk) use ($device) {
+                $multi_data = snmp_get_multi_oid($device, $oid_chunk->toArray(), '-OUQnt');
                 return $carry->merge(collect($multi_data));
             }, collect())
+            // don't remove 0
+            ->filter(function ($val) {
+                return $val !== '' && $val !== null && $val !== false;
+            })
             // deal with string values that may be surrounded by quotes
-            ->filter()
             ->map(function ($oid) {
                 return trim($oid, '"') + 0;
             });
@@ -440,7 +446,7 @@ class Wireless implements DiscoveryModule, PollerModule
                 $sensor_value = $data->first();
             }
 
-            // apply multiplier and divisor
+            // apply multiplier and fix type
             $sensor_value = $sensor_value * $sensor->multiplier;
 
             return $all_data->put($sensor->wireless_sensor_id, $sensor_value);
@@ -461,7 +467,7 @@ class Wireless implements DiscoveryModule, PollerModule
 
         /** @var WirelessSensor $sensor */
         foreach ($sensors as $sensor) {
-            $sensor_value = $data->get($sensor->wireless_sensor_id)+0;
+            $sensor_value = floatval($data->get($sensor->wireless_sensor_id));
 
             $type = $types->get($sensor->type);
             echo "  $sensor->description: $sensor_value {$type['unit']}\n";
@@ -485,14 +491,12 @@ class Wireless implements DiscoveryModule, PollerModule
             ];
             data_update($os->getDevice(), $sensor->measurementName(), $tags, $fields);
 
-            if ($sensor_value != $sensor->value) {
-                $sensor->fill([
-                    'previous_value' => $sensor->value,
-                    'value' => $sensor_value
-                ]);
+            $sensor->fill([
+                'previous_value' => $sensor->value,
+                'value' => $sensor_value
+            ]);
 
-                $sensor->save();
-            }
+            $sensor->save();
         }
     }
 }
