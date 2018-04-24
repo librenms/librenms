@@ -7,9 +7,9 @@ $app_id = $app['app_id'];
 
 echo $name;
 
-try{
+try {
     $zfs=json_app_get($device, $name, 0);
-}catch (JsonAppPollingFailedException $e) {
+} catch (JsonAppPollingFailedException $e) {
     echo $e->getMessage();
     return;
 }
