@@ -10,6 +10,6 @@ if ($device['os'] == 'boss') {
     foreach (explode("\n", $mem) as $i => $t) {
         $t   = explode(' ', $t);
         $oid = str_replace($OID, '', $t[0]);
-        discover_mempool($valid_mempool, $device, $oid, 'avaya-ers', 'Unit '.($i + 1).' memory', '1', null, null);
+        discover_mempool($valid_mempool, $device, $oid, 'boss', 'Unit '.($i + 1).' memory', '1', null, null);
     }
 }
