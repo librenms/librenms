@@ -41,7 +41,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-1. [Unbound](#unbound) - SNMP extend
+1. [Unbound](#unbound) - SNMP extend, Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
 1. [ZFS](#zfs) - SNMP extend
