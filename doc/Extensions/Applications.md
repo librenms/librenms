@@ -927,10 +927,7 @@ remote-control:
 
 Restart your unbound after changing the configuration, verify it is working by running 'unbound-control stats'.
 
-##### Option 1: Agent
-[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
-
-##### Option 2: SNMP Extend (Preferred and easiest method)
+##### Option 1: SNMP Extend (Preferred and easiest method)
 
 1: Copy the shell script, unbound, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/unbound -O /etc/snmp/unbound)
 
@@ -943,6 +940,8 @@ extend unbound /etc/snmp/unbound
 
 4: Restart snmpd.
 
+##### Option 2: Agent
+[Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
 
 ### UPS-nut
 A small shell script that exports nut ups status.
