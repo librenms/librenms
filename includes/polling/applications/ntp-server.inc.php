@@ -7,9 +7,9 @@ $app_id = $app['app_id'];
 
 echo $name;
 
-try{
+try {
     $ntp=json_app_get($device, 'ntp-server', 1);
-} catch (JsonAppPollingFailedException $e ){
+} catch (JsonAppPollingFailedException $e) {
     echo $e->getMessage();
     return;
 }
