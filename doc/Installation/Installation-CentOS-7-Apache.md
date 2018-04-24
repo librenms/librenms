@@ -9,7 +9,7 @@ source: Installation/Installation-CentOS-7-Apache.md
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+    yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 
 #### Add librenms user
 
@@ -156,8 +156,8 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 ### Set permissions
 
     chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 
 ## Web installer ##
 

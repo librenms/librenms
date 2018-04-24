@@ -41,10 +41,11 @@ class Checks
         $check = [
             self::basePath('bootstrap/cache'),
             self::basePath('storage'),
+            self::basePath('logs'),
             self::basePath('logs/librenms.log')
         ];
         foreach ($check as $path) {
-            if (!is_writable($path)) {
+            if (file_exists($path) && !is_writable($path)) {
                 // load .env, it isn't loaded
                 $dotenv = new Dotenv(__DIR__ . '/../');
                 $dotenv->load();
