@@ -1707,31 +1707,29 @@ widgets:
     widget: { Name: widget, Columns: [widget], Unique: true, Type: BTREE }
 wireless_sensors:
   Columns:
-    - { Field: sensor_id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: sensor_deleted, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
-    - { Field: sensor_class, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: wireless_sensor_id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: sensor_index, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: sensor_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: sensor_descr, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: sensor_divisor, Type: int(11), 'Null': false, Extra: '', Default: '1' }
-    - { Field: sensor_multiplier, Type: int(11), 'Null': false, Extra: '', Default: '1' }
-    - { Field: sensor_aggregator, Type: varchar(16), 'Null': false, Extra: '', Default: sum }
-    - { Field: sensor_current, Type: float, 'Null': true, Extra: '' }
-    - { Field: sensor_prev, Type: float, 'Null': true, Extra: '' }
-    - { Field: sensor_limit, Type: float, 'Null': true, Extra: '' }
-    - { Field: sensor_limit_warn, Type: float, 'Null': true, Extra: '' }
-    - { Field: sensor_limit_low, Type: float, 'Null': true, Extra: '' }
-    - { Field: sensor_limit_low_warn, Type: float, 'Null': true, Extra: '' }
-    - { Field: sensor_alert, Type: tinyint(1), 'Null': false, Extra: '', Default: '1' }
-    - { Field: sensor_custom, Type: 'enum(''No'',''Yes'')', 'Null': false, Extra: '', Default: 'No' }
-    - { Field: entPhysicalIndex, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: entPhysicalIndex_measured, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: sensor_oids, Type: text, 'Null': false, Extra: '' }
     - { Field: access_point_id, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: type, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: description, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: subtype, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: index, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: oids, Type: text, 'Null': false, Extra: '' }
+    - { Field: multiplier, Type: float, 'Null': false, Extra: '', Default: '1' }
+    - { Field: aggregator, Type: varchar(16), 'Null': false, Extra: '', Default: sum }
+    - { Field: value, Type: float, 'Null': true, Extra: '' }
+    - { Field: previous_value, Type: float, 'Null': true, Extra: '' }
+    - { Field: alert_high, Type: float, 'Null': true, Extra: '' }
+    - { Field: alert_low, Type: float, 'Null': true, Extra: '' }
+    - { Field: warn_high, Type: float, 'Null': true, Extra: '' }
+    - { Field: warn_low, Type: float, 'Null': true, Extra: '' }
+    - { Field: alert, Type: tinyint(1), 'Null': false, Extra: '', Default: '1' }
+    - { Field: custom_thresholds, Type: 'enum(''No'',''Yes'')', 'Null': false, Extra: '', Default: 'No' }
+    - { Field: created_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: deleted_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
-    sensor_class: { Name: sensor_class, Columns: [sensor_class], Unique: false, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [wireless_sensor_id], Unique: true, Type: BTREE }
+    sensor_class: { Name: sensor_class, Columns: [type], Unique: false, Type: BTREE }
     sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
-    sensor_type: { Name: sensor_type, Columns: [sensor_type], Unique: false, Type: BTREE }
+    sensor_type: { Name: sensor_type, Columns: [subtype], Unique: false, Type: BTREE }

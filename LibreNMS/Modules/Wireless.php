@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Modules;
 
-
 use App\Models\Device;
 use App\Models\WirelessSensor;
 use Illuminate\Support\Collection;
@@ -54,8 +53,7 @@ class Wireless implements DiscoveryModule, PollerModule
         $alert_low = null,
         $warn_high = null,
         $warn_low = null
-    )
-    {
+    ) {
         // ensure leading dots
         $oids = array_map(function ($oid) {
             return '.' . ltrim($oid, '.');
@@ -387,7 +385,7 @@ class Wireless implements DiscoveryModule, PollerModule
     {
         return self::getOidsFromSensors($sensors, get_device_oid_limit($device))
             // fetch data in chunks
-            ->reduce(function ($carry, $oid_chunk) use ($device) {
+            ->reduce(function (Collection $carry, $oid_chunk) use ($device) {
                 $multi_data = snmp_get_multi_oid($device, $oid_chunk->toArray(), '-OUQnt');
                 return $carry->merge(collect($multi_data));
             }, collect())

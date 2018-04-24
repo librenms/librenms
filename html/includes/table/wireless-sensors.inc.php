@@ -33,7 +33,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
         $query->orWhere('devices.hostname', 'like', "%$searchPhrase%")
             ->orWhere('description', 'like', "%$searchPhrase%")
             ->orWhere('value', 'like', "%$searchPhrase%");
-        });
+    });
 }
 
 $count = $query->count();
