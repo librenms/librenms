@@ -27,5 +27,4 @@ if (is_null($pwr_board)) {
     $description = "MB Input Power";
     d_echo($oid." - ".$description." - ".$pwr_board[$oid][$index]."\n");
     discover_sensor($valid['sensor'], 'power', $device, $oid.".".$index, 'mb-input-power', 'cimc', $description, '1', '1', null, null, null, null, $temp_board[$oid][$index]);
-
 }
