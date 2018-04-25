@@ -7,8 +7,15 @@ d_echo('Ironware Mempool'."\n");
 if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
     echo 'Ironware Dynamic: ';
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+    if ($mempool['total'] < 0) {
+        $mempool['total'] =+ 4294967296 ; // signed vs unsigned snmp output
+    }
     $mempool['free']  = snmp_get($device, 'snAgGblDynMemFree.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+    if ($mempool['free'] < 0) {
+        $mempool['free'] =+ 4294967296 ; // signed vs unsigned snmp output
+    }
     $mempool['used']  = ($mempool['total'] - $mempool['free']);
+    d_echo($mempool);
 } //end_if
 
 else {
