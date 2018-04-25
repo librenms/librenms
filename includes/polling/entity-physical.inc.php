@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 if ($config['enable_inventory']) {
     if (file_exists(Config::get('install_dir') . "/includes/polling/entity-physical/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/polling/entity-physical/{$device['os']}.inc.php";

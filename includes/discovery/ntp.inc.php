@@ -25,6 +25,8 @@
  * )
  */
 
+use LibreNMS\Config;
+
 if (file_exists(Config::get('install_dir') . "/includes/discovery/ntp/{$device['os_group']}.inc.php")) {
     include Config::get('install_dir') . "/includes/discovery/ntp/{$device['os_group']}.inc.php";
 }
