@@ -7,7 +7,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="hidden-md hidden-sm navbar-brand" href="">{{ $title_image }}</a>
+            <a class="hidden-md hidden-sm navbar-brand" href>
+            @if($title_image)
+                <img src="{{ $title_image }}" alt="{{ $project_name }}">
+            @else
+                {{ $project_name }}
+            @endif
+            </a>
         </div>
 
         <div class="collapse navbar-collapse" id="navHeaderCollapse">
