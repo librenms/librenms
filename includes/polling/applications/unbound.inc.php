@@ -90,7 +90,7 @@ $fields = array (
     'rcodeNXDOMAIN' => $unbound['num.answer.rcode.NXDOMAIN'],
     'rcodeNodata' => $unbound['num.answer.rcode.nodata']
     );
-$metrics += $fields;
+$metrics['operations'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
  
