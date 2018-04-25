@@ -108,9 +108,9 @@ options {
 
 6: The script for this also requires the Perl module File::ReadBackwards. On FreeBSD this is available as p5-File-ReadBackwards and on linux as perl-File-ReadBackwards in CentOS/Redhat and libfile-readbackwards-perl Debian/Ubuntu. If it is not available, it can be installed by `cpan -i File::ReadBackwards`.
 
-7: You may possible need to configure the agent/extend script as well.
+7: You may possibly need to configure the agent/extend script as well.
 
-The config file's path defaults to the same path as the script, but with .config appended. So if the script is located at `/etc/snmp/bind`, the config file will be `/etc/snmp/bind.config`. Alternatively you can also specific a config via `-c $file`.
+The config file's path defaults to the same path as the script, but with .config appended. So if the script is located at `/etc/snmp/bind`, the config file will be `/etc/snmp/bind.config`. Alternatively you can also specify a config via `-c $file`.
 
 Anything starting with a # is comment. The format for variables is $variable=$value. Empty lines are ignored. Spaces and tabes at either the start or end of a line are ignored.
 
