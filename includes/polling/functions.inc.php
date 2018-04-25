@@ -697,7 +697,8 @@ function convert_to_celsius($value)
  * This is to make it easier polling apps. Also to help standardize around JSON.
  * @param $device
  * @param string $extend the extend name
- * @param integer $min_version the minimum version to accept for the returned JSON
+ * @param integer $min_version the minimum version to accept for the returned JSON. default: 0
+ * @param integer $throw_me If this function should throw the exception JsonAppPollingFailedException or not. default 1
  *
  * In regards extend name, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
  *
@@ -719,8 +720,14 @@ function convert_to_celsius($value)
  *
  * If version, error, and errorString are not set, it is assumed it is a old JSON backend and
  * sets them manually with a version of 0 and assumes a error of 0(no error).
+ *
+ * Error checking may also be done via checking the exception JsonAppPollingFailedException.
+ * The error value can be accessed via Exception::getCode. Unfortunately this methode does methode
+ * make the return or the like available.
+ *
+ * The raw return can be accessed in the returned array via 'returned_from_snmp_get';
  */
-function json_app_get($device, $extend, $min_version)
+function json_app_get($device, $extend, $min_version = 0, $throw_me = 1)
 {
     $returned_json = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-O qv', 'NET-SNMP-EXTEND-MIB');
 
@@ -729,8 +736,12 @@ function json_app_get($device, $extend, $min_version)
         throw new JsonAppPollingFailedException("\n".$extend.":-4: Empty return from snmp_get.\n");
     }
 
+    # turn the JSON into a array
     $parsed_json=json_decode(stripslashes($returned_json), true);
 
+    #save this for any possible 
+    $parsed_json['returned_from_snmp_get']=$returned_json;
+    
     if (json_last_error() === JSON_ERROR_NONE) {
         if (empty($parsed_json)) {
             // If we get here it means there are no keys in the array, meaining '{}' was was returned
@@ -769,8 +780,8 @@ function json_app_get($device, $extend, $min_version)
         ];
     }
 
-    if ($parsed_json[error] != 0) {
-        throw new JsonAppPollingFailedException("\n".$extend.":".$parsed_json[error].": ".$parsed_json[errorString]."\n");
+    if (($parsed_json[error] != 0)&&($throw_me == 1)) {
+        throw new JsonAppPollingFailedException("\n".$extend.":".$parsed_json[error].": ".$parsed_json[errorString]."\n", $parsed_json[error]);
     }
 
     return $parsed_json;
