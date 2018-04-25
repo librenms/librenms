@@ -1650,7 +1650,7 @@ function get_zfs_pools($device_id)
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
- * @param device array
+ * @param array device
  * @return string
  */
 function get_device_name($device)
