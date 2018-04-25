@@ -124,6 +124,8 @@ OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
 ```php
 $config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
+<<<<<<< HEAD
+=======
 ### RRDCached installation Debian Stretch (rrdcached 1.6.0)
 
 1. Install rrdcached
@@ -166,7 +168,11 @@ NETWORK_OPTIONS="-L"
 ```php
 $config['rrdcached'] = "IPADDRESS:42217";
 ```
+<<<<<<< HEAD
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on. 
+=======
+>>>>>>> e814cd8e34a73c2441ca8eaf34cf7025bf26e2b3
+>>>>>>> 16a25d72d52338ba25b38ed7e27d640147d910d2
 
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
