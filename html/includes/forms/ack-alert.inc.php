@@ -48,7 +48,11 @@ if (!is_numeric($alert_id)) {
 
     $data = ['state' => $state, 'open' => $open];
     if (!empty($ack_msg)) {
-        $data['note'] = date(Config::get('dateformat.long')) . " - Ack ({$_SESSION['username']}) $ack_msg";
+        $note = dbFetchCell('SELECT note FROM alerts WHERE id=?', [$alert_id]);
+        if (!empty($note)) {
+            $note .= PHP_EOL;
+        }
+        $data['note'] = $note . date(Config::get('dateformat.long')) . " - Ack ({$_SESSION['username']}) $ack_msg";
     }
 
     if (dbUpdate($data, 'alerts', 'id=?', array($alert_id)) >= 0) {
