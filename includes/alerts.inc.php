@@ -229,7 +229,7 @@ function RunRules($device_id)
                 c_echo('Status: %bNOCHG');
             } else {
                 if (dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id']), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 0, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
+                    if (!dbUpdate(array('state' => 0, 'open' => 1, 'note' => ''), 'alerts', 'device_id = ? && rule_id = ?', array($device_id,$rule['id']))) {
                         dbInsert(array('state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
                     }
                     c_echo(PHP_EOL . 'Status: %gOK');
