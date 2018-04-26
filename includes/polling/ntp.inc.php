@@ -27,5 +27,6 @@ if ($device['os'] == 'awplus') {
 }
 
 unset(
-    $cntpPeersVarEntry, $atNtpAssociationEntry
+    $cntpPeersVarEntry,
+    $atNtpAssociationEntry
 );
