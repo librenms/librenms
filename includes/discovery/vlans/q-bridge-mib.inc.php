@@ -12,12 +12,12 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
 
     // drop dot1qVlanTimeMark, we don't care about it
-    $tagoruntag = array_reduce(array_keys($tagoruntag), function($result, $key) use ($tagoruntag) {
+    $tagoruntag = array_reduce(array_keys($tagoruntag), function ($result, $key) use ($tagoruntag) {
         list($time, $new_key) = explode('.', $key);
         $result[$new_key] = $tagoruntag[$key];
         return $result;
     }, []);
-    $untag = array_reduce(array_keys($untag), function($result, $key) use ($untag) {
+    $untag = array_reduce(array_keys($untag), function ($result, $key) use ($untag) {
         list($time, $new_key) = explode('.', $key);
         $result[$new_key] = $untag[$key];
         return $result;
