@@ -29,7 +29,7 @@
     "default": true
   },
   {
-    "rule": "%macros.port_usage_perc >= \"80\" && %macros.port_up = \"1\" && %macros.port = \"1\"",
+    "rule": "%macros.port_usage_perc >= \"80\" && %macros.port_up = \"1\"",
     "name": "Port utilisation over threshold",
     "default": true
   },
