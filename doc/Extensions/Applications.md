@@ -3,6 +3,8 @@ source: Extensions/Applications.md
 
 You can use Application support to graph performance statistics from many applications.
 
+Note that the monitoring of applications could be added before or after the hosts have been added to LibreNMS. If your device is already in LibreNMS, you will need to go and edit the pertaining device, and enable the application(s) you want to monitor. If the device is not in LibreNMS yet, don't sweat, because adding the agent or snmp extend scripts before adding the device will make the application auto-discoverable by LibreNMS. 
+
 Different applications support a variety of ways to collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
 
 1. [Apache](#apache) - SNMP extend, Agent
