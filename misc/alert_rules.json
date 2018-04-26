@@ -81,7 +81,7 @@
     "name": "IPSec tunnels down"
   },
   {
-    "rule": "%pollers.time_taken >= \"250\"",
+    "rule": "devices.last_polled_timetaken >= 290",
     "name": "Poller is taking too long"
   },
   {
