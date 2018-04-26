@@ -28,7 +28,7 @@ $components = $components[$device['device_id']];
 // Only collect SNMP data if we have enabled components
 if (count($components > 0)) {
     // Let's gather the stats..
-    $atNtpAssociationEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.207.8.4.4.4.502.10.1', 2);
+    $atNtpAssociationEntry = snmpwalk_array_num($device, 'atNtpAssociationEntry', 2);
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {
@@ -56,10 +56,10 @@ if (count($components > 0)) {
         $rrd['stratum'] = $array['stratum'];
         $rrd['offset'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][10][$array['UID']];
         $rrd['offset'] = str_replace(' milliseconds', '', $rrd['offset']);
-        $rrd['offset'] = floor($rrd['offset'] / 1000); // Convert to seconds
+        $rrd['offset'] = $rrd['offset'] / 1000; // Convert to seconds
         $rrd['delay'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][9][$array['UID']];
         $rrd['delay'] =  str_replace(' milliseconds', '', $rrd['delay']);
-        $rrd['delay'] = floor($rrd['delay'] / 1000); // Convert to seconds
+        $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
         $rrd['dispersion'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][11][$array['UID']];
         $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
         data_update($device, 'ntp', $tags, $rrd);

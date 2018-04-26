@@ -28,7 +28,7 @@ $tblComponents = array();
 // For Reference:
 //      https://github.com/librenms/librenms/blob/master/mibs/awplus/AT-NTP-MIB
 //      https://www.alliedtelesis.com/documents/network-time-protocol-ntp-feature-overview-and-configuration-guide
-$atNtpAssociationEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.207.8.4.4.4.502.10.1', 2);
+$atNtpAssociationEntry = snmpwalk_array_num($device, 'atNtpAssociationEntry', 2);
 
 /*
  * False == no object found - this is not an error, no objects exist
