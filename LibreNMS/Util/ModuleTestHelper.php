@@ -53,6 +53,7 @@ class ModuleTestHelper
     private $exclude_from_all = ['arp-table'];
     private $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'vlans' => ['ports', 'vlans'],
     ];
 
 
@@ -686,7 +687,7 @@ class ModuleTestHelper
                         return array_diff_key($row, $keys);
                     }, $rows);
                 }
-                
+
                 if (isset($key)) {
                     $data[$module][$key][$table] = $rows;
                 } else {
