@@ -180,6 +180,9 @@ $data       = array();
 
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require_once 'ports/f5.inc.php';
+}
+else if ($device['os'] === 'exablaze-fusion') {
+    require_once 'ports/exablaze-fusion.inc.php';
 } else {
     if ($config['polling']['selected_ports'] === true || $config['os'][$device['os']]['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
         echo('Select ports polling');
