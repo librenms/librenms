@@ -161,8 +161,8 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
     $hardware = $output[6];
 } elseif ($device['os'] == "metamako-mos") {
     # Detect Metamako MOS
-    if (preg_match('/^Metamako MOS release ([.0-9]+) .*? running on a (.*)$/', $device['sysDescr'], $attrs) !== FALSE){
-	$hardware = $attrs[2];
+    if (preg_match('/^Metamako MOS release ([.0-9]+) .*? running on a (.*)$/', $device['sysDescr'], $attrs) !== false) {
+        $hardware = $attrs[2];
         $version = $attrs[1];
     }
 }

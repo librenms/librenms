@@ -39,8 +39,9 @@ $orig_tf = array('true', 'false');
 $std_tf = array('up','down');
 
 foreach ($exa_stats as $name => $tmp_stats) {
-    if ($exa_stats[$name]['fusionPortPresent'] === 2)
+    if ($exa_stats[$name]['fusionPortPresent'] === 2) {
         continue;
+    }
     $e_name = explode('.', $name);
     $index = (((int)($e_name[0]))-1)*16 + (int)($e_name[1]);
     $port_stats[$index] = $tmp_stats;
