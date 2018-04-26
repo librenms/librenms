@@ -1351,6 +1351,22 @@ route:
     - { Field: ipRouteMask, Type: varchar(256), 'Null': false, Extra: '' }
   Indexes:
     device: { Name: device, Columns: [device_id, context_name, ipRouteDest, ipRouteNextHop], Unique: false, Type: BTREE }
+routing_resources:
+  Columns:
+    - { Field: resource_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: oid_current, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: oid_maximum, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: resource, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: feature, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: forwarding_element, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: current, Type: float, 'Null': false, Extra: '' }
+    - { Field: maximum, Type: float, 'Null': false, Extra: '' }
+    - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [resource_id], Unique: true, Type: BTREE }
+    unique_id: { Name: unique_id, Columns: [device_id, oid_current, oid_maximum], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: int(11), 'Null': false, Extra: auto_increment }
