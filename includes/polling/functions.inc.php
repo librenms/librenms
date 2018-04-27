@@ -695,93 +695,69 @@ function convert_to_celsius($value)
 
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
- * @param $device
- * @param string $extend the extend name
- * @param integer $min_version the minimum version to accept for the returned JSON. default: 0
- * @param integer $throw_me If this function should throw the exception JsonAppPollingFailedException or not. default 1
  *
- * In regards extend name, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * Keys on the json should be:
+ *  data        - Required. The array of data returned from the snmp extend script
+ *  version     - Required. The version of the snmp extend script. Should be numeric and at least 1.
+ *  error       - Optional. Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
+ *  errorString - Optional. Text to describe the error.
  *
- * The returned value is JSON parsed into a array.
+ * If the app returns an error, an exception will be raised.
+ * Positive numbers will be errors returned by the extend script.
  *
- * The key error contains the any errorcode and 0 if non is present. A textual
- * description of said error is found in errorString . The version of the return
- * can be found in version.
- *
- * Possible parsing related errors.
- * -2 : Could not decode the JSON.
- * -3 : Empty JSON parsed, meaning blank JSON was returned.
- * -4 : Empty return from snmp_get().
- * -5 : Non-numeric version number.
- * -6 : Returned version is less than the min version.
- *
- * Other error codes are possible, but those are extend related and should be handled
- * by the poller calling this function.
- *
- * If version, error, and errorString are not set, it is assumed it is a old JSON backend and
- * sets them manually with a version of 0 and assumes a error of 0(no error).
+ * Possible parsing related errors:
+ * -1  : Failed to fetch data from the device
+ * -2  : Returned version is less than the min version or non-numeric.
+ * -11 : Could not decode the JSON.
+ * -12 : Empty JSON parsed, meaning blank JSON was returned.
+ * -13 : Valid json, but not a JSON app. Missing required keys
  *
  * Error checking may also be done via checking the exception JsonAppPollingFailedException.
- * The error value can be accessed via Exception::getCode. Unfortunately this methode does methode
- * make the return or the like available.
+ * The error value can be accessed via JsonAppPollingFailedException::getCode()
+ * The output can be accessed via JsonAppPollingFailedException::getOutput()
  *
- * The raw return can be accessed in the returned array via 'returned_from_snmp_get';
+ * If the error is less than -10, you can assume it is a legacy snmp extend script.
+ *
+ * @param array $device
+ * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * @param integer $min_version the minimum version to accept for the returned JSON. default: 1
+ *
+ * @return array The json output data parsed into an array
+ * @throws JsonAppPollingFailedException
  */
-function json_app_get($device, $extend, $min_version = 0, $throw_me = 1)
+function json_app_get($device, $extend, $min_version = 1)
 {
-    $returned_json = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-O qv', 'NET-SNMP-EXTEND-MIB');
+    $output = snmp_get($device, 'nsExtendOutputFull.'.string_to_oid($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
     // make sure we actually get something back
-    if (empty($returned_json)) {
-        throw new JsonAppPollingFailedException("\n".$extend.":-4: Empty return from snmp_get.\n");
+    if (empty($output)) {
+        throw new JsonAppPollingFailedException("Empty return from snmp_get.", $output, -1);
     }
 
-    # turn the JSON into a array
-    $parsed_json=json_decode(stripslashes($returned_json), true);
+    //  turn the JSON into a array
+    $parsed_json = json_decode(stripslashes($output), true);
 
-    #save this for any possible 
-    $parsed_json['returned_from_snmp_get']=$returned_json;
-    
-    if (json_last_error() === JSON_ERROR_NONE) {
-        if (empty($parsed_json)) {
-            // If we get here it means there are no keys in the array, meaining '{}' was was returned
-            $parsed_json['error']='-3';
-            $parsed_json['errorString']='Blank JSON returned.';
-        } else {
-            // If the following is true, it is a legacy JSON app extend, meaning these are not set
-            if (!isset($parsed_json['error'])) {
-                $parsed_json['error']='0';
-            }
-            if (!isset($parsed_json['errorString'])) {
-                $parsed_json['errorString']='';
-            }
-            if (!isset($parsed_json['version'])) {
-                $parsed_json['version']='0';
-            }
-
-            // If the version is not numeric and there is not an error already set, do so now.
-            if ((!is_numeric($parsed_json['version'])) &&
-                ($parsed_json['error'] != '0')
-            ) {
-                $parsed_json['error']='-5';
-                $parsed_json['errorString']='is_numeric returns false for the value "'.$parsed_json{'version'}.'"';
-            } else {
-                if ($parsed_json['version'] < $min_version) {
-                    $parsed_json['error']='-6';
-                    $parsed_json['errorString']='"'.$parsed_json['version'].'" is less than the required version of "'.$min_version.'"';
-                }
-            }
-        }
-    } else {
-        // If we get here, it means improper JSON or something else was returned. Populate the variable with an errorr.
-        $parsed_json=[
-            "error"=>"-2",
-            "errorString"=>"Invalid JSON",
-        ];
+    // improper JSON or something else was returned. Populate the variable with an error.
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new JsonAppPollingFailedException("Invalid JSON", $output, -11);
     }
 
-    if (($parsed_json[error] != 0)&&($throw_me == 1)) {
-        throw new JsonAppPollingFailedException("\n".$extend.":".$parsed_json[error].": ".$parsed_json[errorString]."\n", $parsed_json[error]);
+    // There no keys in the array, meaning '{}' was was returned
+    if (empty($parsed_json)) {
+        throw new JsonAppPollingFailedException("Blank JSON returned.", $output, -12);
+    }
+
+    // It is a legacy JSON app extend, meaning these are not set
+    if (!isset($parsed_json['data'], $parsed_json['version'])) {
+        throw new JsonAppPollingFailedException("Legacy script, missing required keys.", $output, -13);
+    }
+
+    if ($parsed_json['version'] < $min_version) {
+        throw new JsonAppPollingFailedException("Script older than required version of $min_version", $output, 2);
+    }
+
+    if (isset($parsed_json['error']) && $parsed_json['error'] > 0) {
+        throw new JsonAppPollingFailedException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json['error']);
     }
 
     return $parsed_json;

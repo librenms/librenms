@@ -1,0 +1,97 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "fail2ban",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "fail2ban",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "jail_apache-security_banned",
+                    "value": "115",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_plesk-horde_banned",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_plesk-panel_banned",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_plesk-proftpd_banned",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_plesk-qmail_banned",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_plesk-roundcube_banned",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_plesk-wordpress_banned",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_recidive_banned",
+                    "value": "699",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "jail_ssh_banned",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "total_banned",
+                    "value": "816",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                },
+                {
+                    "metric": "total_firewalled",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "fail2ban"
+                }
+            ]
+        }
+    }
+}
