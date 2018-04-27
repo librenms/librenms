@@ -30,6 +30,7 @@ class Config extends BaseModel
     public $timestamps = false;
     protected $table = 'config';
     public $primaryKey = 'config_name';
+    public $incrementing = false;
     protected $fillable = [
         'config_name',
         'config_value',
