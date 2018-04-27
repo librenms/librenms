@@ -7,17 +7,6 @@ source: Installation/Installation-Ubuntu-1804-Nginx.md
 
     apt install composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
     
-## Install Additional Packages and Build mcrypt module for php7.2 ##
-> NOTE: There is no php7.2-mcrypt package available as libsodium is the new favored method so you will have to install it manually
-
-    apt install php-pear php7.2-dev pkg-config libmcrypt-dev
-    pecl install mcrypt-1.0.1
-    
-Add extension=mcrypt.so to php.ini
-
-    nano /etc/php/7.2/cli/php.ini
-    nano /etc/php/7.2/fpm/php.ini
-
 #### Add librenms user
 
     useradd librenms -d /opt/librenms -M -r
@@ -43,7 +32,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-    vim /etc/mysql/mariadb.conf.d/50-server.cnf
+    nano /etc/mysql/mariadb.conf.d/50-server.cnf
 
 > NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
 
@@ -61,14 +50,14 @@ lower_case_table_names=0
 ### Configure and Start PHP-FPM
 Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
-    vim /etc/php/7.2/fpm/php.ini
-    vim /etc/php/7.2/cli/php.ini
+    nano /etc/php/7.2/fpm/php.ini
+    nano /etc/php/7.2/cli/php.ini
 
     systemctl restart php7.2-fpm
 
 #### Configure NGINX
 
-    vim /etc/nginx/conf.d/librenms.conf
+    nano /etc/nginx/conf.d/librenms.conf
 
 Add the following config, edit `server_name` as required:
 
@@ -105,7 +94,7 @@ server {
 #### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-    vim /etc/snmp/snmpd.conf
+    nano /etc/snmp/snmpd.conf
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
