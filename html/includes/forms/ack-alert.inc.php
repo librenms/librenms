@@ -23,6 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
 header('Content-type: application/json');
@@ -40,25 +41,26 @@ if (!is_numeric($alert_id)) {
 } else {
     if ($state == 2) {
         $state = 1;
+        $state_descr = 'UnAck';
         $open  = 1;
     } elseif ($state >= 1) {
         $state = 2;
+        $state_descr = 'Ack';
         $open  = 1;
     }
 
+    $username = Auth::user()->username;
     $data = ['state' => $state, 'open' => $open];
-    if (!empty($ack_msg)) {
-        $note = dbFetchCell('SELECT note FROM alerts WHERE id=?', [$alert_id]);
-        if (!empty($note)) {
-            $note .= PHP_EOL;
-        }
-        $data['note'] = $note . date(Config::get('dateformat.long')) . " - Ack ({$_SESSION['username']}) $ack_msg";
+    $note = dbFetchCell('SELECT note FROM alerts WHERE id=?', [$alert_id]);
+    if (!empty($note)) {
+        $note .= PHP_EOL;
     }
+    $data['note'] = $note . date(Config::get('dateformat.long')) . " - $state_descr ($username) $ack_msg";
 
     if (dbUpdate($data, 'alerts', 'id=?', array($alert_id)) >= 0) {
         if ($state === 2) {
             $alert_info = dbFetchRow("SELECT `alert_rules`.`name`,`alerts`.`device_id` FROM `alert_rules` LEFT JOIN `alerts` ON `alerts`.`rule_id` = `alert_rules`.`id` WHERE `alerts`.`id` = ?", [$alert_id]);
-            log_event("{$_SESSION['username']} acknowledged alert {$alert_info['name']}", $alert_info['device_id'], 'alert', 2, $alert_id);
+            log_event("$username acknowledged alert {$alert_info['name']}", $alert_info['device_id'], 'alert', 2, $alert_id);
         }
         $message = 'Alert acknowledged status changed.';
         $status  = 'ok';
