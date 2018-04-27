@@ -1,0 +1,298 @@
+CUMULUS-POE-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Power Over Ethernet attributes in the Cumulus enterprise MIB --
+--
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY,
+    Integer32                           FROM SNMPv2-SMI
+    ifIndex                             FROM IF-MIB
+    cumulusMib                          FROM CUMULUS-SNMP-MIB
+    DisplayString,
+    TEXTUAL-CONVENTION, TimeStamp       FROM SNMPv2-TC;
+
+poeMIBObjects MODULE-IDENTITY
+    LAST-UPDATED "201607120000Z"
+    ORGANIZATION "Cumulus Networks"
+    CONTACT-INFO
+         "postal:   Cumulus Networks
+                    185 E. Dana Street,
+                    Mountain View, CA 94041
+          web:      http://www.cumulusnetworks.com"
+    DESCRIPTION
+        "Cumulus Networks Power Over Ethernet tables of the Cumulus enterprise MIB
+         tree. These table values come from the Power Over Ethernet (POE) display
+         and configuration tool (poectl)."
+    REVISION     "201607120000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { cumulusMib 3 }
+
+MilliValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "This is a value in milliunits.  Divide the value by 1000 to
+        get the native unit value.  So a value of 45600 milliunits should be
+        interpreted as 45.6 units."
+    SYNTAX      Integer32
+
+-- the global POE values group --
+
+poeSystemValues OBJECT IDENTIFIER ::= { poeMIBObjects 1 }
+
+poeTotalSystemPower OBJECT-TYPE
+    SYNTAX       MilliValue
+    UNITS        "milliwatts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total power available to the system, shown with 3 decimal place
+        of precision (milliwatts).  Dividing this value by 1000 returns the number
+        of watts.  For example, a value of 730400 is equivalent to 730.4 watts."
+    ::= { poeSystemValues 1 }
+
+poeTotalUsedPower OBJECT-TYPE
+    SYNTAX       MilliValue
+    UNITS        "milliwatts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total power USED by ports in the system, shown with 3 decimal places
+        of precision (milliwatts).  For example, an integer value of 24500 is
+        equivalent to 24.5 Watts."
+    ::= { poeSystemValues 2 }
+
+poeTotalAvailablePower OBJECT-TYPE
+    SYNTAX       MilliValue
+    UNITS        "milliwatts"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total UNUSED and available power for the system in the common pool for
+        new devices, shown with 3 decimal places of precision (milliwatts).  For
+        example, an integer value of 706300 is equivalent 706.3 Watts."
+    ::= { poeSystemValues 3 }
+
+poeLastUpdateTime OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The system uptime timestamp when the objects in this MIB were last
+        updated. The default for the update period is every 300 seconds or 5
+        minutes."
+    ::= { poeSystemValues 4 }
+
+-- the port specific POE values group --
+
+poeObjectsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PoeObjectsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table displays POE current, voltage, type and other attributes
+        for each port."
+    ::= { poeMIBObjects 2 }
+
+poeObjectsEntry OBJECT-TYPE
+    SYNTAX      PoeObjectsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing POE attributes (indexed by ifIndex)."
+    INDEX { ifIndex }
+    ::= { poeObjectsTable 1 }
+
+PoeObjectsEntry ::=
+        SEQUENCE {
+                portName                DisplayString,
+                portPriority            INTEGER,
+                portType                INTEGER,
+                portStatus              INTEGER,
+                portClass               INTEGER,
+                portFourPairModeEnabled INTEGER,
+                portVoltage             MilliValue,
+                portCurrent             MilliValue,
+                portPower               MilliValue,
+                portMaxPower            MilliValue,
+                portAllocatedPower      MilliValue,
+                lldpRequestedPower      MilliValue,
+                lldpAllocatedPower      MilliValue
+        }
+
+portName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The textual port name used by the system (such as swp1)."
+    ::= { poeObjectsEntry 1 }
+
+portPriority OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    low(1),
+                    high(2),
+                    critical(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portPriority is an integer value that determine which ports
+        should be shut down if the system is in a power limited
+        situation. Ports with low priority will get disconnected first,
+        followed by high priority, then critical ports. If multiple ports
+        have the same priority setting, the port with the lower port number is
+        considered to have the higher priority."
+    ::= { poeObjectsEntry 2 }
+
+portType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    ieee802Dot3af(2),
+                    ieee802Dot3at(3),
+                    legacy(4),
+                    highpower(5),
+                    invalid(6),
+                    ieee802Dot3afat(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portType represents the type of DC power the system is
+        supplying to this port. POE is designated IEEE802.3af (2) and
+        POE+ is designated IEEE802.3at (3). UPOE is designated as high power (5).
+        Ports desigated as IEEE802.3afat (7) can handle either POE and POE+."
+    ::= { poeObjectsEntry 3 }
+
+portStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    disabled(2),
+                    searching(3),
+                    connected(4),
+                    powerdenied(5),
+                    fault(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portStatus represents the current status of the port."
+    ::= { poeObjectsEntry 4 }
+
+portClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    default(0),
+                    verylowpower(1),
+                    lowpower(2),
+                    midpower(3),
+                    highpower(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portClass represents the standard class of the port shown as
+        follows:
+        Class usage       Class current  Power range   Class description
+                          [mA]           [Watt]
+        ====================================================================
+        0     Default     0-4             0.44-12.94   Class unimplemented
+        1     Optional    9-12            0.44-3.84    Very Low power
+        2     Optional    17-20           3.84-6.49    Low power
+        3     Optional    26-30           6.49-12.95   Mid power
+        4     Valid for   36-44           12.95-25.50  High power
+              Class 4 for 802.3at(Type 2) devices and not allowed for 802.3af
+              devices. Note that a portClass of Default can also exist if a
+              portStatus is not connected."
+    ::= { poeObjectsEntry 5 }
+
+portFourPairModeEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents whether 4 Pair PoE mode is enabled or disabled
+	for the device on this port. An integer value of 1 means it is enabled
+	(true) and operating in 4 Pair PoE mode and a value of 2 means it is
+	disabled (false) and the port is operating in 2 Pair PoE mode."
+    ::= { poeObjectsEntry 6 }
+
+portVoltage OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "millivolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portVoltage represents the port voltage in millivolts.
+        An integer like 50400 should be divided by 1000 for a value
+        of 50.4 Volts."
+    ::= { poeObjectsEntry 7 }
+
+portCurrent OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "milliamps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portCurrent represents the port current in milliamps.
+        An integer like 50400 should be divided by 1000 for a value
+        of 50.4 Amps."
+    ::= { poeObjectsEntry 8 }
+
+portPower OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portPower represents the port power usage in milliwatts.
+        An integer like 50400 should be divided by 1000 for a value
+        of 50.4 Watts."
+    ::= { poeObjectsEntry 9 }
+
+portMaxPower OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portMaxPower represents the maximum port power available
+        and is measured in milliwatts. An integer like 50400
+        should be divided by 1000 for a value of 50.4 Watts."
+    ::= { poeObjectsEntry 10 }
+
+portAllocatedPower OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The portAllocatedPower represents the power allocated to the port
+        regardless of LLDP for the device in milliwatts."
+    ::= { poeObjectsEntry 11 }
+
+lldpRequestedPower OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lldpRequestedPower is either blank or the number of milliwatts
+        requested for the device via LLDP."
+    ::= { poeObjectsEntry 12 }
+
+lldpAllocatedPower OBJECT-TYPE
+    SYNTAX      MilliValue
+    UNITS       "milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lldpAllocatedPower is either blank or the number of milliwatts
+        allocated for the device via LLDP."
+    ::= { poeObjectsEntry 13 }
+
+END

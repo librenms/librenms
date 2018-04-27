@@ -1,0 +1,683 @@
+CUMULUS-COUNTERS-MIB DEFINITIONS ::= BEGIN
+
+--
+-- System specific counters of the Cumulus enterprise MIB tree
+--
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    enterprises, Counter32,
+    Counter64			        FROM SNMPv2-SMI
+    InterfaceIndex, ifIndex	        FROM IF-MIB
+    cumulusMib                          FROM CUMULUS-SNMP-MIB
+    DateAndTime, DisplayString,
+    TEXTUAL-CONVENTION 			FROM SNMPv2-TC;
+
+sysSpecificCounters MODULE-IDENTITY
+    LAST-UPDATED "201711080000Z"
+    ORGANIZATION "Cumulus Networks"
+    CONTACT-INFO
+         "postal:   Cumulus Networks
+                    185 E. Dana Street,
+                    Mountain View, CA 94041
+
+          web:      http://www.cumulusnetworks.com"
+    DESCRIPTION
+        "Cumulus Ethtool Interface Counters Table of the Cumulus enterprise MIB
+	 tree. These table values come from Ethtool hardware interface statistics
+         counters."
+    REVISION     "201711080000Z"
+    DESCRIPTION
+        "Added IEEE 802.1Qbb counters for link pause and Priority Flow Control (PFC)
+         called pfcClCountersTable."
+    REVISION     "201610110000Z"
+    DESCRIPTION
+        "Added 64 bit versions of the discardCountersTable and interfaceCountersTable
+         called discardClCountersTable and interfaceClCountersTable.  Also deprecated
+         the old tables and entries."
+    REVISION     "201606060000Z"
+    DESCRIPTION
+        "Minor fix in the IMPORTS."
+    REVISION     "201510310000Z"
+    DESCRIPTION
+        "Second version which adds multicast, broadcast, and other counters."
+    REVISION     "201207230000Z"
+    DESCRIPTION
+        "Initial version containing portName, l3V4InDiscards,
+         bufferOverflowDiscards, l3AclDiscards, l3v4BlackholeDiscards,
+         and egressQOverflowDiscards, and egressNonQDiscards."
+    ::= { cumulusMib 2 }
+
+
+-- The discardCounters group lists certain selected detailed discard
+-- counters that are not called out in standard MIBs.
+
+discardCounters		OBJECT IDENTIFIER ::= {sysSpecificCounters 1}
+
+--
+-- This table is deprecated, having been replaced in functionality
+-- by the the discardClCountersTable.
+--
+
+discardCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DiscardCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+	"This table breaks out ingress packet discards into more
+	reason-specific discard counters."
+    ::= { discardCounters 1 }
+
+discardCountersEntry OBJECT-TYPE
+    SYNTAX      DiscardCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+	"Reason-specific ingress discard counters indexed by ifIndex"
+    INDEX { ifIndex }
+    ::= { discardCountersTable 1 }
+
+--
+-- The counters are all Counter32 instead of Counter64 because of
+-- limitations in the pass persist protocol.
+--
+
+DiscardCountersEntry ::=
+	SEQUENCE {
+		portName                DisplayString,
+		l3v4InDiscards		Counter32,
+		bufferOverflowDiscards	Counter32,
+		l3AclDiscards		Counter32,
+		l3v4BlackholeDiscards	Counter32,
+		egressQOverflowDiscards Counter32,
+		egressNonQDiscards      Counter32
+	}
+
+	portName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Port name"
+	    ::= { discardCountersEntry 1 }
+
+
+	l3v4InDiscards OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Number of inbound IPv4 packets discarded
+		by the routing engine."
+	    DEFVAL { 0 }
+	    ::= { discardCountersEntry 2 }
+
+	bufferOverflowDiscards OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Number of inbound packets discarded due to
+		ingress buffer overflow."
+	    DEFVAL { 0 }
+	    ::= { discardCountersEntry 3 }
+
+	l3AclDiscards OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Number of inbound IPv4 packets discarded
+		due to ingress ACL table."
+	    DEFVAL { 0 }
+	    ::= { discardCountersEntry 4 }
+
+	l3v4BlackholeDiscards OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Number of inbound packets discarded due to
+		match on a blackhole route.  This is currently unsupported."
+	    DEFVAL { 0 }
+	    ::= { discardCountersEntry 5 }
+
+	egressQOverflowDiscards OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Number of packets discarded due to egress queue overflow."
+	    DEFVAL { 0 }
+	    ::= { discardCountersEntry 6 }
+
+	egressNonQDiscards OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"Total number of packets discarded on egress due to reasons
+                reasons other than queue overflow. With IF MIB's ifOutDiscards
+                not accounting for certain specific drops, this one accounts
+	        for drops seen in the egress pipeline of the system that were
+                not because of egress queue overflow drops."
+	    DEFVAL { 0 }
+	    ::= { discardCountersEntry 7 }
+
+--
+-- This discardClCountersTable provides the same functionality as the discardCountersTable
+-- but with 64 bit counters.
+--
+
+discardClCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DiscardClCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"This table breaks out ingress packet discards into more
+	reason-specific discard counters with 64 bits."
+    ::= { discardCounters 2 }
+
+discardClCountersEntry OBJECT-TYPE
+    SYNTAX      DiscardClCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Reason-specific ingress discard 64 bit counters indexed by ifIndex"
+    INDEX { ifIndex }
+    ::= { discardClCountersTable 1 }
+
+DiscardClCountersEntry ::=
+	SEQUENCE {
+		clPortName			DisplayString,
+		clL3v4InDiscards		Counter64,
+		clBufferOverflowDiscards	Counter64,
+		clL3AclDiscards			Counter64,
+		clL3v4BlackholeDiscards		Counter64,
+		clEgressQOverflowDiscards	Counter64,
+		clEgressNonQDiscards		Counter64
+	}
+
+	clPortName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Port name"
+	    ::= { discardClCountersEntry 1 }
+
+	clL3v4InDiscards OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Number of inbound IPv4 packets discarded
+		by the routing engine."
+	    DEFVAL { 0 }
+	    ::= { discardClCountersEntry 2 }
+
+	clBufferOverflowDiscards OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Number of inbound packets discarded due to
+		ingress buffer overflow."
+	    DEFVAL { 0 }
+	    ::= { discardClCountersEntry 3 }
+
+	clL3AclDiscards OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Number of inbound IPv4 packets discarded
+		due to ingress Access Control List."
+	    DEFVAL { 0 }
+	    ::= { discardClCountersEntry 4 }
+
+	clL3v4BlackholeDiscards OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Number of inbound packets discarded due to
+		match on a blackhole route.  This is currently unsupported."
+	    DEFVAL { 0 }
+	    ::= { discardClCountersEntry 5 }
+
+	clEgressQOverflowDiscards OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Number of packets discarded due to egress queue overflow."
+	    DEFVAL { 0 }
+	    ::= { discardClCountersEntry 6 }
+
+	clEgressNonQDiscards OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"Total number of packets discarded on egress due to reasons
+                reasons other than queue overflow. With IF MIB's ifOutDiscards
+                not accounting for certain specific drops, this one accounts
+	        for drops seen in the egress pipeline of the system that were
+                not because of egress queue overflow drops."
+	    DEFVAL { 0 }
+	    ::= { discardClCountersEntry 7 }
+
+
+interfaceCounters		OBJECT IDENTIFIER ::= {sysSpecificCounters 2}
+
+--
+-- The deprecated interfaceCountersTable contains Counter32 instead of Counter64.
+-- The new interfaceClCountersTable handles 64 bit counters.
+--
+
+interfaceCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF InterfaceCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+	"This table shows interface counters."
+    ::= { interfaceCounters 1 }
+
+interfaceCountersEntry OBJECT-TYPE
+    SYNTAX      InterfaceCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+	"Interface counters indexed by ifIndex"
+    INDEX { ifIndex }
+    ::= { interfaceCountersTable 1 }
+
+InterfaceCountersEntry ::=
+	SEQUENCE {
+		portName          DisplayString,
+		intInOctets	  Counter32,
+		intInUcastPkts	  Counter32,
+		intInBcastPkts	  Counter32,
+		intInMcastPkts	  Counter32,
+		intOutOctets	  Counter32,
+		intOutUcastPkts	  Counter32,
+		intOutBcastPkts	  Counter32,
+		intOutMcastPkts	  Counter32
+	}
+
+	portName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The port name"
+	    ::= { interfaceCountersEntry 1 }
+
+	intInOctets OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of input octets on the interface."
+	    ::= { interfaceCountersEntry 2 }
+
+	intInUcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of input unicast packets on the interface."
+	    ::= { interfaceCountersEntry 3 }
+
+	intInBcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of input broadcast packets on the interface."
+	    ::= { interfaceCountersEntry 4 }
+
+	intInMcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of input multicast packets on the interface."
+	    ::= { interfaceCountersEntry 5 }
+
+	intOutOctets OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of output octets on the interface."
+	    ::= { interfaceCountersEntry 6 }
+
+	intOutUcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of output unicast packets on the interface."
+	    ::= { interfaceCountersEntry 7 }
+
+	intOutBcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of output broadcast packets on the interface."
+	    ::= { interfaceCountersEntry 8 }
+
+	intOutMcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter32
+	    MAX-ACCESS  read-only
+	    STATUS      deprecated
+	    DESCRIPTION
+		"The number of output multicast packets on the interface."
+	    ::= { interfaceCountersEntry 9 }
+
+--
+-- The interfaceClCountersTable is a 64 bit version of the interfaceCountersTable.
+--
+
+interfaceClCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF InterfaceClCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"This table shows 64 bit interface counters retrieved from ethtool -S."
+    ::= { interfaceCounters 2 }
+
+interfaceClCountersEntry OBJECT-TYPE
+    SYNTAX      InterfaceClCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Interface counters indexed by ifIndex"
+    INDEX { ifIndex }
+    ::= { interfaceClCountersTable 1 }
+
+InterfaceClCountersEntry ::=
+	SEQUENCE {
+		clIntPortName	  DisplayString,
+		clIntInOctets	  Counter64,
+		clIntInUcastPkts  Counter64,
+		clIntInBcastPkts  Counter64,
+		clIntInMcastPkts  Counter64,
+		clIntOutOctets	  Counter64,
+		clIntOutUcastPkts Counter64,
+		clIntOutBcastPkts Counter64,
+		clIntOutMcastPkts Counter64
+	}
+
+	clIntPortName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The port name"
+	    ::= { interfaceClCountersEntry 1 }
+
+	clIntInOctets OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of input octets on the interface."
+	    ::= { interfaceClCountersEntry 2 }
+
+	clIntInUcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of input unicast packets on the interface."
+	    ::= { interfaceClCountersEntry 3 }
+
+	clIntInBcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of input broadcast packets on the interface."
+	    ::= { interfaceClCountersEntry 4 }
+
+	clIntInMcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of input multicast packets on the interface."
+	    ::= { interfaceClCountersEntry 5 }
+
+	clIntOutOctets OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of output octets on the interface."
+	    ::= { interfaceClCountersEntry 6 }
+
+	clIntOutUcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of output unicast packets on the interface."
+	    ::= { interfaceClCountersEntry 7 }
+
+	clIntOutBcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of output broadcast packets on the interface."
+	    ::= { interfaceClCountersEntry 8 }
+
+	clIntOutMcastPkts  OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of output multicast packets on the interface."
+	    ::= { interfaceClCountersEntry 9 }
+
+--
+-- The pfcClCountersTable tracks pause and Priority Flow Control packets.
+--
+
+pfcClCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PfcClCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"This table shows the IEEE 802.1Qbb standard interface counters for pause and Priority Flow Control packets."
+    ::= { interfaceCounters 3 }
+
+pfcClCountersEntry OBJECT-TYPE
+    SYNTAX      PfcClCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"IEEE 802.1Qbb standard Interface Pause and Priority Flow Control counters indexed by ifIndex"
+    INDEX { ifIndex }
+    ::= { pfcClCountersTable 1 }
+
+PfcClCountersEntry ::=
+	SEQUENCE {
+		clIntPfcPortName  DisplayString,
+		clIntInPausePkt   Counter64,
+		clIntOutPausePkt  Counter64,
+		clIntInPfc0Pkt    Counter64,
+		clIntOutPfc0Pkt   Counter64,
+		clIntInPfc1Pkt    Counter64,
+		clIntOutPfc1Pkt   Counter64,
+		clIntInPfc2Pkt    Counter64,
+		clIntOutPfc2Pkt   Counter64,
+		clIntInPfc3Pkt    Counter64,
+		clIntOutPfc3Pkt   Counter64,
+		clIntInPfc4Pkt    Counter64,
+		clIntOutPfc4Pkt   Counter64,
+		clIntInPfc5Pkt    Counter64,
+		clIntOutPfc5Pkt   Counter64,
+		clIntInPfc6Pkt    Counter64,
+		clIntOutPfc6Pkt   Counter64,
+		clIntInPfc7Pkt    Counter64,
+		clIntOutPfc7Pkt   Counter64
+	}
+
+	clIntPfcPortName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The port name"
+	    ::= { pfcClCountersEntry 1 }
+
+	clIntInPausePkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet flow control pause packets received on the interface."
+	    ::= { pfcClCountersEntry 2 }
+
+	clIntOutPausePkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet flow control pause packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 3 }
+
+	clIntInPfc0Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 0 packets received on the interface."
+	    ::= { pfcClCountersEntry 4 }
+
+	clIntOutPfc0Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 0 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 5 }
+
+	clIntInPfc1Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 1 packets received on the interface."
+	    ::= { pfcClCountersEntry 6 }
+
+	clIntOutPfc1Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 1 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 7 }
+
+	clIntInPfc2Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 2 packets received on the interface."
+	    ::= { pfcClCountersEntry 8 }
+
+	clIntOutPfc2Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 2 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 9 }
+
+	clIntInPfc3Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 3 packets received on the interface."
+	    ::= { pfcClCountersEntry 10 }
+
+	clIntOutPfc3Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 3 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 11 }
+
+	clIntInPfc4Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 4 packets received on the interface."
+	    ::= { pfcClCountersEntry 12 }
+
+	clIntOutPfc4Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 4 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 13 }
+
+	clIntInPfc5Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 5 packets received on the interface."
+	    ::= { pfcClCountersEntry 14 }
+
+	clIntOutPfc5Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 5 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 15 }
+
+	clIntInPfc6Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 6 packets received on the interface."
+	    ::= { pfcClCountersEntry 16 }
+
+	clIntOutPfc6Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 6 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 17 }
+
+	clIntInPfc7Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 7 packets received on the interface."
+	    ::= { pfcClCountersEntry 18 }
+
+	clIntOutPfc7Pkt OBJECT-TYPE
+	    SYNTAX      Counter64
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The number of ethernet priority flow control traffic class 7 packets transmitted on the interface."
+	    ::= { pfcClCountersEntry 19 }
+
+END

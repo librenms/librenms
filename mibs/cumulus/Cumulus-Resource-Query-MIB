@@ -1,0 +1,428 @@
+CUMULUS-RESOURCES-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the Cumulus enterprise MIB tree
+--
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, enterprises              FROM SNMPv2-SMI
+    InterfaceIndex, ifIndex	        FROM IF-MIB
+    cumulusMib                          FROM CUMULUS-SNMP-MIB
+    DateAndTime, DisplayString,
+    TEXTUAL-CONVENTION 			FROM SNMPv2-TC;
+
+resourceUtilization MODULE-IDENTITY
+    LAST-UPDATED "201606060000Z"
+    ORGANIZATION "Cumulus Networks"
+    CONTACT-INFO
+         "postal:   Cumulus Networks
+                    185 E. Dana Street,
+                    Mountain View, CA 94041
+
+          web:      http://www.cumulusnetworks.com"
+    DESCRIPTION
+        "Cumulus Resource Query Table of the Cumulus enterprise MIB tree.
+         These table values come from the cl-resources-query command and contain
+         routing table, ECMP, and ACL counters"
+    REVISION     "201606060000Z"
+    DESCRIPTION
+        "Minor fix in the IMPORTS."
+    REVISION     "201510260000Z"
+    DESCRIPTION
+        "Second version with the Ingress and Egress entries, counters, meters,
+         and slices"
+    REVISION     "201207230000Z"
+    DESCRIPTION
+        "Initial version containing the routes, host entries, and ECMP nexthops."
+    ::= { cumulusMib 1 }
+
+-- Resource groups in cumulusMib
+-- The resourceUtilization group lists the current utilization
+-- of various tables and buffers in the system.
+
+-- the l3 tables group
+
+l3Tables                  OBJECT IDENTIFIER ::= {resourceUtilization 1}
+
+l3HostTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of L3 Host table entries currently in use"
+    ::= { l3Tables 1 }
+
+l3HostTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the L3 Host table. The
+	Host table is defined as the table holding the ARP/ND cache."
+    ::= {l3Tables 2 }
+
+l3RoutingTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of L3 Routing table entries currently in use."
+    ::= { l3Tables 3 }
+
+l3RoutingTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the L3 Routing table.
+	L3 Routing table is defined as the table holding the
+	longest prefix match (LPM) entries."
+    ::= { l3Tables 4 }
+
+l3NextHopTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of L3 Next Hop table entries currently in use."
+    ::= { l3Tables 5 }
+
+l3NextHopTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the L3 Next Hop table.
+	The L3 Next Hop table holds information about the next hop(s)
+	associated with a routing table entry."
+    ::= { l3Tables 6 }
+
+l3EcmpGroupTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"Number of ECMP Group table entries currently in use."
+    ::= { l3Tables 7 }
+
+l3EcmpGroupTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the ECMP Group table.
+	The ECMP Group table holds information about "
+    ::= { l3Tables 8 }
+
+l3EcmpNextHopTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of ECMP Next Hop table entries currently in use."
+    ::= { l3Tables 9 }
+
+l3EcmpNextHopTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the ECMP Next Hop
+	table. ECMP Next Hop table stores information about the next
+	hop associated with a routing table entry that has multiple equal
+	cost next hop neighbors."
+    ::= { l3Tables 10 }
+
+ingressAclCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Ingress entries in the Network Access Control
+	List table."
+    ::= { l3Tables 11 }
+
+ingressAclMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Ingress entries in the Network Access Control
+	table."
+    ::= { l3Tables 12 }
+
+ingressAclCurrentCounters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Ingress counters in the Network Access Control
+	List table."
+    ::= { l3Tables 13 }
+
+ingressAclMaxCounters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Ingress counters in the Network Access Control
+	table."
+    ::= { l3Tables 14 }
+
+ingressAclCurrentMeters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Ingress meters in the Network Access Control
+	List table."
+    ::= { l3Tables 15 }
+
+ingressAclMaxMeters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Ingress meters in the Network Access Control
+	table."
+    ::= { l3Tables 16 }
+
+ingressAclCurrentSlices OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Ingress slices in the Network Access Control
+	List table."
+    ::= { l3Tables 17 }
+
+ingressAclMaxSlices OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Ingress slices in the Network Access Control
+	table."
+    ::= { l3Tables 18 }
+
+egressAclCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Egress entries in the Network Access Control
+	List table."
+    ::= { l3Tables 19 }
+
+egressAclMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Egress entries in the Network Access Control
+	table."
+    ::= { l3Tables 20 }
+
+egressAclCurrentCounters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Egress counters in the Network Access Control
+	List table."
+    ::= { l3Tables 21 }
+
+egressAclMaxCounters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Egress counters in the Network Access Control
+	table."
+    ::= { l3Tables 22 }
+
+egressAclCurrentMeters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Egress meters in the Network Access Control
+	List table."
+    ::= { l3Tables 23 }
+
+egressAclMaxMeters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Egress meters in the Network Access Control
+	table."
+    ::= { l3Tables 24 }
+
+egressAclCurrentSlices OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The current number of Egress slices in the Network Access Control
+	List table."
+    ::= { l3Tables 25 }
+
+egressAclMaxSlices OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible Egress slices in the Network Access Control
+	table."
+    ::= { l3Tables 26 }
+
+-- the l2 tables group
+
+l2Tables                  OBJECT IDENTIFIER ::= {resourceUtilization 2}
+
+l2MacTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of L2 Mac table entries currently in use."
+    ::= { l2Tables 1 }
+
+l2MacTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the L2 Mac table."
+    ::= { l2Tables 2 }
+
+l2CacheTableCurrentEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of Cache table currently entries in use"
+    ::= { l2Tables 3 }
+
+l2CacheTableMaxEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum possible entries in the Cache table. The Cache table
+	holds entries that are to be redirected to the CPU because they are
+	control packets, specifically L2 protocol control packets. Examples
+	are STP BPDUs, LLDP BPDUs etc."
+    ::= { l2Tables 4 }
+
+-- the buffer utilization group
+
+bufferUtilizn             OBJECT IDENTIFIER ::= {resourceUtilization 3}
+
+bufUtiliznComputeTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The time when the buffer utilization statistic was computed."
+    DEFVAL { "0" }
+    ::= { bufferUtilizn 1 }
+
+bufUtiliznPollInterval OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The periodicity at which the buffer utilization data
+	is pulled from the hardware. This is specified in milliseconds."
+    ::= { bufferUtilizn 2 }
+
+
+bufUtiliznMeasureInterval OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The time interval over which the buffer utilization
+	statistics is computed. This is specified in minutes."
+    ::= { bufferUtilizn 3 }
+
+bufUtiliznTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BufUtiliznEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table describes the ingress buffer utilization per service pool"
+    ::= { bufferUtilizn 4 }
+
+bufUtiliznEntry OBJECT-TYPE
+    SYNTAX      BufUtiliznEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	""
+    INDEX { bufServicePoolID }
+    ::= { bufUtiliznTable 1 }
+
+BufUtiliznEntry ::=
+	SEQUENCE {
+		bufServicePoolID	INTEGER,
+		bufMin			INTEGER,
+		bufMax			INTEGER,
+		bufAvg			DisplayString,
+		bufVariance		DisplayString,
+		bufStdDev		DisplayString
+	}
+
+	bufServicePoolID OBJECT-TYPE
+	    SYNTAX      INTEGER (1..8)
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The service pool number."
+	    ::= { bufUtiliznEntry 1 }
+
+	bufMin OBJECT-TYPE
+	    SYNTAX      INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The minimum number of cells used in this service pool."
+	    ::= { bufUtiliznEntry 2 }
+
+	bufMax OBJECT-TYPE
+	    SYNTAX      INTEGER
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The maximum number of cells used in this service pool"
+	    ::= { bufUtiliznEntry 3 }
+
+	bufAvg OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The average number of cells used in this service pool"
+	    ::= { bufUtiliznEntry 4 }
+
+	bufVariance OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The variance of the buffer pool utilization for this service pool
+		over the last measured interval."
+	    ::= { bufUtiliznEntry 5 }
+
+	bufStdDev OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+		"The Standard Deviation of the buffer pool utilization for this
+		service pool over the last measured interval."
+	    ::= { bufUtiliznEntry 6 }
+END
