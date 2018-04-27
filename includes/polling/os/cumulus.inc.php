@@ -20,8 +20,9 @@
  * @author     https://github.com/theherodied/
  */
 
-    $data = snmp_get_multi_oid($device, 'entPhysicalDescr.0 entPhysicalSoftwareRev.0 entPhysicalSerialNum.0 entPhysicalMfgName.0', '-OQUs', 'ENTITY-MIB');
-    $hardware = $data['entPhysicalDescr.0'];
-    $version = $data['entPhysicalSoftwareRev.0'];
-    $serial = $data['entPhysicalSerialNum.0'];
-
+    $data = snmp_get_multi_oid($device, 'entPhysicalDescr.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1', '-OQUs', 'ENTITY-MIB');
+    $hardware = $data['entPhysicalDescr.1'];
+    $serial = $data['entPhysicalSerialNum.1'];
+    $version2 = $data['entPhysicalSoftwareRev.1'];
+    $version = preg_replace('/^Cumulus Linux /', '', $version2);
+    $features = 'Cumulus Linux';
