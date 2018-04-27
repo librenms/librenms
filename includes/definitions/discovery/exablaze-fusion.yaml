@@ -49,6 +49,7 @@ modules:
                     descr: 'temp{{ $index }} ({{ $fusionTempSensorName }})'
                     index: 'fusionTempSensorValue.{{ $index }}'
         fanspeed:
+            data:
                 -
                     oid: fusionFanSensorTable
                     value: fusionFanSensorValue
