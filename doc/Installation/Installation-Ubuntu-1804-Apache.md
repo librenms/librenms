@@ -34,7 +34,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    nano /etc/mysql/mariadb.conf.d/50-server.cnf
 
 > NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
 
@@ -53,8 +53,8 @@ lower_case_table_names=0
 
 Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
-    vi /etc/php/7.2/apache2/php.ini
-    vi /etc/php/7.2/cli/php.ini
+    nano /etc/php/7.2/apache2/php.ini
+    nano /etc/php/7.2/cli/php.ini
 
     a2enmod php7.2
     a2dismod mpm_event
@@ -63,7 +63,7 @@ Ensure date.timezone is set in php.ini to your preferred time zone.  See http://
 
 ### Configure Apache
 
-    vi /etc/apache2/sites-available/librenms.conf
+    nano /etc/apache2/sites-available/librenms.conf
 
 Add the following config, edit `ServerName` as required:
 
@@ -91,7 +91,7 @@ Add the following config, edit `ServerName` as required:
 #### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-    vi /etc/snmp/snmpd.conf
+    nano /etc/snmp/snmpd.conf
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
