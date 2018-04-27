@@ -28,7 +28,7 @@ $tblComponents = array();
 // For Reference:
 //      https://github.com/librenms/librenms/blob/master/mibs/awplus/AT-NTP-MIB
 //      https://www.alliedtelesis.com/documents/network-time-protocol-ntp-feature-overview-and-configuration-guide
-$atNtpAssociationEntry = snmpwalk_array_num($device, 'atNtpAssociationEntry', 2);
+$atNtpAssociationEntry = snmpwalk_group($device, 'atNtpAssociationEntry', 'AT-NTP-MIB');
 
 /*
  * False == no object found - this is not an error, no objects exist
@@ -42,13 +42,13 @@ if (is_null($atNtpAssociationEntry)) {
     d_echo("Objects Found:\n");
 
     // Let's grab the index for each NTP peer
-    foreach ($atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][2] as $index => $value) {
+    foreach ($atNtpAssociationEntry as $index => $value) {
         $result = array();
         $result['UID'] = (string)$index;    // This is cast as a string so it can be compared with the database value.
-        $result['peer'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][2][$index];
+        $result['peer'] = $atNtpAssociationEntry[$index]['atNtpAssociationPeerAddr'];
         $result['port'] = '123'; // awplus only supports default NTP Port.
-        $result['stratum'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][6][$index];
-        $result['peerref'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][5][$index];
+        $result['stratum'] = $atNtpAssociationEntry[$index]['atNtpAssociationStratum'];
+        $result['peerref'] = $atNtpAssociationEntry[$index]['atNtpAssociationRefClkAddr'];
         $result['label'] = $result['peer'].":".$result['port'];
 
         // Set the status, 16 = Bad

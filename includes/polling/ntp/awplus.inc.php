@@ -28,7 +28,7 @@ $components = $components[$device['device_id']];
 // Only collect SNMP data if we have enabled components
 if (count($components > 0)) {
     // Let's gather the stats..
-    $atNtpAssociationEntry = snmpwalk_array_num($device, 'atNtpAssociationEntry', 2);
+    $atNtpAssociationEntry = snmpwalk_group($device, 'atNtpAssociationEntry', 'AT-NTP-MIB');
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {
@@ -42,7 +42,7 @@ if (count($components > 0)) {
             ->addDataset('delay', 'GAUGE', -1000)
             ->addDataset('dispersion', 'GAUGE', -1000);
 
-        $array['stratum'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][6][$array['UID']];
+        $array['stratum'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationStratum'];
         // Set the status, 16 = Bad
         if ($array['stratum'] == 16) {
             $array['status'] = 2;
@@ -54,13 +54,13 @@ if (count($components > 0)) {
 
         // Extract the statistics and update rrd
         $rrd['stratum'] = $array['stratum'];
-        $rrd['offset'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][10][$array['UID']];
+        $rrd['offset'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationOffset'];
         $rrd['offset'] = str_replace(' milliseconds', '', $rrd['offset']);
         $rrd['offset'] = $rrd['offset'] / 1000; // Convert to seconds
-        $rrd['delay'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][9][$array['UID']];
+        $rrd['delay'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDelay'];
         $rrd['delay'] =  str_replace(' milliseconds', '', $rrd['delay']);
         $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
-        $rrd['dispersion'] = $atNtpAssociationEntry['1.3.6.1.4.1.207.8.4.4.4.502.10.1'][11][$array['UID']];
+        $rrd['dispersion'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDisp'];
         $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
         data_update($device, 'ntp', $tags, $rrd);
 
@@ -68,10 +68,10 @@ if (count($components > 0)) {
         d_echo("\n\nComponent: ".$key."\n");
         d_echo("    Index:      ".$array['UID']."\n");
         d_echo("    Peer:       ".$array['peer'].":".$array['port']."\n");
-        d_echo("    Stratum:    1.3.6.1.4.1.207.8.4.4.4.502.10.1.6.".$array['UID']."  = ".$rrd['stratum']."\n");
-        d_echo("    Offset:     1.3.6.1.4.1.207.8.4.4.4.502.10.1.10.".$array['UID']." = ".$rrd['offset']."\n");
-        d_echo("    Delay:      1.3.6.1.4.1.207.8.4.4.4.502.10.1.9.".$array['UID']." = ".$rrd['delay']."\n");
-        d_echo("    Dispersion: 1.3.6.1.4.1.207.8.4.4.4.502.10.1.11.".$array['UID']." = ".$rrd['dispersion']."\n");
+        d_echo("    Stratum:    atNtpAssociationStratum.".$array['UID']."  = ".$rrd['stratum']."\n");
+        d_echo("    Offset:     atNtpAssociationOffset.".$array['UID']." = ".$rrd['offset']."\n");
+        d_echo("    Delay:      atNtpAssociationDelay.".$array['UID']." = ".$rrd['delay']."\n");
+        d_echo("    Dispersion: atNtpAssociationDisp.".$array['UID']." = ".$rrd['dispersion']."\n");
 
         // Clean-up after yourself!
         unset($filename, $rrd_filename, $rrd);
