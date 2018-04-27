@@ -832,6 +832,7 @@ Anything starting with a # is comment. The format for variables is $variable=$va
 #This is a comment
 cache=/var/cache/smart
 smartctl=/usr/bin/env smartctl
+useSN=1
 ada0
 ada1
 ```
@@ -840,6 +841,8 @@ The variables are as below.
 ```
 cache = The path to the cache file to use. Default: /var/cache/smart
 smartctl = The path to use for smartctl. Default: /usr/bin/env smartctl
+useSN = If set to 1, it will use the disks SN for reporting instead of the device name.
+        1 is the default. 0 will use the device name.
 ```
 
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
@@ -860,6 +863,10 @@ and modify your snmpd.conf file accordingly:
 ```
 extend smart /usr/bin/sudo /etc/snmp/smart
 ``` 
+
+If you set useSN to 1, it is worth noting that you will loose history(not able to access it from the web interface) for that device each time you change it. You will also need to run camcontrol or the like on said server to figure out what device actually corresponds with that serial number.
+
+Also if the system you are using uses non-static device naming based on bus information, it may be worthwhile just using the SN as the device ID is going to be irrelevant in that case.
 
 ### Squid
 
