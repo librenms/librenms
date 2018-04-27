@@ -30,6 +30,8 @@ pages:
       - Installing LibreNMS: Installation/index.md
       - Ubuntu VM Image: Installation/Ubuntu-image.md
       - CentOS VM Image: Installation/CentOS-image.md
+      - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
+      - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
       - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
       - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
