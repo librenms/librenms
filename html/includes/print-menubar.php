@@ -690,6 +690,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                </ul>
            </li>
            <li role="presentation" class="divider"></li>');
+    echo('<li><a href="snmptrapmanager"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> SNMP Trap Manager</a></li>');
+
+    echo ('
+           <li role="presentation" class="divider"></li>');
+
     echo('
            <li class="dropdown-submenu">
            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
